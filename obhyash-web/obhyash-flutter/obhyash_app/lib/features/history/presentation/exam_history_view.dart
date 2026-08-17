@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
-import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/domain/exam_models.dart';
@@ -75,69 +74,6 @@ class _ExamRecord {
   }
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-int _getSubjectSortPriority(String name, String id) {
-  final l = '$name $id'.toLowerCase();
-  int base = 100;
-
-  if (l.contains('bangla') || l.contains('বাংলা')) {
-    base = 10;
-  } else if (l.contains('english') || l.contains('ইংরেজি')) {
-    base = 20;
-  } else if (l.contains('ict') ||
-      l.contains('তথ্য') ||
-      l.contains('information')) {
-    base = 30;
-  } else if (l.contains('physics') || l.contains('পদার্থ')) {
-    base = 40;
-  } else if (l.contains('chemistry') ||
-      l.contains('রসায়ন') ||
-      l.contains('রসায়ন')) {
-    base = 50;
-  } else if (l.contains('math') || l.contains('গণিত')) {
-    base = 60;
-  } else if (l.contains('biology') ||
-      l.contains('botany') ||
-      l.contains('zoology') ||
-      l.contains('জীববিজ্ঞান')) {
-    base = 70;
-  } else if (l.contains('accounting') || l.contains('হিসাব')) {
-    base = 80;
-  } else if (l.contains('finance') ||
-      l.contains('ফিন্যান্স') ||
-      l.contains('ব্যাংকিং')) {
-    base = 82;
-  } else if (l.contains('management') ||
-      l.contains('ব্যবসায়') ||
-      l.contains('ব্যবস্থাপনা')) {
-    base = 84;
-  } else if (l.contains('marketing') || l.contains('বিপণন')) {
-    base = 86;
-  } else if (l.contains('economics') || l.contains('অর্থনীতি')) {
-    base = 88;
-  } else if (l.contains('statistics') || l.contains('পরিসংখ্যান')) {
-    base = 90;
-  } else if (l.contains('civics') || l.contains('পৌরনীতি')) {
-    base = 92;
-  } else if (l.contains('history') || l.contains('ইতিহাস')) {
-    base = 94;
-  }
-
-  // 1st paper comes before 2nd paper
-  if (l.contains('2nd') ||
-      l.contains('_2') ||
-      l.contains('২য়') ||
-      l.contains('২য়') ||
-      l.contains('zoology') ||
-      l.contains('প্রাণি')) {
-    return base + 1;
-  }
-  return base;
-}
-
-String _subjectDisplay(String key, [String? label]) {
-  return BanglaNameHelper.formatSubject(key, label);
-}
 
 String _formatDur(int secs) {
   final m = secs ~/ 60;
@@ -217,6 +153,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   Future<void> _fetchMetadata() async {
+    // 1. Immediately hydrate from local cache for instant offline responsiveness
+    final cachedSubjects = await LocalExamCacheService.getCachedSubjectList();
+    if (cachedSubjects != null && cachedSubjects.isNotEmpty && mounted) {
+      setState(() {
+        _subjectList = cachedSubjects;
+      });
+    }
+
     try {
       final profile = ref.read(userProfileProvider).value;
       final level = profile?.level?.trim() ?? profile?.stream?.trim();
@@ -310,11 +254,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         if (soA != null && soB != null && soA != soB) {
           return soA.compareTo(soB);
         }
-        final prioA = _getSubjectSortPriority(a.value, a.key);
-        final prioB = _getSubjectSortPriority(b.value, b.key);
+        final prioA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
+        final prioB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
         if (prioA != prioB) return prioA.compareTo(prioB);
         return a.value.compareTo(b.value);
       });
+
+      // Save to local cache for offline usage
+      await LocalExamCacheService.cacheSubjectList(entries);
 
       if (mounted) {
         setState(() {
@@ -327,16 +274,27 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   Future<void> _fetchBookmarks() async {
+    // Hydrate cached bookmarks first
+    final cachedBookmarks = await LocalExamCacheService.getCachedBookmarks();
+    if (cachedBookmarks.isNotEmpty && mounted) {
+      setState(() {
+        _bookmarkedIds = cachedBookmarks;
+      });
+    }
+
     try {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
       if (uid == null) return;
-      final data = await sb.from('bookmarks').select('question_id').eq('user_id', uid);
+      final data =
+          await sb.from('bookmarks').select('question_id').eq('user_id', uid);
       if (mounted) {
+        final ids = (data as List)
+            .map((e) => e['question_id'].toString())
+            .toSet();
+        await LocalExamCacheService.cacheBookmarks(ids);
         setState(() {
-          _bookmarkedIds = (data as List)
-              .map((e) => e['question_id'].toString())
-              .toSet();
+          _bookmarkedIds = ids;
         });
       }
     } catch (e) {
@@ -358,6 +316,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           _bookmarkedIds.add(questionId);
         }
       });
+      await LocalExamCacheService.cacheBookmarks(_bookmarkedIds);
 
       if (isBookmarked) {
         await sb
@@ -390,21 +349,31 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     }
     try {
       final sb = Supabase.instance.client;
+      final variants = BanglaNameHelper.getSubjectSearchVariants(subjectId, '');
       final chData = await sb
           .from('chapters')
-          .select('name')
-          .eq('subject_id', subjectId)
+          .select('id, name')
+          .inFilter('subject_id', variants)
           .limit(100);
 
-      final chSet = <String>{};
+      final Map<String, String> chMap = {};
       for (final c in (chData as List)) {
         final n = c['name']?.toString() ?? '';
-        if (n.isNotEmpty) chSet.add(n);
+        final id = c['id']?.toString() ?? '';
+        if (n.isNotEmpty) chMap[n] = id;
       }
+
+      final sortedList = chMap.keys.toList()
+        ..sort((a, b) {
+          final idxA = BanglaNameHelper.getChapterSortIndex(a, chMap[a] ?? '');
+          final idxB = BanglaNameHelper.getChapterSortIndex(b, chMap[b] ?? '');
+          if (idxA != idxB) return idxA.compareTo(idxB);
+          return a.compareTo(b);
+        });
 
       if (mounted) {
         setState(() {
-          _chapterList = chSet.toList()..sort();
+          _chapterList = sortedList;
           _filterChapter = '';
         });
       }
@@ -413,10 +382,47 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     }
   }
 
+  /// Silently prefetch and cache full exam results in background so every exam card opens offline
+  void _precacheRecentExams(List<_ExamRecord> records) {
+    Future.microtask(() async {
+      try {
+        final sb = Supabase.instance.client;
+        final toFetch = records.take(15).toList();
+        for (final r in toFetch) {
+          final isCached = await LocalExamCacheService.isExamCached(r.id);
+          if (!isCached) {
+            final row = await sb
+                .from('exam_results')
+                .select('*')
+                .eq('id', r.id)
+                .maybeSingle();
+            if (row != null) {
+              final result = ExamResult.fromJson(row);
+              await LocalExamCacheService.saveExamResult(result);
+            }
+          }
+        }
+      } catch (_) {}
+    });
+  }
+
   Future<void> _fetchExams({bool refresh = false}) async {
+    // 1. Stale-while-revalidate: Hydrate local cache immediately for instant render
+    if (refresh && _history.isEmpty) {
+      final cached = await LocalExamCacheService.getCachedHistoryList();
+      if (cached != null && cached.isNotEmpty && mounted) {
+        final cachedRecords =
+            cached.map((r) => _ExamRecord.fromJson(r)).toList();
+        setState(() {
+          _history = cachedRecords;
+          _isLoadingExams = false;
+        });
+      }
+    }
+
     if (refresh) {
       setState(() {
-        _isLoadingExams = true;
+        _isLoadingExams = _history.isEmpty;
         _hasErrorExams = false;
         _examOffset = 0;
         _hasMoreExams = true;
@@ -449,20 +455,37 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           )
           .eq('user_id', uid);
 
+      String filterBanglaSubject = '';
+      for (final s in _subjectList) {
+        if (s.key == _filterSubject) {
+          filterBanglaSubject = s.value;
+          break;
+        }
+      }
+
       if (_filterSubject.isNotEmpty) {
-        query = query.or('subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%');
+        if (filterBanglaSubject.isNotEmpty &&
+            filterBanglaSubject != _filterSubject) {
+          query = query.or(
+            'subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%,subject.eq.$filterBanglaSubject,subject.ilike.%$filterBanglaSubject%,subject_label.ilike.%$filterBanglaSubject%',
+          );
+        } else {
+          query = query.or(
+            'subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%',
+          );
+        }
       }
 
       if (_filterDate != null) {
-        final startUtc = DateTime(
+        final startUtc = DateTime.utc(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
           0,
           0,
           0,
-        ).toUtc().toIso8601String();
-        final endUtc = DateTime(
+        ).toIso8601String();
+        final endUtc = DateTime.utc(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
@@ -470,10 +493,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           59,
           59,
           999,
-        ).toUtc().toIso8601String();
-        query = query.or(
-          'and(created_at.gte.$startUtc,created_at.lte.$endUtc),and(date.gte.$startUtc,date.lte.$endUtc)',
-        );
+        ).toIso8601String();
+        query = query.gte('date', startUtc).lte('date', endUtc);
       }
 
       final data = await query
@@ -486,7 +507,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             .toList();
 
         // Cache history list for offline usage (on first page)
-        if (refresh) {
+        if (refresh && _filterSubject.isEmpty && _filterDate == null) {
           await LocalExamCacheService.cacheHistoryList(
             (data as List).map((e) => e as Map<String, dynamic>).toList(),
           );
@@ -497,14 +518,25 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           final seen = <String, String>{};
           for (final h in records) {
             if (!seen.containsKey(h.subject)) {
-              seen[h.subject] = h.subjectLabel.isNotEmpty
-                  ? h.subjectLabel
-                  : _subjectDisplay(h.subject);
+              seen[h.subject] = BanglaNameHelper.formatSubject(
+                h.subject,
+                h.subjectLabel,
+              );
             }
           }
-          _subjectList = seen.entries.toList()
-            ..sort((a, b) => a.value.compareTo(b.value));
+          final entries = seen.entries.toList()
+            ..sort((a, b) {
+              final pA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
+              final pB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
+              if (pA != pB) return pA.compareTo(pB);
+              return a.value.compareTo(b.value);
+            });
+          _subjectList = entries;
+          await LocalExamCacheService.cacheSubjectList(_subjectList);
         }
+
+        // Precache full exam results in background for offline viewing
+        _precacheRecentExams(records);
 
         setState(() {
           if (refresh) {
@@ -519,27 +551,44 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         });
       }
     } catch (e) {
-      debugPrint('[ExamHistoryView] _fetchExams error: $e');
-      if (refresh) {
-        final cached = await LocalExamCacheService.getCachedHistoryList();
-        if (cached != null && cached.isNotEmpty && mounted) {
-          final records = cached
-              .map((r) => _ExamRecord.fromJson(r))
-              .toList();
-          setState(() {
-            _history = records;
-            _isLoadingExams = false;
-            _hasErrorExams = false;
-            _hasMoreExams = false;
-          });
-          return;
+      debugPrint('[ExamHistoryView] _fetchExams error (offline fallback): $e');
+      final cached = await LocalExamCacheService.getCachedHistoryList();
+      if (cached != null && cached.isNotEmpty && mounted) {
+        final records = cached.map((r) => _ExamRecord.fromJson(r)).toList();
+
+        if (_subjectList.isEmpty) {
+          final seen = <String, String>{};
+          for (final h in records) {
+            if (!seen.containsKey(h.subject)) {
+              seen[h.subject] = BanglaNameHelper.formatSubject(
+                h.subject,
+                h.subjectLabel,
+              );
+            }
+          }
+          final entries = seen.entries.toList()
+            ..sort((a, b) {
+              final pA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
+              final pB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
+              if (pA != pB) return pA.compareTo(pB);
+              return a.value.compareTo(b.value);
+            });
+          _subjectList = entries;
         }
+
+        setState(() {
+          _history = records;
+          _isLoadingExams = false;
+          _hasErrorExams = false;
+          _hasMoreExams = false;
+        });
+        return;
       }
       if (mounted) {
         setState(() {
           if (refresh) {
             _isLoadingExams = false;
-            _hasErrorExams = true;
+            _hasErrorExams = _history.isEmpty;
           } else {
             _isLoadingMoreExams = false;
           }
@@ -549,9 +598,22 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   Future<void> _fetchQuestions({bool refresh = false}) async {
+    // 1. Stale-while-revalidate: Hydrate local cache immediately for Questions tab
+    if (refresh && _questions.isEmpty) {
+      final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
+      if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
+        final cachedQuestions =
+            cachedQ.map((q) => Question.fromJson(q)).toList();
+        setState(() {
+          _questions = cachedQuestions;
+          _isLoadingQuestions = false;
+        });
+      }
+    }
+
     if (refresh) {
       setState(() {
-        _isLoadingQuestions = true;
+        _isLoadingQuestions = _questions.isEmpty;
         _hasErrorQuestions = false;
         _qOffset = 0;
         _hasMoreQuestions = true;
@@ -563,6 +625,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       });
     }
 
+    String filterBanglaSubject = '';
+    for (final s in _subjectList) {
+      if (s.key == _filterSubject) {
+        filterBanglaSubject = s.value;
+        break;
+      }
+    }
+
     try {
       final sb = Supabase.instance.client;
       final currentOffset = refresh ? 0 : _qOffset;
@@ -570,23 +640,28 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       var query = sb.from('questions').select();
 
       if (_filterSubject.isNotEmpty) {
-        query = query.or('subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%');
+        final variants = BanglaNameHelper.getSubjectSearchVariants(
+          _filterSubject,
+          filterBanglaSubject,
+        );
+        query = query.inFilter('subject', variants);
       }
 
       if (_filterChapter.isNotEmpty) {
-        query = query.or('chapter.eq.$_filterChapter,chapter.ilike.%$_filterChapter%');
+        final chapterVariants = BanglaNameHelper.getChapterSearchVariants(_filterChapter);
+        query = query.inFilter('chapter', chapterVariants);
       }
 
       if (_filterDate != null) {
-        final startUtc = DateTime(
+        final startUtc = DateTime.utc(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
           0,
           0,
           0,
-        ).toUtc().toIso8601String();
-        final endUtc = DateTime(
+        ).toIso8601String();
+        final endUtc = DateTime.utc(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
@@ -594,7 +669,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           59,
           59,
           999,
-        ).toUtc().toIso8601String();
+        ).toIso8601String();
         query = query.gte('created_at', startUtc).lte('created_at', endUtc);
       }
 
@@ -602,9 +677,15 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           .order('created_at', ascending: false)
           .range(currentOffset, currentOffset + _qPageSize - 1);
 
-      final fetched = (data as List)
-          .map((q) => Question.fromJson(q as Map<String, dynamic>))
-          .toList();
+      final rawList = data as List;
+      final fetched =
+          rawList.map((q) => Question.fromJson(q as Map<String, dynamic>)).toList();
+
+      if (refresh && _filterSubject.isEmpty && _filterChapter.isEmpty) {
+        await LocalExamCacheService.cacheQuestionsList(
+          rawList.map((e) => e as Map<String, dynamic>).toList(),
+        );
+      }
 
       if (mounted) {
         setState(() {
@@ -620,12 +701,49 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         });
       }
     } catch (e) {
-      debugPrint('[ExamHistoryView] _fetchQuestions error: $e');
+      debugPrint('[ExamHistoryView] _fetchQuestions error (offline fallback): $e');
+      final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
+      if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
+        var cachedQuestions =
+            cachedQ.map((q) => Question.fromJson(q)).toList();
+
+        // Apply subject filter to cached fallback if set
+        if (_filterSubject.isNotEmpty) {
+          final subVariants = BanglaNameHelper.getSubjectSearchVariants(
+            _filterSubject,
+            filterBanglaSubject,
+          );
+          final lowerSub = subVariants.map((v) => v.toLowerCase().trim()).toSet();
+          cachedQuestions = cachedQuestions.where((q) {
+            final s = q.subject.toLowerCase().trim();
+            final sl = (q.subjectLabel ?? '').toLowerCase().trim();
+            return lowerSub.contains(s) || lowerSub.contains(sl);
+          }).toList();
+        }
+
+        // Apply chapter filter to cached fallback if set
+        if (_filterChapter.isNotEmpty) {
+          final chVariants = BanglaNameHelper.getChapterSearchVariants(_filterChapter);
+          final lowerCh = chVariants.map((v) => v.toLowerCase().trim()).toSet();
+          cachedQuestions = cachedQuestions.where((q) {
+            final c = q.chapter.toLowerCase().trim();
+            return lowerCh.contains(c) || lowerCh.any((v) => c.contains(v) || v.contains(c));
+          }).toList();
+        }
+
+        setState(() {
+          _questions = cachedQuestions;
+          _isLoadingQuestions = false;
+          _hasErrorQuestions = false;
+          _hasMoreQuestions = false;
+        });
+        return;
+      }
       if (mounted) {
         setState(() {
           if (refresh) {
             _isLoadingQuestions = false;
-            _hasErrorQuestions = true;
+            _hasErrorQuestions = _questions.isEmpty;
           } else {
             _isLoadingMoreQuestions = false;
           }
@@ -640,19 +758,57 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     setState(() {});
   }
 
+  bool _matchesSubject(String recordSubject, String recordSubjectLabel, String filterKey) {
+    if (filterKey.isEmpty) return true;
+
+    String filterDisplayName = '';
+    for (final s in _subjectList) {
+      if (s.key == filterKey) {
+        filterDisplayName = s.value;
+        break;
+      }
+    }
+
+    final variants = BanglaNameHelper.getSubjectSearchVariants(filterKey, filterDisplayName);
+    final lowerVariants = variants.map((v) => v.toLowerCase().trim()).toSet();
+
+    final rSub = recordSubject.toLowerCase().trim();
+    final rLabel = recordSubjectLabel.toLowerCase().trim();
+
+    if (lowerVariants.contains(rSub) || lowerVariants.contains(rLabel)) return true;
+    for (final v in lowerVariants) {
+      if (v.isNotEmpty && (rSub.contains(v) || v.contains(rSub) || rLabel.contains(v) || v.contains(rLabel))) {
+        return true;
+      }
+    }
+
+    final norm = BanglaNameHelper.formatSubject(recordSubject, recordSubjectLabel).toLowerCase();
+    if (lowerVariants.contains(norm)) return true;
+    for (final v in lowerVariants) {
+      if (v.isNotEmpty && (norm.contains(v) || v.contains(norm))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _matchesDate(DateTime recordDate, DateTime? filterDate) {
+    if (filterDate == null) return true;
+    final local = recordDate.toLocal();
+    return local.year == filterDate.year &&
+        local.month == filterDate.month &&
+        local.day == filterDate.day;
+  }
+
   List<_ExamRecord> get _filteredExams {
     return _history.where((h) {
       if (_filterSubject.isNotEmpty &&
-          h.subject.toLowerCase() != _filterSubject.toLowerCase()) {
+          !_matchesSubject(h.subject, h.subjectLabel, _filterSubject)) {
         return false;
       }
-      if (_filterDate != null) {
-        final d = h.createdAt;
-        if (d.year != _filterDate!.year ||
-            d.month != _filterDate!.month ||
-            d.day != _filterDate!.day) {
-          return false;
-        }
+      if (_filterDate != null && !_matchesDate(h.createdAt, _filterDate)) {
+        return false;
       }
       return true;
     }).toList();
@@ -1141,78 +1297,8 @@ class _ExamsTab extends StatelessWidget {
       color: const Color(0xFF10B981),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          // Sort Header Row
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              height: 34,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                borderRadius: BorderRadius.circular(9),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF2E2E2E)
-                      : const Color(0xFFE5E7EB),
-                ),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<_SortMode>(
-                  value: sortBy,
-                  isDense: true,
-                  icon: Icon(
-                    LucideIcons.chevronDown,
-                    size: 13,
-                    color: isDark
-                        ? const Color(0xFFA3A3A3)
-                        : const Color(0xFF6B7280),
-                  ),
-                  dropdownColor: isDark
-                      ? const Color(0xFF1E1E1E)
-                      : Colors.white,
-                  items: const [
-                    DropdownMenuItem(
-                      value: _SortMode.date,
-                      child: Text(
-                        'তারিখ অনুযায়ী',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: _SortMode.scoreDesc,
-                      child: Text(
-                        'স্কোর: বেশি আগে',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: _SortMode.scoreAsc,
-                      child: Text(
-                        'স্কোর: কম আগে',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) onSortChange(v);
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
           // ── Compact Center-Aligned 3-Card Stat Row ─────────────────────────────
           Row(
             children: [
@@ -1220,8 +1306,6 @@ class _ExamsTab extends StatelessWidget {
                 child: _buildStatCard(
                   title: 'মোট প্রশ্ন',
                   value: '$totalQuestions',
-                  icon: LucideIcons.layers,
-                  accentColor: const Color(0xFF059669),
                   isDark: isDark,
                 ),
               ),
@@ -1230,8 +1314,6 @@ class _ExamsTab extends StatelessWidget {
                 child: _buildStatCard(
                   title: 'সঠিক উত্তর',
                   value: '$totalCorrect',
-                  icon: LucideIcons.checkCircle2,
-                  accentColor: const Color(0xFF10B981),
                   isDark: isDark,
                 ),
               ),
@@ -1240,8 +1322,6 @@ class _ExamsTab extends StatelessWidget {
                 child: _buildStatCard(
                   title: 'গড় নম্বর',
                   value: '${avgScore.round()}%',
-                  icon: LucideIcons.target,
-                  accentColor: const Color(0xFF3B82F6),
                   isDark: isDark,
                 ),
               ),
@@ -1321,12 +1401,10 @@ class _ExamsTab extends StatelessWidget {
   Widget _buildStatCard({
     required String title,
     required String value,
-    required IconData icon,
-    required Color accentColor,
     required bool isDark,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -1346,37 +1424,27 @@ class _ExamsTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: isDark ? 0.15 : 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, size: 15, color: accentColor),
-          ),
-          const SizedBox(height: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w900,
               color: isDark ? Colors.white : const Color(0xFF0F172A),
               height: 1.1,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 4),
           Text(
             title,
             style: TextStyle(
-              fontSize: 11.5,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
               color: isDark
                   ? const Color(0xFFA1A1AA)
-                  : const Color(0xFF71717A),
+                  : const Color(0xFF64748B),
               fontFamily: 'HindSiliguri',
+              height: 1.1,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -1453,16 +1521,45 @@ class _ExamCardState extends State<_ExamCard> {
         return;
       }
     } catch (e) {
-      debugPrint('[ExamCard] Error fetching exam details: $e');
+      debugPrint('[ExamCard] Error fetching exam details (offline fallback): $e');
+      // Offline fallback: synthesize an ExamResult so user is never blocked from viewing their score
+      final fallbackResult = ExamResult(
+        id: widget.record.id,
+        subject: widget.record.subject,
+        subjectLabel: widget.record.subjectLabel,
+        totalQuestions: widget.record.totalQuestions,
+        correctCount: widget.record.correctCount,
+        wrongCount: widget.record.wrongCount,
+        score: widget.record.score,
+        totalMarks: widget.record.totalQuestions,
+        timeTaken: widget.record.timeTaken ?? 0,
+        date: widget.record.createdAt.toIso8601String(),
+        negativeMarking: 0.25,
+        questions: const [],
+        userAnswers: const {},
+        flaggedQuestions: const [],
+        submissionType: 'digital',
+        status: 'evaluated',
+        examType: widget.record.examType,
+      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (_) => ResultView(
+              result: fallbackResult,
+              isHistoryMode: true,
+              onRestart: () => Navigator.pop(context),
+            ),
+          ),
+        );
+        return;
+      }
     }
 
     if (mounted) {
       setState(() => _isLoading = false);
-      AppPopups.show(
-        context,
-        message: 'এই পরীক্ষার বিস্তারিত ডাটা লোড করা সম্ভব হয়নি। ইন্টারনেট সংযোগ চেক করুন।',
-        isError: true,
-      );
     }
   }
 
@@ -1472,9 +1569,7 @@ class _ExamCardState extends State<_ExamCard> {
     final isDark = widget.isDark;
     final color = _scoreColor(record.score);
     final dateStr = DateFormat('d MMM yyyy, h:mm a').format(record.createdAt);
-    final label = record.subjectLabel.isNotEmpty
-        ? record.subjectLabel
-        : _subjectDisplay(record.subject);
+    final label = BanglaNameHelper.formatSubject(record.subject, record.subjectLabel);
     final timeStr = record.timeTaken != null
         ? _formatDur(record.timeTaken!)
         : '--';
@@ -1505,10 +1600,10 @@ class _ExamCardState extends State<_ExamCard> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Score Ring
+                // Score Ring (48x48)
                 SizedBox(
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1552,9 +1647,10 @@ class _ExamCardState extends State<_ExamCard> {
                         label,
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 15,
+                          fontSize: 15.5,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF111827),
+                          height: 1.25,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1583,7 +1679,7 @@ class _ExamCardState extends State<_ExamCard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 7),
                       Row(
                         children: [
                           Container(

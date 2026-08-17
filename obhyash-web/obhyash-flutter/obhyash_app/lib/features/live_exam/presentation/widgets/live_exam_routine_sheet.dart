@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -262,14 +263,21 @@ class LiveExamRoutineSheet extends StatelessWidget {
     final fileName = 'Obhyash_${isHSC ? 'HSC' : 'SSC'}_Live_Exam_Routine.pdf';
 
     try {
-      await DownloadNotificationService().savePdfAndNotify(
+      final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: fileName,
         notificationTitle: 'লাইভ পরীক্ষার রুটিন ডাউনলোড সম্পন্ন হয়েছে ✅',
-        context: context,
+        context: context.mounted ? context : null,
       );
+
+      if (file != null) {
+        try {
+          await OpenFilex.open(file.path);
+        } catch (_) {}
+      } else {
+        await Printing.sharePdf(bytes: bytes, filename: fileName);
+      }
     } catch (_) {
-      // Fallback share if file system writing is restricted
       await Printing.sharePdf(bytes: bytes, filename: fileName);
     }
   }

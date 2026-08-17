@@ -441,7 +441,14 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         map[q.subject] = BanglaNameHelper.formatSubject(q.subject, q.subjectLabel);
       }
     }
-    return map.entries.toList();
+    final entries = map.entries.toList()
+      ..sort((a, b) {
+        final pA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
+        final pB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
+        if (pA != pB) return pA.compareTo(pB);
+        return a.value.compareTo(b.value);
+      });
+    return entries;
   }
 
   void _toggleSelectAll() {

@@ -38,7 +38,46 @@ String _cleanConditionText(String raw) {
 String _unwrapBengaliMathContent(String inner) {
   String clean = inner;
 
-  // 1. Process chemical arrows and equilibrium arrows first
+  // 0. Normalize any @@CHEM_ARROW tokens inside math first
+  clean = clean.replaceAllMapped(
+    RegExp(r'@@CHEM_ARROW\s*:\s*([^@]*)@@'),
+    (m) {
+      final raw = m.group(1) ?? '';
+      String above = '';
+      String below = '';
+      String dir = 'right';
+
+      if (raw.contains('||')) {
+        final parts = raw.split('||');
+        above = parts[0].trim();
+        dir = parts.length > 1 ? parts[1].trim() : 'right';
+      } else if (raw.contains('|')) {
+        final parts = raw.split('|');
+        if (parts.length >= 3) {
+          above = parts[0].trim();
+          below = parts[1].trim();
+          dir = parts[2].trim();
+        } else if (parts.length == 2) {
+          above = parts[0].trim();
+          final second = parts[1].trim();
+          if (second == 'right' || second == 'left' || second == 'bi') {
+            dir = second;
+          } else {
+            below = second;
+          }
+        } else {
+          above = parts[0].trim();
+        }
+      } else {
+        above = raw.trim();
+      }
+
+      if (dir.isEmpty) dir = 'right';
+      return ' $_kChemArrowPrefix$above|$below|$dir$_kChemArrowSuffix ';
+    },
+  );
+
+  // 1. Process chemical arrows and equilibrium arrows
   clean = clean.replaceAllMapped(
     RegExp(r'\\xrightleftharpoons(?:\[([^\]]*)\])?\{([^}]*)\}'),
     (m) {
@@ -114,7 +153,7 @@ String _unwrapBengaliMathContent(String inner) {
 
   clean = clean.replaceAllMapped(tokenRegex, (m) {
     final token = m.group(0)!;
-    if (token.startsWith(_kChemArrowPrefix)) return token;
+    if (token.contains('CHEM_ARROW') || token.contains('@')) return token;
     // Don't wrap if token contains Bengali
     if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
     return '\$$token\$';
@@ -184,6 +223,45 @@ String _preprocess(String text) {
 
   var processedText =
       text.replaceAll(r'\n', '\n').replaceAll(RegExp(r'\r\n|\r'), '\n');
+
+  // 0. Normalize any raw or spaced @@CHEM_ARROW tokens from database
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'@@CHEM_ARROW\s*:\s*([^@]*)@@'),
+    (m) {
+      final raw = m.group(1) ?? '';
+      String above = '';
+      String below = '';
+      String dir = 'right';
+
+      if (raw.contains('||')) {
+        final parts = raw.split('||');
+        above = parts[0].trim();
+        dir = parts.length > 1 ? parts[1].trim() : 'right';
+      } else if (raw.contains('|')) {
+        final parts = raw.split('|');
+        if (parts.length >= 3) {
+          above = parts[0].trim();
+          below = parts[1].trim();
+          dir = parts[2].trim();
+        } else if (parts.length == 2) {
+          above = parts[0].trim();
+          final second = parts[1].trim();
+          if (second == 'right' || second == 'left' || second == 'bi') {
+            dir = second;
+          } else {
+            below = second;
+          }
+        } else {
+          above = parts[0].trim();
+        }
+      } else {
+        above = raw.trim();
+      }
+
+      if (dir.isEmpty) dir = 'right';
+      return ' $_kChemArrowPrefix$above|$below|$dir$_kChemArrowSuffix ';
+    },
+  );
 
   // 1. Convert chemical reaction and equilibrium arrows into custom tokens
   processedText = processedText.replaceAllMapped(
@@ -270,6 +348,51 @@ String _preprocess(String text) {
     (m) => '\n\n${m.group(1)}',
   );
 
+  // 4b. Auto-detect un-escaped LaTeX in options / formulas (e.g. "1.6 \times 10^{-19} \text{ Kg}")
+  if (!processedText.contains(r'$')) {
+    final hasLatexMath = RegExp(
+      r'\\(?:times|frac|sqrt|pm|cdot|text|mathrm|textbf|textit|mu|alpha|beta|theta|pi|omega|lambda|sigma|rho|epsilon|eta|tau|phi|psi|gamma|Delta|degree|pu|ce|infty|approx|le|ge|neq|sim|propto|circ|rightarrow|leftarrow|rightleftharpoons|vec|sum|int|lim|sin|cos|tan|log|ln)\b|\^\{?[0-9\-\+a-zA-Z]+\}?|_\{?[0-9\-\+a-zA-Z]+\}?',
+    ).hasMatch(processedText);
+
+    if (hasLatexMath) {
+      // Check if there is Bengali outside of \text{...}
+      final stripped = processedText.replaceAll(
+        RegExp(r'\\(?:text|mathrm|textbf|textit)\{[^}]*\}'),
+        '',
+      );
+      final hasExternalBengali = RegExp(r'[\u0980-\u09FF]').hasMatch(stripped);
+
+      if (!hasExternalBengali) {
+        // Pure LaTeX formula option
+        processedText = '\$${processedText.trim()}\$';
+      } else {
+        // Mixed text: auto-wrap LaTeX math chunks
+        processedText = processedText.replaceAllMapped(
+          RegExp(
+            r'((?:[0-9a-zA-Z\.\+\-\=\/\(\)\<\>\,\s]|\\(?:times|frac|sqrt|pm|cdot|text|mathrm|textbf|textit|mu|alpha|beta|theta|pi|omega|lambda|sigma|rho|epsilon|eta|tau|phi|psi|gamma|Delta|degree|pu|ce|infty|approx|le|ge|neq|sim|propto|circ|rightarrow|leftarrow|rightleftharpoons|vec)\b(?:\{[^{}]*\}|\[[^\[\]]*\])*|\^\{?[0-9\-\+a-zA-Z]+\}?|_\{?[0-9\-\+a-zA-Z]+\}?)+)',
+          ),
+          (m) {
+            final chunk = m.group(0)!;
+            final trimmed = chunk.trim();
+            final isMath = RegExp(
+              r'\\[a-zA-Z]+|\^\{?[0-9\-\+a-zA-Z]+\}?|_\{?[0-9\-\+a-zA-Z]+\}?',
+            ).hasMatch(trimmed);
+            if (isMath && !trimmed.startsWith(r'$') && !trimmed.endsWith(r'$')) {
+              final innerBengali = trimmed.replaceAll(
+                RegExp(r'\\(?:text|mathrm|textbf|textit)\{[^}]*\}'),
+                '',
+              );
+              if (!RegExp(r'[\u0980-\u09FF]').hasMatch(innerBengali)) {
+                return ' \$$trimmed\$ ';
+              }
+            }
+            return chunk;
+          },
+        );
+      }
+    }
+  }
+
   // 5. Split into math blocks ($$...$$ or $...$) and non-math segments
   final mathPattern = RegExp(r'(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)');
   final parts = <String>[];
@@ -312,12 +435,12 @@ String _preprocess(String text) {
     // Non-Math Text Segment
     String t = part;
 
-    // Check for un-delimited chemical formula sequences like C_{12}H_{22}O_{11}+H_2O, Fe^{3+}, SO_4^{2-}
+    // Check for un-delimited chemical formula sequences like C_6H_12O_6, C_{12}H_{22}O_{11}, H_2O, CO_2, Fe^{3+}, SO_4^{2-}
     t = t.replaceAllMapped(
-      RegExp(r'\b([A-Z][a-z]?(?:_\{?\d+\}?|\^\{?[\d\+\-a-zA-Z]+\}?)+[\w\+\-\(\)\_\^\{\}\s=]*)\b'),
+      RegExp(r'\b([A-Z][a-z]?(?:_\d+|_\{\d+\}|\^[-+0-9a-zA-Z]+|\^\{[-+0-9a-zA-Z]+\})(?:[A-Z][a-z]?(?:_\d+|_\{\d+\}|\^[-+0-9a-zA-Z]+|\^\{[-+0-9a-zA-Z]+\})|\d+)*)\b'),
       (m) {
         final formula = m.group(0)!.trim();
-        if (formula.contains(_kChemArrowPrefix)) return formula;
+        if (formula.contains('CHEM_ARROW') || formula.contains('@')) return formula;
         if (RegExp(r'[\u0980-\u09FF]').hasMatch(formula)) return formula;
         return '\$$formula\$';
       },
@@ -384,14 +507,42 @@ class _DisplayMathSyntax extends md.InlineSyntax {
 
 class _ChemArrowSyntax extends md.InlineSyntax {
   _ChemArrowSyntax()
-      : super(r'@@CHEM_ARROW:([^|]*)\|([^|]*)\|([^@]*)@@',
+      : super(r'@@CHEM_ARROW\s*:\s*([^@]*)@@',
             caseSensitive: true);
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
-    final above = match.group(1) ?? '';
-    final below = match.group(2) ?? '';
-    final dir = match.group(3) ?? 'right';
+    final raw = match.group(1) ?? '';
+    String above = '';
+    String below = '';
+    String dir = 'right';
+
+    if (raw.contains('||')) {
+      final parts = raw.split('||');
+      above = parts[0].trim();
+      dir = parts.length > 1 ? parts[1].trim() : 'right';
+    } else if (raw.contains('|')) {
+      final parts = raw.split('|');
+      if (parts.length >= 3) {
+        above = parts[0].trim();
+        below = parts[1].trim();
+        dir = parts[2].trim();
+      } else if (parts.length == 2) {
+        above = parts[0].trim();
+        final second = parts[1].trim();
+        if (second == 'right' || second == 'left' || second == 'bi') {
+          dir = second;
+        } else {
+          below = second;
+        }
+      } else {
+        above = parts[0].trim();
+      }
+    } else {
+      above = raw.trim();
+    }
+
+    if (dir.isEmpty) dir = 'right';
     parser.addNode(_ChemArrowElement(above, below, dir));
     return true;
   }
@@ -680,6 +831,7 @@ class LatexText extends StatelessWidget {
         text.contains('_') ||
         text.contains('#') ||
         text.contains('`') ||
+        text.contains('@') ||
         text.contains('\n') ||
         text.contains(r'\') ||
         text.contains('|') ||

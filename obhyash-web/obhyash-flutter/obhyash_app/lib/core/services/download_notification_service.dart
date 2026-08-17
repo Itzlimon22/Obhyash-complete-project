@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:printing/printing.dart';
 
 class DownloadNotificationService {
   static final DownloadNotificationService _instance =
@@ -89,34 +91,55 @@ class DownloadNotificationService {
     return true;
   }
 
-  /// Resolve the best public download directory on the device
-  Future<Directory> _getBestDownloadDirectory() async {
-    if (Platform.isAndroid) {
-      // 1. First choice: Public Android Download directory
-      final publicDownloadDir = Directory('/storage/emulated/0/Download');
-      if (await publicDownloadDir.exists()) {
-        return publicDownloadDir;
-      }
+  /// Writes bytes to the most appropriate and guaranteed writable storage directory
+  Future<File> _writeBytesSafely(List<int> bytes, String fileName) async {
+    final List<Directory> candidates = [];
 
-      // 2. Second choice: path_provider getDownloadsDirectory
+    // 1. App Documents directory (standard iOS/Android application documents - guaranteed 100% accessible)
+    try {
+      candidates.add(await getApplicationDocumentsDirectory());
+    } catch (_) {}
+
+    if (Platform.isAndroid) {
+      // 2. App-specific external download directory (Guaranteed read/write without special permissions)
       try {
-        final dir = await getDownloadsDirectory();
-        if (dir != null && await dir.exists()) {
-          return dir;
+        final extDownloads = await getExternalStorageDirectories(
+          type: StorageDirectory.downloads,
+        );
+        if (extDownloads != null && extDownloads.isNotEmpty) {
+          candidates.addAll(extDownloads);
         }
       } catch (_) {}
 
-      // 3. Third choice: getExternalStorageDirectory
+      // 3. App-specific external files directory
       try {
         final extDir = await getExternalStorageDirectory();
-        if (extDir != null) {
-          return extDir;
-        }
+        if (extDir != null) candidates.add(extDir);
       } catch (_) {}
     }
 
-    // Default for iOS / Desktop / Fallback
-    return await getApplicationDocumentsDirectory();
+    // 4. Temporary directory fallback
+    try {
+      candidates.add(await getTemporaryDirectory());
+    } catch (_) {}
+
+    for (final dir in candidates) {
+      try {
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+        }
+        final testFile = File('${dir.path}/$fileName');
+        await testFile.writeAsBytes(bytes, flush: true);
+        if (await testFile.exists() && await testFile.length() > 0) {
+          debugPrint('[DownloadNotificationService] Successfully saved PDF at: ${testFile.path}');
+          return testFile;
+        }
+      } catch (e) {
+        debugPrint('[DownloadNotificationService] Failed to write to ${dir.path}: $e');
+      }
+    }
+
+    throw Exception('ডিভাইসে ফাইল সংরক্ষণের জন্য উপযুক্ত মেমোরি পাওয়া যায়নি');
   }
 
   /// Sanitize filename to avoid illegal characters in filesystem
@@ -133,44 +156,48 @@ class DownloadNotificationService {
     required String notificationTitle,
     BuildContext? context,
   }) async {
+    final sanitizedName = _sanitizeFileName(rawFileName);
+    final finalFileName =
+        sanitizedName.endsWith('.pdf') ? sanitizedName : '$sanitizedName.pdf';
+
     try {
       await init();
-      await requestNotificationPermission();
+      try {
+        await requestNotificationPermission();
+      } catch (_) {}
 
-      final downloadDir = await _getBestDownloadDirectory();
-      final sanitizedName = _sanitizeFileName(rawFileName);
-      final finalFileName =
-          sanitizedName.endsWith('.pdf') ? sanitizedName : '$sanitizedName.pdf';
-
-      final file = File('${downloadDir.path}/$finalFileName');
-      await file.writeAsBytes(bytes, flush: true);
+      final file = await _writeBytesSafely(bytes, finalFileName);
 
       final notifId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      // Show System Notification
-      final androidDetails = AndroidNotificationDetails(
-        _channelId,
-        _channelName,
-        channelDescription: _channelDesc,
-        importance: Importance.high,
-        priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
-        ticker: 'PDF ডাউনলোড সম্পন্ন হয়েছে',
-      );
-      const iosDetails = DarwinNotificationDetails();
+      // Show System Notification (Safely wrapped)
+      try {
+        final androidDetails = AndroidNotificationDetails(
+          _channelId,
+          _channelName,
+          channelDescription: _channelDesc,
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          ticker: 'PDF ডাউনলোড সম্পন্ন হয়েছে',
+        );
+        const iosDetails = DarwinNotificationDetails();
 
-      final notifDetails = NotificationDetails(
-        android: androidDetails,
-        iOS: iosDetails,
-      );
+        final notifDetails = NotificationDetails(
+          android: androidDetails,
+          iOS: iosDetails,
+        );
 
-      await _notificationsPlugin.show(
-        id: notifId,
-        title: notificationTitle,
-        body: '$finalFileName\nট্যাপ করে ফাইলটি ওপেন করুন',
-        notificationDetails: notifDetails,
-        payload: file.path,
-      );
+        await _notificationsPlugin.show(
+          id: notifId,
+          title: notificationTitle,
+          body: '$finalFileName\nট্যাপ করে ফাইলটি ওপেন করুন',
+          notificationDetails: notifDetails,
+          payload: file.path,
+        );
+      } catch (notifErr) {
+        debugPrint('[DownloadNotificationService] Notification error: $notifErr');
+      }
 
       // In-App Toast/SnackBar Feedback with Open Button
       if (context != null && context.mounted) {
@@ -233,15 +260,22 @@ class DownloadNotificationService {
 
       return file;
     } catch (e) {
-      debugPrint('[DownloadNotificationService] Error saving file: $e');
-      if (context != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: const Color(0xFFDC2626),
-            content: Text('ফাইল সেভ করতে সমস্যা হয়েছে: $e'),
-            behavior: SnackBarBehavior.floating,
-          ),
+      debugPrint('[DownloadNotificationService] Error saving file directly: $e. Falling back to sharePdf...');
+      try {
+        await Printing.sharePdf(
+          bytes: bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
+          filename: finalFileName,
         );
+      } catch (shareErr) {
+        if (context != null && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: const Color(0xFFDC2626),
+              content: Text('ফাইল সেভ করতে সমস্যা হয়েছে: $shareErr'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
       return null;
     }

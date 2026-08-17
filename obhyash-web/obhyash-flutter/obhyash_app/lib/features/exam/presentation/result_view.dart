@@ -41,7 +41,10 @@ class _ResultViewState extends State<ResultView> {
       duration: const Duration(seconds: 3),
     );
 
-    _confettiController.play();
+    // Only celebrate with confetti once right after direct exam completion
+    if (!widget.isHistoryMode) {
+      _confettiController.play();
+    }
     _fetchBookmarks();
   }
 
@@ -461,22 +464,24 @@ class _ResultViewState extends State<ResultView> {
           ),
         ],
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.topCenter,
-        child: ConfettiWidget(
-          confettiController: _confettiController,
-          blastDirectionality: BlastDirectionality.explosive,
-          shouldLoop: false,
-          colors: const [
-            Colors.green,
-            Colors.blue,
-            Colors.pink,
-            Colors.orange,
-            Colors.purple,
-          ],
-          createParticlePath: drawStar,
-        ),
-      ),
+      floatingActionButton: widget.isHistoryMode
+          ? null
+          : Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple,
+                ],
+                createParticlePath: drawStar,
+              ),
+            ),
     );
   }
 

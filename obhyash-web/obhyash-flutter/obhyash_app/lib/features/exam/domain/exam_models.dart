@@ -56,16 +56,32 @@ class Question {
     }
     List<String> validInstitutes = [];
     if (j['institutes'] is List) {
-      validInstitutes = (j['institutes'] as List).map((e) => e.toString()).toList();
-    } else if (j['institute'] != null && j['institute'].toString().isNotEmpty) {
-      validInstitutes = [j['institute'].toString()];
+      validInstitutes = (j['institutes'] as List)
+          .map((e) => e.toString().trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    } else if (j['institute'] != null && j['institute'].toString().trim().isNotEmpty) {
+      validInstitutes = [j['institute'].toString().trim()];
+    } else if (j['institution'] != null && j['institution'].toString().trim().isNotEmpty) {
+      validInstitutes = [j['institution'].toString().trim()];
+    } else if (j['board'] != null && j['board'].toString().trim().isNotEmpty) {
+      validInstitutes = [j['board'].toString().trim()];
     }
     
     List<int> validYears = [];
     if (j['years'] is List) {
-      validYears = (j['years'] as List).map((e) => (e as num).toInt()).toList();
-    } else if (j['year'] != null && j['year'].toString().isNotEmpty) {
-      final y = int.tryParse(j['year'].toString());
+      for (final e in j['years'] as List) {
+        if (e is num) {
+          validYears.add(e.toInt());
+        } else if (e != null) {
+          final digits = e.toString().replaceAll(RegExp(r'[^0-9]'), '');
+          final parsed = int.tryParse(digits);
+          if (parsed != null) validYears.add(parsed);
+        }
+      }
+    } else if (j['year'] != null && j['year'].toString().trim().isNotEmpty) {
+      final digits = j['year'].toString().replaceAll(RegExp(r'[^0-9]'), '');
+      final y = int.tryParse(digits);
       if (y != null) validYears = [y];
     }
     return Question(

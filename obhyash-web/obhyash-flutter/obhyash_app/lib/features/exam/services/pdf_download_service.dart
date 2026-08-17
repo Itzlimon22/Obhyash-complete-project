@@ -5,6 +5,8 @@ import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../domain/exam_models.dart';
 
+import 'package:open_filex/open_filex.dart';
+
 class PdfDownloadService {
   /// Directly exports/downloads the question paper as a PDF file
   static Future<void> downloadQuestionPaper(
@@ -21,14 +23,22 @@ class PdfDownloadService {
         html: htmlContent,
       );
 
-      await DownloadNotificationService().savePdfAndNotify(
+      final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: pdfBytes,
         rawFileName: filename,
         notificationTitle: 'প্রশ্নপত্র PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
-        context: context,
+        context: context.mounted ? context : null,
       );
+
+      if (file != null) {
+        try {
+          await OpenFilex.open(file.path);
+        } catch (_) {}
+      } else {
+        await Printing.sharePdf(bytes: pdfBytes, filename: '$filename.pdf');
+      }
     } catch (e) {
-      debugPrint('[PdfDownloadService] downloadQuestionPaper failed: $e. Falling back to layoutPdf...');
+      debugPrint('[PdfDownloadService] downloadQuestionPaper direct save failed: $e. Falling back to layoutPdf...');
       try {
         await Printing.layoutPdf(
           name: '$filename.pdf',
@@ -68,14 +78,22 @@ class PdfDownloadService {
         html: htmlContent,
       );
 
-      await DownloadNotificationService().savePdfAndNotify(
+      final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: pdfBytes,
         rawFileName: filename,
         notificationTitle: 'ফলাফল ও ব্যাখ্যা PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
-        context: context,
+        context: context.mounted ? context : null,
       );
+
+      if (file != null) {
+        try {
+          await OpenFilex.open(file.path);
+        } catch (_) {}
+      } else {
+        await Printing.sharePdf(bytes: pdfBytes, filename: '$filename.pdf');
+      }
     } catch (e) {
-      debugPrint('[PdfDownloadService] downloadResultWithExplanations failed: $e. Falling back to layoutPdf...');
+      debugPrint('[PdfDownloadService] downloadResultWithExplanations direct save failed: $e. Falling back to layoutPdf...');
       try {
         await Printing.layoutPdf(
           name: '$filename.pdf',

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supa;
+import '../../../core/utils/bangla_name_helper.dart';
 import 'models.dart';
 
 class DashboardRepository {
@@ -75,11 +76,14 @@ class DashboardRepository {
         return true;
       }).toList();
 
-      // Sort by sortOrder from DB if available
+      // Sort by sortOrder from DB if available, fallback to canonical academic priority
       filtered.sort((a, b) {
         if (a.sortOrder != null && b.sortOrder != null && a.sortOrder != b.sortOrder) {
           return a.sortOrder!.compareTo(b.sortOrder!);
         }
+        final prioA = BanglaNameHelper.getSubjectSortPriority(a.name, a.id);
+        final prioB = BanglaNameHelper.getSubjectSortPriority(b.name, b.id);
+        if (prioA != prioB) return prioA.compareTo(prioB);
         return a.name.compareTo(b.name);
       });
 

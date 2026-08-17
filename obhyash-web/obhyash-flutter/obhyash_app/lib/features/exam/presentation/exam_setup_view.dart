@@ -48,65 +48,6 @@ class TopicItem {
   });
 }
 
-// --- Subject Serial Comparator ---
-int _getSubjectSortPriority(String name, String id) {
-  final l = '$name $id'.toLowerCase();
-  int base = 100;
-
-  if (l.contains('bangla') || l.contains('বাংলা')) {
-    base = 10;
-  } else if (l.contains('english') || l.contains('ইংরেজি')) {
-    base = 20;
-  } else if (l.contains('ict') ||
-      l.contains('তথ্য') ||
-      l.contains('information')) {
-    base = 30;
-  } else if (l.contains('physics') || l.contains('পদার্থ')) {
-    base = 40;
-  } else if (l.contains('chemistry') ||
-      l.contains('রসায়ন') ||
-      l.contains('রসায়ন')) {
-    base = 50;
-  } else if (l.contains('math') || l.contains('গণিত')) {
-    base = 60;
-  } else if (l.contains('biology') ||
-      l.contains('botany') ||
-      l.contains('zoology') ||
-      l.contains('জীববিজ্ঞান')) {
-    base = 70;
-  } else if (l.contains('accounting') || l.contains('হিসাব')) {
-    base = 80;
-  } else if (l.contains('finance') ||
-      l.contains('ফিন্যান্স') ||
-      l.contains('ব্যাংকিং')) {
-    base = 82;
-  } else if (l.contains('management') ||
-      l.contains('ব্যবসায়') ||
-      l.contains('ব্যবস্থাপনা')) {
-    base = 84;
-  } else if (l.contains('marketing') || l.contains('বিপণন')) {
-    base = 86;
-  } else if (l.contains('economics') || l.contains('অর্থনীতি')) {
-    base = 88;
-  } else if (l.contains('statistics') || l.contains('পরিসংখ্যান')) {
-    base = 90;
-  } else if (l.contains('civics') || l.contains('পৌরনীতি')) {
-    base = 92;
-  } else if (l.contains('history') || l.contains('ইতিহাস')) {
-    base = 94;
-  }
-
-  // 1st paper comes before 2nd paper
-  if (l.contains('2nd') ||
-      l.contains('_2') ||
-      l.contains('২য়') ||
-      l.contains('২য়') ||
-      l.contains('zoology') ||
-      l.contains('প্রাণি')) {
-    return base + 1;
-  }
-  return base;
-}
 
 // --- View ---
 class ExamSetupView extends ConsumerStatefulWidget {
@@ -252,8 +193,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             a.sortOrder != b.sortOrder) {
           return a.sortOrder!.compareTo(b.sortOrder!);
         }
-        final priorityA = _getSubjectSortPriority(a.name, a.id);
-        final priorityB = _getSubjectSortPriority(b.name, b.id);
+        final priorityA = BanglaNameHelper.getSubjectSortPriority(a.name, a.id);
+        final priorityB = BanglaNameHelper.getSubjectSortPriority(b.name, b.id);
         if (priorityA != priorityB) {
           return priorityA.compareTo(priorityB);
         }
@@ -1727,7 +1668,7 @@ class _MultiSelectDropdownModal extends StatefulWidget {
 
   const _MultiSelectDropdownModal({
     required this.title,
-    required this.searchHint,
+    this.searchHint = '',
     required this.items,
     required this.selectedIds,
     required this.onSave,
@@ -1741,8 +1682,6 @@ class _MultiSelectDropdownModal extends StatefulWidget {
 }
 
 class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
-  String _searchQuery = '';
-  final _searchController = TextEditingController();
   late Set<String> _currentSelected;
 
   @override
@@ -1751,13 +1690,8 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
     _currentSelected = Set.from(widget.selectedIds);
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   void _toggleSelection(String id) {
+    HapticFeedback.selectionClick();
     setState(() {
       if (_currentSelected.contains(id)) {
         _currentSelected.remove(id);
@@ -1767,8 +1701,9 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
     });
   }
 
-  void _toggleSelectAll(List<dynamic> currentList) {
-    final allIds = currentList.map((e) => widget.getId(e)).toSet();
+  void _toggleSelectAll() {
+    HapticFeedback.selectionClick();
+    final allIds = widget.items.map((e) => widget.getId(e)).toSet();
     final allSelected = allIds.every((id) => _currentSelected.contains(id));
 
     setState(() {
@@ -1783,29 +1718,27 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final allIds = widget.items.map((e) => widget.getId(e)).toSet();
+    final isAllSelected =
+        allIds.isNotEmpty && allIds.every((id) => _currentSelected.contains(id));
 
-    final filteredItems = widget.items.where((item) {
-      final name = widget.getName(item);
-      return name.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
-
-    final maxHeight = MediaQuery.of(context).size.height * 0.5;
+    final maxHeight = MediaQuery.of(context).size.height * 0.78;
 
     return Material(
       color: Colors.transparent,
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
+          color: isDark ? const Color(0xFF141417) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
-            // Drag Handle
+            // Compact Drag Handle
             Center(
               child: Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40,
+                margin: const EdgeInsets.only(top: 10, bottom: 6),
+                width: 36,
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark
@@ -1816,24 +1749,98 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
               ),
             ),
 
-            // Header
+            // Compact Header with Title, Select All Pill & Close Button
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 12, 12),
+              padding: const EdgeInsets.fromLTRB(16, 4, 10, 10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
+
+                  // Select All Compact Button
+                  InkWell(
+                    onTap: _toggleSelectAll,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isAllSelected
+                            ? (isDark
+                                ? const Color(0xFF064E3B)
+                                : const Color(0xFFECFDF5))
+                            : (isDark
+                                ? const Color(0xFF1F1F24)
+                                : const Color(0xFFF1F5F9)),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isAllSelected
+                              ? (isDark
+                                  ? const Color(0xFF059669)
+                                  : const Color(0xFFA7F3D0))
+                              : (isDark
+                                  ? const Color(0xFF2E2E33)
+                                  : const Color(0xFFE2E8F0)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isAllSelected
+                                ? LucideIcons.checkCheck
+                                : LucideIcons.check,
+                            size: 13,
+                            color: isAllSelected
+                                ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF047857))
+                                : (isDark
+                                    ? const Color(0xFFA1A1AA)
+                                    : const Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'HindSiliguri',
+                              color: isAllSelected
+                                  ? (isDark
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF047857))
+                                  : (isDark
+                                      ? const Color(0xFFE4E4E7)
+                                      : const Color(0xFF334155)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(LucideIcons.x, size: 20),
+                    visualDensity: VisualDensity.compact,
                     color: isDark
                         ? const Color(0xFFA1A1AA)
                         : const Color(0xFF64748B),
@@ -1842,123 +1849,35 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
               ),
             ),
 
-            const Divider(height: 1, thickness: 0.8),
-
-            // Search & Select All
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF18181B)
-                            : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF27272A)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (v) => setState(() => _searchQuery = v),
-                        style: TextStyle(
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'খুঁজুন...',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? const Color(0xFF71717A)
-                                : const Color(0xFF94A3B8),
-                            fontSize: 14,
-                          ),
-                          prefixIcon: Icon(
-                            LucideIcons.search,
-                            size: 16,
-                            color: isDark
-                                ? const Color(0xFFA1A1AA)
-                                : const Color(0xFF64748B),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  InkWell(
-                    onTap: () => _toggleSelectAll(filteredItems),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF18181B)
-                            : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF27272A)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: Text(
-                        'সবগুলো',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFF1F5F9),
             ),
 
-            const SizedBox(height: 8),
-
-            // List
+            // Content List (Expanded with Maximum Space)
             Expanded(
-              child: filteredItems.isEmpty
+              child: widget.items.isEmpty
                   ? Center(
                       child: Text(
-                        'কোনো তথ্য পাওয়া যায়নি',
+                        'কোনো অধ্যায় পাওয়া যায়নি',
                         style: TextStyle(
                           color: isDark
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
-                          fontSize: 16,
+                          fontSize: 15,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),
                     )
                   : ListView.builder(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      itemCount: filteredItems.length,
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      itemCount: widget.items.length,
                       itemBuilder: (context, index) {
-                        final item = filteredItems[index];
+                        final item = widget.items[index];
                         final id = widget.getId(item);
                         final name = widget.getName(item);
                         final isSelected = _currentSelected.contains(id);
@@ -1969,48 +1888,49 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                             onTap: () => _toggleSelection(id),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 11,
+                              ),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? (isDark
-                                          ? const Color(0xFF003D2C)
-                                          : const Color(0xFF004633))
+                                        ? const Color(0xFF003D2C)
+                                        : const Color(0xFF004633))
                                     : (isDark
-                                          ? const Color(0xFF141416)
-                                          : Colors.transparent),
+                                        ? const Color(0xFF18181B)
+                                        : Colors.transparent),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isSelected
                                       ? (isDark
-                                            ? const Color(
-                                                0xFF059669,
-                                              ).withValues(alpha: 0.5)
-                                            : const Color(0xFF004633))
+                                          ? const Color(0xFF059669)
+                                          : const Color(0xFF004633))
                                       : (isDark
-                                            ? const Color(0xFF27272A)
-                                            : const Color(0xFFE2E8F0)),
+                                          ? const Color(0xFF27272A)
+                                          : const Color(0xFFE2E8F0)),
                                   width: isSelected ? 1.4 : 1.0,
                                 ),
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 24,
-                                    height: 24,
+                                    width: 22,
+                                    height: 22,
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? (isDark
-                                                ? const Color(0xFF10B981)
-                                                : Colors.white)
+                                              ? const Color(0xFF10B981)
+                                              : Colors.white)
                                           : Colors.transparent,
                                       border: Border.all(
                                         color: isSelected
                                             ? (isDark
-                                                  ? const Color(0xFF10B981)
-                                                  : Colors.white)
+                                                ? const Color(0xFF10B981)
+                                                : Colors.white)
                                             : (isDark
-                                                  ? const Color(0xFF52525B)
-                                                  : const Color(0xFFCBD5E1)),
+                                                ? const Color(0xFF52525B)
+                                                : const Color(0xFFCBD5E1)),
                                         width: 1.8,
                                       ),
                                       borderRadius: BorderRadius.circular(6),
@@ -2018,7 +1938,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                     child: isSelected
                                         ? Icon(
                                             LucideIcons.check,
-                                            size: 14,
+                                            size: 13,
                                             color: isDark
                                                 ? Colors.black
                                                 : const Color(0xFF004633),
@@ -2030,18 +1950,18 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                     child: LatexText(
                                       text: name,
                                       style: TextStyle(
-                                        fontSize: 15.5,
+                                        fontSize: 15,
                                         fontFamily: 'HindSiliguri',
                                         fontWeight: isSelected
                                             ? FontWeight.bold
                                             : FontWeight.w600,
                                         color: isSelected
                                             ? (isDark
-                                                  ? const Color(0xFFE6FFFA)
-                                                  : Colors.white)
+                                                ? const Color(0xFFE6FFFA)
+                                                : Colors.white)
                                             : (isDark
-                                                  ? const Color(0xFFD4D4D8)
-                                                  : const Color(0xFF334155)),
+                                                ? const Color(0xFFD4D4D8)
+                                                : const Color(0xFF334155)),
                                       ),
                                     ),
                                   ),
@@ -2054,11 +1974,11 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     ),
             ),
 
-            // Footer Save Button - Deep Green Theme Button
+            // Footer Save Button
             SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -2069,7 +1989,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFB45309),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -2078,7 +1998,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     child: Text(
                       'সংরক্ষণ করো (${_currentSelected.length})',
                       style: const TextStyle(
-                        fontSize: 16.5,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'HindSiliguri',
                       ),
@@ -2114,8 +2034,6 @@ class _TopicCollapsibleSelectionModal extends StatefulWidget {
 
 class _TopicCollapsibleSelectionModalState
     extends State<_TopicCollapsibleSelectionModal> {
-  String _searchQuery = '';
-  final _searchController = TextEditingController();
   late Set<String> _currentSelected;
   final Set<String> _expandedChapterIds = {};
 
@@ -2126,12 +2044,6 @@ class _TopicCollapsibleSelectionModalState
     for (final c in widget.chapters) {
       _expandedChapterIds.add(c.id);
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 
   void _toggleTopic(String topicId) {
@@ -2159,9 +2071,9 @@ class _TopicCollapsibleSelectionModalState
     });
   }
 
-  void _toggleSelectAll(List<TopicItem> filteredTopics) {
+  void _toggleSelectAll(List<TopicItem> allTopics) {
     HapticFeedback.selectionClick();
-    final allIds = filteredTopics.map((t) => t.id).toSet();
+    final allIds = allTopics.map((t) => t.id).toSet();
     final allSelected = allIds.every((id) => _currentSelected.contains(id));
 
     setState(() {
@@ -2188,14 +2100,8 @@ class _TopicCollapsibleSelectionModalState
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final query = _searchQuery.trim().toLowerCase();
-    final filteredTopics = widget.topics.where((t) {
-      if (query.isEmpty) return true;
-      return t.name.toLowerCase().contains(query);
-    }).toList();
-
     final Map<String, List<TopicItem>> topicsByChapter = {};
-    for (final t in filteredTopics) {
+    for (final t in widget.topics) {
       topicsByChapter.putIfAbsent(t.chapterId, () => []).add(t);
     }
 
@@ -2204,23 +2110,27 @@ class _TopicCollapsibleSelectionModalState
           topicsByChapter[c.id]!.isNotEmpty;
     }).toList();
 
-    final maxHeight = MediaQuery.of(context).size.height * 0.5;
+    final allTopicIds = widget.topics.map((t) => t.id).toSet();
+    final isAllSelected = allTopicIds.isNotEmpty &&
+        allTopicIds.every((id) => _currentSelected.contains(id));
+
+    final maxHeight = MediaQuery.of(context).size.height * 0.78;
 
     return Material(
       color: Colors.transparent,
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
+          color: isDark ? const Color(0xFF141417) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
-            // Drag Handle
+            // Compact Drag Handle
             Center(
               child: Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40,
+                margin: const EdgeInsets.only(top: 10, bottom: 6),
+                width: 36,
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark
@@ -2231,24 +2141,98 @@ class _TopicCollapsibleSelectionModalState
               ),
             ),
 
-            // Header
+            // Compact Header with Title, Select All Pill & Close Button
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 12, 12),
+              padding: const EdgeInsets.fromLTRB(16, 4, 10, 10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'টপিক নির্বাচন করো',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  Expanded(
+                    child: Text(
+                      'টপিক নির্বাচন করো',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
+
+                  // Select All Compact Button
+                  InkWell(
+                    onTap: () => _toggleSelectAll(widget.topics),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isAllSelected
+                            ? (isDark
+                                ? const Color(0xFF064E3B)
+                                : const Color(0xFFECFDF5))
+                            : (isDark
+                                ? const Color(0xFF1F1F24)
+                                : const Color(0xFFF1F5F9)),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isAllSelected
+                              ? (isDark
+                                  ? const Color(0xFF059669)
+                                  : const Color(0xFFA7F3D0))
+                              : (isDark
+                                  ? const Color(0xFF2E2E33)
+                                  : const Color(0xFFE2E8F0)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isAllSelected
+                                ? LucideIcons.checkCheck
+                                : LucideIcons.check,
+                            size: 13,
+                            color: isAllSelected
+                                ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF047857))
+                                : (isDark
+                                    ? const Color(0xFFA1A1AA)
+                                    : const Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'HindSiliguri',
+                              color: isAllSelected
+                                  ? (isDark
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF047857))
+                                  : (isDark
+                                      ? const Color(0xFFE4E4E7)
+                                      : const Color(0xFF334155)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(LucideIcons.x, size: 20),
+                    visualDensity: VisualDensity.compact,
                     color: isDark
                         ? const Color(0xFFA1A1AA)
                         : const Color(0xFF64748B),
@@ -2257,98 +2241,13 @@ class _TopicCollapsibleSelectionModalState
               ),
             ),
 
-            const Divider(height: 1, thickness: 0.8),
-
-            // Search & Select All
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF18181B)
-                            : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF27272A)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (v) => setState(() => _searchQuery = v),
-                        style: TextStyle(
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'টপিক খুঁজুন...',
-                          hintStyle: TextStyle(
-                            color: isDark
-                                ? const Color(0xFF71717A)
-                                : const Color(0xFF94A3B8),
-                            fontSize: 14,
-                          ),
-                          prefixIcon: Icon(
-                            LucideIcons.search,
-                            size: 16,
-                            color: isDark
-                                ? const Color(0xFFA1A1AA)
-                                : const Color(0xFF64748B),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  InkWell(
-                    onTap: () => _toggleSelectAll(filteredTopics),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF18181B)
-                            : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF27272A)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: Text(
-                        'সবগুলো',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFF1F5F9),
             ),
-
-            const SizedBox(height: 8),
 
             // Collapsible Chapter & Topics List
             Expanded(
@@ -2367,17 +2266,12 @@ class _TopicCollapsibleSelectionModalState
                     )
                   : ListView.builder(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 6,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
                       itemCount: visibleChapters.length,
                       itemBuilder: (context, chapterIdx) {
                         final chapter = visibleChapters[chapterIdx];
                         final chapterTopics = topicsByChapter[chapter.id] ?? [];
-                        final isExpanded =
-                            query.isNotEmpty ||
-                            _expandedChapterIds.contains(chapter.id);
+                        final isExpanded = _expandedChapterIds.contains(chapter.id);
                         final selectedInChapterCount = chapterTopics
                             .where((t) => _currentSelected.contains(t.id))
                             .length;

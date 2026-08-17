@@ -15,6 +15,21 @@ export default function GlobalError({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Unhandled Application Error:', error);
+
+    // Auto-recover from ChunkLoadError (happens when a new Vercel deployment replaces old chunk hashes)
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('ChunkLoadError') ||
+      error?.message?.includes('Failed to load chunk') ||
+      error?.message?.includes('Loading chunk');
+
+    if (isChunkError) {
+      const reloadKey = 'chunk_reload_' + (error.digest || 'last');
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+      }
+    }
   }, [error]);
 
   return (

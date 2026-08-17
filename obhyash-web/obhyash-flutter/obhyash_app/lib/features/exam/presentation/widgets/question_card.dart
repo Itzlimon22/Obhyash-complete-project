@@ -164,13 +164,14 @@ class _QuestionCardState extends State<QuestionCard>
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
 
                 // Tags + action buttons row
                 Row(
                   children: [
-                    // Unified Source Tag (Board / University & Year - Chorcha Style)
-                    if (widget.readOnly &&
+                    // Unified Source Tag (Board / University & Year - Short Form e.g. DB-24)
+                    // Hidden during active exam runner, visible in Result, History, Practice review & Bookmarks
+                    if ((widget.readOnly || widget.showFeedback || widget.showAnswer) &&
                         (widget.question.institutes.isNotEmpty ||
                             widget.question.years.isNotEmpty)) ...[
                       () {
@@ -182,24 +183,30 @@ class _QuestionCardState extends State<QuestionCard>
 
                         return Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
+                            horizontal: 9,
+                            vertical: 3.5,
                           ),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF0E3A4A)
-                                : const Color(0xFFBAF7FF),
-                            borderRadius: BorderRadius.circular(20),
+                                : const Color(0xFFE0F7FA),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF164E63)
+                                  : const Color(0xFFB2EBF2),
+                              width: 0.8,
+                            ),
                           ),
                           child: Text(
                             sourceText,
                             style: TextStyle(
                               fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA5F3FC)
-                                  : const Color(0xFF083344),
+                                  : const Color(0xFF006064),
                               letterSpacing: 0.2,
                               height: 1.1,
                             ),
@@ -260,13 +267,13 @@ class _QuestionCardState extends State<QuestionCard>
                     if (widget.readOnly) ...[
                       const SizedBox(width: 2),
 
-                      // Report button
+                      // Report / Flag button
                       _IconBtn(
                         onTap: widget.onReport,
                         tooltip: 'রিপোর্ট করো',
                         child: Icon(
-                          Icons.warning_amber_rounded,
-                          size: 18,
+                          Icons.outlined_flag_rounded,
+                          size: 19,
                           color: isDark
                               ? const Color(0xFF525252)
                               : const Color(0xFF9CA3AF),
@@ -700,7 +707,7 @@ class _IconBtn extends StatelessWidget {
               : null,
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
             child: child,
           ),
         ),

@@ -7,7 +7,10 @@ class LocalExamCacheService {
   static const String _kSavedExamIdsKey = 'obhyash_cached_exam_ids_v1';
   static const String _kExamPrefix = 'obhyash_cached_exam_';
   static const String _kHistoryCacheKey = 'obhyash_cached_history_list_v1';
-  static const int _kMaxCachedExams = 60; // Max 60 exams (~600 KB - 1.2 MB total)
+  static const String _kQuestionsCacheKey = 'obhyash_cached_questions_list_v1';
+  static const String _kBookmarksCacheKey = 'obhyash_cached_bookmarks_v1';
+  static const String _kSubjectListCacheKey = 'obhyash_cached_subject_list_v1';
+  static const int _kMaxCachedExams = 100; // Max 100 exams cached locally
 
   /// Automatically cache an evaluated exam result to local storage
   static Future<void> saveExamResult(ExamResult result) async {
@@ -34,8 +37,45 @@ class LocalExamCacheService {
 
       await prefs.setStringList(_kSavedExamIdsKey, ids);
       debugPrint('[LocalExamCacheService] Saved exam ${result.id} locally.');
+
+      // Also ensure this exam is prepended to the cached history list
+      await addExamToHistoryCache(result);
     } catch (e) {
       debugPrint('[LocalExamCacheService] saveExamResult error: $e');
+    }
+  }
+
+  /// Add/prepend a newly submitted exam to the local history list cache
+  static Future<void> addExamToHistoryCache(ExamResult result) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<Map<String, dynamic>> current = await getCachedHistoryList() ?? [];
+
+      // Remove existing if matching ID
+      current.removeWhere((item) => item['id']?.toString() == result.id);
+
+      // Construct record representation matching Supabase schema
+      final newRecord = <String, dynamic>{
+        'id': result.id,
+        'subject': result.subject,
+        'subject_label': result.subjectLabel ?? result.subject,
+        'correct_count': result.correctCount,
+        'wrong_count': result.wrongCount,
+        'total_questions': result.totalQuestions,
+        'time_taken': result.timeTaken,
+        'created_at': result.date,
+        'date': result.date,
+        'exam_type': result.examType,
+      };
+
+      current.insert(0, newRecord);
+      if (current.length > _kMaxCachedExams) {
+        current = current.sublist(0, _kMaxCachedExams);
+      }
+
+      await prefs.setString(_kHistoryCacheKey, jsonEncode(current));
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] addExamToHistoryCache error: $e');
     }
   }
 
@@ -87,6 +127,81 @@ class LocalExamCacheService {
       return list.map((e) => e as Map<String, dynamic>).toList();
     } catch (e) {
       debugPrint('[LocalExamCacheService] getCachedHistoryList error: $e');
+      return null;
+    }
+  }
+
+  /// Cache questions list for Questions tab offline support
+  static Future<void> cacheQuestionsList(List<Map<String, dynamic>> questions) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kQuestionsCacheKey, jsonEncode(questions));
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] cacheQuestionsList error: $e');
+    }
+  }
+
+  /// Retrieve cached questions list for Questions tab offline support
+  static Future<List<Map<String, dynamic>>?> getCachedQuestionsList() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_kQuestionsCacheKey);
+      if (jsonStr == null || jsonStr.isEmpty) return null;
+
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      return list.map((e) => e as Map<String, dynamic>).toList();
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] getCachedQuestionsList error: $e');
+      return null;
+    }
+  }
+
+  /// Cache bookmarked question IDs
+  static Future<void> cacheBookmarks(Set<String> bookmarkIds) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_kBookmarksCacheKey, bookmarkIds.toList());
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] cacheBookmarks error: $e');
+    }
+  }
+
+  /// Retrieve cached bookmarked question IDs
+  static Future<Set<String>> getCachedBookmarks() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = prefs.getStringList(_kBookmarksCacheKey);
+      return list?.toSet() ?? {};
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] getCachedBookmarks error: $e');
+      return {};
+    }
+  }
+
+  /// Cache subject metadata entries for offline filter dropdowns
+  static Future<void> cacheSubjectList(List<MapEntry<String, String>> subjects) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final mapList = subjects.map((e) => {'k': e.key, 'v': e.value}).toList();
+      await prefs.setString(_kSubjectListCacheKey, jsonEncode(mapList));
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] cacheSubjectList error: $e');
+    }
+  }
+
+  /// Retrieve cached subject metadata entries
+  static Future<List<MapEntry<String, String>>?> getCachedSubjectList() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_kSubjectListCacheKey);
+      if (jsonStr == null || jsonStr.isEmpty) return null;
+
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      return list
+          .map((e) => MapEntry(e['k'].toString(), e['v'].toString()))
+          .toList();
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] getCachedSubjectList error: $e');
       return null;
     }
   }
@@ -149,6 +264,9 @@ class LocalExamCacheService {
       }
       await prefs.remove(_kSavedExamIdsKey);
       await prefs.remove(_kHistoryCacheKey);
+      await prefs.remove(_kQuestionsCacheKey);
+      await prefs.remove(_kBookmarksCacheKey);
+      await prefs.remove(_kSubjectListCacheKey);
       await prefs.remove(_kActiveDraftKey);
     } catch (e) {
       debugPrint('[LocalExamCacheService] clearAll error: $e');
