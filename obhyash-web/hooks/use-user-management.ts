@@ -96,9 +96,10 @@ export function useUserManagement() {
 
       // Apply Server-Side Filters
       if (searchQuery) {
-        // Simple search across name, email, phone
+        const q = searchQuery.trim();
+        // Search across Student ID (e.g. OBH-10492), name, email, phone
         query = query.or(
-          `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`,
+          `student_id.ilike.%${q}%,name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`,
         );
       }
 
@@ -137,6 +138,7 @@ export function useUserManagement() {
       // Map DB fields to User type
       interface UserRow {
         id: string;
+        student_id?: string;
         name?: string;
         email?: string;
         phone?: string;
@@ -163,6 +165,7 @@ export function useUserManagement() {
 
       const mappedUsers: User[] = (data || []).map((u: UserRow) => ({
         id: u.id,
+        student_id: u.student_id,
         name: u.name || '',
         email: u.email || '',
         phone: u.phone,

@@ -713,6 +713,84 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
+-- ==============================================================================
+-- 10. Production-Grade Student ID System (e.g. OBH-10492)
+-- ==============================================================================
+
+-- 1. Create a dedicated sequence starting at 10001
+CREATE SEQUENCE IF NOT EXISTS public.student_id_seq START WITH 10001;
+
+-- 2. Add student_id column if not present
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        ALTER TABLE public.users ADD COLUMN IF NOT EXISTS student_id TEXT;
+    END IF;
+END $$;
+
+-- 3. Function to generate clean student IDs (OBH-10001, OBH-10002, ...)
+CREATE OR REPLACE FUNCTION public.generate_next_student_id()
+RETURNS TEXT AS $$
+DECLARE
+    v_id TEXT;
+    v_exists BOOLEAN;
+BEGIN
+    LOOP
+        v_id := 'OBH-' || nextval('public.student_id_seq')::TEXT;
+        SELECT EXISTS (SELECT 1 FROM public.users WHERE student_id = v_id) INTO v_exists;
+        IF NOT v_exists THEN
+            RETURN v_id;
+        END IF;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 4. Trigger to auto-assign student_id on user creation
+CREATE OR REPLACE FUNCTION public.assign_student_id_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.student_id IS NULL OR TRIM(NEW.student_id) = '' THEN
+        NEW.student_id := public.generate_next_student_id();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        DROP TRIGGER IF EXISTS trg_assign_student_id ON public.users;
+        CREATE TRIGGER trg_assign_student_id
+        BEFORE INSERT ON public.users
+        FOR EACH ROW
+        EXECUTE FUNCTION public.assign_student_id_trigger();
+    END IF;
+END $$;
+
+-- 5. Backfill existing users who don't have a student_id yet
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        FOR r IN SELECT id FROM public.users WHERE student_id IS NULL OR TRIM(student_id) = '' ORDER BY created_at ASC LOOP
+            UPDATE public.users
+            SET student_id = public.generate_next_student_id()
+            WHERE id = r.id;
+        END LOOP;
+    END IF;
+END $$;
+
+-- 6. Ensure Unique Index on student_id
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_student_id ON public.users (student_id);
+    END IF;
+END $$;
+
+
+
 
 
 

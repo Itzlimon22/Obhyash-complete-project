@@ -141,6 +141,7 @@ class SubjectStats {
 
 class UserProfile {
   final String id;
+  final String? studentId;
   final String name;
   final String? email;
   final int xp;
@@ -168,6 +169,7 @@ class UserProfile {
 
   UserProfile({
     required this.id,
+    this.studentId,
     required this.name,
     this.email,
     required this.xp,
@@ -194,9 +196,20 @@ class UserProfile {
     this.lastStreakDate,
   });
 
+  String get displayStudentId {
+    if (studentId != null && studentId!.isNotEmpty) {
+      return studentId!;
+    }
+    if (id.length >= 8) {
+      return 'OBH-${id.replaceAll('-', '').substring(0, 5).toUpperCase()}';
+    }
+    return 'OBH-10001';
+  }
+
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       id: json['id'] as String,
+      studentId: json['student_id'] as String?,
       name: json['name'] as String? ?? 'Unknown User',
       email: json['email'] as String?,
       xp: (json['xp'] as num?)?.toInt() ?? 0,

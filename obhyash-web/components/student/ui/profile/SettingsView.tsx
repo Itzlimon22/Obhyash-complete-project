@@ -313,6 +313,12 @@ export default function SettingsView({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const desktopSection: PanelSection = activeSection ?? 'personal';
 
+  const displayStudentId =
+    user.student_id ||
+    (user.id
+      ? `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`
+      : 'OBH-10001');
+
   const handleCopy = (label: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(label);
@@ -322,12 +328,13 @@ export default function SettingsView({
   const handleCopyAll = () => {
     const lines = [
       '📋 Obhyash Account Info:',
+      `• Student ID: ${displayStudentId}`,
       `• User Name: ${user.name || 'N/A'}`,
-      `• User ID: ${user.id || 'N/A'}`,
       user.email ? `• Email: ${user.email}` : null,
       user.phone ? `• Phone: ${user.phone}` : null,
       user.stream ? `• Stream: ${user.stream}${user.batch ? ` (${user.batch})` : ''}` : null,
       user.institute ? `• Institute: ${user.institute}` : null,
+      `• System UUID: ${user.id || 'N/A'}`,
     ].filter(Boolean);
 
     navigator.clipboard.writeText(lines.join('\n'));
@@ -616,7 +623,7 @@ export default function SettingsView({
 
               {/* User ID */}
               <div
-                onClick={() => handleCopy('id', user.id || '')}
+                onClick={() => handleCopy('id', displayStudentId)}
                 className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
               >
                 <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
@@ -627,7 +634,7 @@ export default function SettingsView({
                     User ID
                   </p>
                   <p className="text-base font-mono font-bold text-white truncate">
-                    {user.id || 'N/A'}
+                    {displayStudentId}
                   </p>
                 </div>
                 {copiedField === 'id' ? (

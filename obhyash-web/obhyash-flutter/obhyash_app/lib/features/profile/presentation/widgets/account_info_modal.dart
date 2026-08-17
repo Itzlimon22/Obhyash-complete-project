@@ -27,8 +27,8 @@ class AccountInfoModal extends StatelessWidget {
   void _copyAll(BuildContext context) {
     final buffer = StringBuffer();
     buffer.writeln('📋 Obhyash Account Info:');
+    buffer.writeln('• Student ID: ${user.displayStudentId}');
     buffer.writeln('• User Name: ${user.name}');
-    buffer.writeln('• User ID: ${user.id}');
     if (user.email != null && user.email!.isNotEmpty) {
       buffer.writeln('• Email: ${user.email}');
     }
@@ -41,6 +41,7 @@ class AccountInfoModal extends StatelessWidget {
     if (user.institute != null && user.institute!.isNotEmpty) {
       buffer.writeln('• Institute: ${user.institute}');
     }
+    buffer.writeln('• System UUID: ${user.id}');
 
     Clipboard.setData(ClipboardData(text: buffer.toString().trim()));
     HapticFeedback.mediumImpact();
@@ -120,13 +121,13 @@ class AccountInfoModal extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Item 2: User ID
+            // Item 2: Student ID (User ID)
             _buildInfoRow(
               context: context,
               icon: LucideIcons.hash,
               iconBg: iconBg,
               label: 'User ID',
-              value: user.id,
+              value: user.displayStudentId,
               textPrimary: textPrimary,
               textSecondary: textSecondary,
               cardBg: cardBg,

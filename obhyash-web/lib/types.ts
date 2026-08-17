@@ -241,6 +241,7 @@ export type UserStatus = "Active" | "Inactive" | "Suspended";
 
 export interface User {
   id: string;
+  student_id?: string;
 
   // Identity
   name: string;
@@ -294,6 +295,7 @@ export interface User {
 export interface UserProfile extends Partial<User> {
   // A simplified view for Leaderboards/Public profiles
   id: string;
+  student_id?: string;
   name: string;
   institute: string;
   xp: number;

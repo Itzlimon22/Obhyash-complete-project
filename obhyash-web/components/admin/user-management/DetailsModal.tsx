@@ -59,6 +59,9 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                 {user.name || 'Unnamed User'}
               </h3>
               <p className="text-neutral-500 dark:text-neutral-400 flex items-center gap-2 mt-1">
+                <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-mono text-xs font-bold border border-emerald-200 dark:border-emerald-800">
+                  ID: {user.student_id || `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`}
+                </span>
                 <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold uppercase tracking-wider">
                   {user.role}
                 </span>
