@@ -59,6 +59,10 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
     negative_marking:
       exam?.negative_marking !== undefined ? exam.negative_marking : 0.25,
     status: exam?.status || 'published',
+    is_leaderboard_published:
+      exam?.is_leaderboard_published !== undefined
+        ? exam.is_leaderboard_published
+        : true,
   });
 
   const handleStartChange = (startVal: string) => {
@@ -331,6 +335,33 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Leaderboard Visibility Control */}
+          <div className="p-3.5 bg-neutral-50 dark:bg-zinc-900/60 rounded-2xl border border-neutral-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                <span>📢</span>
+                <span>শিক্ষার্থীদের জন্য মেধা তালিকা উন্মুক্ত রাখুন (Publish Leaderboard)</span>
+              </p>
+              <p className="text-[11px] text-neutral-500 dark:text-zinc-400 mt-0.5">
+                সক্রিয় থাকলে শিক্ষার্থীরা তাদের র‍্যাংক ও মেধা তালিকা দেখতে পাবে
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={formData.is_leaderboard_published !== false}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    is_leaderboard_published: e.target.checked,
+                  })
+                }
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-emerald-600"></div>
+            </label>
           </div>
 
           {/* Footer Save */}

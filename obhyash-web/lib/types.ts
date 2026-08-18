@@ -199,6 +199,7 @@ export interface LiveExam {
   total_questions?: number; // Fetched from relation count
   negative_marking: number;
   status: "draft" | "published" | "archived";
+  is_leaderboard_published?: boolean;
   created_at: string;
   updated_at: string;
   created_by?: string;

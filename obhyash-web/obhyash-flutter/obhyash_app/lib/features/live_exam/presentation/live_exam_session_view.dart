@@ -35,6 +35,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
   final ScrollController _scrollController = ScrollController();
   final Map<int, GlobalKey> _itemKeys = {};
 
+  DateTime _sessionStartTime = DateTime.now().toUtc();
   Timer? _timer;
   int _secondsRemaining = 0;
   bool _isSubmitting = false;
@@ -42,10 +43,41 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
   @override
   void initState() {
     super.initState();
+    _sessionStartTime = DateTime.now().toUtc();
     final durationMins = widget.exam?.durationMinutes ?? 45;
     _secondsRemaining = durationMins * 60;
     _startTimer();
     _fetchBookmarks();
+    _registerAttemptStart();
+  }
+
+  Future<void> _registerAttemptStart() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+    if (user == null || widget.examId.startsWith('mock-')) return;
+
+    try {
+      final existing = await supabase
+          .from('live_exam_attempts')
+          .select('id, start_time, status')
+          .eq('live_exam_id', widget.examId)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+      if (existing == null) {
+        await supabase.from('live_exam_attempts').insert({
+          'live_exam_id': widget.examId,
+          'user_id': user.id,
+          'status': 'ongoing',
+          'start_time': _sessionStartTime.toIso8601String(),
+        });
+      } else if (existing['status'] != 'submitted' && existing['start_time'] != null) {
+        final parsed = DateTime.tryParse(existing['start_time'].toString());
+        if (parsed != null) {
+          _sessionStartTime = parsed.toUtc();
+        }
+      }
+    } catch (_) {}
   }
 
   void _startTimer() {
@@ -182,6 +214,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               existing == null || existing['status'] != 'submitted';
 
           if (isFirstOfficialAttempt) {
+            final submitTime = DateTime.now().toUtc();
             // 1. Official Live Attempt -> Determines Leaderboard Rank
             await supabase.from('live_exam_attempts').upsert({
               'live_exam_id': widget.examId,
@@ -191,13 +224,14 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'correct_count': correctCount,
               'wrong_count': wrongCount,
               'user_answers': _userAnswers,
-              'submit_time': DateTime.now().toIso8601String(),
+              'start_time': _sessionStartTime.toIso8601String(),
+              'submit_time': submitTime.toIso8601String(),
             });
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
             try {
-              final totalDuration = (widget.exam?.durationMinutes ?? 45) * 60;
-              final timeTaken = (totalDuration - _secondsRemaining).clamp(0, totalDuration);
+              final submitTime = DateTime.now().toUtc();
+              final timeTaken = submitTime.difference(_sessionStartTime).inSeconds.clamp(0, 86400);
               await supabase.from('live_exam_practice_history').insert({
                 'live_exam_id': widget.examId,
                 'user_id': user.id,
@@ -207,7 +241,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                 'unanswered_count': questions.length - _userAnswers.length,
                 'user_answers': _userAnswers,
                 'time_taken_seconds': timeTaken,
-                'submit_time': DateTime.now().toIso8601String(),
+                'submit_time': submitTime.toIso8601String(),
               });
             } catch (_) {}
           }

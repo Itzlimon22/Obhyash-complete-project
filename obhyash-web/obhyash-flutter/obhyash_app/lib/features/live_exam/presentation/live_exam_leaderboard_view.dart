@@ -99,6 +99,35 @@ class _LiveExamLeaderboardViewState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Notice if leaderboard is in review / unpublished
+                if (widget.exam?.isLeaderboardPublished == false)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.clock, color: Color(0xFFD97706), size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'মেধা তালিকা পর্যালোচনাধীন রয়েছে। এডমিন কর্তৃক চূড়ান্ত প্রকাশের পর এখানে সকলের তালিকা দৃশ্যমান হবে।',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.amber[200] : const Color(0xFF92400E),
+                              fontFamily: 'HindSiliguri',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 // Current User Spotlight Card (If candidate took the exam)
                 if (myEntry != null && myRank != null) ...[
                   Container(

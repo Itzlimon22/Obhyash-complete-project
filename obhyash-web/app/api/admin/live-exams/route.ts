@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
         .eq('live_exam_id', leaderboardForExam)
         .eq('status', 'submitted')
         .order('score', { ascending: false })
+        .order('wrong_count', { ascending: true })
         .order('submit_time', { ascending: true });
 
       if (error) throw error;

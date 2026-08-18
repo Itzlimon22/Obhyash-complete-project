@@ -120,6 +120,7 @@ export async function startLiveExam(
           live_exam_id: examId,
           user_id: userId,
           status: "ongoing",
+          start_time: new Date().toISOString(),
         },
       ])
       .select("id")
@@ -417,6 +418,7 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
     .eq("live_exam_id", examId)
     .eq("status", "submitted")
     .order("score", { ascending: false })
+    .order("wrong_count", { ascending: true })
     .order("submit_time", { ascending: true })
     .limit(limit);
 

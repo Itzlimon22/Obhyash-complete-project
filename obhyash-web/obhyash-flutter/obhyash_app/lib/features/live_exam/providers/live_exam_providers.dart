@@ -213,6 +213,7 @@ final liveExamLeaderboardProvider = FutureProvider.autoDispose
       .eq('live_exam_id', examId)
       .eq('status', 'submitted')
       .order('score', ascending: false)
+      .order('wrong_count', ascending: true)
       .order('submit_time', ascending: true)
       .limit(100);
 

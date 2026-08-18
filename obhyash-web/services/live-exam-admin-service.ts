@@ -584,6 +584,7 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
     .eq("live_exam_id", examId)
     .eq("status", "submitted")
     .order("score", { ascending: false })
+    .order("wrong_count", { ascending: true })
     .order("submit_time", { ascending: true });
 
   if (error) {

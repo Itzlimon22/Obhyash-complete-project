@@ -11,6 +11,7 @@ class LiveExam {
   final String status;
   final String category;
   final String? userAttemptStatus;
+  final bool isLeaderboardPublished;
 
   LiveExam({
     required this.id,
@@ -25,6 +26,7 @@ class LiveExam {
     required this.status,
     required this.category,
     this.userAttemptStatus,
+    this.isLeaderboardPublished = true,
   });
 
   factory LiveExam.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class LiveExam {
       status: json['status'] as String? ?? '',
       category: json['category'] as String? ?? '',
       userAttemptStatus: json['userAttemptStatus'] as String?,
+      isLeaderboardPublished: json['is_leaderboard_published'] as bool? ?? true,
     );
   }
 
@@ -86,6 +89,7 @@ class LiveExam {
       'status': status,
       'category': category,
       'userAttemptStatus': userAttemptStatus,
+      'is_leaderboard_published': isLeaderboardPublished,
     };
   }
 

@@ -18,6 +18,9 @@ import {
   X,
   Sparkles,
   School,
+  Globe,
+  Send,
+  Lock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LiveExam } from '@/lib/types';
@@ -26,6 +29,7 @@ import {
   getLiveExamLeaderboard,
   resetLiveExamAttempt,
   getLiveExamOngoingCount,
+  updateLiveExam,
 } from '@/services/live-exam-admin-service';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -44,6 +48,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAttempt, setSelectedAttempt] = useState<any | null>(null);
+  const [isUpdatingPublish, setIsUpdatingPublish] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -191,6 +196,25 @@ export default function LiveExamResults({ examId }: { examId: string }) {
   const avgAccuracy =
     totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
 
+  const handleTogglePublishLeaderboard = async () => {
+    if (!exam) return;
+    const nextState = exam.is_leaderboard_published === false ? true : false;
+    try {
+      setIsUpdatingPublish(true);
+      await updateLiveExam(exam.id, { is_leaderboard_published: nextState });
+      setExam((prev) => (prev ? { ...prev, is_leaderboard_published: nextState } : null));
+      if (nextState) {
+        toast.success('🎉 মেধা তালিকা শিক্ষার্থীদের জন্য সফলভাবে উন্মুক্ত/প্রকাশ করা হয়েছে!');
+      } else {
+        toast.info('🔒 মেধা তালিকা শিক্ষার্থীদের জন্য লুকানো হয়েছে।');
+      }
+    } catch (err) {
+      toast.error('মেধা তালিকা স্ট্যাটাস পরিবর্তন করা যায়নি');
+    } finally {
+      setIsUpdatingPublish(false);
+    }
+  };
+
   const filteredLeaderboard = leaderboard.filter((entry) => {
     const student = entry.users || entry.user || {};
     const name = student.name || '';
@@ -266,14 +290,40 @@ export default function LiveExamResults({ examId }: { examId: string }) {
           </div>
         </div>
 
-        <button
-          onClick={handleExport}
-          disabled={leaderboard.length === 0}
-          className="px-4 py-2 bg-white dark:bg-zinc-900 hover:bg-neutral-50 dark:hover:bg-zinc-800 text-neutral-800 dark:text-zinc-200 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer shrink-0"
-        >
-          <Download size={15} />
-          <span>CSV রিপোর্ট ডাউনলোড</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Publish / Unpublish Leaderboard Action Button */}
+          <button
+            onClick={handleTogglePublishLeaderboard}
+            disabled={isUpdatingPublish}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm cursor-pointer ${
+              exam.is_leaderboard_published !== false
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-950/20'
+                : 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-amber-950/20 animate-pulse'
+            }`}
+            title="শিক্ষার্থীদের জন্য ফলাফল ও মেধা তালিকা উন্মুক্ত বা লুকান"
+          >
+            {exam.is_leaderboard_published !== false ? (
+              <>
+                <Globe size={14} />
+                <span>মেধা তালিকা প্রকাশিত (সবার জন্য উন্মুক্ত)</span>
+              </>
+            ) : (
+              <>
+                <Send size={14} />
+                <span>📢 মেধা তালিকা প্রকাশ করুন (Publish Leaderboard)</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleExport}
+            disabled={leaderboard.length === 0}
+            className="px-4 py-2 bg-white dark:bg-zinc-900 hover:bg-neutral-50 dark:hover:bg-zinc-800 text-neutral-800 dark:text-zinc-200 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer shrink-0"
+          >
+            <Download size={15} />
+            <span>CSV রিপোর্ট ডাউনলোড</span>
+          </button>
+        </div>
       </div>
 
       {/* ── 4 KPI Stats Grid ── */}
@@ -541,19 +591,53 @@ export default function LiveExamResults({ examId }: { examId: string }) {
               </div>
             </div>
 
-            <div className="space-y-1.5 text-xs text-neutral-600 dark:text-zinc-400">
-              <p className="flex justify-between">
+            <div className="space-y-2 text-xs text-neutral-600 dark:text-zinc-400 bg-neutral-50 dark:bg-zinc-900/60 p-3 rounded-2xl border border-neutral-100 dark:border-zinc-800">
+              <p className="flex justify-between items-center">
                 <span>পরীক্ষা শুরু:</span>
-                <span className="font-mono text-neutral-900 dark:text-white">
-                  {new Date(selectedAttempt.start_time).toLocaleTimeString()}
+                <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                  {selectedAttempt.start_time
+                    ? new Date(selectedAttempt.start_time).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      })
+                    : 'নির্ধারিত নয়'}
                 </span>
               </p>
-              <p className="flex justify-between">
+              <p className="flex justify-between items-center">
                 <span>জমা দেওয়ার সময়:</span>
-                <span className="font-mono text-neutral-900 dark:text-white">
-                  {new Date(selectedAttempt.submit_time).toLocaleTimeString()}
+                <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                  {selectedAttempt.submit_time
+                    ? new Date(selectedAttempt.submit_time).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      })
+                    : 'নির্ধারিত নয়'}
                 </span>
               </p>
+              {selectedAttempt.start_time && selectedAttempt.submit_time && (
+                <p className="flex justify-between items-center pt-1.5 border-t border-neutral-200/60 dark:border-zinc-800 text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span>মোট সময় লেগেছে:</span>
+                  <span className="font-mono">
+                    {(() => {
+                      const diffSec = Math.max(
+                        0,
+                        Math.round(
+                          (new Date(selectedAttempt.submit_time).getTime() -
+                            new Date(selectedAttempt.start_time).getTime()) /
+                            1000
+                        )
+                      );
+                      const m = Math.floor(diffSec / 60);
+                      const s = diffSec % 60;
+                      return `${m} মিনিট ${s} সেকেন্ড`;
+                    })()}
+                  </span>
+                </p>
+              )}
             </div>
 
             <div className="pt-3 border-t border-neutral-100 dark:border-zinc-800 flex justify-between gap-2">
