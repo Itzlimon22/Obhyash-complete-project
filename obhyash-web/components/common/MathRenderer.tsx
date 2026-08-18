@@ -75,6 +75,29 @@ function cleanIntraSentenceNewlines(text: string): string {
   return buffer.join("").replaceAll(placeholder, "\n\n");
 }
 
+function wrapLatexExpressionsInBengaliText(str: string): string {
+  // Normalize consecutive dollar signs (e.g. $$$$ -> \n\n)
+  let s = str.replace(/\${3,}/g, "\n\n");
+
+  // Format dimensional brackets like [MLT^{-2}], [M], [LT^{-1}], [T] into math
+  s = s.replace(/(?<!\$)(?:\[[A-Za-z0-9\s\+\-\*\/\^\{\}\_\\]+\])(?!\$)/g, (match) => {
+    return `$${match}$`;
+  });
+
+  // Detect and wrap raw LaTeX command clusters in non-math Bengali text
+  s = s.replace(
+    /(?:(?<=\s|^|[=+\-*/:])|(?<=\b))((?:[A-Za-z0-9=\+\-\*\/\(\)\s,.]|\\left|\\right|\\frac\{[^{}]*\}\{[^{}]*\}|\\times|\\cdot|\\sqrt\{[^{}]*\}|\\vec\{[^{}]*\}|\\pm|\^\{?[a-zA-Z0-9\-\+]+\}?|\_\{?[a-zA-Z0-9\-\+]+\}?)*\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*(?:[A-Za-z0-9=\+\-\*\/\(\)\s,.]|\\left|\\right|\\frac\{[^{}]*\}\{[^{}]*\}|\\times|\\cdot|\\sqrt\{[^{}]*\}|\\vec\{[^{}]*\}|\\pm|\^\{?[a-zA-Z0-9\-\+]+\}?|\_\{?[a-zA-Z0-9\-\+]+\}?)*)(?:(?=\s|$|[=+\-*/:])|(?=\b))/g,
+    (match) => {
+      const trimmed = match.trim();
+      if (!trimmed || /[\u0980-\u09FF]/.test(trimmed)) return match;
+      if (trimmed.startsWith("$") && trimmed.endsWith("$")) return match;
+      return ` $${trimmed}$ `;
+    }
+  );
+
+  return s;
+}
+
 const preprocessCache = new Map<string, string>();
 const MAX_PREPROCESS_CACHE = 600;
 
@@ -83,8 +106,8 @@ function preprocess(text: string): string {
     return preprocessCache.get(text)!;
   }
 
-  // 1. Normalize literal \n
-  let processedText = text.replace(/\\n/g, "\n");
+  // 1. Normalize literal \n and multiple $$$$
+  let processedText = text.replace(/\\n/g, "\n").replace(/\${3,}/g, "\n\n");
 
   // 2. Split into math blocks and non-math segments
   const mathPattern = /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g;
@@ -103,7 +126,7 @@ function preprocess(text: string): string {
     parts.push(processedText.slice(lastIndex));
   }
 
-  // 3. Process each segment safely (never modifying content inside pure math blocks)
+  // 3. Process each segment safely
   const processedParts = parts.map((part) => {
     if (part.startsWith("$")) {
       const isDisplay = part.startsWith("$$");
@@ -127,6 +150,9 @@ function preprocess(text: string): string {
     if (hasNoBengali && trimmed.length > 0 && (hasLatexCmd || (hasMathExpr && /[=+\-*/<>()]/.test(trimmed)))) {
       return `$${trimmed}$`;
     }
+
+    // Wrap embedded LaTeX commands inside Bengali text
+    t = wrapLatexExpressionsInBengaliText(t);
 
     t = t.replace(/\b([a-zA-Z0-9]+)\^(-?[0-9]+)\b/g, "$$$1^{$2}$$");
     t = t.replace(/\b([a-zA-Z0-9]+)\^\{(-?[0-9a-zA-Z]+)\}\b/g, "$$$1^{$2}$$");

@@ -34,6 +34,10 @@ import {
   FileSpreadsheet,
   FileCode,
   FileCheck,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
@@ -75,6 +79,10 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
   const [bankQuestions, setBankQuestions] = useState<Question[]>([]);
   const [totalBankCount, setTotalBankCount] = useState(0);
   const [bankPage, setBankPage] = useState(1);
+  const [bankPageSize, setBankPageSize] = useState(50);
+  const [isCustomPageSize, setIsCustomPageSize] = useState(false);
+  const [customPageSizeInput, setCustomPageSizeInput] = useState('');
+  const [jumpToPageInput, setJumpToPageInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedBankIds, setSelectedBankIds] = useState<Set<string>>(new Set());
   const [isBatchAdding, setIsBatchAdding] = useState(false);
@@ -117,16 +125,18 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
   const [expandedSolutions, setExpandedSolutions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    fetchExamData();
+    fetchExamData(true);
   }, [examId]);
 
   useEffect(() => {
-    fetchBankQuestions(1);
-  }, [subjectFilter, chapterFilter, difficultyFilter]);
+    fetchBankQuestions(1, bankPageSize);
+  }, [subjectFilter, chapterFilter, difficultyFilter, bankPageSize]);
 
-  const fetchExamData = async () => {
+  const totalBankPages = Math.max(1, Math.ceil(totalBankCount / bankPageSize));
+
+  const fetchExamData = async (isInitial: boolean = false) => {
     try {
-      setIsLoading(true);
+      if (isInitial) setIsLoading(true);
       const [examData, questionsData] = await Promise.all([
         getLiveExam(examId),
         getLiveExamQuestions(examId),
@@ -139,16 +149,18 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       setExam(examData);
       setExamQuestions(questionsData);
     } catch (error) {
-      toast.error('Failed to load exam data: ' + String(error));
+      if (isInitial) {
+        toast.error('Failed to load exam data: ' + String(error));
+      }
     } finally {
-      setIsLoading(false);
+      if (isInitial) setIsLoading(false);
     }
   };
 
-  const fetchBankQuestions = async (page: number = 1) => {
+  const fetchBankQuestions = async (page: number = 1, size: number = bankPageSize) => {
     try {
       setIsSearching(true);
-      const res = await getQuestionsPage(page, 25, {
+      const res = await getQuestionsPage(page, size, {
         search: searchQuery || undefined,
         subject: subjectFilter || undefined,
         chapter: chapterFilter || undefined,
@@ -167,7 +179,41 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
 
   const handleBankSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchBankQuestions(1);
+    fetchBankQuestions(1, bankPageSize);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    const targetPage = Math.max(1, Math.min(newPage, totalBankPages));
+    fetchBankQuestions(targetPage, bankPageSize);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setBankPageSize(newSize);
+    setIsCustomPageSize(false);
+    fetchBankQuestions(1, newSize);
+  };
+
+  const handleCustomPageSizeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = parseInt(customPageSizeInput);
+    if (!parsed || parsed <= 0) {
+      toast.warning('সঠিক সংখ্যা লিখুন (যেমন: ১০০, ৩০০, ১০০০)');
+      return;
+    }
+    setBankPageSize(parsed);
+    setIsCustomPageSize(true);
+    fetchBankQuestions(1, parsed);
+  };
+
+  const handleJumpToPageSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNum = parseInt(jumpToPageInput);
+    if (!pageNum || pageNum < 1 || pageNum > totalBankPages) {
+      toast.warning(`১ থেকে ${totalBankPages}-এর মধ্যে পৃষ্ঠা সংখ্যা লিখুন`);
+      return;
+    }
+    handlePageChange(pageNum);
+    setJumpToPageInput('');
   };
 
   // Set of assigned question IDs
@@ -204,33 +250,99 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
     return { total, subjectsMap, easy, med, hard };
   }, [examQuestions]);
 
-  // --- Handlers: Question Actions ---
+  // --- Handlers: Question Actions with Smooth Optimistic Updates ---
+  const handleToggleSwapTarget = (mapping: any) => {
+    if (swappingMapping?.mapping_id === mapping.mapping_id) {
+      setSwappingMapping(null);
+      toast.info('প্রতিস্থাপন মোড বাতিল করা হয়েছে');
+    } else {
+      setSwappingMapping(mapping);
+      if (mapping.question?.subject) {
+        setSubjectFilter(mapping.question.subject);
+        if (mapping.question.chapter) {
+          setChapterFilter(mapping.question.chapter);
+        }
+      }
+      toast.info(
+        `#${mapping.serial} নম্বর প্রশ্নটি প্রতিস্থাপনের জন্য সক্রিয় করা হয়েছে। ডানপাশের প্রশ্ন ব্যাংক থেকে পছন্দের প্রশ্নে ক্লিক করুন।`
+      );
+    }
+  };
+
   const handleAddSingleQuestion = async (question: Question) => {
     if (assignedQuestionIds.has(question.id)) {
       toast.warning('এই প্রশ্নটি ইতিমধ্যেই পরীক্ষায় যুক্ত রয়েছে');
       return;
     }
+
+    // ── IF IN SWAP / REPLACEMENT MODE ──
+    if (swappingMapping) {
+      const targetMappingId = swappingMapping.mapping_id;
+      const targetSerial = swappingMapping.serial;
+
+      // Instant optimistic replacement in place!
+      setExamQuestions((prev) =>
+        prev.map((eq) =>
+          eq.mapping_id === targetMappingId ? { ...eq, question } : eq
+        )
+      );
+      setSwappingMapping(null);
+
+      try {
+        await swapLiveExamQuestion(targetMappingId, question.id);
+        toast.success(`#${targetSerial} নম্বর প্রশ্নটি সফলভাবে প্রতিস্থাপন করা হয়েছে!`);
+        fetchExamData(false);
+      } catch (error) {
+        toast.error('প্রতিস্থাপন করা যায়নি');
+        fetchExamData(false);
+      }
+      return;
+    }
+
+    // ── REGULAR ADD TO BOTTOM ──
+    const tempMappingId = 'temp-' + Date.now();
+    const serial = examQuestions.length + 1;
+
+    // Instant optimistic update
+    setExamQuestions((prev) => [
+      ...prev,
+      { mapping_id: tempMappingId, serial, points: 1, question },
+    ]);
+
     try {
-      const serial = examQuestions.length + 1;
       await addQuestionToLiveExam(examId, question.id, serial, 1);
       toast.success('প্রশ্ন সফলভাবে যুক্ত হয়েছে!');
-      fetchExamData();
+      fetchExamData(false);
     } catch (error) {
       toast.error('প্রশ্ন যুক্ত করা যায়নি');
+      fetchExamData(false);
     }
   };
 
   const handleBatchAddSelected = async () => {
     if (selectedBankIds.size === 0) return;
+    const idsToAdd = Array.from(selectedBankIds);
+    const questionsToAdd = bankQuestions.filter((q) => selectedBankIds.has(q.id));
+
+    // Instant optimistic update
+    let curSerial = examQuestions.length + 1;
+    const newItems = questionsToAdd.map((q) => ({
+      mapping_id: 'temp-' + q.id,
+      serial: curSerial++,
+      points: 1,
+      question: q,
+    }));
+    setExamQuestions((prev) => [...prev, ...newItems]);
+    setSelectedBankIds(new Set());
+
     try {
       setIsBatchAdding(true);
-      const idsToAdd = Array.from(selectedBankIds);
       const count = await addQuestionsBatchToLiveExam(examId, idsToAdd, 1);
       toast.success(`${count}টি প্রশ্ন সফলভাবে যুক্ত করা হয়েছে!`);
-      setSelectedBankIds(new Set());
-      fetchExamData();
+      fetchExamData(false);
     } catch (error) {
       toast.error('বাল্ক যুক্ত করতে সমস্যা হয়েছে');
+      fetchExamData(false);
     } finally {
       setIsBatchAdding(false);
     }
@@ -255,12 +367,20 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
   };
 
   const handleRemoveQuestion = async (mappingId: string) => {
+    // Instant optimistic removal
+    setExamQuestions((prev) =>
+      prev
+        .filter((eq) => eq.mapping_id !== mappingId)
+        .map((eq, idx) => ({ ...eq, serial: idx + 1 }))
+    );
+
     try {
       await removeQuestionFromLiveExam(mappingId, examId);
       toast.success('প্রশ্ন পরীক্ষা থেকে বাদ দেওয়া হয়েছে');
-      fetchExamData();
+      fetchExamData(false);
     } catch (error) {
       toast.error('প্রশ্ন বাদ দেওয়া যায়নি');
+      fetchExamData(false);
     }
   };
 
@@ -289,30 +409,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       await reorderLiveExamQuestions(updates);
     } catch (error) {
       toast.error('Failed to save order');
-      fetchExamData();
-    }
-  };
-
-  // --- Handlers: Swapping Question ---
-  const handleOpenSwapModal = async (mapping: any) => {
-    setSwappingMapping(mapping);
-    setSwapSearchQuery('');
-    const targetSub = mapping.question?.subject || '';
-    const targetCh = mapping.question?.chapter || '';
-
-    try {
-      setIsSwapSearching(true);
-      const res = await getQuestionsPage(1, 15, {
-        subject: targetSub || undefined,
-        chapter: targetCh || undefined,
-        status: 'Approved' as any,
-      });
-      setSwapCandidates(
-        res.questions.filter((q) => !assignedQuestionIds.has(q.id)),
-      );
-    } catch (_) {
-    } finally {
-      setIsSwapSearching(false);
+      fetchExamData(false);
     }
   };
 
@@ -338,13 +435,23 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
 
   const handleExecuteSwap = async (newQuestion: Question) => {
     if (!swappingMapping) return;
+    const targetMappingId = swappingMapping.mapping_id;
+
+    // Instant optimistic swap
+    setExamQuestions((prev) =>
+      prev.map((eq) =>
+        eq.mapping_id === targetMappingId ? { ...eq, question: newQuestion } : eq
+      )
+    );
+    setSwappingMapping(null);
+
     try {
-      await swapLiveExamQuestion(swappingMapping.mapping_id, newQuestion.id);
+      await swapLiveExamQuestion(targetMappingId, newQuestion.id);
       toast.success('প্রশ্নটি সফলভাবে প্রতিস্থাপন করা হয়েছে!');
-      setSwappingMapping(null);
-      fetchExamData();
+      fetchExamData(false);
     } catch (e) {
       toast.error('প্রতিস্থাপন করা যায়নি');
+      fetchExamData(false);
     }
   };
 
@@ -388,7 +495,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       } else {
         toast.success(`সফলভাবে ${added}টি প্রশ্ন যুক্ত করা হয়েছে!`);
         setShowBlueprintModal(false);
-        fetchExamData();
+        fetchExamData(false);
       }
     } catch (e) {
       toast.error('ব্লুপ্রিন্ট তৈরি করতে সমস্যা হয়েছে');
@@ -434,7 +541,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
         setNewQStem('');
         setNewQOptions(['', '', '', '']);
         setNewQExplanation('');
-        fetchExamData();
+        fetchExamData(false);
       } else {
         toast.error('প্রশ্ন সংরক্ষণ করা যায়নি: ' + (res.error || ''));
       }
@@ -708,7 +815,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
         setBulkParsedQuestions([]);
         setBulkParseErrors([]);
         setBulkRawText('');
-        fetchExamData();
+        fetchExamData(false);
       } else {
         toast.error('প্রশ্ন আপলোড ব্যর্থ হয়েছে');
       }
@@ -740,6 +847,51 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       return matchesSearch && matchesSub;
     });
   }, [examQuestions, assignedFilterText, assignedSubjectFilter]);
+
+  // Subject-wise Grouping for clean collapsible sections
+  const [collapsedSubjects, setCollapsedSubjects] = useState<Record<string, boolean>>({});
+
+  const toggleCollapseSubject = (subj: string) => {
+    setCollapsedSubjects((prev) => ({
+      ...prev,
+      [subj]: !prev[subj],
+    }));
+  };
+
+  const groupedAssignedQuestions = useMemo(() => {
+    const groups: { subject: string; items: any[] }[] = [];
+    const map = new Map<string, any[]>();
+
+    filteredAssignedQuestions.forEach((eq) => {
+      const subj = eq.question?.subject || 'অন্যান্য';
+      if (!map.has(subj)) {
+        map.set(subj, []);
+        groups.push({ subject: subj, items: map.get(subj)! });
+      }
+      map.get(subj)!.push(eq);
+    });
+
+    return groups;
+  }, [filteredAssignedQuestions]);
+
+  const isAllSubjectsCollapsed = useMemo(() => {
+    return (
+      groupedAssignedQuestions.length > 0 &&
+      groupedAssignedQuestions.every((g) => collapsedSubjects[g.subject])
+    );
+  }, [groupedAssignedQuestions, collapsedSubjects]);
+
+  const toggleAllSubjectsCollapse = () => {
+    if (isAllSubjectsCollapsed) {
+      setCollapsedSubjects({});
+    } else {
+      const allCol: Record<string, boolean> = {};
+      groupedAssignedQuestions.forEach((g) => {
+        allCol[g.subject] = true;
+      });
+      setCollapsedSubjects(allCol);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -825,7 +977,12 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
 
           {/* Quick Create Button */}
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              if (!newQSubject) {
+                setNewQSubject(subjectFilter || availableBankSubjects[0]?.name || '');
+              }
+              setShowCreateModal(true);
+            }}
             className="px-3.5 py-2 bg-neutral-900 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-neutral-700/40"
           >
             <Plus size={14} />
@@ -850,7 +1007,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
             </div>
 
             {/* Filter inputs */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
               <div className="relative w-36 sm:w-44">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
@@ -876,11 +1033,32 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                   ))}
                 </select>
               )}
+
+              {groupedAssignedQuestions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={toggleAllSubjectsCollapse}
+                  className="px-2 py-1 rounded-lg bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-300 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shrink-0"
+                  title={isAllSubjectsCollapsed ? 'সব বিষয় বিস্তারিত দেখুন' : 'সব বিষয় গুটিয়ে নিন'}
+                >
+                  {isAllSubjectsCollapsed ? (
+                    <>
+                      <ChevronDown size={12} className="text-emerald-600" />
+                      <span>সব খুলুন</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronUp size={12} className="text-emerald-600" />
+                      <span>সব লুকান</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
           {/* Assigned Questions Scrollable List */}
-          <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
+          <div className="flex-1 overflow-y-auto p-3.5 space-y-4">
             {filteredAssignedQuestions.length === 0 ? (
               <div className="text-center py-20 text-neutral-400 dark:text-zinc-500 space-y-3">
                 <AlertCircle className="mx-auto opacity-30 text-emerald-500" size={44} />
@@ -895,148 +1073,231 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                 </p>
               </div>
             ) : (
-              filteredAssignedQuestions.map((eq, index) => {
-                const q = eq.question;
-                if (!q) return null;
-                const isSolExpanded = !!expandedSolutions[eq.mapping_id];
-                const realIndex = examQuestions.findIndex((item) => item.mapping_id === eq.mapping_id);
+              groupedAssignedQuestions.map((group) => {
+                const isCollapsed = !!collapsedSubjects[group.subject];
 
                 return (
                   <div
-                    key={eq.mapping_id}
-                    className="p-3.5 bg-neutral-50 dark:bg-zinc-900/40 border border-neutral-200/90 dark:border-zinc-800/80 rounded-xl hover:border-emerald-500/50 transition-all space-y-2.5 group"
+                    key={group.subject}
+                    className="space-y-3 rounded-2xl border border-neutral-200/70 dark:border-zinc-800/80 bg-neutral-50/40 dark:bg-zinc-900/30 p-2.5 sm:p-3 transition-all"
                   >
-                    {/* Header Row: Serial & Badges & Actions */}
-                    <div className="flex items-center justify-between gap-2 border-b border-neutral-200/50 dark:border-zinc-800/60 pb-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {/* Serial Number */}
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-black text-xs border border-emerald-500/20">
-                          #{realIndex + 1}
+                    {/* Subject Sticky / Collapsible Header Card */}
+                    <div
+                      onClick={() => toggleCollapseSubject(group.subject)}
+                      className="p-2.5 px-3 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/50 hover:shadow-sm transition-all select-none group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="p-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border border-emerald-600/20 shrink-0">
+                          <BookOpen size={14} />
                         </span>
-
-                        {/* Subject & Chapter Badges */}
-                        <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-200 dark:bg-zinc-800 text-neutral-800 dark:text-zinc-200">
-                          {q.subject}
-                        </span>
-                        {q.chapter && (
-                          <span className="text-[11px] text-neutral-600 dark:text-zinc-400 font-medium">
-                            {q.chapter}
-                          </span>
-                        )}
-                        {q.difficulty && (
-                          <span
-                            className={`px-1.5 py-0.2 text-[10px] font-bold rounded ${
-                              q.difficulty.toLowerCase() === 'easy'
-                                ? 'bg-emerald-500/10 text-emerald-600'
-                                : q.difficulty.toLowerCase() === 'hard'
-                                ? 'bg-rose-500/10 text-rose-600'
-                                : 'bg-amber-500/10 text-amber-600'
-                            }`}
-                          >
-                            {q.difficulty}
-                          </span>
-                        )}
+                        <div className="min-w-0">
+                          <h3 className="text-xs font-black text-neutral-900 dark:text-white flex items-center gap-2 truncate">
+                            <span className="truncate">{group.subject}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shrink-0">
+                              {group.items.length}টি প্রশ্ন
+                            </span>
+                          </h3>
+                        </div>
                       </div>
 
-                      {/* Action Tools: Swap, Reorder, Remove */}
-                      <div className="flex items-center gap-1">
-                        {/* 1-Click Swap Button */}
-                        <button
-                          onClick={() => handleOpenSwapModal(eq)}
-                          className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
-                          title="এই প্রশ্নটি অন্য প্রশ্ন দিয়ে পরিবর্তন করুন"
-                        >
-                          <RefreshCw size={12} />
-                          <span>বদলান</span>
-                        </button>
-
-                        {/* Reorder Buttons */}
-                        <button
-                          onClick={() => moveQuestion(realIndex, 'up')}
-                          disabled={realIndex === 0}
-                          className="p-1 text-neutral-500 hover:text-emerald-600 disabled:opacity-20 cursor-pointer"
-                          title="উপরে নিন"
-                        >
-                          <ChevronUp size={16} />
-                        </button>
-                        <button
-                          onClick={() => moveQuestion(realIndex, 'down')}
-                          disabled={realIndex === examQuestions.length - 1}
-                          className="p-1 text-neutral-500 hover:text-emerald-600 disabled:opacity-20 cursor-pointer"
-                          title="নিচে নিন"
-                        >
-                          <ChevronDown size={16} />
-                        </button>
-
-                        {/* Remove */}
-                        <button
-                          onClick={() => handleRemoveQuestion(eq.mapping_id)}
-                          className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
-                          title="পরীক্ষা থেকে বাদ দিন"
-                        >
-                          <Trash2 size={15} />
-                        </button>
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-zinc-400 group-hover:text-emerald-600 shrink-0">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider hidden sm:inline">
+                          {isCollapsed ? 'প্রশ্নগুলো দেখুন' : 'গুটিয়ে নিন'}
+                        </span>
+                        {isCollapsed ? (
+                          <ChevronDown size={16} className="text-emerald-600 transition-transform" />
+                        ) : (
+                          <ChevronUp size={16} className="text-emerald-600 transition-transform" />
+                        )}
                       </div>
                     </div>
 
-                    {/* Question Statement */}
-                    <div className="text-xs sm:text-[13px] font-medium text-neutral-900 dark:text-zinc-100 leading-relaxed">
-                      <MathRenderer text={q.question || ''} />
-                    </div>
+                    {/* Questions inside this Subject */}
+                    {!isCollapsed && (
+                      <div className="space-y-3 pt-1 animate-in fade-in duration-150">
+                        {group.items.map((eq) => {
+                          const q = eq.question;
+                          if (!q) return null;
+                          const isSolExpanded = !!expandedSolutions[eq.mapping_id];
+                          const realIndex = examQuestions.findIndex(
+                            (item) => item.mapping_id === eq.mapping_id,
+                          );
 
-                    {/* MCQ Options Grid (Chorcha-grade full preview) */}
-                    {q.options && q.options.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                        {q.options.map((opt: string, optIdx: number) => {
-                          const isCorrect =
-                            q.correct_answer_indices?.includes(optIdx) ||
-                            q.correct_answer_index === optIdx ||
-                            q.correct_answer === opt;
-                          const optionLabels = ['(ক)', '(খ)', '(গ)', '(ঘ)', '(ঙ)'];
+                          const isSwapActive = swappingMapping?.mapping_id === eq.mapping_id;
+
                           return (
                             <div
-                              key={optIdx}
-                              className={`p-2 rounded-lg border text-xs flex items-start gap-2 ${
-                                isCorrect
-                                  ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-200 font-bold'
-                                  : 'bg-white/60 dark:bg-zinc-900/60 border-neutral-200/70 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300'
+                              key={eq.mapping_id}
+                              className={`p-4 rounded-2xl transition-all space-y-3 group ${
+                                isSwapActive
+                                  ? 'bg-amber-50/40 dark:bg-amber-950/20 border-2 border-amber-500 shadow-md ring-4 ring-amber-500/15'
+                                  : 'bg-white dark:bg-[#151518] border border-neutral-200/90 dark:border-zinc-800/90 hover:border-emerald-500/40 hover:shadow-md'
                               }`}
                             >
-                              <span className="font-mono text-neutral-400 font-bold">
-                                {optionLabels[optIdx] || `(${optIdx + 1})`}
-                              </span>
-                              <div className="flex-1 min-w-0">
-                                <MathRenderer text={opt} />
+                              {/* Header Row: Serial & Badges & Actions */}
+                              <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-zinc-800/80 pb-2.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {/* Serial Number */}
+                                  <span
+                                    className={`px-2.5 py-1 rounded-lg font-mono font-black text-xs border shadow-2xs ${
+                                      isSwapActive
+                                        ? 'bg-amber-500 text-white border-amber-600'
+                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                    }`}
+                                  >
+                                    #{realIndex + 1}
+                                  </span>
+
+                                  {/* Chapter Badge */}
+                                  {q.chapter && (
+                                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-zinc-300">
+                                      {q.chapter}
+                                    </span>
+                                  )}
+
+                                  {/* Topic Badge if available */}
+                                  {q.topic && (
+                                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-medium bg-neutral-100/70 dark:bg-zinc-800/60 text-neutral-600 dark:text-zinc-400">
+                                      {q.topic}
+                                    </span>
+                                  )}
+
+                                  {/* Difficulty Badge */}
+                                  {q.difficulty && (
+                                    <span
+                                      className={`px-2 py-0.5 text-[10px] font-bold rounded-lg ${
+                                        q.difficulty.toLowerCase() === 'easy'
+                                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                          : q.difficulty.toLowerCase() === 'hard'
+                                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                      }`}
+                                    >
+                                      {q.difficulty}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Action Tools: Swap, Reorder, Remove */}
+                                <div className="flex items-center gap-1">
+                                  {/* 1-Click Swap Button */}
+                                  <button
+                                    onClick={() => handleToggleSwapTarget(eq)}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
+                                      isSwapActive
+                                        ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm ring-2 ring-amber-400/50'
+                                        : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400'
+                                    }`}
+                                    title={
+                                      isSwapActive
+                                        ? 'প্রতিস্থাপন বাতিল করুন'
+                                        : 'ডানপাশের প্রশ্ন ব্যাংক থেকে যেকোনো প্রশ্নে ক্লিক করে এটি প্রতিস্থাপন করুন'
+                                    }
+                                  >
+                                    <RefreshCw size={12} className={isSwapActive ? 'animate-spin' : ''} />
+                                    <span>{isSwapActive ? 'সক্রিয় (বাতিল)' : 'বদলান'}</span>
+                                  </button>
+
+                                  {/* Reorder Buttons */}
+                                  <button
+                                    onClick={() => moveQuestion(realIndex, 'up')}
+                                    disabled={realIndex === 0}
+                                    className="p-1 rounded-md text-neutral-500 hover:text-emerald-600 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-20 transition cursor-pointer"
+                                    title="উপরে নিন"
+                                  >
+                                    <ChevronUp size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => moveQuestion(realIndex, 'down')}
+                                    disabled={realIndex === examQuestions.length - 1}
+                                    className="p-1 rounded-md text-neutral-500 hover:text-emerald-600 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-20 transition cursor-pointer"
+                                    title="নিচে নিন"
+                                  >
+                                    <ChevronDown size={16} />
+                                  </button>
+
+                                  {/* Remove */}
+                                  <button
+                                    onClick={() => handleRemoveQuestion(eq.mapping_id)}
+                                    className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
+                                    title="পরীক্ষা থেকে বাদ দিন"
+                                  >
+                                    <Trash2 size={15} />
+                                  </button>
+                                </div>
                               </div>
-                              {isCorrect && (
-                                <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+
+                              {/* Question Statement */}
+                              <div className="text-sm font-semibold text-neutral-900 dark:text-zinc-100 leading-relaxed">
+                                <MathRenderer text={q.question || ''} />
+                              </div>
+
+                              {/* MCQ Options Grid */}
+                              {q.options && q.options.length > 0 && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                                  {q.options.map((opt: string, optIdx: number) => {
+                                    const isCorrect =
+                                      q.correct_answer_indices?.includes(optIdx) ||
+                                      q.correct_answer_index === optIdx ||
+                                      q.correct_answer === opt;
+                                    const optionLabels = ['(ক)', '(খ)', '(গ)', '(ঘ)', '(ঙ)'];
+                                    return (
+                                      <div
+                                        key={optIdx}
+                                        className={`p-2.5 px-3 rounded-xl border text-xs flex items-center justify-between gap-2.5 transition-all ${
+                                          isCorrect
+                                            ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-500/50 text-emerald-950 dark:text-emerald-200 font-bold shadow-2xs'
+                                            : 'bg-neutral-50/70 dark:bg-zinc-900/50 border-neutral-200/80 dark:border-zinc-800 text-neutral-800 dark:text-zinc-200'
+                                        }`}
+                                      >
+                                        <div className="flex items-start gap-2 min-w-0 flex-1">
+                                          <span className="font-mono text-neutral-400 dark:text-zinc-500 font-bold shrink-0">
+                                            {optionLabels[optIdx] || `(${optIdx + 1})`}
+                                          </span>
+                                          <div className="flex-1 min-w-0 leading-normal">
+                                            <MathRenderer text={opt} />
+                                          </div>
+                                        </div>
+                                        {isCorrect && (
+                                          <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* Explanation toggle & box */}
+                              {q.explanation && (
+                                <div className="pt-1">
+                                  <button
+                                    onClick={() =>
+                                      setExpandedSolutions((prev) => ({
+                                        ...prev,
+                                        [eq.mapping_id]: !prev[eq.mapping_id],
+                                      }))
+                                    }
+                                    className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 hover:underline cursor-pointer"
+                                  >
+                                    <HelpCircle size={13} />
+                                    <span>{isSolExpanded ? 'ব্যাখ্যা লুকান' : 'ব্যাখ্যা দেখুন'}</span>
+                                  </button>
+                                  {isSolExpanded && (
+                                    <div className="mt-2 p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/25 border border-blue-200/60 dark:border-blue-900/50 text-xs text-neutral-800 dark:text-zinc-200 space-y-1 animate-in fade-in duration-150">
+                                      <div className="flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300 text-[11px]">
+                                        <Sparkles size={13} />
+                                        <span>সঠিক উত্তর ও বিস্তারিত সমাধান:</span>
+                                      </div>
+                                      <div className="pt-0.5 leading-relaxed">
+                                        <MathRenderer text={q.explanation} />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               )}
                             </div>
                           );
                         })}
-                      </div>
-                    )}
-
-                    {/* Explanation toggle */}
-                    {q.explanation && (
-                      <div className="pt-1">
-                        <button
-                          onClick={() =>
-                            setExpandedSolutions((prev) => ({
-                              ...prev,
-                              [eq.mapping_id]: !prev[eq.mapping_id],
-                            }))
-                          }
-                          className="text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline cursor-pointer"
-                        >
-                          <HelpCircle size={12} />
-                          <span>{isSolExpanded ? 'ব্যাখ্যা লুকান' : 'ব্যাখ্যা দেখুন'}</span>
-                        </button>
-                        {isSolExpanded && (
-                          <div className="mt-1.5 p-2.5 rounded-lg bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-900/40 text-xs text-neutral-800 dark:text-zinc-200">
-                            <MathRenderer text={q.explanation} />
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1061,6 +1322,94 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                 মোট {totalBankCount}টি প্রশ্ন
               </span>
             </div>
+
+            {/* Quick Limit Selector Row */}
+            <div className="flex items-center justify-between gap-1 text-[11px] pt-0.5">
+              <span className="text-[10px] uppercase font-black text-neutral-400 dark:text-zinc-500 tracking-wider">
+                প্রতি পেজে:
+              </span>
+              <div className="flex items-center gap-1 overflow-x-auto">
+                {[25, 50, 100, 200, 500, 1000].map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handlePageSizeChange(size)}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold transition cursor-pointer ${
+                      bankPageSize === size && !isCustomPageSize
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 hover:bg-neutral-200 dark:hover:bg-zinc-700'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setIsCustomPageSize(!isCustomPageSize)}
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition cursor-pointer ${
+                    isCustomPageSize
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 hover:bg-neutral-200 dark:hover:bg-zinc-700'
+                  }`}
+                >
+                  কাস্টম
+                </button>
+              </div>
+            </div>
+
+            {/* Custom Limit Input Bar */}
+            {isCustomPageSize && (
+              <form
+                onSubmit={handleCustomPageSizeSubmit}
+                className="flex items-center gap-1.5 p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/40 rounded-xl animate-in fade-in"
+              >
+                <input
+                  type="number"
+                  min="1"
+                  max="10000"
+                  placeholder="কতটি প্রশ্ন দেখতে চান? (যেমন: ৩০০, ১০০০)..."
+                  value={customPageSizeInput}
+                  onChange={(e) => setCustomPageSizeInput(e.target.value)}
+                  className="flex-1 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-xs outline-none text-neutral-900 dark:text-white font-mono font-bold"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shrink-0 cursor-pointer"
+                >
+                  লোড করুন
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCustomPageSize(false);
+                    handlePageSizeChange(50);
+                  }}
+                  className="px-2 py-1 bg-neutral-200 dark:bg-zinc-800 text-neutral-700 dark:text-zinc-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                >
+                  বাতিল
+                </button>
+              </form>
+            )}
+
+            {/* Active Replacement Mode Banner */}
+            {swappingMapping && (
+              <div className="p-2.5 px-3 bg-amber-500/15 border border-amber-500/40 rounded-xl flex items-center justify-between gap-2 text-xs animate-in slide-in-from-top duration-200">
+                <div className="flex items-center gap-2 text-amber-950 dark:text-amber-200 font-bold min-w-0">
+                  <RefreshCw size={14} className="animate-spin text-amber-600 shrink-0" />
+                  <span className="truncate">
+                    প্রশ্ন <strong>#{swappingMapping.serial}</strong> প্রতিস্থাপন সক্রিয় — যেকোনো প্রশ্নে ক্লিক করলেই তা <strong>#{swappingMapping.serial}</strong>-এ বসে যাবে!
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSwappingMapping(null)}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-xs shrink-0 cursor-pointer"
+                >
+                  বাতিল
+                </button>
+              </div>
+            )}
 
             {/* Filter Form */}
             <form onSubmit={handleBankSearchSubmit} className="space-y-2">
@@ -1181,7 +1530,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                   >
                     <div className="flex items-start gap-2.5">
                       {/* Checkbox for Batch Selection */}
-                      {!isAdded && (
+                      {!isAdded && !swappingMapping && (
                         <input
                           type="checkbox"
                           checked={isChecked}
@@ -1212,19 +1561,25 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                         </div>
                       </div>
 
-                      {/* Single Add Button */}
+                      {/* Single Add / Swap Button */}
                       <button
                         onClick={() => handleAddSingleQuestion(q)}
                         disabled={isAdded}
                         className={`px-2.5 py-1 rounded-lg text-xs font-bold transition shrink-0 cursor-pointer ${
                           isAdded
                             ? 'bg-neutral-200 dark:bg-zinc-800 text-neutral-400 cursor-not-allowed'
+                            : swappingMapping
+                            ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm ring-2 ring-amber-400/40'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
                         }`}
                       >
                         {isAdded ? (
                           <span className="flex items-center gap-1 text-[11px]">
                             <Check size={12} /> যুক্ত আছে
+                          </span>
+                        ) : swappingMapping ? (
+                          <span className="flex items-center gap-1 text-[11px]">
+                            <RefreshCw size={12} /> #{swappingMapping.serial}-এ বসান
                           </span>
                         ) : (
                           <span className="flex items-center gap-1 text-[11px]">
@@ -1237,6 +1592,77 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                 );
               })
             )}
+          </div>
+
+          {/* Question Bank Pagination Controls */}
+          <div className="p-2.5 px-3.5 border-t border-neutral-200 dark:border-zinc-800 bg-neutral-50/90 dark:bg-zinc-900/90 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs shrink-0">
+            {/* Left: Summary */}
+            <div className="flex items-center gap-1.5 text-[11px] text-neutral-600 dark:text-zinc-400 font-medium">
+              <span className="font-mono">
+                পৃষ্ঠা <strong className="text-neutral-900 dark:text-white font-bold">{bankPage}</strong> / {totalBankPages}
+              </span>
+              <span className="text-neutral-300 dark:text-zinc-700">•</span>
+              <span className="font-mono text-zinc-500">
+                মোট {totalBankCount}টি প্রশ্ন
+              </span>
+            </div>
+
+            {/* Center / Right: Nav Controls */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => handlePageChange(1)}
+                disabled={bankPage <= 1 || isSearching}
+                className="p-1 rounded-lg border border-neutral-200 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-30 transition cursor-pointer"
+                title="প্রথম পৃষ্ঠা"
+              >
+                <ChevronsLeft size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePageChange(bankPage - 1)}
+                disabled={bankPage <= 1 || isSearching}
+                className="p-1 px-1.5 rounded-lg border border-neutral-200 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-30 transition flex items-center gap-0.5 text-[11px] font-bold cursor-pointer"
+                title="পূর্ববর্তী পৃষ্ঠা"
+              >
+                <ChevronLeft size={14} />
+                <span>আগের</span>
+              </button>
+
+              {/* Direct Page Jump Form */}
+              <form onSubmit={handleJumpToPageSubmit} className="flex items-center gap-1 px-1">
+                <input
+                  type="number"
+                  min="1"
+                  max={totalBankPages}
+                  value={jumpToPageInput}
+                  onChange={(e) => setJumpToPageInput(e.target.value)}
+                  placeholder={`${bankPage}`}
+                  className="w-11 text-center bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-lg py-0.5 text-[11px] font-mono font-bold outline-none text-neutral-900 dark:text-white focus:border-emerald-500"
+                  title="পৃষ্ঠা নম্বরে যান"
+                />
+              </form>
+
+              <button
+                type="button"
+                onClick={() => handlePageChange(bankPage + 1)}
+                disabled={bankPage >= totalBankPages || isSearching}
+                className="p-1 px-1.5 rounded-lg border border-neutral-200 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-30 transition flex items-center gap-0.5 text-[11px] font-bold cursor-pointer"
+                title="পরবর্তী পৃষ্ঠা"
+              >
+                <span>পরের</span>
+                <ChevronRight size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePageChange(totalBankPages)}
+                disabled={bankPage >= totalBankPages || isSearching}
+                className="p-1 rounded-lg border border-neutral-200 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300 hover:bg-neutral-100 dark:hover:bg-zinc-800 disabled:opacity-30 transition cursor-pointer"
+                title="সর্বশেষ পৃষ্ঠা"
+              >
+                <ChevronsRight size={14} />
+              </button>
+            </div>
           </div>
 
           {/* Floating / Sticky Batch Import Bar */}
@@ -1465,96 +1891,6 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                     : `লাইভ পরীক্ষায় ${bulkParsedQuestions.length}টি প্রশ্ন যুক্ত করুন`}
                 </span>
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════
-          MODAL: 1-Click Swap Question Modal
-         ══════════════════════════════════════════════════════════ */}
-      {swappingMapping && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white dark:bg-[#141417] border border-neutral-200 dark:border-zinc-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl p-6 space-y-4 animate-in zoom-in-95 flex flex-col max-h-[85vh]">
-            <div className="flex justify-between items-center border-b border-neutral-100 dark:border-zinc-800 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
-                  <RefreshCw size={18} />
-                </div>
-                <div>
-                  <h2 className="text-sm font-black text-neutral-900 dark:text-white">
-                    প্রশ্ন প্রতিস্থাপন (1-Click Swap)
-                  </h2>
-                  <p className="text-[11px] text-neutral-500">
-                    বর্তমান অবস্থান পরিবর্তন না করে বিকল্প প্রশ্ন দিয়ে প্রতিস্থাপন করুন
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSwappingMapping(null)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-zinc-800 text-zinc-400"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            {/* Current Question Preview */}
-            <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-1">
-              <span className="text-[10px] font-bold text-amber-600 uppercase font-mono">
-                বর্তমান প্রশ্ন (বাদ যাবে):
-              </span>
-              <div className="text-xs font-semibold text-neutral-900 dark:text-white line-clamp-2">
-                <MathRenderer text={swappingMapping.question?.question || ''} />
-              </div>
-            </div>
-
-            {/* Search Alternate */}
-            <form onSubmit={handleSearchSwapCandidates} className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-              <input
-                type="text"
-                placeholder="বিকল্প প্রশ্ন খুঁজুন..."
-                value={swapSearchQuery}
-                onChange={(e) => setSwapSearchQuery(e.target.value)}
-                className="w-full bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs outline-none text-neutral-900 dark:text-white"
-              />
-            </form>
-
-            {/* Candidates List */}
-            <div className="flex-1 overflow-y-auto space-y-2.5 max-h-[350px]">
-              {isSwapSearching ? (
-                <div className="text-center py-12 text-zinc-500 text-xs font-mono">
-                  বিকল্প প্রশ্ন লোড হচ্ছে...
-                </div>
-              ) : swapCandidates.length === 0 ? (
-                <div className="text-center py-12 text-neutral-400 text-xs">
-                  কোনো উপযুক্ত বিকল্প প্রশ্ন পাওয়া যায়নি।
-                </div>
-              ) : (
-                swapCandidates.map((cand) => (
-                  <div
-                    key={cand.id}
-                    className="p-3 bg-neutral-50 dark:bg-zinc-900/40 border border-neutral-200 dark:border-zinc-800 rounded-xl hover:border-emerald-500 flex items-start justify-between gap-3"
-                  >
-                    <div className="space-y-1 flex-1 min-w-0">
-                      <div className="text-xs font-medium text-neutral-900 dark:text-zinc-200 line-clamp-2">
-                        <MathRenderer text={cand.question || ''} />
-                      </div>
-                      <div className="text-[10px] text-neutral-500 flex gap-2">
-                        <span>{cand.subject}</span>
-                        {cand.chapter && <span>• {cand.chapter}</span>}
-                        <span className="text-amber-600 font-bold">{cand.difficulty}</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleExecuteSwap(cand)}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shrink-0 cursor-pointer shadow-sm"
-                    >
-                      প্রতিস্থাপন করুন
-                    </button>
-                  </div>
-                ))
-              )}
             </div>
           </div>
         </div>

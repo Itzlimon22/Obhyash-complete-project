@@ -376,14 +376,20 @@ export const createQuestion = async (
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(question),
       });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) {
-          return { success: true, id: json.data?.id };
-        }
+      const json = await res.json();
+      if (res.ok && json.success) {
+        return { success: true, id: json.data?.id };
       }
-    } catch (e) {
-      console.warn("API createQuestion error, falling back to client query:", e);
+      return {
+        success: false,
+        error: json.error || "Failed to create question",
+      };
+    } catch (e: any) {
+      console.error("API createQuestion error:", e);
+      return {
+        success: false,
+        error: e.message || "API request failed",
+      };
     }
   }
 

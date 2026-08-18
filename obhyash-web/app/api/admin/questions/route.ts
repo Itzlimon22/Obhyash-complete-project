@@ -214,6 +214,62 @@ export async function GET(request: NextRequest) {
   }
 }
 
+async function normalizeQuestionPayload(q: Record<string, any>) {
+  const mapped = mapQuestionToSnakeCase(q);
+
+  const correctAnswerIndices =
+    mapped.correct_answer_indices ||
+    (mapped.correct_answer_index !== undefined
+      ? [mapped.correct_answer_index]
+      : [0]);
+
+  mapped.correct_answer_indices = correctAnswerIndices;
+  mapped.correct_answer_index = correctAnswerIndices[0] ?? 0;
+
+  if (
+    !mapped.correct_answer &&
+    Array.isArray(mapped.options) &&
+    mapped.options[mapped.correct_answer_index]
+  ) {
+    mapped.correct_answer = mapped.options[mapped.correct_answer_index];
+  }
+
+  mapped.options = Array.isArray(mapped.options) ? mapped.options : [];
+  mapped.type = mapped.type || 'MCQ';
+  mapped.difficulty = mapped.difficulty || 'Medium';
+  mapped.status = mapped.status || 'Approved';
+  mapped.author = mapped.author || 'Admin';
+  mapped.author_name = mapped.author_name || mapped.author || 'Admin';
+  mapped.version = mapped.version || 1;
+  mapped.institutes = Array.isArray(mapped.institutes) ? mapped.institutes : [];
+  mapped.years = Array.isArray(mapped.years) ? mapped.years : [];
+  mapped.tags = Array.isArray(mapped.tags) ? mapped.tags : [];
+  mapped.random_id = mapped.random_id || Math.random();
+
+  if (mapped.subject && !mapped.subject_id) {
+    const subObj = findHscSubject(mapped.subject);
+    if (subObj) mapped.subject_id = subObj.id;
+  }
+
+  if (!mapped.fingerprint && mapped.question && mapped.options) {
+    try {
+      mapped.fingerprint = await generateQuestionFingerprint({
+        question: mapped.question,
+        options: mapped.options,
+        subject: mapped.subject,
+        chapter: mapped.chapter,
+      });
+    } catch (_) {}
+  }
+
+  delete mapped.id;
+  if (!mapped.subject_id) delete mapped.subject_id;
+  if (!mapped.chapter_id) delete mapped.chapter_id;
+  if (!mapped.topic_id) delete mapped.topic_id;
+
+  return mapped;
+}
+
 export async function POST(request: NextRequest) {
   try {
     await connection();
@@ -223,21 +279,7 @@ export async function POST(request: NextRequest) {
     // Check if bulk insert
     if (Array.isArray(body)) {
       const records = await Promise.all(
-        body.map(async (q) => {
-          const mapped = mapQuestionToSnakeCase(q);
-          if (!mapped.fingerprint && mapped.question && mapped.options) {
-            mapped.fingerprint = await generateQuestionFingerprint({
-              question: mapped.question,
-              options: mapped.options,
-              subject: mapped.subject,
-              chapter: mapped.chapter,
-            });
-          }
-          if (!mapped.random_id) {
-            mapped.random_id = Math.random();
-          }
-          return mapped;
-        }),
+        body.map(async (q) => normalizeQuestionPayload(q)),
       );
 
       const { data, error } = await supabaseAdmin
@@ -245,7 +287,11 @@ export async function POST(request: NextRequest) {
         .insert(records)
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error inserting bulk questions:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
       return NextResponse.json({
         success: true,
         data: (data || []).map(mapQuestionToCamelCase),
@@ -253,26 +299,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Single question insert
-    const mapped = mapQuestionToSnakeCase(body);
-    if (!mapped.fingerprint && mapped.question && mapped.options) {
-      mapped.fingerprint = await generateQuestionFingerprint({
-        question: mapped.question,
-        options: mapped.options,
-        subject: mapped.subject,
-        chapter: mapped.chapter,
-      });
-    }
-    if (!mapped.random_id) {
-      mapped.random_id = Math.random();
-    }
+    const record = await normalizeQuestionPayload(body);
 
     const { data, error } = await supabaseAdmin
       .from('questions')
-      .insert([mapped])
+      .insert([record])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error inserting single question:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
