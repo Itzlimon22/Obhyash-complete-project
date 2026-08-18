@@ -156,20 +156,30 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
             </select>
           </div>
 
-          {/* Description */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300">
-              নির্দেশনা ও সিলেবাস বিবরণী (Description)
-            </label>
+          {/* Syllabus & Chapters (For Routine & Students) */}
+          <div className="space-y-1.5 p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                <Sparkles size={14} className="text-emerald-600 dark:text-emerald-400" />
+                পরীক্ষার সিলেবাস ও অধ্যায়সমূহ (Syllabus for Routine) *
+              </label>
+              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full">
+                কমা (,) দিয়ে আলাদা করুন
+              </span>
+            </div>
             <textarea
+              required
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-900 dark:text-white"
-              rows={2}
-              placeholder="যেমন: এইচএসসি ২৫ ও ২৬ ব্যাচ। মোট ২৫টি বহুনির্বাচনী প্রশ্ন থাকবে..."
+              className="w-full bg-white dark:bg-zinc-900 border border-emerald-200 dark:border-emerald-800 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none text-neutral-900 dark:text-white"
+              rows={3}
+              placeholder="যেমন: অধ্যায় ১: ভেক্টর, অধ্যায় ৩: গতিবিদ্যা, অধ্যায় ৪: নিউটনিয়ান বলবিদ্যা"
             />
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+              💡 এই অধ্যায়গুলো অ্যাপের <strong>রুটিন ও সিলেবাস</strong> মডালে এবং শিক্ষার্থীদের প্রস্তুতির জন্য ট্যাগে প্রদর্শিত হবে।
+            </p>
           </div>
 
           {/* Duration Presets & Marks Grid */}

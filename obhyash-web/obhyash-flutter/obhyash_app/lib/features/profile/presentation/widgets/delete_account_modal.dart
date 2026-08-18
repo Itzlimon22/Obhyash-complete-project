@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import '../../../dashboard/domain/models.dart';
 
@@ -53,12 +54,28 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
       final supabase = Supabase.instance.client;
       
       // Call secure RPC
-      await supabase.rpc(
-        'delete_user_account',
-        params: {
-          'p_reason': 'User requested deletion',
-        },
-      );
+      try {
+        await supabase.rpc(
+          'delete_user_account',
+          params: {
+            'p_reason': 'User requested deletion',
+          },
+        );
+      } catch (rpcErr) {
+        debugPrint('[DeleteAccountModal] RPC error, attempting fallback: $rpcErr');
+        // Fallback: Delete from public.users directly
+        try {
+          await supabase.from('users').delete().eq('id', widget.user.id);
+        } catch (dbErr) {
+          rethrow; // If both fail, let user see error
+        }
+      }
+
+      // Clear local storage and preferences
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+      } catch (_) {}
 
       // Sign out from Supabase Auth
       await supabase.auth.signOut();

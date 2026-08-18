@@ -73,8 +73,8 @@ class FacebookRefreshIndicator extends StatefulWidget {
     super.key,
     required this.child,
     required this.onRefresh,
-    this.triggerDistance = 72.0,
-    this.maxDragDistance = 100.0,
+    this.triggerDistance = 64.0,
+    this.maxDragDistance = 96.0,
   });
 
   @override
@@ -93,7 +93,7 @@ class _FacebookRefreshIndicatorState extends State<FacebookRefreshIndicator>
   Animation<double>? _returnAnim;
 
   // Settle height while refreshing (circle stays visible at top)
-  static const double _settledOffset = 56.0;
+  static const double _settledOffset = 52.0;
 
   @override
   void initState() {
@@ -129,11 +129,10 @@ class _FacebookRefreshIndicatorState extends State<FacebookRefreshIndicator>
   }
 
   bool _handleScroll(ScrollNotification n) {
-    // Only handle top-level vertical scroll notifications
     if (n.metrics.axis != Axis.vertical) return false;
-    if (n.depth != 0) return false;
     if (_isRefreshing) return false;
 
+    // Handle OverscrollNotification (iOS & BouncingScrollPhysics)
     if (n is OverscrollNotification && n.overscroll < 0) {
       if (_returnCtrl.isAnimating) _returnCtrl.stop();
       final damped = _dampen(-n.overscroll + (_dragOffset * 1.6));
@@ -142,6 +141,21 @@ class _FacebookRefreshIndicatorState extends State<FacebookRefreshIndicator>
         if (_dragOffset >= widget.triggerDistance && !_hapticFired) {
           _hapticFired = true;
           HapticFeedback.mediumImpact();
+        }
+      }
+    }
+
+    // Handle ScrollUpdateNotification when dragged past top edge (Android/Clamping)
+    if (n is ScrollUpdateNotification) {
+      if (n.metrics.pixels < 0 && (n.scrollDelta ?? 0) < 0) {
+        if (_returnCtrl.isAnimating) _returnCtrl.stop();
+        final damped = _dampen(-n.metrics.pixels);
+        if (mounted) {
+          setState(() => _dragOffset = damped);
+          if (_dragOffset >= widget.triggerDistance && !_hapticFired) {
+            _hapticFired = true;
+            HapticFeedback.mediumImpact();
+          }
         }
       }
     }
@@ -193,36 +207,29 @@ class _FacebookRefreshIndicatorState extends State<FacebookRefreshIndicator>
 
     // Circle colours — match Facebook exactly
     final circleBg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final arcColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF1877F2);
+    final arcColor = isDark ? const Color(0xFF34D399) : const Color(0xFF004633);
 
     final progress = (_dragOffset / widget.triggerDistance).clamp(0.0, 1.0);
-    final circleSize = 36.0;
+    const circleSize = 36.0;
 
-    // Circle slides down from -circleSize to _dragOffset - (circleSize/2)
-    final circleTop = _dragOffset - circleSize / 2;
+    return NotificationListener<ScrollNotification>(
+      onNotification: _handleScroll,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          widget.child,
 
-    return Stack(
-      clipBehavior: Clip.hardEdge,
-      children: [
-        // ── Scrollable content ───────────────────────────────────────────────
-        NotificationListener<ScrollNotification>(
-          onNotification: _handleScroll,
-          child: widget.child,
-        ),
-
-        // ── Floating spinner circle ──────────────────────────────────────────
-        if (_dragOffset > 2)
-          Positioned(
-            top: circleTop,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: AnimatedBuilder(
-                animation: _spinCtrl,
-                builder: (context, _) {
-                  return Opacity(
-                    opacity: progress.clamp(0.2, 1.0),
-                    child: Container(
+          // Floating spinner circle
+          if (_dragOffset > 0 || _isRefreshing)
+            Positioned(
+              top: _dragOffset - (circleSize / 2),
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _spinCtrl,
+                  builder: (_, __) {
+                    return Container(
                       width: circleSize,
                       height: circleSize,
                       decoration: BoxDecoration(
@@ -230,30 +237,30 @@ class _FacebookRefreshIndicatorState extends State<FacebookRefreshIndicator>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.14),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.4 : 0.15,
+                            ),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
                         ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(7),
-                        child: CustomPaint(
-                          painter: _SpinnerPainter(
-                            progress: progress,
-                            spinAngle: _spinCtrl.value * 2 * math.pi,
-                            isRefreshing: _isRefreshing,
-                            color: arcColor,
-                          ),
+                      padding: const EdgeInsets.all(7.5),
+                      child: CustomPaint(
+                        painter: _SpinnerPainter(
+                          progress: progress,
+                          spinAngle: _spinCtrl.value * 2 * math.pi,
+                          isRefreshing: _isRefreshing,
+                          color: arcColor,
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -243,6 +243,21 @@ final routerProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) =>
                         const LiveExamCategoryView(category: 'hsc'),
                     routes: [
+                       GoRoute(
+                        path: ':category',
+                        builder: (context, state) {
+                          final category =
+                              state.pathParameters['category'] ?? 'hsc';
+                          return LiveExamCategoryView(category: category);
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'live-exams',
+                    builder: (context, state) =>
+                        const LiveExamCategoryView(category: 'hsc'),
+                    routes: [
                       GoRoute(
                         path: ':category',
                         builder: (context, state) {

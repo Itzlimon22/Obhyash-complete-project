@@ -204,11 +204,17 @@ class _SubscriptionViewState extends State<SubscriptionView> {
         ? premiumPlans[_selectedPlanIndex]
         : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    return RefreshIndicator(
+      color: const Color(0xFF004633),
+      onRefresh: _loadData,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           // HERO BANNER
           if (_isLoading)
             Container(
@@ -405,6 +411,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
           const SizedBox(height: 48),
         ],
+      ),
       ),
     );
   }

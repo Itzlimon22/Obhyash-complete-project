@@ -37,18 +37,30 @@ class FormulaSubjectsView extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.6,
-                ),
-                itemCount: subjects.length,
-                itemBuilder: (context, index) {
-                  final subject = subjects[index];
-                  return _SubjectCard(subject: subject, isDark: isDark);
+              child: RefreshIndicator(
+                color: const Color(0xFF004633),
+                onRefresh: () async {
+                  ref.invalidate(userProfileProvider);
+                  try {
+                    await ref.read(userProfileProvider.future);
+                  } catch (_) {}
                 },
+                child: GridView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.6,
+                  ),
+                  itemCount: subjects.length,
+                  itemBuilder: (context, index) {
+                    final subject = subjects[index];
+                    return _SubjectCard(subject: subject, isDark: isDark);
+                  },
+                ),
               ),
             ),
           ],

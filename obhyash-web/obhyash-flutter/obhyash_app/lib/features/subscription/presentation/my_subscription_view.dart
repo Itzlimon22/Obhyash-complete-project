@@ -308,19 +308,27 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
           : TabBarView(
               controller: _tabController,
               children: [
-                _OverviewTab(
-                  isDark: isDark,
-                  cardBg: cardBg,
-                  activePlan: _activePlan,
-                  expiresAt: _expiresAt,
-                  daysLeft: _daysLeft,
-                  onUpgrade: () => context.push('/profile/subscription'),
+                RefreshIndicator(
+                  color: const Color(0xFF166534),
+                  onRefresh: _loadData,
+                  child: _OverviewTab(
+                    isDark: isDark,
+                    cardBg: cardBg,
+                    activePlan: _activePlan,
+                    expiresAt: _expiresAt,
+                    daysLeft: _daysLeft,
+                    onUpgrade: () => context.push('/profile/subscription'),
+                  ),
                 ),
-                _HistoryTab(
-                  isDark: isDark,
-                  cardBg: cardBg,
-                  invoices: _invoices,
-                  onShowReceipt: _showReceiptSheet,
+                RefreshIndicator(
+                  color: const Color(0xFF166534),
+                  onRefresh: _loadData,
+                  child: _HistoryTab(
+                    isDark: isDark,
+                    cardBg: cardBg,
+                    invoices: _invoices,
+                    onShowReceipt: _showReceiptSheet,
+                  ),
                 ),
               ],
             ),
@@ -579,6 +587,9 @@ class _OverviewTab extends StatelessWidget {
         : 0.0;
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         // Hero card
@@ -845,69 +856,71 @@ class _FreePlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFF166534).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                LucideIcons.crown,
-                color: Color(0xFF166534),
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'কোনো সক্রিয় সাবস্ক্রিপশন নেই',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF000000),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'প্রিমিয়াম প্ল্যান নাও এবং সীমাহীন পড়াশোনা উপভোগ করো',
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark
-                    ? const Color(0xFFA3A3A3)
-                    : const Color(0xFF737373),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: onUpgrade,
-              icon: const Icon(LucideIcons.zap, size: 16),
-              label: const Text(
-                'প্ল্যান দেখো ও আপগ্রেড করো',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF166534),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
-        ),
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      children: [
+        Center(
+          child: Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: const Color(0xFF166534).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              LucideIcons.crown,
+              color: Color(0xFF166534),
+              size: 32,
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'কোনো সক্রিয় সাবস্ক্রিপশন নেই',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            color: isDark ? Colors.white : const Color(0xFF000000),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'প্রিমিয়াম প্ল্যান নাও এবং সীমাহীন পড়াশোনা উপভোগ করো',
+          style: TextStyle(
+            fontSize: 16,
+            color: isDark
+                ? const Color(0xFFA3A3A3)
+                : const Color(0xFF737373),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        Center(
+          child: ElevatedButton.icon(
+            onPressed: onUpgrade,
+            icon: const Icon(LucideIcons.zap, size: 16),
+            label: const Text(
+              'প্ল্যান দেখো ও আপগ্রেড করো',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF166534),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 14,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -930,28 +943,36 @@ class _HistoryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (invoices.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              LucideIcons.receipt,
-              size: 48,
-              color: isDark ? const Color(0xFF525252) : const Color(0xFFD4D4D4),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'কোনো পেমেন্ট ইতিহাস নেই',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: isDark
-                    ? const Color(0xFF737373)
-                    : const Color(0xFFA3A3A3),
-              ),
-            ),
-          ],
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
+        padding: const EdgeInsets.symmetric(vertical: 60),
+        children: [
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  LucideIcons.receipt,
+                  size: 48,
+                  color: isDark ? const Color(0xFF525252) : const Color(0xFFD4D4D4),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'কোনো পেমেন্ট ইতিহাস নেই',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: isDark
+                        ? const Color(0xFF737373)
+                        : const Color(0xFFA3A3A3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
@@ -962,6 +983,9 @@ class _HistoryTab extends StatelessWidget {
         .length;
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         // Summary row

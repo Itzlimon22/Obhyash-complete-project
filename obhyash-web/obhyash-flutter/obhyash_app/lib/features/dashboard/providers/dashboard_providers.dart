@@ -81,26 +81,9 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
     final prefs = ref.watch(sharedPreferencesProvider);
     final cacheKey = 'profile_${user.id}';
-
-    // 1. Cache-first: return immediately if we have cached data
-    final cached = prefs.getString(cacheKey);
-    if (cached != null) {
-      try {
-        final decoded = jsonDecode(cached) as Map<String, dynamic>;
-        // Only use cache if it came from the 'users' table (has users-specific fields)
-        // Old cache from public_profiles lacks 'email', 'phone', etc.
-        if (decoded.containsKey('email') ||
-            decoded.containsKey('phone') ||
-            decoded.containsKey('stream') ||
-            decoded.containsKey('optional_subject')) {
-          return _profileFromJson(decoded);
-        }
-        // Else fall through to re-fetch from users table
-      } catch (_) {}
-    }
-
-    // 2. Network Fetch — use 'users' table to get stream, optional_subject, etc.
     final supabase = ref.watch(supabaseClientProvider);
+
+    // 1. Fetch fresh profile from network
     try {
       final response = await supabase
           .from('users')
@@ -113,10 +96,19 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
         return _profileFromJson(response);
       }
     } catch (e) {
-      debugPrint('[UserProfileNotifier] users table query failed: $e');
+      debugPrint('[UserProfileNotifier] Network fetch failed (offline/slow): $e');
     }
 
-    // Fallback: try public_profiles view (available even without a users row)
+    // 2. Offline / Cache Fallback: return cached data if network failed
+    final cached = prefs.getString(cacheKey);
+    if (cached != null) {
+      try {
+        final decoded = jsonDecode(cached) as Map<String, dynamic>;
+        return _profileFromJson(decoded);
+      } catch (_) {}
+    }
+
+    // 3. Fallback: try public_profiles view
     try {
       final fallback = await supabase
           .from('public_profiles')
@@ -125,12 +117,9 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
           .maybeSingle();
 
       if (fallback != null) {
-        // public_profiles may lack email/phone/stream — store with flag so we re-fetch later
         return _profileFromJson(fallback);
       }
-    } catch (e) {
-      debugPrint('[UserProfileNotifier] public_profiles fallback failed: $e');
-    }
+    } catch (_) {}
 
     return null;
   }

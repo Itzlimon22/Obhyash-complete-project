@@ -23,6 +23,14 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     _fetchActivityData();
   }
 
+  @override
+  void didUpdateWidget(covariant DailyStreakCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userStreak != widget.userStreak) {
+      _fetchActivityData();
+    }
+  }
+
   Future<void> _fetchActivityData() async {
     try {
       final supabase = Supabase.instance.client;
@@ -31,38 +39,49 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
 
       final today = DateTime.now();
       final thirtyDaysAgo = today.subtract(const Duration(days: 29));
-      // Reset hours to start of day
       final startDate = DateTime(thirtyDaysAgo.year, thirtyDaysAgo.month, thirtyDaysAgo.day);
 
       final data = await supabase
           .from('exam_results')
           .select('created_at, date')
           .eq('user_id', userId)
-          .gte('date', startDate.toIso8601String())
-          .order('date', ascending: false);
+          .gte('created_at', startDate.toUtc().toIso8601String())
+          .order('created_at', ascending: false);
 
-      final rows = data as List;
-      
+      final rows = (data as List).toList();
+
+      // Also include live exam attempts
+      try {
+        final liveData = await supabase
+            .from('live_exam_attempts')
+            .select('submit_time')
+            .eq('user_id', userId)
+            .eq('status', 'submitted')
+            .gte('submit_time', startDate.toUtc().toIso8601String());
+
+        for (final row in (liveData as List)) {
+          if (row['submit_time'] != null) {
+            rows.add({'created_at': row['submit_time']});
+          }
+        }
+      } catch (_) {}
+
       // Compute activity per day (index 0 is oldest, 29 is today)
       final List<int> activity = List.filled(30, 0);
-      Set<String> activeDates = {};
 
       for (final row in rows) {
-        final dateStr = row['date'] ?? row['created_at'];
+        final dateStr = (row['created_at'] ?? row['date']) as String?;
         if (dateStr == null) continue;
-        
-        final date = DateTime.tryParse(dateStr);
+
+        final date = DateTime.tryParse(dateStr)?.toLocal();
         if (date == null) continue;
 
-        // Strip time
         final d = DateTime(date.year, date.month, date.day);
         final diff = d.difference(startDate).inDays;
-        
+
         if (diff >= 0 && diff < 30) {
           activity[diff]++;
         }
-        
-        activeDates.add(d.toIso8601String());
       }
 
       _cachedActivity = activity;

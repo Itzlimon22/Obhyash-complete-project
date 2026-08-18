@@ -20,6 +20,7 @@ import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/title_provider.dart';
 import 'widgets/obhyash_tooltip.dart';
+import '../providers/connectivity_provider.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
 import '../../features/practice/providers/practice_providers.dart';
 
@@ -362,6 +363,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     final userInst = user?.institute ?? '';
     final streak = user?.streakCount ?? 0;
     final isLoading = userProfileAsync.isLoading;
+
+    // Auto-refresh & sync whenever internet returns from offline to online
+    ref.listen<AsyncValue<NetworkStatus>>(connectivityStreamProvider, (prev, next) {
+      if (next.value == NetworkStatus.online && prev?.value == NetworkStatus.offline) {
+        globalRefresh(ref);
+      }
+    });
 
     final isDrawerOpen = _scaffoldKey.currentState?.isDrawerOpen ?? false;
     final isAtDashboardRoot = widget.navigationShell.currentIndex == 0 &&
@@ -760,18 +768,18 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         child: widget.navigationShell,
       ),
 
-      bottomNavigationBar: (activeTab == 'dashboard' ||
-              activeTab == 'history' ||
-              activeTab == 'leaderboard' ||
-              activeTab == 'settings')
-          ? MainBottomNav(
-              activeTab: activeTab,
-              onTabChange: _onTabChange,
-              onMenuClick: () {
-                _scaffoldKey.currentState?.openDrawer();
-              },
-            )
-          : null,
+      bottomNavigationBar: MainBottomNav(
+        activeTab: (activeTab == 'history' ||
+                activeTab == 'setup' ||
+                activeTab == 'leaderboard' ||
+                activeTab == 'settings')
+            ? activeTab
+            : 'dashboard',
+        onTabChange: _onTabChange,
+        onMenuClick: () {
+          _scaffoldKey.currentState?.openDrawer();
+        },
+      ),
     ),
   );
   }

@@ -1,0 +1,225 @@
+import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
+/// ─── Daily Quest Model ────────────────────────────────────────────────────────
+class DailyQuest {
+  final String id;
+  final String title;
+  final String description;
+  final int target;
+  final int current;
+  final int xpReward;
+  final IconData icon;
+  final Color color;
+  final bool isClaimed;
+
+  const DailyQuest({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.target,
+    required this.current,
+    required this.xpReward,
+    required this.icon,
+    required this.color,
+    this.isClaimed = false,
+  });
+
+  bool get isCompleted => current >= target;
+  double get progress => target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
+
+  DailyQuest copyWith({
+    int? current,
+    bool? isClaimed,
+  }) {
+    return DailyQuest(
+      id: id,
+      title: title,
+      description: description,
+      target: target,
+      current: current ?? this.current,
+      xpReward: xpReward,
+      icon: icon,
+      color: color,
+      isClaimed: isClaimed ?? this.isClaimed,
+    );
+  }
+}
+
+/// ─── Badge Item Model ─────────────────────────────────────────────────────────
+class BadgeItem {
+  final String id;
+  final String name;
+  final String titleBangla;
+  final String description;
+  final IconData icon;
+  final Color gradientStart;
+  final Color gradientEnd;
+  final bool isUnlocked;
+  final DateTime? unlockedAt;
+
+  const BadgeItem({
+    required this.id,
+    required this.name,
+    required this.titleBangla,
+    required this.description,
+    required this.icon,
+    required this.gradientStart,
+    required this.gradientEnd,
+    this.isUnlocked = false,
+    this.unlockedAt,
+  });
+
+  BadgeItem copyWith({
+    bool? isUnlocked,
+    DateTime? unlockedAt,
+  }) {
+    return BadgeItem(
+      id: id,
+      name: name,
+      titleBangla: titleBangla,
+      description: description,
+      icon: icon,
+      gradientStart: gradientStart,
+      gradientEnd: gradientEnd,
+      isUnlocked: isUnlocked ?? this.isUnlocked,
+      unlockedAt: unlockedAt ?? this.unlockedAt,
+    );
+  }
+}
+
+/// Predefined Badges in Obhyash
+class ObhyashBadges {
+  static const List<BadgeItem> allBadges = [
+    BadgeItem(
+      id: 'first_step',
+      name: 'Inception',
+      titleBangla: 'সূচনা',
+      description: 'প্রথম পরীক্ষা সাফল্যের সাথে সম্পন্ন করেছো',
+      icon: LucideIcons.rocket,
+      gradientStart: Color(0xFF0284C7),
+      gradientEnd: Color(0xFF0EA5E9),
+    ),
+    BadgeItem(
+      id: 'streak_7',
+      name: 'Unbroken Flame',
+      titleBangla: 'অবিচল শিখা',
+      description: 'টানা ৭ দিনের স্ট্রিক বজায় রেখেছো',
+      icon: LucideIcons.flame,
+      gradientStart: Color(0xFFEA580C),
+      gradientEnd: Color(0xFFF97316),
+    ),
+    BadgeItem(
+      id: 'precision_master',
+      name: 'Bullseye',
+      titleBangla: 'সূক্ষ্মদর্শী',
+      description: 'যেকোনো পরীক্ষায় শতভাগ (১০০%) নির্ভুল স্কোর অর্জন',
+      icon: LucideIcons.target,
+      gradientStart: Color(0xFF059669),
+      gradientEnd: Color(0xFF10B981),
+    ),
+    BadgeItem(
+      id: 'night_owl',
+      name: 'Midnight Scholar',
+      titleBangla: 'নিশীথসাধক',
+      description: 'রাত ১১টার পর গভীর মনোযোগে পরীক্ষা সম্পন্ন',
+      icon: LucideIcons.moon,
+      gradientStart: Color(0xFF7C3AED),
+      gradientEnd: Color(0xFF8B5CF6),
+    ),
+    BadgeItem(
+      id: 'knowledge_sage',
+      name: 'Knowledge Sage',
+      titleBangla: 'জ্ঞানতপস্বী',
+      description: '৫০টির বেশি প্রশ্নের সঠিক উত্তর প্রদান করেছো',
+      icon: LucideIcons.brain,
+      gradientStart: Color(0xFFD97706),
+      gradientEnd: Color(0xFFF59E0B),
+    ),
+    BadgeItem(
+      id: 'apex_legend',
+      name: 'Zenith',
+      titleBangla: 'শীর্ষ চূড়া',
+      description: '৫,০০০+ মোট XP অর্জন করে শীর্ষে পৌঁছেছো',
+      icon: LucideIcons.crown,
+      gradientStart: Color(0xFFE11D48),
+      gradientEnd: Color(0xFFF43F5E),
+    ),
+  ];
+}
+
+/// ─── Unique Weekly League Tier Model ───────────────────────────────────────────
+enum WeeklyLeagueTier {
+  seeker(
+    id: 'seeker',
+    nameBangla: 'অনুসন্ধিৎসু',
+    nameEnglish: 'Seeker',
+    icon: LucideIcons.sprout,
+    minXp: 0,
+    color: Color(0xFF10B981),
+  ),
+  pioneer(
+    id: 'pioneer',
+    nameBangla: 'অগ্রপথিক',
+    nameEnglish: 'Pioneer',
+    icon: LucideIcons.zap,
+    minXp: 800,
+    color: Color(0xFF0284C7),
+  ),
+  conqueror(
+    id: 'conqueror',
+    nameBangla: 'দিগ্বিজয়ী',
+    nameEnglish: 'Conqueror',
+    icon: LucideIcons.shield,
+    minXp: 2000,
+    color: Color(0xFF8B5CF6),
+  ),
+  luminary(
+    id: 'luminary',
+    nameBangla: 'মেধাবী',
+    nameEnglish: 'Luminary',
+    icon: LucideIcons.sparkles,
+    minXp: 3500,
+    color: Color(0xFFF59E0B),
+  ),
+  apex(
+    id: 'apex',
+    nameBangla: 'শীর্ষসেনা',
+    nameEnglish: 'Apex',
+    icon: LucideIcons.crown,
+    minXp: 5000,
+    color: Color(0xFFEF4444),
+  );
+
+  final String id;
+  final String nameBangla;
+  final String nameEnglish;
+  final IconData icon;
+  final int minXp;
+  final Color color;
+
+  const WeeklyLeagueTier({
+    required this.id,
+    required this.nameBangla,
+    required this.nameEnglish,
+    required this.icon,
+    required this.minXp,
+    required this.color,
+  });
+
+  static WeeklyLeagueTier fromXp(int xp) {
+    if (xp >= 5000) return WeeklyLeagueTier.apex;
+    if (xp >= 3500) return WeeklyLeagueTier.luminary;
+    if (xp >= 2000) return WeeklyLeagueTier.conqueror;
+    if (xp >= 800) return WeeklyLeagueTier.pioneer;
+    return WeeklyLeagueTier.seeker;
+  }
+}
+
+/// ─── Celebration Type ─────────────────────────────────────────────────────────
+enum CelebrationType {
+  levelUp,
+  badgeUnlock,
+  questClaim,
+  perfectScore,
+}

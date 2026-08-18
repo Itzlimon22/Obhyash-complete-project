@@ -1,17 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class StreakService {
   static final _supabase = Supabase.instance.client;
-
-  /// Calculates the difference in days between two dates using local midnight.
-  static int _daysDiff(DateTime from, DateTime to) {
-    final fromMidnight = DateTime(from.year, from.month, from.day);
-    final toMidnight = DateTime(to.year, to.month, to.day);
-    return toMidnight.difference(fromMidnight).inDays;
-  }
 
   /// Returns "YYYY-MM-DD" for local date comparison.
   static String _toLocalDateStr(DateTime date) {
@@ -19,32 +12,22 @@ class StreakService {
   }
 
   /// Checks and updates the user's daily streak based on exam history.
-  /// Runs ONLY ONCE per calendar day using SharedPreferences as a guard, unless [forceSync] is true.
-  static Future<void> checkAndUpdateStreak(String userId, {bool forceSync = false}) async {
+  static Future<int> checkAndUpdateStreak(String userId, {bool forceSync = false}) async {
     try {
       final now = DateTime.now();
       final todayStr = _toLocalDateStr(now);
-      
-      final prefs = await SharedPreferences.getInstance();
-      final streakKey = 'streak_checked_$userId';
-      final lastCheckedDate = prefs.getString(streakKey);
 
-      if (!forceSync && lastCheckedDate == todayStr) {
-        // Already checked today locally, do nothing.
-        return;
-      }
-
-      // 1. Fetch recent exam dates for this user to calculate actual streak
+      // 1. Fetch recent exam dates from regular exams
       final data = await _supabase
           .from('exam_results')
           .select('created_at, date')
           .eq('user_id', userId)
           .order('created_at', ascending: false)
-          .limit(365); // Support up to a year of streak calculation
+          .limit(365);
 
       final List<dynamic> rows = data as List<dynamic>;
       final Set<String> activeDates = {};
-      
+
       for (final row in rows) {
         final dateStr = row['date'] ?? row['created_at'];
         if (dateStr == null) continue;
@@ -54,32 +37,54 @@ class StreakService {
         }
       }
 
-      // 2. Calculate streak backwards from today or yesterday
+      // Also include live exam attempts
+      try {
+        final liveData = await _supabase
+            .from('live_exam_attempts')
+            .select('submit_time')
+            .eq('user_id', userId)
+            .eq('status', 'submitted')
+            .order('submit_time', ascending: false)
+            .limit(100);
+
+        for (final row in (liveData as List<dynamic>)) {
+          final dateStr = row['submit_time'] as String?;
+          if (dateStr == null) continue;
+          final date = DateTime.tryParse(dateStr)?.toLocal();
+          if (date != null) {
+            activeDates.add(_toLocalDateStr(date));
+          }
+        }
+      } catch (_) {}
+
+      // 2. Calculate consecutive streak backwards
       int computedStreak = 0;
       DateTime currentDate = now;
       final yesterday = now.subtract(const Duration(days: 1));
-      
+
+      // If user hasn't completed an exam today, check if yesterday was active to keep streak alive
       if (!activeDates.contains(todayStr)) {
         currentDate = yesterday;
       }
-      
+
       while (activeDates.contains(_toLocalDateStr(currentDate))) {
         computedStreak++;
         currentDate = currentDate.subtract(const Duration(days: 1));
       }
 
-      // 3. Fetch fresh user data to give login bonus
+      // 3. Fetch user record for streak & login bonus
       final res = await _supabase
           .from('users')
-          .select('xp, last_streak_date')
+          .select('xp, streak, last_streak_date')
           .eq('id', userId)
           .maybeSingle();
-      
-      if (res == null) return;
+
+      if (res == null) return computedStreak;
 
       final currentXp = (res['xp'] as num?)?.toInt() ?? 0;
+      final currentDbStreak = (res['streak'] as num?)?.toInt() ?? 0;
       final lastLoginStr = res['last_streak_date'] as String?;
-      
+
       bool giveLoginBonus = false;
       if (lastLoginStr == null) {
         giveLoginBonus = true;
@@ -92,17 +97,42 @@ class StreakService {
 
       final newXp = giveLoginBonus ? currentXp + 20 : currentXp;
 
-      // 4. Update DB
-      final Map<String, dynamic> updatePayload = {
-        'streak': computedStreak,
-      };
-      
+      // 4. Update DB if streak changed or login bonus given
+      final Map<String, dynamic> updatePayload = {};
+
+      if (computedStreak != currentDbStreak || forceSync) {
+        updatePayload['streak'] = computedStreak;
+      }
+
       if (giveLoginBonus) {
         updatePayload['xp'] = newXp;
         updatePayload['last_streak_date'] = now.toUtc().toIso8601String();
       }
 
-      await _supabase.from('users').update(updatePayload).eq('id', userId);
+      if (updatePayload.isNotEmpty) {
+        try {
+          await _supabase.from('users').update(updatePayload).eq('id', userId);
+        } catch (dbErr) {
+          debugPrint('[StreakService] DB update error: $dbErr');
+        }
+
+        // Also sync local cached profile in SharedPreferences so UI updates without delay
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final cacheKey = 'profile_$userId';
+          final cached = prefs.getString(cacheKey);
+          if (cached != null) {
+            final decoded = jsonDecode(cached) as Map<String, dynamic>;
+            decoded['streak'] = computedStreak;
+            decoded['streak_count'] = computedStreak;
+            if (giveLoginBonus) {
+              decoded['xp'] = newXp;
+              decoded['last_streak_date'] = now.toUtc().toIso8601String();
+            }
+            await prefs.setString(cacheKey, jsonEncode(decoded));
+          }
+        } catch (_) {}
+      }
 
       // 5. Create notification if login bonus was given
       if (giveLoginBonus) {
@@ -124,11 +154,10 @@ class StreakService {
         }
       }
 
-      // Mark locally as checked today
-      await prefs.setString(streakKey, todayStr);
-
+      return computedStreak;
     } catch (e) {
       debugPrint('[StreakService] Error checking streak: $e');
+      return 0;
     }
   }
 }

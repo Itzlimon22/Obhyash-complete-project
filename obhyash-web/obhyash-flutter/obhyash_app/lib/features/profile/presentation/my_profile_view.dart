@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
+import 'widgets/badges_showcase_section.dart';
 import 'widgets/subjects_progress_section.dart';
 import 'widgets/recent_activity_section.dart';
 import 'widgets/streak_calendar.dart';
@@ -242,6 +243,10 @@ class MyProfileView extends ConsumerWidget {
             xp: user.xp,
             streak: user.streakCount,
           ),
+          const SizedBox(height: 24),
+
+          // Badges Showcase
+          BadgesShowcaseSection(userId: user.id),
           const SizedBox(height: 24),
 
           // Main Content Layout (Left Column & Right Column mimic from Web)

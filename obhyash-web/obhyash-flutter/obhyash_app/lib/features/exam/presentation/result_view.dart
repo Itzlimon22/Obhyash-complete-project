@@ -13,6 +13,7 @@ import '../services/pdf_download_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
+import '../../gamification/services/gamification_service.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -45,6 +46,20 @@ class _ResultViewState extends State<ResultView> {
     // Only celebrate with confetti once right after direct exam completion
     if (!widget.isHistoryMode) {
       _confettiController.play();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final uid = Supabase.instance.client.auth.currentUser?.id;
+        if (uid != null && mounted) {
+          GamificationService.checkAndUnlockBadges(
+            context: context,
+            userId: uid,
+            correctCount: widget.result.correctCount,
+            wrongCount: widget.result.wrongCount,
+            totalQuestions: widget.result.totalQuestions,
+            currentStreak: 0,
+            currentXp: 0,
+          );
+        }
+      });
     }
     _fetchBookmarks();
   }

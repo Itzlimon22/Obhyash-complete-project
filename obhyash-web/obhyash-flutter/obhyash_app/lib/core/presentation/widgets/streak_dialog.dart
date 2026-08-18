@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'user_avatar.dart';
 import 'obhyash_tooltip.dart';
+import '../../../features/dashboard/services/streak_service.dart';
 
 class StreakDialog extends StatefulWidget {
   final int currentStreak;
@@ -23,6 +24,7 @@ class StreakDialog extends StatefulWidget {
 class _StreakDialogState extends State<StreakDialog> {
   bool _isLoading = true;
   List<bool> _activeDays = List.generate(7, (index) => false);
+  late int _streakCount;
   int _tabIndex = 0;
   
   static List<dynamic>? _cachedTopStreaks;
@@ -33,6 +35,7 @@ class _StreakDialogState extends State<StreakDialog> {
   @override
   void initState() {
     super.initState();
+    _streakCount = widget.currentStreak;
     _fetchWeeklyActivity();
   }
 
@@ -61,10 +64,38 @@ class _StreakDialogState extends State<StreakDialog> {
           }
         }
       }
+
+      // Also fetch live exam attempts this week
+      try {
+        final liveData = await Supabase.instance.client
+            .from('live_exam_attempts')
+            .select('submit_time')
+            .eq('user_id', widget.userId)
+            .eq('status', 'submitted')
+            .gte('submit_time', startOfWeek.toUtc().toIso8601String());
+
+        for (final row in (liveData as List<dynamic>)) {
+          final dateStr = row['submit_time'] as String?;
+          if (dateStr == null) continue;
+          final date = DateTime.tryParse(dateStr)?.toLocal();
+          if (date != null) {
+            final diff = date.difference(startOfWeek).inDays;
+            if (diff >= 0 && diff < 7) {
+              activeDays[diff] = true;
+            }
+          }
+        }
+      } catch (_) {}
       
+      // Sync fresh streak count from database / service
+      final freshStreak = await StreakService.checkAndUpdateStreak(widget.userId, forceSync: true);
+
       if (mounted) {
         setState(() {
           _activeDays = activeDays;
+          if (freshStreak > _streakCount) {
+            _streakCount = freshStreak;
+          }
           _isLoading = false;
         });
       }
@@ -238,7 +269,7 @@ class _StreakDialogState extends State<StreakDialog> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${widget.currentStreak} দিনের স্ট্রাইক',
+                      '$_streakCount দিনের স্ট্রাইক',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,

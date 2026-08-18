@@ -32,43 +32,43 @@ class _LevelInfo {
 const _levels = [
   _LevelInfo(
     'Legend',
-    'লিজেন্ড (Legend)',
+    'শীর্ষসেনা (Apex)',
     5000,
-    Color(0xFF9333EA), // Amethyst
-    Color(0xFF4C1D95),
-    LucideIcons.award, // Changed from flame
+    Color(0xFFEF4444), // Crimson
+    Color(0xFF991B1B),
+    LucideIcons.crown,
   ),
   _LevelInfo(
     'Titan',
-    'টাইটান (Titan)',
+    'মেধাবী (Luminary)',
     3500,
-    Color(0xFFF97316), // Coral / Orange
-    Color(0xFFB91C1C),
-    LucideIcons.shield, // Changed from zap
+    Color(0xFFF59E0B), // Amber
+    Color(0xFFB45309),
+    LucideIcons.sparkles,
   ),
   _LevelInfo(
     'Warrior',
-    'ওয়ারিয়র (Warrior)',
+    'দিগ্বিজয়ী (Conqueror)',
     2000,
-    Color(0xFF1E3A8A), // Electric Blue
-    Color(0xFF1D4ED8),
-    LucideIcons.target, // Changed from swords
+    Color(0xFF8B5CF6), // Violet
+    Color(0xFF6D28D9),
+    LucideIcons.shield,
   ),
   _LevelInfo(
     'Scout',
-    'স্কাউট (Scout)',
+    'অগ্রপথিক (Pioneer)',
     800,
-    Color(0xFF10B981), // Emerald
-    Color(0xFF059669),
-    LucideIcons.compass, // Changed from eye
+    Color(0xFF0284C7), // Sky Blue
+    Color(0xFF0369A1),
+    LucideIcons.zap,
   ),
   _LevelInfo(
     'Rookie',
-    'রুকি (Rookie)',
+    'অনুসন্ধিৎসু (Seeker)',
     0,
-    Color(0xFF64748B), // Slate
-    Color(0xFF334155),
-    LucideIcons.flag, // Changed from mapPin
+    Color(0xFF10B981), // Emerald
+    Color(0xFF047857),
+    LucideIcons.sprout,
   ),
 ];
 
@@ -393,9 +393,18 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
               : _viewMode == 'level'
               ? (_isLoading && _users.isEmpty
                     ? const Center(child: CircularProgressIndicator())
-                    : ListView(
-                        padding: const EdgeInsets.only(bottom: 80),
-                        children: [
+                    : RefreshIndicator(
+                        color: const Color(0xFF004633),
+                        onRefresh: () async {
+                          await _fetchCounts();
+                          await _fetch();
+                        },
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
+                          ),
+                          padding: const EdgeInsets.only(bottom: 80),
+                          children: [
                           _LevelSelector(
                             levels: _levels,
                             selectedLevel: _selectedLevel,
@@ -487,7 +496,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             ),
                           ),
                         ],
-                      ))
+                      ),
+                    ))
               : _CollegeLeaderboardBody(
                   institute: myProfile?.institute ?? '',
                   users: _collegeUsers,

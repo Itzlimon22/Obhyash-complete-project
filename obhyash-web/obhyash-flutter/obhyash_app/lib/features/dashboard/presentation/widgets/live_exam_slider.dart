@@ -3,12 +3,49 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:intl/intl.dart';
 import '../../../live_exam/domain/models.dart';
 import '../../providers/dashboard_providers.dart';
 
 class LiveExamSlider extends ConsumerWidget {
   const LiveExamSlider({super.key});
+
+  static String _toBanglaDigits(dynamic number) {
+    const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    String s = number.toString();
+    for (int i = 0; i < 10; i++) {
+      s = s.replaceAll(en[i], bn[i]);
+    }
+    return s;
+  }
+
+  static String _formatDurationBn(int minutes) {
+    if (minutes <= 0) return '২০ মিনিট';
+    if (minutes < 60) return '${_toBanglaDigits(minutes)} মিনিট';
+    final h = minutes ~/ 60;
+    final m = minutes % 60;
+    if (m == 0) return '${_toBanglaDigits(h)} ঘণ্টা';
+    return '${_toBanglaDigits(h)} ঘণ্টা ${_toBanglaDigits(m)} মিনিট';
+  }
+
+  static String _formatTimeRemaining(LiveExam exam) {
+    final now = DateTime.now();
+    if (exam.isOngoing) {
+      final diff = exam.endTime.difference(now);
+      if (diff.inDays > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inDays)} দিন';
+      if (diff.inHours > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা';
+      if (diff.inMinutes > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inMinutes)} মিনিট';
+      return 'শীঘ্রই শেষ হবে';
+    } else if (exam.isPast) {
+      return 'পরীক্ষা সম্পন্ন';
+    } else {
+      final diff = exam.startTime.difference(now);
+      if (diff.inDays > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inDays)} দিন';
+      if (diff.inHours > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা';
+      if (diff.inMinutes > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inMinutes)} মিনিট';
+      return 'আজ শুরু হবে';
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,15 +59,15 @@ class LiveExamSlider extends ConsumerWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.only(top: 8, bottom: 0),
+          padding: const EdgeInsets.only(top: 2, bottom: 2),
           child: CarouselSlider(
             options: CarouselOptions(
-              height: 155.0,
+              height: 100.0,
               autoPlay: exams.length > 1,
               autoPlayInterval: const Duration(seconds: 5),
-              enlargeCenterPage: true,
-              viewportFraction: 0.92,
-              aspectRatio: 2.3,
+              enlargeCenterPage: false,
+              viewportFraction: 0.94,
+              enableInfiniteScroll: exams.length > 1,
             ),
             items: exams.map((exam) {
               return Builder(
@@ -49,157 +86,183 @@ class LiveExamSlider extends ConsumerWidget {
 
   Widget _buildExamCard(BuildContext context, LiveExam exam, bool isDark) {
     final isOngoing = exam.isOngoing;
-    final formatter = DateFormat('dd MMM, hh:mm a');
+    final isTaken = exam.userAttemptStatus == 'submitted';
 
-    final bgGradient = isOngoing
-        ? LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF047857), const Color(0xFF064E3B)]
-                : [const Color(0xFF10B981), const Color(0xFF059669)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        : LinearGradient(
-            colors: isDark
-                ? [const Color(0xFFD97706), const Color(0xFF92400E)]
-                : [const Color(0xFFF59E0B), const Color(0xFFD97706)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          );
+    Color cardBg = isDark ? const Color(0xFF13151F) : Colors.white;
+    Color borderColor = isDark ? const Color(0xFF232738) : const Color(0xFFE2E8F0);
+    Color bottomStripBg;
+    Color statusColor;
+    String statusText;
+    IconData statusIcon;
 
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-      decoration: BoxDecoration(
-        gradient: bgGradient,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: (isOngoing ? const Color(0xFF059669) : const Color(0xFFD97706))
-                .withValues(alpha: 0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -10,
-            bottom: -15,
-            child: Icon(
-              isOngoing ? LucideIcons.radio : LucideIcons.calendarClock,
-              size: 110,
-              color: Colors.white.withValues(alpha: 0.12),
-            ),
+    if (isTaken) {
+      statusText = 'অংশগ্রহণকৃত';
+      statusIcon = LucideIcons.checkCircle2;
+      statusColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
+      bottomStripBg = isDark ? const Color(0xFF0E1A2E) : const Color(0xFFEFF6FF);
+    } else if (isOngoing) {
+      statusText = 'Ongoing';
+      statusIcon = LucideIcons.zap;
+      statusColor = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
+      bottomStripBg = isDark ? const Color(0xFF0C2419) : const Color(0xFFF0FDF4);
+    } else {
+      statusText = 'Upcoming';
+      statusIcon = LucideIcons.clock;
+      statusColor = isDark ? const Color(0xFFF87171) : const Color(0xFFB91C1C);
+      bottomStripBg = isDark ? const Color(0xFF260C0E) : const Color(0xFFFEF2F2);
+    }
+
+    final timeRemainingText = _formatTimeRemaining(exam);
+    final durationText = _formatDurationBn(exam.durationMinutes);
+    final questionsText = '${_toBanglaDigits(exam.totalQuestions > 0 ? exam.totalQuestions : 25)} টি প্রশ্ন';
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          final cat = exam.category.isNotEmpty ? exam.category : 'hsc';
+          context.go('/live_exam/$cat');
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 9.0),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.25)
+                    : const Color(0xFF64748B).withValues(alpha: 0.06),
+                blurRadius: 7,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 13.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Top Tag
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isOngoing ? LucideIcons.radio : LucideIcons.clock,
-                        color: Colors.white,
-                        size: 11,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Row 1: Exam Title & Arrow
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      exam.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Anek Bangla',
+                        letterSpacing: -0.2,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        isOngoing ? 'LIVE NOW' : 'UPCOMING',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
-                        ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    LucideIcons.chevronRight,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    size: 14,
+                  ),
+                ],
+              ),
+
+              // Row 2: Metadata (Duration | Questions)
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.clock,
+                    size: 12,
+                    color: const Color(0xFFEF4444),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    durationText,
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Anek Bangla',
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
+                    child: Text(
+                      '|',
+                      style: TextStyle(
+                        color: isDark ? const Color(0xFF33384C) : const Color(0xFFCBD5E1),
+                        fontSize: 11.5,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-
-                // Exam Title
-                Text(
-                  exam.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'Anek Bangla',
-                    height: 1.25,
+                  Icon(
+                    LucideIcons.fileText,
+                    size: 12,
+                    color: const Color(0xFF10B981),
                   ),
-                ),
+                  const SizedBox(width: 4),
+                  Text(
+                    questionsText,
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Anek Bangla',
+                    ),
+                  ),
+                ],
+              ),
 
-                // Bottom Timing & Button
-                Row(
+              // Row 3: Bottom Status Bar Strip
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                decoration: BoxDecoration(
+                  color: bottomStripBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          isOngoing ? 'শেষ হবে:' : 'শুরু হবে:',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 12,
-                            fontFamily: 'Anek Bangla',
-                          ),
+                        Icon(
+                          statusIcon,
+                          color: statusColor,
+                          size: 13,
                         ),
+                        const SizedBox(width: 5),
                         Text(
-                          formatter.format(isOngoing ? exam.endTime : exam.startTime),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          statusText,
+                          style: TextStyle(
+                            color: statusColor,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.go('/live-exams');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: isOngoing
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFD97706),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        minimumSize: const Size(0, 30),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Text(
-                        'অংশগ্রহণ করুন',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'Anek Bangla',
-                        ),
+                    Text(
+                      timeRemainingText,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Anek Bangla',
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

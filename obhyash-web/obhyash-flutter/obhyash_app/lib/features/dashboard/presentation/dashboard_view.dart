@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'widgets/dashboard_action_card.dart';
 import 'widgets/daily_streak_card.dart';
+import 'widgets/daily_quests_card.dart';
 import 'widgets/subject_stat_card.dart';
-import 'widgets/exam_target_modal.dart';
 import 'widgets/live_exam_slider.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
@@ -14,6 +14,7 @@ import '../services/streak_service.dart';
 import '../../exam/services/offline_exam_sync_queue.dart';
 import '../../exam/services/offline_question_bank_service.dart';
 
+import '../../../core/utils/global_refresh.dart';
 import '../../../core/presentation/widgets/global_announcement_banner.dart';
 
 class DashboardView extends ConsumerStatefulWidget {
@@ -24,7 +25,6 @@ class DashboardView extends ConsumerStatefulWidget {
 }
 
 class _DashboardViewState extends ConsumerState<DashboardView> {
-  bool _hasCheckedExamTarget = false;
   bool _hasCheckedStreak = false;
 
   @override
@@ -39,20 +39,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       OfflineQuestionBankService.prefetchQuestionsInBackground('biology');
       OfflineQuestionBankService.prefetchQuestionsInBackground('higher_math');
     });
-  }
-
-  void _checkExamTarget(UserProfile? user) {
-    if (_hasCheckedExamTarget || user == null) return;
-    _hasCheckedExamTarget = true;
-    if (user.examTarget == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        final result = await showExamTargetModal(context);
-        if (result != null && mounted) {
-          ref.invalidate(userProfileProvider);
-        }
-      });
-    }
   }
 
   void _checkStreak(UserProfile? user) {
@@ -71,7 +57,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     final userProfileAsync = ref.watch(userProfileProvider);
 
     final userProfile = userProfileAsync.value;
-    _checkExamTarget(userProfile);
     _checkStreak(userProfile);
 
     final subjects = subjectStatsAsync.when(
@@ -82,8 +67,17 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     final isLoading = subjectStatsAsync.isLoading;
 
-    return CustomScrollView(
-      slivers: [
+    return RefreshIndicator(
+      color: const Color(0xFF004633),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF18181B)
+          : Colors.white,
+      onRefresh: () => globalRefresh(ref),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
         // 0. Live In-App Global Broadcast Announcement Banner
         const SliverToBoxAdapter(
           child: GlobalAnnouncementBanner(),
@@ -167,6 +161,17 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
                 const SizedBox(height: 24),
 
+                const DailyQuestsCard()
+                    .animate(delay: 180.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideY(
+                      begin: 0.05,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
+
+                const SizedBox(height: 24),
+
                 // Subject Stats List
                 SubjectStatCard(
                       data: subjects,
@@ -189,6 +194,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           ),
         ),
       ],
+      ),
     );
   }
 }
