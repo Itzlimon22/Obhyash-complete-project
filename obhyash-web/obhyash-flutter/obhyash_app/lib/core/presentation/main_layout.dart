@@ -23,21 +23,9 @@ import 'widgets/obhyash_tooltip.dart';
 import '../providers/connectivity_provider.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
 import '../../features/practice/providers/practice_providers.dart';
-
-final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
-  final user = ref.watch(authProvider);
-  if (user == null) return 0;
-  try {
-    final result = await Supabase.instance.client
-        .from('notifications')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-    return (result as List).length;
-  } catch (_) {
-    return 0;
-  }
-});
+import '../../features/notifications/domain/notification_model.dart';
+import '../../features/notifications/providers/notification_providers.dart';
+import '../../features/notifications/presentation/widgets/in_app_notification_banner.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -371,6 +359,16 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     });
 
+    // Realtime in-app notification luxury top-sliding floating banner listener
+    ref.listen<AppNotification?>(latestNotificationEventProvider, (prev, next) {
+      if (next != null && mounted) {
+        final currentLoc = GoRouterState.of(context).uri.toString();
+        if (!currentLoc.startsWith('/notifications')) {
+          InAppNotificationBanner.show(context, next);
+        }
+      }
+    });
+
     final isDrawerOpen = _scaffoldKey.currentState?.isDrawerOpen ?? false;
     final isAtDashboardRoot = widget.navigationShell.currentIndex == 0 &&
         (location == '/' || location.isEmpty) &&
@@ -614,8 +612,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                               // Notification Bell with Tooltip
                               Builder(
                                 builder: (context) {
-                                  final unreadAsync = ref.watch(_unreadNotifCountProvider);
-                                  final unread = unreadAsync.whenOrNull(data: (c) => c) ?? 0;
+                                  final unread = ref.watch(unreadNotificationCountProvider);
                                   return ObhyashTooltip(
                                     message: 'নতুন নোটিফিকেশন ও আপডেট',
                                     preferredPosition: TooltipPosition.bottom,

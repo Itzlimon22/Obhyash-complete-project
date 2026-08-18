@@ -135,26 +135,15 @@ class LiveExamDetailsView extends ConsumerWidget {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
+                         Text(
                         exam.title,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
-                      if (exam.description.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          exam.description,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark ? Colors.white60 : Colors.black54,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -182,6 +171,7 @@ class LiveExamDetailsView extends ConsumerWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Colors.black87,
+                              fontFamily: 'HindSiliguri',
                             ),
                           ),
                         ],
@@ -252,44 +242,129 @@ class LiveExamDetailsView extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // Syllabus & Chapter Breakdown Card
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
+                Builder(
+                  builder: (context) {
+                    final syllabusList = exam.description.trim().isNotEmpty
+                        ? exam.description
+                            .split(RegExp(r'[\n\r,;•|]+'))
+                            .map((s) => s.trim())
+                            .where((s) => s.isNotEmpty)
+                            .toList()
+                        : <String>[];
+
+                    return Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(LucideIcons.bookOpen, color: Color(0xFF0B6B42), size: 16),
-                          SizedBox(width: 8),
-                          Text(
-                            'সিলেবাস ও অধ্যায়সমূহ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0B6B42),
-                            ),
+                          const Row(
+                            children: [
+                              Icon(LucideIcons.bookOpen, color: Color(0xFF0B6B42), size: 16),
+                              SizedBox(width: 8),
+                              Text(
+                                'সিলেবাস ও অধ্যায়সমূহ',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0B6B42),
+                                  fontFamily: 'HindSiliguri',
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 12),
+                          if (syllabusList.isNotEmpty)
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final itemWidth = (constraints.maxWidth - 10) / 2;
+                                return Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: List.generate(syllabusList.length, (idx) {
+                                    final item = syllabusList[idx];
+                                    final serial = (idx + 1).toString().padLeft(2, '0');
+
+                                    return Container(
+                                      width: itemWidth,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFFAFAFA),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E5E5),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF0B6B42).withValues(alpha: 0.15),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              serial,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF0B6B42),
+                                                fontFamily: 'HindSiliguri',
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              item,
+                                              style: TextStyle(
+                                                fontSize: 12.5,
+                                                fontWeight: FontWeight.w600,
+                                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                                fontFamily: 'HindSiliguri',
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                );
+                              },
+                            )
+                          else
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFFAFAFA),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  height: 1.4,
+                                  color: isDark ? Colors.white70 : Colors.black87,
+                                  fontFamily: 'HindSiliguri',
+                                ),
+                              ),
+                            ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFFAFAFA),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          exam.description.isNotEmpty
-                              ? exam.description
-                              : 'এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।',
+                    );
+                  },
+                ),��েছে।',
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.4,
@@ -553,50 +628,114 @@ class LiveExamDetailsView extends ConsumerWidget {
                           itemCount: history.length,
                           itemBuilder: (ctx, idx) {
                             final ph = history[idx];
+                            final dt = ph.submitTime.toLocal();
+                            final timeStr = '${dt.day}/${dt.month}/${dt.year} • ${dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour)}:${dt.minute.toString().padLeft(2, '0')} ${dt.hour >= 12 ? 'PM' : 'AM'}';
+                            final durationMins = ph.timeTakenSeconds ~/ 60;
+                            final durationSecs = ph.timeTakenSeconds % 60;
+
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
-                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
                                 ),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  Container(
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '#${history.length - idx}',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF3B82F6),
+                                        fontFamily: 'HindSiliguri',
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          timeStr,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark ? Colors.white54 : Colors.black54,
+                                            fontFamily: 'HindSiliguri',
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'সঠিক: ${ph.correctCount}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF10B981),
+                                                fontFamily: 'HindSiliguri',
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              '• ভুল: ${ph.wrongCount}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFFEF4444),
+                                                fontFamily: 'HindSiliguri',
+                                              ),
+                                            ),
+                                            if (ph.timeTakenSeconds > 0) ...[
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                '• $durationMins মি. $durationSecs সে.',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: isDark ? Colors.white38 : Colors.black38,
+                                                  fontFamily: 'HindSiliguri',
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        'অনুশীলন #${history.length - idx}',
+                                        '${ph.score}',
                                         style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFF0B6B42),
                                           fontFamily: 'HindSiliguri',
-                                          color: Color(0xFF3B82F6),
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
                                       Text(
-                                        'সঠিক: ${ph.correctCount} • ভুল: ${ph.wrongCount}',
+                                        '/ ${exam.totalMarks}',
                                         style: TextStyle(
-                                          fontSize: 11,
-                                          color: isDark ? Colors.white54 : Colors.black54,
+                                          fontSize: 10,
+                                          color: isDark ? Colors.white38 : Colors.black38,
                                           fontFamily: 'HindSiliguri',
                                         ),
                                       ),
                                     ],
-                                  ),
-                                  Text(
-                                    '${ph.score}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF0B6B42),
-                                      fontFamily: 'HindSiliguri',
-                                    ),
                                   ),
                                 ],
                               ),

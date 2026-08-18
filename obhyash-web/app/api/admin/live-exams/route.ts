@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
             name,
             email,
             phone,
+            avatar_url,
             avatarUrl:avatar_url,
+            avatar_color,
             avatarColor:avatar_color,
             institute
           )

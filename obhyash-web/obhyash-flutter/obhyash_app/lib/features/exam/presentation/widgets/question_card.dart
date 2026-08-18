@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../../core/services/haptics_service.dart';
 import '../../../../core/utils/bangla_name_helper.dart';
 import '../../domain/exam_models.dart';
 
@@ -449,7 +450,15 @@ class _QuestionCardState extends State<QuestionCard>
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
                             if (!isAnswered && !widget.readOnly) {
-                              HapticFeedback.lightImpact();
+                              if (widget.showFeedback) {
+                                if (isCorrect) {
+                                  AppHaptics.success();
+                                } else {
+                                  AppHaptics.error();
+                                }
+                              } else {
+                                AppHaptics.selection();
+                              }
                               widget.onSelectOption(idx);
                             }
                           },

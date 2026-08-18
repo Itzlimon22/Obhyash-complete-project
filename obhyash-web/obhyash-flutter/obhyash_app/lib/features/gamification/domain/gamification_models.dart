@@ -223,3 +223,24 @@ enum CelebrationType {
   questClaim,
   perfectScore,
 }
+
+/// ─── League User Model ───────────────────────────────────────────────────────
+class LeagueUser {
+  final String userId;
+  final String name;
+  final String? avatarUrl;
+  final String avatarColor;
+  final int weeklyXp;
+  final int rank;
+  final String leagueTier;
+
+  const LeagueUser({
+    required this.userId,
+    required this.name,
+    this.avatarUrl,
+    required this.avatarColor,
+    required this.weeklyXp,
+    required this.rank,
+    required this.leagueTier,
+  });
+}

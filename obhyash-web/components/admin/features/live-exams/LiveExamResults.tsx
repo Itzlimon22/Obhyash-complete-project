@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ArrowLeft,
   Trophy,
@@ -21,6 +21,13 @@ import {
   Globe,
   Send,
   Lock,
+  Copy,
+  Check,
+  Filter,
+  ArrowUpDown,
+  Mail,
+  Phone,
+  Hash,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LiveExam } from '@/lib/types';
@@ -46,9 +53,18 @@ export default function LiveExamResults({ examId }: { examId: string }) {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [ongoingCount, setOngoingCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedInstitute, setSelectedInstitute] = useState('all');
+  const [selectedScoreTier, setSelectedScoreTier] = useState('all');
+  const [sortBy, setSortBy] = useState<
+    'rank' | 'fastest' | 'correct' | 'least_wrong' | 'latest'
+  >('rank');
+
   const [selectedAttempt, setSelectedAttempt] = useState<any | null>(null);
   const [isUpdatingPublish, setIsUpdatingPublish] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -126,10 +142,148 @@ export default function LiveExamResults({ examId }: { examId: string }) {
     }
   };
 
+  const handleCopy = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!id) return;
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    toast.success('ইউজার আইডি কপি করা হয়েছে!');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleTogglePublishLeaderboard = async () => {
+    if (!exam) return;
+    const nextState = exam.is_leaderboard_published === false ? true : false;
+    try {
+      setIsUpdatingPublish(true);
+      await updateLiveExam(exam.id, { is_leaderboard_published: nextState });
+      setExam((prev) =>
+        prev ? { ...prev, is_leaderboard_published: nextState } : null,
+      );
+      if (nextState) {
+        toast.success(
+          '🎉 মেধা তালিকা শিক্ষার্থীদের জন্য সফলভাবে উন্মুক্ত/প্রকাশ করা হয়েছে!',
+        );
+      } else {
+        toast.info('🔒 মেধা তালিকা শিক্ষার্থীদের জন্য লুকানো হয়েছে।');
+      }
+    } catch (err) {
+      toast.error('মেধা তালিকা স্ট্যাটাস পরিবর্তন করা যায়নি');
+    } finally {
+      setIsUpdatingPublish(false);
+    }
+  };
+
+  // Unique Institutes for Filter Dropdown
+  const uniqueInstitutes = useMemo(() => {
+    const set = new Set<string>();
+    leaderboard.forEach((entry) => {
+      const student = entry.users || entry.user || {};
+      const inst = (student.institute || '').trim();
+      if (inst && inst !== 'প্রতিষ্ঠান অনুল্লেখিত') set.add(inst);
+    });
+    return Array.from(set).sort();
+  }, [leaderboard]);
+
+  // Processed, Filtered & Sorted Leaderboard
+  const processedLeaderboard = useMemo(() => {
+    let list = [...leaderboard];
+
+    // 1. Search Query Filter (Name, Email, Phone, Institute, User ID)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter((entry) => {
+        const student = entry.users || entry.user || {};
+        const name = (student.name || '').toLowerCase();
+        const email = (student.email || '').toLowerCase();
+        const phone = (student.phone || '').toLowerCase();
+        const institute = (student.institute || '').toLowerCase();
+        const userId = (entry.user_id || student.id || '').toLowerCase();
+        return (
+          name.includes(q) ||
+          email.includes(q) ||
+          phone.includes(q) ||
+          institute.includes(q) ||
+          userId.includes(q)
+        );
+      });
+    }
+
+    // 2. Institute Filter
+    if (selectedInstitute !== 'all') {
+      list = list.filter((entry) => {
+        const student = entry.users || entry.user || {};
+        return (student.institute || '').trim() === selectedInstitute;
+      });
+    }
+
+    // 3. Performance / Score Tier Filter
+    const totalMarks = exam?.total_marks || 25;
+    if (selectedScoreTier === 'top10') {
+      list = list.slice(0, 10);
+    } else if (selectedScoreTier === 'top50') {
+      list = list.slice(0, 50);
+    } else if (selectedScoreTier === 'pass80') {
+      list = list.filter((e) => Number(e.score) >= totalMarks * 0.8);
+    } else if (selectedScoreTier === 'avg50') {
+      list = list.filter(
+        (e) =>
+          Number(e.score) >= totalMarks * 0.5 &&
+          Number(e.score) < totalMarks * 0.8,
+      );
+    } else if (selectedScoreTier === 'fail') {
+      list = list.filter((e) => Number(e.score) < totalMarks * 0.5);
+    } else if (selectedScoreTier === 'perfect') {
+      list = list.filter(
+        (e) => Number(e.wrong_count) === 0 && Number(e.correct_count) > 0,
+      );
+    }
+
+    // 4. Sorting
+    if (sortBy === 'fastest') {
+      list.sort((a, b) => {
+        const timeA =
+          new Date(a.submit_time).getTime() - new Date(a.start_time).getTime();
+        const timeB =
+          new Date(b.submit_time).getTime() - new Date(b.start_time).getTime();
+        return timeA - timeB;
+      });
+    } else if (sortBy === 'correct') {
+      list.sort((a, b) => (b.correct_count || 0) - (a.correct_count || 0));
+    } else if (sortBy === 'least_wrong') {
+      list.sort((a, b) => (a.wrong_count || 0) - (b.wrong_count || 0));
+    } else if (sortBy === 'latest') {
+      list.sort(
+        (a, b) =>
+          new Date(b.submit_time).getTime() - new Date(a.submit_time).getTime(),
+      );
+    } else {
+      // Default rank: score DESC, wrong_count ASC, submit_time ASC
+      list.sort((a, b) => {
+        if (b.score !== a.score) return (b.score || 0) - (a.score || 0);
+        if (a.wrong_count !== b.wrong_count)
+          return (a.wrong_count || 0) - (b.wrong_count || 0);
+        return (
+          new Date(a.submit_time).getTime() - new Date(b.submit_time).getTime()
+        );
+      });
+    }
+
+    return list;
+  }, [
+    leaderboard,
+    searchQuery,
+    selectedInstitute,
+    selectedScoreTier,
+    sortBy,
+    exam?.total_marks,
+  ]);
+
   const handleExport = () => {
     const csv = [
       [
         'Rank',
+        'User ID',
         'Student Name',
         'Email',
         'Phone',
@@ -140,7 +294,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
         'Time Taken (Mins)',
         'Submit Time',
       ].join(','),
-      ...leaderboard.map((entry, index) => {
+      ...processedLeaderboard.map((entry, index) => {
         const student = entry.users || entry.user || {};
         const timeTakenMs =
           new Date(entry.submit_time).getTime() -
@@ -149,6 +303,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
 
         return [
           index + 1,
+          `"${entry.user_id || student.id || 'N/A'}"`,
           `"${student.name || 'Student'}"`,
           `"${student.email || 'N/A'}"`,
           `"${student.phone || 'N/A'}"`,
@@ -195,36 +350,6 @@ export default function LiveExamResults({ examId }: { examId: string }) {
   );
   const avgAccuracy =
     totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-
-  const handleTogglePublishLeaderboard = async () => {
-    if (!exam) return;
-    const nextState = exam.is_leaderboard_published === false ? true : false;
-    try {
-      setIsUpdatingPublish(true);
-      await updateLiveExam(exam.id, { is_leaderboard_published: nextState });
-      setExam((prev) => (prev ? { ...prev, is_leaderboard_published: nextState } : null));
-      if (nextState) {
-        toast.success('🎉 মেধা তালিকা শিক্ষার্থীদের জন্য সফলভাবে উন্মুক্ত/প্রকাশ করা হয়েছে!');
-      } else {
-        toast.info('🔒 মেধা তালিকা শিক্ষার্থীদের জন্য লুকানো হয়েছে।');
-      }
-    } catch (err) {
-      toast.error('মেধা তালিকা স্ট্যাটাস পরিবর্তন করা যায়নি');
-    } finally {
-      setIsUpdatingPublish(false);
-    }
-  };
-
-  const filteredLeaderboard = leaderboard.filter((entry) => {
-    const student = entry.users || entry.user || {};
-    const name = student.name || '';
-    const institute = student.institute || '';
-    const query = searchQuery.toLowerCase();
-    return (
-      name.toLowerCase().includes(query) ||
-      institute.toLowerCase().includes(query)
-    );
-  });
 
   if (isLoading)
     return (
@@ -350,11 +475,11 @@ export default function LiveExamResults({ examId }: { examId: string }) {
 
         <div className="p-4 rounded-2xl bg-white dark:bg-[#141417] border border-neutral-200 dark:border-zinc-800/80 shadow-sm space-y-1">
           <div className="flex items-center justify-between text-neutral-500 dark:text-zinc-400 text-xs font-bold">
-            <span>গড় স্কোর (Average)</span>
+            <span>গড় স্কোর</span>
             <TrendingUp size={16} className="text-emerald-500" />
           </div>
           <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-            {avgScore}
+            {avgScore} <span className="text-xs font-normal text-zinc-500">/ {exam.total_marks}</span>
           </p>
         </div>
 
@@ -369,19 +494,106 @@ export default function LiveExamResults({ examId }: { examId: string }) {
         </div>
       </div>
 
-      {/* ── Search Bar ── */}
-      <div className="relative max-w-sm">
-        <Search
-          size={15}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
-        />
-        <input
-          type="text"
-          placeholder="শিক্ষার্থীর নাম বা কলেজ খুঁজুন..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 text-neutral-900 dark:text-white"
-        />
+      {/* ── Search & Multi-Filter Control Panel ── */}
+      <div className="bg-white dark:bg-[#141417] p-4 rounded-2xl border border-neutral-200 dark:border-zinc-800 shadow-sm space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
+            />
+            <input
+              type="text"
+              placeholder="নাম, ফোন, ইমেইল বা আইডি দিয়ে খুঁজুন..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 text-neutral-900 dark:text-white"
+            />
+          </div>
+
+          {/* Institute Filter */}
+          <div className="relative">
+            <School
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+            />
+            <select
+              value={selectedInstitute}
+              onChange={(e) => setSelectedInstitute(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 text-neutral-900 dark:text-white cursor-pointer"
+            >
+              <option value="all">সকল প্রতিষ্ঠান ({uniqueInstitutes.length})</option>
+              {uniqueInstitutes.map((inst) => (
+                <option key={inst} value={inst}>
+                  {inst}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Score Tier Filter */}
+          <div className="relative">
+            <Filter
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+            />
+            <select
+              value={selectedScoreTier}
+              onChange={(e) => setSelectedScoreTier(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 text-neutral-900 dark:text-white cursor-pointer"
+            >
+              <option value="all">সকল স্কোর টায়ার</option>
+              <option value="top10">🏆 শীর্ষ ১০ (Top 10)</option>
+              <option value="top50">⭐ শীর্ষ ৫০ (Top 50)</option>
+              <option value="pass80">🎯 ৮০%+ নম্বর (অসাধারণ)</option>
+              <option value="avg50">📈 ৫০% - ৮০% নম্বর (গড়)</option>
+              <option value="fail">⚠️ ৫০% এর নিচে</option>
+              <option value="perfect">✨ ১০০% নির্ভুল (০ ভুল)</option>
+            </select>
+          </div>
+
+          {/* Sorting */}
+          <div className="relative">
+            <ArrowUpDown
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+            />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 text-neutral-900 dark:text-white cursor-pointer"
+            >
+              <option value="rank">🥇 মেধা ক্রম (সর্বোচ্চ নম্বর)</option>
+              <option value="fastest">⚡ দ্রুততম জমা (Fastest)</option>
+              <option value="correct">✓ সর্বাধিক সঠিক উত্তর</option>
+              <option value="least_wrong">✓ কম ভুল উত্তর</option>
+              <option value="latest">🕒 সর্বশেষ জমাকৃত</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results summary & active filter reset */}
+        <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-zinc-800/80 text-xs">
+          <p className="text-neutral-500 dark:text-zinc-400">
+            প্রদর্শিত হচ্ছে: <span className="font-bold text-neutral-900 dark:text-white font-mono">{processedLeaderboard.length}</span> / {leaderboard.length} জন পরীক্ষার্থী
+          </p>
+
+          {(searchQuery || selectedInstitute !== 'all' || selectedScoreTier !== 'all' || sortBy !== 'rank') && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedInstitute('all');
+                setSelectedScoreTier('all');
+                setSortBy('rank');
+              }}
+              className="text-rose-600 hover:text-rose-700 font-bold transition flex items-center gap-1 cursor-pointer text-xs"
+            >
+              <RotateCcw size={12} />
+              <span>ফিল্টার রিসেট করুন</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Leaderboard Table ── */}
@@ -391,7 +603,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
             <thead>
               <tr className="bg-neutral-50 dark:bg-zinc-900/60 border-b border-neutral-200 dark:border-zinc-800 text-[11px] font-bold text-neutral-500 dark:text-zinc-400 uppercase tracking-wider">
                 <th className="p-4 w-16 text-center">র‍্যাংক</th>
-                <th className="p-4">শিক্ষার্থী</th>
+                <th className="p-4">শিক্ষার্থী ও ইউজার আইডি</th>
                 <th className="p-4 text-center">স্কোর</th>
                 <th className="p-4 text-center">সঠিক / ভুল</th>
                 <th className="p-4 text-center">সময়</th>
@@ -400,22 +612,28 @@ export default function LiveExamResults({ examId }: { examId: string }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 dark:divide-zinc-800/60 text-xs">
-              {filteredLeaderboard.length === 0 ? (
+              {processedLeaderboard.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-neutral-500">
-                    এখনও কোনো ফলাফল পাওয়া যায়নি।
+                    কোনো পরীক্ষার্থী বা ফলাফল পাওয়া যায়নি।
                   </td>
                 </tr>
               ) : (
-                filteredLeaderboard.map((entry, index) => {
+                processedLeaderboard.map((entry, index) => {
                   const student = entry.users || entry.user || {};
+                  const userId = entry.user_id || student.id || '';
+                  const avatarUrl =
+                    student.avatar_url || student.avatarUrl || student.image;
+                  const avatarColor =
+                    student.avatar_color || student.avatarColor || '#059669';
+
                   const timeTakenMs =
                     new Date(entry.submit_time).getTime() -
                     new Date(entry.start_time).getTime();
                   const mins = Math.floor(timeTakenMs / 1000 / 60);
                   const secs = Math.floor((timeTakenMs / 1000) % 60);
 
-                  const isTop3 = index < 3;
+                  const isTop3 = index < 3 && sortBy === 'rank';
 
                   return (
                     <tr
@@ -430,11 +648,11 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                       <td className="p-4 text-center">
                         <span
                           className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-black font-mono ${
-                            index === 0
+                            isTop3 && index === 0
                               ? 'bg-amber-500 text-neutral-950 shadow-md shadow-amber-500/20'
-                              : index === 1
+                              : isTop3 && index === 1
                               ? 'bg-slate-300 dark:bg-zinc-700 text-slate-900 dark:text-white'
-                              : index === 2
+                              : isTop3 && index === 2
                               ? 'bg-amber-700/80 text-white'
                               : 'text-neutral-500 font-normal'
                           }`}
@@ -443,26 +661,72 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                         </span>
                       </td>
 
-                      {/* Student Info */}
+                      {/* Student Info with Avatar Image and Copyable User ID */}
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-xs shrink-0 shadow-sm"
-                            style={{
-                              backgroundColor:
-                                student.avatarColor || '#059669',
-                            }}
-                          >
-                            {student.name?.charAt(0)?.toUpperCase() || 'S'}
+                          {/* Profile Avatar / Image */}
+                          <div className="relative w-10 h-10 rounded-xl shrink-0 overflow-hidden bg-neutral-100 dark:bg-zinc-800 border border-neutral-200/80 dark:border-zinc-700/60 flex items-center justify-center text-white font-black text-xs shadow-sm">
+                            {avatarUrl ? (
+                              <img
+                                src={avatarUrl}
+                                alt={student.name || 'User'}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display =
+                                    'none';
+                                }}
+                              />
+                            ) : (
+                              <div
+                                className="w-full h-full flex items-center justify-center"
+                                style={{ backgroundColor: avatarColor }}
+                              >
+                                {student.name?.charAt(0)?.toUpperCase() || 'S'}
+                              </div>
+                            )}
                           </div>
-                          <div>
-                            <p className="font-bold text-neutral-900 dark:text-white">
-                              {student.name || 'শিক্ষার্থী'}
-                            </p>
+
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-neutral-900 dark:text-white text-xs">
+                                {student.name || 'শিক্ষার্থী'}
+                              </p>
+                              {student.phone && (
+                                <span className="text-[10px] text-zinc-400 font-mono">
+                                  • {student.phone}
+                                </span>
+                              )}
+                            </div>
+
                             <p className="text-[11px] text-neutral-500 dark:text-zinc-400 flex items-center gap-1">
-                              <School size={11} />
-                              <span>{student.institute || 'প্রতিষ্ঠান অনুল্লেখিত'}</span>
+                              <School size={11} className="shrink-0" />
+                              <span className="truncate max-w-[200px]">
+                                {student.institute || 'প্রতিষ্ঠান অনুল্লেখিত'}
+                              </span>
                             </p>
+
+                            {/* User ID Badge with Copy */}
+                            {userId && (
+                              <div className="flex items-center gap-1 pt-0.5">
+                                <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 bg-neutral-100 dark:bg-zinc-800/80 px-1.5 py-0.5 rounded border border-neutral-200/60 dark:border-zinc-700/60 select-all">
+                                  ID: {userId.slice(0, 8)}...
+                                </span>
+                                <button
+                                  onClick={(e) => handleCopy(userId, e)}
+                                  className="p-1 text-zinc-400 hover:text-emerald-500 rounded hover:bg-neutral-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                                  title="সম্পূর্ণ ইউজার আইডি কপি করুন"
+                                >
+                                  {copiedId === userId ? (
+                                    <Check
+                                      size={11}
+                                      className="text-emerald-500"
+                                    />
+                                  ) : (
+                                    <Copy size={11} />
+                                  )}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -505,8 +769,8 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                           {/* Inspect Submission */}
                           <button
                             onClick={() => setSelectedAttempt(entry)}
-                            className="p-1.5 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-300 rounded-lg transition"
-                            title="উত্তরপত্র দেখুন (Inspect Answers)"
+                            className="p-1.5 bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 rounded-lg transition cursor-pointer"
+                            title="উত্তরপত্র ও বিবরণ দেখুন"
                           >
                             <Eye size={14} />
                           </button>
@@ -540,18 +804,40 @@ export default function LiveExamResults({ examId }: { examId: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white dark:bg-[#141417] border border-neutral-200 dark:border-zinc-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl p-6 space-y-5 animate-in zoom-in-95">
             <div className="flex justify-between items-center border-b border-neutral-100 dark:border-zinc-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
-                  style={{
-                    backgroundColor:
-                      selectedAttempt.users?.avatarColor ||
-                      selectedAttempt.user?.avatarColor ||
-                      '#059669',
-                  }}
-                >
-                  {selectedAttempt.users?.name?.charAt(0) || 'S'}
+              <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12 rounded-2xl shrink-0 overflow-hidden bg-neutral-100 dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                  {selectedAttempt.users?.avatar_url ||
+                  selectedAttempt.users?.avatarUrl ||
+                  selectedAttempt.user?.avatar_url ||
+                  selectedAttempt.user?.avatarUrl ? (
+                    <img
+                      src={
+                        selectedAttempt.users?.avatar_url ||
+                        selectedAttempt.users?.avatarUrl ||
+                        selectedAttempt.user?.avatar_url ||
+                        selectedAttempt.user?.avatarUrl
+                      }
+                      alt={selectedAttempt.users?.name || 'User'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{
+                        backgroundColor:
+                          selectedAttempt.users?.avatar_color ||
+                          selectedAttempt.users?.avatarColor ||
+                          selectedAttempt.user?.avatar_color ||
+                          selectedAttempt.user?.avatarColor ||
+                          '#059669',
+                      }}
+                    >
+                      {selectedAttempt.users?.name?.charAt(0)?.toUpperCase() ||
+                        'S'}
+                    </div>
+                  )}
                 </div>
+
                 <div>
                   <h3 className="text-sm font-black text-neutral-900 dark:text-white">
                     {selectedAttempt.users?.name || 'শিক্ষার্থী'}
@@ -568,6 +854,61 @@ export default function LiveExamResults({ examId }: { examId: string }) {
               >
                 <X size={16} />
               </button>
+            </div>
+
+            {/* Student ID & Contact Pill */}
+            <div className="p-3 rounded-2xl bg-neutral-50 dark:bg-zinc-900/60 border border-neutral-100 dark:border-zinc-800 space-y-1.5 text-xs text-neutral-600 dark:text-zinc-400">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Hash size={12} className="text-neutral-400" />
+                  <span>ইউজার আইডি:</span>
+                </span>
+                <div className="flex items-center gap-1.5 font-mono font-bold text-neutral-900 dark:text-white">
+                  <span>
+                    {selectedAttempt.user_id || selectedAttempt.users?.id}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleCopy(
+                        selectedAttempt.user_id || selectedAttempt.users?.id,
+                      )
+                    }
+                    className="p-1 hover:bg-neutral-200 dark:hover:bg-zinc-700 rounded transition cursor-pointer"
+                    title="কপি করুন"
+                  >
+                    {copiedId ===
+                    (selectedAttempt.user_id || selectedAttempt.users?.id) ? (
+                      <Check size={12} className="text-emerald-500" />
+                    ) : (
+                      <Copy size={12} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {selectedAttempt.users?.phone && (
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Phone size={12} className="text-neutral-400" />
+                    <span>মোবাইল নম্বর:</span>
+                  </span>
+                  <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                    {selectedAttempt.users.phone}
+                  </span>
+                </div>
+              )}
+
+              {selectedAttempt.users?.email && (
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <Mail size={12} className="text-neutral-400" />
+                    <span>ইমেইল:</span>
+                  </span>
+                  <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                    {selectedAttempt.users.email}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-neutral-50 dark:bg-zinc-900/60 text-center text-xs">
@@ -596,12 +937,15 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                 <span>পরীক্ষা শুরু:</span>
                 <span className="font-mono font-bold text-neutral-900 dark:text-white">
                   {selectedAttempt.start_time
-                    ? new Date(selectedAttempt.start_time).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true,
-                      })
+                    ? new Date(selectedAttempt.start_time).toLocaleTimeString(
+                        'en-US',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        },
+                      )
                     : 'নির্ধারিত নয়'}
                 </span>
               </p>
@@ -609,12 +953,15 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                 <span>জমা দেওয়ার সময়:</span>
                 <span className="font-mono font-bold text-neutral-900 dark:text-white">
                   {selectedAttempt.submit_time
-                    ? new Date(selectedAttempt.submit_time).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true,
-                      })
+                    ? new Date(selectedAttempt.submit_time).toLocaleTimeString(
+                        'en-US',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        },
+                      )
                     : 'নির্ধারিত নয়'}
                 </span>
               </p>
@@ -628,8 +975,8 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                         Math.round(
                           (new Date(selectedAttempt.submit_time).getTime() -
                             new Date(selectedAttempt.start_time).getTime()) /
-                            1000
-                        )
+                            1000,
+                        ),
                       );
                       const m = Math.floor(diffSec / 60);
                       const s = diffSec % 60;
@@ -648,7 +995,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
                     selectedAttempt.users?.name || 'Student',
                   )
                 }
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw size={14} />
                 <span>অ্যাটেম্পট রিসেট করুন</span>
@@ -656,7 +1003,7 @@ export default function LiveExamResults({ examId }: { examId: string }) {
 
               <button
                 onClick={() => setSelectedAttempt(null)}
-                className="px-5 py-2 rounded-xl border border-neutral-200 dark:border-zinc-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-zinc-800"
+                className="px-5 py-2 rounded-xl border border-neutral-200 dark:border-zinc-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 বন্ধ করুন
               </button>

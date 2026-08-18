@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/services/haptics_service.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
@@ -46,17 +47,17 @@ class _ResultViewState extends State<ResultView> {
     // Only celebrate with confetti once right after direct exam completion
     if (!widget.isHistoryMode) {
       _confettiController.play();
+      AppHaptics.celebrate();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final uid = Supabase.instance.client.auth.currentUser?.id;
         if (uid != null && mounted) {
           GamificationService.checkAndUnlockBadges(
             context: context,
             userId: uid,
-            correctCount: widget.result.correctCount,
-            wrongCount: widget.result.wrongCount,
+            totalExamsCompleted: 1,
+            userStreak: 1,
+            latestScore: widget.result.correctCount,
             totalQuestions: widget.result.totalQuestions,
-            currentStreak: 0,
-            currentXp: 0,
           );
         }
       });
@@ -99,8 +100,11 @@ class _ResultViewState extends State<ResultView> {
       final supabase = Supabase.instance.client;
       final uid = supabase.auth.currentUser?.id;
       if (uid != null) {
-        supabase.from('users').select('is_subscribed, subscription_status').eq('id', uid).maybeSingle().then((userRow) {
-          final isSub = (userRow?['is_subscribed'] == true) || (userRow?['subscription_status'] == 'active');
+        supabase.from('users').select('is_subscribed, subscription_status, subscription_expires_at').eq('id', uid).maybeSingle().then((userRow) {
+          final expStr = userRow?['subscription_expires_at']?.toString();
+          final exp = expStr != null ? DateTime.tryParse(expStr) : null;
+          final isNotExpired = exp != null && exp.isAfter(DateTime.now());
+          final isSub = isNotExpired && ((userRow?['is_subscribed'] == true) || (userRow?['subscription_status']?.toString().toLowerCase() == 'active'));
           if (!isSub) {
             if (mounted) {
               ProUpgradeModal.show(

@@ -110,16 +110,14 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
             if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
             final bool isExpired = parsedExp != null && parsedExp.isBefore(DateTime.now());
 
-            final bool isSub = (userRes['is_subscribed'] == true && !isExpired) ||
-                (rawStatus == 'active' && !isExpired) ||
-                (userRes['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
-                (parsedExp != null && parsedExp.isAfter(DateTime.now()) && (subJson != null || userRes['subscription_status'] != null));
+            final bool isSub = !isExpired &&
+                parsedExp != null &&
+                parsedExp.isAfter(DateTime.now()) &&
+                (userRes['is_subscribed'] == true || rawStatus == 'active');
 
             if (isSub) {
               expiresAt = parsedExp;
-              final days = parsedExp != null
-                  ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
-                  : 30;
+              final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
               final planTitle = (subJson?['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
               final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
                   ? 'Yearly Plan'
@@ -595,8 +593,23 @@ class _OverviewTab extends StatelessWidget {
         // Hero card
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF14532D),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF022C22), Color(0xFF064E3B)],
+            ),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFF065F46).withValues(alpha: 0.6),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF022C22).withValues(alpha: 0.5),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           padding: const EdgeInsets.all(20),
           child: Column(

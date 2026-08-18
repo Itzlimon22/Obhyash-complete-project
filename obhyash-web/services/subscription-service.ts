@@ -398,7 +398,7 @@ export const getUserActiveSubscription =
           userProfile.level?.toLowerCase().includes('pro');
 
         const expDate = expiry ? new Date(expiry) : null;
-        const isNotExpired = !expDate || expDate > now;
+        const isNotExpired = !!expDate && expDate > now;
 
         if (isSub && isNotExpired) {
           const planName = sub?.plan || 'প্রো সাবস্ক্রিপশন';
@@ -555,106 +555,29 @@ export const extendSubscription = async (
   userId: string,
   days: number,
 ): Promise<boolean> => {
-  if (!isSupabaseConfigured() || !supabase) {
-    throw new Error('Database configuration missing');
-  }
-
   try {
-    const now = new Date();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    // 1. Get latest active subscription from subscription_history
-    const { data: sub } = await supabase
-      .from('subscription_history')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .gt('expires_at', now.toISOString())
-      .order('expires_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    // 2. Fetch User Profile subscription info
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('subscription, subscription_expires_at')
-      .eq('id', userId)
-      .maybeSingle();
-
-    const currentSub = userProfile?.subscription || {};
-    let baseDate = now;
-
-    if (sub && sub.expires_at) {
-      const exp = new Date(sub.expires_at);
-      if (exp > now) baseDate = exp;
-    } else if (currentSub.expiry || userProfile?.subscription_expires_at) {
-      const exp = new Date(currentSub.expiry || userProfile?.subscription_expires_at);
-      if (exp > now) baseDate = exp;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
     }
 
-    const newExpiry = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000);
-
-    // 3. Update 'users' table
-    await supabase
-      .from('users')
-      .update({
-        subscription: {
-          ...currentSub,
-          plan:
-            currentSub.plan && currentSub.plan !== 'Free'
-              ? currentSub.plan
-              : 'Premium (Reward)',
-          expiry: newExpiry.toISOString(),
-          expires_at: newExpiry.toISOString(),
-          status: 'Active',
-        },
-        subscription_status: 'Active',
-        subscription_expires_at: newExpiry.toISOString(),
-        is_subscribed: true,
-        updated_at: now.toISOString(),
-      })
-      .eq('id', userId);
-
-    // 4. Update 'subscription_history' table
-    if (sub) {
-      await supabase
-        .from('subscription_history')
-        .update({ expires_at: newExpiry.toISOString() })
-        .eq('id', sub.id);
-    } else {
-      // Find popular or default plan
-      const { data: planData } = await supabase
-        .from('subscription_plans')
-        .select('id')
-        .eq('is_active', true)
-        .limit(1)
-        .maybeSingle();
-
-      // Deactivate older inactive records
-      await supabase
-        .from('subscription_history')
-        .update({ is_active: false })
-        .eq('user_id', userId);
-
-      await supabase.from('subscription_history').insert({
-        user_id: userId,
-        plan_id: planData?.id || null,
-        started_at: now.toISOString(),
-        expires_at: newExpiry.toISOString(),
-        is_active: true,
-      });
-    }
-
-    // 5. Notify User
-    await supabase.from('notifications').insert({
-      user_id: userId,
-      title: 'রিপোর্ট গৃহীত ও প্রো রিওয়ার্ড! 🎁',
-      message: `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে তোমার অ্যাকাউন্টে ${days} দিনের প্রো সাবস্ক্রিপশন চালু করা হয়েছে!`,
-      type: 'reward',
-      is_read: false,
-      created_at: now.toISOString(),
+    const res = await fetch('/api/admin/subscriptions', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        action: 'extend_subscription',
+        userId,
+        extensionDays: days,
+      }),
     });
-
-    return true;
+    const result = await res.json();
+    return result.success === true;
   } catch (err) {
     console.error('Failed to extend subscription:', err);
     return false;

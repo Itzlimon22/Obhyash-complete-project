@@ -203,15 +203,15 @@ class UserProfile {
   });
 
   bool get isPro {
-    if (isSubscribed) return true;
-    final status = subscriptionStatus?.toString().toLowerCase().trim();
-    if (status == 'active') return true;
-    if (level != null && level!.toLowerCase().contains('pro')) return true;
-    if (subscriptionExpiresAt != null) {
-      final exp = DateTime.tryParse(subscriptionExpiresAt!);
-      if (exp != null && exp.isAfter(DateTime.now())) return true;
+    if (subscriptionExpiresAt == null || subscriptionExpiresAt!.isEmpty) {
+      return false;
     }
-    return false;
+    final exp = DateTime.tryParse(subscriptionExpiresAt!);
+    if (exp == null || exp.isBefore(DateTime.now())) {
+      return false;
+    }
+    final status = subscriptionStatus?.toString().toLowerCase().trim();
+    return isSubscribed == true || status == 'active';
   }
 
   String get displayStudentId {
@@ -233,10 +233,10 @@ class UserProfile {
     final expDate = rawExp != null ? DateTime.tryParse(rawExp) : null;
     final bool isExpired = expDate != null && expDate.isBefore(DateTime.now());
 
-    final bool isSub = (json['is_subscribed'] == true && !isExpired) ||
-        (rawStatus == 'active' && !isExpired) ||
-        (json['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
-        (expDate != null && expDate.isAfter(DateTime.now()) && (subJson != null || json['subscription_status'] != null));
+    final bool isSub = !isExpired &&
+        expDate != null &&
+        expDate.isAfter(DateTime.now()) &&
+        (json['is_subscribed'] == true || rawStatus == 'active');
 
     return UserProfile(
       id: json['id'] as String,

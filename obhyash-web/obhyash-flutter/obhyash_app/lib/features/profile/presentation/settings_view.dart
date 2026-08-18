@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../../core/services/haptics_service.dart';
 import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
 import 'widgets/account_info_modal.dart';
@@ -51,7 +52,11 @@ class SettingsView extends ConsumerWidget {
 
   const SettingsView({super.key, required this.user});
 
-  List<_SettingsGroup> _buildGroups(BuildContext context, ThemeMode themeMode) {
+  List<_SettingsGroup> _buildGroups(
+    BuildContext context,
+    ThemeMode themeMode,
+    bool hapticsEnabled,
+  ) {
     return [
       _SettingsGroup(
         title: 'কার্যকলাপ',
@@ -171,6 +176,13 @@ class SettingsView extends ConsumerWidget {
             actionId: 'toggleTheme',
           ),
           _SettingsItem(
+            label: hapticsEnabled ? 'হ্যাপটিক ভাইব্রেশন: চালু' : 'হ্যাপটিক ভাইব্রেশন: বন্ধ',
+            description: 'প্রশ্নের উত্তর ও বাটনে টাচ ভাইব্রেশন ফিডব্যাক',
+            icon: hapticsEnabled ? LucideIcons.vibrate : LucideIcons.vibrateOff,
+            type: _ItemType.action,
+            actionId: 'toggleHaptics',
+          ),
+          _SettingsItem(
             label: 'লগ আউট',
             description: 'অ্যাকাউন্ট থেকে বের হও',
             icon: LucideIcons.logOut,
@@ -215,15 +227,19 @@ class SettingsView extends ConsumerWidget {
           DeleteAccountModal.show(context, user);
         } else if (item.actionId == 'toggleTheme') {
           ref.read(themeModeProvider.notifier).toggle();
+        } else if (item.actionId == 'toggleHaptics') {
+          ref.read(hapticsProvider.notifier).toggle();
         } else if (item.actionId == 'logout') {
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text('লগ আউট?'),
-              content: const Text('তুমি কি সত্যিই বের হতে চাও?'),
+              title: const Text('লগ আউট'),
+              content: const Text(
+                'তুমি কি নিশ্চিতভাবে লগ আউট করতে চাও?',
+              ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
+                  onPressed: () => Navigator.of(ctx).pop(false),
                   child: const Text('বাতিল'),
                 ),
                 TextButton(
@@ -254,9 +270,10 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
+    final hapticsEnabled = ref.watch(hapticsProvider);
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA);
     final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
-    final groups = _buildGroups(context, themeMode);
+    final groups = _buildGroups(context, themeMode, hapticsEnabled);
 
     final nameParts = user.name.trim().split(' ');
     final initials = nameParts.length >= 2
@@ -394,6 +411,12 @@ class SettingsView extends ConsumerWidget {
                         Row(
                           children: [
                             _ActionBtn(
+                              icon: LucideIcons.user,
+                              label: 'প্রোফাইল',
+                              isDark: isDark,
+                              onTap: () => context.push('/profile/stats'),
+                            ),
+                            _ActionBtn(
                               icon: LucideIcons.pencil,
                               label: 'এডিট',
                               isDark: isDark,
@@ -405,16 +428,10 @@ class SettingsView extends ConsumerWidget {
                               ),
                             ),
                             _ActionBtn(
-                              icon: LucideIcons.bell,
-                              label: 'নোটিফি',
+                              icon: LucideIcons.info,
+                              label: 'ইনফো',
                               isDark: isDark,
-                              onTap: () => context.push('/notifications'),
-                            ),
-                            _ActionBtn(
-                              icon: LucideIcons.alertTriangle,
-                              label: 'রিপোর্ট',
-                              isDark: isDark,
-                              onTap: () => context.push('/my-reports'),
+                              onTap: () => AccountInfoModal.show(context, user),
                             ),
                             _ActionBtn(
                               icon: LucideIcons.gift,

@@ -111,9 +111,31 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await connection();
+    const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
+
+    // ── Security Check: Verify Caller Admin Role ──
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const { data: authData } = await supabaseAdmin.auth.getUser(token);
+      if (authData?.user) {
+        const { data: userRow } = await supabaseAdmin
+          .from('users')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (userRow?.role !== 'Admin') {
+          return NextResponse.json(
+            { success: false, error: 'Unauthorized: Admin role required' },
+            { status: 403 },
+          );
+        }
+      }
+    }
+
     const body = await request.json();
     const { action } = body;
-    const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
     // ── Action: Review Payment Request (Approve / Reject) ──
     if (action === 'review_payment') {

@@ -130,10 +130,10 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               final expStr = userRes['subscription_expires_at'] as String?;
               final parsedExp = expStr != null ? DateTime.tryParse(expStr) : null;
 
-              if (isSub && (parsedExp == null || parsedExp.isAfter(DateTime.now()))) {
+              if (isSub && parsedExp != null && parsedExp.isAfter(DateTime.now())) {
                 final subMeta = userRes['subscription'] as Map<String, dynamic>?;
                 final planTitle = (subMeta?['plan'] as String?) ?? 'প্রো প্ল্যান';
-                final days = parsedExp != null ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999) : 30;
+                final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
 
                 final matchedPlan = plans.where((p) =>
                     p.id == (subMeta?['plan_id'] as String?) ||
@@ -211,7 +211,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -227,7 +227,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           else
             _HeroBanner(isDark: isDark),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 28),
 
           // ACTIVE SUBSCRIPTION BANNER
           if (!_isLoading && _activeSubscription != null) ...[
@@ -236,7 +236,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               daysRemaining: _daysRemaining,
               expiresAt: _activeSubscription!.expiresAt,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
           ],
 
           // PRICING HEADER
@@ -246,17 +246,17 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 Text(
                   'তোমার প্ল্যান বেছে নাও',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 23,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   'সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 14.5,
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     fontFamily: 'HindSiliguri',
                   ),
@@ -264,7 +264,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // COMPACT PLAN SELECTOR CARDS
           if (_isLoading)
@@ -319,12 +319,12 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             // PRIMARY CTA BUTTON FOR SELECTED PLAN
             if (selectedPlan != null)
               Container(
-                margin: const EdgeInsets.only(bottom: 24),
+                margin: const EdgeInsets.only(top: 8, bottom: 28),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF004633),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
@@ -335,12 +335,30 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'এই প্ল্যানটি নাও (${selectedPlan.name} • ৳${selectedPlan.price})',
-                        style: const TextStyle(
+                      const Text(
+                        'পেমেন্ট করতে এগিয়ে যান',
+                        style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
                           fontFamily: 'HindSiliguri',
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '৳${selectedPlan.price}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'HindSiliguri',
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -510,30 +528,32 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF14532D), Color(0xFF166534)],
+        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: const Color(0x3316A34A),
+              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 LucideIcons.crown,
-                color: Color(0xFF4ADE80),
-                size: 22,
+                color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                size: 20,
               ),
             ),
           ),
@@ -544,17 +564,20 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
               children: [
                 Text(
                   planName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'HindSiliguri',
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}',
-                  style: const TextStyle(
-                    color: Color(0xFF86EFAC),
-                    fontSize: 16,
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                    fontSize: 13,
+                    fontFamily: 'HindSiliguri',
                   ),
                 ),
               ],
@@ -563,15 +586,16 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF4ADE80),
+              color: isDark ? const Color(0xFF064E3B) : const Color(0xFFE6F4EA),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
+            child: Text(
               'সক্রিয়',
               style: TextStyle(
-                color: Color(0xFF14532D),
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
+                color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'HindSiliguri',
               ),
             ),
           ),
@@ -606,24 +630,24 @@ class _CompactPlanCard extends StatelessWidget {
     Color tagBg = const Color(0xFFE6F4EA);
 
     if (isMasterPro) {
-      tagText = '👑 ৫০% সাশ্রয় • সেরা ভ্যালু';
+      tagText = '৫০% সাশ্রয় • সেরা ভ্যালু';
       tagColor = const Color(0xFFB45309);
       tagBg = const Color(0xFFFEF3C7);
     } else if (isTopRankers) {
-      tagText = '🔥 ৪১% সাশ্রয় • সর্বাধিক জনপ্রিয়';
+      tagText = '৪১% সাশ্রয় • সর্বাধিক জনপ্রিয়';
       tagColor = const Color(0xFF004633);
       tagBg = const Color(0xFFE6F4EA);
     } else {
-      tagText = '⚡ স্টার্টার';
-      tagColor = const Color(0xFF3B82F6);
+      tagText = 'স্টার্টার প্যাক';
+      tagColor = const Color(0xFF2563EB);
       tagBg = const Color(0xFFEFF6FF);
     }
 
     String perMonthText;
     if (isMasterPro) {
-      perMonthText = 'প্রতি মাসে মাত্র ৳৯৯';
+      perMonthText = 'প্রতি মাসে ৳৯৯';
     } else if (isTopRankers) {
-      perMonthText = 'প্রতি মাসে মাত্র ৳১১৬';
+      perMonthText = 'প্রতি মাসে ৳১১৬';
     } else {
       perMonthText = '৳৪/দিন এককালীন';
     }
@@ -638,8 +662,8 @@ class _CompactPlanCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: isDark
               ? (isSelected
@@ -694,25 +718,22 @@ class _CompactPlanCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          plan.name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'HindSiliguri',
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    plan.name,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 3),
-                  Row(
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 3,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
@@ -724,20 +745,19 @@ class _CompactPlanCard extends StatelessWidget {
                           tagText,
                           style: TextStyle(
                             fontSize: 10.5,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                             fontFamily: 'HindSiliguri',
                             color: isDark ? (isMasterPro ? const Color(0xFFFBBF24) : const Color(0xFF34D399)) : tagColor,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
                       Text(
                         perMonthText,
                         style: TextStyle(
-                          fontSize: 11.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
-                          color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         ),
                       ),
                     ],
