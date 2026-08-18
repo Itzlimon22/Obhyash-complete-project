@@ -145,28 +145,39 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
   final supabase = Supabase.instance.client;
   final user = supabase.auth.currentUser;
 
-  // 1. Fetch Exam
-  final examData = await supabase
-      .from('live_exams')
-      .select('*, total_questions:live_exam_questions(count)')
-      .eq('id', examId)
-      .single();
+  // 1. Fetch Exam with fallback
+  Map<String, dynamic> examData;
+  try {
+    examData = await supabase
+        .from('live_exams')
+        .select('*, total_questions:live_exam_questions(count)')
+        .eq('id', examId)
+        .single();
+  } catch (_) {
+    examData = await supabase
+        .from('live_exams')
+        .select()
+        .eq('id', examId)
+        .single();
+  }
 
   final exam = LiveExam.fromJson(examData);
 
-  // 2. Fetch User Attempt
+  // 2. Fetch User Attempt safely
   LiveExamAttempt? attempt;
   if (user != null) {
-    final attemptData = await supabase
-        .from('live_exam_attempts')
-        .select()
-        .eq('live_exam_id', examId)
-        .eq('user_id', user.id)
-        .maybeSingle();
+    try {
+      final attemptData = await supabase
+          .from('live_exam_attempts')
+          .select()
+          .eq('live_exam_id', examId)
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-    if (attemptData != null) {
-      attempt = LiveExamAttempt.fromJson(attemptData);
-    }
+      if (attemptData != null) {
+        attempt = LiveExamAttempt.fromJson(attemptData);
+      }
+    } catch (_) {}
   }
 
   return (exam: exam, attempt: attempt);

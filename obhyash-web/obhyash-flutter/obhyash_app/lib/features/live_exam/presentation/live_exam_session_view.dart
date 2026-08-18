@@ -539,7 +539,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
           preferredSize: const Size.fromHeight(56),
           child: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: isDark ? const Color(0xFF09090B) : Colors.white,
+            backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
             elevation: 1,
             surfaceTintColor: Colors.transparent,
             flexibleSpace: SafeArea(
@@ -549,56 +549,44 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // LEFT: Close & Answered / Total Pill
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(LucideIcons.x, size: 20),
-                          onPressed: _showCancelConfirmation,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        ),
-                        const SizedBox(width: 4),
-                        questionsAsync.maybeWhen(
-                          data: (questions) => ObhyashTooltip(
-                            message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা',
-                            preferredPosition: TooltipPosition.bottom,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)} / ${BanglaNameHelper.toBanglaNumeral(questions.length)}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'HindSiliguri',
-                                  color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
-                                ),
-                              ),
+                    // LEFT: Answered / Total Pill
+                    questionsAsync.maybeWhen(
+                      data: (questions) => ObhyashTooltip(
+                        message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা',
+                        preferredPosition: TooltipPosition.bottom,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)} / ${BanglaNameHelper.toBanglaNumeral(questions.length)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
                             ),
                           ),
-                          orElse: () => const SizedBox(),
                         ),
-                      ],
+                      ),
+                      orElse: () => const SizedBox(),
                     ),
 
                     // MIDDLE: Timer box
                     ObhyashTooltip(
-                      message: 'অবশিষ্ট সময়। সময় শেষ হলে স্বয়ংক্রিয়ভাবে জমা হবে।',
+                      message: 'অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।',
                       preferredPosition: TooltipPosition.bottom,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: _secondsRemaining < 60
-                              ? const Color(0xFFDC2626)
+                              ? const Color(0xFFDC2626) // Critical
                               : _secondsRemaining < 300
-                                  ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB))
-                                  : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)),
-                          borderRadius: BorderRadius.circular(8),
+                                  ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
+                                  : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
+                          borderRadius: BorderRadius.circular(6),
                           border: Border.all(
                             color: _secondsRemaining < 60
                                 ? const Color(0xFFDC2626)
@@ -606,6 +594,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                                     ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
                                     : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                           ),
+                          boxShadow: _secondsRemaining < 60
+                              ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
+                              : [],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -648,12 +639,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                             preferredPosition: TooltipPosition.bottom,
                             child: InkWell(
                               onTap: () => _showQuestionPalette(questions),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
                                   color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Icon(
                                   LucideIcons.layoutGrid,
@@ -673,12 +664,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                             onTap: () {
                               ref.read(themeModeProvider.notifier).toggle();
                             },
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                               child: Icon(
                                 isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
@@ -838,57 +829,62 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
           },
         ),
 
-        // Bottom Action Floating Submit Bar
+        // Bottom Action Floating Submit Bar (Exact Mock Exam Style)
         bottomNavigationBar: SafeArea(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF09090B).withValues(alpha: 0.95)
+                  ? const Color(0xFF000000).withValues(alpha: 0.95)
                   : Colors.white.withValues(alpha: 0.95),
               border: Border(
                 top: BorderSide(
-                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                  color: isDark
+                      ? const Color(0xFF1C1C1E)
+                      : const Color(0xFFE5E5E5),
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
             child: questionsAsync.maybeWhen(
-              data: (questions) => SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () => _showSubmitConfirmation(questions.length, _userAnswers.length),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 1,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(LucideIcons.send, size: 16, color: Colors.white),
-                      const SizedBox(width: 8),
-                      Text(
-                        'উত্তরপত্র জমা দাও (${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)}/${BanglaNameHelper.toBanglaNumeral(questions.length)})',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'HindSiliguri',
-                          color: Colors.white,
-                        ),
+              data: (questions) => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_userAnswers.length == questions.length) {
+                        _submitExam();
+                      } else {
+                        _showSubmitConfirmation(questions.length, _userAnswers.length);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004633), // Deep signature emerald green
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      minimumSize: const Size(0, 35),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: const EdgeInsets.symmetric(vertical: 6.5, horizontal: 22),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
+                    ),
+                    child: const Text(
+                      'জমা দাও',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               orElse: () => const SizedBox(),
             ),

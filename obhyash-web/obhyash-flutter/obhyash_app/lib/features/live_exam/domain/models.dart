@@ -28,20 +28,44 @@ class LiveExam {
   });
 
   factory LiveExam.fromJson(Map<String, dynamic> json) {
+    int parseTotalQuestions(dynamic val) {
+      if (val is int) return val;
+      if (val is num) return val.toInt();
+      if (val is String) return int.tryParse(val) ?? 0;
+      if (val is List && val.isNotEmpty) {
+        final first = val.first;
+        if (first is Map && first.containsKey('count')) {
+          final countVal = first['count'];
+          if (countVal is int) return countVal;
+          if (countVal is num) return countVal.toInt();
+          if (countVal is String) return int.tryParse(countVal) ?? 0;
+        }
+      }
+      return 0;
+    }
+
+    num parseNum(dynamic val) {
+      if (val is num) return val;
+      if (val is String) return num.tryParse(val) ?? 0;
+      return 0;
+    }
+
     return LiveExam(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       startTime: json['start_time'] != null
-          ? DateTime.parse(json['start_time'].toString()).toLocal()
+          ? (DateTime.tryParse(json['start_time'].toString())?.toLocal() ?? DateTime.now())
           : DateTime.now(),
       endTime: json['end_time'] != null
-          ? DateTime.parse(json['end_time'].toString()).toLocal()
+          ? (DateTime.tryParse(json['end_time'].toString())?.toLocal() ?? DateTime.now())
           : DateTime.now(),
-      durationMinutes: json['duration_minutes'] as int? ?? 0,
-      totalQuestions: json['total_questions'] as int? ?? 0,
-      totalMarks: json['total_marks'] as num? ?? 0,
-      negativeMarking: json['negative_marking'] as num? ?? 0,
+      durationMinutes: json['duration_minutes'] is num
+          ? (json['duration_minutes'] as num).toInt()
+          : int.tryParse(json['duration_minutes']?.toString() ?? '') ?? 0,
+      totalQuestions: parseTotalQuestions(json['total_questions']),
+      totalMarks: parseNum(json['total_marks']),
+      negativeMarking: parseNum(json['negative_marking']),
       status: json['status'] as String? ?? '',
       category: json['category'] as String? ?? '',
       userAttemptStatus: json['userAttemptStatus'] as String?,

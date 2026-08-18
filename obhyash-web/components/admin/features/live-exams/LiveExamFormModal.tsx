@@ -228,7 +228,7 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
             {/* Total Marks */}
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-neutral-600 dark:text-zinc-400 flex items-center gap-1">
-                <Award size={13} /> মোট নম্বর
+                <Award size={13} /> মোট নম্বর / পূর্ণমান
               </label>
               <input
                 required
@@ -243,6 +243,9 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
                 }
                 className="w-full bg-white dark:bg-zinc-850 border border-neutral-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-neutral-900 dark:text-white"
               />
+              <p className="text-[10px] text-neutral-400 dark:text-zinc-500">
+                বিল্ডারে প্রশ্ন যোগ করার পর পূর্ণমান সরাসরি সিঙ্ক করা যাবে
+              </p>
             </div>
 
             {/* Negative Marking */}

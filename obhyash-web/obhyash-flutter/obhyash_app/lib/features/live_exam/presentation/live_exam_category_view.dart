@@ -277,7 +277,10 @@ class _LiveExamCard extends StatelessWidget {
     }
 
     final durationText = _formatDurationBn(exam.durationMinutes);
-    final questionsText = '${_toBanglaDigits(exam.totalQuestions > 0 ? exam.totalQuestions : 25)} টি প্রশ্ন';
+    final count = exam.totalQuestions > 0
+        ? exam.totalQuestions
+        : (exam.totalMarks > 0 ? exam.totalMarks.toInt() : 25);
+    final questionsText = '${_toBanglaDigits(count)} টি প্রশ্ন';
     final timeRemainingText = _formatTimeRemaining(exam);
 
     return Material(

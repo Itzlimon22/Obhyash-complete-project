@@ -38,6 +38,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Settings2,
+  AlertTriangle,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
@@ -51,6 +53,7 @@ import {
   removeQuestionFromLiveExam,
   reorderLiveExamQuestions,
   autoAssignQuestionsByBlueprint,
+  updateLiveExam,
   BlueprintRule,
 } from '@/services/live-exam-admin-service';
 import { getQuestionsPage, createQuestion } from '@/services/question-service';
@@ -124,6 +127,12 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
   const [assignedSubjectFilter, setAssignedSubjectFilter] = useState('all');
   const [expandedSolutions, setExpandedSolutions] = useState<Record<string, boolean>>({});
 
+  // --- Quick Settings (Duration & Total Marks) State ---
+  const [showQuickSettingsModal, setShowQuickSettingsModal] = useState(false);
+  const [editDuration, setEditDuration] = useState<number>(30);
+  const [editMarks, setEditMarks] = useState<number>(25);
+  const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+
   useEffect(() => {
     fetchExamData(true);
   }, [examId]);
@@ -148,12 +157,54 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       }
       setExam(examData);
       setExamQuestions(questionsData);
+      setEditDuration(examData.duration_minutes || 30);
+      setEditMarks(examData.total_marks || 25);
     } catch (error) {
       if (isInitial) {
         toast.error('Failed to load exam data: ' + String(error));
       }
     } finally {
       if (isInitial) setIsLoading(false);
+    }
+  };
+
+  const handleAutoSyncTotalMarks = async (targetMarks: number) => {
+    try {
+      setIsUpdatingSettings(true);
+      await updateLiveExam(examId, { total_marks: targetMarks });
+      setExam((prev) => (prev ? { ...prev, total_marks: targetMarks } : null));
+      setEditMarks(targetMarks);
+      toast.success(`পূর্ণমান সফলভাবে ${targetMarks} নম্বরে সিঙ্ক করা হয়েছে!`);
+    } catch (e) {
+      toast.error('পূর্ণমান সিঙ্ক করা যায়নি');
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
+  const handleSaveQuickSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsUpdatingSettings(true);
+      await updateLiveExam(examId, {
+        duration_minutes: Number(editDuration),
+        total_marks: Number(editMarks),
+      });
+      setExam((prev) =>
+        prev
+          ? {
+              ...prev,
+              duration_minutes: Number(editDuration),
+              total_marks: Number(editMarks),
+            }
+          : null
+      );
+      toast.success('সময় ও পূর্ণমান সফলভাবে আপডেট করা হয়েছে!');
+      setShowQuickSettingsModal(false);
+    } catch (e) {
+      toast.error('আপডেট করতে সমস্যা হয়েছে');
+    } finally {
+      setIsUpdatingSettings(false);
     }
   };
 
@@ -929,8 +980,8 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
               </h1>
             </div>
             {/* Live Counter & Metrics */}
-            <div className="flex items-center gap-3 mt-1 text-xs text-neutral-500 dark:text-zinc-400 font-medium">
-              <span className="flex items-center gap-1 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-2.5 mt-1 text-xs text-neutral-500 dark:text-zinc-400 font-medium flex-wrap">
+              <span className="flex items-center gap-1 font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                 <CheckCircle2 size={13} /> {examStats.total}টি প্রশ্ন যুক্ত
               </span>
               <span>•</span>
@@ -938,7 +989,32 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                 <Clock size={13} /> {exam.duration_minutes} মিনিট
               </span>
               <span>•</span>
-              <span>পূর্ণমান: {exam.total_marks}</span>
+              {exam.total_marks !== examStats.total && examStats.total > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => handleAutoSyncTotalMarks(examStats.total)}
+                  disabled={isUpdatingSettings}
+                  className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-[11px] font-bold flex items-center gap-1 hover:bg-amber-500/25 transition cursor-pointer shadow-2xs"
+                  title="প্রশ্ন সংখ্যা ও পূর্ণমানের মধ্যে অমিল রয়েছে। ক্লিক করে সিঙ্ক করুন।"
+                >
+                  <AlertTriangle size={12} className="text-amber-600 animate-pulse" />
+                  <span>পূর্ণমান: {exam.total_marks} ({examStats.total}-এ সিঙ্ক করুন)</span>
+                </button>
+              ) : (
+                <span>পূর্ণমান: {exam.total_marks} নম্বর</span>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditDuration(exam.duration_minutes);
+                  setEditMarks(exam.total_marks);
+                  setShowQuickSettingsModal(true);
+                }}
+                className="p-1 rounded-md text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800 transition cursor-pointer ml-0.5"
+                title="সময় ও পূর্ণমান পরিবর্তন করুন"
+              >
+                <Settings2 size={13} />
+              </button>
             </div>
           </div>
         </div>
@@ -990,6 +1066,39 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
           </button>
         </div>
       </div>
+
+      {/* Mismatch Alert & Auto-Sync Banner */}
+      {exam.total_marks !== examStats.total && examStats.total > 0 && (
+        <div className="p-3 px-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-amber-950 dark:text-amber-200 animate-in fade-in shrink-0">
+          <div className="flex items-center gap-2 font-medium min-w-0">
+            <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+            <span>
+              পরীক্ষায় <strong>{examStats.total}টি</strong> প্রশ্ন রয়েছে কিন্তু মোট পূর্ণমান <strong>{exam.total_marks}</strong> নির্ধারিত আছে।
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleAutoSyncTotalMarks(examStats.total)}
+              disabled={isUpdatingSettings}
+              className="px-3 py-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+            >
+              {isUpdatingSettings ? 'সিঙ্ক হচ্ছে...' : `পূর্ণমান ${examStats.total} নম্বরে সিঙ্ক করুন`}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditDuration(exam.duration_minutes);
+                setEditMarks(exam.total_marks);
+                setShowQuickSettingsModal(true);
+              }}
+              className="px-2.5 py-1 rounded-xl bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 text-neutral-700 dark:text-zinc-300 hover:bg-neutral-100 text-xs font-bold transition cursor-pointer"
+            >
+              কাস্টম সেট করুন
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Main Split View ── */}
       <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-[780px] lg:min-h-[880px] xl:min-h-[940px]">
@@ -2239,6 +2348,103 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                     <Plus size={14} />
                   )}
                   <span>তৈরি করে যুক্ত করুন</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════
+          MODAL: Quick Settings (Duration & Total Marks)
+         ══════════════════════════════════════════════════════════ */}
+      {showQuickSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white dark:bg-[#141417] border border-neutral-200 dark:border-zinc-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-4 animate-in zoom-in-95">
+            <div className="flex justify-between items-center border-b border-neutral-100 dark:border-zinc-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Settings2 size={18} />
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-neutral-900 dark:text-white">
+                    সময় ও পূর্ণমান সম্পাদনা
+                  </h2>
+                  <p className="text-[11px] text-neutral-500">
+                    পরীক্ষার সময়কাল এবং মোট পূর্ণমান সমন্বয় করুন
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowQuickSettingsModal(false)}
+                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-zinc-800 text-zinc-400 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveQuickSettings} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300 block mb-1">
+                  পরীক্ষার সময়কাল (মিনিট):
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={300}
+                    value={editDuration}
+                    onChange={(e) => setEditDuration(Number(e.target.value))}
+                    className="w-full bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs outline-none text-neutral-900 dark:text-white font-mono font-bold"
+                    required
+                  />
+                  <span className="text-xs text-neutral-500 font-bold shrink-0">মিনিট</span>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300 block">
+                    মোট পূর্ণমান:
+                  </label>
+                  {examStats.total > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setEditMarks(examStats.total)}
+                      className="text-[11px] text-emerald-600 font-bold hover:underline cursor-pointer"
+                    >
+                      প্রশ্ন সংখ্যার সমান ({examStats.total})
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={editMarks}
+                    onChange={(e) => setEditMarks(Number(e.target.value))}
+                    className="w-full bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs outline-none text-neutral-900 dark:text-white font-mono font-bold"
+                    required
+                  />
+                  <span className="text-xs text-neutral-500 font-bold shrink-0">নম্বর</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-neutral-100 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowQuickSettingsModal(false)}
+                  className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-zinc-800 text-xs font-bold cursor-pointer"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingSettings}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition cursor-pointer disabled:opacity-50"
+                >
+                  {isUpdatingSettings ? 'সংরক্ষণ হচ্ছে...' : 'সংরক্ষণ করুন'}
                 </button>
               </div>
             </form>
