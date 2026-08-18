@@ -291,6 +291,52 @@ export async function addQuestionToLiveExam(
   }
 }
 
+export async function addQuestionsBatchToLiveExam(
+  examId: string,
+  questionIds: string[],
+  points: number = 1
+): Promise<number> {
+  if (!questionIds || questionIds.length === 0) return 0;
+
+  // 1. Fetch current questions to determine next serial and avoid duplicates
+  const existing = await getLiveExamQuestions(examId);
+  const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
+  
+  const toAdd = questionIds.filter((id) => !existingIds.has(id));
+  if (toAdd.length === 0) return 0;
+
+  let currentSerial = existing.length + 1;
+  const inserts = toAdd.map((qId) => ({
+    live_exam_id: examId,
+    question_id: qId,
+    serial: currentSerial++,
+    points,
+  }));
+
+  const { error } = await supabase.from("live_exam_questions").insert(inserts);
+  if (error) {
+    console.error("Error batch adding questions to live exam:", error);
+    throw error;
+  }
+
+  return toAdd.length;
+}
+
+export async function swapLiveExamQuestion(
+  mappingId: string,
+  newQuestionId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from("live_exam_questions")
+    .update({ question_id: newQuestionId })
+    .eq("id", mappingId);
+
+  if (error) {
+    console.error("Error swapping live exam question:", error);
+    throw error;
+  }
+}
+
 export async function removeQuestionFromLiveExam(
   mappingId: string
 ): Promise<void> {
@@ -308,8 +354,6 @@ export async function removeQuestionFromLiveExam(
 export async function reorderLiveExamQuestions(
   updates: { id: string; serial: number }[]
 ): Promise<void> {
-  // Supabase doesn't easily support bulk upsert based on id with simple JS objects in the way we might want here.
-  // Instead, we can do parallel updates or a postgres function. For simplicity, we use parallel promises.
   const promises = updates.map((update) =>
     supabase
       .from("live_exam_questions")
@@ -326,6 +370,58 @@ export async function reorderLiveExamQuestions(
   }
 }
 
+export interface BlueprintRule {
+  subject: string;
+  chapter?: string;
+  difficulty?: string;
+  count: number;
+}
+
+export async function autoAssignQuestionsByBlueprint(
+  examId: string,
+  rules: BlueprintRule[]
+): Promise<number> {
+  const existing = await getLiveExamQuestions(examId);
+  const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
+  const candidateIdsToAdd: string[] = [];
+
+  for (const rule of rules) {
+    if (!rule.subject || rule.count <= 0) continue;
+
+    let query = supabase
+      .from("questions")
+      .select("id")
+      .or("status.eq.Approved,status.eq.published");
+
+    query = query.or(
+      `subject.eq.${rule.subject},subject_id.eq.${rule.subject},subject.ilike.%${rule.subject}%`
+    );
+
+    if (rule.chapter && rule.chapter !== "all") {
+      query = query.ilike("chapter", `%${rule.chapter}%`);
+    }
+    if (rule.difficulty && rule.difficulty !== "all") {
+      query = query.eq("difficulty", rule.difficulty);
+    }
+
+    const { data: candidates } = await query.limit(rule.count * 4);
+
+    if (candidates && candidates.length > 0) {
+      const filtered = candidates
+        .map((c) => c.id)
+        .filter((id) => !existingIds.has(id) && !candidateIdsToAdd.includes(id));
+
+      // Pick up to rule.count
+      const picked = filtered.slice(0, rule.count);
+      picked.forEach((id) => candidateIdsToAdd.push(id));
+    }
+  }
+
+  if (candidateIdsToAdd.length === 0) return 0;
+
+  return addQuestionsBatchToLiveExam(examId, candidateIdsToAdd);
+}
+
 export async function autoAssignQuestionsToLiveExam(
   examId: string,
   subject?: string,
@@ -333,52 +429,14 @@ export async function autoAssignQuestionsToLiveExam(
   count: number = 25,
   difficulty?: string
 ): Promise<number> {
-  // 1. Get existing question IDs to avoid duplicates
-  const existing = await getLiveExamQuestions(examId);
-  const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
-
-  // 2. Query approved questions
-  let query = supabase
-    .from("questions")
-    .select("id")
-    .or("status.eq.Approved,status.eq.published");
-
-  if (subject) {
-    query = query.or(`subject.eq.${subject},subject_id.eq.${subject},subject.ilike.%${subject}%`);
-  }
-  if (chapter) query = query.ilike("chapter", `%${chapter}%`);
-  if (difficulty) query = query.eq("difficulty", difficulty);
-
-  const { data: candidates, error } = await query.limit(200);
-
-  if (error) {
-    console.error("Error fetching candidate questions for auto-assign:", error);
-    throw error;
-  }
-
-  const newQuestions = (candidates || []).filter((q: any) => !existingIds.has(q.id));
-  const selected = newQuestions.slice(0, count);
-
-  if (selected.length === 0) return 0;
-
-  let currentSerial = existing.length + 1;
-  const inserts = selected.map((q: any) => ({
-    live_exam_id: examId,
-    question_id: q.id,
-    serial: currentSerial++,
-    points: 1,
-  }));
-
-  const { error: insertErr } = await supabase
-    .from("live_exam_questions")
-    .insert(inserts);
-
-  if (insertErr) {
-    console.error("Error inserting auto-assigned questions:", insertErr);
-    throw insertErr;
-  }
-
-  return selected.length;
+  return autoAssignQuestionsByBlueprint(examId, [
+    {
+      subject: subject || "",
+      chapter: chapter || "",
+      difficulty: difficulty || "",
+      count,
+    },
+  ]);
 }
 
 export async function extendLiveExamDuration(

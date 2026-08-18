@@ -959,7 +959,7 @@ class _LevelSelector extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: 128, // Reduced height to match compact padding
+        height: 136,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1021,7 +1021,7 @@ class _LevelSelector extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 12,
+                          vertical: 8,
                           horizontal: 4,
                         ),
                         child: Column(
@@ -1030,8 +1030,8 @@ class _LevelSelector extends StatelessWidget {
                             // Icon in a soft circle
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              width: 38,
-                              height: 38,
+                              width: 34,
+                              height: 34,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: isActive
@@ -1050,11 +1050,11 @@ class _LevelSelector extends StatelessWidget {
                               ),
                               child: Icon(
                                 l.icon,
-                                size: 18,
+                                size: 16,
                                 color: isActive ? Colors.white : l.start,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Text(
                               l.label.split(' ').first,
                               style: TextStyle(

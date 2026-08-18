@@ -214,13 +214,32 @@ final liveExamSolutionProvider = FutureProvider.autoDispose.family<
   final questions = await ref.watch(liveExamQuestionsProvider(examId).future);
   final details = await ref.watch(liveExamDetailsProvider(examId).future);
 
-  final userAnswers = details.attempt?.userAnswers ?? {
-    'mock-q-0': 0,
-    'mock-q-1': 0,
-    'mock-q-2': 1,
-    'mock-q-3': 0,
-  };
+  final userAnswers = details.attempt?.userAnswers ?? {};
 
   return (questions: questions, userAnswers: userAnswers);
 });
+
+// Practice History Provider
+final liveExamPracticeHistoryProvider = FutureProvider.autoDispose
+    .family<List<LiveExamPracticeAttempt>, String>((ref, examId) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) return [];
+
+  try {
+    final res = await supabase
+        .from('live_exam_practice_history')
+        .select()
+        .eq('live_exam_id', examId)
+        .eq('user_id', user.id)
+        .order('submit_time', ascending: false);
+
+    return (res as List)
+        .map((e) => LiveExamPracticeAttempt.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } catch (_) {
+    return [];
+  }
+});
+
 

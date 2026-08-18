@@ -20,6 +20,7 @@ class LiveExamDetailsView extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final detailsAsync = ref.watch(liveExamDetailsProvider(examId));
     final leaderboardAsync = ref.watch(liveExamLeaderboardProvider(examId));
+    final practiceHistoryAsync = ref.watch(liveExamPracticeHistoryProvider(examId));
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAFA),
@@ -456,6 +457,158 @@ class LiveExamDetailsView extends ConsumerWidget {
                   ],
                 ],
 
+                // Official Attempt Result Card
+                if (isTaken && (isPast || exam.id.startsWith('mock-')) && attempt != null) ...[
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(LucideIcons.award, color: Color(0xFF10B981), size: 18),
+                                SizedBox(width: 8),
+                                Text(
+                                  'অফিসিয়াল ফলাফল',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'HindSiliguri',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'মেধা তালিকায় অন্তর্ভুক্ত',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF10B981),
+                                  fontFamily: 'HindSiliguri',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildScoreStat('সঠিক', '${attempt.correctCount}', const Color(0xFF10B981), isDark),
+                            Container(width: 1, height: 28, color: isDark ? Colors.white12 : Colors.black12),
+                            _buildScoreStat('ভুল', '${attempt.wrongCount}', const Color(0xFFEF4444), isDark),
+                            Container(width: 1, height: 28, color: isDark ? Colors.white12 : Colors.black12),
+                            _buildScoreStat('মোট নম্বর', '${attempt.score}', const Color(0xFF3B82F6), isDark),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Practice History Section
+                practiceHistoryAsync.maybeWhen(
+                  data: (history) {
+                    if (history.isEmpty) return const SizedBox();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            const Icon(LucideIcons.history, color: Color(0xFF3B82F6), size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'অনুশীলন পরীক্ষার ইতিহাস (${history.length})',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: history.length,
+                          itemBuilder: (ctx, idx) {
+                            final ph = history[idx];
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'অনুশীলন #${history.length - idx}',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'HindSiliguri',
+                                          color: Color(0xFF3B82F6),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'সঠিক: ${ph.correctCount} • ভুল: ${ph.wrongCount}',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: isDark ? Colors.white54 : Colors.black54,
+                                          fontFamily: 'HindSiliguri',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${ph.score}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0B6B42),
+                                      fontFamily: 'HindSiliguri',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                  orElse: () => const SizedBox(),
+                ),
+
                 // Leaderboard Section (when finished / past)
                 if (isTaken && (isPast || exam.id.startsWith('mock-'))) ...[
                   const SizedBox(height: 24),
@@ -613,6 +766,31 @@ class LiveExamDetailsView extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildScoreStat(String label, String value, Color color, bool isDark) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'HindSiliguri',
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontFamily: 'HindSiliguri',
+            color: isDark ? Colors.white54 : Colors.black54,
+          ),
+        ),
+      ],
     );
   }
 

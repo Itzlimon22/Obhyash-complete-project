@@ -99,10 +99,12 @@ export const useLiveExamEngine = () => {
   const stateRef = useRef(appState);
   const timeLeftRef = useRef(timeLeft);
   const examDetailsRef = useRef(examDetails);
+  const liveExamRef = useRef(liveExam);
   
   useEffect(() => { stateRef.current = appState; }, [appState]);
   useEffect(() => { timeLeftRef.current = timeLeft; }, [timeLeft]);
   useEffect(() => { examDetailsRef.current = examDetails; }, [examDetails]);
+  useEffect(() => { liveExamRef.current = liveExam; }, [liveExam]);
 
   const submitExam = useCallback(
     async (userId: string, manualSubmit = false) => {
@@ -117,12 +119,22 @@ export const useLiveExamEngine = () => {
       setErrorDetails("");
 
       try {
-        const duration = examDetailsRef.current ? examDetailsRef.current.durationMinutes * 60 - timeLeftRef.current : 0;
+        const totalDuration = examDetailsRef.current ? examDetailsRef.current.durationMinutes * 60 : 0;
+        const duration = Math.max(0, totalDuration - timeLeftRef.current);
         setTimeTaken(duration);
 
         const stats = calculateExamStats(questions, userAnswers, examDetailsRef.current?.negativeMarking || 0);
 
-        await submitLiveExam(attemptId, userAnswers, stats.correctCount, stats.wrongCount, stats.finalScore);
+        await submitLiveExam(
+          attemptId,
+          userAnswers,
+          stats.correctCount,
+          stats.wrongCount,
+          stats.finalScore,
+          liveExamRef.current?.id,
+          userId,
+          duration
+        );
 
         setAppState(AppState.COMPLETED);
         toast.success("পরীক্ষা সফলভাবে জমা হয়েছে!");

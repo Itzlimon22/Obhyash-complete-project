@@ -171,21 +171,53 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
         final user = supabase.auth.currentUser;
 
         if (user != null) {
-          await supabase.from('live_exam_attempts').upsert({
-            'live_exam_id': widget.examId,
-            'user_id': user.id,
-            'status': 'submitted',
-            'score': finalScore,
-            'correct_count': correctCount,
-            'wrong_count': wrongCount,
-            'user_answers': _userAnswers,
-            'submit_time': DateTime.now().toIso8601String(),
-          });
+          final existing = await supabase
+              .from('live_exam_attempts')
+              .select('id, status')
+              .eq('live_exam_id', widget.examId)
+              .eq('user_id', user.id)
+              .maybeSingle();
+
+          final bool isFirstOfficialAttempt =
+              existing == null || existing['status'] != 'submitted';
+
+          if (isFirstOfficialAttempt) {
+            // 1. Official Live Attempt -> Determines Leaderboard Rank
+            await supabase.from('live_exam_attempts').upsert({
+              'live_exam_id': widget.examId,
+              'user_id': user.id,
+              'status': 'submitted',
+              'score': finalScore,
+              'correct_count': correctCount,
+              'wrong_count': wrongCount,
+              'user_answers': _userAnswers,
+              'submit_time': DateTime.now().toIso8601String(),
+            });
+          } else {
+            // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
+            try {
+              final totalDuration = (widget.exam?.durationMinutes ?? 45) * 60;
+              final timeTaken = (totalDuration - _secondsRemaining).clamp(0, totalDuration);
+              await supabase.from('live_exam_practice_history').insert({
+                'live_exam_id': widget.examId,
+                'user_id': user.id,
+                'score': finalScore,
+                'correct_count': correctCount,
+                'wrong_count': wrongCount,
+                'unanswered_count': questions.length - _userAnswers.length,
+                'user_answers': _userAnswers,
+                'time_taken_seconds': timeTaken,
+                'submit_time': DateTime.now().toIso8601String(),
+              });
+            } catch (_) {}
+          }
         }
       }
 
-      // Invalidate details so it reloads attempt status
+      // Invalidate details & history so it reloads attempt status & practice records
       ref.invalidate(liveExamDetailsProvider(widget.examId));
+      ref.invalidate(liveExamLeaderboardProvider(widget.examId));
+      ref.invalidate(liveExamPracticeHistoryProvider(widget.examId));
       ref.invalidate(liveExamsProvider);
 
       if (mounted) {
@@ -678,6 +710,16 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               );
             }
 
+            final Set<String> distinctSubjects = questions
+                .map((q) => q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ'))
+                .toSet();
+
+            final Map<String, int> subjectQuestionCounts = {};
+            for (final q in questions) {
+              final key = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
+              subjectQuestionCounts[key] = (subjectQuestionCounts[key] ?? 0) + 1;
+            }
+
             return ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 120),
@@ -686,32 +728,110 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                 final q = questions[index];
                 _itemKeys[index] = GlobalKey();
 
-                return Container(
-                  key: _itemKeys[index],
-                  margin: const EdgeInsets.only(bottom: 14),
-                  child: QuestionCard(
-                    question: q,
-                    serialNumber: index + 1,
-                    selectedOptionIndex: _userAnswers[q.id],
-                    isFlagged: _flaggedIds.contains(q.id),
-                    isBookmarked: _bookmarkedIds.contains(q.id),
-                    onSelectOption: (optIndex) {
-                      setState(() {
-                        _userAnswers[q.id] = optIndex;
-                      });
-                    },
-                    onToggleFlag: () {
-                      setState(() {
-                        if (_flaggedIds.contains(q.id)) {
-                          _flaggedIds.remove(q.id);
-                        } else {
-                          _flaggedIds.add(q.id);
-                        }
-                      });
-                    },
-                    onToggleBookmark: () => _toggleBookmark(q.id),
-                    onReport: () => QuestionReportDialog.show(context, q.id),
-                  ),
+                final currentSub = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
+                final prevSub = index > 0
+                    ? (questions[index - 1].subject.trim().isNotEmpty
+                        ? questions[index - 1].subject.trim()
+                        : (questions[index - 1].subjectLabel?.trim() ?? 'সাধারণ'))
+                    : null;
+
+                final isFirstInSubject = index == 0 || (prevSub != null && prevSub.toLowerCase() != currentSub.toLowerCase());
+
+                Widget? subjectHeader;
+                if (distinctSubjects.length > 1 && isFirstInSubject) {
+                  final banglaSub = BanglaNameHelper.formatSubject(currentSub);
+                  final count = subjectQuestionCounts[currentSub] ?? 0;
+                  subjectHeader = Container(
+                    margin: EdgeInsets.only(top: index == 0 ? 0 : 22, bottom: 14),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            thickness: 1.2,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
+                              const SizedBox(width: 6),
+                              Text(
+                                banglaSub,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
+                              ),
+                              if (count > 0) ...[
+                                const SizedBox(width: 6),
+                                Text(
+                                  '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            thickness: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (subjectHeader != null) subjectHeader,
+                    Container(
+                      key: _itemKeys[index],
+                      margin: const EdgeInsets.only(bottom: 14),
+                      child: QuestionCard(
+                        question: q,
+                        serialNumber: index + 1,
+                        selectedOptionIndex: _userAnswers[q.id],
+                        isFlagged: _flaggedIds.contains(q.id),
+                        isBookmarked: _bookmarkedIds.contains(q.id),
+                        onSelectOption: (optIndex) {
+                          setState(() {
+                            _userAnswers[q.id] = optIndex;
+                          });
+                        },
+                        onToggleFlag: () {
+                          setState(() {
+                            if (_flaggedIds.contains(q.id)) {
+                              _flaggedIds.remove(q.id);
+                            } else {
+                              _flaggedIds.add(q.id);
+                            }
+                          });
+                        },
+                        onToggleBookmark: () => _toggleBookmark(q.id),
+                        onReport: () => QuestionReportDialog.show(context, q.id),
+                      ),
+                    ),
+                  ],
                 );
               },
             );

@@ -1,195 +1,175 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
 export const POST = async (req: Request) => {
-  const supabase = await createClient();
+  try {
+    const { historyId, action } = await req.json(); // action: 'approve' | 'reject'
 
-  // 1.Verify Authentication & Role
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!historyId || !['approve', 'reject'].includes(action)) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
 
-  // Ensure user is an admin
-  const { data: profile, error: profileErr } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
-  if (profileErr || profile?.role !== 'Admin') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const { historyId, action } = await req.json(); // action: 'approve' | 'reject'
-
-  if (!historyId || !['approve', 'reject'].includes(action)) {
-    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
-  }
-
-  const supabaseAdmin = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-
-  // 2. Look up the history record
-  const { data: history, error: historyErr } = await supabaseAdmin
-    .from('referral_history')
-    .select('*, referral:referrals(owner_id)')
-    .eq('id', historyId)
-    .single();
-
-  if (historyErr || !history) {
-    return NextResponse.json(
-      { error: 'History record not found' },
-      { status: 404 },
-    );
-  }
-
-  if (history.admin_status !== 'Pending') {
-    return NextResponse.json(
-      { error: `Record is already ${history.admin_status}` },
-      { status: 400 },
-    );
-  }
-
-  if (action === 'reject') {
-    await supabaseAdmin
+    // 1. Look up the history record
+    const { data: history, error: historyErr } = await supabaseAdmin
       .from('referral_history')
-      .update({ admin_status: 'Rejected' })
-      .eq('id', historyId);
-
-    // Insert notification for the referrer about the rejection
-    await supabaseAdmin.from('notifications').insert({
-      user_id: (history.referral as any).owner_id,
-      title: 'রেফারেল বাতিল!',
-      message: 'আপনার একটি রেফারেল অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
-      type: 'system',
-      is_read: false,
-    });
-
-    // Insert notification for the referee about the rejection
-    await supabaseAdmin.from('notifications').insert({
-      user_id: history.redeemed_by,
-      title: 'রেফারেল বাতিল!',
-      message:
-        'দুঃখিত, তোমার রেফারেল বোনাস রিকোয়েস্টটি অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
-      type: 'system',
-      is_read: false,
-    });
-
-    return NextResponse.json({ success: true, message: 'Referral rejected.' });
-  }
-
-  // Action is approve
-  // Helper: extend subscription by 30 days
-  const extendSubscription = async (userId: string) => {
-    const { data: userProfile } = await supabaseAdmin
-      .from('users')
-      .select('subscription')
-      .eq('id', userId)
+      .select('*, referral:referrals(owner_id)')
+      .eq('id', historyId)
       .single();
 
-    const sub = userProfile?.subscription || {};
-
-    // Parse existing expiry or use current date if none
-    let currentExpiry = new Date();
-    if (sub.expiry) {
-      const parsedExpiry = new Date(sub.expiry);
-      // Validate that the parsed date is actually valid before using it
-      if (!isNaN(parsedExpiry.getTime())) {
-        currentExpiry = parsedExpiry;
-      }
+    if (historyErr || !history) {
+      return NextResponse.json(
+        { error: 'History record not found' },
+        { status: 404 },
+      );
     }
 
-    const now = new Date();
-
-    // If the expiry is in the past (or it's a new sub), reset it to right now
-    if (currentExpiry < now) {
-      currentExpiry = new Date();
+    if (history.admin_status !== 'Pending') {
+      return NextResponse.json(
+        { error: `Record is already ${history.admin_status}` },
+        { status: 400 },
+      );
     }
 
-    // Add exactly 30 days accurately using Date methods (better than setMonth because
-    // setMonth can cause issues at the end of months like Jan 31 -> Feb 28/31)
-    currentExpiry.setDate(currentExpiry.getDate() + 30);
-
-    await supabaseAdmin
-      .from('users')
-      .update({
-        subscription: {
-          ...sub,
-          plan: 'Premium',
-          status: 'Active',
-          expiry: currentExpiry.toISOString(),
-        },
-      })
-      .eq('id', userId);
-
-    // Also record in subscription_history for full history tracking
-    try {
-      // Find standard/monthly plan if available
-      const { data: planData } = await supabaseAdmin
-        .from('subscription_plans')
-        .select('id')
-        .eq('is_active', true)
-        .limit(1)
-        .maybeSingle();
-
-      // Deactivate old active records
+    if (action === 'reject') {
       await supabaseAdmin
-        .from('subscription_history')
-        .update({ is_active: false })
-        .eq('user_id', userId)
-        .eq('is_active', true);
+        .from('referral_history')
+        .update({ admin_status: 'Rejected' })
+        .eq('id', historyId);
 
-      // Insert new active subscription record
-      await supabaseAdmin.from('subscription_history').insert({
-        user_id: userId,
-        plan_id: planData?.id || null,
-        started_at: new Date().toISOString(),
-        expires_at: currentExpiry.toISOString(),
-        is_active: true,
+      // Insert notification for the referrer about the rejection
+      await supabaseAdmin.from('notifications').insert({
+        user_id: (history.referral as any).owner_id,
+        title: 'রেফারেল বাতিল!',
+        message: 'আপনার একটি রেফারেল অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
+        type: 'system',
+        is_read: false,
       });
-    } catch (subHistErr) {
-      console.warn('Could not insert subscription_history record:', subHistErr);
+
+      // Insert notification for the referee about the rejection
+      await supabaseAdmin.from('notifications').insert({
+        user_id: history.redeemed_by,
+        title: 'রেফারেল বাতিল!',
+        message:
+          'দুঃখিত, তোমার রেফারেল বোনাস রিকোয়েস্টটি অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
+        type: 'system',
+        is_read: false,
+      });
+
+      return NextResponse.json({ success: true, message: 'Referral rejected.' });
     }
-  };
 
-  // Extend both users
-  await extendSubscription(history.redeemed_by);
-  await extendSubscription((history.referral as any).owner_id);
+    // Action is approve
+    // Helper: extend subscription by 30 days
+    const extendSubscription = async (userId: string) => {
+      const { data: userProfile } = await supabaseAdmin
+        .from('users')
+        .select('subscription')
+        .eq('id', userId)
+        .single();
 
-  // Update history status
-  await supabaseAdmin
-    .from('referral_history')
-    .update({ admin_status: 'Approved', reward_given: true })
-    .eq('id', historyId);
+      const sub = userProfile?.subscription || {};
 
-  // Insert notification for the referrer
-  await supabaseAdmin.from('notifications').insert({
-    user_id: (history.referral as any).owner_id,
-    title: 'রেফারেল সফল!',
-    message:
-      'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। তুমি ১ মাসের ফ্রি প্রিমিয়াম পেয়েছেন!',
-    type: 'system',
-    is_read: false,
-  });
+      let currentExpiry = new Date();
+      if (sub.expiry) {
+        const parsedExpiry = new Date(sub.expiry);
+        if (!isNaN(parsedExpiry.getTime())) {
+          currentExpiry = parsedExpiry;
+        }
+      }
 
-  // Insert notification for the new user
-  await supabaseAdmin.from('notifications').insert({
-    user_id: history.redeemed_by,
-    title: 'রেফারেল বোনাস!',
-    message:
-      'রেফারেল কোড ব্যবহারের জন্য তোমার অ্যাকাউন্টে ১ মাসের ফ্রি প্রিমিয়াম যোগ করা হয়েছে।',
-    type: 'system',
-    is_read: false,
-  });
+      const now = new Date();
+      if (currentExpiry < now) {
+        currentExpiry = new Date();
+      }
 
-  return NextResponse.json({
-    success: true,
-    message: 'Referral approved and rewards distributed.',
-  });
+      currentExpiry.setDate(currentExpiry.getDate() + 30);
+
+      await supabaseAdmin
+        .from('users')
+        .update({
+          subscription: {
+            ...sub,
+            plan: 'Premium',
+            status: 'Active',
+            expiry: currentExpiry.toISOString(),
+          },
+          subscription_status: 'Active',
+          subscription_expires_at: currentExpiry.toISOString(),
+          is_subscribed: true,
+        })
+        .eq('id', userId);
+
+      // Also record in subscription_history for full history tracking
+      try {
+        const { data: planData } = await supabaseAdmin
+          .from('subscription_plans')
+          .select('id')
+          .eq('is_active', true)
+          .limit(1)
+          .maybeSingle();
+
+        await supabaseAdmin
+          .from('subscription_history')
+          .update({ is_active: false })
+          .eq('user_id', userId)
+          .eq('is_active', true);
+
+        await supabaseAdmin.from('subscription_history').insert({
+          user_id: userId,
+          plan_id: planData?.id || null,
+          started_at: new Date().toISOString(),
+          expires_at: currentExpiry.toISOString(),
+          is_active: true,
+        });
+      } catch (subHistErr) {
+        console.warn('Could not insert subscription_history record:', subHistErr);
+      }
+    };
+
+    // Extend both users
+    await extendSubscription(history.redeemed_by);
+    await extendSubscription((history.referral as any).owner_id);
+
+    // Update history status
+    await supabaseAdmin
+      .from('referral_history')
+      .update({ admin_status: 'Approved', reward_given: true })
+      .eq('id', historyId);
+
+    // Insert notification for the referrer
+    await supabaseAdmin.from('notifications').insert({
+      user_id: (history.referral as any).owner_id,
+      title: 'রেফারেল সফল!',
+      message:
+        'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। তুমি ১ মাসের ফ্রি প্রিমিয়াম পেয়েছেন!',
+      type: 'system',
+      is_read: false,
+    });
+
+    // Insert notification for the new user
+    await supabaseAdmin.from('notifications').insert({
+      user_id: history.redeemed_by,
+      title: 'রেফারেল বোনাস!',
+      message:
+        'রেফারেল কোড ব্যবহারের জন্য তোমার অ্যাকাউন্টে ১ মাসের ফ্রি প্রিমিয়াম যোগ করা হয়েছে।',
+      type: 'system',
+      is_read: false,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Referral approved and rewards distributed.',
+    });
+  } catch (error: any) {
+    console.error('Referral approve error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
+  }
 };

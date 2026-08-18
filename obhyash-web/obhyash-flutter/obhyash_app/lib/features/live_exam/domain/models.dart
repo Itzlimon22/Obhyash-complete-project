@@ -168,3 +168,44 @@ class LiveExamLeaderboardEntry {
   }
 }
 
+class LiveExamPracticeAttempt {
+  final String id;
+  final String liveExamId;
+  final String userId;
+  final num score;
+  final int correctCount;
+  final int wrongCount;
+  final int unansweredCount;
+  final int timeTakenSeconds;
+  final DateTime submitTime;
+
+  LiveExamPracticeAttempt({
+    required this.id,
+    required this.liveExamId,
+    required this.userId,
+    required this.score,
+    required this.correctCount,
+    required this.wrongCount,
+    required this.unansweredCount,
+    required this.timeTakenSeconds,
+    required this.submitTime,
+  });
+
+  factory LiveExamPracticeAttempt.fromJson(Map<String, dynamic> json) {
+    return LiveExamPracticeAttempt(
+      id: json['id'] as String? ?? '',
+      liveExamId: json['live_exam_id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? '',
+      score: json['score'] as num? ?? 0,
+      correctCount: json['correct_count'] as int? ?? 0,
+      wrongCount: json['wrong_count'] as int? ?? 0,
+      unansweredCount: json['unanswered_count'] as int? ?? 0,
+      timeTakenSeconds: json['time_taken_seconds'] as int? ?? 0,
+      submitTime: json['submit_time'] != null
+          ? DateTime.parse(json['submit_time'].toString()).toLocal()
+          : DateTime.now(),
+    );
+  }
+}
+
+

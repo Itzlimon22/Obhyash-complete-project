@@ -17,6 +17,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   SubscriptionPlan? _activeSubscription;
   String _currentPlanId = 'free';
   DateTime? _expiresAt;
+  int _selectedPlanIndex = 1;
 
   int get _daysRemaining {
     if (_expiresAt == null) return 0;
@@ -114,39 +115,29 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               currentPlanId = 'pro';
             }
           }
-        }
-
-        // Fallback: Check 'users' table
-        if (activeSub == null) {
+        } else {
+          // Fallback to user metadata
           try {
             final userRes = await supabase
                 .from('users')
-                .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
+                .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
                 .eq('id', userId)
                 .maybeSingle();
 
             if (userRes != null) {
-              final subJson = userRes['subscription'] as Map<String, dynamic>?;
-              final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
-              final rawExp = subJson?['expiry'] ?? subJson?['expires_at'] ?? userRes['subscription_expires_at'];
-              DateTime? parsedExp;
-              if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
-              final bool isExpired = parsedExp != null && parsedExp.isBefore(DateTime.now());
+              final isSub = userRes['is_subscribed'] == true ||
+                  (userRes['subscription_status'] as String?)?.toLowerCase() == 'active';
+              final expStr = userRes['subscription_expires_at'] as String?;
+              final parsedExp = expStr != null ? DateTime.tryParse(expStr) : null;
 
-              final bool isSub = (userRes['is_subscribed'] == true && !isExpired) ||
-                  (rawStatus == 'active' && !isExpired) ||
-                  (userRes['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
-                  (parsedExp != null && parsedExp.isAfter(DateTime.now()) && (subJson != null || userRes['subscription_status'] != null));
+              if (isSub && (parsedExp == null || parsedExp.isAfter(DateTime.now()))) {
+                final subMeta = userRes['subscription'] as Map<String, dynamic>?;
+                final planTitle = (subMeta?['plan'] as String?) ?? 'প্রো প্ল্যান';
+                final days = parsedExp != null ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999) : 30;
 
-              if (isSub) {
-                expiresAt = parsedExp;
-                final days = parsedExp != null
-                    ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
-                    : 30;
-                final planTitle = (subJson?['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
                 final matchedPlan = plans.where((p) =>
-                    p.id == subJson?['plan_id'] ||
-                    p.name.toLowerCase().trim() == planTitle.toLowerCase().trim() ||
+                    p.id == (subMeta?['plan_id'] as String?) ||
+                    p.name.toLowerCase() == planTitle.toLowerCase() ||
                     p.name.toLowerCase().contains(planTitle.toLowerCase()) ||
                     planTitle.toLowerCase().contains(p.name.toLowerCase())).firstOrNull;
 
@@ -177,11 +168,18 @@ class _SubscriptionViewState extends State<SubscriptionView> {
       }
 
       if (mounted) {
+        final premium = plans.where((p) => p.price > 0).toList();
+        int defaultIdx = 0;
+        if (premium.length >= 2) {
+          defaultIdx = 1;
+        }
+
         setState(() {
           _plans = plans;
           _activeSubscription = activeSub;
           _currentPlanId = currentPlanId;
           _expiresAt = expiresAt;
+          _selectedPlanIndex = defaultIdx;
           _isLoading = false;
         });
       }
@@ -202,27 +200,28 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final premiumPlans = _plans.where((p) => p.price > 0).toList();
+    final selectedPlan = (premiumPlans.isNotEmpty && _selectedPlanIndex < premiumPlans.length)
+        ? premiumPlans[_selectedPlanIndex]
+        : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // HERO BANNER
           if (_isLoading)
             Container(
-              height: 200,
+              height: 180,
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF000000)
-                    : const Color(0xFF1C1C1E),
+                color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
                 borderRadius: BorderRadius.circular(24),
               ),
             )
           else
             _HeroBanner(isDark: isDark),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // ACTIVE SUBSCRIPTION BANNER
           if (!_isLoading && _activeSubscription != null) ...[
@@ -231,34 +230,45 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               daysRemaining: _daysRemaining,
               expiresAt: _activeSubscription!.expiresAt,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
           ],
 
           // PRICING HEADER
-          const Center(
-            child: Text(
-              'তোমার প্ল্যান বেছে নাও',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  'তোমার প্ল্যান বেছে নাও',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                    fontFamily: 'HindSiliguri',
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
-          const Center(
-            child: Text(
-              'যেকোনো সময় বাতিল করা যাবে',
-              style: TextStyle(fontSize: 16, color: Color(0xFF737373)),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // PRICING CARDS
+          // COMPACT PLAN SELECTOR CARDS
           if (_isLoading)
-            ...[1, 2].map(
+            ...[1, 2, 3].map(
               (i) => Container(
-                height: 250,
-                margin: const EdgeInsets.only(bottom: 16),
+                height: 84,
+                margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF000000) : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  color: isDark ? const Color(0xFF18181B) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
             )
@@ -266,38 +276,77 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF000000) : Colors.white,
+                color: isDark ? const Color(0xFF18181B) : Colors.white,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: const Center(
                 child: Text('কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।'),
               ),
             )
-          else
-            ...premiumPlans.map(
-              (plan) {
-                final isCurrent = _currentPlanId == plan.id ||
-                    (_activeSubscription != null &&
-                        (_activeSubscription!.id == plan.id ||
-                            _activeSubscription!.name.toLowerCase().trim() ==
-                                plan.name.toLowerCase().trim() ||
-                            plan.name
-                                .toLowerCase()
-                                .contains(_activeSubscription!.name.toLowerCase()) ||
-                            _activeSubscription!.name
-                                .toLowerCase()
-                                .contains(plan.name.toLowerCase())));
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: _PricingCard(
-                    plan: plan,
-                    isCurrent: isCurrent,
-                    onSelect: () => _handlePlanSelect(plan),
-                    isDark: isDark,
+          else ...[
+            // Compact Interactive Selectable Cards
+            ...premiumPlans.asMap().entries.map((entry) {
+              final index = entry.key;
+              final plan = entry.value;
+              final isSelected = _selectedPlanIndex == index;
+              final isCurrent = _currentPlanId == plan.id ||
+                  (_activeSubscription != null &&
+                      (_activeSubscription!.id == plan.id ||
+                          _activeSubscription!.name.toLowerCase().trim() ==
+                              plan.name.toLowerCase().trim()));
+
+              return _CompactPlanCard(
+                plan: plan,
+                isSelected: isSelected,
+                isCurrent: isCurrent,
+                isDark: isDark,
+                onTap: () {
+                  setState(() {
+                    _selectedPlanIndex = index;
+                  });
+                },
+              );
+            }),
+
+            const SizedBox(height: 14),
+
+            // PRIMARY CTA BUTTON FOR SELECTED PLAN
+            if (selectedPlan != null)
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF004633),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 3,
+                    shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
                   ),
-                );
-              },
-            ),
+                  onPressed: () => _handlePlanSelect(selectedPlan),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'এই প্ল্যানটি নাও (${selectedPlan.name} • ৳${selectedPlan.price})',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(LucideIcons.arrowRight, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+
+            // UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE (SHOWN ONCE)
+            _UnifiedFeaturesShowcase(isDark: isDark),
+          ],
 
           const SizedBox(height: 16),
 
@@ -525,17 +574,19 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
   }
 }
 
-class _PricingCard extends StatelessWidget {
+class _CompactPlanCard extends StatelessWidget {
   final SubscriptionPlan plan;
+  final bool isSelected;
   final bool isCurrent;
-  final VoidCallback onSelect;
   final bool isDark;
+  final VoidCallback onTap;
 
-  const _PricingCard({
+  const _CompactPlanCard({
     required this.plan,
+    required this.isSelected,
     required this.isCurrent,
-    required this.onSelect,
     required this.isDark,
+    required this.onTap,
   });
 
   @override
@@ -543,292 +594,293 @@ class _PricingCard extends StatelessWidget {
     final bool isMasterPro = plan.durationDays >= 180;
     final bool isTopRankers = plan.durationDays >= 90 && plan.durationDays < 180;
 
-    // Accent Colors
-    final Color accentColor = isMasterPro
-        ? const Color(0xFFD97706) // Amber / Gold
-        : isTopRankers
-            ? const Color(0xFF059669) // Emerald
-            : const Color(0xFF4F46E5); // Indigo
-
-    // Gradient Card Background
-    final cardGradient = isDark
-        ? LinearGradient(
-            colors: isMasterPro
-                ? [const Color(0xFF261D0F), const Color(0xFF18130B)]
-                : isTopRankers
-                    ? [const Color(0xFF142921), const Color(0xFF0E1A15)]
-                    : [const Color(0xFF18181B), const Color(0xFF121215)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        : LinearGradient(
-            colors: isMasterPro
-                ? [const Color(0xFFFFFBEB), Colors.white]
-                : isTopRankers
-                    ? [const Color(0xFFF0FDF4), Colors.white]
-                    : [Colors.white, const Color(0xFFFAFAFA)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          );
-
-    final borderColor = isMasterPro
-        ? const Color(0xFFD97706).withValues(alpha: isDark ? 0.8 : 0.6)
-        : isTopRankers
-            ? const Color(0xFF059669).withValues(alpha: isDark ? 0.8 : 0.6)
-            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
-
-    // Badge configuration
-    String? badgeText;
-    IconData? badgeIcon;
-    List<Color>? badgeColors;
+    String? tagText;
+    Color tagColor = const Color(0xFF004633);
+    Color tagBg = const Color(0xFFE6F4EA);
 
     if (isMasterPro) {
-      badgeText = 'মেগা সেভার 👑 ৫০% সাশ্রয়';
-      badgeIcon = LucideIcons.crown;
-      badgeColors = const [Color(0xFFB45309), Color(0xFFD97706)];
+      tagText = '👑 ৫০% সাশ্রয় • সেরা ভ্যালু';
+      tagColor = const Color(0xFFB45309);
+      tagBg = const Color(0xFFFEF3C7);
     } else if (isTopRankers) {
-      badgeText = 'জনপ্রিয় 🌟 ৪১% সাশ্রয়';
-      badgeIcon = LucideIcons.sparkles;
-      badgeColors = const [Color(0xFF064E3B), Color(0xFF059669)];
+      tagText = '🔥 ৪১% সাশ্রয় • সর্বাধিক জনপ্রিয়';
+      tagColor = const Color(0xFF004633);
+      tagBg = const Color(0xFFE6F4EA);
     } else {
-      badgeText = 'স্টার্টার ⚡';
-      badgeIcon = LucideIcons.zap;
-      badgeColors = const [Color(0xFF312E81), Color(0xFF4F46E5)];
+      tagText = '⚡ স্টার্টার';
+      tagColor = const Color(0xFF3B82F6);
+      tagBg = const Color(0xFFEFF6FF);
     }
 
-    // Monthly breakdown calculation
-    String monthlyCostText;
+    String perMonthText;
     if (isMasterPro) {
-      monthlyCostText = 'প্রতি মাসে মাত্র ৳৯৯ • সেরা লং-টার্ম ভ্যালু!';
+      perMonthText = 'প্রতি মাসে মাত্র ৳৯৯';
     } else if (isTopRankers) {
-      monthlyCostText = 'প্রতি মাসে মাত্র ৳১১৬ • সিজন স্পেশাল!';
+      perMonthText = 'প্রতি মাসে মাত্র ৳১১৬';
     } else {
-      monthlyCostText = '৩০ দিন ফুল এক্সেস • এককালীন পেমেন্ট';
+      perMonthText = '৳৪/দিন এককালীন';
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: cardGradient,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: borderColor,
-          width: (isMasterPro || isTopRankers) ? 1.6 : 1.2,
-        ),
-        boxShadow: [
-          if (isMasterPro)
-            BoxShadow(
-              color: const Color(0xFFD97706).withValues(alpha: isDark ? 0.25 : 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            )
-          else if (isTopRankers)
-            BoxShadow(
-              color: const Color(0xFF059669).withValues(alpha: isDark ? 0.25 : 0.12),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            )
-          else
-            BoxShadow(
-              color: isDark ? const Color(0x2A000000) : const Color(0x08000000),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Top-right dynamic badge
-          Positioned(
-            top: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: badgeColors),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: accentColor.withValues(alpha: 0.35),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(badgeIcon, size: 12, color: Colors.white),
-                  const SizedBox(width: 4),
-                  Text(
-                    badgeText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    final activeBorderColor = isSelected
+        ? (isMasterPro
+            ? const Color(0xFFD97706)
+            : const Color(0xFF004633))
+        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isDark
+              ? (isSelected
+                  ? (isMasterPro ? const Color(0xFF251A08) : const Color(0xFF0D251D))
+                  : const Color(0xFF18181B))
+              : (isSelected
+                  ? (isMasterPro ? const Color(0xFFFFFBEB) : const Color(0xFFF0FDF4))
+                  : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: activeBorderColor,
+            width: isSelected ? 2.0 : 1.0,
           ),
-          Padding(
-            padding: const EdgeInsets.all(22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 2),
-                Text(
-                  plan.name,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
+          boxShadow: [
+            if (isSelected)
+              BoxShadow(
+                color: (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                    .withValues(alpha: isDark ? 0.25 : 0.12),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Radio selection icon
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                      : (isDark ? Colors.white38 : Colors.black26),
+                  width: 2,
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      '৳${plan.price}',
-                      style: TextStyle(
-                        fontSize: 34,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        height: 1,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '/ ${plan.durationDays} দিন',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  monthlyCostText,
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
-                    color: accentColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Divider(
-                  height: 1,
-                  thickness: 0.8,
-                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                ),
-                const SizedBox(height: 16),
-                ...plan.features.map(
-                  (feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 11),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 22,
-                          height: 22,
-                          margin: const EdgeInsets.only(top: 1),
-                          decoration: BoxDecoration(
-                            color: accentColor.withValues(alpha: isDark ? 0.22 : 0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Icon(
-                              LucideIcons.check,
-                              size: 13,
-                              color: accentColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            feature,
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              height: 1.35,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
-                              color: isDark
-                                  ? const Color(0xFFE4E4E7)
-                                  : const Color(0xFF334155),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: isCurrent ? null : onSelect,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isCurrent
-                          ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB))
-                          : (isMasterPro
-                              ? const Color(0xFFB45309)
-                              : isTopRankers
-                                  ? const Color(0xFF004633)
-                                  : const Color(0xFF3730A3)),
-                      foregroundColor: isCurrent
-                          ? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A))
-                          : Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: !isMasterPro && !isTopRankers && !isCurrent
-                            ? BorderSide(
-                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFF4338CA),
-                                width: 1,
-                              )
-                            : BorderSide.none,
-                      ),
-                      elevation: (isMasterPro || isTopRankers) ? 3 : 0,
-                      shadowColor: accentColor.withValues(alpha: 0.35),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          isCurrent ? 'বর্তমান প্ল্যান' : 'এই প্ল্যানটি নাও',
+                color: isSelected
+                    ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                    : Colors.transparent,
+              ),
+              child: isSelected
+                  ? const Center(
+                      child: Icon(LucideIcons.check, size: 13, color: Colors.white),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 14),
+
+            // Plan Title & Tag & Subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          plan.name,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'HindSiliguri',
-                            color: isCurrent
-                                ? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A))
-                                : Colors.white,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isDark ? tagColor.withValues(alpha: 0.2) : tagBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          tagText,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark ? (isMasterPro ? const Color(0xFFFBBF24) : const Color(0xFF34D399)) : tagColor,
                           ),
                         ),
-                        if (!isCurrent) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            (isMasterPro || isTopRankers) ? LucideIcons.sparkles : LucideIcons.arrowRight,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        perMonthText,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Price Column
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '৳${plan.price}',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'HindSiliguri',
+                    color: isSelected
+                        ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                        : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                  ),
+                ),
+                Text(
+                  '/${plan.durationDays} দিন',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   ),
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UnifiedFeaturesShowcase extends StatelessWidget {
+  final bool isDark;
+  const _UnifiedFeaturesShowcase({required this.isDark});
+
+  static const _featuresList = [
+    (
+      icon: LucideIcons.zap,
+      title: 'আনলিমিটেড মক টেস্ট ও প্র্যাকটিস',
+      desc: 'যেকোনো বিষয় ও অধ্যায়ের সীমাহীন কাস্টম টেস্ট',
+    ),
+    (
+      icon: LucideIcons.bookOpen,
+      title: 'প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা',
+      desc: 'সঠিক উত্তরের পাশাপাশি গভীর ধারণা ও ট্রিকস',
+    ),
+    (
+      icon: LucideIcons.trophy,
+      title: 'লাইভ পরীক্ষা ও জাতীয় মেধা তালিকা',
+      desc: 'হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম কম্পিটিশন',
+    ),
+    (
+      icon: LucideIcons.lineChart,
+      title: 'স্মার্ট পারফরম্যান্স অ্যানালিটিক্স',
+      desc: 'দুর্বল টপিক ট্র্যাকার ও প্রোগ্রেস গ্রাফ',
+    ),
+    (
+      icon: LucideIcons.award,
+      title: '৫০ ও ১০০ প্রশ্নের ফুল মডেল টেস্ট',
+      desc: 'আসল পরীক্ষার মতো স্ট্যান্ডার্ড নেগেটিভ মার্কিং',
+    ),
+    (
+      icon: LucideIcons.shieldCheck,
+      title: 'বিজ্ঞাপনমুক্ত ও প্রায়োরিটি সাপোর্ট',
+      desc: '১০০% নিরবচ্ছিন্ন ও দ্রুত সমাধান সাপোর্ট',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.sparkles, color: Color(0xFF004633), size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'প্রিমিয়াম প্ল্যানে যা যা থাকছে',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 14),
+          ..._featuresList.map((f) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF004633).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(f.icon, size: 15, color: const Color(0xFF004633)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            f.title,
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                          Text(
+                            f.desc,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );

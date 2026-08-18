@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getStudentLiveExamDetails, getPublicLeaderboard } from "@/services/live-exam-student-service";
+import { getStudentLiveExamDetails, getPublicLeaderboard, getStudentLiveExamPracticeHistory } from "@/services/live-exam-student-service";
 import { LiveExam, LiveExamAttempt } from "@/lib/types";
 import { toast } from "sonner";
-import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight } from "lucide-react";
+import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight, History, Award } from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
 import LiveExamSolutionView from "./LiveExamSolutionView";
 import LiveExamLeaderboardView from "./LiveExamLeaderboardView";
@@ -27,6 +27,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const { user } = useAuth();
   const [exam, setExam] = useState<LiveExam | null>(null);
   const [attempt, setAttempt] = useState<LiveExamAttempt | null>(null);
+  const [practiceHistory, setPracticeHistory] = useState<any[]>([]);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTakingExam, setIsTakingExam] = useState(false);
@@ -42,16 +43,20 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const fetchDetails = async () => {
     try {
       setIsLoading(true);
-      const { exam, attempt } = await getStudentLiveExamDetails(examId, user!.id);
-      setExam(exam);
-      setAttempt(attempt);
+      const [detailsData, historyData] = await Promise.all([
+        getStudentLiveExamDetails(examId, user!.id),
+        getStudentLiveExamPracticeHistory(examId, user!.id),
+      ]);
+      setExam(detailsData.exam);
+      setAttempt(detailsData.attempt);
+      setPracticeHistory(historyData);
 
       const now = new Date();
-      const end = new Date(exam.end_time);
+      const end = new Date(detailsData.exam.end_time);
       const isPast = now > end;
 
       // Only show public leaderboard if exam has ended or publish_result_instantly is true
-      if (attempt?.status === "submitted" && (isPast || exam.id.startsWith("mock-"))) {
+      if (detailsData.attempt?.status === "submitted" && (isPast || detailsData.exam.id.startsWith("mock-"))) {
         const lb = await getPublicLeaderboard(examId, 5);
         setLeaderboard(lb);
       }
@@ -312,10 +317,18 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
           {/* User's Result summary if completed and ended */}
           {isTaken && (isPast || exam.id.startsWith("mock-")) && attempt && (
-            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800">
-              <h3 className="text-base font-extrabold text-neutral-900 dark:text-white mb-3">
-                আপনার ফলাফল সারাংশ
-              </h3>
+            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
+                    অফিসিয়াল লাইভ পরীক্ষার ফলাফল
+                  </h3>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                  মেধা তালিকায় অন্তর্ভুক্ত
+                </span>
+              </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
                   <span className="text-xs text-neutral-500 font-medium">সঠিক</span>
@@ -329,6 +342,48 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                   <span className="text-xs text-neutral-500 font-medium">মোট স্কোর</span>
                   <p className="text-lg font-black text-neutral-900 dark:text-white">{attempt.score}</p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Practice Attempts History Section */}
+          {practiceHistory.length > 0 && (
+            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
+                    অনুশীলন পরীক্ষার ইতিহাস ({practiceHistory.length})
+                  </h3>
+                </div>
+                <span className="text-xs text-neutral-500 font-medium">
+                  শুধুমাত্র অনুশীলনের রেকর্ড
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-neutral-100 dark:divide-zinc-800">
+                {practiceHistory.map((ph, idx) => (
+                  <div key={ph.id || idx} className="pt-2.5 first:pt-0 flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-bold text-neutral-800 dark:text-zinc-200 flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 font-mono text-[10px]">
+                          অনুশীলন #{practiceHistory.length - idx}
+                        </span>
+                        <span>{new Date(ph.submit_time).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <div className="text-[11px] text-neutral-500 mt-0.5">
+                        সঠিক: <span className="text-emerald-600 font-bold">{ph.correct_count}</span> • ভুল: <span className="text-rose-600 font-bold">{ph.wrong_count}</span>
+                        {ph.time_taken_seconds > 0 && ` • সময়: ${Math.floor(ph.time_taken_seconds / 60)} মি.`}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-sm text-neutral-900 dark:text-white">
+                        {ph.score}
+                      </span>
+                      <span className="text-[10px] text-neutral-400 block font-semibold">নম্বর</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

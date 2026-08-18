@@ -118,6 +118,34 @@ class Question {
     'institutes': institutes,
     'years': years,
   };
+
+  Question copyWith({
+    String? id,
+    String? subject,
+    String? subjectLabel,
+    String? chapter,
+    String? question,
+    String? explanation,
+    List<String>? options,
+    int? correctAnswerIndex,
+    int? points,
+    List<String>? institutes,
+    List<int>? years,
+  }) {
+    return Question(
+      id: id ?? this.id,
+      subject: subject ?? this.subject,
+      subjectLabel: subjectLabel ?? this.subjectLabel,
+      chapter: chapter ?? this.chapter,
+      question: question ?? this.question,
+      explanation: explanation ?? this.explanation,
+      options: options ?? this.options,
+      correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
+      points: points ?? this.points,
+      institutes: institutes ?? this.institutes,
+      years: years ?? this.years,
+    );
+  }
 }
 
 class ExamConfig {

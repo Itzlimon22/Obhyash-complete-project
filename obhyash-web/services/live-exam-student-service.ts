@@ -106,14 +106,13 @@ export async function startLiveExam(
 
   if (attemptError) throw attemptError;
 
+  let attemptId: string;
+
   if (attemptData && attemptData.status === "submitted") {
-    throw new Error("You have already submitted this exam.");
-  }
-
-  let attemptId = attemptData?.id;
-
-  if (!attemptData) {
-    // Insert new attempt
+    // Already submitted official attempt -> Enter practice re-attempt mode!
+    attemptId = `practice-${Date.now()}`;
+  } else if (!attemptData) {
+    // Insert new official attempt
     const { data: newAttempt, error: insertError } = await supabase
       .from("live_exam_attempts")
       .insert([
@@ -128,6 +127,8 @@ export async function startLiveExam(
 
     if (insertError) throw insertError;
     attemptId = newAttempt.id;
+  } else {
+    attemptId = attemptData.id;
   }
 
   // 2. Fetch the questions for this exam
@@ -156,12 +157,37 @@ export async function submitLiveExam(
   userAnswers: Record<string, number>,
   correctCount: number,
   wrongCount: number,
-  score: number
+  score: number,
+  examId?: string,
+  userId?: string,
+  timeTakenSeconds?: number
 ): Promise<void> {
   if (attemptId.startsWith("mock-")) {
     return;
   }
 
+  if (attemptId.startsWith("practice-") && examId && userId) {
+    // Practice Attempt -> Persist in practice history table
+    try {
+      await supabase.from("live_exam_practice_history").insert([
+        {
+          live_exam_id: examId,
+          user_id: userId,
+          score,
+          correct_count: correctCount,
+          wrong_count: wrongCount,
+          user_answers: userAnswers,
+          time_taken_seconds: timeTakenSeconds || 0,
+          submit_time: new Date().toISOString(),
+        },
+      ]);
+    } catch (err) {
+      console.warn("Failed to insert into live_exam_practice_history:", err);
+    }
+    return;
+  }
+
+  // Official First-Time Attempt -> Updates live_exam_attempts for official Leaderboard
   const { error } = await supabase
     .from("live_exam_attempts")
     .update({
@@ -177,6 +203,25 @@ export async function submitLiveExam(
   if (error) {
     console.error("Error submitting live exam:", error);
     throw error;
+  }
+}
+
+export async function getStudentLiveExamPracticeHistory(
+  examId: string,
+  userId: string
+): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from("live_exam_practice_history")
+      .select("*")
+      .eq("live_exam_id", examId)
+      .eq("user_id", userId)
+      .order("submit_time", { ascending: false });
+
+    if (error) return [];
+    return data || [];
+  } catch (_) {
+    return [];
   }
 }
 
