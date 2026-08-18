@@ -14,6 +14,7 @@ import '../../exam/presentation/result_view.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../exam/services/local_exam_cache_service.dart';
+import '../../dashboard/services/streak_service.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -914,6 +915,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
       await LocalExamCacheService.deleteExamFromCache(record.id);
 
+      final uid = ref.read(authProvider)?.id;
+      if (uid != null) {
+        StreakService.checkAndUpdateStreak(uid);
+      }
+      ref.invalidate(userProfileProvider);
+      ref.invalidate(dashboardSubjectStatsProvider);
+      ref.invalidate(leaderboardProvider);
+
       if (mounted) {
         setState(() {
           _history.removeWhere((r) => r.id == record.id);
@@ -923,6 +932,13 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     } catch (e) {
       debugPrint('[ExamHistory] delete exam error: $e');
       await LocalExamCacheService.deleteExamFromCache(record.id);
+      final uid = ref.read(authProvider)?.id;
+      if (uid != null) {
+        StreakService.checkAndUpdateStreak(uid);
+      }
+      ref.invalidate(userProfileProvider);
+      ref.invalidate(dashboardSubjectStatsProvider);
+      ref.invalidate(leaderboardProvider);
       if (mounted) {
         setState(() {
           _history.removeWhere((r) => r.id == record.id);

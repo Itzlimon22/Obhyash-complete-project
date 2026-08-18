@@ -78,13 +78,21 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...formData,
-      start_time: new Date(formData.start_time as string).toISOString(),
-      end_time: new Date(formData.end_time as string).toISOString(),
-    });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onSave({
+        ...formData,
+        start_time: new Date(formData.start_time as string).toISOString(),
+        end_time: new Date(formData.end_time as string).toISOString(),
+      });
+    } catch (err) {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -333,10 +341,19 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-emerald-950/20 cursor-pointer"
+              disabled={isSubmitting}
+              className={`px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-emerald-950/20 ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              }`}
             >
-              <Save size={15} />
-              <span>{exam ? 'আপডেট সংরক্ষণ করুন' : 'লাইভ এক্সাম তৈরি করুন'}</span>
+              <Save size={15} className={isSubmitting ? 'animate-spin' : ''} />
+              <span>
+                {isSubmitting
+                  ? 'সংরক্ষণ হচ্ছে...'
+                  : exam
+                    ? 'আপডেট সংরক্ষণ করুন'
+                    : 'লাইভ এক্সাম তৈরি করুন'}
+              </span>
             </button>
           </div>
         </form>

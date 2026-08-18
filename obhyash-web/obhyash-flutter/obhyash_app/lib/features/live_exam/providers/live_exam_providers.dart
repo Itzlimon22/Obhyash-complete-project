@@ -61,7 +61,10 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
       .select()
       .inFilter('status', ['published', 'active', 'ongoing', 'upcoming', 'Published']);
 
-  if (rawCategory.isNotEmpty && rawCategory.toLowerCase() != 'all') {
+  if (rawCategory.isEmpty || rawCategory.toLowerCase() == 'all' || rawCategory.toLowerCase() == 'hsc') {
+    // Show all HSC & Admission tracks (HSC Science, Medical, Engineering, Varsity A-Unit, All)
+    filterBuilder = filterBuilder.or('category.ilike.hsc,category.ilike.medical,category.ilike.engineering,category.ilike.varsity_a,category.ilike.varsity,category.ilike.all,category.ilike.general');
+  } else {
     filterBuilder = filterBuilder.or('category.ilike.$rawCategory,category.ilike.all,category.ilike.general');
   }
 

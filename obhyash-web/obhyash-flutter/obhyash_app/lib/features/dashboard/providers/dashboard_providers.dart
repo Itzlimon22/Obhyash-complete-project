@@ -357,10 +357,11 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
         return a.startTime.compareTo(b.startTime);
       });
 
-      // If student has a specific stream or exam target, prioritize matching exams first
+      // Keep all relevant exams for HSC & Admission students (HSC, Medical, Engineering, Varsity, All)
       final matchingExams = activeExams.where((e) {
         final cat = e.category.toLowerCase().trim();
         if (cat.isEmpty || cat == 'all' || cat == 'general') return true;
+        if (cat == 'hsc' || cat == 'medical' || cat == 'engineering' || cat == 'varsity_a' || cat == 'varsity') return true;
         if (targetStream.isNotEmpty && (cat.contains(targetStream) || targetStream.contains(cat))) return true;
         if (examTarget.isNotEmpty && (cat.contains(examTarget) || examTarget.contains(cat))) return true;
         return false;

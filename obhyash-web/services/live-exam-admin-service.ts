@@ -138,21 +138,16 @@ export async function createLiveExam(
   exam: Partial<LiveExam>
 ): Promise<LiveExam> {
   if (typeof window !== "undefined") {
-    try {
-      const res = await fetch("/api/admin/live-exams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create", exam }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          return json.data as LiveExam;
-        }
-      }
-    } catch (apiErr) {
-      console.warn("API createLiveExam failed, falling back to direct query:", apiErr);
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "create", exam }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success && json.data) {
+      return json.data as LiveExam;
     }
+    throw new Error(json.error || "Failed to create live exam");
   }
 
   const { data, error } = await supabase
@@ -174,21 +169,16 @@ export async function updateLiveExam(
   updates: Partial<LiveExam>
 ): Promise<LiveExam> {
   if (typeof window !== "undefined") {
-    try {
-      const res = await fetch("/api/admin/live-exams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "update", id, updates }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          return json.data as LiveExam;
-        }
-      }
-    } catch (apiErr) {
-      console.warn("API updateLiveExam failed, falling back to direct query:", apiErr);
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update", id, updates }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success && json.data) {
+      return json.data as LiveExam;
     }
+    throw new Error(json.error || "Failed to update live exam");
   }
 
   const { data, error } = await supabase
@@ -208,19 +198,14 @@ export async function updateLiveExam(
 
 export async function deleteLiveExam(id: string): Promise<void> {
   if (typeof window !== "undefined") {
-    try {
-      const res = await fetch("/api/admin/live-exams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete", id }),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return;
-      }
-    } catch (apiErr) {
-      console.warn("API deleteLiveExam failed, falling back to direct query:", apiErr);
-    }
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", id }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to delete live exam");
   }
 
   const { error } = await supabase.from("live_exams").delete().eq("id", id);
