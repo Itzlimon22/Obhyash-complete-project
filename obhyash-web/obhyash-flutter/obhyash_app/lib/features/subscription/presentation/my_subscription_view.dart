@@ -67,56 +67,83 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         final h = hist.first as Map<String, dynamic>;
         final planJson = h['subscription_plans'] as Map<String, dynamic>?;
         final rawExpires = h['expires_at'] as String?;
+        if (rawExpires != null) expiresAt = DateTime.tryParse(rawExpires);
+
         if (planJson != null) {
           activePlan = SubscriptionPlan.fromJson(
             planJson,
             expiresAt: rawExpires?.substring(0, 10),
           );
-          if (rawExpires != null) expiresAt = DateTime.tryParse(rawExpires);
+        } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
+          final days = expiresAt.difference(DateTime.now()).inDays.clamp(1, 999);
+          activePlan = SubscriptionPlan(
+            id: 'active_plan',
+            name: 'প্রো সাবস্ক্রিপশন',
+            price: 0,
+            billingCycle: days >= 365 ? 'Yearly Plan' : days >= 90 ? 'Quarterly Plan' : 'Monthly Plan',
+            durationDays: days,
+            currency: '৳',
+            features: const [
+              'সকল প্রিমিয়াম ফিচার আনলকড',
+              'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+              'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+            ],
+            colorTheme: 'emerald',
+            expiresAt: rawExpires?.substring(0, 10),
+          );
         }
       }
 
-      // If no active plan found in subscription_history, check user profile (e.g. Referral Rewards)
+      // If no active plan found in subscription_history, check user profile
       if (activePlan == null) {
         try {
           final userRes = await supabase
               .from('users')
-              .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+              .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
               .eq('id', userId)
               .maybeSingle();
           if (userRes != null) {
             final subJson = userRes['subscription'] as Map<String, dynamic>?;
-            final status = subJson?['status'] ?? userRes['subscription_status'];
-            final rawExp = subJson?['expiry'] ?? userRes['subscription_expires_at'];
-            final isSub = userRes['is_subscribed'] == true ||
-                status?.toString().toLowerCase() == 'active';
+            final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
+            final rawExp = subJson?['expiry'] ?? subJson?['expires_at'] ?? userRes['subscription_expires_at'];
+            DateTime? parsedExp;
+            if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
+            final bool isExpired = parsedExp != null && parsedExp.isBefore(DateTime.now());
+
+            final bool isSub = (userRes['is_subscribed'] == true && !isExpired) ||
+                (rawStatus == 'active' && !isExpired) ||
+                (userRes['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
+                (parsedExp != null && parsedExp.isAfter(DateTime.now()) && (subJson != null || userRes['subscription_status'] != null));
 
             if (isSub) {
-              DateTime? parsedExp;
-              if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
-              if (parsedExp == null || parsedExp.isAfter(DateTime.now())) {
-                expiresAt = parsedExp;
-                final days = parsedExp != null
-                    ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
-                    : 30;
-                activePlan = SubscriptionPlan(
-                  id: 'referral_reward',
-                  name: (subJson?['plan'] ?? 'রেফারেল রিওয়ার্ড প্ল্যান').toString(),
-                  price: 0,
-                  billingCycle: 'Referral Bonus',
-                  durationDays: days,
-                  currency: '৳',
-                  features: const [
-                    'সকল প্রিমিয়াম ফিচার আনলকড',
-                    'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
-                    'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
-                  ],
-                  colorTheme: 'emerald',
-                  expiresAt: rawExp != null && rawExp.toString().length >= 10
-                      ? rawExp.toString().substring(0, 10)
-                      : null,
-                );
-              }
+              expiresAt = parsedExp;
+              final days = parsedExp != null
+                  ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
+                  : 30;
+              final planTitle = (subJson?['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+              final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                  ? 'Yearly Plan'
+                  : planTitle.toLowerCase().contains('pro') || planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                      ? 'Quarterly Plan'
+                      : 'Monthly Plan';
+
+              activePlan = SubscriptionPlan(
+                id: 'user_active_plan',
+                name: planTitle,
+                price: 0,
+                billingCycle: cycle,
+                durationDays: days,
+                currency: '৳',
+                features: const [
+                  'সকল প্রিমিয়াম ফিচার আনলকড',
+                  'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                  'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+                ],
+                colorTheme: 'emerald',
+                expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
+                    ? parsedExp.toIso8601String().substring(0, 10)
+                    : null,
+              );
             }
           }
         } catch (_) {}

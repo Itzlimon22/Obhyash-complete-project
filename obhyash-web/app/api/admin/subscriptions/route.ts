@@ -158,46 +158,98 @@ export async function POST(request: NextRequest) {
 
       // If approved, update user's subscription
       if (status === 'Approved') {
-        // Find plan duration
+        // Find plan duration & matching plan from subscription_plans
         let durationDays = 30;
-        const { data: planData } = await supabaseAdmin
-          .from('subscription_plans')
-          .select('*')
-          .ilike('display_name', `%${reqData.plan_name}%`)
-          .single();
+        let matchedPlanId: string | null = null;
+        let planDisplayName = reqData.plan_name || 'Premium';
 
-        if (planData?.duration_days) {
-          durationDays = planData.duration_days;
-        } else if (reqData.plan_name.toLowerCase().includes('year') || reqData.plan_name.toLowerCase().includes('বছর')) {
-          durationDays = 365;
-        } else if (reqData.plan_name.toLowerCase().includes('pro') || reqData.plan_name.toLowerCase().includes('ত্রৈমাসিক') || reqData.plan_name.toLowerCase().includes('quarter')) {
-          durationDays = 90;
+        const { data: allPlans } = await supabaseAdmin
+          .from('subscription_plans')
+          .select('*');
+
+        if (allPlans && allPlans.length > 0) {
+          const reqPlanLower = (reqData.plan_name || '').toLowerCase().trim();
+          const matched = allPlans.find(
+            (p) =>
+              p.id === reqData.plan_id ||
+              p.name.toLowerCase() === reqPlanLower ||
+              p.display_name.toLowerCase() === reqPlanLower ||
+              reqPlanLower.includes(p.name.toLowerCase()) ||
+              reqPlanLower.includes(p.display_name.toLowerCase()) ||
+              p.display_name.toLowerCase().includes(reqPlanLower),
+          );
+
+          if (matched) {
+            matchedPlanId = matched.id;
+            durationDays = matched.duration_days || 30;
+            planDisplayName = matched.display_name;
+          }
+        }
+
+        if (!matchedPlanId) {
+          if (
+            reqData.plan_name.toLowerCase().includes('year') ||
+            reqData.plan_name.toLowerCase().includes('বছর')
+          ) {
+            durationDays = 365;
+          } else if (
+            reqData.plan_name.toLowerCase().includes('pro') ||
+            reqData.plan_name.toLowerCase().includes('ত্রৈমাসিক') ||
+            reqData.plan_name.toLowerCase().includes('quarter')
+          ) {
+            durationDays = 90;
+          }
         }
 
         const expiryDate = new Date(now);
         expiryDate.setDate(expiryDate.getDate() + durationDays);
 
-        // Update user subscription
+        // 1. Update all subscription & access fields on users table
         const { error: userErr } = await supabaseAdmin
           .from('users')
           .update({
             subscription: {
-              plan: reqData.plan_name,
+              plan: planDisplayName,
               expiry: expiryDate.toISOString(),
               expires_at: expiryDate.toISOString(),
               status: 'Active',
             },
+            subscription_status: 'Active',
+            subscription_expires_at: expiryDate.toISOString(),
+            is_subscribed: true,
+            level: 'Pro',
+            status: 'Active',
             updated_at: now.toISOString(),
           })
           .eq('id', reqData.user_id);
 
         if (userErr) throw userErr;
 
-        // Send Notification
+        // 2. Deactivate previous active records and insert new record into subscription_history
+        try {
+          await supabaseAdmin
+            .from('subscription_history')
+            .update({ is_active: false })
+            .eq('user_id', reqData.user_id);
+
+          await supabaseAdmin.from('subscription_history').insert({
+            user_id: reqData.user_id,
+            plan_id: matchedPlanId,
+            payment_request_id: reqData.id,
+            started_at: now.toISOString(),
+            expires_at: expiryDate.toISOString(),
+            is_active: true,
+            created_at: now.toISOString(),
+          });
+        } catch (histErr) {
+          console.error('Error inserting subscription_history (non-fatal):', histErr);
+        }
+
+        // 3. Send in-app notification
         await supabaseAdmin.from('notifications').insert({
           user_id: reqData.user_id,
           title: 'পেমেন্ট সফল ও প্ল্যান সক্রিয়!',
-          message: `আপনার ${reqData.plan_name} প্ল্যানের পেমেন্ট অনুমোদিত হয়েছে। মেয়াদ: ${expiryDate.toLocaleDateString('bn-BD')} পর্যন্ত।`,
+          message: `আপনার ${planDisplayName} প্ল্যানের পেমেন্ট অনুমোদিত হয়েছে। মেয়াদ: ${expiryDate.toLocaleDateString('bn-BD')} পর্যন্ত।`,
           type: 'success',
           read: false,
           created_at: now.toISOString(),
@@ -232,7 +284,7 @@ export async function POST(request: NextRequest) {
 
       const { data: userData, error: uErr } = await supabaseAdmin
         .from('users')
-        .select('subscription')
+        .select('subscription, subscription_expires_at')
         .eq('id', userId)
         .single();
 
@@ -244,29 +296,48 @@ export async function POST(request: NextRequest) {
       }
 
       const currentSub = userData.subscription || {};
-      const currentExpiry = currentSub.expiry || currentSub.expires_at;
-      const baseDate = currentExpiry && new Date(currentExpiry) > new Date()
-        ? new Date(currentExpiry)
-        : new Date();
+      const currentExpiry =
+        currentSub.expiry || currentSub.expires_at || userData.subscription_expires_at;
+      const baseDate =
+        currentExpiry && new Date(currentExpiry) > new Date()
+          ? new Date(currentExpiry)
+          : new Date();
 
       const newExpiry = new Date(baseDate);
       newExpiry.setDate(newExpiry.getDate() + Number(extensionDays));
+      const planTitle = currentSub.plan && currentSub.plan !== 'Free' ? currentSub.plan : 'Premium';
 
       const { error: updateErr } = await supabaseAdmin
         .from('users')
         .update({
           subscription: {
             ...currentSub,
-            plan: currentSub.plan && currentSub.plan !== 'Free' ? currentSub.plan : 'Premium',
+            plan: planTitle,
             expiry: newExpiry.toISOString(),
             expires_at: newExpiry.toISOString(),
             status: 'Active',
           },
+          subscription_status: 'Active',
+          subscription_expires_at: newExpiry.toISOString(),
+          is_subscribed: true,
+          level: 'Pro',
+          status: 'Active',
           updated_at: new Date().toISOString(),
         })
         .eq('id', userId);
 
       if (updateErr) throw updateErr;
+
+      // Update subscription_history
+      try {
+        await supabaseAdmin
+          .from('subscription_history')
+          .update({ expires_at: newExpiry.toISOString(), is_active: true })
+          .eq('user_id', userId)
+          .eq('is_active', true);
+      } catch (histErr) {
+        console.error('Error updating subscription_history on extend:', histErr);
+      }
 
       return NextResponse.json({ success: true, newExpiry: newExpiry.toISOString() });
     }
@@ -295,6 +366,19 @@ export async function POST(request: NextRequest) {
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + Number(durationDays));
 
+      let matchedPlanId: string | null = null;
+      try {
+        const { data: allPlans } = await supabaseAdmin
+          .from('subscription_plans')
+          .select('*');
+        const matched = allPlans?.find(
+          (p) =>
+            p.name.toLowerCase() === planName.toLowerCase() ||
+            p.display_name.toLowerCase() === planName.toLowerCase(),
+        );
+        if (matched) matchedPlanId = matched.id;
+      } catch (_) {}
+
       const { error: grantErr } = await supabaseAdmin
         .from('users')
         .update({
@@ -304,11 +388,34 @@ export async function POST(request: NextRequest) {
             expires_at: expiryDate.toISOString(),
             status: 'Active',
           },
+          subscription_status: 'Active',
+          subscription_expires_at: expiryDate.toISOString(),
+          is_subscribed: true,
+          level: 'Pro',
+          status: 'Active',
           updated_at: new Date().toISOString(),
         })
         .eq('id', targetUserId);
 
       if (grantErr) throw grantErr;
+
+      try {
+        await supabaseAdmin
+          .from('subscription_history')
+          .update({ is_active: false })
+          .eq('user_id', targetUserId);
+
+        await supabaseAdmin.from('subscription_history').insert({
+          user_id: targetUserId,
+          plan_id: matchedPlanId,
+          started_at: new Date().toISOString(),
+          expires_at: expiryDate.toISOString(),
+          is_active: true,
+          created_at: new Date().toISOString(),
+        });
+      } catch (histErr) {
+        console.error('Error recording subscription_history on grant:', histErr);
+      }
 
       return NextResponse.json({ success: true, expiryDate: expiryDate.toISOString() });
     }

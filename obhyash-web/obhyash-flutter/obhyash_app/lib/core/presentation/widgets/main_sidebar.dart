@@ -337,8 +337,8 @@ class MainSidebar extends StatelessWidget {
                         preferredPosition: TooltipPosition.top,
                         child: IconButton(
                           onPressed: () {
-                            onLogout();
                             Navigator.pop(context);
+                            onLogout();
                           },
                           icon: const Icon(LucideIcons.logOut, size: 20),
                           color: const Color(0xFF737373),

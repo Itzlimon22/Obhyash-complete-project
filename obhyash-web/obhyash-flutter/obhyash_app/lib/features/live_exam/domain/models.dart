@@ -33,10 +33,10 @@ class LiveExam {
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       startTime: json['start_time'] != null
-          ? DateTime.parse(json['start_time'].toString())
+          ? DateTime.parse(json['start_time'].toString()).toLocal()
           : DateTime.now(),
       endTime: json['end_time'] != null
-          ? DateTime.parse(json['end_time'].toString())
+          ? DateTime.parse(json['end_time'].toString()).toLocal()
           : DateTime.now(),
       durationMinutes: json['duration_minutes'] as int? ?? 0,
       totalQuestions: json['total_questions'] as int? ?? 0,

@@ -230,24 +230,33 @@ class AuthController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final userId = _supabase.auth.currentUser?.id;
 
-      // Stop session monitor and remove DB row
-      if (userId != null) {
-        await SessionMonitorService.stop(userId: userId);
-      }
+      // 1. Invalidate cached user profile state immediately
+      ref.invalidate(userProfileProvider);
 
-      // Clear all encrypted tokens
-      await SecureStorageService.clearSession();
-      await SecureStorageService.clearUserMeta();
-
-      // Sign out from Supabase (invalidates access + refresh tokens)
+      // 2. Perform local signOut first so the in-memory session is cleared immediately
+      // and onAuthStateChange(AuthChangeEvent.signedOut) fires with zero delay.
       try {
-        await _supabase.auth.signOut();
+        await _supabase.auth.signOut(scope: SignOutScope.local);
       } catch (e) {
-        debugPrint('[AuthController] Remote signOut failed, falling back to local: $e');
-        try {
-          await _supabase.auth.signOut(scope: SignOutScope.local);
-        } catch (_) {}
+        debugPrint('[AuthController] Local signOut error: $e');
       }
+
+      // 3. Clear local encrypted tokens in parallel
+      await Future.wait([
+        SecureStorageService.clearSession().catchError((_) {}),
+        SecureStorageService.clearUserMeta().catchError((_) {}),
+      ]);
+
+      // 4. In the background (non-blocking), clean up session monitor & revoke server token
+      if (userId != null) {
+        unawaited(SessionMonitorService.stop(userId: userId));
+      }
+      unawaited(
+        _supabase.auth
+            .signOut(scope: SignOutScope.global)
+            .timeout(const Duration(seconds: 3))
+            .catchError((_) {}),
+      );
     });
   }
 }

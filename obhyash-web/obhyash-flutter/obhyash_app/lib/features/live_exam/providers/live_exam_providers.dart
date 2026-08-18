@@ -50,19 +50,22 @@ final liveExamCategoryProvider =
 final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
   ref,
 ) async {
-  final category = ref.watch(liveExamCategoryProvider);
-  if (category.isEmpty) return [];
+  final rawCategory = ref.watch(liveExamCategoryProvider).trim();
 
   final supabase = Supabase.instance.client;
   final user = supabase.auth.currentUser;
 
-  // 1. Fetch all published exams for this category
-  final examsResponse = await supabase
+  // 1. Fetch exams from Supabase
+  var filterBuilder = supabase
       .from('live_exams')
       .select()
-      .eq('category', category)
-      .eq('status', 'published')
-      .order('start_time', ascending: false);
+      .inFilter('status', ['published', 'active', 'ongoing', 'upcoming', 'Published']);
+
+  if (rawCategory.isNotEmpty && rawCategory.toLowerCase() != 'all') {
+    filterBuilder = filterBuilder.or('category.ilike.$rawCategory,category.ilike.all,category.ilike.general');
+  }
+
+  final examsResponse = await filterBuilder.order('start_time', ascending: false);
 
   final List<LiveExam> exams = (examsResponse as List)
       .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))

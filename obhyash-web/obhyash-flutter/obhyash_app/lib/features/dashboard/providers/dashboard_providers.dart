@@ -311,11 +311,11 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
   @override
   FutureOr<List<LiveExam>> build() async {
     final profile = await ref.watch(userProfileProvider.future);
-    if (profile == null) return [];
-
     final prefs = ref.watch(sharedPreferencesProvider);
-    final category = profile.level ?? 'HSC';
-    final cacheKey = 'cached_live_exams_$category';
+
+    final targetStream = profile?.stream?.toLowerCase().trim() ?? '';
+    final examTarget = profile?.examTarget?.toLowerCase().trim() ?? '';
+    final cacheKey = 'cached_dashboard_live_exams_${targetStream}_$examTarget';
 
     // 1. Cache-first: return immediately if cached
     final cached = prefs.getString(cacheKey);
@@ -328,44 +328,63 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
             .toList();
         if (cachedExams.isNotEmpty) {
           // Trigger background refresh
-          unawaited(_fetchAndCache(category, cacheKey, prefs));
+          unawaited(_fetchAndCache(targetStream, examTarget, cacheKey, prefs));
           return cachedExams;
         }
       } catch (_) {}
     }
 
     // 2. Network fetch
-    return _fetchAndCache(category, cacheKey, prefs);
+    return _fetchAndCache(targetStream, examTarget, cacheKey, prefs);
   }
 
   Future<List<LiveExam>> _fetchAndCache(
-    String category,
+    String targetStream,
+    String examTarget,
     String cacheKey,
-    var prefs,
+    dynamic prefs,
   ) async {
     final supabase = ref.read(supabaseClientProvider);
     try {
-      final catLower = category.toLowerCase().trim();
+      // Fetch all published/active live exams
       final examsResponse = await supabase
           .from('live_exams')
           .select()
-          .or('category.eq.$catLower,category.eq.all')
-          .eq('status', 'published')
-          .order('start_time', ascending: false);
+          .inFilter('status', ['published', 'active', 'ongoing', 'upcoming', 'Published'])
+          .order('start_time', ascending: true);
 
-      final List<LiveExam> exams = (examsResponse as List)
+      final List<LiveExam> allExams = (examsResponse as List)
           .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      final validExams =
-          exams.where((e) => e.isOngoing || e.isUpcoming).toList();
+      // Filter: keep ongoing or upcoming exams
+      final activeExams =
+          allExams.where((e) => e.isOngoing || e.isUpcoming).toList();
+
+      // Sort: ongoing exams first, then upcoming exams by nearest start time
+      activeExams.sort((a, b) {
+        if (a.isOngoing && !b.isOngoing) return -1;
+        if (!a.isOngoing && b.isOngoing) return 1;
+        return a.startTime.compareTo(b.startTime);
+      });
+
+      // If student has a specific stream or exam target, prioritize matching exams first
+      final matchingExams = activeExams.where((e) {
+        final cat = e.category.toLowerCase().trim();
+        if (cat.isEmpty || cat == 'all' || cat == 'general') return true;
+        if (targetStream.isNotEmpty && (cat.contains(targetStream) || targetStream.contains(cat))) return true;
+        if (examTarget.isNotEmpty && (cat.contains(examTarget) || examTarget.contains(cat))) return true;
+        return false;
+      }).toList();
+
+      final displayExams = matchingExams.isNotEmpty ? matchingExams : activeExams;
 
       prefs.setString(
         cacheKey,
-        jsonEncode(exams.map((e) => e.toJson()).toList()),
+        jsonEncode(displayExams.map((e) => e.toJson()).toList()),
       );
 
-      return validExams;
+      return displayExams;
     } catch (e) {
       debugPrint('[DashboardLiveExamsNotifier] failed: $e');
       return [];

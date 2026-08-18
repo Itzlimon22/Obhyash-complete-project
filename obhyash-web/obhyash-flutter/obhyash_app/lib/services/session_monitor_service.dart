@@ -86,19 +86,32 @@ class SessionMonitorService {
 
   /// Unsubscribe and clean up. Call on sign-out and app dispose.
   static Future<void> stop({required String userId}) async {
-    if (_channel != null) {
-      await _supabase.removeChannel(_channel!);
+    try {
+      final ch = _channel;
       _channel = null;
+      if (ch != null) {
+        unawaited(_supabase.removeChannel(ch).catchError((_) => ''));
+      }
+
+      final sessId = _currentSessionId;
+      _currentSessionId = null;
+      if (sessId != null && sessId.isNotEmpty) {
+        unawaited(
+          _supabase
+              .from('user_sessions')
+              .delete()
+              .eq('user_id', userId)
+              .eq('session_id', sessId)
+              .timeout(const Duration(seconds: 3))
+              .then((_) {})
+              .catchError((e) {
+                debugPrint('[SessionMonitor] Error deleting session row: $e');
+              }),
+        );
+      }
+    } catch (e) {
+      debugPrint('[SessionMonitor] stop error: $e');
     }
-    // Remove this device's session row
-    if (_currentSessionId != null) {
-      await _supabase
-          .from('user_sessions')
-          .delete()
-          .eq('user_id', userId)
-          .eq('session_id', _currentSessionId!);
-    }
-    _currentSessionId = null;
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────

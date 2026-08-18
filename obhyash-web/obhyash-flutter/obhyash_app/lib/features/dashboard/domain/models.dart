@@ -204,7 +204,8 @@ class UserProfile {
 
   bool get isPro {
     if (isSubscribed) return true;
-    if (subscriptionStatus == 'active') return true;
+    final status = subscriptionStatus?.toString().toLowerCase().trim();
+    if (status == 'active') return true;
     if (level != null && level!.toLowerCase().contains('pro')) return true;
     if (subscriptionExpiresAt != null) {
       final exp = DateTime.tryParse(subscriptionExpiresAt!);
@@ -225,12 +226,17 @@ class UserProfile {
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     final subJson = json['subscription'] as Map<String, dynamic>?;
-    final bool isSub = (json['is_subscribed'] == true) ||
-        (subJson != null && subJson['status'] == 'active') ||
-        (json['subscription_status'] == 'active');
+    final rawStatus = (subJson?['status'] ?? json['subscription_status'])?.toString().toLowerCase().trim();
     final rawExp = subJson?['expiry'] as String? ??
         subJson?['expires_at'] as String? ??
         json['subscription_expires_at'] as String?;
+    final expDate = rawExp != null ? DateTime.tryParse(rawExp) : null;
+    final bool isExpired = expDate != null && expDate.isBefore(DateTime.now());
+
+    final bool isSub = (json['is_subscribed'] == true && !isExpired) ||
+        (rawStatus == 'active' && !isExpired) ||
+        (json['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
+        (expDate != null && expDate.isAfter(DateTime.now()) && (subJson != null || json['subscription_status'] != null));
 
     return UserProfile(
       id: json['id'] as String,

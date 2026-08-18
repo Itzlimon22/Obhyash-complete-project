@@ -77,71 +77,97 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               expiresAt: rawExpires?.substring(0, 10),
             );
             currentPlanId = activeSub.id;
-          } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
-            // Reward / Custom Plan
-            activeSub = SubscriptionPlan(
-              id: 'active_reward_plan',
-              name: 'প্রো সাবস্ক্রিপশন (রিওয়ার্ড)',
-              price: 0,
-              billingCycle: 'Active Plan',
-              durationDays: expiresAt.difference(DateTime.now()).inDays.clamp(1, 999),
-              currency: '৳',
-              features: [
-                'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
-              ],
-              colorTheme: 'emerald',
-              expiresAt: rawExpires?.substring(0, 10),
-            );
-            currentPlanId = 'pro';
+          } else {
+            // Find by plan_id in fetched plans list
+            final matched = plans.where((p) => p.id == h['plan_id']).firstOrNull;
+            if (matched != null) {
+              activeSub = SubscriptionPlan(
+                id: matched.id,
+                name: matched.name,
+                price: matched.price,
+                billingCycle: matched.billingCycle,
+                durationDays: matched.durationDays,
+                currency: matched.currency,
+                features: matched.features,
+                colorTheme: matched.colorTheme,
+                expiresAt: rawExpires?.substring(0, 10),
+              );
+              currentPlanId = matched.id;
+            } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
+              // Reward / Custom Plan
+              final days = expiresAt.difference(DateTime.now()).inDays.clamp(1, 999);
+              activeSub = SubscriptionPlan(
+                id: 'active_custom_plan',
+                name: 'প্রো সাবস্ক্রিপশন',
+                price: 0,
+                billingCycle: days >= 365 ? 'Yearly' : days >= 90 ? 'Quarterly' : 'Monthly',
+                durationDays: days,
+                currency: '৳',
+                features: const [
+                  'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                  'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                  'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
+                ],
+                colorTheme: 'emerald',
+                expiresAt: rawExpires?.substring(0, 10),
+              );
+              currentPlanId = 'pro';
+            }
           }
         }
 
-        // Fallback: Check 'users' table (e.g. Question Report Reward / Referral Bonus)
+        // Fallback: Check 'users' table
         if (activeSub == null) {
           try {
             final userRes = await supabase
                 .from('users')
-                .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+                .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
                 .eq('id', userId)
                 .maybeSingle();
 
             if (userRes != null) {
               final subJson = userRes['subscription'] as Map<String, dynamic>?;
-              final status = subJson?['status'] ?? userRes['subscription_status'];
-              final rawExp = subJson?['expiry'] ?? userRes['subscription_expires_at'];
-              final isSub = userRes['is_subscribed'] == true ||
-                  status?.toString().toLowerCase() == 'active';
+              final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
+              final rawExp = subJson?['expiry'] ?? subJson?['expires_at'] ?? userRes['subscription_expires_at'];
+              DateTime? parsedExp;
+              if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
+              final bool isExpired = parsedExp != null && parsedExp.isBefore(DateTime.now());
+
+              final bool isSub = (userRes['is_subscribed'] == true && !isExpired) ||
+                  (rawStatus == 'active' && !isExpired) ||
+                  (userRes['plan']?.toString().toLowerCase() == 'pro' && !isExpired) ||
+                  (parsedExp != null && parsedExp.isAfter(DateTime.now()) && (subJson != null || userRes['subscription_status'] != null));
 
               if (isSub) {
-                DateTime? parsedExp;
-                if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
-                if (parsedExp == null || parsedExp.isAfter(DateTime.now())) {
-                  expiresAt = parsedExp;
-                  final days = parsedExp != null
-                      ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
-                      : 30;
-                  final planTitle = subJson?['plan']?.toString() ?? 'প্রো সাবস্ক্রিপশন';
-                  activeSub = SubscriptionPlan(
-                    id: 'user_active_sub',
-                    name: planTitle,
-                    price: 0,
-                    billingCycle: 'Active Plan',
-                    durationDays: days,
-                    currency: '৳',
-                    features: [
-                      'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                      'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                      'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
-                    ],
-                    colorTheme: 'emerald',
-                    expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
-                        ? parsedExp.toIso8601String().substring(0, 10)
-                        : null,
-                  );
-                  currentPlanId = 'pro';
-                }
+                expiresAt = parsedExp;
+                final days = parsedExp != null
+                    ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
+                    : 30;
+                final planTitle = (subJson?['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+                final matchedPlan = plans.where((p) =>
+                    p.id == subJson?['plan_id'] ||
+                    p.name.toLowerCase().trim() == planTitle.toLowerCase().trim() ||
+                    p.name.toLowerCase().contains(planTitle.toLowerCase()) ||
+                    planTitle.toLowerCase().contains(p.name.toLowerCase())).firstOrNull;
+
+                activeSub = SubscriptionPlan(
+                  id: matchedPlan?.id ?? 'user_active_sub',
+                  name: matchedPlan?.name ?? planTitle,
+                  price: matchedPlan?.price ?? 0,
+                  billingCycle: matchedPlan?.billingCycle ?? (days >= 365 ? 'Yearly' : days >= 90 ? 'Quarterly' : 'Monthly'),
+                  durationDays: days,
+                  currency: matchedPlan?.currency ?? '৳',
+                  features: matchedPlan?.features ?? const [
+                    'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                    'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                    'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
+                  ],
+                  colorTheme: 'emerald',
+                  expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
+                      ? parsedExp.toIso8601String().substring(0, 10)
+                      : null,
+                );
+                currentPlanId = activeSub.id;
               }
             }
           } catch (userSubErr) {
@@ -249,15 +275,28 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             )
           else
             ...premiumPlans.map(
-              (plan) => Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: _PricingCard(
-                  plan: plan,
-                  isCurrent: _currentPlanId == plan.id,
-                  onSelect: () => _handlePlanSelect(plan),
-                  isDark: isDark,
-                ),
-              ),
+              (plan) {
+                final isCurrent = _currentPlanId == plan.id ||
+                    (_activeSubscription != null &&
+                        (_activeSubscription!.id == plan.id ||
+                            _activeSubscription!.name.toLowerCase().trim() ==
+                                plan.name.toLowerCase().trim() ||
+                            plan.name
+                                .toLowerCase()
+                                .contains(_activeSubscription!.name.toLowerCase()) ||
+                            _activeSubscription!.name
+                                .toLowerCase()
+                                .contains(plan.name.toLowerCase())));
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: _PricingCard(
+                    plan: plan,
+                    isCurrent: isCurrent,
+                    onSelect: () => _handlePlanSelect(plan),
+                    isDark: isDark,
+                  ),
+                );
+              },
             ),
 
           const SizedBox(height: 16),

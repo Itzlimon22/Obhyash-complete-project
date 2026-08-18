@@ -335,14 +335,35 @@ export const getUserActiveSubscription =
         .maybeSingle();
 
       if (hist) {
-        const plan = hist.subscription_plans as any;
+        let plan = hist.subscription_plans as any;
         const expiry = hist.expires_at;
+
+        // If subscription_plans was not joined directly, try fetching by plan_id
+        if (!plan && hist.plan_id) {
+          const { data: matchedPlan } = await supabase
+            .from('subscription_plans')
+            .select('*')
+            .eq('id', hist.plan_id)
+            .maybeSingle();
+          if (matchedPlan) plan = matchedPlan;
+        }
+
+        const durationDays = plan?.duration_days || 30;
+        const cycle =
+          durationDays >= 365
+            ? 'Yearly Plan'
+            : durationDays >= 90
+              ? 'Quarterly Plan'
+              : durationDays >= 30
+                ? 'Monthly Plan'
+                : `${durationDays} Days Plan`;
+
         return {
           id: plan?.id || 'history_active_sub',
-          name: plan?.display_name || 'প্রো সাবস্ক্রিপশন (রিওয়ার্ড)',
+          name: plan?.display_name || plan?.name || 'প্রো সাবস্ক্রিপশন',
           price: plan?.price || 0,
           currency: plan?.currency || '৳',
-          billingCycle: 'Active Plan',
+          billingCycle: cycle,
           features: plan?.features || [
             'সকল প্রিমিয়াম প্রশ্নের সমাধান',
             'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
@@ -358,31 +379,43 @@ export const getUserActiveSubscription =
       const { data: userProfile } = await supabase
         .from('users')
         .select(
-          'subscription, subscription_status, subscription_expires_at, is_subscribed',
+          'subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level',
         )
         .eq('id', user.id)
         .maybeSingle();
 
       if (userProfile) {
-        const sub = userProfile.subscription as any;
-        const status = sub?.status || userProfile.subscription_status;
+        const sub = (userProfile.subscription || {}) as any;
+        const status = (sub?.status || userProfile.subscription_status)?.toString().toLowerCase();
         const expiry =
           sub?.expiry ||
           sub?.expires_at ||
           userProfile.subscription_expires_at;
         const isSub =
-          userProfile.is_subscribed ||
-          (status && String(status).toLowerCase() === 'active');
+          userProfile.is_subscribed === true ||
+          status === 'active' ||
+          userProfile.plan === 'Pro' ||
+          userProfile.level?.toLowerCase().includes('pro');
 
-        if (isSub && sub?.plan && sub.plan !== 'Free') {
-          const expDate = expiry ? new Date(expiry) : null;
-          if (!expDate || expDate > now) {
+        const expDate = expiry ? new Date(expiry) : null;
+        const isNotExpired = !expDate || expDate > now;
+
+        if (isSub && isNotExpired) {
+          const planName = sub?.plan || 'প্রো সাবস্ক্রিপশন';
+          if (planName !== 'Free') {
+            const cycle =
+              planName.toLowerCase().includes('year') || planName.toLowerCase().includes('বছর')
+                ? 'Yearly Plan'
+                : planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('quarter')
+                  ? 'Quarterly Plan'
+                  : 'Monthly Plan';
+
             return {
               id: 'user_active_plan',
-              name: sub?.plan || 'প্রো সাবস্ক্রিপশন',
+              name: planName,
               price: 0,
               currency: '৳',
-              billingCycle: 'Active Plan',
+              billingCycle: cycle,
               features: [
                 'সকল প্রিমিয়াম প্রশ্নের সমাধান',
                 'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',

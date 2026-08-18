@@ -15,8 +15,8 @@ export async function getPublishedLiveExams(category?: string, userId?: string):
     .eq("status", "published")
     .order("start_time", { ascending: true });
 
-  if (category && category !== 'All') {
-    query = query.ilike("category", category);
+  if (category && category !== 'All' && category !== 'all') {
+    query = query.or(`category.ilike.${category},category.ilike.all,category.ilike.general`);
   }
 
   const { data, error } = await query;

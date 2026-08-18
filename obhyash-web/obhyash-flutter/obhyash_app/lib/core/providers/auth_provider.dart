@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/secure_storage_service.dart';
@@ -60,11 +61,13 @@ class AuthNotifier extends Notifier<User?> {
   /// Convenience sign-out that delegates to the controller.
   Future<void> signOut() async {
     try {
-      await Supabase.instance.client.auth.signOut();
-    } catch (e) {
-      try {
-        await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
-      } catch (_) {}
-    }
+      await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+    } catch (_) {}
+    unawaited(
+      Supabase.instance.client.auth
+          .signOut(scope: SignOutScope.global)
+          .timeout(const Duration(seconds: 3))
+          .catchError((_) {}),
+    );
   }
 }

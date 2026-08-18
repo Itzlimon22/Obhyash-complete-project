@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
@@ -245,11 +244,7 @@ class SettingsView extends ConsumerWidget {
               await ref.read(authControllerProvider.notifier).logout();
             } catch (e) {
               debugPrint('[SettingsView] Logout error: $e');
-              try {
-                await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
-              } catch (_) {}
             }
-            if (context.mounted) context.go('/login');
           }
         }
     }
