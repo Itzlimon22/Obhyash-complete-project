@@ -228,6 +228,18 @@ export async function getLiveExamQuestions(examId: string): Promise<
     question: Question;
   }[]
 > {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/admin/live-exams?questions_for_exam=${examId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          return json.data;
+        }
+      }
+    } catch (_) {}
+  }
+
   const { data, error } = await supabase
     .from("live_exam_questions")
     .select(
@@ -247,7 +259,7 @@ export async function getLiveExamQuestions(examId: string): Promise<
     throw error;
   }
 
-  return data.map((item: any) => ({
+  return (data || []).map((item: any) => ({
     mapping_id: item.id,
     serial: item.serial,
     points: item.points,
@@ -261,6 +273,23 @@ export async function addQuestionToLiveExam(
   serial: number,
   points: number = 1
 ): Promise<void> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "add_question",
+        examId,
+        questionId,
+        serial,
+        points,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to add question to live exam");
+  }
+
   const { error } = await supabase.from("live_exam_questions").insert([
     {
       live_exam_id: examId,
@@ -283,10 +312,27 @@ export async function addQuestionsBatchToLiveExam(
 ): Promise<number> {
   if (!questionIds || questionIds.length === 0) return 0;
 
-  // 1. Fetch current questions to determine next serial and avoid duplicates
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "add_questions_batch",
+        examId,
+        questionIds,
+        points,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return json.count || 0;
+    }
+    throw new Error(json.error || "Failed to batch add questions to live exam");
+  }
+
+  // Fallback
   const existing = await getLiveExamQuestions(examId);
   const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
-  
   const toAdd = questionIds.filter((id) => !existingIds.has(id));
   if (toAdd.length === 0) return 0;
 
@@ -311,6 +357,21 @@ export async function swapLiveExamQuestion(
   mappingId: string,
   newQuestionId: string
 ): Promise<void> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "swap_question",
+        mappingId,
+        newQuestionId,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to swap live exam question");
+  }
+
   const { error } = await supabase
     .from("live_exam_questions")
     .update({ question_id: newQuestionId })
@@ -323,8 +384,24 @@ export async function swapLiveExamQuestion(
 }
 
 export async function removeQuestionFromLiveExam(
-  mappingId: string
+  mappingId: string,
+  examId?: string
 ): Promise<void> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "remove_question",
+        mappingId,
+        examId,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to remove question from live exam");
+  }
+
   const { error } = await supabase
     .from("live_exam_questions")
     .delete()
@@ -339,6 +416,20 @@ export async function removeQuestionFromLiveExam(
 export async function reorderLiveExamQuestions(
   updates: { id: string; serial: number }[]
 ): Promise<void> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "reorder_questions",
+        updates,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to reorder live exam questions");
+  }
+
   const promises = updates.map((update) =>
     supabase
       .from("live_exam_questions")
@@ -366,6 +457,23 @@ export async function autoAssignQuestionsByBlueprint(
   examId: string,
   rules: BlueprintRule[]
 ): Promise<number> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "auto_assign_blueprint",
+        examId,
+        rules,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return json.count || 0;
+    }
+    throw new Error(json.error || "Failed to auto-assign blueprint questions");
+  }
+
   const existing = await getLiveExamQuestions(examId);
   const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
   const candidateIdsToAdd: string[] = [];
@@ -396,7 +504,6 @@ export async function autoAssignQuestionsByBlueprint(
         .map((c) => c.id)
         .filter((id) => !existingIds.has(id) && !candidateIdsToAdd.includes(id));
 
-      // Pick up to rule.count
       const picked = filtered.slice(0, rule.count);
       picked.forEach((id) => candidateIdsToAdd.push(id));
     }
@@ -446,6 +553,18 @@ export async function extendLiveExamDuration(
 // ==========================================
 
 export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/admin/live-exams?leaderboard_for_exam=${examId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          return json.data;
+        }
+      }
+    } catch (_) {}
+  }
+
   const { data, error } = await supabase
     .from("live_exam_attempts")
     .select(
@@ -472,10 +591,24 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
     throw error;
   }
 
-  return data;
+  return data || [];
 }
 
 export async function resetLiveExamAttempt(attemptId: string): Promise<void> {
+  if (typeof window !== "undefined") {
+    const res = await fetch("/api/admin/live-exams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "reset_attempt",
+        attemptId,
+      }),
+    });
+    const json = await res.json();
+    if (res.ok && json.success) return;
+    throw new Error(json.error || "Failed to reset live exam attempt");
+  }
+
   const { error } = await supabase
     .from("live_exam_attempts")
     .delete()
@@ -488,6 +621,18 @@ export async function resetLiveExamAttempt(attemptId: string): Promise<void> {
 }
 
 export async function getLiveExamOngoingCount(examId: string): Promise<number> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/admin/live-exams?ongoing_for_exam=${examId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && typeof json.count === "number") {
+          return json.count;
+        }
+      }
+    } catch (_) {}
+  }
+
   const { count, error } = await supabase
     .from("live_exam_attempts")
     .select("id", { count: "exact", head: true })

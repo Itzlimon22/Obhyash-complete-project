@@ -50,7 +50,7 @@ import {
   BlueprintRule,
 } from '@/services/live-exam-admin-service';
 import { getQuestionsPage, createQuestion } from '@/services/question-service';
-import { subjects } from '@/lib/data';
+import { getHscSubjectList, getHscChapterList } from '@/lib/data/hsc-helpers';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { MathRenderer } from '@/components/common/MathRenderer';
@@ -256,7 +256,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
 
   const handleRemoveQuestion = async (mappingId: string) => {
     try {
-      await removeQuestionFromLiveExam(mappingId);
+      await removeQuestionFromLiveExam(mappingId, examId);
       toast.success('প্রশ্ন পরীক্ষা থেকে বাদ দেওয়া হয়েছে');
       fetchExamData();
     } catch (error) {
@@ -719,9 +719,12 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
     }
   };
 
-  // Selected subject object for chapter lists in question bank
-  const selectedBankSubObj = subjects.find((s) => s.id === subjectFilter);
-  const bankChaptersList = selectedBankSubObj ? selectedBankSubObj.chapters : [];
+  // Available subjects and chapters for question bank
+  const availableBankSubjects = useMemo(() => getHscSubjectList(), []);
+  const bankChaptersList = useMemo(
+    () => (subjectFilter ? getHscChapterList(subjectFilter) : []),
+    [subjectFilter],
+  );
 
   // Filtered assigned questions
   const filteredAssignedQuestions = useMemo(() => {
@@ -1083,8 +1086,8 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                   className="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-2.5 py-1.5 text-xs outline-none text-neutral-900 dark:text-white font-semibold"
                 >
                   <option value="">সকল বিষয়</option>
-                  {subjects.map((s) => (
-                    <option key={s.id} value={s.id}>
+                  {availableBankSubjects.map((s) => (
+                    <option key={s.id} value={s.name}>
                       {s.name}
                     </option>
                   ))}
@@ -1588,8 +1591,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
             {/* Rules List */}
             <form onSubmit={handleRunBlueprint} className="space-y-3 flex-1 overflow-y-auto">
               {blueprintRules.map((rule, idx) => {
-                const subObj = subjects.find((s) => s.id === rule.subject);
-                const chList = subObj ? subObj.chapters : [];
+                const chList = rule.subject ? getHscChapterList(rule.subject) : [];
 
                 return (
                   <div
@@ -1626,8 +1628,8 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                           className="w-full bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-2.5 py-1.5 text-xs outline-none font-semibold text-neutral-900 dark:text-white mt-0.5"
                         >
                           <option value="">বিষয় বাছুন</option>
-                          {subjects.map((s) => (
-                            <option key={s.id} value={s.id}>
+                          {availableBankSubjects.map((s) => (
+                            <option key={s.id} value={s.name}>
                               {s.name}
                             </option>
                           ))}
@@ -1830,8 +1832,8 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                     className="w-full bg-neutral-50 dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 rounded-xl px-2.5 py-1.5 text-xs outline-none font-semibold text-neutral-900 dark:text-white mt-0.5"
                   >
                     <option value="">বিষয় বাছুন</option>
-                    {subjects.map((s) => (
-                      <option key={s.id} value={s.id}>
+                    {availableBankSubjects.map((s) => (
+                      <option key={s.id} value={s.name}>
                         {s.name}
                       </option>
                     ))}

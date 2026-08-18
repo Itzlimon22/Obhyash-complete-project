@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, connection } from 'next/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { generateQuestionFingerprint } from '@/lib/crypto-utils';
+import { findHscSubject } from '@/lib/data/hsc-helpers';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -106,13 +107,39 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
+    const applyCommonFilters = (baseQ: any) => {
+      let q = baseQ;
+      if (subject) {
+        const subObj = findHscSubject(subject);
+        if (subObj) {
+          q = q.or(
+            `subject.eq."${subObj.name}",subject.eq."${subObj.id}",subject_id.eq."${subObj.id}",subject.ilike."%${subObj.name}%"`,
+          );
+        } else {
+          q = q.or(`subject.eq."${subject}",subject.ilike."%${subject}%"`);
+        }
+      }
+      if (chapter) {
+        q = q.or(`chapter.eq."${chapter}",chapter.ilike."%${chapter}%"`);
+      }
+      if (topic) {
+        q = q.or(`topic.eq."${topic}",topic.ilike."%${topic}%"`);
+      }
+      if (difficulty) q = q.eq('difficulty', difficulty);
+      if (author) q = q.eq('author', author);
+      if (search && search.trim()) {
+        const searchTerm = search.trim();
+        q = q.or(
+          `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%,chapter.ilike.%${searchTerm}%,topic.ilike.%${searchTerm}%`,
+        );
+      }
+      return q;
+    };
+
     // Build base query
     let query = supabaseAdmin.from('questions').select('*', { count: 'exact' });
+    query = applyCommonFilters(query);
 
-    if (subject) query = query.eq('subject', subject);
-    if (chapter) query = query.eq('chapter', chapter);
-    if (topic) query = query.eq('topic', topic);
-    if (difficulty) query = query.eq('difficulty', difficulty);
     if (status) {
       if (status === 'Pending') {
         query = query.or('status.eq.Pending,status.is.null');
@@ -120,37 +147,12 @@ export async function GET(request: NextRequest) {
         query = query.eq('status', status);
       }
     }
-    if (author) query = query.eq('author', author);
-
-    if (search && search.trim()) {
-      const searchTerm = search.trim();
-      query = query.or(
-        `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%`,
-      );
-    }
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' });
 
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
     query = query.range(from, to);
-
-    // Apply common non-status filters to count queries
-    const applyCommonFilters = (baseQ: any) => {
-      let q = baseQ;
-      if (subject) q = q.eq('subject', subject);
-      if (chapter) q = q.eq('chapter', chapter);
-      if (topic) q = q.eq('topic', topic);
-      if (difficulty) q = q.eq('difficulty', difficulty);
-      if (author) q = q.eq('author', author);
-      if (search && search.trim()) {
-        const searchTerm = search.trim();
-        q = q.or(
-          `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%`,
-        );
-      }
-      return q;
-    };
 
     const appQuery = applyCommonFilters(
       supabaseAdmin
