@@ -84,18 +84,39 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
         }
       }
 
+      // Today active in app
+      if (activity[29] == 0) {
+        activity[29] = 1;
+      }
+
+      // Compute consecutive streak backwards from today (index 29)
+      int consecutive = 0;
+      for (int i = 29; i >= 0; i--) {
+        if (activity[i] > 0) {
+          consecutive++;
+        } else {
+          break;
+        }
+      }
+
       _cachedActivity = activity;
       if (mounted) {
         setState(() {
           _last30DaysActivity = activity;
+          if (consecutive > 0) {
+            _streakCount = consecutive;
+          }
         });
       }
     } catch (_) {}
   }
 
+  int _streakCount = 0;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currentStreak = _streakCount > 0 ? _streakCount : widget.userStreak;
     
     final Color surfaceColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final Color borderColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
@@ -128,13 +149,13 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                   Icon(
                     LucideIcons.flame,
                     size: 26,
-                    color: widget.userStreak > 0
+                    color: currentStreak > 0
                         ? const Color(0xFF059669)
                         : (isDark ? Colors.white54 : Colors.black54),
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    '${widget.userStreak} দিনের স্ট্রাইক',
+                    '$currentStreak দিনের স্ট্রাইক',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -144,7 +165,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                   ),
                 ],
               ),
-              if (widget.userStreak > 0)
+              if (currentStreak > 0)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Domain Models ──────────────────────────────────────────────────────────────
 
@@ -520,11 +521,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: bgColor,
-        body: const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.deepGreen),
-          ),
-        ),
+        body: const ExamHistorySkeleton(),
       );
     }
 

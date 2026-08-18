@@ -9,6 +9,7 @@ import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../exam/services/local_exam_cache_service.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 
 class BookmarksView extends StatefulWidget {
@@ -461,7 +462,7 @@ class _BookmarksViewState extends State<BookmarksView> {
 
   Widget _buildBody(bool isDark) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const BookmarksListSkeleton();
     }
 
     if (_hasError) {

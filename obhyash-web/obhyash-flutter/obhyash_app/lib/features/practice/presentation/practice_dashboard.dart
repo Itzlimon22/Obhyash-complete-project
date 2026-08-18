@@ -17,6 +17,7 @@ import '../../exam/services/local_exam_cache_service.dart';
 import '../providers/practice_providers.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Domain Model ────────────────────────────────────────────────────────────
 
@@ -628,7 +629,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final list = _currentList;
 
     return _isLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? const BookmarksListSkeleton()
         : CustomScrollView(
             controller: _scrollController,
             slivers: [

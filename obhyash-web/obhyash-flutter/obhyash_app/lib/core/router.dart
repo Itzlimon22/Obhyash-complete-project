@@ -32,6 +32,7 @@ import '../features/exam/presentation/exam_runner_view.dart';
 import '../features/notifications/presentation/notifications_view.dart';
 import '../features/blog/presentation/blog_view.dart';
 import '../features/referral/presentation/referral_view.dart';
+import '../features/live_exam/presentation/live_exam_main_view.dart';
 import '../features/live_exam/presentation/live_exam_category_view.dart';
 import '../features/live_exam/presentation/live_exam_details_view.dart';
 import '../features/live_exam/presentation/live_exam_session_view.dart';
@@ -240,14 +241,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'live_exam',
-                    builder: (context, state) =>
-                        const LiveExamCategoryView(category: 'hsc'),
+                    builder: (context, state) => const LiveExamMainView(),
                     routes: [
                        GoRoute(
                         path: ':category',
                         builder: (context, state) {
                           final category =
-                              state.pathParameters['category'] ?? 'hsc';
+                              state.pathParameters['category'] ?? 'all';
                           return LiveExamCategoryView(category: category);
                         },
                       ),
@@ -255,14 +255,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'live-exams',
-                    builder: (context, state) =>
-                        const LiveExamCategoryView(category: 'hsc'),
+                    builder: (context, state) => const LiveExamMainView(),
                     routes: [
                       GoRoute(
                         path: ':category',
                         builder: (context, state) {
                           final category =
-                              state.pathParameters['category'] ?? 'hsc';
+                              state.pathParameters['category'] ?? 'all';
                           return LiveExamCategoryView(category: category);
                         },
                       ),

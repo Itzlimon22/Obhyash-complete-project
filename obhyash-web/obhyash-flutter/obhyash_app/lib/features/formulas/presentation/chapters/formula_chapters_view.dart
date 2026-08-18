@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/formula_models.dart';
 import '../../../../core/providers/title_provider.dart';
+import '../../../../core/presentation/widgets/skeleton_loading.dart';
 
 class FormulaChaptersView extends ConsumerStatefulWidget {
   final String subjectId;
@@ -63,7 +64,7 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
-        body: const Center(child: CircularProgressIndicator(color: Color(0xFF059669))),
+        body: const BookmarksListSkeleton(),
       );
     }
 

@@ -8,6 +8,7 @@ import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import 'my_profile_view.dart';
 import 'widgets/streak_calendar.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // Provider that fetches exam history for the stats page
 final _statsExamHistoryProvider = FutureProvider.autoDispose<List<ExamResult>>((
@@ -34,7 +35,7 @@ final _statsExamHistoryProvider = FutureProvider.autoDispose<List<ExamResult>>((
       wrongCount: (m['wrong_count'] as num?)?.toInt() ?? 0,
       subjectLabel: m['subject_label'] as String?,
       createdAt: m['created_at'] != null
-          ? DateTime.tryParse(m['created_at'] as String)
+          ? DateTime.tryParse(m['created_at'] as String)?.toLocal()
           : null,
     );
   }).toList();
@@ -114,7 +115,7 @@ class ProfileStatsPage extends ConsumerWidget {
           calendarData: _buildCalendarData(history),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const ProfileStatsSkeleton(),
       error: (e, s) => Center(child: Text('Error: $e')),
     );
   }

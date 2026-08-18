@@ -1,13 +1,15 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'user_avatar.dart';
 import 'obhyash_tooltip.dart';
 import '../../../features/dashboard/services/streak_service.dart';
+import '../../../features/dashboard/providers/dashboard_providers.dart';
 
-class StreakDialog extends StatefulWidget {
+class StreakDialog extends ConsumerStatefulWidget {
   final int currentStreak;
   final String userId;
 
@@ -18,17 +20,15 @@ class StreakDialog extends StatefulWidget {
   });
 
   @override
-  State<StreakDialog> createState() => _StreakDialogState();
+  ConsumerState<StreakDialog> createState() => _StreakDialogState();
 }
 
-class _StreakDialogState extends State<StreakDialog> {
+class _StreakDialogState extends ConsumerState<StreakDialog> {
   bool _isLoading = true;
   List<bool> _activeDays = List.generate(7, (index) => false);
   late int _streakCount;
   int _tabIndex = 0;
   
-  static List<dynamic>? _cachedTopStreaks;
-  static DateTime? _lastFetchTime;
   List<dynamic> _topStreaks = [];
   bool _isLoadingLeaderboard = false;
 
@@ -86,16 +86,21 @@ class _StreakDialogState extends State<StreakDialog> {
           }
         }
       } catch (_) {}
+
+      // Today the user is active in the app
+      final todayIndex = now.weekday == DateTime.sunday ? 0 : now.weekday;
+      if (todayIndex >= 0 && todayIndex < 7) {
+        activeDays[todayIndex] = true;
+      }
       
       // Sync fresh streak count from database / service
       final freshStreak = await StreakService.checkAndUpdateStreak(widget.userId, forceSync: true);
 
       if (mounted) {
+        ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
         setState(() {
           _activeDays = activeDays;
-          if (freshStreak > _streakCount) {
-            _streakCount = freshStreak;
-          }
+          _streakCount = freshStreak;
           _isLoading = false;
         });
       }
@@ -109,18 +114,6 @@ class _StreakDialogState extends State<StreakDialog> {
   }
 
   Future<void> _fetchTopStreaks() async {
-    // Client-side cache: Only fetch if empty or older than 24 hours
-    if (_cachedTopStreaks != null && _lastFetchTime != null) {
-      if (DateTime.now().difference(_lastFetchTime!).inHours < 24) {
-        if (mounted) {
-          setState(() {
-            _topStreaks = _cachedTopStreaks!;
-          });
-        }
-        return;
-      }
-    }
-
     if (!mounted) return;
     setState(() => _isLoadingLeaderboard = true);
     try {
@@ -131,12 +124,9 @@ class _StreakDialogState extends State<StreakDialog> {
           .order('streak', ascending: false)
           .limit(5);
           
-      _cachedTopStreaks = response as List<dynamic>;
-      _lastFetchTime = DateTime.now();
-      
       if (mounted) {
         setState(() {
-          _topStreaks = _cachedTopStreaks!;
+          _topStreaks = response as List<dynamic>;
         });
       }
     } catch (e) {

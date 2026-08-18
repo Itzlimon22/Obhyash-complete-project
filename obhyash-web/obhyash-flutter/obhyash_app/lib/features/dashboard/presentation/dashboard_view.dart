@@ -44,9 +44,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   void _checkStreak(UserProfile? user) {
     if (_hasCheckedStreak || user == null) return;
     _hasCheckedStreak = true;
-    StreakService.checkAndUpdateStreak(user.id).then((_) {
+    StreakService.checkAndUpdateStreak(user.id).then((freshStreak) {
       if (mounted) {
-        ref.invalidate(userProfileProvider);
+        ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
       }
     });
   }

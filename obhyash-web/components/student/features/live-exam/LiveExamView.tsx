@@ -11,74 +11,60 @@ const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps }) => {
 
   const cards = [
     {
-      id: "hsc_science_2025",
-      title: "HSC ২০২৫",
-      subtitle: "বিজ্ঞান বিভাগ\nপূর্ণাঙ্গ মডেল টেস্ট",
+      id: "engineering",
+      title: "ইঞ্জিনিয়ারিং",
+      subtitle: "বুয়েট, কুয়েট, রুয়েট, চুয়েট\nসাপ্তাহিক মডেল টেস্ট",
       footerIcon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
         </svg>
       ),
       footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-red-500 to-red-800",
+      gradient: "bg-gradient-to-br from-blue-600 to-indigo-900",
       bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "HSC Science - 2025",
+      categoryTitle: "Engineering Weekly",
     },
     {
-      id: "hsc_chapter_2026",
-      title: "HSC ২০২৬",
-      subtitle: "অধ্যায়ভিত্তিক\nলাইভ টেস্ট সিরিজ",
+      id: "medical",
+      title: "মেডিকেল",
+      subtitle: "মেডিকেল ও ডেন্টাল ভর্তি\nপূর্ণাঙ্গ মডেল টেস্ট",
       footerIcon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
         </svg>
       ),
-      footerText: "ডেইলি",
-      gradient: "bg-gradient-to-br from-blue-500 to-blue-800",
+      footerText: "উইকলি",
+      gradient: "bg-gradient-to-br from-rose-600 to-red-900",
       bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "HSC Chapter - 2026",
+      categoryTitle: "Medical Weekly",
     },
     {
-      id: "ssc_science_2025",
-      title: "SSC ২০২৫",
-      subtitle: "বিজ্ঞান বিভাগ\nবোর্ড স্পেশাল টেস্ট",
+      id: "varsity",
+      title: "ভার্সিটি ক-ইউনিট",
+      subtitle: "ঢাকা বিশ্ববিদ্যালয় ও সমন্বিত গুচ্ছ\nভর্তি পরীক্ষা প্রস্তুতি",
       footerIcon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+        </svg>
+      ),
+      footerText: "উইকলি",
+      gradient: "bg-gradient-to-br from-purple-600 to-indigo-950",
+      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
+      categoryTitle: "Varsity Weekly",
+    },
+    {
+      id: "hsc",
+      title: "এইচএসসি স্পেশাল",
+      subtitle: "বিজ্ঞান বিভাগ\nঅধ্যায়ভিত্তিক বোর্ড টেস্ট",
+      footerIcon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
         </svg>
       ),
       footerText: "উইকলি",
       gradient: "bg-gradient-to-br from-emerald-600 to-teal-900",
       bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "SSC Science - 2025",
-    },
-    {
-      id: "ssc_math_2025",
-      title: "SSC গণিত",
-      subtitle: "সাধারণ ও উচ্চতর গণিত\nলাইভ মডেল টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-        </svg>
-      ),
-      footerText: "স্পেশাল",
-      gradient: "bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-950",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "SSC Math - 2025",
-    },
-    {
-      id: "compulsory_ict",
-      title: "আইসিটি ও আবশ্যিক",
-      subtitle: "বাংলা, ইংরেজি ও ICT\nলাইভ টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-        </svg>
-      ),
-      footerText: "২০২৫-২৬",
-      gradient: "bg-gradient-to-br from-amber-600 to-rose-900",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "ICT & Compulsory",
+      categoryTitle: "HSC Weekly",
     },
   ];
 

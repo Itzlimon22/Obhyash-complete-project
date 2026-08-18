@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _Chapter {
@@ -298,7 +299,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
 
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const ExamHistorySkeleton()
               : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),

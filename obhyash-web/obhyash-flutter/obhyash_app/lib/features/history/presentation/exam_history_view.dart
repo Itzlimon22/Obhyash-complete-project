@@ -15,6 +15,7 @@ import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../exam/services/local_exam_cache_service.dart';
 import '../../dashboard/services/streak_service.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -1405,12 +1406,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             children: [
               // Tab 1: Exams
               _isLoadingExams
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF10B981),
-                        strokeWidth: 2.5,
-                      ),
-                    )
+                  ? const ExamHistorySkeleton()
                   : _hasErrorExams
                   ? _errorState(isDark, _fetchExams)
                   : _ExamsTab(
@@ -1427,12 +1423,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
               // Tab 2: Questions (Paginated with Load More using standard QuestionCard)
               _isLoadingQuestions
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF10B981),
-                        strokeWidth: 2.5,
-                      ),
-                    )
+                  ? const BookmarksListSkeleton()
                   : _hasErrorQuestions
                   ? _errorState(isDark, () => _fetchQuestions(refresh: true))
                   : _QuestionsTab(

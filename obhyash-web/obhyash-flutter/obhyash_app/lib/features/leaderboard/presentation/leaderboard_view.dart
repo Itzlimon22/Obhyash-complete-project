@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/data/college_list.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -392,7 +393,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                 )
               : _viewMode == 'level'
               ? (_isLoading && _users.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const LeaderboardSkeleton()
                     : RefreshIndicator(
                         color: const Color(0xFF004633),
                         onRefresh: () async {
@@ -619,7 +620,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
     }
 
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const LeaderboardSkeleton();
     }
 
     return ListView(

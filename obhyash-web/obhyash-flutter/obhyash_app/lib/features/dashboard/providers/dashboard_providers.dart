@@ -123,6 +123,31 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
     return null;
   }
+
+  void updateStreak(int newStreak, {int? newXp}) {
+    final current = state.value;
+    if (current != null) {
+      final updated = current.copyWith(
+        streakCount: newStreak,
+        xp: newXp ?? current.xp,
+      );
+      state = AsyncData(updated);
+
+      // Also persist to local cache so restarts have the latest streak immediately
+      try {
+        final prefs = ref.read(sharedPreferencesProvider);
+        final cacheKey = 'profile_${current.id}';
+        final cached = prefs.getString(cacheKey);
+        if (cached != null) {
+          final decoded = jsonDecode(cached) as Map<String, dynamic>;
+          decoded['streak'] = newStreak;
+          decoded['streak_count'] = newStreak;
+          if (newXp != null) decoded['xp'] = newXp;
+          prefs.setString(cacheKey, jsonEncode(decoded));
+        }
+      } catch (_) {}
+    }
+  }
 }
 
 final userProfileProvider =

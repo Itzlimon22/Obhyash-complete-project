@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
+import '../../../core/presentation/widgets/skeleton_loading.dart';
 
 // ─── Models ──────────────────────────────────────────────────────────────────────
 class ReportQuestionData {
@@ -287,7 +288,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
       children: [
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const ExamHistorySkeleton()
               : _hasError
               ? _errorState(isDark)
               : RefreshIndicator(

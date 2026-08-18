@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/live_exam_providers.dart';
+import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../domain/models.dart';
 import 'widgets/live_exam_routine_sheet.dart';
 
@@ -25,6 +26,18 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
           .read(liveExamCategoryProvider.notifier)
           .updateCategory(widget.category);
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant LiveExamCategoryView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category != widget.category) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(liveExamCategoryProvider.notifier)
+            .updateCategory(widget.category);
+      });
+    }
   }
 
   @override
@@ -163,10 +176,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
 
               // Exams List
               if (isLoading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Center(child: CircularProgressIndicator()),
-                )
+                const LiveExamListSkeleton()
               else if (filteredExams.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 40),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/models.dart';
 import '../providers/live_exam_providers.dart';
+import '../../../../core/presentation/widgets/skeleton_loading.dart';
 
 class LiveExamLeaderboardView extends ConsumerStatefulWidget {
   final String examId;
@@ -69,9 +70,7 @@ class _LiveExamLeaderboardViewState
         centerTitle: true,
       ),
       body: leaderboardAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: Color(0xFF0B6B42)),
-        ),
+        loading: () => const LeaderboardSkeleton(),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (entries) {
           if (entries.isEmpty) {

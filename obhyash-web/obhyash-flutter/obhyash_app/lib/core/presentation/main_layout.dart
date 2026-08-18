@@ -39,6 +39,21 @@ class MainLayout extends ConsumerStatefulWidget {
 class _MainLayoutState extends ConsumerState<MainLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _streakAnimKey = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(authProvider);
+      if (user != null) {
+        StreakService.checkAndUpdateStreak(user.id).then((freshStreak) {
+          if (mounted) {
+            ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
+          }
+        });
+      }
+    });
+  }
   
   void _showStreakDialog(int currentStreak, String userId) {
     showModalBottomSheet(
@@ -96,12 +111,31 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/bookmarks')) return 'bookmarks';
     if (location.contains('/formulas/') && location.split('/').length >= 5) return 'formula_detail';
     if (location.contains('/formulas/') && location.split('/').length >= 4) return 'formula_chapters';
+    if (location.startsWith('/live_exam/')) {
+      final segs = location.split('/');
+      if (segs.length >= 3 && segs[2].isNotEmpty) {
+        return 'live_exam_${segs[2]}';
+      }
+    }
     if (location.startsWith('/live_exam')) return 'live_exam';
     if (location.startsWith('/formulas')) return 'formulas';
     return 'dashboard';
   }
 
   String _getTitle(String tab) {
+    if (tab.startsWith('live_exam_')) {
+      final cat = tab.replaceFirst('live_exam_', '').toLowerCase();
+      const liveNames = {
+        'engineering': 'ইঞ্জিনিয়ারিং উইকলি',
+        'medical': 'মেডিকেল উইকলি',
+        'varsity': 'ভার্সিটি উইকলি',
+        'varsity_a': 'ভার্সিটি উইকলি',
+        'hsc': 'এইচএসসি উইকলি',
+        'all': 'সকল লাইভ পরীক্ষা',
+      };
+      return liveNames[cat] ?? 'লাইভ পরীক্ষা';
+    }
+
     if (tab.startsWith('subject_') && tab != 'subject_report') {
       final subj = tab.replaceFirst('subject_', '');
       const names = {

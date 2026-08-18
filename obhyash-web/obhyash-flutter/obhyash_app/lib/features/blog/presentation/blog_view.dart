@@ -1,19 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../../../core/providers/theme_provider.dart';
 
-class BlogView extends StatefulWidget {
+class BlogView extends ConsumerStatefulWidget {
   const BlogView({super.key});
 
   @override
-  State<BlogView> createState() => _BlogViewState();
+  ConsumerState<BlogView> createState() => _BlogViewState();
 }
 
-class _BlogViewState extends State<BlogView> {
+class _BlogViewState extends ConsumerState<BlogView> {
   late final WebViewController _controller;
   int _loadingProgress = 0;
   String _pageTitle = 'অভ্যাস ব্লগ';
@@ -65,12 +67,17 @@ class _BlogViewState extends State<BlogView> {
                 _canGoBack = canGoBack;
                 _currentUrl = url;
 
-                // Format clean title
-                if (title != null && title.isNotEmpty) {
+                // Format clean title in Bengali
+                if (title != null &&
+                    title.isNotEmpty &&
+                    !title.toLowerCase().contains('obhyash blog') &&
+                    !title.contains('অভ্যাস ব্লগ')) {
                   _pageTitle = title
                       .replaceAll(' | Obhyash Blog', '')
                       .replaceAll(' - Obhyash Blog', '')
+                      .replaceAll('Obhyash Blog', '')
                       .trim();
+                  if (_pageTitle.isEmpty) _pageTitle = 'অভ্যাস ব্লগ';
                 } else {
                   _pageTitle = 'অভ্যাস ব্লগ';
                 }
@@ -121,121 +128,112 @@ class _BlogViewState extends State<BlogView> {
     );
   }
 
-  /// Sets up Supabase SSR session cookies on all relevant domains
+  /// Injects official Supabase auth cookies onto the target domain so SSR/Middleware authenticates seamlessly
   Future<void> _setupAuthCookies() async {
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session == null || session.accessToken.isEmpty) return;
-
     try {
-      final cookieManager = WebViewCookieManager();
-      final domains = [
-        'obhyash.vercel.app',
-        '.vercel.app',
-        'obhyash.com',
-        '.obhyash.com'
-      ];
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) return;
 
-      final rawList = [
+      final cookieManager = WebViewCookieManager();
+      final uri = Uri.parse(_baseBlogUrl);
+      final domain = uri.host;
+
+      final sessionData = [
         session.accessToken,
         session.refreshToken ?? '',
-        null,
-        null,
-        null,
+        session.user.id,
+        session.tokenType,
       ];
-      final jsonRaw = jsonEncode(rawList);
-      final base64Val = 'base64-${base64Url.encode(utf8.encode(jsonRaw)).replaceAll('=', '')}';
+      final cookieValue = 'base64-${base64Url.encode(utf8.encode(jsonEncode(sessionData)))}';
 
-      for (final domain in domains) {
-        // Base64 chunked and direct cookies for @supabase/ssr compatibility
-        await cookieManager.setCookie(
-          WebViewCookie(
-            name: _authCookieKey,
-            value: base64Val,
-            domain: domain,
-            path: '/',
-          ),
-        );
-        await cookieManager.setCookie(
-          WebViewCookie(
-            name: '$_authCookieKey.0',
-            value: base64Val,
-            domain: domain,
-            path: '/',
-          ),
-        );
-      }
+      await cookieManager.setCookie(
+        WebViewCookie(
+          name: _authCookieKey,
+          value: cookieValue,
+          domain: domain,
+          path: '/',
+        ),
+      );
+
+      // Also set standard access_token cookie
+      await cookieManager.setCookie(
+        WebViewCookie(
+          name: 'sb-access-token',
+          value: session.accessToken,
+          domain: domain,
+          path: '/',
+        ),
+      );
     } catch (e) {
-      debugPrint('[BlogView] Error setting up auth cookies: $e');
+      debugPrint('[BlogView] Error setting auth cookies: $e');
     }
   }
 
-  /// Injects session tokens into WebView's localStorage, cookies, and fetch interceptor
+  /// Injects active auth token & user data into WebView window and intercept Fetch requests
   Future<void> _syncAuthToWebView() async {
     final session = Supabase.instance.client.auth.currentSession;
-    if (session == null || session.accessToken.isEmpty) return;
+    if (session == null) return;
 
-    final userJson = jsonEncode(session.user.toJson());
     final accessToken = session.accessToken;
     final refreshToken = session.refreshToken ?? '';
-    final expiresAt = session.expiresAt ??
-        (DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3600);
+    final userJson = jsonEncode(session.user.toJson());
+
+    final sessionObjJson = jsonEncode({
+      'access_token': accessToken,
+      'refresh_token': refreshToken,
+      'expires_in': session.expiresIn ?? 3600,
+      'token_type': session.tokenType,
+      'user': session.user.toJson(),
+    });
 
     final jsAuthCode = '''
       (function() {
         try {
-          const accessToken = "$accessToken";
-          const refreshToken = "$refreshToken";
-          const storageKey = "$_authCookieKey";
+          const accessToken = '$accessToken';
+          const refreshToken = '$refreshToken';
+          const userObj = $userJson;
+          const sessionObj = $sessionObjJson;
+          const cookieKey = '$_authCookieKey';
 
-          // 1. Supabase LocalStorage session
-          const sessionObj = {
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            token_type: "bearer",
-            expires_in: 3600,
-            expires_at: $expiresAt,
-            user: $userJson
-          };
-          localStorage.setItem(storageKey, JSON.stringify(sessionObj));
+          // 1. Write Supabase Auth session token to localStorage
+          localStorage.setItem(cookieKey, JSON.stringify(sessionObj));
+          localStorage.setItem('supabase.auth.token', JSON.stringify(sessionObj));
+          localStorage.setItem('sb-access-token', accessToken);
 
-          // 2. Cache user profile for AuthProvider instant resolution
-          localStorage.setItem("obhyash_user_profile", JSON.stringify({
-            id: "${session.user.id}",
-            email: "${session.user.email ?? ''}",
-            name: "${session.user.userMetadata?['name'] ?? session.user.userMetadata?['full_name'] ?? 'User'}",
-            role: "student"
-          }));
+          // 2. Set Cookies directly via document.cookie for immediate availability
+          const domain = window.location.hostname;
+          const maxAge = 60 * 60 * 24 * 7; // 7 days
+          
+          const sessionData = [
+            accessToken,
+            refreshToken,
+            userObj.id,
+            sessionObj.token_type || 'bearer'
+          ];
+          const b64Val = 'base64-' + btoa(JSON.stringify(sessionData));
+          
+          document.cookie = cookieKey + '=' + b64Val + '; path=/; domain=' + domain + '; max-age=' + maxAge + '; SameSite=Lax';
+          document.cookie = 'sb-access-token=' + accessToken + '; path=/; domain=' + domain + '; max-age=' + maxAge + '; SameSite=Lax';
 
-          // 3. Browser document.cookie in proper base64url format for SSR API endpoints
-          const rawArr = JSON.stringify([accessToken, refreshToken, null, null, null]);
-          const b64 = 'base64-' + btoa(unescape(encodeURIComponent(rawArr)))
-            .replace(/\\+/g, '-')
-            .replace(/\\//g, '_')
-            .replace(/=+\$/, '');
-          const cookieFlags = '; path=/; max-age=31536000; SameSite=Lax';
-
-          document.cookie = storageKey + '=' + b64 + cookieFlags;
-          document.cookie = storageKey + '.0=' + b64 + cookieFlags;
-
-          // 4. Intercept fetch to guarantee Authorization header is attached to all API calls
-          if (!window._obhyashAuthHooked) {
-            window._obhyashAuthHooked = true;
-            window._obhyashToken = accessToken;
+          // 3. Inject Bearer token in dynamic fetch requests to Obhyash APIs
+          if (!window._obhyashFetchHooked) {
+            window._obhyashFetchHooked = true;
             const originalFetch = window.fetch;
-            window.fetch = function(url, options) {
-              options = options || {};
-              const token = window._obhyashToken || accessToken;
-              if (token) {
+            window.fetch = function(url, options = {}) {
+              if (typeof url === 'string' && (url.startsWith('/api') || url.includes(domain))) {
+                options.headers = options.headers || {};
                 if (options.headers instanceof Headers) {
                   if (!options.headers.has('Authorization')) {
-                    options.headers.set('Authorization', 'Bearer ' + token);
+                    options.headers.set('Authorization', 'Bearer ' + accessToken);
                   }
                 } else if (Array.isArray(options.headers)) {
-                  options.headers.push(['Authorization', 'Bearer ' + token]);
+                  const hasAuth = options.headers.some(([k]) => k.toLowerCase() === 'authorization');
+                  if (!hasAuth) {
+                    options.headers.push(['Authorization', 'Bearer ' + accessToken]);
+                  }
                 } else {
-                  options.headers = options.headers || {};
                   if (!options.headers['Authorization'] && !options.headers['authorization']) {
-                    options.headers['Authorization'] = 'Bearer ' + token;
+                    options.headers['Authorization'] = 'Bearer ' + accessToken;
                   }
                 }
               }
@@ -248,7 +246,7 @@ class _BlogViewState extends State<BlogView> {
           window._obhyashToken = accessToken;
           window._obhyashUser = sessionObj.user;
 
-          // 5. Inform Supabase JS & trigger storage events
+          // 4. Inform Supabase JS & trigger storage events
           if (window.supabase && window.supabase.auth) {
             window.supabase.auth.setSession({
               access_token: accessToken,
@@ -276,8 +274,10 @@ class _BlogViewState extends State<BlogView> {
         // Sync theme
         if (${isDark ? 'true' : 'false'}) {
           document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
         }
 
         // 1. Inject permanent CSS rule into head for flicker-free hiding
@@ -318,43 +318,41 @@ class _BlogViewState extends State<BlogView> {
             'header',
             '[class*="BlogHeader"]',
             'nav',
-            'header.sticky',
             'footer',
             '[class*="BlogFooter"]',
-            '#blog-cta-banner',
-            'section:has(a[href="/"]):has(h2)'
+            '#blog-cta-banner'
           ];
-          selectors.forEach(selector => {
-            try {
-              document.querySelectorAll(selector).forEach(el => {
-                el.style.setProperty('display', 'none', 'important');
-              });
-            } catch (_) {}
+          selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+              el.style.setProperty('display', 'none', 'important');
+            });
           });
 
-          // Ensure category bar sticks flush to top: 0px (no floating gap)
-          try {
-            document.querySelectorAll('.sticky, [class*="sticky"], #blog-category-sticky-bar').forEach(el => {
-              if (el.id === 'blog-category-sticky-bar' || el.className.includes('top-16')) {
-                el.style.setProperty('top', '0px', 'important');
-              }
-            });
-          } catch (_) {}
-
-          // Adjust main padding to sit cleanly under native app bar
-          const main = document.querySelector('main');
-          if (main) {
-            main.style.paddingTop = '12px';
-            main.style.paddingBottom = '32px';
+          // Adjust sticky bars
+          const stickyBar = document.getElementById('blog-category-sticky-bar') ||
+                            document.querySelector('.sticky.top-16');
+          if (stickyBar) {
+            stickyBar.style.setProperty('top', '0px', 'important');
           }
         };
 
         hideElements();
-        // Repeat on dynamic DOM updates
-        const observer = new MutationObserver(hideElements);
-        if (document.body) {
-          observer.observe(document.body, { childList: true, subtree: true });
-        }
+        setTimeout(hideElements, 100);
+        setTimeout(hideElements, 500);
+        setTimeout(hideElements, 1500);
+
+        // 3. Intercept dynamic category filter clicks & internal blog links
+        document.querySelectorAll('a[href^="/blog"]').forEach(link => {
+          if (!link._obhyashBound) {
+            link._obhyashBound = true;
+            link.addEventListener('click', function(e) {
+              const target = this.getAttribute('href');
+              if (target && target.startsWith('/blog')) {
+                // Keep smooth in-app navigation
+              }
+            });
+          }
+        });
       })();
     ''';
 
@@ -364,7 +362,6 @@ class _BlogViewState extends State<BlogView> {
   }
 
   void _closeOrGoHome() {
-    if (!mounted) return;
     if (context.canPop()) {
       context.pop();
     } else {
@@ -375,28 +372,29 @@ class _BlogViewState extends State<BlogView> {
   Future<bool> _handleBackPress() async {
     if (await _controller.canGoBack()) {
       await _controller.goBack();
-      return false;
+      return false; // Handled by WebView
     }
-    return true;
+    return true; // Pop screen
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isLoading = _loadingProgress > 0 && _loadingProgress < 100;
+    final isLoading = _loadingProgress < 100;
 
     return PopScope(
       canPop: !_canGoBack,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        final shouldPop = await _handleBackPress();
-        if (shouldPop) {
-          _closeOrGoHome();
+        if (!didPop) {
+          final shouldPop = await _handleBackPress();
+          if (shouldPop && mounted) {
+            _closeOrGoHome();
+          }
         }
       },
       child: Scaffold(
         backgroundColor: isDark
-            ? const Color(0xFF0C0A09)
+            ? const Color(0xFF0C0A09) // Matches blog dark background
             : const Color(0xFFFAF6F3), // Matches blog web background
         appBar: AppBar(
           backgroundColor: isDark
@@ -428,7 +426,7 @@ class _BlogViewState extends State<BlogView> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w700,
                   fontSize: 18,
                   color: isDark ? Colors.white : const Color(0xFF111827),
@@ -436,12 +434,13 @@ class _BlogViewState extends State<BlogView> {
               ),
               if (_currentUrl != _baseBlogUrl)
                 Text(
-                  'Obhyash Blog',
+                  'অভ্যাস ব্লগ',
                   style: TextStyle(
+                    fontFamily: 'HindSiliguri',
                     fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: isDark
-                        ? const Color(0xFF737373)
+                        ? const Color(0xFF9CA3AF)
                         : const Color(0xFF6B7280),
                   ),
                 ),
@@ -466,20 +465,31 @@ class _BlogViewState extends State<BlogView> {
                 }
               },
             ),
-            // Open in external browser
+            // Theme Toggle Button (Replaced external browser button)
             IconButton(
               icon: Icon(
-                LucideIcons.externalLink,
-                size: 19,
+                isDark ? LucideIcons.sun : LucideIcons.moon,
+                size: 20,
                 color: isDark
-                    ? const Color(0xFFA3A3A3)
+                    ? const Color(0xFFFBBF24)
                     : const Color(0xFF4B5563),
               ),
-              tooltip: 'ব্রাউজারে খুলুন',
-              onPressed: () => launchUrl(
-                Uri.parse(_currentUrl),
-                mode: LaunchMode.externalApplication,
-              ),
+              tooltip: isDark ? 'লাইট মোড' : 'ডার্ক মোড',
+              onPressed: () {
+                ref.read(themeModeProvider.notifier).toggle();
+                final nextDark = !isDark;
+                _controller.runJavaScript('''
+                  if ($nextDark) {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                  }
+                ''');
+              },
             ),
             const SizedBox(width: 4),
           ],

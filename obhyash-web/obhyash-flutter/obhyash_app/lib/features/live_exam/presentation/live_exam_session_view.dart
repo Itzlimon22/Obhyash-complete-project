@@ -13,6 +13,8 @@ import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../domain/models.dart';
 import '../providers/live_exam_providers.dart';
+import '../../exam/presentation/result_view.dart';
+import '../../dashboard/services/streak_service.dart';
 
 class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
@@ -198,11 +200,17 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     final finalScore = rawScore < 0 ? 0 : rawScore;
 
     try {
+      bool isPracticeMode = false;
+      int timeTakenSeconds = 0;
+
       if (!widget.examId.startsWith('mock-')) {
         final supabase = Supabase.instance.client;
         final user = supabase.auth.currentUser;
 
         if (user != null) {
+          final now = DateTime.now();
+          final isPast = widget.exam != null && widget.exam!.endTime.isBefore(now);
+
           final existing = await supabase
               .from('live_exam_attempts')
               .select('id, status')
@@ -211,10 +219,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               .maybeSingle();
 
           final bool isFirstOfficialAttempt =
-              existing == null || existing['status'] != 'submitted';
+              (existing == null || existing['status'] != 'submitted') && !isPast;
+
+          final submitTime = DateTime.now().toUtc();
+          timeTakenSeconds = submitTime.difference(_sessionStartTime).inSeconds.clamp(0, 86400);
 
           if (isFirstOfficialAttempt) {
-            final submitTime = DateTime.now().toUtc();
             // 1. Official Live Attempt -> Determines Leaderboard Rank
             await supabase.from('live_exam_attempts').upsert({
               'live_exam_id': widget.examId,
@@ -227,11 +237,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'start_time': _sessionStartTime.toIso8601String(),
               'submit_time': submitTime.toIso8601String(),
             });
+            await StreakService.checkAndUpdateStreak(user.id);
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
+            isPracticeMode = true;
             try {
-              final submitTime = DateTime.now().toUtc();
-              final timeTaken = submitTime.difference(_sessionStartTime).inSeconds.clamp(0, 86400);
               await supabase.from('live_exam_practice_history').insert({
                 'live_exam_id': widget.examId,
                 'user_id': user.id,
@@ -240,12 +250,15 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                 'wrong_count': wrongCount,
                 'unanswered_count': questions.length - _userAnswers.length,
                 'user_answers': _userAnswers,
-                'time_taken_seconds': timeTaken,
+                'time_taken_seconds': timeTakenSeconds,
                 'submit_time': submitTime.toIso8601String(),
               });
+              await StreakService.checkAndUpdateStreak(user.id);
             } catch (_) {}
           }
         }
+      } else {
+        isPracticeMode = true;
       }
 
       // Invalidate details & history so it reloads attempt status & practice records
@@ -255,12 +268,47 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
       ref.invalidate(liveExamsProvider);
 
       if (mounted) {
-        context.pop();
-        AppPopups.show(
-          context,
-          message: 'উত্তরপত্র সফলভাবে জমা দেওয়া হয়েছে!',
-          isError: false,
-        );
+        if (isPracticeMode) {
+          // Open standard Rich Mock Result Page
+          final examResult = ExamResult(
+            id: 'live_practice_${widget.examId}_${DateTime.now().millisecondsSinceEpoch}',
+            subject: widget.exam?.title ?? 'লাইভ এক্সাম অনুশীলন',
+            subjectLabel: widget.exam?.category ?? 'অনুশীলন',
+            examType: 'live_exam_practice',
+            date: DateTime.now().toIso8601String(),
+            score: (finalScore is double) ? finalScore : (finalScore as num).toDouble(),
+            totalMarks: widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+            totalQuestions: questions.length,
+            correctCount: correctCount,
+            wrongCount: wrongCount,
+            timeTaken: timeTakenSeconds,
+            negativeMarking: negativeRate,
+            questions: questions,
+            flaggedQuestions: _flaggedIds.toList(),
+            submissionType: 'normal',
+            userAnswers: _userAnswers,
+            status: 'completed',
+          );
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => ResultView(
+                result: examResult,
+                onRestart: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          );
+        } else {
+          // Official live exam pop
+          context.pop();
+          AppPopups.show(
+            context,
+            message: 'উত্তরপত্র সফলভাবে জমা দেওয়া হয়েছে!',
+            isError: false,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
