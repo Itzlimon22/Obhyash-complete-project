@@ -44,27 +44,21 @@ class FormulaMathView extends StatelessWidget {
         child: Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 10.0,
-          runSpacing: 12.0,
+          spacing: 8.0,
+          runSpacing: 10.0,
           children: clauses.map((clause) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: _renderSingleClause(clause, textColor),
-              ),
+              child: _renderSingleClause(clause, textColor),
             );
           }).toList(),
         ),
       );
     }
 
-    // 2. Single clause formula
+    // 2. Single clause formula — render without forced scaling so it wraps or displays naturally
     return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: _renderSingleClause(trimmed, textColor),
-      ),
+      child: _renderSingleClause(trimmed, textColor),
     );
   }
 
@@ -116,19 +110,23 @@ class FormulaMathView extends StatelessWidget {
         clause.contains(r'\overset');
 
     if (!hasBengali && !hasChemArrow) {
-      return Math.tex(
-        clause,
-        mathStyle: MathStyle.display,
-        textStyle: TextStyle(
-          fontSize: fontSize + 1.5,
-          color: textColor,
-        ),
-        onErrorFallback: (_) => Text(
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        child: Math.tex(
           clause,
-          style: TextStyle(
+          mathStyle: MathStyle.display,
+          textStyle: TextStyle(
             fontSize: fontSize,
-            fontFamily: 'monospace',
             color: textColor,
+          ),
+          onErrorFallback: (_) => Text(
+            clause,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontFamily: 'HindSiliguri',
+              color: textColor,
+            ),
           ),
         ),
       );
@@ -172,14 +170,13 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
       return _renderToken(tokens.first);
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 6.0,
+      runSpacing: 8.0,
       children: tokens.map((t) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-          child: _renderToken(t),
-        );
+        return _renderToken(t);
       }).toList(),
     );
   }
@@ -300,8 +297,8 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
         }
       }
 
-      // 3. Check for \text{...}, \mathrm{...}, \textbf{...}, \textit{...}
-      final textCmdMatch = RegExp(r'^\\(?:text|mathrm|textbf|textit)\{').matchAsPrefix(input, i);
+      // 3. Check for \text{...}, text{...}, \mathrm{...}, \textbf{...}, \textit{...}
+      final textCmdMatch = RegExp(r'^(?:\\)?(?:text|mathrm|textbf|textit|mbox)\{').matchAsPrefix(input, i);
       if (textCmdMatch != null) {
         final braceStart = textCmdMatch.end - 1;
         final braceEnd = _findMatchingBrace(input, braceStart);

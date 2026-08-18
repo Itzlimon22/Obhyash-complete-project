@@ -259,7 +259,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '$_streakCount দিনের স্ট্রাইক',
+                      '${ref.watch(userProfileProvider).value?.streakCount ?? _streakCount} দিনের স্ট্রাইক',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,

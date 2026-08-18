@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../dashboard/providers/dashboard_providers.dart';
 
 // Since MonthCalendarDay isn't defined in dart models yet
 class MonthCalendarDay {
@@ -15,7 +17,7 @@ class MonthCalendarDay {
   });
 }
 
-class StreakCalendar extends StatefulWidget {
+class StreakCalendar extends ConsumerStatefulWidget {
   final List<MonthCalendarDay> calendarData;
   final int streakCount;
 
@@ -26,10 +28,10 @@ class StreakCalendar extends StatefulWidget {
   });
 
   @override
-  State<StreakCalendar> createState() => _StreakCalendarState();
+  ConsumerState<StreakCalendar> createState() => _StreakCalendarState();
 }
 
-class _StreakCalendarState extends State<StreakCalendar> {
+class _StreakCalendarState extends ConsumerState<StreakCalendar> {
   late DateTime _displayedMonth;
 
   @override
@@ -252,16 +254,16 @@ class _StreakCalendarState extends State<StreakCalendar> {
                   children: [
                     const Icon(
                       Icons.local_fire_department_rounded,
-                      color: Color(0xFF1E3A8A),
+                      color: Color(0xFFF97316),
                       size: 18,
-                    ), // orange-500
-                    const SizedBox(width: 8), // sm:gap-2.5
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      '${widget.streakCount} দিন স্ট্রিক',
+                      '${ref.watch(userProfileProvider).value?.streakCount ?? widget.streakCount} দিন স্ট্রিক',
                       style: const TextStyle(
-                        fontSize: 16, // sm:text-base
-                        fontWeight: FontWeight.w900, // font-black
-                        color: Color(0xFFEA580C), // orange-600 : orange-400
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFFEA580C),
                         fontFamily: 'Anek Bangla',
                       ),
                     ),

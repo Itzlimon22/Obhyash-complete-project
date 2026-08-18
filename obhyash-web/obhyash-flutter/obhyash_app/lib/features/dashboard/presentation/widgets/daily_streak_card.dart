@@ -142,49 +142,25 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
         children: [
           // Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.flame,
-                    size: 26,
-                    color: currentStreak > 0
-                        ? const Color(0xFF059669)
-                        : (isDark ? Colors.white54 : Colors.black54),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '$currentStreak দিনের স্ট্রাইক',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Anek Bangla',
-                      color: isDark ? Colors.white : const Color(0xFF18181B),
-                    ),
-                  ),
-                ],
+              Icon(
+                LucideIcons.calendar,
+                size: 20,
+                color: const Color(0xFF059669),
               ),
-              if (currentStreak > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'অসাধারণ! 🔥',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Anek Bangla',
-                      color: Color(0xFF059669),
-                    ),
-                  ),
+              const SizedBox(width: 8),
+              Text(
+                'গত ৩০ দিনের অ্যাক্টিভিটি',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Anek Bangla',
+                  color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
 
           // Heatmap
           _buildHeatmap(isDark, primaryAccent),
@@ -197,21 +173,8 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     final emptyBoxColor =
         isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF1F5F9);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'গত ৩০ দিনের অ্যাক্টিভিটি',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            fontFamily: 'Anek Bangla',
-            color: isDark ? Colors.white70 : const Color(0xFF3F3F46),
-          ),
-        ),
-        const SizedBox(height: 12),
-        LayoutBuilder(
-          builder: (context, constraints) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
             // Find ideal box size for 10 columns (3 rows of 10)
             final totalSpacing = 9 * 6.0; 
             final boxSize = ((constraints.maxWidth - totalSpacing) / 10).floorToDouble();
@@ -244,9 +207,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                 );
               }),
             );
-          }
-        ),
-      ],
+          },
     );
   }
 }

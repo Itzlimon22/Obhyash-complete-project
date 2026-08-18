@@ -46,7 +46,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(authProvider);
       if (user != null) {
-        StreakService.checkAndUpdateStreak(user.id).then((freshStreak) {
+        StreakService.checkAndUpdateStreak(user.id, forceSync: true).then((freshStreak) {
           if (mounted) {
             ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
           }
@@ -120,6 +120,57 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/live_exam')) return 'live_exam';
     if (location.startsWith('/formulas')) return 'formulas';
     return 'dashboard';
+  }
+
+  bool _shouldShowBottomNav(String location) {
+    try {
+      final uri = Uri.parse(location);
+      final segs = uri.pathSegments;
+
+      // 1. Formulas: Keep bottom nav on main hub (/formulas) and subject chapters list (/formulas/:subjectId),
+      //    hide only inside specific chapter formula detail page (/formulas/:subjectId/:chapterId).
+      if (segs.contains('formulas')) {
+        final formulaIdx = segs.indexOf('formulas');
+        final depth = segs.length - formulaIdx;
+        if (depth >= 3) {
+          return false; // Chapter formulas detail page -> Hide
+        }
+        return true; // Main formulas & Subject chapters -> Show
+      }
+
+      // 2. Live Exam: Keep bottom nav on main hub (/live_exam), hide on category/details/session
+      if (segs.contains('live_exam') || segs.contains('live-exams') || segs.contains('live-exam')) {
+        final idx = segs.indexWhere((s) => s.startsWith('live'));
+        if (idx != -1 && segs.length - idx >= 2) {
+          return false;
+        }
+        return true;
+      }
+
+      // 3. Detail sub-routes that hide bottom nav
+      if (location.startsWith('/notifications')) return false;
+      if (location.startsWith('/bookmarks') || location.contains('/bookmarks')) return false;
+      if (location.startsWith('/subject') || location.contains('/subject/')) return false;
+      if (location.startsWith('/my-reports') || location.startsWith('/analysis')) return false;
+      if (location.startsWith('/profile/') && location != '/profile') return false;
+      if (location.startsWith('/history/') && location != '/history') return false;
+      if (location.startsWith('/setup/') && location != '/setup') return false;
+      if (location.startsWith('/leaderboard/') && location != '/leaderboard') return false;
+      if (location.startsWith('/exam')) return false;
+      if (location.contains('/user-profile')) return false;
+
+      // Primary root tabs
+      return location == '/' ||
+          location.isEmpty ||
+          location == '/history' ||
+          location == '/setup' ||
+          location == '/practice' ||
+          location == '/leaderboard' ||
+          location == '/profile' ||
+          location == '/settings';
+    } catch (_) {
+      return true;
+    }
   }
 
   String _getTitle(String tab) {
@@ -799,18 +850,20 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         child: widget.navigationShell,
       ),
 
-      bottomNavigationBar: MainBottomNav(
-        activeTab: (activeTab == 'history' ||
-                activeTab == 'setup' ||
-                activeTab == 'leaderboard' ||
-                activeTab == 'settings')
-            ? activeTab
-            : 'dashboard',
-        onTabChange: _onTabChange,
-        onMenuClick: () {
-          _scaffoldKey.currentState?.openDrawer();
-        },
-      ),
+      bottomNavigationBar: _shouldShowBottomNav(location)
+          ? MainBottomNav(
+              activeTab: (activeTab == 'history' ||
+                      activeTab == 'setup' ||
+                      activeTab == 'leaderboard' ||
+                      activeTab == 'settings')
+                  ? activeTab
+                  : 'dashboard',
+              onTabChange: _onTabChange,
+              onMenuClick: () {
+                _scaffoldKey.currentState?.openDrawer();
+              },
+            )
+          : null,
     ),
   );
   }

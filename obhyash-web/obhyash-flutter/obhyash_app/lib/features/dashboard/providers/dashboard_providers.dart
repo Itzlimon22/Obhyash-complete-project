@@ -74,6 +74,8 @@ final dashboardRepositoryProvider = Provider<DashboardRepository>((ref) {
 });
 
 class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
+  RealtimeChannel? _channel;
+
   @override
   FutureOr<UserProfile?> build() async {
     final user = ref.watch(authProvider);
@@ -83,7 +85,44 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
     final cacheKey = 'profile_${user.id}';
     final supabase = ref.watch(supabaseClientProvider);
 
-    // 1. Fetch fresh profile from network
+    // Setup Supabase Realtime for instant live updates from database
+    if (_channel != null) {
+      supabase.removeChannel(_channel!);
+      _channel = null;
+    }
+
+    try {
+      _channel = supabase.channel('realtime_user_profile_${user.id}');
+      _channel!.onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'users',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'id',
+          value: user.id,
+        ),
+        callback: (payload) {
+          final newRecord = payload.newRecord;
+          if (newRecord.isNotEmpty) {
+            prefs.setString(cacheKey, jsonEncode(newRecord));
+            final updatedProfile = _profileFromJson(newRecord);
+            state = AsyncData(updatedProfile);
+          }
+        },
+      ).subscribe();
+
+      ref.onDispose(() {
+        if (_channel != null) {
+          supabase.removeChannel(_channel!);
+          _channel = null;
+        }
+      });
+    } catch (e) {
+      debugPrint('[UserProfileNotifier] Realtime subscription error: $e');
+    }
+
+    // 1. Fetch fresh profile directly from network
     try {
       final response = await supabase
           .from('users')
@@ -96,10 +135,10 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
         return _profileFromJson(response);
       }
     } catch (e) {
-      debugPrint('[UserProfileNotifier] Network fetch failed (offline/slow): $e');
+      debugPrint('[UserProfileNotifier] Network fetch failed: $e');
     }
 
-    // 2. Offline / Cache Fallback: return cached data if network failed
+    // 2. Offline / Cache Fallback
     final cached = prefs.getString(cacheKey);
     if (cached != null) {
       try {
@@ -125,18 +164,23 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
   }
 
   void updateStreak(int newStreak, {int? newXp}) {
+    final user = ref.read(authProvider);
     final current = state.value;
+    
     if (current != null) {
       final updated = current.copyWith(
         streakCount: newStreak,
         xp: newXp ?? current.xp,
       );
       state = AsyncData(updated);
+    }
 
-      // Also persist to local cache so restarts have the latest streak immediately
-      try {
-        final prefs = ref.read(sharedPreferencesProvider);
-        final cacheKey = 'profile_${current.id}';
+    // Persist to local cache so restarts always have the exact synced streak
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final userId = current?.id ?? user?.id;
+      if (userId != null) {
+        final cacheKey = 'profile_$userId';
         final cached = prefs.getString(cacheKey);
         if (cached != null) {
           final decoded = jsonDecode(cached) as Map<String, dynamic>;
@@ -145,8 +189,8 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
           if (newXp != null) decoded['xp'] = newXp;
           prefs.setString(cacheKey, jsonEncode(decoded));
         }
-      } catch (_) {}
-    }
+      }
+    } catch (_) {}
   }
 }
 
