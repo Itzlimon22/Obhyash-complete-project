@@ -907,7 +907,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
   if (!exam) return null;
 
   return (
-    <div className="p-3 sm:p-5 lg:p-6 max-w-[1700px] mx-auto space-y-4 flex flex-col h-[calc(100vh-65px)]">
+    <div className="p-3 sm:p-5 lg:p-6 max-w-[1700px] mx-auto space-y-4 flex flex-col min-h-[calc(100vh-60px)]">
       {/* ── Top Header & Blueprint Bar ── */}
       <div className="bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-zinc-800/90 rounded-2xl p-4 shadow-sm shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Left: Exam Info & Category */}
@@ -992,11 +992,11 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       </div>
 
       {/* ── Main Split View ── */}
-      <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
+      <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-[780px] lg:min-h-[880px] xl:min-h-[940px]">
         {/* ══════════════════════════════════════════════════════════
             LEFT PANEL: Assigned Questions in Live Exam
            ══════════════════════════════════════════════════════════ */}
-        <div className="flex-1 bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-sm min-h-0">
+        <div className="flex-1 bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-sm min-h-[650px] lg:min-h-[850px]">
           {/* Assigned Header & Local Search */}
           <div className="p-3.5 border-b border-neutral-200 dark:border-zinc-800 bg-neutral-50/70 dark:bg-zinc-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
             <div className="flex items-center gap-2">
@@ -1310,7 +1310,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
         {/* ══════════════════════════════════════════════════════════
             RIGHT PANEL: Multi-Select Question Bank Studio
            ══════════════════════════════════════════════════════════ */}
-        <div className="w-full lg:w-[480px] xl:w-[540px] bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-sm shrink-0 min-h-0">
+        <div className="w-full lg:w-[480px] xl:w-[540px] bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-sm shrink-0 min-h-[650px] lg:min-h-[850px]">
           {/* Bank Header & Filters */}
           <div className="p-3.5 border-b border-neutral-200 dark:border-zinc-800 bg-neutral-50/70 dark:bg-zinc-900/50 space-y-2.5 shrink-0">
             <div className="flex items-center justify-between">

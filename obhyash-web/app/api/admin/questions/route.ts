@@ -40,8 +40,10 @@ function mapQuestionToSnakeCase(q: Record<string, any>) {
     delete dbRecord.updatedAt;
   }
   if ('correctAnswer' in q) {
-    dbRecord.correct_answer = q.correctAnswer;
     delete dbRecord.correctAnswer;
+  }
+  if ('correct_answer' in q) {
+    delete dbRecord.correct_answer;
   }
   if ('correctAnswerIndex' in q) {
     dbRecord.correct_answer_index = q.correctAnswerIndex;
@@ -226,13 +228,8 @@ async function normalizeQuestionPayload(q: Record<string, any>) {
   mapped.correct_answer_indices = correctAnswerIndices;
   mapped.correct_answer_index = correctAnswerIndices[0] ?? 0;
 
-  if (
-    !mapped.correct_answer &&
-    Array.isArray(mapped.options) &&
-    mapped.options[mapped.correct_answer_index]
-  ) {
-    mapped.correct_answer = mapped.options[mapped.correct_answer_index];
-  }
+  delete mapped.correct_answer;
+  delete mapped.correctAnswer;
 
   mapped.options = Array.isArray(mapped.options) ? mapped.options : [];
   mapped.type = mapped.type || 'MCQ';
@@ -341,6 +338,9 @@ export async function PUT(request: NextRequest) {
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
     const mapped = mapQuestionToSnakeCase(updates);
     mapped.updated_at = new Date().toISOString();
+    delete mapped.correct_answer;
+    delete mapped.correctAnswer;
+    delete mapped.id;
 
     const { data, error } = await supabaseAdmin
       .from('questions')
