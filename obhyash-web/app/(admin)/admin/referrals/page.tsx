@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Users,
   Search,
@@ -8,10 +9,11 @@ import {
   Gift,
   ArrowRightLeft,
   Calendar,
+  Clock,
   CheckCircle,
   XCircle,
-  ChevronLeft,
-  ChevronRight,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/admin/questions/pagination';
@@ -37,6 +39,8 @@ interface ReferralHistory {
   };
 }
 
+import { exportToCSV } from '@/lib/utils/export-csv';
+
 export default function AdminReferralsPage() {
   const [history, setHistory] = useState<ReferralHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +54,7 @@ export default function AdminReferralsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   useEffect(() => {
     fetchData();
@@ -60,42 +64,97 @@ export default function AdminReferralsPage() {
     setPage(1);
   }, [searchQuery]);
 
+  const formatTimestamp24h = (dateStr?: string | null) => {
+    if (!dateStr) return { date: 'N/A', time: '', full: 'N/A' };
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return { date: 'N/A', time: '', full: 'N/A' };
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    return {
+      date: `${day}/${month}/${year}`,
+      time: `${hours}:${minutes}:${seconds}`,
+      full: `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`,
+    };
+  };
+
   const fetchData = async (showToast = false) => {
+    setIsLoading(true);
     try {
       const res = await fetch(
-        `/api/admin/referrals?page=${page}&pageSize=${pageSize}`,
+        `/api/admin/referrals?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(
+          searchQuery,
+        )}`,
       );
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to fetch referrals');
+      const data = await res.json();
+      if (res.ok) {
+        setHistory(data.history || []);
+        setTotalCount(data.totalCount || 0);
+        setStats(
+          data.stats || {
+            totalRedemptions: 0,
+            uniqueReferrers: 0,
+          },
+        );
+        if (showToast) toast.success('রেফারেল তালিকা আপডেট করা হয়েছে');
+      } else {
+        toast.error(data.error || 'Failed to fetch referrals');
       }
-
-      setHistory(json.data || []);
-      setTotalCount(json.totalCount || 0);
-      setStats(json.stats || { totalRedemptions: 0, uniqueReferrers: 0 });
-
-      if (showToast) toast.success('ডেটা রিফ্রেশ করা হয়েছে');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error(err.message || 'Error loading referral data');
+      toast.error('Network error loading referrals');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAction = async (
-    historyId: string,
-    action: 'approve' | 'reject',
-  ) => {
+  const exportCSV = () => {
+    if (!history || history.length === 0) {
+      toast.error('এক্সপোর্ট করার মতো কোনো ডেটা নেই');
+      return;
+    }
+
+    const success = exportToCSV({
+      filename: `referrals_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
+        'Redemption ID',
+        'Redeemed Date & Time (24h)',
+        'Referrer Name',
+        'Referrer Email',
+        'Referral Code',
+        'Redeemed By Student',
+        'Redeemed By Email',
+        'Status',
+      ],
+      rows: history.map((item) => [
+        item.id,
+        formatTimestamp24h(item.redeemed_at).full,
+        item.referral?.owner?.name || 'Unknown',
+        item.referral?.owner?.email || 'N/A',
+        item.referral?.code || 'N/A',
+        item.redeemed_by_user?.name || 'Unknown',
+        item.redeemed_by_user?.email || 'N/A',
+        item.admin_status,
+      ]),
+    });
+
+    if (success) {
+      toast.success('রেফারেল ডেটা শিট সফলভাবে ডাউনলোড হয়েছে');
+    }
+  };
+
+  const handleAction = async (id: string, action: 'approve' | 'reject') => {
     try {
       const res = await fetch('/api/admin/referrals/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ historyId, action }),
+        body: JSON.stringify({ id, action }),
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || `Failed to ${action} referral`);
+      if (!res.ok) throw new Error(data.error);
 
       toast.success(data.message);
       fetchData(); // Refresh UI
@@ -123,7 +182,7 @@ export default function AdminReferralsPage() {
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-3">
               <Gift className="w-8 h-8 text-red-600" />
-              রেফারেল ম্যাওেজমেন্ট
+              রেফারেল ম্যানেজমেন্ট
             </h1>
             <p className="text-neutral-500 mt-2">
               সকল ব্যবহারকারীর রেফারেল হিস্ট্রি এবং স্ট্যাটাস দেখো
@@ -132,8 +191,16 @@ export default function AdminReferralsPage() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={exportCSV}
+              className="p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 text-xs font-bold"
+              title="CSV Export"
+            >
+              <Download size={15} />
+              <span>Export CSV</span>
+            </button>
+            <button
               onClick={() => fetchData(true)}
-              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               title="Refresh"
             >
               <RefreshCw
@@ -155,7 +222,7 @@ export default function AdminReferralsPage() {
               bg: 'bg-emerald-50 dark:bg-emerald-500/10',
             },
             {
-              label: 'উনিক রেফারার',
+              label: 'ইউনিক রেফারার',
               value: stats.uniqueReferrers.toString(),
               icon: Users,
               gradient: 'from-red-500 to-red-500',
@@ -206,7 +273,7 @@ export default function AdminReferralsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-neutral-50 dark:bg-neutral-800/50 text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm uppercase tracking-wider">
-                  <th className="px-6 py-4 font-bold">তারিখ</th>
+                  <th className="px-6 py-4 font-bold">তারিখ ও সময় (24h)</th>
                   <th className="px-6 py-4 font-bold">রেফারার (মালিক)</th>
                   <th className="px-6 py-4 font-bold">কোড</th>
                   <th className="px-6 py-4 font-bold">নতুন ইউজার</th>
@@ -227,26 +294,45 @@ export default function AdminReferralsPage() {
                   filteredHistory.map((item) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                      className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors group"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-sm font-medium">
-                            {new Date(item.redeemed_at).toLocaleDateString()}
+                        <div className="flex flex-col text-neutral-600 dark:text-neutral-300 font-mono text-xs">
+                          <span className="flex items-center gap-1.5 font-semibold">
+                            <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                            {formatTimestamp24h(item.redeemed_at).date}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-[11px] text-neutral-400 pl-5">
+                            <Clock className="w-3 h-3" />
+                            {formatTimestamp24h(item.redeemed_at).time}
                           </span>
                         </div>
                       </td>
 
                       <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                            {item.referral?.owner?.name || 'অজানা'}
-                          </span>
-                          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                            {item.referral?.owner?.email || 'N/A'}
-                          </span>
-                        </div>
+                        {item.referral?.owner?.id ? (
+                          <Link
+                            href={`/admin/user-management/${item.referral.owner.id}`}
+                            className="group/user block"
+                          >
+                            <span className="text-sm font-bold text-neutral-900 dark:text-white group-hover/user:text-red-600 dark:group-hover/user:text-red-400 transition-colors flex items-center gap-1">
+                              <span>{item.referral?.owner?.name || 'অজানা'}</span>
+                              <ExternalLink size={10} className="opacity-0 group-hover/user:opacity-100 transition-opacity" />
+                            </span>
+                            <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block">
+                              {item.referral?.owner?.email || 'N/A'}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                              {item.referral?.owner?.name || 'অজানা'}
+                            </span>
+                            <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                              {item.referral?.owner?.email || 'N/A'}
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-6 py-4">
@@ -256,14 +342,29 @@ export default function AdminReferralsPage() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
-                            {item.redeemed_by_user?.name || 'অজানা'}
-                          </span>
-                          <span className="text-[11px] text-emerald-600/70 dark:text-emerald-400/70">
-                            {item.redeemed_by_user?.email || 'N/A'}
-                          </span>
-                        </div>
+                        {item.redeemed_by_user?.id ? (
+                          <Link
+                            href={`/admin/user-management/${item.redeemed_by_user.id}`}
+                            className="group/user block"
+                          >
+                            <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400 group-hover/user:text-red-600 dark:group-hover/user:text-red-400 transition-colors flex items-center gap-1">
+                              <span>{item.redeemed_by_user?.name || 'অজানা'}</span>
+                              <ExternalLink size={10} className="opacity-0 group-hover/user:opacity-100 transition-opacity" />
+                            </span>
+                            <span className="text-[11px] text-emerald-600/70 dark:text-emerald-400/70 block">
+                              {item.redeemed_by_user?.email || 'N/A'}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                              {item.redeemed_by_user?.name || 'অজানা'}
+                            </span>
+                            <span className="text-[11px] text-emerald-600/70 dark:text-emerald-400/70">
+                              {item.redeemed_by_user?.email || 'N/A'}
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-6 py-4">

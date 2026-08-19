@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/admin/questions/pagination';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -182,38 +183,45 @@ export default function BlogManagementClient() {
       return;
     }
 
-    const csvContent =
-      activeTab === 'comments'
-        ? [
-            ['ID', 'User Name', 'Email', 'Post Slug', 'Comment Content', 'Date & Time (24h)'],
-            ...(listData as Comment[]).map((c) => [
-              c.id,
-              c.user?.name || 'Unknown',
-              c.user?.email || 'N/A',
-              c.post_slug,
-              `"${c.content.replace(/"/g, '""')}"`,
-              formatTimestamp24h(c.created_at).full,
-            ]),
-          ]
-            .map((e) => e.join(','))
-            .join('\n')
-        : [
-            ['ID', 'Email', 'Status', 'Subscribed At (24h)'],
-            ...(listData as Subscriber[]).map((s) => [
-              s.id,
-              s.email,
-              s.status,
-              formatTimestamp24h(s.subscribed_at).full,
-            ]),
-          ]
-            .map((e) => e.join(','))
-            .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `blog_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    if (activeTab === 'comments') {
+      const success = exportToCSV({
+        filename: `blog_comments_${new Date().toISOString().split('T')[0]}.csv`,
+        headers: [
+          'Comment ID',
+          'User Name',
+          'Email',
+          'Article Slug',
+          'Comment Content',
+          'Created Date & Time (24h)',
+        ],
+        rows: (listData as Comment[]).map((c) => [
+          c.id,
+          c.user?.name || 'Unknown',
+          c.user?.email || 'N/A',
+          c.post_slug,
+          c.content || '',
+          formatTimestamp24h(c.created_at).full,
+        ]),
+      });
+      if (success) toast.success('ব্লগ কমেন্ট তালিকা সফলভাবে ডাউনলোড হয়েছে');
+    } else {
+      const success = exportToCSV({
+        filename: `newsletter_subscribers_${new Date().toISOString().split('T')[0]}.csv`,
+        headers: [
+          'Subscriber ID',
+          'Email Address',
+          'Status',
+          'Subscribed Date & Time (24h)',
+        ],
+        rows: (listData as Subscriber[]).map((s) => [
+          s.id,
+          s.email,
+          s.status,
+          formatTimestamp24h(s.subscribed_at).full,
+        ]),
+      });
+      if (success) toast.success('সাবস্ক্রাইবার তালিকা সফলভাবে ডাউনলোড হয়েছে');
+    }
   };
 
   return (

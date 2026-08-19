@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/models.dart';
+import '../domain/coupon_service.dart';
 import 'payment_view.dart';
+import 'widgets/coupon_bottom_sheet.dart';
 
 class SubscriptionView extends StatefulWidget {
   const SubscriptionView({super.key});
@@ -18,6 +20,9 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   String _currentPlanId = 'free';
   DateTime? _expiresAt;
   int _selectedPlanIndex = 1;
+
+  // ── Coupon state ──────────────────────────────────────────────────────
+  AppliedCoupon? _appliedCoupon;
 
   int get _daysRemaining {
     if (_expiresAt == null) return 0;
@@ -191,8 +196,93 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
   void _handlePlanSelect(SubscriptionPlan plan) {
     if (plan.id == _currentPlanId || plan.id == 'free') return;
+
+    // Apply coupon discount if active
+    SubscriptionPlan effectivePlan = plan;
+    if (_appliedCoupon != null && plan.price > 0) {
+      final discountedPrice = CouponService.effectivePrice(plan.price, _appliedCoupon);
+      if (discountedPrice != plan.price) {
+        effectivePlan = SubscriptionPlan(
+          id: plan.id,
+          name: plan.name,
+          price: discountedPrice,
+          billingCycle: plan.billingCycle,
+          durationDays: plan.durationDays,
+          currency: plan.currency,
+          features: plan.features,
+          colorTheme: plan.colorTheme,
+          expiresAt: plan.expiresAt,
+        );
+      }
+    }
+
     Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(builder: (_) => PaymentView(plan: plan)),
+      MaterialPageRoute(
+        builder: (_) => PaymentView(
+          plan: effectivePlan,
+          appliedCouponCode: _appliedCoupon?.code,
+        ),
+      ),
+    );
+  }
+
+  /// Opens a bottom sheet for coupon entry.
+  void _openCouponSheet([int? planPrice]) {
+    final premiumPlans = _plans.where((p) => p.price > 0).toList();
+    final selectedPlan = (premiumPlans.isNotEmpty && _selectedPlanIndex < premiumPlans.length)
+        ? premiumPlans[_selectedPlanIndex]
+        : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
+    final refPrice = planPrice ?? selectedPlan?.price ?? 149;
+
+    CouponBottomSheet.show(
+      context: context,
+      appliedCoupon: _appliedCoupon,
+      planPrice: refPrice,
+      onApply: (code) {
+        final result = CouponService.validate(code, refPrice);
+        if (result.isValid && result.appliedCoupon != null) {
+          setState(() => _appliedCoupon = result.appliedCoupon);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "🎉 '${result.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
+                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+              ),
+              backgroundColor: const Color(0xFF004633),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                result.errorMessage ?? 'অকার্যকর কুপন কোড!',
+                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+              ),
+              backgroundColor: const Color(0xFF991B1B),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          );
+        }
+      },
+      onRemove: () {
+        setState(() => _appliedCoupon = null);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'কুপন মুছে ফেলা হয়েছে',
+              style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+            ),
+            backgroundColor: Colors.grey[700],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        );
+      },
     );
   }
 
@@ -292,6 +382,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 isSelected: isSelected,
                 isCurrent: isCurrent,
                 isDark: isDark,
+                appliedCoupon: _appliedCoupon,
                 onTap: () {
                   setState(() {
                     _selectedPlanIndex = index;
@@ -300,59 +391,128 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               );
             }),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
-            // PRIMARY CTA BUTTON FOR SELECTED PLAN
-            if (selectedPlan != null)
-              Container(
-                margin: const EdgeInsets.only(top: 8, bottom: 28),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 3,
-                    shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
-                  ),
-                  onPressed: () => _handlePlanSelect(selectedPlan),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'পেমেন্ট করতে এগিয়ে যান',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'HindSiliguri',
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '৳${selectedPlan.price}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'HindSiliguri',
-                            color: Colors.white,
+            // ── Coupon prompt / remove coupon text link (no box) ──────────
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 8),
+                child: GestureDetector(
+                  onTap: () {
+                    if (_appliedCoupon != null) {
+                      setState(() => _appliedCoupon = null);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'কুপন মুছে ফেলা হয়েছে',
+                            style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
                           ),
+                          backgroundColor: Colors.grey[700],
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
+                      );
+                    } else {
+                      _openCouponSheet();
+                    }
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      _appliedCoupon != null ? 'কুপন রিমুভ করুন' : 'কুপন আছে?',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'HindSiliguri',
+                        color: _appliedCoupon != null
+                            ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                            : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                        decoration: TextDecoration.underline,
+                        decorationColor: _appliedCoupon != null
+                            ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                            : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(LucideIcons.arrowRight, size: 18),
-                    ],
+                    ),
                   ),
                 ),
               ),
+            ),
+
+            // PRIMARY CTA BUTTON FOR SELECTED PLAN
+            if (selectedPlan != null)
+              Builder(builder: (ctx) {
+                final effectivePrice = CouponService.effectivePrice(selectedPlan.price, _appliedCoupon);
+                final hasDiscount = effectivePrice != selectedPlan.price;
+                return Container(
+                  margin: const EdgeInsets.only(top: 4, bottom: 28),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004633),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      elevation: 3,
+                      shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
+                    ),
+                    onPressed: () => _handlePlanSelect(selectedPlan),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'পেমেন্ট করতে এগিয়ে যান',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'HindSiliguri',
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (hasDiscount) ...[
+                                Text(
+                                  '৳${selectedPlan.price}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'HindSiliguri',
+                                    color: Colors.white60,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: Colors.white60,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                '৳$effectivePrice',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'HindSiliguri',
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(LucideIcons.arrowRight, size: 18),
+                      ],
+                    ),
+                  ),
+                );
+              }),
 
             // UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE (SHOWN ONCE)
             _UnifiedFeaturesShowcase(isDark: isDark),
@@ -517,6 +677,7 @@ class _CompactPlanCard extends StatelessWidget {
   final bool isCurrent;
   final bool isDark;
   final VoidCallback onTap;
+  final AppliedCoupon? appliedCoupon;
 
   const _CompactPlanCard({
     required this.plan,
@@ -524,39 +685,12 @@ class _CompactPlanCard extends StatelessWidget {
     required this.isCurrent,
     required this.isDark,
     required this.onTap,
+    this.appliedCoupon,
   });
 
   @override
   Widget build(BuildContext context) {
     final bool isMasterPro = plan.durationDays >= 180;
-    final bool isTopRankers = plan.durationDays >= 90 && plan.durationDays < 180;
-
-    String? tagText;
-    Color tagColor = const Color(0xFF004633);
-    Color tagBg = const Color(0xFFE6F4EA);
-
-    if (isMasterPro) {
-      tagText = '৫০% সাশ্রয় • সেরা ভ্যালু';
-      tagColor = const Color(0xFFB45309);
-      tagBg = const Color(0xFFFEF3C7);
-    } else if (isTopRankers) {
-      tagText = '৪১% সাশ্রয় • সর্বাধিক জনপ্রিয়';
-      tagColor = const Color(0xFF004633);
-      tagBg = const Color(0xFFE6F4EA);
-    } else {
-      tagText = 'স্টার্টার প্যাক';
-      tagColor = const Color(0xFF2563EB);
-      tagBg = const Color(0xFFEFF6FF);
-    }
-
-    String perMonthText;
-    if (isMasterPro) {
-      perMonthText = 'প্রতি মাসে ৳৯৯';
-    } else if (isTopRankers) {
-      perMonthText = 'প্রতি মাসে ৳১১৬';
-    } else {
-      perMonthText = '৳৪/দিন এককালীন';
-    }
 
     final activeBorderColor = isSelected
         ? (isMasterPro
@@ -619,85 +753,66 @@ class _CompactPlanCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
 
-            // Plan Title & Tag & Subtitle
+            // Plan Title (Heading only)
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plan.name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 3,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isDark ? tagColor.withValues(alpha: 0.2) : tagBg,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          tagText,
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'HindSiliguri',
-                            color: isDark ? (isMasterPro ? const Color(0xFFFBBF24) : const Color(0xFF34D399)) : tagColor,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        perMonthText,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              child: Text(
+                plan.name,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
 
-            // Price Column
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '৳${plan.price}',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
-                    color: isSelected
-                        ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
-                        : (isDark ? Colors.white : const Color(0xFF0F172A)),
+            // Price Column (with coupon discount if applicable)
+            Builder(builder: (context) {
+              final effectivePrice = CouponService.effectivePrice(plan.price, appliedCoupon);
+              final hasDiscount = plan.price > 0 && effectivePrice != plan.price;
+              final priceColor = isSelected
+                  ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                  : (isDark ? Colors.white : const Color(0xFF0F172A));
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (hasDiscount)
+                    Text(
+                      '৳${plan.price}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
+                        decoration: TextDecoration.lineThrough,
+                        decorationColor: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
+                      ),
+                    ),
+                  Text(
+                    '৳$effectivePrice',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'HindSiliguri',
+                      color: hasDiscount
+                          ? const Color(0xFF16A34A)
+                          : priceColor,
+                    ),
                   ),
-                ),
-                Text(
-                  '/${plan.durationDays} দিন',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                  Text(
+                    '/${plan.durationDays} দিন',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            }),
           ],
         ),
       ),
@@ -1081,3 +1196,4 @@ class _ComparisonTable extends StatelessWidget {
     );
   }
 }
+

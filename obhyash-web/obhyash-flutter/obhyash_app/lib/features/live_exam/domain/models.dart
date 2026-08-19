@@ -161,37 +161,60 @@ class LiveExamAttempt {
 
 class LiveExamLeaderboardEntry {
   final String id;
+  final String? userId;
   final num score;
   final int correctCount;
   final int wrongCount;
   final String userName;
   final String userInstitute;
   final String avatarColor;
+  final String? avatarUrl;
+  final DateTime? startTime;
   final DateTime? submitTime;
+  final int? timeTakenSeconds;
 
   LiveExamLeaderboardEntry({
     required this.id,
+    this.userId,
     required this.score,
     required this.correctCount,
     required this.wrongCount,
     required this.userName,
     required this.userInstitute,
     required this.avatarColor,
+    this.avatarUrl,
+    this.startTime,
     this.submitTime,
+    this.timeTakenSeconds,
   });
 
   factory LiveExamLeaderboardEntry.fromJson(Map<String, dynamic> json) {
     final userData = json['users'] as Map<String, dynamic>?;
+    final start = json['start_time'] != null ? DateTime.tryParse(json['start_time'].toString()) : null;
+    final submit = json['submit_time'] != null ? DateTime.tryParse(json['submit_time'].toString()) : null;
+    int? timeTaken;
+    if (json['time_taken_seconds'] != null) {
+      timeTaken = (json['time_taken_seconds'] as num?)?.toInt();
+    } else if (start != null && submit != null) {
+      final diff = submit.difference(start).inSeconds;
+      if (diff >= 0 && diff <= 86400) {
+        timeTaken = diff;
+      }
+    }
 
     return LiveExamLeaderboardEntry(
       id: json['id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? userData?['id'] as String?,
       score: json['score'] as num? ?? 0,
       correctCount: json['correct_count'] as int? ?? 0,
       wrongCount: json['wrong_count'] as int? ?? 0,
       userName: userData?['name'] as String? ?? 'শিক্ষার্থী',
       userInstitute: userData?['institute'] as String? ?? 'প্রতিষ্ঠান নেই',
       avatarColor: userData?['avatar_color'] as String? ?? userData?['avatarColor'] as String? ?? '#10b981',
-      submitTime: json['submit_time'] != null ? DateTime.parse(json['submit_time'].toString()) : null,
+      avatarUrl: userData?['avatar_url'] as String?,
+      startTime: start,
+      submitTime: submit,
+      timeTakenSeconds: timeTaken,
     );
   }
 }

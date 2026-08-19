@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/models.dart';
 import '../providers/live_exam_providers.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../../core/presentation/widgets/user_avatar.dart';
 
 class LiveExamLeaderboardView extends ConsumerStatefulWidget {
   final String examId;
@@ -37,6 +38,108 @@ class _LiveExamLeaderboardViewState
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  String _formatTime(int? seconds, DateTime? start, DateTime? submit) {
+    if (seconds != null && seconds > 0) {
+      final mins = seconds ~/ 60;
+      final secs = seconds % 60;
+      return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')} মি.';
+    }
+    if (start != null && submit != null) {
+      final diff = submit.difference(start).inSeconds;
+      if (diff > 0 && diff <= 86400) {
+        final mins = diff ~/ 60;
+        final secs = diff % 60;
+        return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')} মি.';
+      }
+    }
+    if (submit != null) {
+      final local = submit.toLocal();
+      final hour = local.hour > 12
+          ? local.hour - 12
+          : (local.hour == 0 ? 12 : local.hour);
+      final period = local.hour >= 12 ? 'PM' : 'AM';
+      return '${hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')} $period';
+    }
+    return '--';
+  }
+
+  Widget _buildRankBadge(int rank, bool isDark) {
+    if (rank == 1) {
+      return Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF59E0B),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: const Text(
+          '1',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            fontFamily: 'Anek Bangla',
+          ),
+        ),
+      );
+    } else if (rank == 2) {
+      return Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: const Color(0xFF94A3B8),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        alignment: Alignment.center,
+        child: const Text(
+          '2',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            fontFamily: 'Anek Bangla',
+          ),
+        ),
+      );
+    } else if (rank == 3) {
+      return Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: const Color(0xFFB45309),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        alignment: Alignment.center,
+        child: const Text(
+          '3',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            fontFamily: 'Anek Bangla',
+          ),
+        ),
+      );
+    }
+    return Text(
+      '#$rank',
+      style: TextStyle(
+        fontSize: 12.5,
+        fontWeight: FontWeight.w800,
+        fontFamily: 'Anek Bangla',
+        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+      ),
+    );
   }
 
   @override
@@ -102,11 +205,12 @@ class _LiveExamLeaderboardViewState
           // Find current user entry
           final myIndex = entries.indexWhere((e) =>
               currentUser != null &&
-              (e.userName == (currentUser.userMetadata?['full_name'] ?? currentUser.email)));
+              ((e.userId != null && e.userId == currentUser.id) ||
+                  e.userName ==
+                      (currentUser.userMetadata?['full_name'] ??
+                          currentUser.email)));
           final myEntry = myIndex != -1 ? entries[myIndex] : null;
           final myRank = myIndex != -1 ? myIndex + 1 : null;
-
-          final top3 = entries.take(3).toList();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -121,18 +225,23 @@ class _LiveExamLeaderboardViewState
                     decoration: BoxDecoration(
                       color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: const Color(0xFFF59E0B)
+                              .withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(LucideIcons.clock, color: Color(0xFFD97706), size: 20),
+                        const Icon(LucideIcons.clock,
+                            color: Color(0xFFD97706), size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'মেধা তালিকা পর্যালোচনাধীন রয়েছে। এডমিন কর্তৃক চূড়ান্ত প্রকাশের পর এখানে সকলের তালিকা দৃশ্যমান হবে।',
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDark ? Colors.amber[200] : const Color(0xFF92400E),
+                              color: isDark
+                                  ? Colors.amber[200]
+                                  : const Color(0xFF92400E),
                               fontFamily: 'HindSiliguri',
                               fontWeight: FontWeight.w600,
                             ),
@@ -142,7 +251,7 @@ class _LiveExamLeaderboardViewState
                     ),
                   ),
 
-                // Current User Spotlight Card in Premium Grey
+                // Current User Spotlight Card
                 if (myEntry != null && myRank != null) ...[
                   Container(
                     padding: const EdgeInsets.all(18),
@@ -150,7 +259,9 @@ class _LiveExamLeaderboardViewState
                       color: isDark ? const Color(0xFF18181B) : Colors.white,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                        color: isDark
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFCBD5E1),
                         width: 1.2,
                       ),
                       boxShadow: [
@@ -169,17 +280,23 @@ class _LiveExamLeaderboardViewState
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                              color: isDark
+                                  ? const Color(0xFF3F3F46)
+                                  : const Color(0xFFCBD5E1),
                             ),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             '#$myRank',
                             style: TextStyle(
-                              color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                              color: isDark
+                                  ? const Color(0xFFF8FAFC)
+                                  : const Color(0xFF0F172A),
                               fontWeight: FontWeight.w900,
                               fontFamily: 'Anek Bangla',
                               fontSize: 17,
@@ -194,7 +311,9 @@ class _LiveExamLeaderboardViewState
                               Text(
                                 'আপনার অবস্থান',
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF64748B),
                                   fontSize: 11,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.w700,
@@ -204,7 +323,9 @@ class _LiveExamLeaderboardViewState
                               Text(
                                 myEntry.userName,
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                  color: isDark
+                                      ? const Color(0xFFF8FAFC)
+                                      : const Color(0xFF0F172A),
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w900,
                                   fontFamily: 'Anek Bangla',
@@ -215,7 +336,9 @@ class _LiveExamLeaderboardViewState
                               Text(
                                 'মোট ${entries.length} জনের মধ্যে $myRankম স্থান',
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
+                                  color: isDark
+                                      ? const Color(0xFF71717A)
+                                      : const Color(0xFF94A3B8),
                                   fontSize: 11,
                                   fontFamily: 'Anek Bangla',
                                 ),
@@ -229,18 +352,26 @@ class _LiveExamLeaderboardViewState
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                              color: isDark
+                                  ? const Color(0xFF3F3F46)
+                                  : const Color(0xFFE2E8F0),
                             ),
                           ),
                           child: Column(
                             children: [
                               Text(
-                                '${myEntry.score}',
+                                myEntry.score % 1 == 0
+                                    ? '${myEntry.score.toInt()}'
+                                    : '${myEntry.score}',
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                  color: isDark
+                                      ? const Color(0xFFF8FAFC)
+                                      : const Color(0xFF0F172A),
                                   fontWeight: FontWeight.w900,
                                   fontSize: 17,
                                   fontFamily: 'Anek Bangla',
@@ -249,7 +380,9 @@ class _LiveExamLeaderboardViewState
                               Text(
                                 'মার্কস',
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF64748B),
                                   fontSize: 10,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
@@ -261,77 +394,16 @@ class _LiveExamLeaderboardViewState
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                 ],
 
-                // Top 3 Podium
-                if (top3.length >= 3) ...[
-                  const Center(
-                    child: Text(
-                      'টপ ৩ স্থানাধিকারী',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // 2nd Place
-                      Expanded(
-                        child: _buildPodiumItem(
-                          rank: 2,
-                          name: top3[1].userName,
-                          institute: top3[1].userInstitute,
-                          score: top3[1].score,
-                          color: const Color(0xFF94A3B8),
-                          isDark: isDark,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // 1st Place (Champion)
-                      Expanded(
-                        child: _buildPodiumItem(
-                          rank: 1,
-                          name: top3[0].userName,
-                          institute: top3[0].userInstitute,
-                          score: top3[0].score,
-                          color: const Color(0xFFF59E0B),
-                          isDark: isDark,
-                          isChampion: true,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // 3rd Place
-                      Expanded(
-                        child: _buildPodiumItem(
-                          rank: 3,
-                          name: top3[2].userName,
-                          institute: top3[2].userInstitute,
-                          score: top3[2].score,
-                          color: const Color(0xFFB45309),
-                          isDark: isDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Reduced Size Compact Search Bar
+                // Search Bar
                 Container(
-                  height: 42,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF141417) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
                           ? const Color(0xFF27272A)
@@ -341,7 +413,8 @@ class _LiveExamLeaderboardViewState
                   ),
                   child: Row(
                     children: [
-                      const Icon(LucideIcons.search, size: 15, color: Color(0xFF94A3B8)),
+                      const Icon(LucideIcons.search,
+                          size: 16, color: Color(0xFF94A3B8)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
@@ -352,15 +425,18 @@ class _LiveExamLeaderboardViewState
                             });
                           },
                           style: TextStyle(
-                            color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            fontSize: 13,
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
+                            fontSize: 13.5,
                             fontFamily: 'Anek Bangla',
                           ),
                           decoration: const InputDecoration(
-                            hintText: 'শিক্ষার্থী বা কলেজের নাম দিয়ে খুঁজুন...',
+                            hintText:
+                                'শিক্ষার্থী বা কলেজের নাম দিয়ে খুঁজুন...',
                             hintStyle: TextStyle(
                               color: Color(0xFF94A3B8),
-                              fontSize: 12.5,
+                              fontSize: 13,
                               fontFamily: 'Anek Bangla',
                             ),
                             border: InputBorder.none,
@@ -378,336 +454,379 @@ class _LiveExamLeaderboardViewState
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(3),
+                            padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                              color: isDark
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFE2E8F0),
                             ),
                             child: Icon(
                               LucideIcons.x,
                               size: 13,
-                              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                              color: isDark
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF64748B),
                             ),
                           ),
                         ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // Empty Search Result Notice
                 if (filteredEntries.isEmpty)
                   Container(
-                    padding: const EdgeInsets.all(28),
+                    padding: const EdgeInsets.all(32),
                     alignment: Alignment.center,
                     child: Column(
                       children: [
                         Icon(
                           LucideIcons.searchX,
-                          size: 36,
-                          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                          size: 40,
+                          color: isDark
+                              ? const Color(0xFF3F3F46)
+                              : const Color(0xFFCBD5E1),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Text(
                           'কোনো শিক্ষার্থী বা কলেজ পাওয়া যায়নি',
                           style: TextStyle(
-                            fontSize: 13.5,
+                            fontSize: 14,
                             fontFamily: 'Anek Bangla',
-                            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF64748B),
                           ),
                         ),
                       ],
                     ),
-                  ),
-
-                // Candidates List
-                ...filteredEntries.asMap().entries.map((entry) {
-                  final rank = entry.key + 1;
-                  final candidate = entry.value;
-                  final isMe = currentUser != null &&
-                      (candidate.userName ==
-                          (currentUser.userMetadata?['full_name'] ??
-                              currentUser.email));
-
-                  final totalAttempted = candidate.correctCount + candidate.wrongCount;
-                  final accuracy = totalAttempted > 0
-                      ? ((candidate.correctCount / totalAttempted) * 100).round()
-                      : (candidate.score > 0 ? 100 : 0);
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  )
+                else
+                  // ── LEADERBOARD TABLE ──────────────────────────────────
+                  Container(
                     decoration: BoxDecoration(
-                      color: isMe
-                          ? const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.06)
-                          : (isDark ? const Color(0xFF141417) : Colors.white),
+                      color: isDark ? const Color(0xFF141417) : Colors.white,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isMe
-                            ? const Color(0xFF059669).withValues(alpha: isDark ? 0.4 : 0.25)
-                            : (isDark
-                                ? const Color(0xFF27272A)
-                                : const Color(0xFFE2E8F0)),
-                        width: 1.2,
+                        color: isDark
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE2E8F0),
+                        width: 1.1,
                       ),
                       boxShadow: [
                         if (!isDark)
                           BoxShadow(
                             color: const Color(0x06000000),
-                            blurRadius: 8,
+                            blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
                       ],
                     ),
-                    child: Row(
-                      children: [
-                        // Rank Badge
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: rank == 1
-                                ? const Color(0xFFF59E0B)
-                                : (rank == 2
-                                    ? const Color(0xFF94A3B8)
-                                    : (rank == 3
-                                        ? const Color(0xFFB45309)
-                                        : (isDark
-                                            ? const Color(0xFF27272A)
-                                            : const Color(0xFFF1F5F9)))),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '#$rank',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'Anek Bangla',
-                              color: rank <= 3
-                                  ? Colors.white
-                                  : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Table Header Row
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF1C1C20)
+                                  : const Color(0xFFF8FAFC),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: isDark
+                                      ? const Color(0xFF27272A)
+                                      : const Color(0xFFE2E8F0),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                // Rank
+                                SizedBox(
+                                  width: 44,
+                                  child: Text(
+                                    'র‍্যাংক',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? const Color(0xFFA1A1AA)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Profile Image
+                                SizedBox(
+                                  width: 36,
+                                  child: Text(
+                                    'ছবি',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? const Color(0xFFA1A1AA)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+
+                                // Name & Institute
+                                Expanded(
+                                  child: Text(
+                                    'নাম ও প্রতিষ্ঠান',
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? const Color(0xFFA1A1AA)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+
+                                // Time
+                                SizedBox(
+                                  width: 65,
+                                  child: Text(
+                                    'সময়',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? const Color(0xFFA1A1AA)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+
+                                // Marks
+                                SizedBox(
+                                  width: 50,
+                                  child: Text(
+                                    'মার্কস',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? const Color(0xFFA1A1AA)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
 
-                        // Name & Institute
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                          // Table Body Rows (Student Results)
+                          ...filteredEntries.asMap().entries.map((entry) {
+                            final rank = entry.key + 1;
+                            final candidate = entry.value;
+                            final isMe = currentUser != null &&
+                                ((candidate.userId != null &&
+                                        candidate.userId == currentUser.id) ||
+                                    candidate.userName ==
+                                        (currentUser.userMetadata?[
+                                                'full_name'] ??
+                                            currentUser.email));
+                            final isLast =
+                                entry.key == filteredEntries.length - 1;
+
+                            final timeText = _formatTime(
+                              candidate.timeTakenSeconds,
+                              candidate.startTime,
+                              candidate.submitTime,
+                            );
+
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isMe
+                                    ? const Color(0xFF059669).withValues(
+                                        alpha: isDark ? 0.16 : 0.08)
+                                    : (entry.key.isEven
+                                        ? Colors.transparent
+                                        : (isDark
+                                            ? const Color(0xFF18181D)
+                                            : const Color(0xFFFAFAFC))),
+                                border: isLast
+                                    ? null
+                                    : Border(
+                                        bottom: BorderSide(
+                                          color: isDark
+                                              ? const Color(0xFF1F1F24)
+                                              : const Color(0xFFF1F5F9),
+                                          width: 1,
+                                        ),
+                                      ),
+                              ),
+                              child: Row(
                                 children: [
-                                  Flexible(
+                                  // 1. Rank
+                                  SizedBox(
+                                    width: 44,
+                                    child: Center(
+                                      child: _buildRankBadge(rank, isDark),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+
+                                  // 2. Profile Image
+                                  SizedBox(
+                                    width: 36,
+                                    child: Center(
+                                      child: UserAvatar(
+                                        avatarUrl: candidate.avatarUrl,
+                                        name: candidate.userName,
+                                        id: candidate.userId,
+                                        size: 34,
+                                        useDiceBearFallback: true,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+
+                                  // 3. Name & Institute
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                candidate.userName,
+                                                style: TextStyle(
+                                                  fontSize: 13.5,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontFamily: 'Anek Bangla',
+                                                  color: isDark
+                                                      ? const Color(0xFFF8FAFC)
+                                                      : const Color(0xFF0F172A),
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            if (isMe) ...[
+                                              const SizedBox(width: 4),
+                                              Container(
+                                                padding: const EdgeInsets
+                                                    .symmetric(
+                                                  horizontal: 5,
+                                                  vertical: 1.5,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF059669)
+                                                      .withValues(alpha: 0.2),
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: const Text(
+                                                  'আপনি',
+                                                  style: TextStyle(
+                                                    fontSize: 9.5,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFF059669),
+                                                    fontFamily: 'Anek Bangla',
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          candidate.userInstitute.isNotEmpty
+                                              ? candidate.userInstitute
+                                              : 'প্রতিষ্ঠান নেই',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontFamily: 'Anek Bangla',
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark
+                                                ? const Color(0xFFA1A1AA)
+                                                : const Color(0xFF64748B),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // 4. Time
+                                  SizedBox(
+                                    width: 65,
                                     child: Text(
-                                      candidate.userName,
+                                      timeText,
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.w800,
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w600,
                                         fontFamily: 'Anek Bangla',
                                         color: isDark
-                                            ? const Color(0xFFF8FAFC)
-                                            : const Color(0xFF0F172A),
+                                            ? const Color(0xFFCBD5E1)
+                                            : const Color(0xFF475569),
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  if (isMe) ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF059669)
-                                            .withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Text(
-                                        'আপনি',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF059669),
-                                          fontFamily: 'Anek Bangla',
-                                        ),
+
+                                  // 5. Marks
+                                  SizedBox(
+                                    width: 50,
+                                    child: Text(
+                                      candidate.score % 1 == 0
+                                          ? '${candidate.score.toInt()}'
+                                          : '${candidate.score}',
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'Anek Bangla',
+                                        color: isDark
+                                            ? const Color(0xFF34D399)
+                                            : const Color(0xFF059669),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                candidate.userInstitute.isNotEmpty
-                                    ? candidate.userInstitute
-                                    : 'প্রতিষ্ঠান নেই',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontFamily: 'Anek Bangla',
-                                  color: isDark
-                                      ? const Color(0xFFA1A1AA)
-                                      : const Color(0xFF64748B),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 8),
-
-                        // Accuracy info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '$accuracy% নির্ভুলতা',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'Anek Bangla',
-                                color: accuracy >= 80
-                                    ? const Color(0xFF10B981)
-                                    : (accuracy >= 50
-                                        ? const Color(0xFFF59E0B)
-                                        : const Color(0xFFEF4444)),
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              '${candidate.correctCount} সঠিক • ${candidate.wrongCount} ভুল',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Anek Bangla',
-                                color: isDark
-                                    ? const Color(0xFF71717A)
-                                    : const Color(0xFF94A3B8),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        // Marks Got / Score Pill
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1F2937)
-                                : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF374151)
-                                  : const Color(0xFFE2E8F0),
-                            ),
-                          ),
-                          child: Text(
-                            '${candidate.score} মার্কস',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w900,
-                              fontFamily: 'Anek Bangla',
-                              color: isDark
-                                  ? const Color(0xFFF8FAFC)
-                                  : const Color(0xFF0F172A),
-                            ),
-                          ),
-                        ),
-                      ],
+                            );
+                          }),
+                        ],
+                      ),
                     ),
-                  );
-                }),
-                const SizedBox(height: 24),
+                  ),
+                const SizedBox(height: 32),
               ],
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildPodiumItem({
-    required int rank,
-    required String name,
-    required String institute,
-    required num score,
-    required Color color,
-    required bool isDark,
-    bool isChampion = false,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: isChampion ? 16 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isChampion ? color : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
-          width: isChampion ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isChampion ? '👑' : '$rank',
-              style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            institute.isNotEmpty ? institute : 'শিক্ষার্থী',
-            style: const TextStyle(fontSize: 10, color: Colors.grey),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '$score',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

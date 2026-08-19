@@ -1363,7 +1363,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       downloadBlob(blob, 'question_template.json');
     } else if (format === 'csv') {
       const csv = Papa.unparse(rows);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
       downloadBlob(blob, 'question_template.csv');
     } else {
       const ws = XLSX.utils.json_to_sheet(rows);

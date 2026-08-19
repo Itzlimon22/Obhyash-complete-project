@@ -36,6 +36,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 interface PaymentRequest {
   id: string;
@@ -449,46 +450,71 @@ export default function SubscriptionsPage() {
   };
 
   const exportData = () => {
-    const csvContent =
-      activeTab === 'requests'
-        ? [
-            ['ID', 'User', 'Email', 'Phone', 'Plan', 'Amount', 'Method', 'Transaction ID', 'Status', 'Date & Time (24h)'],
-            ...filteredRequests.map((r) => [
-              r.id,
-              r.user?.name || '',
-              r.user?.email || '',
-              r.user?.phone || '',
-              r.plan_name,
-              r.amount,
-              r.payment_method,
-              r.transaction_id || '',
-              r.status,
-              formatTimestamp24h(r.requested_at).full,
-            ]),
-          ]
-            .map((e) => e.join(','))
-            .join('\n')
-        : [
-            ['ID', 'User', 'Email', 'Phone', 'Plan', 'Started (24h)', 'Expires (24h)', 'Status'],
-            ...filteredSubscriptions.map((s) => [
-              s.id,
-              s.user?.name || '',
-              s.user?.email || '',
-              s.user?.phone || '',
-              s.plan_name || s.plan?.display_name || '',
-              formatTimestamp24h(s.started_at).full,
-              s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
-              s.is_active ? 'Active' : 'Expired',
-            ]),
-          ]
-            .map((e) => e.join(','))
-            .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    if (activeTab === 'requests') {
+      if (!filteredRequests || filteredRequests.length === 0) {
+        toast.error('এক্সপোর্ট করার মতো কোনো পেমেন্ট রিকোয়েস্ট নেই');
+        return;
+      }
+      exportToCSV({
+        filename: `payment_requests_${new Date().toISOString().split('T')[0]}.csv`,
+        headers: [
+          'Request ID',
+          'User Name',
+          'Email',
+          'Phone',
+          'Plan Name',
+          'Amount (BDT)',
+          'Payment Method',
+          'Transaction ID',
+          'Status',
+          'Requested Date & Time (24h)',
+          'Admin Notes',
+        ],
+        rows: filteredRequests.map((r) => [
+          r.id,
+          r.user?.name || 'N/A',
+          r.user?.email || 'N/A',
+          r.user?.phone || 'N/A',
+          r.plan_name,
+          r.amount,
+          r.payment_method,
+          r.transaction_id || 'N/A',
+          r.status,
+          formatTimestamp24h(r.requested_at).full,
+          r.admin_notes || '',
+        ]),
+      });
+      toast.success('পেমেন্ট রিকোয়েস্ট শিট সফলভাবে ডাউনলোড হয়েছে');
+    } else {
+      if (!filteredSubscriptions || filteredSubscriptions.length === 0) {
+        toast.error('এক্সপোর্ট করার মতো কোনো অ্যাক্টিভ সাবস্ক্রিপশন নেই');
+        return;
+      }
+      exportToCSV({
+        filename: `active_subscriptions_${new Date().toISOString().split('T')[0]}.csv`,
+        headers: [
+          'Subscription ID',
+          'User Name',
+          'Email',
+          'Phone',
+          'Plan Name',
+          'Started Date & Time (24h)',
+          'Expires Date & Time (24h)',
+          'Status',
+        ],
+        rows: filteredSubscriptions.map((s) => [
+          s.id,
+          s.user?.name || 'N/A',
+          s.user?.email || 'N/A',
+          s.user?.phone || 'N/A',
+          s.plan_name || s.plan?.display_name || 'Premium',
+          formatTimestamp24h(s.started_at).full,
+          s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
+          s.is_active ? 'Active' : 'Expired',
+        ]),
+      });
+      toast.success('সাবস্ক্রিপশন শিট সফলভাবে ডাউনলোড হয়েছে');
+    }
   };
 
   if (isLoading) {

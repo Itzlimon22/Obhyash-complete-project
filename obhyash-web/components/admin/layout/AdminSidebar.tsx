@@ -22,6 +22,7 @@ import {
   X,
   Sparkles,
   UploadCloud,
+  Gift,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -88,6 +89,12 @@ const ADMIN_NAVIGATION: NavSection[] = [
         label: 'সাবস্ক্রিপশন ও পেমেন্ট',
         icon: CreditCard,
         href: '/admin/subscriptions',
+      },
+      {
+        id: 'referrals',
+        label: 'রেফারেল ও রিওয়ার্ড',
+        icon: Gift,
+        href: '/admin/referrals',
       },
       {
         id: 'reports',

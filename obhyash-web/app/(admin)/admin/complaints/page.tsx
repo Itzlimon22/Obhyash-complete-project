@@ -24,6 +24,8 @@ import { ComplaintResolutionModal } from '@/components/admin/complaints/complain
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+import { exportToCSV } from '@/lib/utils/export-csv';
+
 export default function AdminComplaintsPage() {
   const [complaints, setComplaints] = useState<AppComplaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,30 +80,37 @@ export default function AdminComplaintsPage() {
 
   const exportCSV = () => {
     if (!complaints || complaints.length === 0) {
-      toast.error('No complaints to export');
+      toast.error('এক্সপোর্ট করার মতো কোনো অভিযোগ নেই');
       return;
     }
 
-    const csvContent = [
-      ['ID', 'Reporter Name', 'Email', 'Type', 'Description', 'Status', 'Date & Time (24h)'],
-      ...complaints.map((c) => [
+    const success = exportToCSV({
+      filename: `student_complaints_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
+        'Complaint ID',
+        'Student Name',
+        'Email',
+        'Category / Type',
+        'Problem Description',
+        'Status',
+        'Admin Feedback',
+        'Submitted Date & Time (24h)',
+      ],
+      rows: complaints.map((c) => [
         c.id,
         c.user?.name || 'Unknown',
         c.user?.email || 'N/A',
         c.type,
-        `"${(c.description || '').replace(/"/g, '""')}"`,
+        c.description || '',
         c.status,
-        `${new Date(c.created_at).toLocaleDateString('en-GB')} ${new Date(c.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        c.admin_feedback || '',
+        `${new Date(c.created_at).toLocaleDateString('en-GB')} ${new Date(c.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
       ]),
-    ]
-      .map((e) => e.join(','))
-      .join('\n');
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `complaints_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    if (success) {
+      toast.success('অভিযোগ তালিকা সফলভাবে এক্সপোর্ট হয়েছে');
+    }
   };
 
   const getStatusColor = (status: ComplaintStatus) => {

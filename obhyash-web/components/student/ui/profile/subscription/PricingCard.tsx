@@ -3,18 +3,25 @@
 import React from 'react';
 import { SubscriptionPlan } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Check, Crown, Sparkles, Zap } from 'lucide-react';
+import { Check, Crown, Sparkles, Zap, Tag, X } from 'lucide-react';
+import { AppliedCoupon, calculateCouponDiscount } from '@/lib/utils/coupon-system';
 
 interface PricingCardProps {
   plan: SubscriptionPlan;
   isCurrent: boolean;
   onSelect: () => void;
+  appliedCoupon?: AppliedCoupon | null;
+  onOpenCouponModal?: () => void;
+  onRemoveCoupon?: () => void;
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({
   plan,
   isCurrent,
   onSelect,
+  appliedCoupon,
+  onOpenCouponModal,
+  onRemoveCoupon,
 }) => {
   const isMasterPro = (plan.duration_days ?? 0) >= 180 || plan.price >= 500;
   const isTopRankers = ((plan.duration_days ?? 0) >= 90 && (plan.duration_days ?? 0) < 180) || (plan.price >= 300 && plan.price < 500);
@@ -41,6 +48,14 @@ const PricingCard: React.FC<PricingCardProps> = ({
     monthlyText = 'প্রতি মাসে মাত্র ৳১১৬ • সিজন স্পেশাল!';
     buttonClasses = 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-500/30';
   }
+
+  // Calculate dynamic price based on applied coupon
+  const discountInfo = appliedCoupon && plan.price > 0
+    ? calculateCouponDiscount(appliedCoupon.code, plan.price).appliedCoupon
+    : null;
+
+  const displayPrice = discountInfo ? discountInfo.finalPrice : plan.price;
+  const hasDiscount = discountInfo && discountInfo.discountAmount > 0;
 
   return (
     <div
@@ -92,18 +107,29 @@ const PricingCard: React.FC<PricingCardProps> = ({
             {plan.name}
           </h3>
 
-          <div className="flex items-start justify-center gap-1 mb-1 relative">
-            <span className="text-2xl sm:text-3xl font-bold text-neutral-400 mt-1 sm:mt-2 font-anek">
-              ৳
-            </span>
-            <span className="text-4xl sm:text-5xl font-black text-neutral-900 dark:text-white tracking-tighter font-anek">
-              {plan.price}
-            </span>
-            {plan.price > 0 && (
-              <span className="text-neutral-500 dark:text-neutral-400 font-bold text-sm sm:text-base mt-auto mb-1.5 ml-1 font-anek">
-                /{plan.duration_days ? `${plan.duration_days} দিন` : plan.billingCycle === 'Half-Yearly' ? '৬ মাস' : plan.billingCycle === 'Quarterly' ? '৩ মাস' : 'মাস'}
-              </span>
+          {/* Pricing Display */}
+          <div className="flex flex-col items-center justify-center mb-1">
+            {hasDiscount && (
+              <div className="flex items-center gap-1.5 text-xs text-neutral-400 line-through font-semibold font-anek mb-0.5">
+                <span>মূল্য: ৳{plan.price}</span>
+              </div>
             )}
+            <div className="flex items-start justify-center gap-1 relative">
+              <span className="text-2xl sm:text-3xl font-bold text-neutral-400 mt-1 sm:mt-2 font-anek">
+                ৳
+              </span>
+              <span className={cn(
+                "text-4xl sm:text-5xl font-black tracking-tighter font-anek",
+                hasDiscount ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-900 dark:text-white"
+              )}>
+                {displayPrice}
+              </span>
+              {plan.price > 0 && (
+                <span className="text-neutral-500 dark:text-neutral-400 font-bold text-sm sm:text-base mt-auto mb-1.5 ml-1 font-anek">
+                  /{plan.duration_days ? `${plan.duration_days} দিন` : plan.billingCycle === 'Half-Yearly' ? '৬ মাস' : plan.billingCycle === 'Quarterly' ? '৩ মাস' : 'মাস'}
+                </span>
+              )}
+            </div>
           </div>
 
           <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-5 sm:mb-6 font-anek">
@@ -133,6 +159,41 @@ const PricingCard: React.FC<PricingCardProps> = ({
           </ul>
 
           <div className="mt-auto w-full pt-2">
+            {/* ── 'kupon ase?' or Active Coupon Badge above button ── */}
+            {plan.price > 0 && !isCurrent && (
+              <div className="mb-2 flex items-center justify-center">
+                {hasDiscount && discountInfo ? (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                    <Tag size={12} className="text-emerald-500 shrink-0" />
+                    <span>{discountInfo.code} কুপন যুক্ত (৳{discountInfo.discountAmount} ছাড়)</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveCoupon?.();
+                      }}
+                      className="ml-1 p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800 rounded text-neutral-500 hover:text-red-600 transition-colors"
+                      title="কুপন বাদ দাও"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenCouponModal?.();
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold transition-colors hover:underline"
+                  >
+                    <Tag size={12} className="text-emerald-500 shrink-0" />
+                    <span>কুপন আছে?</span>
+                  </button>
+                )}
+              </div>
+            )}
+
             <button
               onClick={onSelect}
               className={cn(

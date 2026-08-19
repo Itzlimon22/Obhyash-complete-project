@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { AnalyticsKPIGrid, AnalyticsKPIs } from '@/components/admin/analytics/analytics-kpi-grid';
 import { SubjectAccuracyMatrix, SubjectPerf } from '@/components/admin/analytics/subject-accuracy-matrix';
 import { PeakStudyHeatmap } from '@/components/admin/analytics/peak-study-heatmap';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 interface AnalyticsData {
   timeRange: string;
@@ -84,19 +85,25 @@ export default function AnalyticsPage() {
   const handleExportCSV = () => {
     if (!data) return;
 
-    const rows = [
-      ['Metric', 'Value'],
-      ['Time Range', data.timeRange],
-      ['Total Exams', data.kpis.totalExams],
-      ['Period Exams', data.kpis.rangeExamsCount],
-      ['Average Score %', `${data.kpis.averageScore}%`],
-      ['Total Users', data.kpis.totalUsers],
-      ['Pro Users', data.kpis.proUsers],
-      ['DAU (Daily Active)', data.kpis.dau],
-      ['MAU (Monthly Active)', data.kpis.mau],
-      ['Stickiness Ratio %', `${data.kpis.stickinessRatio}%`],
-      [],
-      ['Subject Performance', 'Exams Count', 'Average Score %', 'Students Count', 'Mastery Tier'],
+    const headers = [
+      'Report Type / Subject',
+      'Exams Count',
+      'Average Score %',
+      'Students Count',
+      'Mastery Tier / Metric Value',
+    ];
+
+    const rows: (string | number)[][] = [
+      ['KPI: Time Range', '', '', '', data.timeRange],
+      ['KPI: Total Exams', '', '', '', data.kpis.totalExams],
+      ['KPI: Period Exams', '', '', '', data.kpis.rangeExamsCount],
+      ['KPI: Average Score %', '', '', '', `${data.kpis.averageScore}%`],
+      ['KPI: Total Users', '', '', '', data.kpis.totalUsers],
+      ['KPI: Pro Users', '', '', '', data.kpis.proUsers],
+      ['KPI: DAU (Daily Active)', '', '', '', data.kpis.dau],
+      ['KPI: MAU (Monthly Active)', '', '', '', data.kpis.mau],
+      ['KPI: Stickiness Ratio %', '', '', '', `${data.kpis.stickinessRatio}%`],
+      ['---', '---', '---', '---', '---'],
       ...data.subjectPerformance.map((s) => [
         s.subject,
         s.examsCount,
@@ -106,21 +113,15 @@ export default function AnalyticsPage() {
       ]),
     ];
 
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      rows.map((e) => e.join(',')).join('\n');
+    const success = exportToCSV({
+      filename: `obhyash_analytics_${data.timeRange}_${new Date().toISOString().split('T')[0]}.csv`,
+      headers,
+      rows,
+    });
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute(
-      'download',
-      `obhyash_analytics_${data.timeRange}_${new Date().toISOString().split('T')[0]}.csv`,
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('CSV রিপোর্ট ডাউনলোড সম্পন্ন হয়েছে!');
+    if (success) {
+      toast.success('CSV রিপোর্ট ডাউনলোড সম্পন্ন হয়েছে!');
+    }
   };
 
   const defaultKpis: AnalyticsKPIs = {

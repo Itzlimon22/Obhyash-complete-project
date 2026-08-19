@@ -41,6 +41,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 export default function LiveExamResults({ examId }: { examId: string }) {
   const router = useRouter();
@@ -280,21 +281,27 @@ export default function LiveExamResults({ examId }: { examId: string }) {
   ]);
 
   const handleExport = () => {
-    const csv = [
-      [
+    if (!processedLeaderboard || processedLeaderboard.length === 0) {
+      toast.error('এক্সপোর্ট করার মতো কোনো ফলাফল নেই');
+      return;
+    }
+
+    const success = exportToCSV({
+      filename: `live_exam_leaderboard_${(exam?.title || 'exam').toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
         'Rank',
-        'User ID',
+        'Student ID',
         'Student Name',
-        'Email',
-        'Phone',
-        'Institute',
+        'Email Address',
+        'Phone Number',
+        'College / Institution',
         'Score',
         'Correct Count',
         'Wrong Count',
         'Time Taken (Mins)',
-        'Submit Time',
-      ].join(','),
-      ...processedLeaderboard.map((entry, index) => {
+        'Submission Time (24h)',
+      ],
+      rows: processedLeaderboard.map((entry, index) => {
         const student = entry.users || entry.user || {};
         const timeTakenMs =
           new Date(entry.submit_time).getTime() -
@@ -303,27 +310,23 @@ export default function LiveExamResults({ examId }: { examId: string }) {
 
         return [
           index + 1,
-          `"${entry.user_id || student.id || 'N/A'}"`,
-          `"${student.name || 'Student'}"`,
-          `"${student.email || 'N/A'}"`,
-          `"${student.phone || 'N/A'}"`,
-          `"${student.institute || 'N/A'}"`,
+          entry.user_id || student.id || 'N/A',
+          student.name || 'Student',
+          student.email || 'N/A',
+          student.phone || 'N/A',
+          student.institute || 'N/A',
           entry.score,
-          entry.correct_count,
-          entry.wrong_count,
+          entry.correct_count || 0,
+          entry.wrong_count || 0,
           timeTakenMins,
-          `"${new Date(entry.submit_time).toLocaleString()}"`,
-        ].join(',');
+          `${new Date(entry.submit_time).toLocaleDateString('en-GB')} ${new Date(entry.submit_time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
+        ];
       }),
-    ].join('\n');
+    });
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `live-exam-leaderboard-${exam?.title.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    toast.success('লিডারবোর্ড CSV সফলভাবে ডাউনলোড হয়েছে!');
+    if (success) {
+      toast.success('লিডারবোর্ড শিট সফলভাবে ডাউনলোড হয়েছে!');
+    }
   };
 
   // Calculations

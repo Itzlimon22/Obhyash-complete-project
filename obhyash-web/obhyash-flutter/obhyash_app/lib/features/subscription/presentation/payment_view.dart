@@ -7,6 +7,8 @@ import '../../../core/presentation/widgets/app_dropdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../domain/models.dart';
+import '../domain/coupon_service.dart';
+import 'widgets/coupon_bottom_sheet.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class SavedPaymentMethod {
@@ -31,8 +33,9 @@ class SavedPaymentMethod {
 
 class PaymentView extends StatefulWidget {
   final SubscriptionPlan plan;
+  final String? appliedCouponCode;
 
-  const PaymentView({super.key, required this.plan});
+  const PaymentView({super.key, required this.plan, this.appliedCouponCode});
 
   @override
   State<PaymentView> createState() => _PaymentViewState();
@@ -55,12 +58,68 @@ class _PaymentViewState extends State<PaymentView>
   String? _pendingRequestId;
   bool _isCancellingPending = false;
 
+  // Coupon state
+  late SubscriptionPlan _currentPlan;
+  AppliedCoupon? _appliedCoupon;
+
   @override
   void initState() {
     super.initState();
+    _currentPlan = widget.plan;
+    if (widget.appliedCouponCode != null && widget.appliedCouponCode!.isNotEmpty) {
+      final res = CouponService.validate(widget.appliedCouponCode!, widget.plan.price);
+      if (res.isValid && res.appliedCoupon != null) {
+        _appliedCoupon = res.appliedCoupon;
+      }
+    }
     _tabController = TabController(length: 3, vsync: this);
     _fetchSavedMethods();
     _checkPendingPayment();
+  }
+
+  void _openCouponSheet() {
+    CouponBottomSheet.show(
+      context: context,
+      appliedCoupon: _appliedCoupon,
+      planPrice: widget.plan.price,
+      onApply: (code) {
+        final res = CouponService.validate(code, widget.plan.price);
+        if (res.isValid && res.appliedCoupon != null) {
+          setState(() {
+            _appliedCoupon = res.appliedCoupon;
+            _currentPlan = SubscriptionPlan(
+              id: widget.plan.id,
+              name: widget.plan.name,
+              price: res.appliedCoupon!.finalPrice,
+              billingCycle: widget.plan.billingCycle,
+              durationDays: widget.plan.durationDays,
+              currency: widget.plan.currency,
+              features: widget.plan.features,
+              colorTheme: widget.plan.colorTheme,
+              expiresAt: widget.plan.expiresAt,
+            );
+          });
+          Navigator.pop(context);
+          AppPopups.success(
+            context,
+            message: "🎉 '${res.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
+          );
+        } else {
+          AppPopups.warning(
+            context,
+            message: res.errorMessage ?? 'অকার্যকর কুপন কোড!',
+          );
+        }
+      },
+      onRemove: () {
+        setState(() {
+          _appliedCoupon = null;
+          _currentPlan = widget.plan;
+        });
+        Navigator.pop(context);
+        AppPopups.info(context, message: 'কুপন মুছে ফেলা হয়েছে');
+      },
+    );
   }
 
   Future<void> _checkPendingPayment() async {
@@ -280,8 +339,8 @@ class _PaymentViewState extends State<PaymentView>
 
       await supabase.from('payment_requests').insert({
         'user_id': userId,
-        'plan_name': widget.plan.name,
-        'amount': widget.plan.price,
+        'plan_name': _currentPlan.name,
+        'amount': _currentPlan.price,
         'currency': 'BDT',
         'payment_method': '$_selectedMethod ($sender)',
         'transaction_id': trxId,
@@ -521,7 +580,7 @@ class _PaymentViewState extends State<PaymentView>
                 child: _summaryCard(
                   isDark,
                   label: 'প্যাকেজ',
-                  value: widget.plan.name,
+                  value: _currentPlan.name,
                   bgColor: isDark
                       ? const Color(0xFF18181B)
                       : const Color(0xFFF8FAFC),
@@ -536,24 +595,67 @@ class _PaymentViewState extends State<PaymentView>
                 child: _summaryCard(
                   isDark,
                   label: 'পরিশোধ করতে হবে',
-                  value: '৳ ${widget.plan.price}.00',
+                  value: '৳ ${_currentPlan.price}.00',
                   bgColor: isDark
-                      ? const Color(0xFF2D1515)
-                      : const Color(0xFFFEF2F2),
+                      ? const Color(0xFF0D2506)
+                      : const Color(0xFFF0FDF4),
                   borderColor: isDark
-                      ? const Color(0xFF7F1D1D).withValues(alpha: 0.4)
-                      : const Color(0xFFFEE2E2),
+                      ? const Color(0xFF16A34A).withValues(alpha: 0.5)
+                      : const Color(0xFFBBF7D0),
                   valueColor: isDark
-                      ? const Color(0xFFF87171)
-                      : const Color(0xFFDC2626),
+                      ? const Color(0xFF4ADE80)
+                      : const Color(0xFF16A34A),
                   labelColor: isDark
-                      ? const Color(0xFFF87171)
-                      : const Color(0xFFDC2626),
+                      ? const Color(0xFF4ADE80)
+                      : const Color(0xFF16A34A),
+                  badge: _appliedCoupon != null
+                      ? '🏷️ ${_appliedCoupon!.code}'
+                      : null,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+
+          // ── Coupon prompt / remove coupon text link (no box) ──────────
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 4),
+              child: GestureDetector(
+                onTap: () {
+                  if (_appliedCoupon != null) {
+                    setState(() {
+                      _appliedCoupon = null;
+                      _currentPlan = widget.plan;
+                    });
+                    AppPopups.info(context, message: 'কুপন মুছে ফেলা হয়েছে');
+                  } else {
+                    _openCouponSheet();
+                  }
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Text(
+                    _appliedCoupon != null ? 'কুপন রিমুভ করুন' : 'কুপন আছে?',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: _appliedCoupon != null
+                          ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                          : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                      decoration: TextDecoration.underline,
+                      decorationColor: _appliedCoupon != null
+                          ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                          : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
           // Merchant number instruction card
           Container(
@@ -1467,6 +1569,7 @@ class _PaymentViewState extends State<PaymentView>
     required Color valueColor,
     Color? labelColor,
     Color? borderColor,
+    String? badge,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -1510,6 +1613,26 @@ class _PaymentViewState extends State<PaymentView>
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
           ),
+          if (badge != null) ...[
+            const SizedBox(height: 5),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFF004633).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                badge,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF004633),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ],
       ),
     );

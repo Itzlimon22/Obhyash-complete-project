@@ -17,12 +17,14 @@ import {
   MessageSquare,
   School,
   Sparkles,
+  Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ReportHealthBar } from '@/components/admin/reports/report-health-bar';
 import { ReportInspectorDrawer } from '@/components/admin/reports/report-inspector-drawer';
 import { ReportBulkActions } from '@/components/admin/reports/report-bulk-actions';
 import { MathRenderer } from '@/components/common/MathRenderer';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 const REASON_PILLS = [
   { id: 'All', label: 'সকল ধরণ' },
@@ -110,6 +112,45 @@ export default function AdminReportsPage() {
     }
   };
 
+  const exportCSV = () => {
+    if (!reports || reports.length === 0) {
+      toast.error('এক্সপোর্ট করার মতো কোনো রিপোর্ট নেই');
+      return;
+    }
+
+    const success = exportToCSV({
+      filename: `question_reports_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
+        'Report ID',
+        'Student Name',
+        'Student Phone',
+        'Issue Reason',
+        'Description',
+        'Question ID',
+        'Question Text',
+        'Status',
+        'Admin Comment',
+        'Submitted Date & Time (24h)',
+      ],
+      rows: reports.map((r) => [
+        r.id,
+        r.reporter?.name || r.reporter_name || 'Student',
+        r.reporter?.phone || 'N/A',
+        r.reason || '',
+        r.description || '',
+        r.question_id || '',
+        r.question?.question || '',
+        r.status,
+        r.admin_comment || '',
+        `${new Date(r.created_at).toLocaleDateString('en-GB')} ${new Date(r.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
+      ]),
+    });
+
+    if (success) {
+      toast.success('প্রশ্ন রিপোর্ট তালিকা সফলভাবে এক্সপোর্ট হয়েছে');
+    }
+  };
+
   const totalPages = Math.max(1, Math.ceil(totalReports / pageSize));
 
   return (
@@ -131,13 +172,23 @@ export default function AdminReportsPage() {
           </p>
         </div>
 
-        <button
-          onClick={fetchReports}
-          className="px-4 py-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <RefreshCcw size={14} className={loading ? 'animate-spin' : ''} />
-          <span>রিফ্রেশ</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={exportCSV}
+            className="px-3.5 py-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+            title="Export CSV"
+          >
+            <Download size={14} />
+            <span>Export CSV</span>
+          </button>
+          <button
+            onClick={fetchReports}
+            className="px-4 py-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-700 dark:text-zinc-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <RefreshCcw size={14} className={loading ? 'animate-spin' : ''} />
+            <span>রিফ্রেশ</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Live Health Metrics Bar ── */}

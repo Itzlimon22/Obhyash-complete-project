@@ -31,6 +31,7 @@ import EditUserModal from '@/components/admin/user-management/EditUserModal';
 import TeacherStatsModal from '@/components/admin/user-management/TeacherStatsModal';
 import ResetPasswordModal from '@/components/admin/user-management/ResetPasswordModal';
 import SuspendUserModal from '@/components/admin/user-management/SuspendUserModal';
+import { exportToCSV } from '@/lib/utils/export-csv';
 
 export default function UserManagementPage() {
   const {
@@ -150,41 +151,50 @@ export default function UserManagementPage() {
   };
 
   const handleExport = () => {
-    toast.success('Preparing user data export...');
-    setTimeout(() => {
-      const csv = [
-        [
-          'Name',
-          'Email',
-          'Phone',
-          'Role',
-          'Status',
-          'Institute',
-          'Exams Taken',
-          'Created At',
-        ].join(','),
-        ...filteredUsers.map((user) =>
-          [
-            user.name || '',
-            user.email || '',
-            user.phone || '',
-            user.role,
-            user.status,
-            user.institute || '',
-            user.enrolledExams,
-            new Date(user.lastActive).toLocaleDateString(),
-          ].join(','),
-        ),
-      ].join('\n');
+    if (!filteredUsers || filteredUsers.length === 0) {
+      toast.error('এক্সপোর্ট করার মতো কোনো ইউজার নেই');
+      return;
+    }
 
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `users-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      toast.success('User data exported successfully!');
-    }, 1000);
+    const success = exportToCSV({
+      filename: `users_directory_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
+        'User ID',
+        'Student ID',
+        'Full Name',
+        'Email',
+        'Phone Number',
+        'Role',
+        'Account Status',
+        'Subscription Plan',
+        'Subscription Status',
+        'Institution',
+        'HSC Batch',
+        'Exams Taken',
+        'Last Active (24h)',
+      ],
+      rows: filteredUsers.map((user) => [
+        user.id,
+        user.student_id || 'N/A',
+        user.name || 'Unknown',
+        user.email || 'N/A',
+        user.phone || 'N/A',
+        user.role || 'Student',
+        user.status || 'Active',
+        user.subscription?.plan || 'Free',
+        user.subscription?.status || 'Inactive',
+        user.institute || 'N/A',
+        user.batch || 'N/A',
+        user.enrolledExams || 0,
+        user.lastActive
+          ? `${new Date(user.lastActive).toLocaleDateString('en-GB')} ${new Date(user.lastActive).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`
+          : 'N/A',
+      ]),
+    });
+
+    if (success) {
+      toast.success('ইউজার ডিরেক্টরি শিট সফলভাবে এক্সপোর্ট হয়েছে');
+    }
   };
 
   const stats =

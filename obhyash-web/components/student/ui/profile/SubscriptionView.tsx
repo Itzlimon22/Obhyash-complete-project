@@ -9,6 +9,7 @@ import {
 } from '@/lib/types';
 import PricingCard from './subscription/PricingCard';
 import ManualPaymentModal from './subscription/ManualPaymentModal';
+import { CouponModal } from './subscription/CouponModal';
 import { toast } from 'sonner';
 import {
   getSubscriptionPlans,
@@ -17,6 +18,7 @@ import {
   submitManualPayment,
   getUserActiveSubscription,
 } from '@/services/database';
+import { calculateCouponDiscount, AppliedCoupon } from '@/lib/utils/coupon-system';
 import { cn } from '@/lib/utils';
 import {
   Zap,
@@ -27,6 +29,9 @@ import {
   CheckCircle2,
   XCircle,
   Check,
+  Tag,
+  Sparkles,
+  X,
 } from 'lucide-react';
 
 // ── Comparison table feature matrix ──────────────────────────────────────────
@@ -136,6 +141,8 @@ const SubscriptionView: React.FC = () => {
     null,
   );
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -160,9 +167,33 @@ const SubscriptionView: React.FC = () => {
     fetchData();
   }, []);
 
+  const handleApplyCoupon = (code: string): boolean => {
+    // Validate with reference 149 plan
+    const result = calculateCouponDiscount(code, 149);
+    if (result.isValid && result.appliedCoupon) {
+      setAppliedCoupon(result.appliedCoupon);
+      return true;
+    }
+    return false;
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+  };
+
   const handlePlanSelect = (plan: SubscriptionPlan) => {
     if (plan.id === 'free' || plan.id === currentPlanId) return;
-    setSelectedPlan(plan);
+
+    // Apply coupon discount to selected plan if active
+    let effectivePlan = { ...plan };
+    if (appliedCoupon && plan.price > 0) {
+      const discount = calculateCouponDiscount(appliedCoupon.code, plan.price);
+      if (discount.appliedCoupon) {
+        effectivePlan.price = discount.appliedCoupon.finalPrice;
+      }
+    }
+
+    setSelectedPlan(effectivePlan);
     setIsPaymentModalOpen(true);
   };
 
@@ -246,15 +277,47 @@ const SubscriptionView: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
-            {premiumPlans.map((plan) => (
-              <PricingCard
-                key={plan.id}
-                plan={plan}
-                isCurrent={currentPlanId === plan.id}
-                onSelect={() => handlePlanSelect(plan)}
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
+              {premiumPlans.map((plan) => (
+                <PricingCard
+                  key={plan.id}
+                  plan={plan}
+                  isCurrent={currentPlanId === plan.id}
+                  onSelect={() => handlePlanSelect(plan)}
+                  appliedCoupon={appliedCoupon}
+                  onOpenCouponModal={() => setIsCouponModalOpen(true)}
+                  onRemoveCoupon={handleRemoveCoupon}
+                />
+              ))}
+            </div>
+
+            {/* Global Coupon Bar Below Packages */}
+            <div className="max-w-4xl mx-auto flex items-center justify-center">
+              {appliedCoupon ? (
+                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl shadow-sm text-xs text-emerald-800 dark:text-emerald-300">
+                  <Sparkles size={14} className="text-amber-500 shrink-0" />
+                  <span>
+                    কুপন <strong>{appliedCoupon.code}</strong> কার্যকর রয়েছে (৳{appliedCoupon.discountAmount} ছাড়)
+                  </span>
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="ml-2 text-xs font-bold text-red-600 hover:text-red-700 underline"
+                  >
+                    মুছে ফেলুন
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsCouponModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-neutral-600 dark:text-neutral-400 hover:text-emerald-700 dark:hover:text-emerald-400 font-semibold transition-all group underline underline-offset-4"
+                >
+                  <Tag size={13} className="text-emerald-500" />
+                  <span>কুপন আছে?</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
       </section>
@@ -343,6 +406,15 @@ const SubscriptionView: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* ── COUPON MODAL POPUP ────────────────────────────────────────────── */}
+      <CouponModal
+        isOpen={isCouponModalOpen}
+        onClose={() => setIsCouponModalOpen(false)}
+        appliedCoupon={appliedCoupon}
+        onApplyCoupon={handleApplyCoupon}
+        onRemoveCoupon={handleRemoveCoupon}
+      />
     </div>
   );
 };

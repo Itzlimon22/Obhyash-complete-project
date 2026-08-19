@@ -3,6 +3,8 @@ import { X, Search, Filter, Download, Activity } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
+import { exportToCSV } from '@/lib/utils/export-csv';
+
 interface ActivityLog {
   id: string;
   activity_type: string;
@@ -79,26 +81,26 @@ export default function ActivityLogModal({
   };
 
   const handleExport = () => {
-    const csvContent = [
-      ['Date', 'Type', 'Description'].join(','),
-      ...activities.map((a) =>
-        [
-          new Date(a.created_at).toLocaleString(),
-          a.activity_type,
-          `"${a.description}"`,
-        ].join(','),
-      ),
-    ].join('\n');
+    if (!activities || activities.length === 0) {
+      toast.error('No activities to export');
+      return;
+    }
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `activity-log-${userName}-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast.success('Activity log exported');
+    const success = exportToCSV({
+      filename: `activity_log_${(userName || 'user').toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: ['Log ID', 'Date & Time (24h)', 'Activity Type', 'Description', 'Metadata'],
+      rows: activities.map((a) => [
+        a.id,
+        `${new Date(a.created_at).toLocaleDateString('en-GB')} ${new Date(a.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
+        a.activity_type,
+        a.description || '',
+        a.metadata ? JSON.stringify(a.metadata) : '',
+      ]),
+    });
+
+    if (success) {
+      toast.success('Activity log exported');
+    }
   };
 
   const filteredActivities =

@@ -25,6 +25,8 @@ import { FeatureRequestModal } from '@/components/admin/feature-requests/feature
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+import { exportToCSV } from '@/lib/utils/export-csv';
+
 export default function AdminFeatureRequestsPage() {
   const [featureRequests, setFeatureRequests] = useState<AppFeatureRequest[]>(
     [],
@@ -93,32 +95,39 @@ export default function AdminFeatureRequestsPage() {
 
   const exportCSV = () => {
     if (!featureRequests || featureRequests.length === 0) {
-      toast.error('No feature requests to export');
+      toast.error('এক্সপোর্ট করার মতো কোনো ফিচার প্রস্তাবনা নেই');
       return;
     }
 
-    const csvContent = [
-      ['ID', 'Reporter Name', 'Email', 'Category', 'Title', 'Description', 'Status', 'Date & Time (24h)', 'Admin Feedback'],
-      ...featureRequests.map((r) => [
+    const success = exportToCSV({
+      filename: `feature_requests_${new Date().toISOString().split('T')[0]}.csv`,
+      headers: [
+        'Request ID',
+        'Student Name',
+        'Email',
+        'Category',
+        'Feature Title',
+        'Description',
+        'Status',
+        'Admin Feedback',
+        'Submitted Date & Time (24h)',
+      ],
+      rows: featureRequests.map((r) => [
         r.id,
         r.user?.name || 'Student',
         r.user?.email || 'N/A',
         r.category,
-        `"${(r.title || '').replace(/"/g, '""')}"`,
-        `"${(r.description || '').replace(/"/g, '""')}"`,
+        r.title || '',
+        r.description || '',
         r.status,
-        `${new Date(r.created_at).toLocaleDateString('en-GB')} ${new Date(r.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
-        `"${(r.admin_feedback || '').replace(/"/g, '""')}"`,
+        r.admin_feedback || '',
+        `${new Date(r.created_at).toLocaleDateString('en-GB')} ${new Date(r.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}`,
       ]),
-    ]
-      .map((e) => e.join(','))
-      .join('\n');
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `feature_requests_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+    if (success) {
+      toast.success('ফিচার প্রস্তাবনা শিট সফলভাবে ডাউনলোড হয়েছে');
+    }
   };
 
   const getStatusBadge = (status: FeatureRequestStatus) => {
