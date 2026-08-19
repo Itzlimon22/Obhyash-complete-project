@@ -728,15 +728,17 @@ BEGIN
     END IF;
 END $$;
 
--- 3. Function to generate clean student IDs (OBH-10001, OBH-10002, ...)
+-- 3. Function to generate random non-serial student IDs (e.g. OBH-74921, OBH-38502, ...)
 CREATE OR REPLACE FUNCTION public.generate_next_student_id()
 RETURNS TEXT AS $$
 DECLARE
     v_id TEXT;
     v_exists BOOLEAN;
+    v_random_num INTEGER;
 BEGIN
     LOOP
-        v_id := 'OBH-' || nextval('public.student_id_seq')::TEXT;
+        v_random_num := floor(random() * (99999 - 10000 + 1) + 10000)::INTEGER;
+        v_id := 'OBH-' || v_random_num::TEXT;
         SELECT EXISTS (SELECT 1 FROM public.users WHERE student_id = v_id) INTO v_exists;
         IF NOT v_exists THEN
             RETURN v_id;

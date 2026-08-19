@@ -510,7 +510,7 @@ class _PaymentViewState extends State<PaymentView>
 
   Widget _buildDetailsTab(bool isDark) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -523,9 +523,12 @@ class _PaymentViewState extends State<PaymentView>
                   label: 'প্যাকেজ',
                   value: widget.plan.name,
                   bgColor: isDark
-                      ? const Color(0xFF1C1C1E)
-                      : const Color(0xFFF5F5F5),
-                  valueColor: isDark ? Colors.white : const Color(0xFF000000),
+                      ? const Color(0xFF18181B)
+                      : const Color(0xFFF8FAFC),
+                  borderColor: isDark
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFE2E8F0),
+                  valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(width: 12),
@@ -535,111 +538,158 @@ class _PaymentViewState extends State<PaymentView>
                   label: 'পরিশোধ করতে হবে',
                   value: '৳ ${widget.plan.price}.00',
                   bgColor: isDark
-                      ? const Color(0xFF3F1515) // red-900/20 approx
-                      : const Color(0xFFFEF2F2), // red-50
+                      ? const Color(0xFF2D1515)
+                      : const Color(0xFFFEF2F2),
                   borderColor: isDark
-                      ? const Color(0xFF7F1D1D).withValues(alpha: 0.3)
+                      ? const Color(0xFF7F1D1D).withValues(alpha: 0.4)
                       : const Color(0xFFFEE2E2),
                   valueColor: isDark
                       ? const Color(0xFFF87171)
-                      : const Color(0xFFB91C1C), // red-400 : red-600
+                      : const Color(0xFFDC2626),
                   labelColor: isDark
                       ? const Color(0xFFF87171)
-                      : const Color(0xFFB91C1C),
+                      : const Color(0xFFDC2626),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Merchant number instruction card
           Container(
             decoration: BoxDecoration(
-              color: isDark ? Colors.black : Colors.white,
+              color: isDark ? const Color(0xFF141416) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
                     ? const Color(0xFF059669)
-                    : const Color(0xFFA7F3D0), // emerald-200
-                width: 2,
+                    : const Color(0xFFA7F3D0),
+                width: 1.5,
               ),
             ),
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করো',
+                  'অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'HindSiliguri',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                     color: isDark
-                        ? const Color(0xFFD4D4D4)
-                        : const Color(0xFF27272A),
+                        ? const Color(0xFFF4F4F5)
+                        : const Color(0xFF18181B),
                   ),
                 ),
                 const SizedBox(height: 12),
 
-                // Copyable merchant number
-                GestureDetector(
-                  onTap: _copyNumber,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
+                // Copyable merchant number container
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1F1F23)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(10),
+                          ? const Color(0xFF2E2E33)
+                          : const Color(0xFFE2E8F0),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'bKash/Nagad (Send Money)',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: isDark
-                                  ? const Color(0xFFA3A3A3)
-                                  : const Color(0xFF737373),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'bKash / Nagad (Send Money)',
+                              style: TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? const Color(0xFFA1A1AA)
+                                    : const Color(0xFF64748B),
+                              ),
                             ),
-                           maxLines: 1, overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 2),
+                            Text(
+                              _merchantNumber,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.2,
+                                fontFamily: 'monospace',
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '01946855793', // Web uses 01234567890 in display but let's put real one
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
-                            fontFamily: 'monospace',
+                      ),
+                      InkWell(
+                        onTap: _copyNumber,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
                             color: isDark
-                                ? Colors.white
-                                : const Color(0xFF000000),
+                                ? const Color(0xFF27272A)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF3F3F46)
+                                  : const Color(0xFFCBD5E1),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.copy,
+                                size: 14,
+                                color: isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF059669),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'কপি',
+                                style: TextStyle(
+                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF059669),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Icon(
-                          LucideIcons.copy,
-                          size: 16,
-                          color: isDark
-                              ? const Color(0xFFA3A3A3)
-                              : const Color(0xFF737373),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 12),
 
                 // Step instructions
                 ...[
-                  'উপরের নম্বরে Send Money করো।',
-                  'Reference হিসেবে তোমার মোবাইল নম্বর দাও।',
-                  'নিচের ফর্মে তোমার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID দাও।',
+                  'উপরের নম্বরে Send Money করুন।',
+                  'Reference হিসেবে আপনার মোবাইল নম্বর দিন।',
+                  'নিচের ফর্মে আপনার পেমেন্ট মেথড, প্রেরকের মোবাইল নম্বর এবং TrxID দিন।',
                 ].map(
                   (step) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
@@ -648,14 +698,16 @@ class _PaymentViewState extends State<PaymentView>
                       children: [
                         Container(
                           margin: const EdgeInsets.only(
-                            top: 6,
+                            top: 7,
                             right: 8,
                             left: 4,
                           ),
-                          width: 4,
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFA3A3A3),
+                          width: 4.5,
+                          height: 4.5,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF71717A),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -663,12 +715,14 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             step,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontFamily: 'HindSiliguri',
+                              fontSize: 13.5,
+                              height: 1.4,
                               color: isDark
-                                  ? const Color(0xFFA3A3A3)
-                                  : const Color(0xFF737373),
+                                  ? const Color(0xFFD4D4D8)
+                                  : const Color(0xFF334155),
                             ),
-                           maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ],
                     ),
@@ -677,22 +731,60 @@ class _PaymentViewState extends State<PaymentView>
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // Saved Payment Methods
-          if (_savedMethods.isNotEmpty) ...[
-            Text(
-              'SAVED PAYMENT METHODS',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                color: isDark
-                    ? const Color(0xFF737373)
-                    : const Color(0xFFA3A3A3),
+          // Saved Payment Methods Header with Edit / Add Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'SAVED PAYMENT METHODS',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: isDark
+                      ? const Color(0xFFA1A1AA)
+                      : const Color(0xFF64748B),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              InkWell(
+                onTap: () => _openManagePaymentMethodsSheet(isDark),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _savedMethods.isEmpty ? LucideIcons.plusCircle : LucideIcons.edit3,
+                        size: 14,
+                        color: isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF059669),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _savedMethods.isEmpty ? 'মেথড যোগ করুন' : 'এডিট / যোগ করুন',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? const Color(0xFF34D399)
+                              : const Color(0xFF059669),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          if (_savedMethods.isNotEmpty)
             ..._savedMethods.map((method) {
               final isSelected =
                   _selectedMethod.toLowerCase() == method.type.toLowerCase() &&
@@ -706,8 +798,8 @@ class _PaymentViewState extends State<PaymentView>
                       _selectedMethod = method.type.toLowerCase() == 'bkash'
                           ? 'bKash'
                           : method.type.toLowerCase() == 'nagad'
-                          ? 'Nagad'
-                          : method.type;
+                              ? 'Nagad'
+                              : method.type;
                       _senderController.text = method.number;
                     });
                   },
@@ -716,30 +808,30 @@ class _PaymentViewState extends State<PaymentView>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? (isDark
-                                ? const Color(0xFF059669).withValues(alpha: 0.2)
+                                ? const Color(0xFF059669).withValues(alpha: 0.15)
                                 : const Color(0xFFECFDF5))
-                          : Colors.transparent,
+                          : (isDark ? const Color(0xFF141416) : Colors.white),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
                             ? const Color(0xFF059669)
                             : (isDark
-                                  ? const Color(0xFF1C1C1E)
-                                  : const Color(0xFFE5E5E5)),
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFE2E8F0)),
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 32,
-                          height: 32,
+                          width: 34,
+                          height: 34,
                           decoration: BoxDecoration(
                             color: method.type.toLowerCase() == 'bkash'
-                                ? const Color(0xFFB91C1C)
+                                ? const Color(0xFFD11559)
                                 : method.type.toLowerCase() == 'nagad'
-                                ? const Color(0xFFB91C1C)
-                                : const Color(0xFF737373),
+                                    ? const Color(0xFFE11D48)
+                                    : const Color(0xFF6B21A8),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
@@ -747,8 +839,8 @@ class _PaymentViewState extends State<PaymentView>
                               method.type.toLowerCase() == 'bkash'
                                   ? 'bK'
                                   : method.type.toLowerCase() == 'nagad'
-                                  ? 'N'
-                                  : 'C',
+                                      ? 'N'
+                                      : 'R',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
@@ -763,50 +855,93 @@ class _PaymentViewState extends State<PaymentView>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                method.type,
+                                method.type.toUpperCase(),
                                 style: TextStyle(
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF000000),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               Text(
                                 method.number,
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14.5,
                                   fontFamily: 'monospace',
+                                  fontWeight: FontWeight.w600,
                                   color: isDark
-                                      ? const Color(0xFFA3A3A3)
-                                      : const Color(0xFF737373),
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF64748B),
                                 ),
                               ),
                             ],
                           ),
                         ),
+                        if (isSelected)
+                          const Icon(
+                            LucideIcons.checkCircle2,
+                            size: 18,
+                            color: Color(0xFF059669),
+                          ),
                       ],
                     ),
                   ),
                 ),
               );
-            }),
-            const SizedBox(height: 16),
-          ],
+            })
+          else
+            GestureDetector(
+              onTap: () => _openManagePaymentMethodsSheet(isDark),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF141416) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.plusCircle,
+                      size: 18,
+                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'ভবিষ্যতে সহজে পেমেন্ট করতে আপনার বিকাশ/নগদ নম্বর যোগ করুন',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 12.5,
+                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
 
           // Payment method selector
           Text(
-            'Payment Method',
+            'পেমেন্ট মেথড (Payment Method)',
             style: TextStyle(
-              fontSize: 16,
+              fontFamily: 'HindSiliguri',
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+              color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           AppDropdown<String>(
             value: _selectedMethod,
-            options: ['bKash', 'Nagad', 'Rocket']
+            options: ['bKash', 'Nagad']
                 .map((m) => AppDropdownOption(value: m, label: m))
                 .toList(),
             onChanged: (val) {
@@ -817,17 +952,18 @@ class _PaymentViewState extends State<PaymentView>
 
           // Sender number
           Text(
-            'Your Mobile Number',
+            'প্রেরকের মোবাইল নম্বর (Your Mobile Number)',
             style: TextStyle(
-              fontSize: 16,
+              fontFamily: 'HindSiliguri',
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+              color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
             ),
           ),
           const SizedBox(height: 6),
           _inputField(
             controller: _senderController,
-            hint: 'e.g., 01xxxxxxxxx',
+            hint: 'যেমন: 017xxxxxxxx',
             keyboardType: TextInputType.phone,
             isDark: isDark,
           ),
@@ -835,21 +971,22 @@ class _PaymentViewState extends State<PaymentView>
 
           // TrxID
           Text(
-            'Transaction ID (TrxID)',
+            'ট্রানজেকশন আইডি (TrxID)',
             style: TextStyle(
-              fontSize: 16,
+              fontFamily: 'HindSiliguri',
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+              color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
             ),
           ),
           const SizedBox(height: 6),
           _inputField(
             controller: _trxController,
-            hint: 'Enter the TrxID',
+            hint: 'SMS থেকে প্রাপ্ত TrxID দিন',
             isDark: isDark,
             textCapitalization: TextCapitalization.characters,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Pending Payment Status Alert
           if (_hasPendingPayment) ...[
@@ -1114,8 +1251,9 @@ class _PaymentViewState extends State<PaymentView>
                             Text(
                               item.$2,
                               style: TextStyle(
+                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.bold,
-                                fontSize: 17,
+                                fontSize: 16,
                                 color: isDark
                                     ? Colors.white
                                     : const Color(0xFF000000),
@@ -1124,9 +1262,12 @@ class _PaymentViewState extends State<PaymentView>
                             const SizedBox(height: 2),
                             Text(
                               item.$3,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFFA3A3A3),
+                              style: TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontSize: 13,
+                                color: isDark
+                                    ? const Color(0xFFA1A1AA)
+                                    : const Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -1146,15 +1287,26 @@ class _PaymentViewState extends State<PaymentView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Go to Payment',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'পেমেন্ট করতে এগিয়ে যান',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(LucideIcons.arrowRight, size: 18),
+                ],
               ),
             ),
           ),
@@ -1168,38 +1320,85 @@ class _PaymentViewState extends State<PaymentView>
   Widget _buildInfoTab(bool isDark) {
     final faqs = [
       (
-        q: 'কিভাবে পেমেন্ট করবেন?',
-        a: '১. তোমার বিকাশ/নগদ অ্যাপে যাও। ২. সেন্ড মানি অপশনে যাও। ৩. আমাদের নম্বর দাও। ৪. রেফারেন্সে তোমার নম্বর দাও। ৫. পেমেন্ট শেষে TrxID ফর্মে জমা দাও।',
+        q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
+        a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01946855793 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
       ),
       (
-        q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট আপগ্রেড হবে?',
-        a: 'আমাদের টিম তোমার তথ্য যাচাই করে ৩০ মিনিট থেকে ২ ঘন্টার মধ্যে তোমার একাউন্ট আপগ্রেড করে দিবে।',
+        q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
+        a: 'তথ্য সাবমিট করার পর সাধারণত ৫ থেকে ৩০ মিনিটের মধ্যে আমাদের ভেরিফিকেশন টিম যাচাই করে আপনার একাউন্ট স্বয়ংক্রিয়ভাবে প্রিমিয়াম করে দেয়। সর্বোচ্চ ১-২ ঘণ্টার মধ্যে নিশ্চিতভাবে এক্টিভেশন সম্পন্ন হয়।',
       ),
       (
-        q: 'ট্রানজেকশন আইডি (TrxID) খুঁজে না পেলে কী করব?',
-        a: 'তোমার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করো। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করো।',
+        q: 'ট্রানজেকশন আইডি (TrxID) কোথায় পাব?',
+        a: '• বিকাশ: পেমেন্ট সফল হওয়ার পর স্ক্রিনে, ইনবক্স স্টেটমেন্টে অথবা আসা SMS-এ TrxID (যেমন: BLA7X8Y9Z) দেখতে পাবেন।\n• নগদ: নগদ অ্যাপের "লেনদেন" হিস্ট্রি বা ফিরতি SMS-এ TxnID দেখতে পাবেন।',
       ),
       (
-        q: 'ভুল নম্বরে টাকা পাঠালে কী হবে?',
-        a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করো।',
+        q: 'ভুল TrxID বা ভুল নম্বর সাবমিট করলে কি করব?',
+        a: 'ভুল তথ্য দেওয়া হয়ে থাকলে "বিস্তারিত" ট্যাবে থাকা পেন্ডিং রিকোয়েস্ট থেকে "আবেদন বাতিল" বাটনে ক্লিক করে সাথে সাথে সঠিক তথ্য দিয়ে পুনরায় আবেদন করতে পারবেন। অথবা আমাদের হোয়াটসঅ্যাপ সাপোর্টে যোগাযোগ করতে পারেন।',
       ),
       (
-        q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',
-        a: 'আনলিমিটেড এক্সাম, AI বিস্তারিত ব্যাখ্যা, এবং পারফরম্যান্স এনালাইসিস রিপোর্ট।',
+        q: 'রেফারেন্সে (Reference) কিছু না দিলে কি সমস্যা হবে?',
+        a: 'না, কোনো সমস্যা নেই। রেফারেন্সে আপনার নম্বর দেওয়া সুবিধাজনক, তবে রেফারেন্স না দিলেও সঠিক TrxID ফর্মে সাবমিট করলেই পেমেন্ট সফলভাবে শনাক্ত করা যাবে।',
+      ),
+      (
+        q: 'প্যাকেজের মেয়াদ শেষ হলে কি স্বয়ংক্রিয়ভাবে টাকা কাটবে?',
+        a: 'না, এখানে কোনো অটো-রিনিউ বা স্বয়ংক্রিয় টাকা কাটার সুযোগ নেই। মেয়াদ শেষ হলে আপনি নিজের সুবিধাজনক সময়ে পুনরায় রিনিউ করতে পারবেন।',
+      ),
+      (
+        q: 'টাকা কেটে নিয়েছে কিন্তু কনফার্মেশন পাইনি?',
+        a: 'কখনও নেটওয়ার্ক সমস্যার কারণে SMS আসতে দেরি হতে পারে। আপনার বিকাশ/নগদ অ্যাপের স্টেটমেন্ট চেক করে প্রাপ্ত TrxID ফর্মে সাবমিট করুন অথবা সরাসরি সাপোর্টে যোগাযোগ করুন।',
+      ),
+      (
+        q: 'যেকোনো প্রয়োজনে জরুরি সহায়তা কোথায় পাব?',
+        a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01946855793) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
       ),
     ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF141416) : const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFBBF7D0),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  LucideIcons.helpCircle,
+                  size: 20,
+                  color: Color(0xFF059669),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'পেমেন্ট সংক্রান্ত যেকোনো প্রশ্নে নিচের উত্তরগুলো দেখে নিন',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? const Color(0xFFE4E4E7)
+                          : const Color(0xFF166534),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           ...faqs.map(
             (faq) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 10),
               child: _FaqTile(q: faq.q, a: faq.a, isDark: isDark),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -1207,19 +1406,53 @@ class _PaymentViewState extends State<PaymentView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Go to Payment',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'পেমেন্ট করতে এগিয়ে যান',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(LucideIcons.arrowRight, size: 18),
+                ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openManagePaymentMethodsSheet(bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _PaymentMethodsBottomSheet(
+        isDark: isDark,
+        savedMethods: _savedMethods,
+        selectedMethod: _selectedMethod,
+        selectedNumber: _senderController.text,
+        onSelectMethod: (method) {
+          setState(() {
+            _selectedMethod = method.type.toLowerCase() == 'nagad'
+                ? 'Nagad'
+                : 'bKash';
+            _senderController.text = method.number;
+          });
+        },
+        onMethodsChanged: _fetchSavedMethods,
       ),
     );
   }
@@ -1236,16 +1469,16 @@ class _PaymentViewState extends State<PaymentView>
     Color? borderColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: borderColor != null
             ? Border.all(color: borderColor)
             : Border.all(
                 color: isDark
-                    ? const Color(0xFF1C1C1E)
-                    : const Color(0xFFE5E5E5),
+                    ? const Color(0xFF27272A)
+                    : const Color(0xFFE2E8F0),
               ),
       ),
       child: Column(
@@ -1254,21 +1487,24 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             label.toUpperCase(),
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+              fontFamily: 'HindSiliguri',
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
               color:
                   labelColor ??
-                  (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373)),
+                  (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontFamily: 'HindSiliguri',
+              fontSize: 15.5,
+              fontWeight: FontWeight.w900,
               color: valueColor,
+              height: 1.2,
             ),
             maxLines: 2,
             textAlign: TextAlign.center,
@@ -1291,29 +1527,29 @@ class _PaymentViewState extends State<PaymentView>
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       style: TextStyle(
-        color: isDark ? Colors.white : const Color(0xFF000000),
+        color: isDark ? Colors.white : const Color(0xFF0F172A),
         fontWeight: FontWeight.w600,
         fontFamily: 'monospace',
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
-          fontFamily: 'sans-serif',
+          color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
+          fontFamily: 'HindSiliguri',
           fontWeight: FontWeight.normal,
         ),
         filled: true,
-        fillColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+        fillColor: isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -1323,6 +1559,602 @@ class _PaymentViewState extends State<PaymentView>
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Saved Payment Methods Bottom Sheet (Max 50% Height) ──────────────────────
+
+class _PaymentMethodsBottomSheet extends StatefulWidget {
+  final bool isDark;
+  final List<SavedPaymentMethod> savedMethods;
+  final String selectedMethod;
+  final String selectedNumber;
+  final ValueChanged<SavedPaymentMethod> onSelectMethod;
+  final VoidCallback onMethodsChanged;
+
+  const _PaymentMethodsBottomSheet({
+    required this.isDark,
+    required this.savedMethods,
+    required this.selectedMethod,
+    required this.selectedNumber,
+    required this.onSelectMethod,
+    required this.onMethodsChanged,
+  });
+
+  @override
+  State<_PaymentMethodsBottomSheet> createState() =>
+      _PaymentMethodsBottomSheetState();
+}
+
+class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> {
+  int _currentTab = 0; // 0 = List, 1 = Add New
+  String _newType = 'bKash';
+  final _phoneController = TextEditingController();
+  bool _isSaving = false;
+  late List<SavedPaymentMethod> _localMethods;
+
+  @override
+  void initState() {
+    super.initState();
+    _localMethods = List.from(widget.savedMethods);
+    if (_localMethods.isEmpty) {
+      _currentTab = 1; // Default to Add if none saved
+    }
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveMethod() async {
+    final phone = _phoneController.text.trim();
+    final phoneRegex = RegExp(r'^01[3-9]\d{8}$');
+    if (!phoneRegex.hasMatch(phone)) {
+      AppPopups.warning(
+        context,
+        message: 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx)',
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+
+      final dbType = _newType.toLowerCase();
+
+      final res = await supabase
+          .from('payment_methods')
+          .insert({
+            'user_id': userId,
+            'type': dbType,
+            'number': phone,
+            'is_default': false,
+          })
+          .select()
+          .single();
+
+      final newMethod = SavedPaymentMethod.fromJson(res);
+
+      if (mounted) {
+        widget.onMethodsChanged();
+        widget.onSelectMethod(newMethod);
+        Navigator.pop(context);
+        AppPopups.success(
+          context,
+          message: 'পেমেন্ট মেথড সফলভাবে যোগ করা হয়েছে!',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        AppPopups.error(
+          context,
+          message: 'পেমেন্ট মেথড সংরক্ষণে সমস্যা হয়েছে।',
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteMethod(SavedPaymentMethod method) async {
+    try {
+      final supabase = Supabase.instance.client;
+      await supabase.from('payment_methods').delete().eq('id', method.id);
+
+      if (mounted) {
+        setState(() {
+          _localMethods.removeWhere((m) => m.id == method.id);
+          if (_localMethods.isEmpty) {
+            _currentTab = 1;
+          }
+        });
+        widget.onMethodsChanged();
+        AppPopups.success(context, message: 'পেমেন্ট মেথড মুছে ফেলা হয়েছে');
+      }
+    } catch (e) {
+      if (mounted) {
+        AppPopups.error(context, message: 'মুছে ফেলতে সমস্যা হয়েছে');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final maxHeight = MediaQuery.of(context).size.height * 0.5;
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF141416) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 8),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'পেমেন্ট মেথড ম্যানেজমেন্ট',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(
+                      LucideIcons.x,
+                      size: 20,
+                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+
+            // Tab bar switcher
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _currentTab = 0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _currentTab == 0
+                                ? (isDark ? const Color(0xFF27272A) : Colors.white)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: _currentTab == 0
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'সংরক্ষিত নম্বর (${_localMethods.length})',
+                              style: TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontSize: 13,
+                                fontWeight: _currentTab == 0
+                                    ? FontWeight.w800
+                                    : FontWeight.w600,
+                                color: _currentTab == 0
+                                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                    : (isDark
+                                        ? const Color(0xFFA1A1AA)
+                                        : const Color(0xFF64748B)),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _currentTab = 1),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _currentTab == 1
+                                ? (isDark ? const Color(0xFF27272A) : Colors.white)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: _currentTab == 1
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(LucideIcons.plus, size: 13),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'নতুন যোগ করুন',
+                                  style: TextStyle(
+                                    fontFamily: 'HindSiliguri',
+                                    fontSize: 13,
+                                    fontWeight: _currentTab == 1
+                                        ? FontWeight.w800
+                                        : FontWeight.w600,
+                                    color: _currentTab == 1
+                                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                        : (isDark
+                                            ? const Color(0xFFA1A1AA)
+                                            : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Content Area
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: _currentTab == 0
+                    ? (_localMethods.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.creditCard,
+                                  size: 36,
+                                  color: isDark
+                                      ? const Color(0xFF3F3F46)
+                                      : const Color(0xFFCBD5E1),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'কোনো সেভ করা মেথড নেই',
+                                  style: TextStyle(
+                                    fontFamily: 'HindSiliguri',
+                                    fontSize: 14,
+                                    color: isDark
+                                        ? const Color(0xFFA1A1AA)
+                                        : const Color(0xFF64748B),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                TextButton.icon(
+                                  onPressed: () => setState(() => _currentTab = 1),
+                                  icon: const Icon(LucideIcons.plus, size: 16),
+                                  label: const Text('নতুন মেথড যোগ করুন'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: const Color(0xFF059669),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: _localMethods.length,
+                            separatorBuilder: (context, index) => const SizedBox(height: 8),
+                            itemBuilder: (ctx, i) {
+                              final m = _localMethods[i];
+                              final isSelected = widget.selectedMethod.toLowerCase() ==
+                                      m.type.toLowerCase() &&
+                                  widget.selectedNumber == m.number;
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1C1C1E)
+                                      : const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? const Color(0xFF059669)
+                                        : (isDark
+                                            ? const Color(0xFF27272A)
+                                            : const Color(0xFFE2E8F0)),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: m.type.toLowerCase() == 'bkash'
+                                            ? const Color(0xFFD11559)
+                                            : m.type.toLowerCase() == 'nagad'
+                                                ? const Color(0xFFE11D48)
+                                                : const Color(0xFF6B21A8),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          m.type.toLowerCase() == 'bkash'
+                                              ? 'bK'
+                                              : m.type.toLowerCase() == 'nagad'
+                                                  ? 'N'
+                                                  : 'R',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            m.type.toUpperCase(),
+                                            style: TextStyle(
+                                              fontFamily: 'HindSiliguri',
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF0F172A),
+                                            ),
+                                          ),
+                                          Text(
+                                            m.number,
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              fontFamily: 'monospace',
+                                              color: isDark
+                                                  ? const Color(0xFFA1A1AA)
+                                                  : const Color(0xFF64748B),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        widget.onSelectMethod(m);
+                                        Navigator.pop(context);
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: const Color(0xFF059669),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      child: const Text(
+                                        'ব্যবহার করুন',
+                                        style: TextStyle(
+                                          fontFamily: 'HindSiliguri',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => _deleteMethod(m),
+                                      icon: Icon(
+                                        LucideIcons.trash2,
+                                        size: 16,
+                                        color: isDark
+                                            ? const Color(0xFF71717A)
+                                            : const Color(0xFF94A3B8),
+                                      ),
+                                      padding: const EdgeInsets.all(6),
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ))
+                    : SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Provider select
+                            Row(
+                              children: ['bKash', 'Nagad'].map((prov) {
+                                final isSel = _newType == prov;
+                                return Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _newType = prov),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: isSel
+                                            ? const Color(0xFF059669)
+                                            : (isDark
+                                                ? const Color(0xFF1E1E22)
+                                                : const Color(0xFFF1F5F9)),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: isSel
+                                              ? const Color(0xFF059669)
+                                              : (isDark
+                                                  ? const Color(0xFF27272A)
+                                                  : const Color(0xFFE2E8F0)),
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          prov,
+                                          style: TextStyle(
+                                            fontFamily: 'HindSiliguri',
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                            color: isSel
+                                                ? Colors.white
+                                                : (isDark
+                                                    ? Colors.white
+                                                    : const Color(0xFF0F172A)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Phone Number Input
+                            TextField(
+                              controller: _phoneController,
+                              keyboardType: TextInputType.phone,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'monospace',
+                                fontSize: 15,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: '১১ ডিজিটের মোবাইল নম্বর দিন (01xxxxxxxxx)',
+                                hintStyle: TextStyle(
+                                  color: isDark
+                                      ? const Color(0xFF71717A)
+                                      : const Color(0xFF94A3B8),
+                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 13,
+                                ),
+                                filled: true,
+                                fillColor: isDark
+                                    ? const Color(0xFF18181B)
+                                    : const Color(0xFFF8FAFC),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: isDark
+                                        ? const Color(0xFF27272A)
+                                        : const Color(0xFFE2E8F0),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: isDark
+                                        ? const Color(0xFF27272A)
+                                        : const Color(0xFFE2E8F0),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF059669),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+
+                            // Save button
+                            ElevatedButton(
+                              onPressed: _isSaving ? null : _saveMethod,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF059669),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'সংরক্ষণ ও ব্যবহার করুন',
+                                      style: TextStyle(
+                                        fontFamily: 'HindSiliguri',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1351,13 +2183,16 @@ class _FaqTileState extends State<_FaqTile> {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: widget.isDark
-            ? const Color(0xFF1C1C1E)
-            : const Color(0xFFF5F5F5),
+            ? const Color(0xFF18181B)
+            : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: widget.isDark
-              ? const Color(0xFF27272A)
-              : const Color(0xFFE5E5E5),
+          color: _open
+              ? (widget.isDark ? const Color(0xFF059669) : const Color(0xFF10B981))
+              : (widget.isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFE2E8F0)),
+          width: _open ? 1.2 : 1.0,
         ),
       ),
       child: Column(
@@ -1374,18 +2209,23 @@ class _FaqTileState extends State<_FaqTile> {
                     child: Text(
                       widget.q,
                       style: TextStyle(
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 15,
                         color: widget.isDark
                             ? Colors.white
-                            : const Color(0xFF000000),
+                            : const Color(0xFF0F172A),
                       ),
-                     maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ),
                   ),
                   Icon(
                     _open ? LucideIcons.chevronUp : LucideIcons.chevronDown,
                     size: 18,
-                    color: const Color(0xFFA3A3A3),
+                    color: _open
+                        ? const Color(0xFF059669)
+                        : (widget.isDark
+                            ? const Color(0xFFA1A1AA)
+                            : const Color(0xFF64748B)),
                   ),
                 ],
               ),
@@ -1396,16 +2236,19 @@ class _FaqTileState extends State<_FaqTile> {
               height: 1,
               color: widget.isDark
                   ? const Color(0xFF27272A)
-                  : const Color(0xFFE5E5E5),
+                  : const Color(0xFFF1F5F9),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Text(
                 widget.a,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFFA3A3A3),
-                  height: 1.6,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 14,
+                  color: widget.isDark
+                      ? const Color(0xFFD4D4D8)
+                      : const Color(0xFF334155),
+                  height: 1.55,
                 ),
               ),
             ),

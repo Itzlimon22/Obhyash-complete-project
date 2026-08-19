@@ -154,7 +154,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                     'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
                   ],
                   colorTheme: 'emerald',
-                  expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
+                  expiresAt: parsedExp.toIso8601String().length >= 10
                       ? parsedExp.toIso8601String().substring(0, 10)
                       : null,
                 );
@@ -215,20 +215,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-          // HERO BANNER
-          if (_isLoading)
-            Container(
-              height: 180,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
-                borderRadius: BorderRadius.circular(24),
-              ),
-            )
-          else
-            _HeroBanner(isDark: isDark),
-
-          const SizedBox(height: 28),
-
           // ACTIVE SUBSCRIPTION BANNER
           if (!_isLoading && _activeSubscription != null) ...[
             _ActiveSubscriptionBanner(
@@ -430,86 +416,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           const SizedBox(height: 48),
         ],
       ),
-      ),
-    );
-  }
-}
-
-class _HeroBanner extends StatelessWidget {
-  final bool isDark;
-  const _HeroBanner({required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF064E3B), const Color(0xFF022C22)] // Deep emerald gradient
-              : [const Color(0xFF059669), const Color(0xFF059669)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF059669).withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(LucideIcons.zap, size: 14, color: Color(0xFF6EE7B7)),
-                SizedBox(width: 8),
-                Text(
-                  'প্রিমিয়াম প্ল্যান',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'আরো বেশি পড়ো,\nআরো ভালো প্রস্তুতি নাও',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.w900,
-              height: 1.2,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'সীমাহীন পরীক্ষা, AI সাজেশন, বিস্তারিত এনালাইসিস — সব কিছু এক প্ল্যানে',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.85),
-              fontSize: 16,
-              height: 1.5,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -969,7 +875,9 @@ class _TrustBadge extends StatelessWidget {
                     ? const Color(0xFFE5E5E5)
                     : const Color(0xFF171717),
               ),
-             maxLines: 1, overflow: TextOverflow.ellipsis),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -983,35 +891,44 @@ class _ComparisonTable extends StatelessWidget {
   const _ComparisonTable({required this.isDark});
 
   static const _features = [
-    ('দৈনিক মক পরীক্ষা', '৩টি', 'সীমাহীন', false),
     ('অনুশীলন প্রশ্ন', '৫০টি/দিন', 'সীমাহীন', false),
-    ('প্রশ্নব্যাংক অ্যাক্সেস', null, null, true),
-    ('বিস্তারিত ব্যাখ্যা', null, null, false),
-    ('বিষয়ভিত্তিক এনালাইসিস', null, null, false),
-    ('লিডারবোর্ড', null, null, true),
-    ('পেপার স্ক্রিপ্ট আপলোড', null, null, false),
-    ('কাস্টম পরীক্ষা', null, null, false),
-    ('AI সাজেশন', null, null, false),
-    ('ডাউনলোড/প্রিন্ট', null, null, false),
-    ('২৪/৭ সাপোর্ট', null, null, false),
+    ('মডেল টেস্ট ও কাস্টম পরীক্ষা', '৩টি/দিন', 'সীমাহীন', false),
+    ('লাইভ এক্সাম ও প্রতিযোগিতা', 'সীমিত', 'সকল এক্সাম', false),
+    ('অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক', null, null, true),
+    ('প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান', null, null, false),
+    ('বিষয়ভিত্তিক ও পারফরম্যান্স এনালাইসিস', null, null, false),
+    ('মেধা তালিকা ও লাইভ লিডারবোর্ড', null, null, true),
+    ('ডেইলি স্ট্রিক ও রিওয়ার্ড কোয়েস্ট', null, null, true),
+    ('ভুল উত্তর ও বুকমার্ক কালেকশন', null, null, false),
+    ('প্রাইওরিটি হেল্প ও সাপোর্ট', null, null, false),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = isDark ? const Color(0xFF000000) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF141416) : Colors.white;
     final borderColor = isDark
-        ? const Color(0xFF1C1C1E)
-        : const Color(0xFFE5E5E5);
-    final textMain = isDark ? Colors.white : const Color(0xFF000000);
-    final textSub = isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3);
+        ? const Color(0xFF27272A)
+        : const Color(0xFFE2E8F0);
+    final headerBg = isDark
+        ? const Color(0xFF1E1E22)
+        : const Color(0xFFF8FAFC);
+    final textMain = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A);
+    final textSub = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
+    final greenColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+    final crossColor = isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Center(
+        Center(
           child: Text(
-            'ফ্রি বনাম প্রিমিয়াম',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            'ফ্রি বনাম প্রিমিয়াম',
+            style: TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -1031,9 +948,7 @@ class _ComparisonTable extends StatelessWidget {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF000000)
-                      : const Color(0xFFF5F5F5),
+                  color: headerBg,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
@@ -1045,34 +960,43 @@ class _ComparisonTable extends StatelessWidget {
                       child: Text(
                         'ফিচার',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
                           color: textSub,
                         ),
-                       maxLines: 1, overflow: TextOverflow.ellipsis),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     Expanded(
                       child: Center(
                         child: Text(
                           'ফ্রি',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
                             color: textSub,
                           ),
-                         maxLines: 1, overflow: TextOverflow.ellipsis),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.center,
                         child: Text(
-                          'প্রিমিয়াম',
+                          'প্রিমিয়াম',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 15,
                             fontWeight: FontWeight.w900,
-                            color: const Color(0xFF059669),
+                            color: greenColor,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -1086,37 +1010,36 @@ class _ComparisonTable extends StatelessWidget {
                 final String? paidText = feature.$3;
                 final bool isBothTrue = feature.$4;
 
-                Widget buildCellContent(String? text, bool isTrue) {
+                Widget buildCellContent(String? text, bool isTrue, bool isPaidColumn) {
                   if (text != null) {
                     return Text(
                       text,
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: textMain,
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isPaidColumn ? greenColor : textMain,
                       ),
                     );
                   }
                   if (isTrue) {
-                    return const Icon(
+                    return Icon(
                       LucideIcons.check,
-                      size: 16,
-                      color: Color(0xFF15803D),
+                      size: 18,
+                      color: greenColor,
                     );
                   }
                   return Icon(
                     LucideIcons.xCircle,
-                    size: 16,
-                    color: isDark
-                        ? const Color(0xFF27272A)
-                        : const Color(0xFFD4D4D4),
+                    size: 18,
+                    color: crossColor,
                   );
                 }
 
                 return Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 14,
+                    vertical: 13,
                   ),
                   decoration: BoxDecoration(
                     border: Border(top: BorderSide(color: borderColor)),
@@ -1127,16 +1050,25 @@ class _ComparisonTable extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           label,
-                          style: TextStyle(fontSize: 16, color: textMain),
-                         maxLines: 1, overflow: TextOverflow.ellipsis),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: buildCellContent(freeText, isBothTrue),
+                          style: TextStyle(
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            color: textMain,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Expanded(
-                        child: Center(child: buildCellContent(paidText, true)),
+                        child: Center(
+                          child: buildCellContent(freeText, isBothTrue, false),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: buildCellContent(paidText, true, true),
+                        ),
                       ),
                     ],
                   ),

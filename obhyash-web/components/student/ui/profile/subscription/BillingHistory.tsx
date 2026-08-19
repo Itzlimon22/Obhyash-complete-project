@@ -1,19 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Invoice } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Download, Receipt, FileText } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import OfficialReceiptModal from './OfficialReceiptModal';
 
 interface BillingHistoryProps {
   invoices: Invoice[];
-  onDownload: (invoice: Invoice) => void;
+  onDownload?: (invoice: Invoice) => void;
 }
 
 const BillingHistory: React.FC<BillingHistoryProps> = ({
   invoices,
   onDownload,
 }) => {
+  const { user, profile } = useAuth();
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  const handleInvoiceClick = (invoice: Invoice) => {
+    if (onDownload) {
+      onDownload(invoice);
+    } else {
+      setSelectedInvoice(invoice);
+    }
+  };
+
   const getStatusBadge = (status: Invoice['status']) => {
     const styles = {
       paid: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
@@ -29,11 +42,11 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
 
     const labels = {
       paid: 'পরিশোধিত',
-      valid: 'Valid',
+      valid: 'পরিশোধিত',
       pending: 'অপেক্ষমাণ',
-      checking: 'Checking',
+      checking: 'যাচাইাধীন',
       failed: 'ব্যর্থ',
-      rejected: 'Rejected',
+      rejected: 'বাতিল',
     };
 
     return (
@@ -49,71 +62,86 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-800 overflow-hidden">
-      {/* Header */}
-      <div className="p-4 md:p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Receipt className="w-5 h-5 text-neutral-400" />
-          <h3 className="text-base font-bold text-neutral-800 dark:text-white">
-            বিলিং ইতিহাস
-          </h3>
-        </div>
-      </div>
-
-      {/* Content */}
-      {invoices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-          <div className="w-16 h-16 mb-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center">
-            <FileText className="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
+    <>
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-800 overflow-hidden">
+        {/* Header */}
+        <div className="p-4 md:p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Receipt className="w-5 h-5 text-neutral-400" />
+            <h3 className="text-base font-bold text-neutral-800 dark:text-white">
+              বিলিং ইতিহাস
+            </h3>
           </div>
-          <p className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-            কোনো বিল নেই
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-[200px]">
-            তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।
-          </p>
         </div>
-      ) : (
-        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-          {invoices.map((inv) => (
-            <div
-              key={inv.id}
-              className="flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
-            >
-              {/* Left: Plan & Date */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="font-bold text-sm text-neutral-900 dark:text-white truncate">
-                    {inv.planName}
-                  </p>
-                  {getStatusBadge(inv.status)}
-                </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  {inv.date}
-                </p>
-              </div>
 
-              {/* Right: Amount & Download */}
-              <div className="flex items-center gap-4">
-                <span className="font-bold text-sm text-neutral-900 dark:text-white">
-                  {inv.currency}
-                  {inv.amount}
-                </span>
-                {(inv.status === 'paid' || inv.status === 'valid') && (
+        {/* Content */}
+        {invoices.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+            <div className="w-16 h-16 mb-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center">
+              <FileText className="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
+            </div>
+            <p className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              কোনো বিল নেই
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-[200px]">
+              তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            {invoices.map((inv) => (
+              <div
+                key={inv.id}
+                onClick={() => setSelectedInvoice(inv)}
+                className="flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors cursor-pointer"
+              >
+                {/* Left: Plan & Date */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="font-bold text-sm text-neutral-900 dark:text-white truncate">
+                      {inv.planName}
+                    </p>
+                    {getStatusBadge(inv.status)}
+                  </div>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    {inv.date}
+                  </p>
+                </div>
+
+                {/* Right: Amount & Download */}
+                <div className="flex items-center gap-4">
+                  <span className="font-bold text-sm text-neutral-900 dark:text-white">
+                    {inv.currency}
+                    {inv.amount}
+                  </span>
                   <button
-                    onClick={() => onDownload(inv)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleInvoiceClick(inv);
+                    }}
                     className="p-2 text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
-                    title="ডাউনলোড"
+                    title="অফিসিয়াল রিসিট দেখুন ও ডাউনলোড করুন"
                   >
                     <Download className="w-4 h-4" />
                   </button>
-                )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Official Receipt Modal */}
+      {selectedInvoice && (
+        <OfficialReceiptModal
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
+          userName={profile?.name || ''}
+          userEmail={user?.email || ''}
+          userInstitute={profile?.institute || ''}
+        />
       )}
-    </div>
+    </>
   );
 };
 

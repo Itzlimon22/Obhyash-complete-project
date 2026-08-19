@@ -221,7 +221,7 @@ class UserProfile {
     if (id.length >= 8) {
       return 'OBH-${id.replaceAll('-', '').substring(0, 5).toUpperCase()}';
     }
-    return 'OBH-10001';
+    return 'OBH-${id.hashCode.abs().toString().padLeft(5, '0').substring(0, 5)}';
   }
 
   UserProfile copyWith({

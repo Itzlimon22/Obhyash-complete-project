@@ -387,34 +387,36 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Segmented Tab Switcher ──────────────────────────────────────
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF18181B)
+                      : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
                     color: isDark
-                        ? const Color(0xFF18181B)
-                        : const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF27272A)
-                          : const Color(0xFFE2E8F0),
-                    ),
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE2E8F0),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildTabButton(
-                        label: 'নতুন অভিযোগ / পরামর্শ',
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTabButton(
+                        label: 'নতুন অভিযোগ',
                         icon: LucideIcons.send,
                         isActive: _activeTab == 'new',
                         onTap: () => setState(() => _activeTab = 'new'),
                         isDark: isDark,
                       ),
-                      _buildTabButton(
+                    ),
+                    Expanded(
+                      child: _buildTabButton(
                         label: _myComplaints.isEmpty
-                            ? 'আমার তালিক'
-                            : 'আমার তালিক (${_myComplaints.length})',
+                            ? 'আমার তালিকা'
+                            : 'আমার তালিকা (${_toBengaliNumber(_myComplaints.length)})',
                         icon: LucideIcons.clipboardList,
                         isActive: _activeTab == 'my',
                         onTap: () {
@@ -425,11 +427,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         },
                         isDark: isDark,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               if (_activeTab == 'new')
                 _buildNewComplaintForm(isDark)
@@ -444,6 +446,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     );
   }
 
+  String _toBengaliNumber(int number) {
+    const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    String result = number.toString();
+    for (int i = 0; i < 10; i++) {
+      result = result.replaceAll(englishDigits[i], bengaliDigits[i]);
+    }
+    return result;
+  }
+
   // ─── New Complaint Form ─────────────────────────────────────────────────────
 
   Widget _buildNewComplaintForm(bool isDark) {
@@ -453,69 +465,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Support Desk Banner
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF064E3B).withValues(alpha: 0.2)
-                : const Color(0xFFECFDF5),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark
-                  ? const Color(0xFF059669).withValues(alpha: 0.3)
-                  : const Color(0xFFA7F3D0),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF059669).withValues(alpha: 0.3)
-                      : const Color(0xFFD1FAE5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  LucideIcons.shieldCheck,
-                  size: 18,
-                  color: Color(0xFF059669),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'অভ্যাস সাপোর্ট টিম সর্বদা পাশে আছে',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? const Color(0xFF34D399) : const Color(0xFF065F46),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'যেকোনো সমস্যা জানালে দ্রুত সমাধান প্রদান করা হবে।',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF047857),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
         // Anti-Spam / Rate Limit Status Alert
         if (_isPendingLimitReached) ...[
-          const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -1347,7 +1298,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isActive
               ? (isDark ? const Color(0xFF27272A) : Colors.white)
@@ -1364,6 +1316,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               : [],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
@@ -1374,15 +1327,19 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   : const Color(0xFFA3A3A3),
             ),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
-                color: isActive
-                    ? (isDark ? Colors.white : const Color(0xFF059669))
-                    : const Color(0xFFA3A3A3),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
+                  color: isActive
+                      ? (isDark ? Colors.white : const Color(0xFF059669))
+                      : const Color(0xFFA3A3A3),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

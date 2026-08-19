@@ -37,30 +37,64 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
 
   if (data) {
     // Map DB plans to Frontend SubscriptionPlan type
-    const dbPlans = data.map((plan: DbSubscriptionPlan) => ({
-      id: plan.id,
-      name: plan.display_name,
-      price: plan.price,
-      currency: plan.currency || '৳',
-      billingCycle:
-        plan.duration_days >= 365
-          ? 'Yearly'
-          : plan.duration_days >= 90
-            ? 'Quarterly'
-            : plan.duration_days >= 30
-              ? 'Monthly'
-              : `${plan.duration_days} Days`,
-      features: plan.features || [],
-      colorTheme:
-        plan.color_theme ||
-        (plan.display_name.toLowerCase().includes('year')
-          ? 'emerald'
-          : plan.price > 0
-            ? 'indigo'
-            : 'slate'),
-      isPopular:
-        plan.is_popular ?? plan.display_name.toLowerCase().includes('offer'),
-    }));
+    const dbPlans = data.map((plan: DbSubscriptionPlan) => {
+      let displayName = plan.display_name;
+      if (
+        plan.duration_days >= 180 ||
+        displayName.includes('৬ মাস') ||
+        displayName.includes('মাস্টার') ||
+        displayName.includes('master_pro') ||
+        displayName.includes('full_session')
+      ) {
+        displayName = 'ফুল সেশন প্যাক (৬ মাস)';
+      } else if (
+        plan.duration_days >= 90 ||
+        displayName.includes('৩ মাস') ||
+        displayName.includes('র‍্যাঙ্কার্স') ||
+        displayName.includes('pro') ||
+        displayName.includes('admission')
+      ) {
+        displayName = 'এডমিশন প্যাক (৩ মাস)';
+      } else if (
+        (plan.duration_days >= 28 && plan.duration_days <= 60) ||
+        displayName.includes('১ মাস') ||
+        displayName.includes('বুস্টার') ||
+        displayName.includes('exam_ready') ||
+        displayName.includes('monthly')
+      ) {
+        displayName = 'মাসিক প্ল্যান (১ মাস)';
+      }
+
+      return {
+        id: plan.id,
+        name: displayName,
+        price: plan.price,
+        currency: plan.currency || '৳',
+        duration_days: plan.duration_days,
+        billingCycle:
+          plan.duration_days >= 365
+            ? 'Yearly'
+            : plan.duration_days >= 180
+              ? 'Half-Yearly'
+              : plan.duration_days >= 90
+                ? 'Quarterly'
+                : plan.duration_days >= 30
+                  ? 'Monthly'
+                  : `${plan.duration_days} Days`,
+        features: plan.features || [],
+        colorTheme:
+          plan.color_theme ||
+          (plan.duration_days >= 180
+            ? 'amber'
+            : plan.duration_days >= 90
+              ? 'emerald'
+              : plan.price > 0
+                ? 'indigo'
+                : 'slate'),
+        isPopular:
+          plan.is_popular ?? (plan.duration_days >= 90 && plan.duration_days < 180),
+      };
+    });
 
     return dbPlans;
   }

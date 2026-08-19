@@ -12,9 +12,12 @@ import {
   History,
   RefreshCw,
   ArrowUpRight,
+  Download,
 } from 'lucide-react';
 import { Invoice, SubscriptionPlan } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/components/auth/AuthProvider';
+import OfficialReceiptModal from '../subscription/OfficialReceiptModal';
 import {
   getUserInvoices,
   getUserActiveSubscription,
@@ -72,10 +75,12 @@ function SkeletonBlock({ className }: { className?: string }) {
 export default function MySubscriptionPanel({
   onUpgrade,
 }: MySubscriptionPanelProps) {
+  const { user, profile } = useAuth();
   const [tab, setTab] = useState<Tab>('overview');
   const [loading, setLoading] = useState(true);
   const [activeSub, setActiveSub] = useState<SubscriptionPlan | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -357,46 +362,55 @@ export default function MySubscriptionPanel({
         {/* ─── HISTORY TAB ──────────────────────────────────── */}
         {tab === 'history' && (
           <>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <SkeletonBlock key={i} className="h-20" />
-                ))}
+            {/* Pending alert banner */}
+            {pendingInvoices.length > 0 && (
+              <div className="flex items-center gap-3 p-4 bg-red-600/10 rounded-xl border border-red-500/20">
+                <Loader2 size={16} className="text-red-500 animate-spin shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-red-500">
+                    {pendingInvoices.length}টি পেমেন্ট যাচাই করা হচ্ছে
+                  </p>
+                  <p className="text-xs text-neutral-400">
+                    অ্যাডমিন ভেরিফিকেশন সম্পন্ন হলে সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে সক্রিয় হবে
+                  </p>
+                </div>
               </div>
-            ) : invoices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-3 text-neutral-400">
-                <Receipt
+            )}
+
+            {invoices.length === 0 ? (
+              <div className="text-center py-16 space-y-3 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+                <History
                   size={36}
-                  className="text-neutral-300 dark:text-neutral-700"
+                  className="mx-auto text-neutral-300 dark:text-neutral-700"
                 />
-                <p className="text-sm">কোনো ট্রানজেকশন নেই</p>
+                <p className="text-sm font-medium text-neutral-500">
+                  কোনো ইনভয়েস পাওয়া যায়নি
+                </p>
               </div>
             ) : (
               <>
-                {/* Summary row */}
+                {/* Stats row */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
+                    { label: 'মোট ইনভয়েস', value: invoices.length },
                     {
-                      label: 'মোট',
-                      value: invoices.length,
-                      color: 'text-neutral-700 dark:text-neutral-200',
-                    },
-                    {
-                      label: 'সফল',
+                      label: 'পরিশোধিত',
                       value: paidInvoices.length,
-                      color: 'text-green-800 dark:text-green-400',
+                      color: 'text-emerald-700 dark:text-emerald-400',
                     },
                     {
-                      label: 'অপেক্ষমান',
+                      label: 'যাচাইাধীন',
                       value: pendingInvoices.length,
-                      color: 'text-red-600',
+                      color: 'text-red-500',
                     },
                   ].map(({ label, value, color }) => (
                     <div
                       key={label}
-                      className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 text-center"
+                      className="bg-white dark:bg-neutral-900 rounded-xl p-3.5 border border-neutral-200 dark:border-neutral-800 text-center"
                     >
-                      <p className={cn('text-xl font-black', color)}>{value}</p>
+                      <p className={cn('text-xl font-black', color ?? 'text-neutral-800 dark:text-neutral-100')}>
+                        {value}
+                      </p>
                       <p className="text-[10px] text-neutral-500 mt-0.5">
                         {label}
                       </p>
@@ -407,7 +421,11 @@ export default function MySubscriptionPanel({
                 {/* Invoice list */}
                 <div className="space-y-2">
                   {invoices.map((inv) => (
-                    <InvoiceRow key={inv.id} invoice={inv} />
+                    <InvoiceRow
+                      key={inv.id}
+                      invoice={inv}
+                      onSelectInvoice={(invoice) => setSelectedInvoice(invoice)}
+                    />
                   ))}
                 </div>
               </>
@@ -415,12 +433,29 @@ export default function MySubscriptionPanel({
           </>
         )}
       </div>
+
+      {/* Official Receipt Modal */}
+      {selectedInvoice && (
+        <OfficialReceiptModal
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
+          userName={profile?.name || ''}
+          userEmail={user?.email || ''}
+          userInstitute={profile?.institute || ''}
+        />
+      )}
     </div>
   );
 }
 
 // ─── Invoice Row ──────────────────────────────────────────────────────────────
-function InvoiceRow({ invoice }: { invoice: Invoice }) {
+function InvoiceRow({
+  invoice,
+  onSelectInvoice,
+}: {
+  invoice: Invoice;
+  onSelectInvoice?: (invoice: Invoice) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -429,7 +464,7 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
         onClick={() => setExpanded((p) => !p)}
         className="w-full flex items-center gap-3 p-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
       >
-        <div className="w-9 h-9 rounded-xl bg-green-800 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-emerald-800 flex items-center justify-center shrink-0">
           <Receipt size={16} className="text-white" />
         </div>
         <div className="flex-1 min-w-0">
@@ -467,6 +502,20 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
             value={`#${invoice.id.slice(0, 8).toUpperCase()}`}
             mono
           />
+
+          {/* Official Receipt Action Button */}
+          {onSelectInvoice && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => onSelectInvoice(invoice)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl transition-all border border-emerald-200 dark:border-emerald-800/60 active:scale-[0.99]"
+              >
+                <Download size={14} />
+                <span>অফিসিয়াল রিসিট দেখুন ও ডাউনলোড করুন</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

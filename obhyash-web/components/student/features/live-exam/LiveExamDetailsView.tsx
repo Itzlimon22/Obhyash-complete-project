@@ -3,7 +3,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { getStudentLiveExamDetails, getPublicLeaderboard, getStudentLiveExamPracticeHistory } from "@/services/live-exam-student-service";
 import { LiveExam, LiveExamAttempt } from "@/lib/types";
 import { toast } from "sonner";
-import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight, History, Award } from "lucide-react";
+import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight, History, Award, EyeOff } from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
 import LiveExamSolutionView from "./LiveExamSolutionView";
 import LiveExamLeaderboardView from "./LiveExamLeaderboardView";

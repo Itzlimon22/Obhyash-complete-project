@@ -239,7 +239,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
   },
   {
     id: 'exam_ready',
-    name: 'বুস্টার প্যাক (১ মাস)',
+    name: 'মাসিক প্ল্যান (১ মাস)',
     price: 149,
     billingCycle: 'Monthly',
     duration_days: 30,
@@ -256,7 +256,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
   },
   {
     id: 'pro',
-    name: 'টপ র‍্যাঙ্কার্স (৩ মাস)',
+    name: 'এডমিশন প্যাক (৩ মাস)',
     price: 349,
     billingCycle: 'Quarterly',
     duration_days: 90,
@@ -274,7 +274,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
   },
   {
     id: 'master_pro',
-    name: 'মাস্টার প্রো (৬ মাস)',
+    name: 'ফুল সেশন প্যাক (৬ মাস)',
     price: 599,
     billingCycle: 'Half-Yearly',
     duration_days: 180,

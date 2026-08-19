@@ -331,7 +331,7 @@ export default function SettingsView({
     user.student_id ||
     (user.id
       ? `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`
-      : 'OBH-10001');
+      : `OBH-${Math.floor(10000 + Math.random() * 90000)}`);
 
   const handleCopy = (label: string, text: string) => {
     navigator.clipboard.writeText(text);

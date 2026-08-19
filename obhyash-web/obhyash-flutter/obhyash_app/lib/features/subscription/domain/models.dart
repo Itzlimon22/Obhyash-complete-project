@@ -26,6 +26,16 @@ class SubscriptionPlan {
     String? expiresAt,
   }) {
     final days = (j['duration_days'] as num?)?.toInt() ?? 30;
+    String rawName = (j['display_name'] ?? j['name'])?.toString() ?? '';
+    String formattedName = rawName;
+    if (days >= 180 || rawName.contains('৬ মাস') || rawName.contains('মাস্টার') || rawName.contains('master_pro') || rawName.contains('full_session')) {
+      formattedName = 'ফুল সেশন প্যাক (৬ মাস)';
+    } else if (days >= 90 || rawName.contains('৩ মাস') || rawName.contains('র‍্যাঙ্কার্স') || rawName.contains('pro') || rawName.contains('admission')) {
+      formattedName = 'এডমিশন প্যাক (৩ মাস)';
+    } else if ((days >= 28 && days <= 60) || rawName.contains('১ মাস') || rawName.contains('বুস্টার') || rawName.contains('exam_ready') || rawName.contains('monthly')) {
+      formattedName = 'মাসিক প্ল্যান (১ মাস)';
+    }
+
     String cycle;
     if (days >= 365) {
       cycle = 'Yearly';
@@ -52,7 +62,7 @@ class SubscriptionPlan {
 
     return SubscriptionPlan(
       id: j['id']?.toString() ?? '',
-      name: (j['display_name'] ?? j['name'])?.toString() ?? '',
+      name: formattedName,
       price: ((j['price'] as num?)?.toInt()) ?? 0,
       billingCycle: cycle,
       durationDays: days,

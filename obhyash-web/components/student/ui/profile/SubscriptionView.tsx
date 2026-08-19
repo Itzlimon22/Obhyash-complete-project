@@ -32,44 +32,43 @@ import {
 // ── Comparison table feature matrix ──────────────────────────────────────────
 const COMPARISON_FEATURES = [
   {
-    label: 'দৈনিক মক পরীক্ষা',
-    free: '৩টি',
-    paid: 'সীমাহীন',
-  },
-  {
     label: 'অনুশীলন প্রশ্ন',
     free: '৫০টি/দিন',
     paid: 'সীমাহীন',
   },
   {
-    label: 'প্রশ্নব্যাংক অ্যাক্সেস',
+    label: 'মডেল টেস্ট ও কাস্টম পরীক্ষা',
+    free: '৩টি/দিন',
+    paid: 'সীমাহীন',
+  },
+  {
+    label: 'লাইভ এক্সাম ও প্রতিযোগিতা',
+    free: 'সীমিত',
+    paid: 'সকল এক্সাম',
+  },
+  {
+    label: 'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক',
     free: true,
     paid: true,
   },
   {
-    label: 'বিস্তারিত ব্যাখ্যা',
+    label: 'প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান',
     free: false,
     paid: true,
   },
   {
-    label: 'বিষয়ভিত্তিক অ্যানালাইসিস',
+    label: 'বিষয়ভিত্তিক ও পারফরম্যান্স এনালাইসিস',
     free: false,
     paid: true,
   },
-  { label: 'লিডারবোর্ড', free: true, paid: true },
+  { label: 'মেধা তালিকা ও লাইভ লিডারবোর্ড', free: true, paid: true },
+  { label: 'ডেইলি স্ট্রিক ও রিওয়ার্ড কোয়েস্ট', free: true, paid: true },
   {
-    label: 'পেপার স্ক্রিপ্ট আপলোড',
+    label: 'ভুল উত্তর ও বুকমার্ক কালেকশন',
     free: false,
     paid: true,
   },
-  { label: 'কাস্টম পরীক্ষা', free: false, paid: true },
-  { label: 'AI সাজেশন', free: false, paid: true },
-  {
-    label: 'ডাউনলোড/প্রিন্ট',
-    free: false,
-    paid: true,
-  },
-  { label: '২৪/৭ সাপোর্ট', free: false, paid: true },
+  { label: 'প্রাইওরিটি হেল্প ও সাপোর্ট', free: false, paid: true },
 ];
 
 const TRUST_BADGES = [
@@ -99,15 +98,32 @@ const TRUST_BADGES = [
   },
 ];
 
-function ComparisonCell({ value }: { value: boolean | string }) {
+function ComparisonCell({
+  value,
+  isPaid,
+}: {
+  value: boolean | string;
+  isPaid?: boolean;
+}) {
   if (typeof value === 'boolean') {
     return value ? (
-      <Check className="w-4 h-4 text-green-700 mx-auto" />
+      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto" />
     ) : (
-      <XCircle className="w-4 h-4 text-neutral-300 dark:text-neutral-700 mx-auto" />
+      <XCircle className="w-4 h-4 text-neutral-300 dark:text-neutral-600 mx-auto" />
     );
   }
-  return <span className="text-xs font-bold">{value}</span>;
+  return (
+    <span
+      className={cn(
+        'text-xs font-bold',
+        isPaid
+          ? 'text-emerald-700 dark:text-emerald-400'
+          : 'text-neutral-700 dark:text-neutral-300',
+      )}
+    >
+      {value}
+    </span>
+  );
 }
 
 const SubscriptionView: React.FC = () => {
@@ -208,26 +224,7 @@ const SubscriptionView: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 sm:space-y-10 pb-24 sm:pb-20 px-1 animate-fade-in">
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 dark:bg-black p-8 sm:p-14 text-center">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 bg-green-900/50 border border-green-700/50 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-2">
-            <Zap size={11} />
-            প্রিমিয়াম প্ল্যান
-          </div>
-          <h1 className="text-white text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-            আরো বেশি পড়ো,
-            <br className="hidden sm:block" /> আরো ভালো প্রস্তুতি নাও
-          </h1>
-          <p className="text-neutral-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            সীমাহীন পরীক্ষা, AI সাজেশন, বিস্তারিত এনালাইসিস — সব কিছু এক প্ল্যানে
-          </p>
-        </div>
-      </div>
-
+    <div className="max-w-5xl mx-auto space-y-8 sm:space-y-10 pb-24 sm:pb-20 px-1 animate-fade-in pt-2">
       {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
       <section>
         <div className="text-center mb-6 sm:mb-8">
@@ -304,7 +301,7 @@ const SubscriptionView: React.FC = () => {
                 <ComparisonCell value={row.free} />
               </div>
               <div className="p-3 sm:p-4 flex items-center justify-center bg-green-800/5 dark:bg-green-900/10 text-green-800 dark:text-green-400">
-                <ComparisonCell value={row.paid} />
+                <ComparisonCell value={row.paid} isPaid={true} />
               </div>
             </div>
           ))}

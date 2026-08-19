@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
   SubscriptionPlan,
   PaymentMethod,
-  PaymentSubmission,
 } from '@/lib/types';
-import { ArrowLeft, Clock, Info, Headphones } from 'lucide-react';
+import { ArrowLeft, Clock, Info, Headphones, X, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { addPaymentMethod, deletePaymentMethod } from '@/services/subscription-service';
 
 interface ManualPaymentModalProps {
   isOpen: boolean;
@@ -30,6 +30,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   const [trxId, setTrxId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Saved Methods Management Modal State
+  const [localSavedMethods, setLocalSavedMethods] = useState<PaymentMethod[]>(savedMethods);
+  const [isManageMethodsOpen, setIsManageMethodsOpen] = useState(false);
+  const [manageTab, setManageTab] = useState<'list' | 'add'>(savedMethods.length === 0 ? 'add' : 'list');
+  const [newMethodType, setNewMethodType] = useState<'bkash' | 'nagad' | 'card'>('bkash');
+  const [newMethodNumber, setNewMethodNumber] = useState('');
+  const [isSavingMethod, setIsSavingMethod] = useState(false);
+
   if (!isOpen || !plan) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,7 +54,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
       return;
     }
 
-    const trxIdRegex = /^[A-Z0-9]{5,20}$/; // Relaxed slightly from 10 but kept safe
+    const trxIdRegex = /^[A-Z0-9]{5,25}$/;
     if (!trxIdRegex.test(trxId.toUpperCase())) {
       toast.error('সঠিক ট্রানজেকশন আইডি দাও');
       return;
@@ -68,6 +76,53 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     toast.success('নম্বর কপি করা হয়েছে!');
   };
 
+  const handleAddNewMethod = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const phoneRegex = /^01[3-9]\d{8}$/;
+    if (!phoneRegex.test(newMethodNumber.trim())) {
+      toast.error('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx)');
+      return;
+    }
+
+    setIsSavingMethod(true);
+    try {
+      const added = await addPaymentMethod({
+        type: newMethodType,
+        number: newMethodNumber.trim(),
+        last4: newMethodNumber.trim().slice(-4),
+        expiry: '',
+        isDefault: false,
+      });
+
+      setLocalSavedMethods((prev) => [added, ...prev]);
+      setPaymentMethod(
+        added.type === 'nagad'
+          ? 'Nagad'
+          : 'bKash',
+      );
+      setSenderNumber(added.number || '');
+      setNewMethodNumber('');
+      setIsManageMethodsOpen(false);
+      toast.success('পেমেন্ট মেথড সফলভাবে যুক্ত করা হয়েছে!');
+    } catch (err) {
+      console.error(err);
+      toast.error('পেমেন্ট মেথড সংরক্ষণে সমস্যা হয়েছে');
+    } finally {
+      setIsSavingMethod(false);
+    }
+  };
+
+  const handleDeleteMethod = async (id: string) => {
+    try {
+      await deletePaymentMethod(id);
+      setLocalSavedMethods((prev) => prev.filter((m) => m.id !== id));
+      toast.success('পেমেন্ট মেথড মুছে ফেলা হয়েছে');
+    } catch (err) {
+      console.error(err);
+      toast.error('মুছে ফেলতে সমস্যা হয়েছে');
+    }
+  };
+
   const renderTabs = () => (
     <div className="flex border-b border-neutral-200 dark:border-neutral-700 mb-6 bg-white dark:bg-neutral-900 sticky top-0 z-10">
       {[
@@ -81,7 +136,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
           label: 'সাপোর্ট',
           icon: <Headphones className="w-4 h-4" />,
         },
-        { id: 'info', label: 'তথ্য', icon: '?' },
+        { id: 'info', label: 'তথ্য', icon: <span className="text-xs font-bold">?</span> },
       ].map((tab) => (
         <button
           key={tab.id}
@@ -104,7 +159,6 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
   return (
     <div className="min-h-[80vh] flex flex-col bg-white dark:bg-neutral-900 animate-in slide-in-from-right duration-300">
-      {/* Top Header with Back Button */}
       <div className="p-4 sm:p-6 flex items-center gap-4 border-b border-neutral-100 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-20">
         <button
           onClick={onClose}
@@ -121,7 +175,6 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
         {renderTabs()}
 
         <div className="flex-1 p-6 pt-0">
-          {/* TAB 1: DETAILS */}
           {activeTab === 'details' && (
             <div className="space-y-6 animate-fade-in">
               <div className="flex gap-4">
@@ -143,55 +196,53 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </div>
               </div>
 
-              <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-xl p-5 text-center">
-                <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
-                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করো
+              <div className="w-full bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-800/80 rounded-2xl p-5 text-center shadow-sm">
+                <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3">
+                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
                 </h4>
                 <div
-                  className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg mb-3 flex items-center justify-between group cursor-pointer"
-                  onClick={() => copyToClipboard('01234567890')}
+                  className="bg-neutral-100 dark:bg-neutral-800/80 p-3.5 rounded-xl mb-3.5 flex items-center justify-between group cursor-pointer border border-neutral-200 dark:border-neutral-700 hover:border-emerald-400 transition-colors"
+                  onClick={() => copyToClipboard('01946855793')}
                 >
-                  <span className="text-xs font-medium text-neutral-500">
-                    bKash/Nagad (Send Money)
-                  </span>
-                  <span className="font-mono font-bold text-lg text-neutral-800 dark:text-white tracking-wider">
-                    01234567890
-                  </span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
-                    />
-                  </svg>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 block">
+                      bKash / Nagad (Send Money)
+                    </span>
+                    <span className="font-mono font-bold text-lg text-neutral-900 dark:text-white tracking-wider">
+                      01946855793
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-neutral-700 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
+                    কপি
+                  </div>
                 </div>
-                <ul className="text-xs text-neutral-500 dark:text-neutral-400 text-left space-y-1.5 list-disc pl-4">
-                  <li>
-                    উপরের নম্বরে <strong>Send Money</strong> করো।
-                  </li>
-                  <li>Reference হিসেবে তোমার মোবাইল নম্বর দাও।</li>
-                  <li>
-                    নিচের ফর্মে তোমার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID দাও।
-                  </li>
+                <ul className="text-xs text-neutral-600 dark:text-neutral-300 text-left space-y-2 list-disc pl-4">
+                  <li>উপরের নম্বরে <strong>Send Money</strong> করুন।</li>
+                  <li>Reference হিসেবে আপনার মোবাইল নম্বর দিন।</li>
+                  <li>নিচের ফর্মে আপনার পেমেন্ট মেথড, প্রেরকের মোবাইল নম্বর এবং TrxID দিন।</li>
                 </ul>
               </div>
 
-              {savedMethods.length > 0 && (
-                <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                    Saved Payment Methods
+                    SAVED PAYMENT METHODS
                   </h4>
+                  <button
+                    type="button"
+                    onClick={() => setIsManageMethodsOpen(true)}
+                    className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>{localSavedMethods.length === 0 ? 'মেথড যোগ করুন' : 'এডিট / যোগ করুন'}</span>
+                  </button>
+                </div>
+
+                {localSavedMethods.length > 0 ? (
                   <div className="grid grid-cols-1 gap-2">
-                    {savedMethods.map((method) => (
+                    {localSavedMethods.map((method) => (
                       <button
                         key={method.id}
+                        type="button"
                         onClick={() => {
                           setPaymentMethod(
                             method.type === 'bkash'
@@ -206,22 +257,28 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                           senderNumber === method.number &&
                           paymentMethod.toLowerCase() ===
                             method.type.toLowerCase()
-                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500'
-                            : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 ring-1 ring-emerald-500'
+                            : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-700 bg-white dark:bg-neutral-800'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black ${method.type === 'bkash' ? 'bg-red-500' : method.type === 'nagad' ? 'bg-red-500' : 'bg-neutral-500'}`}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] font-black ${
+                              method.type === 'bkash'
+                                ? 'bg-[#D11559]'
+                                : method.type === 'nagad'
+                                  ? 'bg-[#E11D48]'
+                                  : 'bg-purple-600'
+                            }`}
                           >
                             {method.type === 'bkash'
                               ? 'bK'
                               : method.type === 'nagad'
                                 ? 'N'
-                                : 'C'}
+                                : 'R'}
                           </div>
                           <div>
-                            <p className="font-bold text-sm text-neutral-800 dark:text-white capitalize">
+                            <p className="font-bold text-sm text-neutral-800 dark:text-white uppercase">
                               {method.type}
                             </p>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
@@ -229,65 +286,77 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                             </p>
                           </div>
                         </div>
+                        {senderNumber === method.number && (
+                          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                            সিলেক্টেড
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div
+                    onClick={() => setIsManageMethodsOpen(true)}
+                    className="p-3 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 text-center cursor-pointer hover:border-emerald-400 transition-colors"
+                  >
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      ভবিষ্যতে সহজে পেমেন্ট করতে আপনার বিকাশ/নগদ নম্বর যোগ করুন
+                    </p>
+                  </div>
+                )}
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                    Payment Method
+                    পেমেন্ট মেথড (Payment Method)
                   </label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-medium"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-medium text-sm"
                   >
                     <option value="bKash">bKash</option>
                     <option value="Nagad">Nagad</option>
-                    <option value="Rocket">Rocket</option>
                   </select>
                 </div>
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                    Your Mobile Number
+                    প্রেরকের মোবাইল নম্বর (Your Mobile Number)
                   </label>
                   <input
                     type="tel"
                     value={senderNumber}
                     onChange={(e) => setSenderNumber(e.target.value)}
-                    placeholder="e.g., 01xxxxxxxxx"
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono"
+                    placeholder="যেমন: 017xxxxxxxx"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono text-sm"
                     required
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                    Transaction ID (TrxID)
+                    ট্রানজেকশন আইডি (TrxID)
                   </label>
                   <input
                     type="text"
                     value={trxId}
                     onChange={(e) => setTrxId(e.target.value)}
-                    placeholder="Enter the TrxID"
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono uppercase"
+                    placeholder="SMS থেকে প্রাপ্ত TrxID দিন"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono uppercase text-sm"
                     required
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 flex justify-center items-center gap-2 mt-4"
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 flex justify-center items-center gap-2 mt-4 transition-colors"
                 >
-                  {isSubmitting ? 'যাচাই করা হচ্ছে...' : 'Verify Payment'}
+                  {isSubmitting ? 'যাচাই করা হচ্ছে...' : 'পেমেন্ট সম্পন্ন করুন'}
                 </button>
               </form>
             </div>
           )}
 
-          {/* TAB 2: SUPPORT */}
           {activeTab === 'support' && (
             <div className="space-y-4 animate-fade-in pb-4">
               {[
@@ -300,105 +369,38 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 },
                 {
                   icon: '💬',
-                  title: 'লাইভ চ্যাট (Messenger)',
-                  sub: 'এখানে ক্লিক করো',
-                  color: 'bg-emerald-50 text-emerald-600',
-                  link: 'https://m.me/obhyash',
-                },
-                {
-                  icon: '📱',
-                  title: 'লাইভ চ্যাট (WhatsApp)',
-                  sub: 'এখানে ক্লিক করো',
-                  color: 'bg-emerald-50 text-emerald-600',
+                  title: 'হোয়াটসঅ্যাপ মেসেজ',
+                  sub: 'তাৎক্ষণিক চ্যাট সাপোর্ট',
+                  color: 'bg-green-50 text-green-600',
                   link: 'https://wa.me/8801946855793',
                 },
                 {
                   icon: '✉️',
-                  title: 'সাপোর্টে ইমেইল',
-                  sub: 'এখানে ক্লিক করো',
-                  color: 'bg-red-50 text-red-600',
+                  title: 'ইমেইল সাপোর্ট',
+                  sub: 'support@obhyash.com',
+                  color: 'bg-blue-50 text-blue-600',
                   link: 'mailto:support@obhyash.com',
                 },
               ].map((item, idx) => (
                 <a
                   key={idx}
                   href={item.link}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:shadow-md transition-all group"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-emerald-400 dark:hover:border-emerald-600 transition-colors bg-neutral-50/50 dark:bg-neutral-800/50"
                 >
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${item.color} group-hover:scale-110 transition-transform`}
-                  >
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-white dark:bg-neutral-750 shadow-sm border border-neutral-100 dark:border-neutral-700">
                     {item.icon}
                   </div>
                   <div>
-                    <h4 className="font-bold text-neutral-900 dark:text-white">
+                    <h5 className="font-bold text-sm text-neutral-800 dark:text-white">
                       {item.title}
-                    </h4>
-                    <p className="text-xs text-neutral-500">{item.sub}</p>
+                    </h5>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      {item.sub}
+                    </p>
                   </div>
                 </a>
-              ))}
-              <div className="mt-8">
-                <button
-                  onClick={() => setActiveTab('details')}
-                  className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl"
-                >
-                  Go to Payment
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: INFO */}
-          {activeTab === 'info' && (
-            <div className="space-y-3 animate-fade-in pb-4">
-              {[
-                {
-                  q: 'কিভাবে পেমেন্ট করবেন?',
-                  a: '১. তোমার বিকাশ/নগদ অ্যাপে যাও। ২. সেন্ড মানি অপশনে যাও। ৩. আমাদের নম্বর দাও। ৪. রেফারেন্সে তোমার নম্বর দাও। ৫. পেমেন্ট শেষে TrxID ফর্ম এ জমা দাও।',
-                },
-                {
-                  q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট আপগ্রেড হবে?',
-                  a: 'আমাদের টিম তোমার তথ্য যাচাই করে ৩০ মিনিট থেকে ২ ঘন্টার মধ্যে তোমার একাউন্ট আপগ্রেড করে দিবে।',
-                },
-                {
-                  q: 'ট্রানজেকশন আইডি (TrxID) খুঁজে না পেলে কী করব?',
-                  a: 'আপনার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করো। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করো।',
-                },
-                {
-                  q: 'ভুল নম্বরে টাকা পাঠালে কী হবে?',
-                  a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করো।',
-                },
-                {
-                  q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',
-                  a: 'আনলিমিটেড এক্সাম, এবং বিস্তারিত এনালাইসিস রিপোর্ট।',
-                },
-              ].map((faq, idx) => (
-                <details
-                  key={idx}
-                  className="group bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700"
-                >
-                  <summary className="flex justify-between items-center p-4 cursor-pointer font-bold text-neutral-800 dark:text-neutral-200 text-sm">
-                    {faq.q}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className="w-4 h-4 transition-transform group-open:rotate-180"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
-                  </summary>
-                  <div className="p-4 pt-0 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-200 dark:border-neutral-700/50 mt-2">
-                    {faq.a}
-                  </div>
-                </details>
               ))}
               <div className="mt-6">
                 <button
@@ -410,8 +412,243 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               </div>
             </div>
           )}
+
+          {activeTab === 'info' && (
+            <div className="space-y-3 animate-fade-in pb-4">
+              <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center gap-2.5 mb-2">
+                <span className="text-base">💡</span>
+                <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                  পেমেন্ট সংক্রান্ত যেকোনো প্রশ্নে নিচের উত্তরগুলো দেখে নিন
+                </p>
+              </div>
+
+              {[
+                {
+                  q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
+                  a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01946855793 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
+                },
+                {
+                  q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
+                  a: 'তথ্য সাবমিট করার পর সাধারণত ৫ থেকে ৩০ মিনিটের মধ্যে আমাদের ভেরিফিকেশন টিম যাচাই করে আপনার একাউন্ট স্বয়ংক্রিয়ভাবে প্রিমিয়াম করে দেয়। সর্বোচ্চ ১-২ ঘণ্টার মধ্যে নিশ্চিতভাবে এক্টিভেশন সম্পন্ন হয়।',
+                },
+                {
+                  q: 'ট্রানজেকশন আইডি (TrxID) কোথায় পাব?',
+                  a: '• বিকাশ: পেমেন্ট সফল হওয়ার পর স্ক্রিনে, ইনবক্স স্টেটমেন্টে অথবা আসা SMS-এ TrxID (যেমন: BLA7X8Y9Z) দেখতে পাবেন।\n• নগদ: নগদ অ্যাপের "লেনদেন" হিস্ট্রি বা ফিরতি SMS-এ TxnID দেখতে পাবেন।',
+                },
+                {
+                  q: 'ভুল TrxID বা ভুল নম্বর সাবমিট করলে কি করব?',
+                  a: 'ভুল তথ্য দেওয়া হয়ে থাকলে "বিস্তারিত" ট্যাবে থাকা পেন্ডিং রিকোয়েস্ট থেকে "আবেদন বাতিল" বাটনে ক্লিক করে সাথে সাথে সঠিক তথ্য দিয়ে পুনরায় আবেদন করতে পারবেন। অথবা আমাদের হোয়াটসঅ্যাপ সাপোর্টে যোগাযোগ করতে পারেন।',
+                },
+                {
+                  q: 'রেফারেন্সে (Reference) কিছু না দিলে কি সমস্যা হবে?',
+                  a: 'না, কোনো সমস্যা নেই। রেফারেন্সে আপনার নম্বর দেওয়া সুবিধাজনক, তবে রেফারেন্স না দিলেও সঠিক TrxID ফর্মে সাবমিট করলেই পেমেন্ট সফলভাবে শনাক্ত করা যাবে।',
+                },
+                {
+                  q: 'প্যাকেজের মেয়াদ শেষ হলে কি স্বয়ংক্রিয়ভাবে টাকা কাটবে?',
+                  a: 'না, এখানে কোনো অটো-রিনিউ বা স্বয়ংক্রিয় টাকা কাটার সুযোগ নেই। মেয়াদ শেষ হলে আপনি নিজের সুবিধাজনক সময়ে পুনরায় রিনিউ করতে পারবেন।',
+                },
+                {
+                  q: 'টাকা কেটে নিয়েছে কিন্তু কনফার্মেশন পাইনি?',
+                  a: 'কখনও নেটওয়ার্ক সমস্যার কারণে SMS আসতে দেরি হতে পারে। আপনার বিকাশ/নগদ অ্যাপের স্টেটমেন্ট চেক করে প্রাপ্ত TrxID ফর্মে সাবমিট করুন অথবা সরাসরি সাপোর্টে যোগাযোগ করুন।',
+                },
+                {
+                  q: 'যেকোনো প্রয়োজনে জরুরি সহায়তা কোথায় পাব?',
+                  a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01946855793) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
+                },
+              ].map((faq, idx) => (
+                <details
+                  key={idx}
+                  className="group bg-white dark:bg-neutral-800/80 rounded-xl border border-neutral-200 dark:border-neutral-700/80 transition-all open:border-emerald-500/60 open:shadow-sm"
+                >
+                  <summary className="flex justify-between items-center p-4 cursor-pointer font-bold text-neutral-800 dark:text-neutral-100 text-sm select-none">
+                    {faq.q}
+                    <svg
+                      className="w-4 h-4 text-neutral-400 group-open:text-emerald-500 transition-transform group-open:rotate-180"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="p-4 pt-0 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed border-t border-neutral-100 dark:border-neutral-700/50 mt-2 whitespace-pre-line">
+                    {faq.a}
+                  </div>
+                </details>
+              ))}
+
+              <div className="pt-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('details')}
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <span>পেমেন্ট করতে এগিয়ে যান</span>
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {isManageMethodsOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-fade-in">
+          <div className="w-full max-w-lg bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col max-h-[50vh] overflow-hidden animate-in slide-in-from-bottom duration-300">
+            <div className="p-4 px-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900/50">
+              <h4 className="font-bold text-sm text-neutral-900 dark:text-white">
+                পেমেন্ট মেথড ব্যবস্থাপনা
+              </h4>
+              <button
+                onClick={() => setIsManageMethodsOpen(false)}
+                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-3 px-5 border-b border-neutral-100 dark:border-neutral-800 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setManageTab('list')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors ${
+                  manageTab === 'list'
+                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
+                    : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                }`}
+              >
+                সংরক্ষিত নম্বর ({localSavedMethods.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setManageTab('add')}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors ${
+                  manageTab === 'add'
+                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
+                    : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                নতুন যোগ করুন
+              </button>
+            </div>
+            <div className="p-4 px-5 overflow-y-auto flex-1 space-y-3">
+              {manageTab === 'list' ? (
+                localSavedMethods.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">
+                      কোনো সেভ করা পেমেন্ট মেথড নেই
+                    </p>
+                    <button
+                      onClick={() => setManageTab('add')}
+                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                    >
+                      + নতুন মেথড যোগ করুন
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {localSavedMethods.map((m) => (
+                      <div
+                        key={m.id}
+                        className="flex items-center justify-between p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] font-black ${
+                              m.type === 'bkash'
+                                ? 'bg-[#D11559]'
+                                : 'bg-[#E11D48]'
+                            }`}
+                          >
+                            {m.type === 'bkash' ? 'bK' : 'N'}
+                          </div>
+                          <div>
+                            <p className="font-bold text-xs text-neutral-800 dark:text-white uppercase">
+                              {m.type}
+                            </p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
+                              {m.number}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPaymentMethod(
+                                m.type === 'nagad'
+                                  ? 'Nagad'
+                                  : 'bKash',
+                              );
+                              setSenderNumber(m.number || '');
+                              setIsManageMethodsOpen(false);
+                            }}
+                            className="px-2.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg transition-colors"
+                          >
+                            ব্যবহার করুন
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMethod(m.id)}
+                            className="p-1.5 text-neutral-400 hover:text-red-500 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              ) : (
+                <form onSubmit={handleAddNewMethod} className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                      মেথড সিলেক্ট করুন
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['bkash', 'nagad'] as const).map((prov) => (
+                        <button
+                          key={prov}
+                          type="button"
+                          onClick={() => setNewMethodType(prov)}
+                          className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                            newMethodType === prov
+                              ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400'
+                              : 'border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300'
+                          }`}
+                        >
+                          {prov === 'bkash' ? 'bKash' : 'Nagad'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                      ১১ ডিজিটের মোবাইল নম্বর
+                    </label>
+                    <input
+                      type="tel"
+                      value={newMethodNumber}
+                      onChange={(e) => setNewMethodNumber(e.target.value)}
+                      placeholder="যেমন: 017xxxxxxxx"
+                      className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono text-xs"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSavingMethod}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow disabled:opacity-50 transition-colors"
+                  >
+                    {isSavingMethod ? 'সংরক্ষণ করা হচ্ছে...' : 'সংরক্ষণ ও ব্যবহার করুন'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

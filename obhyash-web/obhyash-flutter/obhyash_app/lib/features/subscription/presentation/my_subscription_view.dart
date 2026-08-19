@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import '../domain/models.dart';
+import 'widgets/official_receipt_document.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class MySubscriptionView extends ConsumerStatefulWidget {
@@ -138,7 +140,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
                 ],
                 colorTheme: 'emerald',
-                expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
+                expiresAt: parsedExp.toIso8601String().length >= 10
                     ? parsedExp.toIso8601String().substring(0, 10)
                     : null,
               );
@@ -483,7 +485,40 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 ),
               ),
               const SizedBox(height: 16),
-              OutlinedButton.icon(
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  final user = ref.read(userProfileProvider).value;
+                  final authUser = ref.read(authProvider);
+                  OfficialReceiptService.downloadReceipt(
+                    context: context,
+                    invoice: invoice,
+                    userName: user?.name ?? '',
+                    userEmail: authUser?.email ?? '',
+                    userInstitute: user?.institute ?? '',
+                  );
+                },
+                icon: const Icon(LucideIcons.download, size: 18),
+                label: const Text(
+                  'অফিসিয়াল রিসিট ডাউনলোড করুন',
+                  style: TextStyle(
+                    fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
                 onPressed: () {
                   final text =
                       'অভ্যাস পেমেন্ট রিসিট\n'
@@ -496,23 +531,26 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   Navigator.pop(ctx);
                   AppPopups.show(
                     context,
-                    message: 'রিসিট কপি করা হয়েছে!',
+                    message: 'রিসিটের তথ্য কপি করা হয়েছে!',
                     isError: false,
                   );
                 },
-                icon: const Icon(LucideIcons.copy, size: 16),
-                label: const Text(
-                  'রিসিট কপি করো',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                icon: Icon(
+                  LucideIcons.copy,
+                  size: 14,
+                  color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF64748B),
                 ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                label: Text(
+                  'রিসিটের বিবরণ কপি করুন',
+                  style: TextStyle(
+                    fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF64748B),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
             ],
           ),
         ),

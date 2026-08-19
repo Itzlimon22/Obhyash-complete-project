@@ -57,7 +57,7 @@ INSERT INTO subscription_plans (display_name, name, price, duration_days, featur
   'border-neutral-200'
 ),
 (
-  'বুস্টার প্যাক (১ মাস)',
+  'মাসিক প্ল্যান (১ মাস)',
   'exam_ready',
   149,
   30,
@@ -66,7 +66,7 @@ INSERT INTO subscription_plans (display_name, name, price, duration_days, featur
   'border-indigo-500'
 ),
 (
-  'টপ র‍্যাঙ্কার্স (৩ মাস)',
+  'এডমিশন প্যাক (৩ মাস)',
   'pro',
   349,
   90,
@@ -75,7 +75,7 @@ INSERT INTO subscription_plans (display_name, name, price, duration_days, featur
   'border-emerald-500'
 ),
 (
-  'মাস্টার প্রো (৬ মাস)',
+  'ফুল সেশন প্যাক (৬ মাস)',
   'master_pro',
   599,
   180,
