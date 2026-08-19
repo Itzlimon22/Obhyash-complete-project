@@ -56,7 +56,7 @@ class _WelcomeViewState extends State<WelcomeView> {
     _autoPlayTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (!mounted) return;
       if (_pageController.hasClients) {
-        final nextPage = (_currentPage + 1) % 4;
+        final nextPage = (_currentPage + 1) % 5;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 600),
@@ -84,40 +84,46 @@ class _WelcomeViewState extends State<WelcomeView> {
       OnboardingSlide(
         tag: 'স্মার্ট ড্যাশবোর্ড',
         title: 'তোমার সম্পূর্ণ প্রস্তুতির এক প্ল্যাটফর্ম',
-        description: 'প্রতিদিনের মিশন, অ্যাক্টিভিটি ট্র্যাকার ও সাবজেক্ট হাব এক নজরে।',
         icon: LucideIcons.layoutDashboard,
         imageAssetPath: 'assets/images/onboarding/dashboard.png',
         accentColor: accentGreen,
         fallbackWidget: _buildMinimalStreakCard(),
       ),
 
-      // SLIDE 2: TOPIC PRACTICE & QUESTION SOLVING
+      // SLIDE 2: EXAM RUNNER
+      OnboardingSlide(
+        tag: 'রিয়েল-টাইম এক্সাম',
+        title: 'লাইভ কাউন্টডাউন ও টাইমড পরীক্ষা',
+        icon: LucideIcons.timer,
+        imageAssetPath: 'assets/images/onboarding/exam.png',
+        accentColor: const Color(0xFF10B981),
+        fallbackWidget: _buildMinimalExamCard(),
+      ),
+
+      // SLIDE 3: TOPIC PRACTICE & QUESTION SOLVING
       OnboardingSlide(
         tag: 'টপিকভিত্তিক অনুশীলন',
         title: 'হাজারো অধ্যায়ভিত্তিক প্রশ্ন ও নির্ভুল ব্যাখ্যা',
-        description: 'ভুল চিহ্নিতকরণ ও বুকমার্ক সুবিধায় গড়ে তোলো নিখুঁত প্রস্তুতি।',
         icon: LucideIcons.bookOpen,
         imageAssetPath: 'assets/images/onboarding/practice.png',
         accentColor: accentGreen,
         fallbackWidget: _buildMinimalExamCard(),
       ),
 
-      // SLIDE 3: FORMULAS HUB & SHORTCUTS
+      // SLIDE 4: FORMULAS HUB & SHORTCUTS
       OnboardingSlide(
         tag: 'ফর্মুলা ব্যাংক',
         title: 'সকল বিষয়ের প্রয়োজনীয় সূত্র ও শর্টকাট',
-        description: 'পদার্থ, রসায়ন, গণিত ও জীববিজ্ঞানের সকল সূত্র এক নজরে।',
         icon: LucideIcons.binary,
         imageAssetPath: 'assets/images/onboarding/formulas.png',
         accentColor: const Color(0xFF3B82F6),
         fallbackWidget: _buildMinimalAnalysisCard(),
       ),
 
-      // SLIDE 4: LIVE MODEL TESTS
+      // SLIDE 5: LIVE MODEL TESTS
       OnboardingSlide(
         tag: 'লাইভ মডেল টেস্ট',
         title: 'ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি প্রস্তুতি',
-        description: 'সারা দেশের শিক্ষার্থীদের সাথে লাইভ টেস্টে অংশ নিয়ে মেধা যাচাই করো।',
         icon: LucideIcons.trophy,
         imageAssetPath: 'assets/images/onboarding/live_exam.png',
         accentColor: const Color(0xFFF59E0B),
@@ -135,66 +141,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         body: SafeArea(
           child: Column(
             children: [
-              // Top Bar: Minimal Logo & Skip
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Brand Wordmark with subtle green dot
-                    Row(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: surfaceCard,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: surfaceBorder),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              LucideIcons.graduationCap,
-                              color: accentGreen,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'অভ্যাস',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Anek Bangla',
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Skip Text Button
-                    TextButton(
-                      onPressed: () => context.push('/signup'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: textMuted,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      ),
-                      child: const Text(
-                        'স্কিপ',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Anek Bangla',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // PageView Carousel
+              // PageView Carousel (Fills upper screen naturally without empty top void)
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
@@ -206,29 +153,27 @@ class _WelcomeViewState extends State<WelcomeView> {
                   itemBuilder: (context, index) {
                     final slide = slides[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
 
-                          // Showcase Image / Minimal Device Frame (Ultra Zoomed In & Large)
+                          // Showcase Image / Minimal Smartphone Frame
                           Expanded(
                             child: Center(
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
                                 child: _buildShowcaseCard(slide),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
 
                           // Minimal Tag Pill
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 11,
+                              horizontal: 12,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -241,14 +186,14 @@ class _WelcomeViewState extends State<WelcomeView> {
                               children: [
                                 Icon(
                                   slide.icon,
-                                  size: 12,
+                                  size: 13,
                                   color: slide.accentColor,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   slide.tag,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 11.5,
                                     fontWeight: FontWeight.w700,
                                     fontFamily: 'Anek Bangla',
                                     color: slide.accentColor,
@@ -272,13 +217,15 @@ class _WelcomeViewState extends State<WelcomeView> {
                               letterSpacing: -0.3,
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 6),
                         ],
                       ),
                     );
                   },
                 ),
               ),
+
+              const SizedBox(height: 10),
 
               // Minimal Grey Indicator Dots
               Row(
@@ -289,7 +236,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: isSelected ? 22 : 6,
+                    width: isSelected ? 20 : 6,
                     height: 5,
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.white : const Color(0xFF3F3F46),
@@ -300,7 +247,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ),
 
               // Generous breathing space between upper content & buttons
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               // Bottom CTA Buttons in a single Row
               Padding(
@@ -313,7 +260,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                         Expanded(
                           flex: 4,
                           child: SizedBox(
-                            height: 48,
+                            height: 50,
                             child: OutlinedButton(
                               onPressed: () => context.push('/login'),
                               style: OutlinedButton.styleFrom(
@@ -327,7 +274,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                               child: const Text(
                                 'লগইন',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.5,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: 'Anek Bangla',
                                 ),
@@ -342,7 +289,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                         Expanded(
                           flex: 6,
                           child: Container(
-                            height: 48,
+                            height: 50,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [brandGreen, Color(0xFF00664B)],
@@ -375,7 +322,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                                   Text(
                                     'শুরু করুন',
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       fontFamily: 'Anek Bangla',
                                     ),
@@ -390,27 +337,20 @@ class _WelcomeViewState extends State<WelcomeView> {
                       ],
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
 
-                    // Trust Footer Line
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.shieldCheck,
-                          size: 13,
-                          color: Color(0xFF52525B),
+                    // Brand Slogan Footer Line (Clean Minimal Text)
+                    const Center(
+                      child: Text(
+                        'অভ্যাসে শুরু, সাফল্যে শেষ',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Anek Bangla',
+                          color: Color(0xFF71717A),
+                          letterSpacing: 0.3,
                         ),
-                        SizedBox(width: 5),
-                        Text(
-                          'নিরাপদ ও বিশ্বস্ত প্ল্যাটফর্ম',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontFamily: 'Anek Bangla',
-                            color: Color(0xFF71717A),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
 
                     const SizedBox(height: 10),
@@ -429,36 +369,36 @@ class _WelcomeViewState extends State<WelcomeView> {
   // ─────────────────────────────────────────────────────────────
   Widget _buildShowcaseCard(OnboardingSlide slide) {
     if (slide.imageAssetPath != null) {
-      return Image.asset(
-        slide.imageAssetPath!,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.high,
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded || frame != null) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: surfaceBorder, width: 1.2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+      return Center(
+        child: AspectRatio(
+          aspectRatio: 9 / 19.5,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF09090B),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFF27272A), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  blurRadius: 24,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Image.asset(
+                slide.imageAssetPath!,
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (context, error, stackTrace) {
+                  return slide.fallbackWidget;
+                },
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: child,
-              ),
-            );
-          }
-          return slide.fallbackWidget;
-        },
-        errorBuilder: (context, error, stackTrace) {
-          // If image file is not yet supplied by user, render sleek minimal card
-          return slide.fallbackWidget;
-        },
+            ),
+          ),
+        ),
       );
     }
     return slide.fallbackWidget;

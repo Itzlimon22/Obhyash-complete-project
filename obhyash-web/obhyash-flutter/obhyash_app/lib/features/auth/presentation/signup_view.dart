@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -257,19 +258,32 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const isDark = true;
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
-    final bgColor = isDark ? Colors.black : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    const bgColor = Color(0xFF09090B); // Luxury OLED Dark
+    const textColor = Colors.white;
 
     if (_success) {
       return _buildSuccessScreen(isDark, textColor, bgColor);
     }
 
-    return Scaffold(
-      backgroundColor: bgColor,
+    return Theme(
+      data: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: bgColor,
+        colorScheme: const ColorScheme.dark(
+          surface: Color(0xFF141417),
+          primary: Color(0xFF059669),
+        ),
+      ),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light.copyWith(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: bgColor,
+        ),
+        child: Scaffold(
+          backgroundColor: bgColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -320,14 +334,13 @@ class _SignupViewState extends ConsumerState<SignupView>
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1C1C1E)
-                                : const Color(0xFFF5F5F5),
+                            color: const Color(0xFF141417),
                             borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFF27272A)),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             LucideIcons.chevronLeft,
-                            color: isDark ? Colors.white70 : Colors.black87,
+                            color: Color(0xFFA1A1AA),
                           ),
                         ),
                       ),
@@ -394,12 +407,12 @@ class _SignupViewState extends ConsumerState<SignupView>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'আগেই অ্যাকাউন্ট আছে? ',
                       style: TextStyle(
                         fontFamily: 'Anek Bangla',
                         fontSize: 16,
-                        color: isDark ? Colors.white70 : Colors.black87,
+                        color: Color(0xFFA1A1AA),
                       ),
                     ),
                     GestureDetector(
@@ -410,7 +423,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                           fontFamily: 'Anek Bangla',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFB91C1C),
+                          color: Color(0xFF059669),
                         ),
                       ),
                     ),
@@ -421,8 +434,10 @@ class _SignupViewState extends ConsumerState<SignupView>
           ),
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildProgressBar(bool isDark) {
     return Row(

@@ -56,7 +56,11 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="io.supabase.obhyash"
+                      android:host="login-callback"/>
                 <data android:scheme="com.example.obhyash_app"
+                      android:host="login-callback"/>
+                <data android:scheme="obhyash"
                       android:host="login-callback"/>
             </intent-filter>
             <!-- General App Links -->
