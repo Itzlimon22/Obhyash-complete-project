@@ -1,7 +1,15 @@
 import React from 'react';
 import { UserProfile } from 'lib/types';
 
-export type LevelType = 'Rookie' | 'Scout' | 'Warrior' | 'Titan' | 'Legend';
+export type LevelType =
+  | 'Explorer'
+  | 'Challenger'
+  | 'Warrior'
+  | 'Scholar'
+  | 'Legend'
+  | 'Rookie'
+  | 'Scout'
+  | 'Titan';
 
 export const LEVELS: {
   id: LevelType;
@@ -13,42 +21,42 @@ export const LEVELS: {
 }[] = [
   {
     id: 'Legend',
-    label: 'লিজেন্ড (Legend)',
-    minXP: 5000,
+    label: 'লিজেন্ড',
+    minXP: 15000,
     maxXP: 100000,
-    color: 'from-red-700 to-red-950',
+    color: 'from-red-600 to-red-900',
     icon: null,
   },
   {
-    id: 'Titan',
-    label: 'টাইটান (Titan)',
-    minXP: 3500,
-    maxXP: 4999,
-    color: 'from-red-500 to-red-600',
+    id: 'Scholar',
+    label: 'স্কলার',
+    minXP: 7000,
+    maxXP: 14999,
+    color: 'from-amber-500 to-amber-700',
     icon: null,
   },
   {
     id: 'Warrior',
-    label: 'ওয়ারিয়র (Warrior)',
-    minXP: 2000,
-    maxXP: 3499,
-    color: 'from-red-500 to-red-600',
+    label: 'ওয়ারিয়র',
+    minXP: 3000,
+    maxXP: 6999,
+    color: 'from-purple-600 to-indigo-700',
     icon: null,
   },
   {
-    id: 'Scout',
-    label: 'স্কাউট (Scout)',
-    minXP: 800,
-    maxXP: 1999,
-    color: 'from-emerald-500 to-emerald-500',
+    id: 'Challenger',
+    label: 'চ্যালেঞ্জার',
+    minXP: 1000,
+    maxXP: 2999,
+    color: 'from-sky-500 to-blue-600',
     icon: null,
   },
   {
-    id: 'Rookie',
-    label: 'রুকি (Rookie)',
+    id: 'Explorer',
+    label: 'এক্সপ্লোরার',
     minXP: 0,
-    maxXP: 799,
-    color: 'from-slate-400 to-slate-600',
+    maxXP: 999,
+    color: 'from-emerald-500 to-teal-700',
     icon: null,
   },
 ];

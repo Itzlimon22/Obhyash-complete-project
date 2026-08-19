@@ -230,17 +230,55 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     );
   }
 
-  Widget _buildLabel(String label, bool isDark) {
+  Widget _buildLabel(String label, bool isDark, {String? tooltip}) {
+    if (label.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'HindSiliguri',
-          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+            ),
+          ),
+          if (tooltip != null) ...[
+            const SizedBox(width: 5),
+            Tooltip(
+              message: tooltip,
+              triggerMode: TooltipTriggerMode.tap,
+              showDuration: const Duration(seconds: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF262626) : const Color(0xFF1F2937),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              textStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'HindSiliguri',
+              ),
+              child: Icon(
+                LucideIcons.helpCircle,
+                size: 14,
+                color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -251,8 +289,25 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     required List<String> items,
     required void Function(String?) onChanged,
     required bool isDark,
+    String? tooltip,
   }) {
     final safeValue = items.contains(value) ? value : items.first;
+
+    if (tooltip != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLabel(label, isDark, tooltip: tooltip),
+          AppDropdown<String>(
+            label: '',
+            value: safeValue,
+            fontSize: 14.5,
+            options: items.map((e) => AppDropdownOption(value: e, label: e)).toList(),
+            onChanged: onChanged,
+          ),
+        ],
+      );
+    }
 
     return AppDropdown<String>(
       label: label,
@@ -273,11 +328,12 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     Widget? suffixIcon,
     VoidCallback? onTap,
     String? Function(String?)? validator,
+    String? tooltip,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label, isDark),
+        _buildLabel(label, isDark, tooltip: tooltip),
         TextFormField(
           controller: controller,
           readOnly: readOnly,
@@ -489,6 +545,16 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           children: [
+                            // Student ID (Permanent Read-only)
+                            _buildTextField(
+                              label: 'স্টুডেন্ট আইডি',
+                              controller: TextEditingController(
+                                text: widget.user.displayStudentId,
+                              ),
+                              isDark: isDark,
+                              readOnly: true,
+                            ),
+                            const SizedBox(height: 16),
                             _buildTextField(
                               label: 'নাম',
                               controller: _nameController,
@@ -670,20 +736,32 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
-                                  child: _buildDropdown(
-                                    label: 'ব্যাচ',
-                                    value: _batch,
-                                    items: const [
-                                      'HSC 2024',
-                                      'HSC 2025',
-                                      'HSC 2026',
-                                      'HSC 2027',
-                                    ],
-                                    onChanged: (val) => setState(
-                                      () => _batch = val ?? 'HSC 2025',
-                                    ),
-                                    isDark: isDark,
-                                  ),
+                                  child: widget.user.isBatchLocked
+                                      ? _buildTextField(
+                                          label: 'ব্যাচ',
+                                          controller: TextEditingController(text: _batch),
+                                          isDark: isDark,
+                                          readOnly: true,
+                                          tooltip: 'তুমি ইতিমধ্যে ১ বার ব্যাচ পরিবর্তন করেছো। তাই এটি আর পরিবর্তন করা যাবে না।',
+                                        )
+                                      : _buildDropdown(
+                                          label: 'ব্যাচ',
+                                          value: _batch,
+                                          tooltip: 'ব্যাচ সর্বোচ্চ ১ বার পরিবর্তন করার সুযোগ পাবে।',
+                                          items: const [
+                                            'HSC 2024',
+                                            'HSC 2025',
+                                            'HSC 2026',
+                                            'HSC 2027',
+                                            'SSC 2025',
+                                            'SSC 2026',
+                                            'SSC 2027',
+                                          ],
+                                          onChanged: (val) => setState(
+                                            () => _batch = val ?? 'HSC 2025',
+                                          ),
+                                          isDark: isDark,
+                                        ),
                                 ),
                               ],
                             ),
@@ -700,67 +778,97 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                   setState(() => _target = val ?? 'Medical'),
                               isDark: isDark,
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
+
+                            // SSC Information Header
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, bottom: 4),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'এসএসসি পরীক্ষার তথ্য',
+                                  style: TextStyle(
+                                    fontFamily: 'Anek Bangla',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                    color: isDark ? const Color(0xFFE5E5E5) : const Color(0xFF374151),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                             _buildTextField(
-                              label:
-                                  'এসএসসি রোল নম্বর',
+                              label: 'এসএসসি রোল নম্বর',
                               controller: _sscRollController,
                               isDark: isDark,
-                              placeholder:
-                                  'রোল নম্বর লেখো',
+                              readOnly: widget.user.isSscLocked,
+                              placeholder: 'রোল নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              label:
-                                  'এসএসসি রেজিস্ট্রেশন নম্বর',
+                              label: 'এসএসসি রেজিস্ট্রেশন নম্বর',
                               controller: _sscRegController,
                               isDark: isDark,
-                              placeholder:
-                                  'রেজিস্ট্রেশন নম্বর লেখো',
+                              readOnly: widget.user.isSscLocked,
+                              placeholder: 'রেজিস্ট্রেশন নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
                             Row(
                               children: [
                                 Expanded(
-                                  child: _buildDropdown(
-                                    label: 'এসএসসি বোর্ড',
-                                    value: _sscBoard,
-                                    items: const [
-                                      'Dhaka',
-                                      'Rajshahi',
-                                      'Chittagong',
-                                      'Jessore',
-                                      'Comilla',
-                                      'Barisal',
-                                      'Sylhet',
-                                      'Dinajpur',
-                                      'Mymensingh',
-                                      'Madrasah',
-                                    ],
-                                    onChanged: (val) => setState(
-                                      () => _sscBoard = val ?? 'Dhaka',
-                                    ),
-                                    isDark: isDark,
-                                  ),
+                                  child: widget.user.isSscLocked
+                                      ? _buildTextField(
+                                          label: 'এসএসসি বোর্ড',
+                                          controller: TextEditingController(text: _sscBoard),
+                                          isDark: isDark,
+                                          readOnly: true,
+                                        )
+                                      : _buildDropdown(
+                                          label: 'এসএসসি বোর্ড',
+                                          value: _sscBoard,
+                                          items: const [
+                                            'Dhaka',
+                                            'Rajshahi',
+                                            'Chittagong',
+                                            'Jessore',
+                                            'Comilla',
+                                            'Barisal',
+                                            'Sylhet',
+                                            'Dinajpur',
+                                            'Mymensingh',
+                                            'Madrasah',
+                                          ],
+                                          onChanged: (val) => setState(
+                                            () => _sscBoard = val ?? 'Dhaka',
+                                          ),
+                                          isDark: isDark,
+                                        ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
-                                  child: _buildDropdown(
-                                    label:
-                                        'এসএসসি পাসিং ইয়ার',
-                                    value: _sscYear,
-                                    items: const [
-                                      '2026',
-                                      '2025',
-                                      '2024',
-                                      '2023',
-                                      '2022',
-                                    ],
-                                    onChanged: (val) => setState(
-                                      () => _sscYear = val ?? '2023',
-                                    ),
-                                    isDark: isDark,
-                                  ),
+                                  child: widget.user.isSscLocked
+                                      ? _buildTextField(
+                                          label: 'এসএসসি পাসিং ইয়ার',
+                                          controller: TextEditingController(text: _sscYear),
+                                          isDark: isDark,
+                                          readOnly: true,
+                                        )
+                                      : _buildDropdown(
+                                          label: 'এসএসসি পাসিং ইয়ার',
+                                          value: _sscYear,
+                                          items: const [
+                                            '2027',
+                                            '2026',
+                                            '2025',
+                                            '2024',
+                                            '2023',
+                                            '2022',
+                                          ],
+                                          onChanged: (val) => setState(
+                                            () => _sscYear = val ?? '2023',
+                                          ),
+                                          isDark: isDark,
+                                        ),
                                 ),
                               ],
                             ),
@@ -782,7 +890,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                   ),
                 ),
 
-                // 3. Account Linking (Read-only for now)
+                // 3. Account Linking
                 Container(
                   decoration: cardDecoration,
                   margin: const EdgeInsets.only(bottom: 24),
@@ -807,6 +915,151 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 color: Color(0xFF10B981),
                                 size: 18,
                               ),
+                            ),
+                            const SizedBox(height: 16),
+                            Builder(
+                              builder: (context) {
+                                final supabase = Supabase.instance.client;
+                                final identities =
+                                    supabase.auth.currentUser?.identities ?? [];
+                                final isGoogleLinked = identities.any(
+                                  (id) => id.provider == 'google',
+                                );
+
+                                return Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF1C1C1E)
+                                        : const Color(0xFFF9FAFB),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? const Color(0xFF2C2C2E)
+                                          : const Color(0xFFE5E7EB),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Google অ্যাকাউন্ট',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Anek Bangla',
+                                                color: isDark
+                                                    ? Colors.white
+                                                    : Colors.black87,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              isGoogleLinked
+                                                  ? 'গুগল সফলভাবে লিঙ্ক করা আছে'
+                                                  : '১-ক্লিকে লগইন করার জন্য গুগল লিঙ্ক করুন',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontFamily: 'HindSiliguri',
+                                                color: isDark
+                                                    ? Colors.white54
+                                                    : Colors.black54,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      if (isGoogleLinked)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF059669)
+                                                .withValues(alpha: 0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: const Color(0xFF059669)
+                                                  .withValues(alpha: 0.4),
+                                            ),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                LucideIcons.checkCheck,
+                                                size: 14,
+                                                color: Color(0xFF059669),
+                                              ),
+                                              SizedBox(width: 6),
+                                              Text(
+                                                'লিঙ্কড',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Anek Bangla',
+                                                  color: Color(0xFF059669),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      else
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            try {
+                                              await supabase.auth.linkIdentity(
+                                                OAuthProvider.google,
+                                                redirectTo:
+                                                    'io.supabase.obhyash://login-callback/',
+                                              );
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                AppPopups.show(
+                                                  context,
+                                                  message:
+                                                      'গুগল অ্যাকাউন্ট লিঙ্ক করা সম্ভব হয়নি: $e',
+                                                  isError: true,
+                                                );
+                                              }
+                                            }
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(
+                                              color: Color(0xFF059669),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 14,
+                                              vertical: 8,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'লিঙ্ক করুন',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Anek Bangla',
+                                              color: Color(0xFF059669),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

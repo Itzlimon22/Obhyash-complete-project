@@ -61,6 +61,7 @@ class UserAvatar extends StatelessWidget {
   final Color? borderColor;
   final double borderWidth;
   final bool useDiceBearFallback;
+  final bool isPro;
 
   const UserAvatar({
     super.key,
@@ -73,6 +74,7 @@ class UserAvatar extends StatelessWidget {
     this.borderColor,
     this.borderWidth = 2,
     this.useDiceBearFallback = true,
+    this.isPro = false,
   });
 
   @override
@@ -130,13 +132,13 @@ class UserAvatar extends StatelessWidget {
       );
     }
 
-    return Container(
+    final baseAvatar = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: bgColor,
-        border: showBorder
+        border: showBorder && !isPro
             ? Border.all(
                 color: borderColor ?? Colors.white,
                 width: borderWidth,
@@ -154,6 +156,38 @@ class UserAvatar extends StatelessWidget {
       ),
       child: ClipOval(
         child: avatarContent,
+      ),
+    );
+
+    if (!isPro) return baseAvatar;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final ringPad = size >= 60 ? 3.0 : 2.2;
+
+    return Container(
+      width: size + ringPad * 2 + 3,
+      height: size + ringPad * 2 + 3,
+      padding: EdgeInsets.all(ringPad),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: SweepGradient(
+          colors: [
+            Color(0xFF4285F4), // Google Blue
+            Color(0xFF9B72CB), // Gemini Purple
+            Color(0xFFD96570), // Google Coral / Pink
+            Color(0xFFF4B400), // Google Amber
+            Color(0xFF34A853), // Google Green
+            Color(0xFF4285F4), // Loop
+          ],
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isDark ? const Color(0xFF141414) : Colors.white,
+        ),
+        padding: const EdgeInsets.all(1.5),
+        child: baseAvatar,
       ),
     );
   }

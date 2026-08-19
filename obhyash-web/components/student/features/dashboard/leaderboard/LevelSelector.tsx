@@ -32,8 +32,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
         {LEVELS.map((level) => {
           const isSelected  = selectedLevel === level.id;
           const isUserLevel = currentUser?.level === level.id;
-          const bnName      = level.label.split('(')[0].trim();
-          const count       = levelCounts[level.id] ?? 0;
+          const levelName   = level.label.trim();
 
           return (
             <button
@@ -61,15 +60,15 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                 'font-black leading-tight transition-all',
                 isSelected ? 'text-[15px]' : 'text-[12px]',
               ].join(' ')}>
-                {bnName}
+                {levelName}
               </span>
 
               {/* XP range — highlighted on selected */}
               <span className={[
-                'font-medium leading-none mt-0.5 transition-all',
+                'font-semibold leading-none mt-1 transition-all',
                 isSelected
-                  ? 'text-[10px] text-emerald-600 dark:text-emerald-400'
-                  : 'text-[9px] text-neutral-300 dark:text-neutral-700',
+                  ? 'text-[11px] text-emerald-600 dark:text-emerald-400'
+                  : 'text-[10px] text-neutral-500 dark:text-neutral-400',
               ].join(' ')}>
                 {xpRangeLabel(level.minXP, level.maxXP)}
               </span>

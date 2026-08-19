@@ -47,11 +47,11 @@ export const formatDate = (isoString: string): string => {
 };
 
 export const calculateLevel = (xp: number): string => {
-  if (xp >= 5000) return 'Legend';
-  if (xp >= 3500) return 'Titan';
-  if (xp >= 2000) return 'Warrior';
-  if (xp >= 800) return 'Scout';
-  return 'Rookie';
+  if (xp >= 15000) return 'Legend';
+  if (xp >= 7000) return 'Scholar';
+  if (xp >= 3000) return 'Warrior';
+  if (xp >= 1000) return 'Challenger';
+  return 'Explorer';
 };
 
 export const toBengaliNumeral = (num: number | string): string => {

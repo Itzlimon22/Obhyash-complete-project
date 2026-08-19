@@ -1566,7 +1566,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <Youtube className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://wa.me/8801946855793"
+                  href="https://wa.me/8801409583992"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-all"
@@ -1696,7 +1696,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
-                  <span>+880 1946-855793</span>
+                  <span>+880 1409-583992</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />

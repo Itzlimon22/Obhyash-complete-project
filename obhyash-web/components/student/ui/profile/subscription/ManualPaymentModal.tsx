@@ -202,14 +202,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </h4>
                 <div
                   className="bg-neutral-100 dark:bg-neutral-800/80 p-3.5 rounded-xl mb-3.5 flex items-center justify-between group cursor-pointer border border-neutral-200 dark:border-neutral-700 hover:border-emerald-400 transition-colors"
-                  onClick={() => copyToClipboard('01946855793')}
+                  onClick={() => copyToClipboard('01749591456')}
                 >
                   <div className="text-left">
                     <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 block">
                       bKash / Nagad (Send Money)
                     </span>
                     <span className="font-mono font-bold text-lg text-neutral-900 dark:text-white tracking-wider">
-                      01946855793
+                      01749591456
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-neutral-700 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40">
@@ -365,14 +365,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   title: 'সরাসরি কথা বলুন',
                   sub: 'কল করতে ক্লিক করো',
                   color: 'bg-emerald-50 text-emerald-600',
-                  link: 'tel:+8801946855793',
+                  link: 'tel:+8801409583992',
                 },
                 {
                   icon: '💬',
                   title: 'হোয়াটসঅ্যাপ মেসেজ',
                   sub: 'তাৎক্ষণিক চ্যাট সাপোর্ট',
                   color: 'bg-green-50 text-green-600',
-                  link: 'https://wa.me/8801946855793',
+                  link: 'https://wa.me/8801409583992',
                 },
                 {
                   icon: '✉️',
@@ -425,7 +425,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               {[
                 {
                   q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
-                  a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01946855793 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
+                  a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01749591456 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
                 },
                 {
                   q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
@@ -453,7 +453,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 },
                 {
                   q: 'যেকোনো প্রয়োজনে জরুরি সহায়তা কোথায় পাব?',
-                  a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01946855793) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
+                  a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01409583992) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
                 },
               ].map((faq, idx) => (
                 <details

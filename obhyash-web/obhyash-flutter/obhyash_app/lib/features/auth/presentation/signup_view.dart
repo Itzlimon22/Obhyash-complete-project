@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'widgets/otp_verification_dialog.dart';
 
 import '../providers/auth_controller.dart';
 import '../../../core/data/college_list.dart';
@@ -25,6 +26,11 @@ class _SignupViewState extends ConsumerState<SignupView>
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   String _gender = '';
+
+  // Phone OTP Verification State
+  bool _isPhoneVerified = false;
+  String _verifiedPhone = '';
+  bool _isSendingOtp = false;
 
   final _instituteController = TextEditingController();
   String _stream = 'HSC';
@@ -102,8 +108,9 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   String? _validateStep(int currentStep) {
     if (currentStep == 1) {
-      if (_nameController.text.trim().isEmpty)
+      if (_nameController.text.trim().isEmpty) {
         return 'তোমার নাম উল্লেখ করা আবশ্যক';
+      }
 
       final phone = _phoneController.text.trim();
       if (phone.isEmpty) return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
@@ -119,11 +126,13 @@ class _SignupViewState extends ConsumerState<SignupView>
           phone.contains('987654')) {
         return 'অনুগ্রহ করে একটি সঠিক ও সচল মোবাইল নম্বর দাও';
       }
-
-      if (_gender.isEmpty) return 'লিঙ্গ নির্বাচন করা আবশ্যক';
     } else if (currentStep == 2) {
-      if (_instituteController.text.trim().isEmpty)
+      if (_instituteController.text.trim().isEmpty) {
         return 'তোমার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
+      }
+      if (_gender.isEmpty) {
+        return 'লিঙ্গ (Gender) নির্বাচন করা আবশ্যক';
+      }
     } else if (currentStep == 3) {
       if (_emailController.text.trim().isEmpty ||
           _passwordController.text.isEmpty ||
@@ -135,20 +144,74 @@ class _SignupViewState extends ConsumerState<SignupView>
       ).hasMatch(_emailController.text.trim())) {
         return 'সঠিক ইমেইল এড্রেস দাও (যেমন: example@gmail.com)';
       }
-      if (_passwordController.text.length < 6)
+      if (_passwordController.text.length < 6) {
         return 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে';
-      if (_passwordController.text != _confirmPasswordController.text)
+      }
+      if (_passwordController.text != _confirmPasswordController.text) {
         return 'পাসওয়ার্ড দুটি মিলছে না';
+      }
     }
     return null;
   }
 
-  void _handleNext() {
+  Future<void> _handleNext() async {
     final errorMsg = _validateStep(_step);
     if (errorMsg != null) {
       AppPopups.show(context, message: errorMsg, isError: true);
       return;
     }
+
+    // Step 1: Enforce OTP Verification before proceeding
+    if (_step == 1) {
+      final currentPhone = _phoneController.text.trim();
+      final isAlreadyVerified =
+          _isPhoneVerified && _verifiedPhone == currentPhone;
+
+      if (!isAlreadyVerified) {
+        setState(() => _isSendingOtp = true);
+
+        final authNotifier = ref.read(authControllerProvider.notifier);
+        final res = await authNotifier.sendRegistrationOtp(currentPhone);
+
+        if (!mounted) return;
+        setState(() => _isSendingOtp = false);
+
+        if (res['success'] == true) {
+          final cooldownSec =
+              (res['cooldown_seconds'] as num?)?.toInt() ?? 60;
+
+          final verified = await OtpVerificationDialog.show(
+            context,
+            phone: currentPhone,
+            initialCooldown: cooldownSec,
+            onVerify: (otp) =>
+                authNotifier.verifyRegistrationOtp(currentPhone, otp),
+            onResend: () =>
+                authNotifier.sendRegistrationOtp(currentPhone),
+          );
+
+          if (verified == true && mounted) {
+            setState(() {
+              _isPhoneVerified = true;
+              _verifiedPhone = currentPhone;
+              _step = 2;
+            });
+            AppPopups.success(
+              context,
+              message: 'মোবাইল নম্বর সফলভাবে যাচাই করা হয়েছে! 🎉',
+            );
+          }
+        } else {
+          AppPopups.show(
+            context,
+            message: res['error']?.toString() ?? 'ওটিপি পাঠানো যায়নি',
+            isError: true,
+          );
+        }
+        return;
+      }
+    }
+
     setState(() {
       _step++;
     });
@@ -172,7 +235,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         .signup(
           name: _nameController.text.trim(),
           phone: _phoneController.text.trim(),
-          gender: _gender,
+          gender: _gender.isEmpty ? null : _gender,
           institute: normalizeCollegeName(_instituteController.text.trim()),
           stream: _stream,
           group: _group,
@@ -273,7 +336,7 @@ class _SignupViewState extends ConsumerState<SignupView>
 
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: isLoading
+                        onPressed: (isLoading || _isSendingOtp)
                             ? null
                             : (_step == 3 ? _handleSignup : _handleNext),
                         style: ElevatedButton.styleFrom(
@@ -285,7 +348,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: isLoading
+                        child: (isLoading || _isSendingOtp)
                             ? const SizedBox(
                                 height: 24,
                                 width: 24,
@@ -487,6 +550,10 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   Widget _buildStep1(bool isDark) {
+    final isVerified = _isPhoneVerified &&
+        _phoneController.text.trim().isNotEmpty &&
+        _phoneController.text.trim() == _verifiedPhone;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -498,57 +565,84 @@ class _SignupViewState extends ConsumerState<SignupView>
           isDark: isDark,
         ),
         const SizedBox(height: 20),
-        _buildInputField(
-          label: 'ফোন নাম্বার',
-          icon: LucideIcons.phone,
-          controller: _phoneController,
-          hint: '017XXXXXXXX',
-          isDark: isDark,
-          keyboardType: TextInputType.phone,
-        ),
-        const SizedBox(height: 20),
-        _buildLabel('লিঙ্গ (Gender)', isDark),
-        const SizedBox(height: 8),
-        Row(
-          children: ['Male', 'Female'].map((g) {
-            final isSelected = _gender == g;
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: g == 'Male' ? 12 : 0),
-                child: InkWell(
-                  onTap: () => setState(() => _gender = g),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _buildLabel('মোবাইল নম্বর', isDark),
+                const SizedBox(width: 8),
+                if (isVerified)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFF059669).withValues(alpha: 0.1)
-                          : (isDark
-                                ? const Color(0xFF1C1C1E)
-                                : const Color(0xFFF5F5F5)),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF059669)
-                            : Colors.transparent,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFF059669).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      g == 'Male' ? 'পুরুষ' : 'মহিলা',
-                      style: TextStyle(
-                        fontFamily: 'Anek Bangla',
-                        fontWeight: FontWeight.bold,
-                        color: isSelected
-                            ? const Color(0xFF059669)
-                            : (isDark ? Colors.white70 : Colors.black87),
-                      ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          LucideIcons.checkCircle2,
+                          size: 13,
+                          color: Color(0xFF059669),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'যাচাইকৃত',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'HindSiliguri',
+                            color: Color(0xFF059669),
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            _buildInputField(
+              label: '',
+              icon: LucideIcons.phone,
+              controller: _phoneController,
+              hint: '017XXXXXXXX',
+              isDark: isDark,
+              keyboardType: TextInputType.phone,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFE5E7EB),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.shieldCheck,
+                size: 16,
+                color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইলে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                   ),
                 ),
               ),
-            );
-          }).toList(),
+            ],
+          ),
         ),
       ],
     );
@@ -685,6 +779,51 @@ class _SignupViewState extends ConsumerState<SignupView>
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 20),
+
+        _buildLabel('লিঙ্গ (Gender)', isDark),
+        const SizedBox(height: 8),
+        Row(
+          children: ['Male', 'Female'].map((g) {
+            final isSelected = _gender == g;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: g == 'Male' ? 12 : 0),
+                child: InkWell(
+                  onTap: () => setState(() => _gender = g),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF059669).withValues(alpha: 0.1)
+                          : (isDark
+                                ? const Color(0xFF1C1C1E)
+                                : const Color(0xFFF5F5F5)),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF059669)
+                            : Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      g == 'Male' ? 'পুরুষ' : 'মহিলা',
+                      style: TextStyle(
+                        fontFamily: 'Anek Bangla',
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? const Color(0xFF059669)
+                            : (isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -859,7 +998,6 @@ class _SignupViewState extends ConsumerState<SignupView>
     required List<String> options,
     required Function(String?) onChanged,
     required bool isDark,
-    String? tooltip,
   }) {
     return AppDropdown<String>(
       value: value,

@@ -13,6 +13,21 @@ interface LeaderboardUserRow {
   avatar_url: string | null;
   avatar_color: string | null;
   streak: number | null;
+  batch?: string | null;
+}
+
+function getLevelAliases(level: string): string[] {
+  const l = level.toLowerCase();
+  if (l === 'explorer' || l === 'rookie') {
+    return ['Explorer', 'Rookie', 'explorer', 'rookie', 'Beginner'];
+  } else if (l === 'challenger' || l === 'scout') {
+    return ['Challenger', 'Scout', 'challenger', 'scout'];
+  } else if (l === 'warrior') {
+    return ['Warrior', 'warrior'];
+  } else if (l === 'scholar' || l === 'titan') {
+    return ['Scholar', 'Titan', 'scholar', 'titan'];
+  }
+  return ['Legend', 'legend'];
 }
 
 export async function GET(req: NextRequest) {
@@ -26,6 +41,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
+  const aliases = getLevelAliases(level);
 
   // Try indexed RPC first — pass offset/limit for server-side pagination
   const { data: rpcData, error: rpcError } = await supabase.rpc(
@@ -36,12 +52,11 @@ export async function GET(req: NextRequest) {
   let rows: LeaderboardUserRow[] | null = rpcData;
 
   // Fallback: direct query with .range() for server-side slicing
-  if (rpcError || !rows) {
+  if (rpcError || !rows || rows.length === 0) {
     const { data, error } = await supabase
       .from('public_profiles')
-      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak')
-      .eq('level', level)
-      .ilike('role', 'student')
+      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, batch')
+      .in('level', aliases)
       .order('xp', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -59,9 +74,10 @@ export async function GET(req: NextRequest) {
     level: user.level || level,
     examsTaken: user.exams_taken || 0,
     avatarUrl: user.avatar_url || undefined,
-    avatarColor: user.avatar_color || null,
-    streakCount: user.streak || 0,
-    _index: offset + index,
+    avatarColor: user.avatar_color || undefined,
+    streak: user.streak || 0,
+    batch: user.batch || undefined,
+    rank: offset + index + 1,
   }));
 
   return NextResponse.json(

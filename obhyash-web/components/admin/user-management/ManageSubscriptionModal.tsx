@@ -50,7 +50,8 @@ export default function ManageSubscriptionModal({
     const supabase = createClient();
 
     try {
-      // 1. Update User Subscription JSON
+      // 1. Update User Subscription JSON & Dedicated DB Security Columns
+      const isSubActive = status === 'Active' && new Date(newExpiry) > new Date();
       const updatedSubscription = {
         ...user.subscription,
         status: status,
@@ -59,7 +60,12 @@ export default function ManageSubscriptionModal({
 
       const { error: updateError } = await supabase
         .from('users')
-        .update({ subscription: updatedSubscription })
+        .update({
+          subscription: updatedSubscription,
+          is_subscribed: isSubActive,
+          subscription_status: status.toLowerCase(),
+          subscription_expires_at: newExpiry,
+        })
         .eq('id', user.id);
 
       if (updateError) throw updateError;
@@ -177,7 +183,7 @@ export default function ManageSubscriptionModal({
                 onChange={(e) =>
                   setExtensionDays(parseInt(e.target.value) || 0)
                 }
-                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-md rounded-b-none sm:rounded-b-md animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm outline-none focus:border-emerald-500"
+                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm outline-none focus:border-emerald-500"
               />
             </div>
           </div>

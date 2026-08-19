@@ -760,7 +760,7 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
             <div class="footer">
                 <p><strong>Zenith / Obhyash Education Platform</strong></p>
                 <p>Level 5, House 42, Road 7/A, Dhanmondi, Dhaka - 1209</p>
-                <p>support@obhyash.com | +880 1712 345678</p>
+                <p>support@obhyash.com | +880 1409-583992</p>
                 <p style="margin-top: 10px; font-style: italic;">This is a computer-generated receipt.</p>
             </div>
         </div>

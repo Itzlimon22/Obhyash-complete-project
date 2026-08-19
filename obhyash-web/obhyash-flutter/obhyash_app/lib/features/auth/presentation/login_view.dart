@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -64,47 +65,66 @@ class _LoginViewState extends ConsumerState<LoginView>
     }
   }
 
+  void _handleGoogleLogin() async {
+    await ref.read(authControllerProvider.notifier).loginWithGoogle();
+    if (!mounted) return;
+    final authState = ref.read(authControllerProvider);
+    if (authState.hasError) {
+      AppPopups.show(
+        context,
+        message: authState.error.toString(),
+        isError: true,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const isDark = true;
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
-    final bgColor = isDark ? Colors.black : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    const bgColor = Color(0xFF09090B); // Luxury OLED Dark
+    const textColor = Colors.white;
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-          child: AnimatedBuilder(
-            animation: _animController,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Opacity(opacity: _fadeAnimation.value, child: child),
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 40),
-                // Logo Section
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF059669).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      LucideIcons.graduationCap,
-                      size: 64,
-                      color: Color(0xFF059669),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: bgColor,
+      ),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+            child: AnimatedBuilder(
+              animation: _animController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Opacity(opacity: _fadeAnimation.value, child: child),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 24),
+                  // Logo Section
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF141417),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF27272A)),
+                      ),
+                      child: const Icon(
+                        LucideIcons.graduationCap,
+                        size: 48,
+                        color: Color(0xFF059669),
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
 
                 // Welcome Text
@@ -134,12 +154,12 @@ class _LoginViewState extends ConsumerState<LoginView>
 
                 // Form
                 _buildInputField(
-                  label: 'ইমেইল এড্রেস',
-                  icon: LucideIcons.mail,
+                  label: 'মোবাইল নম্বর অথবা ইমেইল',
+                  icon: LucideIcons.user,
                   controller: _emailController,
-                  hint: 'example@mail.com',
+                  hint: '017XXXXXXXX অথবা example@gmail.com',
                   isDark: isDark,
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 20),
                 _buildInputField(
@@ -175,7 +195,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // Submit Button
                 ElevatedButton(
@@ -208,7 +228,83 @@ class _LoginViewState extends ConsumerState<LoginView>
                         ),
                 ),
 
-                const SizedBox(height: 48),
+                const SizedBox(height: 24),
+
+                // Divider "অথবা"
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.white12 : Colors.black12,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'অথবা',
+                        style: TextStyle(
+                          color: isDark ? Colors.white38 : Colors.black38,
+                          fontSize: 14,
+                          fontFamily: 'Anek Bangla',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: isDark ? Colors.white12 : Colors.black12,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Google Login Button (Account Linking)
+                OutlinedButton(
+                  onPressed: isLoading ? null : _handleGoogleLogin,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF2C2C2E)
+                          : const Color(0xFFE5E7EB),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    backgroundColor:
+                        isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.network(
+                        'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                        width: 20,
+                        height: 20,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                          LucideIcons.globe,
+                          size: 20,
+                          color: Color(0xFF4285F4),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Google দিয়ে লগইন করো',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Anek Bangla',
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 36),
 
                 // Footer
                 Row(
@@ -236,7 +332,6 @@ class _LoginViewState extends ConsumerState<LoginView>
                     ),
                   ],
                 ),
-              ],
             ),
           ),
         ),

@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Search,
   X,
-  Rss,
   Bookmark,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -235,19 +234,6 @@ export default function BlogListingClient({
             >
               সার্চ করো
             </button>
-          </div>
-
-          {/* RSS subscribe link */}
-          <div className="mt-5">
-            <a
-              href="/blog/rss.xml"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors font-anek"
-            >
-              <Rss className="w-3.5 h-3.5" />
-              RSS ফিড সাবস্ক্রাইব করো
-            </a>
           </div>
         </div>
       </section>

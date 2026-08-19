@@ -82,7 +82,7 @@ export default function TeacherStatsModal({
                     {stats?.totalQuestions || 0}
                   </p>
                 </div>
-                <div className="w-full p-3 bg-white dark:bg-neutral-800 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-sm">
+                <div className="p-3 bg-white dark:bg-neutral-800 rounded-xl shadow-sm">
                   <FileText className="text-emerald-500" size={24} />
                 </div>
               </div>

@@ -262,6 +262,7 @@ export interface User {
   goal?: string; // HSC, Admission
   division?: string; // Science, Arts
   batch?: string; // HSC 2025
+  batch_change_count?: number; // 0 = not changed, 1 = maximum 1 change done
   ssc_roll?: string;
   ssc_reg?: string;
   ssc_board?: string;
@@ -306,6 +307,8 @@ export interface UserProfile extends Partial<User> {
   avatarUrl?: string;
   isCurrentUser?: boolean;
   target?: string;
+  batch?: string;
+  batch_change_count?: number;
   stream?: string;
   group?: string; // Legacy alias for division
   createdAt?: string; // Mapped from DB created_at

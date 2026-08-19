@@ -1268,7 +1268,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
                   <p className="flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer">
-                    +880 1712 345678
+                    +880 1409-583992
                   </p>
                   <p className="flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer">
                     support@zenith.edu.bd

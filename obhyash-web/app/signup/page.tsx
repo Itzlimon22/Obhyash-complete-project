@@ -19,6 +19,10 @@ import {
   Eye,
   EyeOff,
   Gift,
+  ShieldCheck,
+  RotateCw,
+  X,
+  AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -56,24 +60,34 @@ function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Phone OTP Verification State
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [verifiedPhone, setVerifiedPhone] = useState('');
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(60);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showCollegeSuggestions, setShowCollegeSuggestions] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
-    // Step 1: Personal (Was Step 2)
+    // Step 1: Personal (Option 2: Name + Phone)
     name: '',
     phone: '',
-    gender: '', // Male, Female, Other
+    gender: '', // Optional
 
-    // Step 2: Academic (Was Step 3)
+    // Step 2: Academic
     institute: '',
     stream: 'HSC',
     group: 'Science',
     batch: 'HSC 2026',
     examTarget: '', // exam_target in DB
 
-    // Step 3: Credentials (Was Step 1)
+    // Step 3: Credentials
     email: '',
     password: '',
     confirmPassword: '',
@@ -93,6 +107,14 @@ function SignupForm() {
     }
   }, [searchParams]);
 
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (otpCooldown > 0 && isOtpModalOpen) {
+      const timer = setTimeout(() => setOtpCooldown((prev) => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpCooldown, isOtpModalOpen]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -110,26 +132,26 @@ function SignupForm() {
   const validateStep = (currentStep: number) => {
     if (currentStep === 1) {
       // Personal
-      if (!formData.name) {
+      if (!formData.name.trim()) {
         return 'আপনার নাম উল্লেখ করা আবশ্যক';
       }
-      if (!formData.phone) {
+      if (!formData.phone.trim()) {
         return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
       }
-      if (!/^01\d{9}$/.test(formData.phone)) {
-        return 'সঠিক মোবাইল নম্বর দাও (যেমন: 01712345678)';
-      }
-      if (!formData.gender) {
-        return 'লিঙ্গ নির্বাচন করা আবশ্যক';
+      if (!/^01[3-9]\d{8}$/.test(formData.phone.trim())) {
+        return 'সঠিক মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)';
       }
     }
     if (currentStep === 2) {
       // Academic
+      if (!formData.institute) {
+        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
+      }
       if (!formData.batch) {
         return 'ব্যাচ সিলেক্ট করা আবশ্যক';
       }
-      if (!formData.institute) {
-        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
+      if (!formData.gender) {
+        return 'লিঙ্গ নির্বাচন করা আবশ্যক';
       }
     }
     if (currentStep === 3) {
@@ -137,7 +159,6 @@ function SignupForm() {
       if (!formData.email || !formData.password || !formData.confirmPassword) {
         return 'সব তথ্য পূরণ করতে হবে';
       }
-      // Strict Email Validation (Gmail included in standard format)
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         return 'সঠিক ইমেইল এড্রেস দাও (যেমন: example@gmail.com)';
       }
@@ -151,12 +172,85 @@ function SignupForm() {
     return null;
   };
 
-  const handleNext = () => {
+  const sendOtpRequest = async (phoneToSend: string) => {
+    setIsSendingOtp(true);
+    setOtpError(null);
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneToSend }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setOtpCooldown(data.cooldown_seconds || 60);
+        setIsOtpModalOpen(true);
+        setOtpCode('');
+        toast.success(data.message || 'মোবাইলে ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে।');
+      } else {
+        setError(data.error || 'ওটিপি পাঠাতে সমস্যা হয়েছে।');
+        toast.error(data.error || 'ওটিপি পাঠাতে সমস্যা হয়েছে।');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'সার্ভার সংযোগে ত্রুটি';
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const verifyOtpRequest = async () => {
+    if (otpCode.trim().length !== 6) {
+      setOtpError('অনুগ্রহ করে ৬ ডিজিটের সম্পূর্ণ ওটিপি লিখুন');
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    setOtpError(null);
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone.trim(), otp: otpCode.trim() }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setIsPhoneVerified(true);
+        setVerifiedPhone(formData.phone.trim());
+        setIsOtpModalOpen(false);
+        setStep(2);
+        toast.success('মোবাইল নম্বর সফলভাবে যাচাই করা হয়েছে! 🎉');
+      } else {
+        setOtpError(data.error || 'ভুল ওটিপি কোড! আবার চেষ্টা করুন।');
+      }
+    } catch (err: unknown) {
+      setOtpError(err instanceof Error ? err.message : 'যাচাইকরণে ত্রুটি');
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleNext = async () => {
     const errorMsg = validateStep(step);
     if (errorMsg) {
       setError(errorMsg);
       return;
     }
+
+    // Step 1: Enforce OTP Verification
+    if (step === 1) {
+      const cleanPhone = formData.phone.trim();
+      const isAlreadyVerified = isPhoneVerified && verifiedPhone === cleanPhone;
+
+      if (!isAlreadyVerified) {
+        await sendOtpRequest(cleanPhone);
+        return;
+      }
+    }
+
     setStep(step + 1);
   };
 
@@ -359,7 +453,7 @@ function SignupForm() {
           )}
 
           <div className="space-y-4 md:space-y-6">
-            {/* STEP 1: PERSONAL DETAILS */}
+            {/* STEP 1: PERSONAL DETAILS (Option 2: Name + Phone) */}
             {step === 1 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
@@ -367,55 +461,48 @@ function SignupForm() {
                     তোমার নাম
                   </label>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="পূর্ণ নাম (Full Name)"
-                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    ফোন নাম্বার
-                  </label>
+                  <div className="flex items-center justify-between ml-1">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      মোবাইল নম্বর
+                    </label>
+                    {isPhoneVerified && verifiedPhone === formData.phone.trim() && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        যাচাইকৃত
+                      </span>
+                    )}
+                  </div>
                   <div className="relative group">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="017xxxxxxxx"
-                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                      placeholder="017XXXXXXXX"
+                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    লিঙ্গ (Gender)
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {['Male', 'Female'].map((g) => (
-                      <button
-                        key={g}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, gender: g })}
-                        className={`py-3 rounded-xl text-sm font-bold transition-all border ${
-                          formData.gender === g
-                            ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-600 dark:text-red-400 shadow-sm'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
-                        }`}
-                      >
-                        {g === 'Male' ? 'পুরুষ' : 'মহিলা'}
-                      </button>
-                    ))}
-                  </div>
+                <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইল নম্বরে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।
+                  </span>
                 </div>
               </div>
             )}
@@ -533,6 +620,28 @@ function SignupForm() {
                         ))}
                       </select>
                     </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    লিঙ্গ (Gender)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {['Male', 'Female'].map((g) => (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, gender: g })}
+                        className={`py-3 rounded-xl text-sm font-bold transition-all border ${
+                          formData.gender === g
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
+                        }`}
+                      >
+                        {g === 'Male' ? 'পুরুষ' : 'মহিলা'}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -714,13 +823,13 @@ function SignupForm() {
               <button
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
-                disabled={loading}
+                disabled={loading || isSendingOtp}
                 className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:py-3.5"
               >
-                {loading ? (
+                {loading || isSendingOtp ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    অপেক্ষা করো...
+                    {isSendingOtp ? 'ওটিপি পাঠানো হচ্ছে...' : 'অপেক্ষা করো...'}
                   </>
                 ) : step === 3 ? (
                   'অ্যাকাউন্ট তৈরি করো'
@@ -732,6 +841,102 @@ function SignupForm() {
               </button>
             </div>
           </div>
+
+          {/* OTP VERIFICATION MODAL */}
+          {isOtpModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 font-bengali">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                        মোবাইল নম্বর যাচাই
+                      </h3>
+                      <p className="text-xs text-neutral-500">
+                        নিরাপত্তা স্বার্থে ৬ ডিজিটের ওটিপি লিখুন
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsOtpModalOpen(false)}
+                    className="p-1 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-between text-xs">
+                  <span className="text-neutral-500">নম্বর:</span>
+                  <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">
+                    {formData.phone}
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-bold text-[10px]">
+                    SMS পাঠানো হয়েছে
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    autoFocus
+                    value={otpCode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setOtpCode(val);
+                      if (otpError) setOtpError(null);
+                    }}
+                    placeholder="••••••"
+                    className="w-full py-3.5 text-center text-3xl font-mono font-bold tracking-[0.4em] bg-neutral-100 dark:bg-neutral-950 border-2 border-emerald-500/50 focus:border-emerald-500 rounded-2xl focus:outline-none transition-all"
+                  />
+                  {otpError && (
+                    <p className="text-xs text-red-500 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {otpError}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={verifyOtpRequest}
+                  disabled={isVerifyingOtp || otpCode.length !== 6}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isVerifyingOtp ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      যাচাই করা হচ্ছে...
+                    </>
+                  ) : (
+                    'যাচাই করে এগিয়ে যাও'
+                  )}
+                </button>
+
+                <div className="text-center text-xs">
+                  {otpCooldown > 0 ? (
+                    <span className="text-neutral-400">
+                      পুনরায় পাঠানো যাবে: <b className="text-neutral-600 dark:text-neutral-300">{otpCooldown}</b> সেকেন্ড পর
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => sendOtpRequest(formData.phone.trim())}
+                      disabled={isSendingOtp}
+                      className="text-emerald-600 hover:text-emerald-700 font-bold inline-flex items-center gap-1"
+                    >
+                      <RotateCw className={`w-3.5 h-3.5 ${isSendingOtp ? 'animate-spin' : ''}`} />
+                      ওটিপি পুনরায় পাঠাও
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mt-4 text-center md:mt-8">
             <p className="text-sm text-slate-500 dark:text-slate-400">

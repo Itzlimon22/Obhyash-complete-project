@@ -1,8 +1,6 @@
-'use client';
-
 import { useState } from 'react';
 import Image from 'next/image';
-import { Camera, Trash2, Loader2 } from 'lucide-react';
+import { Camera, Trash2, Loader2, Lock, HelpCircle } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { UserProfile } from '@/lib/types';
 import { toast } from 'sonner';
@@ -16,6 +14,15 @@ interface PersonalDetailsPanelProps {
   user: UserProfile;
   onSave?: (data: Partial<UserProfile>) => Promise<void> | void;
 }
+
+const FieldTooltip = ({ text }: { text: string }) => (
+  <span className="relative group inline-flex items-center ml-1 cursor-pointer">
+    <HelpCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors" />
+    <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block z-50 w-60 p-2.5 bg-neutral-900 dark:bg-neutral-800 text-white text-[11.5px] font-medium leading-relaxed rounded-xl shadow-xl text-center border border-neutral-700 font-bengali">
+      {text}
+    </span>
+  </span>
+);
 
 type SettingsUpdatePayload = {
   name: string;
@@ -347,6 +354,18 @@ export default function PersonalDetailsPanel({
             </p>
           </div>
 
+          {/* Student ID (Read Only) */}
+          <div className={inputGroupClass}>
+            <label className={labelClass}>স্টুডেন্ট আইডি</label>
+            <input
+              type="text"
+              value={user.student_id || `OBH-${user.id.slice(0, 5).toUpperCase()}`}
+              readOnly
+              disabled
+              className={`${inputClass} bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 font-mono cursor-not-allowed`}
+            />
+          </div>
+
           <div className={inputGroupClass}>
             <label className={labelClass}>নাম</label>
             <input
@@ -360,14 +379,7 @@ export default function PersonalDetailsPanel({
           </div>
 
           <div className={inputGroupClass}>
-            <label className={labelClass}>
-              ফোন নম্বর
-              {user.phone && (
-                <span className="text-xs text-red-500 ml-2">
-                  (পরিবর্তনযোগ্য নয়)
-                </span>
-              )}
-            </label>
+            <label className={labelClass}>ফোন নম্বর</label>
             <div className="relative">
               <input
                 type="tel"
@@ -380,22 +392,6 @@ export default function PersonalDetailsPanel({
                 readOnly={!!user.phone}
                 disabled={!!user.phone}
               />
-              {user.phone && (
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              )}
             </div>
           </div>
 
@@ -529,25 +525,45 @@ export default function PersonalDetailsPanel({
                 </div>
               </div>
             </div>
-            <div className={inputGroupClass}>
-              <label className={labelClass}>ব্যাচ</label>
-              <div className="relative">
-                <select
-                  name="batch"
-                  value={formData.batch}
-                  onChange={handleChange}
-                  className={selectClass}
-                >
-                  <option>HSC 2024</option>
-                  <option>HSC 2025</option>
-                  <option>HSC 2026</option>
-                  <option>HSC 2027</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
-                  <ChevronDownIcon />
+
+            {/* Batch with 1-time change rule & Tooltip */}
+            {(() => {
+              const isBatchLocked = !!user.batch && (user.batch_change_count ?? 0) >= 1;
+              return (
+                <div className={inputGroupClass}>
+                  <label className={labelClass}>
+                    ব্যাচ
+                    <FieldTooltip
+                      text={
+                        isBatchLocked
+                          ? 'তুমি ইতিমধ্যে ১ বার ব্যাচ পরিবর্তন করেছো। তাই এটি আর পরিবর্তন করা যাবে না।'
+                          : 'ব্যাচ সর্বোচ্চ ১ বার পরিবর্তন করার সুযোগ পাবে।'
+                      }
+                    />
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="batch"
+                      value={formData.batch}
+                      onChange={handleChange}
+                      disabled={isBatchLocked}
+                      className={`${selectClass} ${isBatchLocked ? 'bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 cursor-not-allowed' : ''}`}
+                    >
+                      <option>HSC 2024</option>
+                      <option>HSC 2025</option>
+                      <option>HSC 2026</option>
+                      <option>HSC 2027</option>
+                      <option>SSC 2025</option>
+                      <option>SSC 2026</option>
+                      <option>SSC 2027</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
+                      <ChevronDownIcon />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           <div className={inputGroupClass}>
@@ -569,76 +585,102 @@ export default function PersonalDetailsPanel({
             </div>
           </div>
 
-          <div className={inputGroupClass}>
-            <label className={labelClass}>এসএসসি রোল নম্বর</label>
-            <input
-              type="text"
-              name="sscRoll"
-              value={formData.sscRoll}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="রোল নম্বর লেখো"
-            />
-          </div>
-          <div className={inputGroupClass}>
-            <label className={labelClass}>এসএসসি রেজিস্ট্রেশন নম্বর</label>
-            <input
-              type="text"
-              name="sscReg"
-              value={formData.sscReg}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="রেজিস্ট্রেশন নম্বর লেখো"
-            />
-          </div>
+          {/* SSC Info with Permanent Lock Rule */}
+          {(() => {
+            const isSscLocked = !!user.ssc_roll && user.ssc_roll.trim().length > 0;
+            return (
+              <>
+                <div className="pt-2 pb-1">
+                  <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 font-bengali">
+                    এসএসসি পরীক্ষার তথ্য
+                  </span>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className={inputGroupClass}>
-              <label className={labelClass}>এসএসসি বোর্ড</label>
-              <div className="relative">
-                <select
-                  name="sscBoard"
-                  value={formData.sscBoard}
-                  onChange={handleChange}
-                  className={selectClass}
-                >
-                  <option>Dhaka</option>
-                  <option>Rajshahi</option>
-                  <option>Chittagong</option>
-                  <option>Jessore</option>
-                  <option>Comilla</option>
-                  <option>Barisal</option>
-                  <option>Sylhet</option>
-                  <option>Dinajpur</option>
-                  <option>Mymensingh</option>
-                  <option>Madrasah</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
-                  <ChevronDownIcon />
+                <div className={inputGroupClass}>
+                  <label className={labelClass}>এসএসসি রোল নম্বর</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="sscRoll"
+                      value={formData.sscRoll}
+                      onChange={handleChange}
+                      readOnly={isSscLocked}
+                      disabled={isSscLocked}
+                      className={`${inputClass} ${isSscLocked ? 'bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 cursor-not-allowed font-mono' : ''}`}
+                      placeholder="রোল নম্বর লেখো"
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className={inputGroupClass}>
-              <label className={labelClass}>এসএসসি পাসিং ইয়ার</label>
-              <div className="relative">
-                <select
-                  name="sscYear"
-                  value={formData.sscYear}
-                  onChange={handleChange}
-                  className={selectClass}
-                >
-                  <option>2026</option>
-                  <option>2025</option>
-                  <option>2024</option>
-                  <option>2023</option>
-                  <option>2022</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
-                  <ChevronDownIcon />
+
+                <div className={inputGroupClass}>
+                  <label className={labelClass}>এসএসসি রেজিস্ট্রেশন নম্বর</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="sscReg"
+                      value={formData.sscReg}
+                      onChange={handleChange}
+                      readOnly={isSscLocked}
+                      disabled={isSscLocked}
+                      className={`${inputClass} ${isSscLocked ? 'bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 cursor-not-allowed font-mono' : ''}`}
+                      placeholder="রেজিস্ট্রেশন নম্বর লেখো"
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className={inputGroupClass}>
+                    <label className={labelClass}>এসএসসি বোর্ড</label>
+                    <div className="relative">
+                      <select
+                        name="sscBoard"
+                        value={formData.sscBoard}
+                        onChange={handleChange}
+                        disabled={isSscLocked}
+                        className={`${selectClass} ${isSscLocked ? 'bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 cursor-not-allowed' : ''}`}
+                      >
+                        <option>Dhaka</option>
+                        <option>Rajshahi</option>
+                        <option>Chittagong</option>
+                        <option>Jessore</option>
+                        <option>Comilla</option>
+                        <option>Barisal</option>
+                        <option>Sylhet</option>
+                        <option>Dinajpur</option>
+                        <option>Mymensingh</option>
+                        <option>Madrasah</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
+                        <ChevronDownIcon />
+                      </div>
+                    </div>
+                  </div>
+                  <div className={inputGroupClass}>
+                    <label className={labelClass}>এসএসসি পাসিং ইয়ার</label>
+                    <div className="relative">
+                      <select
+                        name="sscYear"
+                        value={formData.sscYear}
+                        onChange={handleChange}
+                        disabled={isSscLocked}
+                        className={`${selectClass} ${isSscLocked ? 'bg-neutral-100 dark:bg-neutral-800/80 text-neutral-500 cursor-not-allowed' : ''}`}
+                      >
+                        <option>2027</option>
+                        <option>2026</option>
+                        <option>2025</option>
+                        <option>2024</option>
+                        <option>2023</option>
+                        <option>2022</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
+                        <ChevronDownIcon />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
 
           <div className={inputGroupClass}>
             <label className={labelClass}>Optional Subject</label>

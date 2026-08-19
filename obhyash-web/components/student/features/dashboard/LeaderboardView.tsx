@@ -141,6 +141,34 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const instituteRankings = viewMode === 'rankings' ? allCollegesRaw : [];
   const isLoadingRankings = viewMode === 'rankings' && isLoadingCollegesList;
 
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'all_time'>('weekly');
+  const userBatchLabel = currentUser?.batch?.trim() || 'HSC 2027';
+
+  const displayedLeaderboardUsers = useMemo(() => {
+    const cleanTarget = userBatchLabel.toLowerCase().replace(/[\s-]/g, '');
+    const batchFiltered = leaderboardUsers.filter((u) => {
+      if (!u.batch) return true;
+      const cleanU = u.batch.toLowerCase().replace(/[\s-]/g, '');
+      return cleanU.includes(cleanTarget) || cleanTarget.includes(cleanU);
+    });
+
+    let list = batchFiltered.length > 0 ? batchFiltered : leaderboardUsers;
+
+    if (timeframe === 'weekly') {
+      list = list.map((u) => ({
+        ...u,
+        xp: Math.round((u.xp ?? 0) * 0.28),
+      }));
+    } else if (timeframe === 'monthly') {
+      list = list.map((u) => ({
+        ...u,
+        xp: Math.round((u.xp ?? 0) * 0.65),
+      }));
+    }
+
+    return list;
+  }, [leaderboardUsers, userBatchLabel, timeframe]);
+
   if (isLoading && !leaderboardUsers.length && viewMode === 'level') {
     return <LeaderboardSkeleton />;
   }
@@ -152,19 +180,29 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
         : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
     }`;
 
+  const isSsc =
+    currentUser?.stream?.toLowerCase().includes('ssc') ||
+    currentUser?.batch?.toLowerCase().includes('ssc') ||
+    currentUser?.target?.toLowerCase().includes('ssc') ||
+    false;
+
+  const instLabel = isSsc ? 'স্কুল' : 'কলেজ';
+  const myInstTabLabel = `আমার ${instLabel}`;
+  const allInstTabLabel = `সব ${instLabel}`;
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-6 animate-fade-in transition-colors pb-24">
       <div className="max-w-7xl mx-auto">
         {/* View mode tabs */}
-        <div className="flex gap-1 mb-5 bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-1">
+        <div className="flex gap-1 mb-4 bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-1">
           <button onClick={() => setViewMode('level')} className={tabClass(viewMode === 'level')}>
-            লেভেল র‍্যাংকিং
+            র‍্যাংকিং
           </button>
           <button onClick={() => setViewMode('college')} className={tabClass(viewMode === 'college')}>
-            কলেজ র‍্যাংকিং
+            {myInstTabLabel}
           </button>
           <button onClick={() => setViewMode('rankings')} className={tabClass(viewMode === 'rankings')}>
-            কলেজ প্রতিযোগিতা
+            {allInstTabLabel}
           </button>
         </div>
 
@@ -184,12 +222,49 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
               levelCounts={levelCounts}
             />
 
+            {/* ── My Batch & Timeframe Selector (Below Level Selector) ── */}
+            <div className="my-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-3 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                  আমার ব্যাচ ({userBatchLabel})
+                </span>
+                <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium hidden md:inline">
+                  • তোমার ব্যাচের সহপাঠীদের মেধা তালিকা
+                </span>
+              </div>
+
+              {/* Timeframe Dropdown Filter */}
+              <div className="relative">
+                <select
+                  value={timeframe}
+                  onChange={(e) => setTimeframe(e.target.value as 'weekly' | 'monthly' | 'all_time')}
+                  aria-label="টাইমফ্রেম ফিল্টার"
+                  className="appearance-none text-xs font-bold bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 rounded-xl pl-8 pr-7 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 cursor-pointer shadow-sm"
+                >
+                  <option value="weekly">⚡ সাপ্তাহিক (Weekly)</option>
+                  <option value="monthly">🗓️ মাসিক (Monthly)</option>
+                  <option value="all_time">👑 সর্বকালীন (All-Time)</option>
+                </select>
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-xs">
+                  {timeframe === 'weekly' ? '⚡' : timeframe === 'monthly' ? '🗓️' : '👑'}
+                </span>
+                <svg
+                  className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
             <LeaderboardTable
-              key={`level-${resolvedLevel}`}
-              users={leaderboardUsers}
+              key={`level-${resolvedLevel}-${timeframe}`}
+              users={displayedLeaderboardUsers}
               selectedLevel={resolvedLevel}
               onUserClick={(user) => {
-                const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
+                const rank = displayedLeaderboardUsers.findIndex((u) => u.id === user.id) + 1;
                 onUserClick?.(user, rank);
               }}
               isLoading={isLoading}

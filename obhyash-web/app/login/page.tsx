@@ -28,7 +28,7 @@ async function withTimeout<T>(
 }
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,9 +53,27 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      let targetEmail = identifier.trim();
+
+      // If user provided a phone number instead of email
+      const cleanDigits = targetEmail.replace(/\D/g, '');
+      if (cleanDigits.length >= 10 && !targetEmail.includes('@')) {
+        const { data: resolvedEmail, error: rpcErr } = await supabase.rpc(
+          'get_email_by_phone',
+          { p_phone: targetEmail }
+        );
+
+        if (rpcErr || !resolvedEmail) {
+          setError('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
+          setLoading(false);
+          return;
+        }
+        targetEmail = resolvedEmail;
+      }
+
       const { data, error: signInError } = await withTimeout(
         supabase.auth.signInWithPassword({
-          email,
+          email: targetEmail,
           password,
         }),
         'লগইন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করো।',
@@ -69,7 +87,7 @@ export default function LoginPage() {
             'দয়া করে তোমার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।',
           );
         } else {
-          setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।');
+          setError('মোবাইল/ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।');
         }
         setLoading(false);
         return;
@@ -124,18 +142,18 @@ export default function LoginPage() {
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                ইমেইল এড্রেস
+                মোবাইল নম্বর অথবা ইমেইল
               </label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                 <input
-                  id="email"
-                  type="email"
+                  id="identifier"
+                  type="text"
                   required
                   className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
-                  placeholder="example@mail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="017XXXXXXXX অথবা example@mail.com"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                 />
               </div>
             </div>

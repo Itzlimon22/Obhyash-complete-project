@@ -294,7 +294,9 @@ class _BlogViewState extends ConsumerState<BlogView> {
             [class*="BlogFooter"],
             #blog-cta-banner,
             section:has(#blog-cta-banner),
-            section:has(a[href="/"]):has(h2) {
+            section:has(a[href="/"]):has(h2),
+            a[href*="rss.xml"],
+            a[href*="rss"] {
               display: none !important;
             }
             .sticky.top-16,

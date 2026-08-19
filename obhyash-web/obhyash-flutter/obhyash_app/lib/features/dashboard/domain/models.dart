@@ -166,6 +166,7 @@ class UserProfile {
   final int dailyExamsGoal;
   final bool admissionTrackInterest;
   final String? lastStreakDate;
+  final int batchChangeCount;
   final bool isSubscribed;
   final String? subscriptionStatus;
   final String? subscriptionExpiresAt;
@@ -187,6 +188,7 @@ class UserProfile {
     this.gender,
     this.address,
     this.batch,
+    this.batchChangeCount = 0,
     this.target,
     this.sscRoll,
     this.sscReg,
@@ -201,6 +203,13 @@ class UserProfile {
     this.subscriptionStatus,
     this.subscriptionExpiresAt,
   });
+
+  bool get isBatchLocked =>
+      (batch != null && batch!.trim().isNotEmpty) && batchChangeCount >= 1;
+
+  bool get isSscLocked => (sscRoll != null && sscRoll!.trim().isNotEmpty);
+
+  int get batchChangesRemaining => isBatchLocked ? 0 : 1;
 
   bool get isPro {
     if (subscriptionExpiresAt == null || subscriptionExpiresAt!.isEmpty) {
@@ -241,6 +250,7 @@ class UserProfile {
     String? gender,
     String? address,
     String? batch,
+    int? batchChangeCount,
     String? target,
     String? sscRoll,
     String? sscReg,
@@ -272,6 +282,7 @@ class UserProfile {
       gender: gender ?? this.gender,
       address: address ?? this.address,
       batch: batch ?? this.batch,
+      batchChangeCount: batchChangeCount ?? this.batchChangeCount,
       target: target ?? this.target,
       sscRoll: sscRoll ?? this.sscRoll,
       sscReg: sscReg ?? this.sscReg,
@@ -322,6 +333,7 @@ class UserProfile {
       gender: json['gender'] as String?,
       address: json['address'] as String?,
       batch: json['batch'] as String?,
+      batchChangeCount: (json['batch_change_count'] as num?)?.toInt() ?? 0,
       target: json['target'] as String?,
       sscRoll: json['ssc_roll'] as String?,
       sscReg: json['ssc_reg'] as String?,

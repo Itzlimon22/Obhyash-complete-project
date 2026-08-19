@@ -148,16 +148,25 @@ export function useUserManagement() {
         institute?: string;
         division?: string;
         batch?: string;
+        batch_change_count?: number;
         exams_taken?: number;
         created_at: string;
         subscription?: { plan: string; status: string; expiry: string };
         goal?: string;
         target?: string;
         stream?: string;
+        exam_target?: string;
+        daily_exams_goal?: number;
         ssc_roll?: string;
         ssc_reg?: string;
         ssc_board?: string;
         ssc_passing_year?: string;
+        optional_subject?: string;
+        gender?: string;
+        dob?: string;
+        address?: string;
+        bio?: string;
+        streak?: number;
         level?: string;
         xp?: number;
         avatar_color?: string;
@@ -175,6 +184,7 @@ export function useUserManagement() {
         institute: u.institute,
         division: u.division,
         batch: u.batch,
+        batch_change_count: u.batch_change_count ?? 0,
         enrolledExams: u.exams_taken || 0, // Map exams_taken to enrolledExams
         lastActive: u.created_at, // Using created_at as proxy for now if last_active missing
         subscription: u.subscription
@@ -195,10 +205,18 @@ export function useUserManagement() {
         goal: u.goal,
         target: u.target,
         stream: u.stream,
+        exam_target: u.exam_target,
+        daily_exams_goal: u.daily_exams_goal ?? 3,
         ssc_roll: u.ssc_roll,
         ssc_reg: u.ssc_reg,
         ssc_board: u.ssc_board,
         ssc_passing_year: u.ssc_passing_year,
+        optional_subject: u.optional_subject,
+        gender: u.gender,
+        dob: u.dob,
+        address: u.address,
+        bio: u.bio,
+        streakCount: u.streak || 0,
         level: u.level,
         xp: u.xp,
         avatarColor: u.avatar_color,
@@ -340,10 +358,18 @@ export function useUserManagement() {
   const handleUpdateSubscription = async (userId: string, plan: string) => {
     const supabase = createClient();
     try {
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + 30);
+      const expiryIso = expiry.toISOString();
+
       const { error } = await supabase
         .from('users')
         .update({
-          subscription: { plan, status: 'Active' },
+          subscription: { plan, status: 'Active', expiry: expiryIso },
+          is_subscribed: true,
+          subscription_status: 'active',
+          subscription_expires_at: expiryIso,
+          plan: plan,
         })
         .eq('id', userId);
 

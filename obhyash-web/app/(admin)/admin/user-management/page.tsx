@@ -27,7 +27,9 @@ import UserStatsCards from '@/components/admin/user-management/UserStatsCards';
 import UserFilters from '@/components/admin/user-management/UserFilters';
 import UserTable from '@/components/admin/user-management/UserTable';
 import EditUserModal from '@/components/admin/user-management/EditUserModal';
-import TeacherStatsModal from '@/components/admin/user-management/TeacherStatsModal'; // Added import
+import TeacherStatsModal from '@/components/admin/user-management/TeacherStatsModal';
+import ResetPasswordModal from '@/components/admin/user-management/ResetPasswordModal';
+import SuspendUserModal from '@/components/admin/user-management/SuspendUserModal';
 
 export default function UserManagementPage() {
   const {
@@ -96,6 +98,12 @@ export default function UserManagementPage() {
   const [showTeacherStatsModal, setShowTeacherStatsModal] = useState(false); // Added state
   const [teacherStatsUser, setTeacherStatsUser] = useState<User | null>(null); // Added state
 
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
+
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [suspendUser, setSuspendUser] = useState<User | null>(null);
+
   const [showBulkEmailModal, setShowBulkEmailModal] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -109,6 +117,16 @@ export default function UserManagementPage() {
   const onViewDetails = (user: User) => {
     setDetailsUser(user);
     setShowDetailsModal(true);
+  };
+
+  const onResetPassword = (user: User) => {
+    setResetPasswordUser(user);
+    setShowResetPasswordModal(true);
+  };
+
+  const onSuspendUser = (user: User) => {
+    setSuspendUser(user);
+    setShowSuspendModal(true);
   };
 
   const onViewActivityLog = (user: User) => {
@@ -429,10 +447,9 @@ export default function UserManagementPage() {
           onEditUser={onEditUser}
           onManageSubscription={onManageSubscription}
           onUpdateSubscription={handleUpdateSubscription}
-          onResetPassword={(id, email) =>
-            console.log('Reset Password', id, email)
-          } // Placeholder or pass logic
+          onResetPassword={onResetPassword}
           onUpdateStatus={handleUpdateStatus}
+          onSuspendUser={onSuspendUser}
           onDeleteUser={handleDeleteUser}
           onViewStats={onManageTeacherStats} // Passed handler
           viewStyle={viewStyle}
@@ -447,12 +464,41 @@ export default function UserManagementPage() {
           />
         )}
 
+        {/* Suspend / Ban User Modal */}
+        {showSuspendModal && suspendUser && (
+          <SuspendUserModal
+            user={suspendUser}
+            isOpen={showSuspendModal}
+            onClose={() => {
+              setShowSuspendModal(false);
+              setSuspendUser(null);
+            }}
+            onSuccess={() => fetchUsers()}
+          />
+        )}
+
+        {/* Reset Password & Account Security Modal */}
+        {showResetPasswordModal && resetPasswordUser && (
+          <ResetPasswordModal
+            user={resetPasswordUser}
+            isOpen={showResetPasswordModal}
+            onClose={() => {
+              setShowResetPasswordModal(false);
+              setResetPasswordUser(null);
+            }}
+          />
+        )}
+
         {/* Reusing existing Modals */}
         {showDetailsModal && detailsUser && (
           <DetailsModal
             user={detailsUser}
             isOpen={showDetailsModal}
             onClose={() => setShowDetailsModal(false)}
+            onEdit={onEditUser}
+            onResetPassword={onResetPassword}
+            onManageSubscription={onManageSubscription}
+            onViewActivityLog={onViewActivityLog}
           />
         )}
 

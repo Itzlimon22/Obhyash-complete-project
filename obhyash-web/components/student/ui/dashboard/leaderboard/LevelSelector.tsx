@@ -32,6 +32,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
             />
           </svg>
         );
+      case 'Scholar':
       case 'Titan':
         return (
           <svg
@@ -63,6 +64,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
             <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z" />
           </svg>
         );
+      case 'Challenger':
       case 'Scout':
         return (
           <svg
@@ -79,7 +81,9 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
             />
           </svg>
         );
+      case 'Explorer':
       case 'Rookie':
+      default:
         return (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -140,15 +144,9 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
               </div>
 
               <span
-                className={`text-xs md:text-sm font-bold mb-1 ${isSelected ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}`}
+                className={`text-xs md:text-sm font-bold ${isSelected ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}`}
               >
                 {level.label.split(' ')[0]}
-              </span>
-
-              <span
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400`}
-              >
-                {levelCounts[level.id] || 0} Students
               </span>
             </button>
           );

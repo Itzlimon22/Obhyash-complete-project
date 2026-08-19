@@ -48,7 +48,7 @@ class _PaymentViewState extends State<PaymentView>
   List<SavedPaymentMethod> _savedMethods = [];
   bool _showSuccess = false;
 
-  static const _merchantNumber = '01946855793';
+  static const _merchantNumber = '01749591456';
 
   bool _hasPendingPayment = false;
   String? _pendingTrxId;
@@ -1175,7 +1175,7 @@ class _PaymentViewState extends State<PaymentView>
         '📞',
         'সরাসরি কথা বলুন',
         'কল করতে ক্লিক করো',
-        'tel:+8801946855793',
+        'tel:+8801409583992',
         const Color(0xFFECFDF5),
         const Color(0xFF059669),
       ),
@@ -1191,7 +1191,7 @@ class _PaymentViewState extends State<PaymentView>
         '📱',
         'লাইভ চ্যাট (WhatsApp)',
         'এখানে ক্লিক করো',
-        'https://wa.me/8801946855793',
+        'https://wa.me/8801409583992',
         const Color(0xFFECFDF5),
         const Color(0xFF059669),
       ),
@@ -1321,7 +1321,7 @@ class _PaymentViewState extends State<PaymentView>
     final faqs = [
       (
         q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
-        a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01946855793 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
+        a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01749591456 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
       ),
       (
         q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
@@ -1349,7 +1349,7 @@ class _PaymentViewState extends State<PaymentView>
       ),
       (
         q: 'যেকোনো প্রয়োজনে জরুরি সহায়তা কোথায় পাব?',
-        a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01946855793) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
+        a: '"সাপোর্ট" ট্যাবে গিয়ে সরাসরি আমাদের হোয়াটসঅ্যাপে (01409583992) মেসেজ দিন অথবা হেল্পলাইনে কল করুন। আমাদের সাপোর্ট টিম দ্রুত সহায়তা প্রদান করবে।',
       ),
     ];
 

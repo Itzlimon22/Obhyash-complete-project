@@ -17,14 +17,29 @@ class AuthController extends AsyncNotifier<void> {
   @override
   FutureOr<void> build() {}
 
-  // ── Login ─────────────────────────────────────────────────────────────────
+  // ── Login (Email OR Mobile Number) ──────────────────────────────────────
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String identifier, String password) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       try {
+        String targetEmail = identifier.trim();
+
+        // If identifier is a phone number (e.g. 017XXXXXXXX or +88017XXXXXXXX)
+        final cleanDigits = targetEmail.replaceAll(RegExp(r'\D'), '');
+        if (cleanDigits.length >= 10 && !targetEmail.contains('@')) {
+          final res = await _supabase.rpc('get_email_by_phone', params: {
+            'p_phone': targetEmail,
+          });
+
+          if (res == null || res.toString().trim().isEmpty) {
+            throw Exception('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
+          }
+          targetEmail = res.toString().trim();
+        }
+
         final response = await _supabase.auth.signInWithPassword(
-          email: email,
+          email: targetEmail,
           password: password,
         );
 
@@ -99,12 +114,71 @@ class AuthController extends AsyncNotifier<void> {
     });
   }
 
+  // ── Google Sign-in (Account-linking Safe) ─────────────────────────────────
+
+  Future<void> loginWithGoogle() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await _supabase.auth.signInWithOAuth(
+          OAuthProvider.google,
+          redirectTo: 'io.supabase.obhyash://login-callback/',
+        );
+      } catch (e) {
+        debugPrint('[AuthController] Google login error: $e');
+        throw Exception(e is AuthException ? e.message : 'গুগল লগইন ব্যর্থ হয়েছে।');
+      }
+    });
+  }
+
+  // ── OTP Phone Verification (Registration Only) ──────────────────────────
+
+  Future<Map<String, dynamic>> sendRegistrationOtp(String phone) async {
+    try {
+      final isDev = kDebugMode;
+      final res = await _supabase.rpc('send_registration_otp', params: {
+        'p_phone': phone.trim(),
+        'p_is_dev_mock': isDev,
+      });
+
+      if (res is Map<String, dynamic>) {
+        if (isDev && res['otp_code'] != null) {
+          debugPrint('========================================');
+          debugPrint('[DEV OTP MOCK] Phone: ${res['phone']} | Code: ${res['otp_code']}');
+          debugPrint('========================================');
+        }
+        return res;
+      }
+      return {'success': false, 'error': 'ওটিপি রেসপন্স ত্রুটিপূর্ণ'};
+    } catch (e) {
+      debugPrint('[AuthController] sendRegistrationOtp error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyRegistrationOtp(String phone, String otp) async {
+    try {
+      final res = await _supabase.rpc('verify_registration_otp', params: {
+        'p_phone': phone.trim(),
+        'p_otp': otp.trim(),
+      });
+
+      if (res is Map<String, dynamic>) {
+        return res;
+      }
+      return {'success': false, 'error': 'যাচাইকরণ রেসপন্স ত্রুটিপূর্ণ'};
+    } catch (e) {
+      debugPrint('[AuthController] verifyRegistrationOtp error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   // ── Sign up ───────────────────────────────────────────────────────────────
 
   Future<void> signup({
     required String name,
     required String phone,
-    required String gender,
+    String? gender,
     required String institute,
     required String stream,
     required String group,
@@ -129,7 +203,7 @@ class AuthController extends AsyncNotifier<void> {
             'email': email,
             'name': name,
             'phone': phone,
-            'gender': gender.isEmpty ? null : gender,
+            if (gender != null && gender.isNotEmpty) 'gender': gender,
             'institute': institute,
             'stream': stream,
             'division': group,

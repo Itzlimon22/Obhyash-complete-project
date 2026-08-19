@@ -757,7 +757,7 @@ class _PaymentViewState extends State<PaymentView>
         '📞', 
         'সরাসরি কথা বলুন', 
         'কল করতে ক্লিক করো', 
-        'tel:+8801946855793',
+        'tel:+8801409583992',
         const Color(0xFFECFDF5),
         const Color(0xFF059669)
       ),

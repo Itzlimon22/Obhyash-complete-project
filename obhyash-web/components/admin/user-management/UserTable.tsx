@@ -34,8 +34,9 @@ interface UserTableProps {
   onEditUser: (user: User) => void;
   onManageSubscription: (user: User) => void;
   onUpdateSubscription: (userId: string, plan: string) => void;
-  onResetPassword: (userId: string, email: string) => void;
+  onResetPassword: (user: User) => void;
   onUpdateStatus: (userId: string, status: string) => void;
+  onSuspendUser?: (user: User) => void;
   onDeleteUser: (userId: string) => void;
   onViewStats?: (user: User) => void; // Added prop
   viewStyle?: 'table' | 'card' | 'responsive';
@@ -54,6 +55,7 @@ const UserTable: React.FC<UserTableProps> = ({
   onUpdateSubscription,
   onResetPassword,
   onUpdateStatus,
+  onSuspendUser,
   onDeleteUser,
   onViewStats, // Destructured
   viewStyle = 'responsive',
@@ -210,6 +212,30 @@ const UserTable: React.FC<UserTableProps> = ({
                         >
                           <Edit className="w-4 h-4" />
                           Edit User
+                        </button>
+                        <button
+                          onClick={() => {
+                            onResetPassword(user);
+                            setShowActionMenu(null);
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
+                        >
+                          <Shield className="w-4 h-4 text-red-500" />
+                          Security & Password
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (onSuspendUser) {
+                              onSuspendUser(user);
+                            } else {
+                              onUpdateStatus(user.id, 'Suspended');
+                            }
+                            setShowActionMenu(null);
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
+                        >
+                          <Ban className="w-4 h-4 text-amber-500" />
+                          Suspend Account
                         </button>
                         <div className="border-t border-neutral-200 dark:border-neutral-700 my-2"></div>
                         <button
@@ -530,18 +556,13 @@ const UserTable: React.FC<UserTableProps> = ({
 
                               <button
                                 onClick={() => {
-                                  if (user.email) {
-                                    onResetPassword(user.id, user.email);
-                                    setShowActionMenu(null);
-                                  } else {
-                                    toast.error('User has no email address');
-                                    setShowActionMenu(null);
-                                  }
+                                  onResetPassword(user);
+                                  setShowActionMenu(null);
                                 }}
                                 className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
                               >
-                                <Shield className="w-4 h-4" />
-                                Reset Password
+                                <Shield className="w-4 h-4 text-red-500" />
+                                Account Security & Password
                               </button>
 
                               <button
@@ -567,13 +588,17 @@ const UserTable: React.FC<UserTableProps> = ({
                               </button>
                               <button
                                 onClick={() => {
-                                  onUpdateStatus(user.id, 'Suspended');
+                                  if (onSuspendUser) {
+                                    onSuspendUser(user);
+                                  } else {
+                                    onUpdateStatus(user.id, 'Suspended');
+                                  }
                                   setShowActionMenu(null);
                                 }}
                                 className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
                               >
-                                <Ban className="w-4 h-4" />
-                                Suspend User
+                                <Ban className="w-4 h-4 text-amber-500" />
+                                Suspend Account
                               </button>
                               <div className="border-t border-neutral-200 dark:border-neutral-700 my-2"></div>
                               <button

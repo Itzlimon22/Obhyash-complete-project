@@ -4,10 +4,17 @@ import { UserProfile } from '@/lib/types';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 
 interface UserAvatarProps {
-  user?: UserProfile | null;
+  user?: (Partial<UserProfile> & {
+    is_subscribed?: boolean;
+    isPro?: boolean;
+    plan?: string;
+    is_pro?: boolean;
+    subscription_status?: string;
+  }) | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
   showBorder?: boolean;
+  isPro?: boolean;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
@@ -15,6 +22,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   size = 'md',
   className = '',
   showBorder = false,
+  isPro: isProProp,
 }) => {
   const [customAvatarError, setCustomAvatarError] = useState(false);
   const [fallbackAvatarError, setFallbackAvatarError] = useState(false);
@@ -26,6 +34,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
       />
     );
   }
+
+  const isPro =
+    isProProp ??
+    (user.isPro ||
+      user.is_pro ||
+      user.is_subscribed ||
+      (user.plan && user.plan.toLowerCase() !== 'free') ||
+      user.subscription_status === 'Active');
 
   const initials = user.name ? user.name.charAt(0).toUpperCase() : '?';
 
@@ -44,14 +60,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   const showImage = hasCustomAvatar || (diceBearAvatar && hasFallbackAvatar);
   const currentSrc = hasCustomAvatar ? user.avatarUrl! : diceBearAvatar;
 
-  return (
+  const avatarNode = (
     <div
       className={`
         relative flex items-center justify-center shrink-0 rounded-full overflow-hidden
         ${getSizeClasses(size)}
         ${!showImage ? user.avatarColor || 'bg-neutral-500' : 'bg-neutral-100 dark:bg-neutral-800'}
-        ${showBorder ? 'ring-2 ring-white dark:ring-neutral-800 shadow-sm' : ''}
-        ${className}
+        ${showBorder && !isPro ? 'ring-2 ring-white dark:ring-neutral-800 shadow-sm' : ''}
+        ${!isPro ? className : ''}
       `}
     >
       {showImage ? (
@@ -74,6 +90,20 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
           {initials}
         </span>
       )}
+    </div>
+  );
+
+  if (!isPro) return avatarNode;
+
+  // Google Pro Style Multi-Color Gradient Ring
+  return (
+    <div
+      className={`relative shrink-0 rounded-full p-[2px] md:p-[2.5px] bg-gradient-to-tr from-[#4285F4] via-[#9B72CB] via-[#D96570] via-[#F4B400] to-[#34A853] shadow-sm ${className}`}
+      title="Pro Member"
+    >
+      <div className="rounded-full bg-white dark:bg-neutral-900 p-[1.5px] flex items-center justify-center">
+        {avatarNode}
+      </div>
     </div>
   );
 };

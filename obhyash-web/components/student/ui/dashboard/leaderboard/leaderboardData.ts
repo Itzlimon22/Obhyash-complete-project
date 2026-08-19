@@ -1,56 +1,69 @@
-
 import React from 'react';
 import { UserProfile } from '@/lib/types';
 
-export type LevelType = 'Rookie' | 'Scout' | 'Warrior' | 'Titan' | 'Legend';
+export type LevelType =
+  | 'Explorer'
+  | 'Challenger'
+  | 'Warrior'
+  | 'Scholar'
+  | 'Legend'
+  | 'Rookie'
+  | 'Scout'
+  | 'Titan';
 
-export const LEVELS: { id: LevelType; label: string; minXP: number; maxXP?: number; color: string; icon: React.ReactNode }[] = [
-  { 
-    id: 'Legend', 
-    label: 'লিজেন্ড (Legend)', 
-    minXP: 5000, 
+export const LEVELS: {
+  id: LevelType;
+  label: string;
+  minXP: number;
+  maxXP?: number;
+  color: string;
+  icon: React.ReactNode;
+}[] = [
+  {
+    id: 'Legend',
+    label: 'লিজেন্ড',
+    minXP: 15000,
     maxXP: 100000,
-    color: 'from-red-600 to-emerald-600',
-    icon: null // Icons handled in component to avoid SVG imports in pure data file if strict, but for now we'll handle icons in the component mapping
+    color: 'from-red-600 to-red-900',
+    icon: null,
   },
-  { 
-    id: 'Titan', 
-    label: 'টাইটান (Titan)', 
-    minXP: 3500, 
-    maxXP: 4999,
-    color: 'from-red-500 to-red-600',
-    icon: null
+  {
+    id: 'Scholar',
+    label: 'স্কলার',
+    minXP: 7000,
+    maxXP: 14999,
+    color: 'from-amber-500 to-amber-700',
+    icon: null,
   },
-  { 
-    id: 'Warrior', 
-    label: 'ওয়ারিয়র (Warrior)', 
-    minXP: 2000, 
-    maxXP: 3499,
-    color: 'from-red-500 to-red-600',
-    icon: null
+  {
+    id: 'Warrior',
+    label: 'ওয়ারিয়র',
+    minXP: 3000,
+    maxXP: 6999,
+    color: 'from-purple-600 to-indigo-700',
+    icon: null,
   },
-  { 
-    id: 'Scout', 
-    label: 'স্কাউট (Scout)', 
-    minXP: 800, 
-    maxXP: 1999,
-    color: 'from-emerald-500 to-emerald-500',
-    icon: null
+  {
+    id: 'Challenger',
+    label: 'চ্যালেঞ্জার',
+    minXP: 1000,
+    maxXP: 2999,
+    color: 'from-sky-500 to-blue-600',
+    icon: null,
   },
-  { 
-    id: 'Rookie', 
-    label: 'রুকি (Rookie)', 
-    minXP: 0, 
-    maxXP: 799,
-    color: 'from-slate-400 to-slate-600',
-    icon: null
-  }
+  {
+    id: 'Explorer',
+    label: 'এক্সপ্লোরার',
+    minXP: 0,
+    maxXP: 999,
+    color: 'from-emerald-500 to-teal-700',
+    icon: null,
+  },
 ];
 
 export const MOCK_USERS: UserProfile[] = [
   { id: '1', name: 'Ishraq Kabir', institute: 'Notre Dame College', xp: 5820, level: 'Legend', examsTaken: 95, avatarColor: 'bg-red-500' },
   { id: '2', name: 'Fatima Anjum', institute: 'Viqarunnisa Noon School', xp: 5150, level: 'Legend', examsTaken: 82, avatarColor: 'bg-emerald-500' },
-  { id: '3', name: 'Tanvir Hasan', institute: 'Dhaka College', xp: 4890, level: 'Titan', examsTaken: 75, avatarColor: 'bg-red-500' },
   { id: '4', name: 'Sadia Islam', institute: 'Holy Cross College', xp: 4200, level: 'Titan', examsTaken: 68, avatarColor: 'bg-red-500' },
   { id: 'me', name: 'আপনি (You)', institute: 'Rajuk Uttara Model College', xp: 2850, level: 'Warrior', examsTaken: 42, avatarColor: 'bg-emerald-600', isCurrentUser: true },
   { id: '5', name: 'Rahim Uddin', institute: 'Chittagong College', xp: 2600, level: 'Warrior', examsTaken: 38, avatarColor: 'bg-red-500' },
