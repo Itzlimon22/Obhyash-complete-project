@@ -22,22 +22,62 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> login(String identifier, String password) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      try {
-        String targetEmail = identifier.trim();
+      String targetEmail = identifier.trim();
+      final isEmail = targetEmail.contains('@');
 
-        // If identifier is a phone number (e.g. 017XXXXXXXX or +88017XXXXXXXX)
-        final cleanDigits = targetEmail.replaceAll(RegExp(r'\D'), '');
-        if (cleanDigits.length >= 10 && !targetEmail.contains('@')) {
-          final res = await _supabase.rpc('get_email_by_phone', params: {
-            'p_phone': targetEmail,
-          });
+      // Convert any Bengali numerals (০-৯) to English digits (0-9)
+      const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      const enDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      for (int i = 0; i < bnDigits.length; i++) {
+        targetEmail = targetEmail.replaceAll(bnDigits[i], enDigits[i]);
+      }
 
-          if (res == null || res.toString().trim().isEmpty) {
-            throw Exception('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
-          }
-          targetEmail = res.toString().trim();
+      // If identifier is a phone number
+      if (!isEmail) {
+        String cleanDigits = targetEmail.replaceAll(RegExp(r'\D'), '');
+        if (cleanDigits.startsWith('8801') && cleanDigits.length == 13) {
+          cleanDigits = cleanDigits.substring(2);
+        } else if (cleanDigits.startsWith('1') && cleanDigits.length == 10) {
+          cleanDigits = '0$cleanDigits';
         }
 
+        String? resolvedEmail;
+
+        // 1. Try secure RPC get_email_by_phone
+        try {
+          final res = await _supabase.rpc('get_email_by_phone', params: {
+            'p_phone': cleanDigits,
+          });
+          if (res != null && res.toString().trim().isNotEmpty) {
+            resolvedEmail = res.toString().trim();
+          }
+        } catch (rpcErr) {
+          debugPrint('[AuthController] get_email_by_phone RPC failed: $rpcErr');
+        }
+
+        // 2. Fallback direct table query
+        if (resolvedEmail == null || resolvedEmail.isEmpty) {
+          try {
+            final userRow = await _supabase
+                .from('users')
+                .select('email')
+                .or('phone.eq.$cleanDigits,phone.eq.+88$cleanDigits,phone.eq.88$cleanDigits')
+                .maybeSingle();
+            if (userRow != null && userRow['email'] != null) {
+              resolvedEmail = userRow['email'].toString().trim();
+            }
+          } catch (tableErr) {
+            debugPrint('[AuthController] users table phone query error: $tableErr');
+          }
+        }
+
+        if (resolvedEmail == null || resolvedEmail.isEmpty) {
+          throw Exception('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
+        }
+        targetEmail = resolvedEmail;
+      }
+
+      try {
         final response = await _supabase.auth.signInWithPassword(
           email: targetEmail,
           password: password,
@@ -47,69 +87,74 @@ class AuthController extends AsyncNotifier<void> {
         final user = response.user;
 
         if (session != null && user != null) {
-          // Derive a unique session ID from the JWT issued-at time + user ID.
-          // This changes each time a new JWT is issued (i.e. each login).
           final sessionId = '${user.id}:${session.accessToken.hashCode}';
 
-          // Persist tokens in AES-256 encrypted storage
-          await SecureStorageService.saveSession(
-            accessToken: session.accessToken,
-            refreshToken: session.refreshToken ?? '',
-            userId: user.id,
-            sessionId: sessionId,
+          // Persist tokens in background (non-blocking)
+          unawaited(
+            SecureStorageService.saveSession(
+              accessToken: session.accessToken,
+              refreshToken: session.refreshToken ?? '',
+              userId: user.id,
+              sessionId: sessionId,
+            ),
           );
 
-          // Cache lightweight UI metadata for instant display on next open
-          await SecureStorageService.saveUserMeta({
-            'name': user.userMetadata?['full_name'] ?? '',
-            'email': user.email ?? '',
-          });
-
-          // Ensure a `users` row exists — handles users who registered via
-          // the web app or other platforms.  We upsert only the identity
-          // fields; all other columns keep their existing values.
-          try {
-            await _supabase.from('users').upsert({
-              'id': user.id,
+          unawaited(
+            SecureStorageService.saveUserMeta({
+              'name': user.userMetadata?['full_name'] ?? '',
               'email': user.email ?? '',
-              'name':
-                  user.userMetadata?['full_name'] ??
-                  user.userMetadata?['name'] ??
-                  'Student',
-              'role':
-                  user.userMetadata?['role'] ??
-                  user.appMetadata['role'] ??
-                  'Student',
-              'last_active': DateTime.now().toIso8601String(),
-            }, onConflict: 'id');
+            }),
+          );
+
+          try {
+            unawaited(
+              _supabase.from('users').upsert({
+                'id': user.id,
+                'email': user.email ?? '',
+                'name':
+                    user.userMetadata?['full_name'] ??
+                    user.userMetadata?['name'] ??
+                    'Student',
+                'role':
+                    user.userMetadata?['role'] ??
+                    user.appMetadata['role'] ??
+                    'Student',
+                'last_active': DateTime.now().toIso8601String(),
+              }, onConflict: 'id'),
+            );
           } catch (upsertErr) {
             debugPrint(
               '[AuthController] users row upsert error (non-fatal): $upsertErr',
             );
           }
 
-          // Start monitoring for logins on other devices
-          await SessionMonitorService.start(
-            userId: user.id,
-            onForcedSignOut: () async => logout(forced: true),
-          );
+          try {
+            unawaited(
+              SessionMonitorService.start(
+                userId: user.id,
+                onForcedSignOut: () async => logout(forced: true),
+              ),
+            );
+          } catch (_) {}
 
-          // Force userProfileProvider to re-fetch now that the users row
-          // is guaranteed to exist.  Avoids the race where the router
-          // navigates to '/' (triggered by signedIn) before the upsert
-          // above has completed, causing userProfileProvider to cache null.
           ref.invalidate(userProfileProvider);
         }
-      } catch (e) {
-        String errorMessage =
-            'ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।';
-        if (e is AuthException) {
-          if (e.message.contains('Email not confirmed')) {
-            errorMessage =
-                'দয়া করে তোমার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।';
-          }
+      } on AuthException catch (e) {
+        if (e.message.contains('Email not confirmed')) {
+          throw Exception('দয়া করে তোমার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।');
+        } else if (e.message.contains('Invalid login credentials') ||
+            e.message.contains('invalid_grant')) {
+          throw Exception(isEmail
+              ? 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।'
+              : 'মোবাইল নম্বর অথবা পাসওয়ার্ড সঠিক নয়।');
         }
-        throw Exception(errorMessage);
+        throw Exception(e.message);
+      } catch (e) {
+        final str = e.toString();
+        if (str.contains('এই মোবাইল নম্বর')) {
+          throw Exception('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
+        }
+        throw Exception(str.startsWith('Exception: ') ? str.substring(11) : str);
       }
     });
   }

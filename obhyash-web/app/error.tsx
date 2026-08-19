@@ -12,25 +12,36 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const isChunkError =
+    error?.name === 'ChunkLoadError' ||
+    error?.message?.includes('ChunkLoadError') ||
+    error?.message?.includes('Failed to load chunk') ||
+    error?.message?.includes('Loading chunk') ||
+    error?.message?.includes('turbopack');
+
   useEffect(() => {
-    // Log the error to an error reporting service
+    // Log the error to console
     console.error('Unhandled Application Error:', error);
 
     // Auto-recover from ChunkLoadError (happens when a new Vercel deployment replaces old chunk hashes)
-    const isChunkError =
-      error?.name === 'ChunkLoadError' ||
-      error?.message?.includes('ChunkLoadError') ||
-      error?.message?.includes('Failed to load chunk') ||
-      error?.message?.includes('Loading chunk');
-
     if (isChunkError) {
-      const reloadKey = 'chunk_reload_' + (error.digest || 'last');
-      if (!sessionStorage.getItem(reloadKey)) {
-        sessionStorage.setItem(reloadKey, 'true');
+      const reloadKey = 'chunk_reload_attempts';
+      const attempts = parseInt(sessionStorage.getItem(reloadKey) || '0', 10);
+      if (attempts < 2) {
+        sessionStorage.setItem(reloadKey, String(attempts + 1));
         window.location.reload();
       }
     }
-  }, [error]);
+  }, [error, isChunkError]);
+
+  const handleRetry = () => {
+    if (isChunkError) {
+      sessionStorage.removeItem('chunk_reload_attempts');
+      window.location.reload();
+    } else {
+      reset();
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-300">
@@ -38,21 +49,22 @@ export default function GlobalError({
         <AlertOctagon size={48} />
       </div>
       <h2 className="text-2xl font-black text-neutral-900 dark:text-white mb-3">
-        দুঃখিত! অপ্রত্যাশিত কিছু ঘটেছে।
+        {isChunkError ? 'নতুন সংস্করণ আপডেট হয়েছে' : 'দুঃখিত! অপ্রত্যাশিত কিছু ঘটেছে।'}
       </h2>
       <p className="text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-8 leading-relaxed font-medium">
-        আমাদের সিস্টেমে সাময়িক সমস্যা হয়েছে অথবা তোমার ইন্টারনেট সংযোগ
-        বিচ্ছিন্ন হতে পারে। দয়া করে আবার চেষ্টা করো।
+        {isChunkError
+          ? 'ওয়েবসাইটে একটি নতুন আপডেট এসেছে। সর্বশেষ সংস্করণ লোড করতে পেজটি রিলোড করুন।'
+          : 'আমাদের সিস্টেমে সাময়িক সমস্যা হয়েছে অথবা তোমার ইন্টারনেট সংযোগ বিচ্ছিন্ন হতে পারে। দয়া করে আবার চেষ্টা করো।'}
       </p>
 
       <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
         <Button
-          onClick={() => reset()}
+          onClick={handleRetry}
           size="lg"
           className="w-full sm:w-auto px-8 rounded-xl font-bold flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20 transition-all active:scale-95"
         >
           <RefreshCw size={18} />
-          আবার চেষ্টা করো
+          {isChunkError ? 'পেজ রিফ্রেশ করো' : 'আবার চেষ্টা করো'}
         </Button>
         <Link
           href="/"

@@ -133,22 +133,27 @@ const UserTable: React.FC<UserTableProps> = ({
                     onChange={() => onSelectUser(user.id)}
                     className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 cursor-pointer shrink-0"
                   />
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {user.name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold text-neutral-900 dark:text-white truncate">
-                        {user.name || 'Unnamed User'}
-                      </p>
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 border border-neutral-200 dark:border-neutral-700">
-                        {user.student_id ||
-                          `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`}
-                      </span>
+                  <div
+                    onClick={() => onViewDetails(user)}
+                    className="flex items-center gap-3 min-w-0 cursor-pointer group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
-                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
-                      {user.email || 'No email'}
-                    </p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-bold text-neutral-900 dark:text-white truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          {user.name || 'Unnamed User'}
+                        </p>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 border border-neutral-200 dark:border-neutral-700">
+                          {user.student_id ||
+                            `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
+                        {user.email || 'No email'}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -361,13 +366,16 @@ const UserTable: React.FC<UserTableProps> = ({
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      <div
+                        onClick={() => onViewDetails(user)}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-semibold text-sm shadow-md group-hover:scale-105 transition-transform">
                           {user.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div className="text-left">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                            <p className="text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                               {user.name || 'Unnamed User'}
                             </p>
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-neutral-100 dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 border border-neutral-200 dark:border-neutral-700">

@@ -90,7 +90,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
           final leaderboardAsync = ref.watch(liveExamLeaderboardProvider(exam.id));
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -106,18 +106,19 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         : <String>[];
 
                     return Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                        borderRadius: BorderRadius.circular(24),
+                        color: isDark ? const Color(0xFF141417) : Colors.white,
+                        borderRadius: BorderRadius.circular(22),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                          width: 1.2,
                         ),
                         boxShadow: [
                           if (!isDark)
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 10,
+                              color: const Color(0x0A000000),
+                              blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
                         ],
@@ -130,147 +131,197 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF0B6B42).withValues(alpha: 0.1),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                                  ),
                                 ),
                                 child: Text(
                                   exam.category.toUpperCase(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0B6B42),
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                                   ),
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                                 decoration: BoxDecoration(
-                                  color: statusBadgeColor.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: statusBadgeColor.withValues(alpha: isDark ? 0.15 : 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: statusBadgeColor.withValues(alpha: isDark ? 0.3 : 0.25),
+                                  ),
                                 ),
                                 child: Text(
                                   statusBadgeText,
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: statusBadgeColor,
+                                    color: isDark && statusBadgeColor == const Color(0xFF0B6B42)
+                                        ? const Color(0xFF34D399)
+                                        : statusBadgeColor,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
 
                           // Exam Title
                           Text(
                             exam.title,
                             style: TextStyle(
                               fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
-                              fontFamily: "HindSiliguri",
+                              fontWeight: FontWeight.w900,
+                              color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                              fontFamily: "Anek Bangla",
+                              letterSpacing: -0.3,
                             ),
                           ),
                           const SizedBox(height: 18),
                           Divider(height: 1, color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 18),
 
                           // 2. Schedule Section
                           Row(
                             children: [
-                              const Icon(LucideIcons.calendar, size: 18, color: Color(0xFF0B6B42)),
+                              Icon(
+                                LucideIcons.calendar,
+                                size: 16,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 "পরীক্ষার সময়সূচী",
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
-                                  fontFamily: "HindSiliguri",
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                  fontFamily: "Anek Bangla",
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 14),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("শুরু", style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.black54)),
+                                  Text(
+                                    "শুরু",
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                   const SizedBox(height: 2),
                                   Text(
                                     "${exam.startTime.day}/${exam.startTime.month}/${exam.startTime.year}",
-                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                    ),
                                   ),
                                   Text(
                                     "${exam.startTime.hour.toString().padLeft(2, "0")}:${exam.startTime.minute.toString().padLeft(2, "0")}",
-                                    style: const TextStyle(fontSize: 12, color: Color(0xFF0B6B42), fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ],
                               ),
-                              Icon(LucideIcons.arrowRight, size: 20, color: isDark ? Colors.white24 : Colors.black26),
+                              Icon(
+                                LucideIcons.arrowRight,
+                                size: 18,
+                                color: isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1),
+                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text("সমাপ্তি", style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.black54)),
+                                  Text(
+                                    "সমাপ্তি",
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                   const SizedBox(height: 2),
                                   Text(
                                     "${exam.endTime.day}/${exam.endTime.month}/${exam.endTime.year}",
-                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                    ),
                                   ),
                                   Text(
                                     "${exam.endTime.hour.toString().padLeft(2, "0")}:${exam.endTime.minute.toString().padLeft(2, "0")}",
-                                    style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      color: Color(0xFFEF4444),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 18),
-                          Divider(height: 1, color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
-                          // 3. Meta 3-Column Stats (Time, Questions, Negative Marks)
+                          // 3. Meta 3-Column Stats (Time, Questions, Negative Marks) - Clean Minimal Data Section
                           Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF242426) : const Color(0xFFF8FAFC),
+                              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0),
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                               ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                _buildMetaItem("সময়", "${exam.durationMinutes} মি.", LucideIcons.clock, isDark),
-                                Container(width: 1, height: 30, color: isDark ? Colors.white12 : Colors.black12),
-                                _buildMetaItem("মোট প্রশ্ন", "${exam.totalQuestions} টি", LucideIcons.helpCircle, isDark),
-                                Container(width: 1, height: 30, color: isDark ? Colors.white12 : Colors.black12),
-                                _buildMetaItem("নেগেটিভ মার্ক", "-${exam.negativeMarking}", LucideIcons.alertTriangle, isDark),
+                                _buildMetaItem("সময়", "${exam.durationMinutes} মি.", isDark),
+                                Container(width: 1, height: 28, color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0)),
+                                _buildMetaItem("মোট প্রশ্ন", "${exam.totalQuestions} টি", isDark),
+                                Container(width: 1, height: 28, color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0)),
+                                _buildMetaItem("নেগেটিভ মার্ক", "-${exam.negativeMarking}", isDark),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 20),
                           Divider(height: 1, color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 18),
 
                           // 4. Syllabus Section
-                          const Row(
+                          Row(
                             children: [
-                              Icon(LucideIcons.bookOpen, color: Color(0xFF0B6B42), size: 16),
-                              SizedBox(width: 8),
+                              Icon(
+                                LucideIcons.bookOpen,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
                               Text(
                                 "সিলেবাস ও অধ্যায়সমূহ",
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0B6B42),
-                                  fontFamily: "HindSiliguri",
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                  fontFamily: "Anek Bangla",
                                 ),
                               ),
                             ],
@@ -280,10 +331,10 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF242426) : const Color(0xFFF8FAFC),
+                              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0),
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                               ),
                             ),
                             child: syllabusList.isNotEmpty
@@ -304,11 +355,11 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                               children: [
                                                 Text(
                                                   "$serial. ",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 13,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0xFF0B6B42),
-                                                    fontFamily: "HindSiliguri",
+                                                    fontWeight: FontWeight.w700,
+                                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                                    fontFamily: "Anek Bangla",
                                                   ),
                                                 ),
                                                 Expanded(
@@ -318,8 +369,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                                       fontSize: 13,
                                                       height: 1.35,
                                                       fontWeight: FontWeight.w500,
-                                                      color: isDark ? Colors.white70 : const Color(0xFF1E293B),
-                                                      fontFamily: "HindSiliguri",
+                                                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
+                                                      fontFamily: "Anek Bangla",
                                                     ),
                                                     maxLines: 2,
                                                     overflow: TextOverflow.ellipsis,
@@ -339,8 +390,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                     style: TextStyle(
                                       fontSize: 13.5,
                                       height: 1.4,
-                                      color: isDark ? Colors.white70 : const Color(0xFF1E293B),
-                                      fontFamily: "HindSiliguri",
+                                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                                      fontFamily: "Anek Bangla",
                                     ),
                                   ),
                           ),
@@ -349,7 +400,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Main CTA Action Button
                 if (!isTaken) ...[
@@ -359,8 +410,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: (isOngoing || isPast || exam.id.startsWith("mock-"))
-                            ? const Color(0xFF0B6B42)
-                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB)),
+                            ? const Color(0xFF059669)
+                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -390,8 +441,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                           fontWeight: FontWeight.bold,
                           color: (isOngoing || isPast || exam.id.startsWith("mock-"))
                               ? Colors.white
-                              : (isDark ? Colors.white38 : Colors.black38),
-                          fontFamily: "HindSiliguri",
+                              : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
+                          fontFamily: "Anek Bangla",
                         ),
                       ),
                     ),
@@ -402,10 +453,10 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                     // Solutions Button
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 52,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0B6B42),
+                          backgroundColor: const Color(0xFF059669),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -421,19 +472,23 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         icon: const Icon(LucideIcons.bookOpen, size: 18),
                         label: const Text(
                           "সমাধান ও ব্যাখ্যা দেখুন",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, fontFamily: "HindSiliguri"),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.5, fontFamily: "Anek Bangla"),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     // Retake as Practice Button
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF0B6B42),
-                          side: const BorderSide(color: Color(0xFF0B6B42), width: 1.5),
+                          foregroundColor: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF0F172A),
+                          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
+                          side: BorderSide(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                            width: 1.2,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -447,7 +502,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         icon: const Icon(LucideIcons.rotateCcw, size: 18),
                         label: const Text(
                           "অনুশীলন পরীক্ষা দিন (Practice)",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, fontFamily: "HindSiliguri"),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, fontFamily: "Anek Bangla"),
                         ),
                       ),
                     ),
@@ -458,28 +513,44 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                 if (isTaken && attempt != null) ...[
                   const SizedBox(height: 20),
                   Container(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      color: isDark ? const Color(0xFF141417) : Colors.white,
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        if (!isDark)
+                          BoxShadow(
+                            color: const Color(0x0A000000),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "আপনার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)",
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, fontFamily: "HindSiliguri"),
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: "Anek Bangla",
+                            color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                          ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildScoreStat("সঠিক", "${attempt.correctCount}", const Color(0xFF0B6B42), isDark),
+                            _buildScoreStat("সঠিক", "${attempt.correctCount}", const Color(0xFF10B981), isDark),
+                            Container(width: 1, height: 28, color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0)),
                             _buildScoreStat("ভুল", "${attempt.wrongCount}", const Color(0xFFEF4444), isDark),
-                            _buildScoreStat("মোট স্কোর", "${attempt.score}", isDark ? Colors.white : Colors.black87, isDark),
+                            Container(width: 1, height: 28, color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFE2E8F0)),
+                            _buildScoreStat("মোট স্কোর", "${attempt.score}", isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A), isDark),
                           ],
                         ),
                       ],
@@ -753,23 +824,37 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         children: leaderboard.asMap().entries.map((entry) {
                           final idx = entry.key;
                           final lb = entry.value;
+                          final totalAttempted = lb.correctCount + lb.wrongCount;
+                          final accuracy = totalAttempted > 0
+                              ? ((lb.correctCount / totalAttempted) * 100).round()
+                              : (lb.score > 0 ? 100 : 0);
+
                           return Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.all(14),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                              color: isDark ? const Color(0xFF141417) : Colors.white,
                               borderRadius: BorderRadius.circular(18),
                               border: Border.all(
                                 color: idx == 0
-                                    ? const Color(0xFFF59E0B).withOpacity(0.5)
-                                    : isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                                    ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                                    : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                width: 1.2,
                               ),
+                              boxShadow: [
+                                if (!isDark)
+                                  BoxShadow(
+                                    color: const Color(0x06000000),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                              ],
                             ),
                             child: Row(
                               children: [
                                 Container(
-                                  width: 28,
-                                  height: 28,
+                                  width: 30,
+                                  height: 30,
                                   decoration: BoxDecoration(
                                     color: idx == 0
                                         ? const Color(0xFFF59E0B)
@@ -777,16 +862,17 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                             ? const Color(0xFF94A3B8)
                                             : idx == 2
                                                 ? const Color(0xFFB45309)
-                                                : isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
-                                    borderRadius: BorderRadius.circular(8),
+                                                : isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(9),
                                   ),
                                   alignment: Alignment.center,
                                   child: Text(
                                     "#${idx + 1}",
                                     style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: idx < 3 ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                      fontWeight: FontWeight.w800,
+                                      fontFamily: "Anek Bangla",
+                                      color: idx < 3 ? Colors.white : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                                     ),
                                   ),
                                 ),
@@ -799,26 +885,57 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                         lb.userName,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDark ? Colors.white : Colors.black87,
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: "Anek Bangla",
+                                          color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
+                                      const SizedBox(height: 2),
                                       Text(
-                                        lb.userInstitute,
+                                        lb.userInstitute.isNotEmpty ? lb.userInstitute : "প্রতিষ্ঠান নেই",
                                         style: TextStyle(
-                                          fontSize: 11,
-                                          color: isDark ? Colors.white54 : Colors.black54,
+                                          fontSize: 11.5,
+                                          fontFamily: "Anek Bangla",
+                                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: 8),
                                 Text(
-                                  "${lb.score}",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0B6B42),
+                                  "$accuracy% নির্ভুলতা",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: "Anek Bangla",
+                                    color: accuracy >= 80
+                                        ? const Color(0xFF10B981)
+                                        : (accuracy >= 50 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444)),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF1F2937) : const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE2E8F0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${lb.score} মার্কস",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: "Anek Bangla",
+                                      color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -833,8 +950,12 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF0B6B42),
-                        side: const BorderSide(color: Color(0xFF0B6B42), width: 1.5),
+                        foregroundColor: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF0F172A),
+                        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
+                        side: BorderSide(
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                          width: 1.2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -849,7 +970,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                       icon: const Icon(LucideIcons.trophy, size: 18),
                       label: const Text(
                         "সম্পূর্ণ মেধা তালিকা দেখুন",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: "Anek Bangla"),
                       ),
                     ),
                   ),
@@ -869,43 +990,46 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            fontFamily: "HindSiliguri",
+            fontSize: 19,
+            fontWeight: FontWeight.w900,
+            fontFamily: "Anek Bangla",
             color: color,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
-            fontFamily: "HindSiliguri",
-            color: isDark ? Colors.white54 : Colors.black54,
+            fontSize: 12,
+            fontFamily: "Anek Bangla",
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildMetaItem(String label, String value, IconData icon, bool isDark) {
+  Widget _buildMetaItem(String label, String value, bool isDark) {
     return Column(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF0B6B42)),
-        const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            fontFamily: "Anek Bangla",
+            color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
           ),
         ),
+        const SizedBox(height: 3),
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
-            color: isDark ? Colors.white54 : Colors.black54,
+            fontSize: 11.5,
+            fontFamily: "Anek Bangla",
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
         ),
       ],

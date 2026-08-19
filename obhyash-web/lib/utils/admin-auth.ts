@@ -6,7 +6,7 @@ type AdminCheckResult =
   | { ok: false; response: NextResponse };
 
 /**
- * Verifies the caller is authenticated AND has role === 'Admin'.
+ * Verifies the caller is authenticated AND has role === 'Admin' (case-insensitive) or 'superadmin'.
  * Usage:
  *   const check = await requireAdmin();
  *   if (!check.ok) return check.response;
@@ -39,7 +39,8 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
     };
   }
 
-  if (profile.role !== 'Admin') {
+  const userRole = String(profile.role || '').toLowerCase();
+  if (userRole !== 'admin' && userRole !== 'superadmin') {
     return {
       ok: false,
       response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }),

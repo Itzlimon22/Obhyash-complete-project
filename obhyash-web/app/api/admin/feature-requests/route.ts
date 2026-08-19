@@ -29,9 +29,23 @@ export async function GET(request: NextRequest) {
 
     if (search && search.trim()) {
       const searchTerm = search.trim();
-      query = query.or(
-        `title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`,
-      );
+      // Match user by name or email
+      const { data: matchedUsers } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`);
+
+      const matchedUserIds = (matchedUsers || []).map((u: any) => u.id);
+
+      if (matchedUserIds.length > 0) {
+        query = query.or(
+          `title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,user_id.in.(${matchedUserIds.join(',')})`,
+        );
+      } else {
+        query = query.or(
+          `title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`,
+        );
+      }
     }
 
     const from = (page - 1) * pageSize;
@@ -91,7 +105,7 @@ export async function GET(request: NextRequest) {
     if (userIds.length > 0) {
       const { data: usersData } = await supabaseAdmin
         .from('users')
-        .select('id, name, email, phone')
+        .select('id, name, email, phone, avatar_url, avatar_color')
         .in('id', userIds);
 
       if (usersData) {
@@ -162,6 +176,38 @@ export async function POST(request: NextRequest) {
         .eq('id', requestId);
 
       if (error) throw error;
+
+      // Send notification to user
+      const { data: requestData } = await supabaseAdmin
+        .from('app_feature_requests')
+        .select('user_id, title')
+        .eq('id', requestId)
+        .single();
+
+      if (requestData?.user_id) {
+        try {
+          const statusBnMap: Record<string, string> = {
+            'Under Review': 'বিবেচনাধীন রয়েছে',
+            'Planned': 'রোডম্যাপে যুক্ত করা হয়েছে',
+            'In Progress': 'কাজ চলছে',
+            'Completed': 'যুক্ত করা হয়েছে! 🎉',
+            'Declined': 'স্থগিত রাখা হয়েছে',
+          };
+          const statusBn = statusBnMap[status] || status;
+          await supabaseAdmin.from('notifications').insert({
+            user_id: requestData.user_id,
+            title: `ফিচার প্রস্তাবনা আপডেট: ${statusBn}`,
+            message: feedback
+              ? `আপনার প্রস্তাব "${requestData.title}" বিষয়ে অ্যাডমিন মন্তব্য: "${feedback}"`
+              : `আপনার প্রস্তাব "${requestData.title}" এর স্ট্যাটাস আপডেট: ${statusBn}`,
+            type: status === 'Completed' ? 'success' : 'info',
+            is_read: false,
+            created_at: new Date().toISOString(),
+          });
+        } catch (notifErr) {
+          console.warn('Failed to send notification for feature request:', notifErr);
+        }
+      }
 
       return NextResponse.json({
         success: true,

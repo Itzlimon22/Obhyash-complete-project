@@ -90,6 +90,7 @@ export default function DetailsModal({
   onManageSubscription,
   onViewActivityLog,
 }: DetailsModalProps) {
+  const [userData, setUserData] = useState<UserType>(user);
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [exams, setExams] = useState<ExamHistoryItem[]>([]);
   const [devices, setDevices] = useState<DeviceItem[]>([]);
@@ -109,70 +110,55 @@ export default function DetailsModal({
   const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
 
   useEffect(() => {
+    setUserData(user);
     if (isOpen && user?.id) {
-      fetchExams();
-      fetchDevices();
-      fetchPayments();
-      fetchNotes();
+      fetchAllDetails();
     }
   }, [isOpen, user?.id]);
 
-  const fetchExams = async () => {
+  const fetchAllDetails = async () => {
     setIsLoadingExams(true);
-    const supabase = createClient();
-    try {
-      const { data } = await supabase
-        .from('exam_results')
-        .select('id, subject, score, total_marks, correct_count, wrong_count, date, time_taken')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(8);
-      setExams(data || []);
-    } catch (_) {}
-    setIsLoadingExams(false);
-  };
-
-  const fetchDevices = async () => {
     setIsLoadingDevices(true);
-    const supabase = createClient();
-    try {
-      const { data } = await supabase
-        .from('user_devices')
-        .select('id, device_name, device_type, ip_address, last_active')
-        .eq('user_id', user.id)
-        .order('last_active', { ascending: false })
-        .limit(5);
-      setDevices(data || []);
-    } catch (_) {}
-    setIsLoadingDevices(false);
-  };
-
-  const fetchPayments = async () => {
     setIsLoadingPayments(true);
-    const supabase = createClient();
+    setIsLoadingNotes(true);
+
     try {
-      const { data } = await supabase
-        .from('payment_requests')
-        .select('id, plan_name, amount, payment_method, trx_id, sender_number, status, requested_at')
-        .eq('user_id', user.id)
-        .order('requested_at', { ascending: false })
-        .limit(10);
-      setPayments(data || []);
-    } catch (_) {}
-    setIsLoadingPayments(false);
+      const res = await fetch(`/api/admin/users/details?userId=${user.id}`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        if (json.data.exams) setExams(json.data.exams);
+        if (json.data.devices) setDevices(json.data.devices);
+        if (json.data.payments) setPayments(json.data.payments);
+        if (json.data.notes) setNotes(json.data.notes);
+        if (json.data.user) {
+          const u = json.data.user;
+          setUserData((prev) => ({
+            ...prev,
+            ...u,
+            student_id: u.student_id || prev.student_id,
+            streakCount: u.streak ?? prev.streakCount,
+            enrolledExams: u.exams_taken ?? prev.enrolledExams,
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch user details:', err);
+    } finally {
+      setIsLoadingExams(false);
+      setIsLoadingDevices(false);
+      setIsLoadingPayments(false);
+      setIsLoadingNotes(false);
+    }
   };
 
   const fetchNotes = async () => {
     setIsLoadingNotes(true);
-    const supabase = createClient();
     try {
-      const { data } = await supabase
-        .from('user_activity_log')
-        .select('id, description, created_at, metadata')
-        .eq('user_id', user.id)
-        .eq('activity_type', 'ADMIN_NOTE')
-        .order('created_at', { ascending: false });
-      setNotes(data || []);
+      const res = await fetch(`/api/admin/users/details?userId=${user.id}`);
+      const json = await res.json();
+      if (json.success && json.data?.notes) {
+        setNotes(json.data.notes);
+      }
     } catch (_) {}
     setIsLoadingNotes(false);
   };
@@ -237,7 +223,7 @@ export default function DetailsModal({
 
   if (!isOpen) return null;
 
-  const isPro = user.subscription?.plan && user.subscription.plan !== 'Free';
+  const isPro = userData.subscription?.plan && userData.subscription.plan !== 'Free';
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-in fade-in duration-200">
@@ -246,29 +232,29 @@ export default function DetailsModal({
         <div className="p-6 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white font-bold text-xl shadow-inner">
-              {user.name?.charAt(0).toUpperCase() || 'U'}
+              {userData.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-white tracking-tight">
-                  {user.name || 'Unnamed User'}
+                  {userData.name || 'Unnamed User'}
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white/20 text-white border border-white/30">
-                  {user.student_id || `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`}
+                  {userData.student_id || `OBH-${userData.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`}
                 </span>
                 {isPro && (
                   <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400 text-neutral-900 shadow-sm">
                     <Crown size={12} />
-                    {user.subscription?.plan}
+                    {userData.subscription?.plan}
                   </span>
                 )}
               </div>
               <p className="text-emerald-100 text-xs mt-0.5 flex items-center gap-2">
-                <span>{user.email || 'No email'}</span>
-                {user.phone && (
+                <span>{userData.email || 'No email'}</span>
+                {userData.phone && (
                   <>
                     <span>•</span>
-                    <span>{user.phone}</span>
+                    <span>{userData.phone}</span>
                   </>
                 )}
               </p>
@@ -351,33 +337,33 @@ export default function DetailsModal({
                 <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-800 text-center">
                   <p className="text-[10px] font-bold uppercase text-neutral-500">Role</p>
                   <p className="text-sm font-bold text-neutral-900 dark:text-white mt-0.5">
-                    {user.role}
+                    {userData.role}
                   </p>
                 </div>
                 <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-800 text-center">
                   <p className="text-[10px] font-bold uppercase text-neutral-500">Status</p>
                   <span
                     className={`inline-block px-2 py-0.5 text-xs font-bold rounded-md mt-0.5 ${
-                      user.status === 'Active'
+                      userData.status === 'Active'
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400'
                         : 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-400'
                     }`}
                   >
-                    {user.status}
+                    {userData.status}
                   </span>
                 </div>
                 <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-800 text-center">
                   <p className="text-[10px] font-bold uppercase text-neutral-500">XP Points</p>
                   <p className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-0.5 flex items-center justify-center gap-1">
                     <Trophy size={13} />
-                    {(user.xp || 0).toLocaleString()}
+                    {(userData.xp || 0).toLocaleString()}
                   </p>
                 </div>
                 <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-800 text-center">
                   <p className="text-[10px] font-bold uppercase text-neutral-500">Streak</p>
                   <p className="text-sm font-bold text-red-600 dark:text-red-400 mt-0.5 flex items-center justify-center gap-1">
                     <Flame size={13} />
-                    {user.streakCount || 0} Days
+                    {userData.streakCount || 0} Days
                   </p>
                 </div>
               </div>
@@ -390,7 +376,7 @@ export default function DetailsModal({
                   </div>
                   <div>
                     <p className="font-bold text-neutral-900 dark:text-white">
-                      Phone Number: {user.phone || 'Not provided'}
+                      Phone Number: {userData.phone || 'Not provided'}
                     </p>
                     <p className="text-[11px] text-neutral-500">
                       OTP SMS System Support & Verification Status
@@ -398,7 +384,7 @@ export default function DetailsModal({
                   </div>
                 </div>
 
-                {user.phone && (
+                {userData.phone && (
                   <button
                     type="button"
                     onClick={handleManualVerifyPhone}
@@ -421,25 +407,25 @@ export default function DetailsModal({
                   <div>
                     <span className="text-neutral-500 block">Institute:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.institute || 'N/A'}
+                      {userData.institute || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Academic Batch:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.batch || 'N/A'}
+                      {userData.batch || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Division / Group:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.division || 'N/A'}
+                      {userData.division || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Stream & Target:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.stream || 'N/A'} {user.target ? `(${user.target})` : ''}
+                      {userData.stream || 'N/A'} {userData.target ? `(${userData.target})` : ''}
                     </span>
                   </div>
                 </div>
@@ -455,25 +441,25 @@ export default function DetailsModal({
                   <div>
                     <span className="text-neutral-500 block">Roll:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white font-mono">
-                      {user.ssc_roll || 'N/A'}
+                      {userData.ssc_roll || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Registration:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white font-mono">
-                      {user.ssc_reg || 'N/A'}
+                      {userData.ssc_reg || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Board:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.ssc_board || 'N/A'}
+                      {userData.ssc_board || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Passing Year:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.ssc_passing_year || 'N/A'}
+                      {userData.ssc_passing_year || 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -489,19 +475,19 @@ export default function DetailsModal({
                   <div>
                     <span className="text-neutral-500 block">Gender / DOB:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.gender || 'N/A'} {user.dob ? `(${user.dob})` : ''}
+                      {userData.gender || 'N/A'} {userData.dob ? `(${userData.dob})` : ''}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Address:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.address || 'N/A'}
+                      {userData.address || 'N/A'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Joined Date:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {new Date(user.lastActive).toLocaleDateString()}
+                      {new Date(userData.lastActive).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
@@ -514,20 +500,20 @@ export default function DetailsModal({
                   <div>
                     <span className="text-neutral-500 block">Current Plan:</span>
                     <span className="font-bold text-neutral-900 dark:text-white">
-                      {user.subscription?.plan || 'Free'} Plan
+                      {userData.subscription?.plan || 'Free'} Plan
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Status:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white">
-                      {user.subscription?.status || 'Active'}
+                      {userData.subscription?.status || 'Active'}
                     </span>
                   </div>
                   <div>
                     <span className="text-neutral-500 block">Expiry Date:</span>
                     <span className="font-semibold text-neutral-900 dark:text-white font-mono">
-                      {user.subscription?.expiry
-                        ? new Date(user.subscription.expiry).toLocaleDateString()
+                      {userData.subscription?.expiry
+                        ? new Date(userData.subscription.expiry).toLocaleDateString()
                         : 'No Expiry'}
                     </span>
                   </div>
@@ -779,7 +765,7 @@ export default function DetailsModal({
                 type="button"
                 onClick={() => {
                   onClose();
-                  onEdit(user);
+                  onEdit(userData);
                 }}
                 className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 flex items-center gap-1.5 transition-colors"
               >
@@ -792,7 +778,7 @@ export default function DetailsModal({
                 type="button"
                 onClick={() => {
                   onClose();
-                  onResetPassword(user);
+                  onResetPassword(userData);
                 }}
                 className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 flex items-center gap-1.5 transition-colors"
               >
@@ -805,7 +791,7 @@ export default function DetailsModal({
                 type="button"
                 onClick={() => {
                   onClose();
-                  onManageSubscription(user);
+                  onManageSubscription(userData);
                 }}
                 className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 flex items-center gap-1.5 transition-colors"
               >
@@ -818,7 +804,7 @@ export default function DetailsModal({
                 type="button"
                 onClick={() => {
                   onClose();
-                  onViewActivityLog(user);
+                  onViewActivityLog(userData);
                 }}
                 className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 flex items-center gap-1.5 transition-colors"
               >

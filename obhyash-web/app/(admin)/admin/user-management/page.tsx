@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   RefreshCw,
   Download,
@@ -35,6 +36,7 @@ export default function UserManagementPage() {
   const {
     users,
     filteredUsers,
+    stats: globalStats,
     isLoading,
     fetchUsers,
 
@@ -108,15 +110,16 @@ export default function UserManagementPage() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showBulkActions, setShowBulkActions] = useState(false);
 
-  // Handlers for Modals
+  const router = useRouter();
+
+  // Handlers for Modals & Navigation
   const onEditUser = (user: User) => {
     setEditUser(user);
     setShowEditModal(true);
   };
 
   const onViewDetails = (user: User) => {
-    setDetailsUser(user);
-    setShowDetailsModal(true);
+    router.push(`/admin/user-management/${user.id}`);
   };
 
   const onResetPassword = (user: User) => {
@@ -184,12 +187,18 @@ export default function UserManagementPage() {
     }, 1000);
   };
 
-  const stats = {
-    total: users.length,
-    active: users.filter((u) => u.status === 'Active').length,
-    students: users.filter((u) => u.role === 'Student').length,
-    premium: users.filter((u) => u.subscription?.plan !== 'Free').length,
-  };
+  const stats =
+    globalStats && globalStats.total > 0
+      ? globalStats
+      : {
+          total: totalUsers || users.length,
+          active: users.filter((u) => u.status === 'Active').length,
+          students: users.filter((u) => u.role === 'Student').length,
+          premium: users.filter((u) => {
+            if (!u.subscription || typeof u.subscription !== 'object') return false;
+            return u.subscription.plan && u.subscription.plan !== 'Free';
+          }).length,
+        };
 
   const handleStatClick = (
     type: 'active' | 'students' | 'premium' | 'total',

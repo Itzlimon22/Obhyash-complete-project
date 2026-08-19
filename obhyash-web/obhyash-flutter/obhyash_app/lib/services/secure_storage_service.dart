@@ -12,6 +12,7 @@
 //   await SecureStorageService.clearSession();
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Storage keys — keep them stable; changing them logs out all users.
@@ -30,7 +31,7 @@ class SecureStorageService {
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
-      encryptedSharedPreferences: true, // AES-256, API 23+
+      resetOnError: true,
     ),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
@@ -47,12 +48,16 @@ class SecureStorageService {
     required String userId,
     required String sessionId,
   }) async {
-    await Future.wait([
-      _storage.write(key: _kAccessToken, value: accessToken),
-      _storage.write(key: _kRefreshToken, value: refreshToken),
-      _storage.write(key: _kUserId, value: userId),
-      _storage.write(key: _kSessionId, value: sessionId),
-    ]);
+    try {
+      await Future.wait([
+        _storage.write(key: _kAccessToken, value: accessToken),
+        _storage.write(key: _kRefreshToken, value: refreshToken),
+        _storage.write(key: _kUserId, value: userId),
+        _storage.write(key: _kSessionId, value: sessionId),
+      ]);
+    } catch (e) {
+      debugPrint('[SecureStorageService] saveSession error: $e');
+    }
   }
 
   /// Read the persisted session. Returns null if no session is stored.

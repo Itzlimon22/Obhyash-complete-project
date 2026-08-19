@@ -70,7 +70,19 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleString("bn-BD");
+      const d = new Date(dateString);
+      const datePart = d.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+      const timePart = d.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+      return `${datePart} ${timePart}`;
     } catch {
       return dateString;
     }

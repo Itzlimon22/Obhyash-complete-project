@@ -50,6 +50,14 @@ export function useUserManagement() {
   const [pageSize, setPageSize] = useState(20);
   const [totalUsers, setTotalUsers] = useState(() => initialCache?.totalUsers || 0);
 
+  // Global aggregate stats across ALL users in database
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    students: 0,
+    premium: 0,
+  });
+
   /** Search query string (name, email, phone) */
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -254,6 +262,45 @@ export function useUserManagement() {
 
       setFilteredUsers(clientFiltered);
       if (count !== null) setTotalUsers(count);
+
+      // Fetch global real-time stats across ALL users in database
+      try {
+        const [totalCountRes, activeCountRes, studentsCountRes, allSubsRes] = await Promise.all([
+          supabase.from('users').select('*', { count: 'exact', head: true }),
+          supabase.from('users').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
+          supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'Student'),
+          supabase.from('users').select('subscription'),
+        ]);
+
+        const totalCount = totalCountRes.count ?? count ?? mappedUsers.length;
+        const activeCount = activeCountRes.count ?? mappedUsers.filter((u) => u.status === 'Active').length;
+        const studentsCount = studentsCountRes.count ?? mappedUsers.filter((u) => u.role === 'Student').length;
+
+        let premiumCount = 0;
+        if (allSubsRes.data && allSubsRes.data.length > 0) {
+          const now = new Date();
+          premiumCount = allSubsRes.data.filter((u: any) => {
+            if (!u.subscription || typeof u.subscription !== 'object') return false;
+            const plan = u.subscription.plan;
+            if (!plan || plan === 'Free' || plan === 'free') return false;
+            if (u.subscription.expiry) {
+              const exp = new Date(u.subscription.expiry);
+              if (!isNaN(exp.getTime()) && exp < now) return false;
+            }
+            if (u.subscription.status === 'Canceled' || u.subscription.status === 'Past Due') return false;
+            return true;
+          }).length;
+        }
+
+        setStats({
+          total: totalCount,
+          active: activeCount,
+          students: studentsCount,
+          premium: premiumCount,
+        });
+      } catch (statsErr) {
+        console.error('Failed to fetch aggregate user stats:', statsErr);
+      }
 
       if (page === 1 && searchQuery === '' && roleFilter === 'all' && statusFilter === 'all') {
         try {
@@ -474,6 +521,7 @@ export function useUserManagement() {
   return {
     users,
     filteredUsers,
+    stats,
     isLoading,
     isRefreshing,
     fetchUsers,

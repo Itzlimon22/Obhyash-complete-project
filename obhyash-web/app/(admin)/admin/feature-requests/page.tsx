@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { AppFeatureRequest, FeatureRequestStatus } from '@/lib/types';
 import { getFeatureRequests } from '@/services/feature-request-service';
@@ -17,6 +18,8 @@ import {
   RefreshCcw,
   XCircle,
   Layers,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import { FeatureRequestModal } from '@/components/admin/feature-requests/feature-request-modal';
 import { Button } from '@/components/ui/button';
@@ -88,6 +91,36 @@ export default function AdminFeatureRequestsPage() {
     }
   };
 
+  const exportCSV = () => {
+    if (!featureRequests || featureRequests.length === 0) {
+      toast.error('No feature requests to export');
+      return;
+    }
+
+    const csvContent = [
+      ['ID', 'Reporter Name', 'Email', 'Category', 'Title', 'Description', 'Status', 'Date & Time (24h)', 'Admin Feedback'],
+      ...featureRequests.map((r) => [
+        r.id,
+        r.user?.name || 'Student',
+        r.user?.email || 'N/A',
+        r.category,
+        `"${(r.title || '').replace(/"/g, '""')}"`,
+        `"${(r.description || '').replace(/"/g, '""')}"`,
+        r.status,
+        `${new Date(r.created_at).toLocaleDateString('en-GB')} ${new Date(r.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        `"${(r.admin_feedback || '').replace(/"/g, '""')}"`,
+      ]),
+    ]
+      .map((e) => e.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `feature_requests_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
   const getStatusBadge = (status: FeatureRequestStatus) => {
     switch (status) {
       case 'Under Review':
@@ -116,15 +149,26 @@ export default function AdminFeatureRequestsPage() {
             শিক্ষার্থীদের পাঠানো নতুন ফিচার আইডিয়া রিভিউ, রোডম্যাপে যুক্ত ও স্ট্যাটাস আপডেট করো
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchRequests(true)}
-          className="rounded-xl border-neutral-200 dark:border-neutral-800 text-xs self-start sm:self-auto"
-        >
-          <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-          রিফ্রেশ
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportCSV}
+            className="rounded-xl border-neutral-200 dark:border-neutral-800 text-xs flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchRequests(true)}
+            className="rounded-xl border-neutral-200 dark:border-neutral-800 text-xs"
+          >
+            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+            রিফ্রেশ
+          </Button>
+        </div>
       </div>
 
       {/* ── Stats Summary Grid ── */}
@@ -198,7 +242,7 @@ export default function AdminFeatureRequestsPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ফিচারের নাম বা বিবরণ খুঁজুন..."
+            placeholder="শিক্ষার্থীর নাম, ইমেইল, ফিচারের নাম বা বিবরণ খুঁজুন..."
             className="w-full pl-9 pr-4 py-2 text-xs md:text-sm rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
@@ -286,13 +330,32 @@ export default function AdminFeatureRequestsPage() {
                       ? 'যুক্ত হয়েছে'
                       : 'বাতিল'}
                   </span>
-                  <span className="text-[11px] text-neutral-400">
-                    {new Date(req.created_at).toLocaleString('bn-BD')}
+                  <span className="text-[11px] font-mono text-neutral-400">
+                    {new Date(req.created_at).toLocaleDateString('en-GB')}{' '}
+                    {new Date(req.created_at).toLocaleTimeString('en-GB', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })}
                   </span>
                 </div>
 
                 <div className="text-xs text-neutral-500 font-medium">
-                  শিক্ষার্থী: <span className="text-neutral-800 dark:text-neutral-200 font-bold">{req.user?.name || 'Student'}</span> ({req.user?.email || 'N/A'})
+                  শিক্ষার্থী:{' '}
+                  {req.user_id ? (
+                    <Link
+                      href={`/admin/user-management/${req.user_id}`}
+                      target="_blank"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-neutral-800 dark:text-neutral-200 font-bold hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
+                    >
+                      <span>{req.user?.name || 'Student'}</span>
+                      <ExternalLink size={10} />
+                    </Link>
+                  ) : (
+                    <span className="text-neutral-800 dark:text-neutral-200 font-bold">{req.user?.name || 'Student'}</span>
+                  )}{' '}
+                  ({req.user?.email || 'N/A'})
                 </div>
               </div>
 

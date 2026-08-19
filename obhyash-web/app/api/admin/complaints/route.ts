@@ -25,9 +25,23 @@ export async function GET(request: NextRequest) {
 
     if (search && search.trim()) {
       const searchTerm = search.trim();
-      query = query.or(
-        `description.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`,
-      );
+      // Match user by name, email or phone
+      const { data: matchedUsers } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`);
+
+      const matchedUserIds = (matchedUsers || []).map((u: any) => u.id);
+
+      if (matchedUserIds.length > 0) {
+        query = query.or(
+          `description.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%,user_id.in.(${matchedUserIds.join(',')})`,
+        );
+      } else {
+        query = query.or(
+          `description.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`,
+        );
+      }
     }
 
     const from = (page - 1) * pageSize;
@@ -80,7 +94,7 @@ export async function GET(request: NextRequest) {
     if (userIds.length > 0) {
       const { data: usersData } = await supabaseAdmin
         .from('users')
-        .select('id, name, email, phone')
+        .select('id, name, email, phone, avatar_url, avatar_color')
         .in('id', userIds);
 
       if (usersData) {
@@ -185,7 +199,7 @@ export async function POST(request: NextRequest) {
               ? `আপনার পাঠানো অভিযোগটির বিষয়ে অ্যাডমিন মন্তব্য: "${feedback}"`
               : `আপনার পাঠানো অভিযোগটি (${statusBn}) হয়েছে।`,
             type: status === 'Resolved' ? 'success' : 'info',
-            read: false,
+            is_read: false,
             created_at: now.toISOString(),
           });
         } catch (notifErr) {

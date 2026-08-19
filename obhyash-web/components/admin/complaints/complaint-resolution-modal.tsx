@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   X,
   User,
@@ -12,6 +13,7 @@ import {
   AlertTriangle,
   MessageSquare,
   Clock,
+  ExternalLink,
 } from 'lucide-react';
 import { AppComplaint, ComplaintStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -113,20 +115,41 @@ export function ComplaintResolutionModal({
                 <span className="text-[9px] font-black text-neutral-400 uppercase tracking-tight opacity-70">
                   Reporter
                 </span>
-                <div className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white truncate">
-                  <div className="w-5 h-5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase">
-                    {(complaint.user?.name || 'U').charAt(0)}
+                {complaint.user_id ? (
+                  <Link
+                    href={`/admin/user-management/${complaint.user_id}`}
+                    target="_blank"
+                    className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 transition-colors truncate group"
+                  >
+                    <div className="w-5 h-5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase">
+                      {(complaint.user?.name || 'U').charAt(0)}
+                    </div>
+                    <span className="truncate">{complaint.user?.name || 'Unknown'}</span>
+                    <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white truncate">
+                    <div className="w-5 h-5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase">
+                      {(complaint.user?.name || 'U').charAt(0)}
+                    </div>
+                    {complaint.user?.name || 'Unknown'}
                   </div>
-                  {complaint.user?.name || 'Unknown'}
-                </div>
+                )}
               </div>
               <div className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-800 space-y-0.5">
                 <span className="text-[9px] font-black text-neutral-400 uppercase tracking-tight opacity-70">
-                  Created
+                  Created (24h)
                 </span>
-                <div className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white">
-                  <Calendar size={12} className="text-red-500" />
-                  {new Date(complaint.created_at).toLocaleDateString()}
+                <div className="flex items-center gap-1.5 font-bold text-xs text-neutral-900 dark:text-white font-mono">
+                  <Calendar size={12} className="text-red-500 shrink-0" />
+                  <span>
+                    {new Date(complaint.created_at).toLocaleDateString('en-GB')}{' '}
+                    {new Date(complaint.created_at).toLocaleTimeString('en-GB', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })}
+                  </span>
                 </div>
               </div>
             </div>

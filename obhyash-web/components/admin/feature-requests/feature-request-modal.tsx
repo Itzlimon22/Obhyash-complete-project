@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   X,
   User,
@@ -12,6 +13,7 @@ import {
   Compass,
   RefreshCcw,
   XCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { AppFeatureRequest, FeatureRequestStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -126,17 +128,35 @@ export function FeatureRequestModal({
                   <User size={14} />
                 </div>
                 <div>
-                  <p className="font-bold text-neutral-900 dark:text-white">
-                    {request.user?.name || 'Student'}
-                  </p>
+                  {request.user_id ? (
+                    <Link
+                      href={`/admin/user-management/${request.user_id}`}
+                      target="_blank"
+                      className="font-bold text-neutral-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1 group"
+                    >
+                      <span>{request.user?.name || 'Student'}</span>
+                      <ExternalLink size={11} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  ) : (
+                    <p className="font-bold text-neutral-900 dark:text-white">
+                      {request.user?.name || 'Student'}
+                    </p>
+                  )}
                   <p className="text-neutral-500 text-[11px]">
                     {request.user?.email || 'User ID: ' + request.user_id.slice(0, 8)}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 text-neutral-500 font-medium">
+              <div className="flex items-center gap-1.5 text-neutral-500 font-bold font-mono">
                 <Calendar size={13} />
-                {new Date(request.created_at).toLocaleString('bn-BD')}
+                <span>
+                  {new Date(request.created_at).toLocaleDateString('en-GB')}{' '}
+                  {new Date(request.created_at).toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })}
+                </span>
               </div>
             </div>
 

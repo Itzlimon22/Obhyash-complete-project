@@ -126,8 +126,12 @@ class AppPopups {
         l.contains('network is unreachable') ||
         l.contains('clientexception') ||
         l.contains('connection refused') ||
-        l.contains('connection timed out')) {
-      return 'ইন্টারনেট সংযোগ নেই বা ধীরগতির। আবার চেষ্টা করো।';
+        l.contains('timeoutexception') ||
+        l.contains('future not completed') ||
+        l.contains('connection timed out') ||
+        l.contains('timed out') ||
+        l.contains('deadline exceeded')) {
+      return 'ইন্টারনেট সংযোগ ধীরগতির বা সার্ভার সাড়া দিতে দেরি করছে। আবার চেষ্টা করো।';
     }
 
     if (l.contains('invalid login credentials') ||

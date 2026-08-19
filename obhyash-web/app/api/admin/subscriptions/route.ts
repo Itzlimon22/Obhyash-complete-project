@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     // 2. Fetch Users with active/paid Subscriptions
     const { data: usersData, error: usersError } = await supabaseAdmin
       .from('users')
-      .select('id, name, email, phone, subscription, created_at, updated_at')
-      .not('subscription', 'is', null)
+      .select('id, name, email, phone, subscription, is_subscribed, subscription_expires_at, created_at, updated_at')
+      .or('subscription.is.not.null,is_subscribed.eq.true,subscription_expires_at.is.not.null')
       .order('created_at', { ascending: false });
 
     if (usersError) {
@@ -35,13 +35,16 @@ export async function GET(request: NextRequest) {
     // Map users to subscription history format expected by Admin UI
     const mappedSubscriptions = (usersData || [])
       .filter((u) => {
-        const plan = u.subscription?.plan;
-        return plan && plan !== 'Free';
+        const plan = u.subscription?.plan || u.subscription?.plan_name;
+        const isSubscribed = u.is_subscribed === true;
+        return (plan && plan !== 'Free') || isSubscribed;
       })
       .map((u) => {
         const sub = u.subscription || {};
-        const expiry = sub.expiry || sub.expires_at || '';
+        const expiry = sub.expiry || sub.expires_at || u.subscription_expires_at || '';
         const isExpired = expiry ? new Date(expiry) < new Date() : false;
+        const isActive = (sub.status === 'Active' || u.is_subscribed === true) && !isExpired;
+        const planName = sub.plan || sub.plan_name || (u.is_subscribed ? 'Premium' : 'Free');
 
         return {
           id: u.id,
@@ -51,11 +54,15 @@ export async function GET(request: NextRequest) {
             email: u.email || '',
             phone: u.phone || '',
           },
-          plan_name: sub.plan || 'Premium',
+          plan_name: planName,
+          plan: {
+            display_name: planName,
+            price: Number(sub.amount) || Number(sub.price) || 0,
+          },
           started_at: u.updated_at || u.created_at,
           expires_at: expiry,
-          is_active: sub.status === 'Active' && !isExpired,
-          status: isExpired ? 'Expired' : (sub.status || 'Active'),
+          is_active: isActive,
+          status: isExpired ? 'Expired' : (isActive ? 'Active' : (sub.status || 'Inactive')),
         };
       });
 
@@ -78,10 +85,19 @@ export async function GET(request: NextRequest) {
     const pendingRequests = paymentRequests.filter(
       (r) => r.status === 'Pending',
     );
+    const rejectedRequests = paymentRequests.filter(
+      (r) => r.status === 'Rejected',
+    );
     const totalRevenue = approvedRequests.reduce(
       (sum, r) => sum + (Number(r.amount) || 0),
       0,
     );
+    const totalRequestsCount = paymentRequests.length;
+    const approvalRate =
+      totalRequestsCount > 0
+        ? Math.round((approvedRequests.length / totalRequestsCount) * 100)
+        : 0;
+    const activeSubscribersCount = mappedSubscriptions.filter((s) => s.is_active).length;
 
     return NextResponse.json({
       success: true,
@@ -91,11 +107,12 @@ export async function GET(request: NextRequest) {
         plans: plansData || [],
         stats: {
           totalRevenue,
-          pendingCount: pendingRequests.length,
-          activeSubscribersCount: mappedSubscriptions.filter((s) => s.is_active)
-            .length,
-          approvedRequestsCount: approvedRequests.length,
-          totalRequestsCount: paymentRequests.length,
+          pendingRequests: pendingRequests.length,
+          activeSubscriptions: activeSubscribersCount,
+          approvalRate,
+          approvedRequests: approvedRequests.length,
+          rejectedRequests: rejectedRequests.length,
+          totalRequests: totalRequestsCount,
         },
       },
     });

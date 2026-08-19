@@ -55,15 +55,53 @@ export default function LoginPage() {
     try {
       let targetEmail = identifier.trim();
 
+      // Convert any Bengali numerals (০-৯) to English digits (0-9)
+      const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      for (let i = 0; i < 10; i++) {
+        targetEmail = targetEmail.split(bnDigits[i]).join(i.toString());
+      }
+
       // If user provided a phone number instead of email
       const cleanDigits = targetEmail.replace(/\D/g, '');
       if (cleanDigits.length >= 10 && !targetEmail.includes('@')) {
-        const { data: resolvedEmail, error: rpcErr } = await supabase.rpc(
-          'get_email_by_phone',
-          { p_phone: targetEmail }
-        );
+        let normalizedPhone = cleanDigits;
+        if (normalizedPhone.startsWith('8801') && normalizedPhone.length === 13) {
+          normalizedPhone = normalizedPhone.substring(2);
+        } else if (normalizedPhone.startsWith('1') && normalizedPhone.length === 10) {
+          normalizedPhone = '0' + normalizedPhone;
+        }
 
-        if (rpcErr || !resolvedEmail) {
+        let resolvedEmail: string | null = null;
+
+        // 1. Try RPC get_email_by_phone
+        try {
+          const { data, error: rpcErr } = await supabase.rpc('get_email_by_phone', {
+            p_phone: normalizedPhone,
+          });
+          if (!rpcErr && data) {
+            resolvedEmail = data;
+          }
+        } catch {
+          // ignore and fallback
+        }
+
+        // 2. Fallback direct table query
+        if (!resolvedEmail) {
+          try {
+            const { data: userRow } = await supabase
+              .from('users')
+              .select('email')
+              .or(`phone.eq.${normalizedPhone},phone.eq.+88${normalizedPhone},phone.eq.88${normalizedPhone}`)
+              .maybeSingle();
+            if (userRow?.email) {
+              resolvedEmail = userRow.email;
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        if (!resolvedEmail) {
           setError('এই মোবাইল নম্বর দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি।');
           setLoading(false);
           return;

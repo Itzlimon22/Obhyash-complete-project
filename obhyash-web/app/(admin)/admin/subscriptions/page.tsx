@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   CreditCard,
   DollarSign,
@@ -25,6 +25,13 @@ import {
   LayoutGrid,
   List,
   Gift,
+  Copy,
+  ExternalLink,
+  AlertCircle,
+  Phone,
+  PhoneCall,
+  Filter,
+  ArrowUpDown,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
@@ -36,9 +43,14 @@ interface PaymentRequest {
   user?: {
     name: string;
     email: string;
-    phone: string;
+    phone?: string;
   };
-  plan_name: string;
+  plan_name?: string;
+  plan_id?: string;
+  plan?: {
+    display_name?: string;
+    price?: number;
+  };
   amount: number;
   currency: string;
   payment_method: string;
@@ -70,9 +82,14 @@ interface SubscriptionHistory {
   user?: {
     name: string;
     email: string;
+    phone?: string;
   };
-  plan_id: string;
-  plan?: SubscriptionPlan;
+  plan_name?: string;
+  plan_id?: string;
+  plan?: {
+    display_name?: string;
+    price?: number;
+  };
   started_at: string;
   expires_at: string;
   is_active: boolean;
@@ -80,22 +97,36 @@ interface SubscriptionHistory {
 
 export default function SubscriptionsPage() {
   const [activeTab, setActiveTab] = useState<
-    'requests' | 'subscriptions' | 'plans' | 'analytics'
+    'requests' | 'subscriptions'
   >('requests');
-  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
-  const [subscriptions, setSubscriptions] = useState<SubscriptionHistory[]>([]);
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [rawRequests, setRawRequests] = useState<PaymentRequest[]>([]);
+  const [rawSubscriptions, setRawSubscriptions] = useState<SubscriptionHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Requests Filters & Sorting
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<
     'All' | 'Pending' | 'Approved' | 'Rejected'
   >('All');
+  const [methodFilter, setMethodFilter] = useState<
+    'All' | 'bKash' | 'Nagad' | 'Rocket' | 'Manual'
+  >('All');
+  const [reqSort, setReqSort] = useState<
+    'newest' | 'oldest' | 'amount_high' | 'amount_low'
+  >('newest');
+
+  // Subscriptions Filters & Sorting
+  const [subSearchQuery, setSubSearchQuery] = useState('');
+  const [subStatusFilter, setSubStatusFilter] = useState<
+    'All' | 'Active' | 'Expiring' | 'Expired'
+  >('All');
+  const [subSort, setSubSort] = useState<
+    'expiring_soon' | 'newest' | 'name'
+  >('expiring_soon');
 
   // Pagination State
   const [reqPage, setReqPage] = useState(1);
-  const [reqTotal, setReqTotal] = useState(0);
   const [subPage, setSubPage] = useState(1);
-  const [subTotal, setSubTotal] = useState(0);
   const pageSize = 20;
 
   // View Style
@@ -113,14 +144,6 @@ export default function SubscriptionsPage() {
     'approve',
   );
   const [adminNotes, setAdminNotes] = useState('');
-  const [showPlanModal, setShowPlanModal] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<Partial<SubscriptionPlan>>({
-    currency: 'BDT',
-    features: [],
-    is_active: true,
-    is_popular: false,
-    color_theme: 'border-neutral-200',
-  });
 
   // Manual Subscription Management
   const [showExtendModal, setShowExtendModal] = useState(false);
@@ -128,52 +151,40 @@ export default function SubscriptionsPage() {
     useState<SubscriptionHistory | null>(null);
   const [extensionDays, setExtensionDays] = useState(30);
 
+  // Global Server Aggregate Stats
+  const [serverStats, setServerStats] = useState({
+    totalRevenue: 0,
+    pendingRequests: 0,
+    activeSubscriptions: 0,
+    approvalRate: 0,
+  });
+
   useEffect(() => {
     fetchData();
-  }, [reqPage, subPage, statusFilter, searchQuery]); // Re-fetch when pagination or filters change
+  }, []);
 
   const fetchData = async (showToast = false) => {
     try {
+      setIsLoading(true);
       const res = await fetch('/api/admin/subscriptions');
       if (!res.ok) throw new Error('Failed to fetch subscriptions data');
       const json = await res.json();
       if (!json.success || !json.data) throw new Error(json.error || 'Invalid response');
 
-      let requests = json.data.paymentRequests || [];
-      if (statusFilter !== 'All') {
-        requests = requests.filter((r: any) => r.status === statusFilter);
-      }
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        requests = requests.filter((r: any) => 
-          (r.transaction_id && r.transaction_id.toLowerCase().includes(query)) ||
-          (r.user?.name && r.user.name.toLowerCase().includes(query)) ||
-          (r.user?.email && r.user.email.toLowerCase().includes(query)) ||
-          (r.user?.phone && r.user.phone.includes(query))
-        );
+      if (json.data.stats) {
+        setServerStats({
+          totalRevenue: Number(json.data.stats.totalRevenue) || 0,
+          pendingRequests: Number(json.data.stats.pendingRequests) || 0,
+          activeSubscriptions: Number(json.data.stats.activeSubscriptions) || 0,
+          approvalRate: Number(json.data.stats.approvalRate) || 0,
+        });
       }
 
-      setReqTotal(requests.length);
-      const reqFrom = (reqPage - 1) * pageSize;
-      setPaymentRequests(requests.slice(reqFrom, reqFrom + pageSize));
-
-      let subs = json.data.subscriptions || [];
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        subs = subs.filter((s: any) => 
-          (s.user?.name && s.user.name.toLowerCase().includes(query)) ||
-          (s.user?.email && s.user.email.toLowerCase().includes(query)) ||
-          (s.user?.phone && s.user.phone.includes(query))
-        );
-      }
-      setSubTotal(subs.length);
-      const subFrom = (subPage - 1) * pageSize;
-      setSubscriptions(subs.slice(subFrom, subFrom + pageSize));
-
-      setPlans(json.data.plans || []);
+      setRawRequests(json.data.paymentRequests || []);
+      setRawSubscriptions(json.data.subscriptions || []);
 
       if (showToast) {
-        toast.success('Data refreshed successfully');
+        toast.success('ডাটা সফলভাবে রিফ্রেশ হয়েছে');
       }
     } catch (error: unknown) {
       console.error('Failed to fetch data:', error);
@@ -184,6 +195,105 @@ export default function SubscriptionsPage() {
       setIsLoading(false);
     }
   };
+
+  // Filtered & Sorted Requests
+  const filteredRequests = useMemo(() => {
+    let list = [...rawRequests];
+
+    // Search by Phone, TrxID, User Name, Email
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter((r) =>
+        (r.transaction_id && r.transaction_id.toLowerCase().includes(q)) ||
+        (r.user?.phone && r.user.phone.toLowerCase().includes(q)) ||
+        (r.user?.name && r.user.name.toLowerCase().includes(q)) ||
+        (r.user?.email && r.user.email.toLowerCase().includes(q)) ||
+        (r.plan_name && r.plan_name.toLowerCase().includes(q))
+      );
+    }
+
+    // Status Filter
+    if (statusFilter !== 'All') {
+      list = list.filter((r) => r.status === statusFilter);
+    }
+
+    // Method Filter
+    if (methodFilter !== 'All') {
+      list = list.filter((r) => {
+        const m = (r.payment_method || '').toLowerCase();
+        return m.includes(methodFilter.toLowerCase());
+      });
+    }
+
+    // Sorting
+    if (reqSort === 'newest') {
+      list.sort((a, b) => new Date(b.requested_at).getTime() - new Date(a.requested_at).getTime());
+    } else if (reqSort === 'oldest') {
+      list.sort((a, b) => new Date(a.requested_at).getTime() - new Date(b.requested_at).getTime());
+    } else if (reqSort === 'amount_high') {
+      list.sort((a, b) => b.amount - a.amount);
+    } else if (reqSort === 'amount_low') {
+      list.sort((a, b) => a.amount - b.amount);
+    }
+
+    return list;
+  }, [rawRequests, searchQuery, statusFilter, methodFilter, reqSort]);
+
+  // Paginated Requests
+  const paginatedRequests = useMemo(() => {
+    const from = (reqPage - 1) * pageSize;
+    return filteredRequests.slice(from, from + pageSize);
+  }, [filteredRequests, reqPage]);
+
+  // Filtered & Sorted Subscriptions
+  const filteredSubscriptions = useMemo(() => {
+    let list = [...rawSubscriptions];
+
+    // Search by Phone, Name, Email, Plan
+    if (subSearchQuery.trim()) {
+      const q = subSearchQuery.toLowerCase().trim();
+      list = list.filter((s) =>
+        (s.user?.phone && s.user.phone.toLowerCase().includes(q)) ||
+        (s.user?.name && s.user.name.toLowerCase().includes(q)) ||
+        (s.user?.email && s.user.email.toLowerCase().includes(q)) ||
+        (s.plan_name && s.plan_name.toLowerCase().includes(q))
+      );
+    }
+
+    // Status Filter
+    if (subStatusFilter === 'Active') {
+      list = list.filter((s) => s.is_active);
+    } else if (subStatusFilter === 'Expiring') {
+      list = list.filter((s) => {
+        if (!s.expires_at || !s.is_active) return false;
+        const days = Math.ceil((new Date(s.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+        return days <= 7 && days >= 0;
+      });
+    } else if (subStatusFilter === 'Expired') {
+      list = list.filter((s) => !s.is_active);
+    }
+
+    // Sorting
+    if (subSort === 'expiring_soon') {
+      list.sort((a, b) => {
+        const aTime = a.expires_at ? new Date(a.expires_at).getTime() : Infinity;
+        const bTime = b.expires_at ? new Date(b.expires_at).getTime() : Infinity;
+        return aTime - bTime;
+      });
+    } else if (subSort === 'newest') {
+      list.sort((a, b) => new Date(b.started_at || 0).getTime() - new Date(a.started_at || 0).getTime());
+    } else if (subSort === 'name') {
+      list.sort((a, b) => (a.user?.name || '').localeCompare(b.user?.name || ''));
+    }
+
+    return list;
+  }, [rawSubscriptions, subSearchQuery, subStatusFilter, subSort]);
+
+  // Paginated Subscriptions
+  const paginatedSubscriptions = useMemo(() => {
+    const from = (subPage - 1) * pageSize;
+    return filteredSubscriptions.slice(from, from + pageSize);
+  }, [filteredSubscriptions, subPage]);
 
   const handleReviewPayment = async () => {
     if (!reviewingRequest) return;
@@ -210,9 +320,11 @@ export default function SubscriptionsPage() {
       setReviewingRequest(null);
       setAdminNotes('');
       fetchData();
-    } catch (error: any) {
-      console.error('Failed to review payment:', error);
-      toast.error(error.message || 'Failed to process payment review');
+    } catch (error: unknown) {
+      console.error('Error reviewing payment:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to review payment';
+      toast.error(errorMessage);
     }
   };
 
@@ -225,8 +337,8 @@ export default function SubscriptionsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'extend_subscription',
-          userId: extendingSubscription.user_id,
-          extensionDays,
+          subscriptionId: extendingSubscription.id,
+          days: extensionDays,
         }),
       });
 
@@ -236,376 +348,428 @@ export default function SubscriptionsPage() {
       toast.success(`Subscription extended by ${extensionDays} days`);
       setShowExtendModal(false);
       setExtendingSubscription(null);
-      setExtensionDays(30);
       fetchData();
-    } catch (error: any) {
-      console.error('Failed to extend subscription:', error);
-      toast.error(error.message || 'Failed to extend subscription');
+    } catch (error: unknown) {
+      console.error('Error extending subscription:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to extend subscription';
+      toast.error(errorMessage);
     }
   };
 
-  const handleCreatePlan = async () => {
-    if (
-      !editingPlan.name ||
-      !editingPlan.display_name ||
-      !editingPlan.price ||
-      !editingPlan.duration_days
-    ) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
+  const formatTimestamp24h = (dateStr?: string | null) => {
+    if (!dateStr) return { date: 'N/A', time: '', full: 'N/A' };
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return { date: 'N/A', time: '', full: 'N/A' };
 
-    try {
-      const res = await fetch('/api/admin/subscriptions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_plan',
-          plan: editingPlan,
-        }),
-      });
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
 
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Failed to save plan');
-
-      toast.success(editingPlan.id ? 'Plan updated successfully' : 'Plan created successfully');
-      setShowPlanModal(false);
-      setEditingPlan({
-        currency: 'BDT',
-        features: [],
-        is_active: true,
-        is_popular: false,
-        color_theme: 'border-neutral-200',
-      });
-      fetchData();
-    } catch (error: any) {
-      console.error('Failed to save plan:', error);
-      toast.error(error.message || 'Failed to save subscription plan');
-    }
-  };
-
-  const handleDeletePlan = async (planId: string) => {
-    if (!confirm('Are you sure you want to delete this plan?')) return;
-
-    try {
-      const res = await fetch('/api/admin/subscriptions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete_plan',
-          planId,
-        }),
-      });
-
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Failed to delete plan');
-
-      toast.success('Plan deleted successfully');
-      fetchData();
-    } catch (error: any) {
-      console.error('Failed to delete plan:', error);
-      toast.error(error.message || 'Failed to delete plan');
-    }
-  };
-
-  const handleExport = () => {
-    const data = activeTab === 'requests' ? paymentRequests : subscriptions;
-    const csv = [
-      activeTab === 'requests'
-        ? [
-            'User',
-            'Email',
-            'Plan',
-            'Amount',
-            'Method',
-            'Transaction ID',
-            'Status',
-            'Date',
-          ].join(',')
-        : ['User', 'Email', 'Plan', 'Started', 'Expires', 'Status'].join(','),
-      ...data.map((item) => {
-        if (activeTab === 'requests' && 'plan_name' in item) {
-          const req = item as PaymentRequest;
-          return [
-            req.user?.name || 'N/A',
-            req.user?.email || 'N/A',
-            req.plan_name,
-            req.amount,
-            req.payment_method,
-            req.transaction_id || 'N/A',
-            req.status,
-            new Date(req.requested_at).toLocaleDateString(),
-          ].join(',');
-        }
-        const sub = item as SubscriptionHistory;
-        return [
-          sub.user?.name || 'N/A',
-          sub.user?.email || 'N/A',
-          sub.plan?.display_name || 'N/A',
-          new Date(sub.started_at).toLocaleDateString(),
-          new Date(sub.expires_at).toLocaleDateString(),
-          sub.is_active ? 'Active' : 'Expired',
-        ].join(',');
-      }),
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${activeTab}-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-
-    toast.success('Data exported successfully!');
+    return {
+      date: `${day}/${month}/${year}`,
+      time: `${hours}:${minutes}:${seconds}`,
+      full: `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`,
+    };
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Approved':
       case 'Active':
-        return 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
       case 'Pending':
-        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20';
       case 'Rejected':
       case 'Expired':
-        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
+        return 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20';
       default:
-        return 'text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800';
+        return 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border border-neutral-500/20';
     }
   };
 
-  const stats = {
-    totalRevenue: paymentRequests
-      .filter((r) => r.status === 'Approved')
-      .reduce((sum, r) => sum + r.amount, 0),
-    pendingRequests: paymentRequests.filter((r) => r.status === 'Pending')
-      .length,
-    activeSubscriptions: subscriptions.filter((s) => s.is_active).length,
-    approvalRate:
-      paymentRequests.length > 0
-        ? Math.round(
-            (paymentRequests.filter((r) => r.status === 'Approved').length /
-              paymentRequests.length) *
-              100,
-          )
-        : 0,
+  const renderMethodBadge = (method?: string) => {
+    const m = (method || '').toLowerCase();
+    if (m.includes('bkash')) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+          bKash
+        </span>
+      );
+    }
+    if (m.includes('nagad')) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+          Nagad
+        </span>
+      );
+    }
+    if (m.includes('rocket')) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+          Rocket
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
+        {method || 'Manual'}
+      </span>
+    );
   };
 
-  // We still explicitly filter for the front-end string matching just in case (e.g. name matching which we didn't send to server)
-  const filteredRequests = paymentRequests.filter((request) => {
-    const matchesSearch =
-      request.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.transaction_id?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+  const renderPhoneCell = (phone?: string | null) => {
+    if (!phone) {
+      return <span className="text-xs text-neutral-400 italic">প্রযোজ্য নয়</span>;
+    }
+    return (
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs font-mono text-neutral-800 dark:text-neutral-200 font-medium">
+          {phone}
+        </span>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(phone);
+            toast.success('ফোন নম্বর কপি করা হয়েছে');
+          }}
+          className="p-1 text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded transition-colors"
+          title="Copy Phone"
+        >
+          <Copy size={12} />
+        </button>
+      </div>
+    );
+  };
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6 lg:p-8">
-      <div className="max-w-[1600px] mx-auto space-y-6 sm:space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
-              সাবস্ক্রিপশন ও পেমেন্ট
-            </h1>
-          </div>
+  const exportData = () => {
+    const csvContent =
+      activeTab === 'requests'
+        ? [
+            ['ID', 'User', 'Email', 'Phone', 'Plan', 'Amount', 'Method', 'Transaction ID', 'Status', 'Date & Time (24h)'],
+            ...filteredRequests.map((r) => [
+              r.id,
+              r.user?.name || '',
+              r.user?.email || '',
+              r.user?.phone || '',
+              r.plan_name,
+              r.amount,
+              r.payment_method,
+              r.transaction_id || '',
+              r.status,
+              formatTimestamp24h(r.requested_at).full,
+            ]),
+          ]
+            .map((e) => e.join(','))
+            .join('\n')
+        : [
+            ['ID', 'User', 'Email', 'Phone', 'Plan', 'Started (24h)', 'Expires (24h)', 'Status'],
+            ...filteredSubscriptions.map((s) => [
+              s.id,
+              s.user?.name || '',
+              s.user?.email || '',
+              s.user?.phone || '',
+              s.plan_name || s.plan?.display_name || '',
+              formatTimestamp24h(s.started_at).full,
+              s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
+              s.is_active ? 'Active' : 'Expired',
+            ]),
+          ]
+            .map((e) => e.join(','))
+            .join('\n');
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => fetchData(true)}
-              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-              title="Refresh"
-            >
-              <RefreshCw
-                size={16}
-                className={`text-neutral-500 ${isLoading ? 'animate-spin' : ''}`}
-              />
-            </button>
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
-            {/* View Toggles for Requests and Subscriptions */}
-            {(activeTab === 'requests' || activeTab === 'subscriptions') && (
-              <div className="hidden md:flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
-                <button
-                  onClick={() => setViewStyle('card')}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    viewStyle === 'card'
-                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400'
-                      : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-                  }`}
-                  title="Card View"
-                >
-                  <LayoutGrid size={18} />
-                </button>
-                <button
-                  onClick={() => setViewStyle('table')}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    viewStyle === 'table'
-                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400'
-                      : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-                  }`}
-                  title="Table View"
-                >
-                  <List size={18} />
-                </button>
-              </div>
-            )}
-
-            <Link
-              href="/admin/referrals"
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs sm:text-sm font-bold rounded-xl border border-indigo-200 dark:border-indigo-800 transition-all shadow-sm active:scale-95"
-            >
-              <Gift size={16} />
-              <span>রেফারেল</span>
-            </Link>
-
-            <button
-              onClick={handleExport}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs sm:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"
-            >
-              <Download size={16} />
-              <span>এক্সপোর্ট</span>
-            </button>
-
-            {activeTab === 'plans' && (
-              <button
-                onClick={() => {
-                  setEditingPlan({
-                    currency: 'BDT',
-                    features: [],
-                    is_active: true,
-                  });
-                  setShowPlanModal(true);
-                }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
-              >
-                <Plus size={16} />
-                <span>নতুন প্লান</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          {[
-            {
-              label: 'মোট আয়',
-              value: `৳${stats.totalRevenue.toLocaleString()}`,
-              icon: DollarSign,
-              gradient: 'from-emerald-600 to-emerald-500',
-              bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-              textColor: 'text-emerald-600 dark:text-emerald-400',
-            },
-            {
-              label: 'পেন্ডিং রিকোয়েস্ট',
-              value: stats.pendingRequests,
-              icon: Clock,
-              gradient: 'from-amber-600 to-amber-500',
-              bg: 'bg-amber-50 dark:bg-amber-500/10',
-              textColor: 'text-amber-600 dark:text-amber-400',
-            },
-            {
-              label: 'এক্টিভ ইউজার',
-              value: stats.activeSubscriptions,
-              icon: Users,
-              gradient: 'from-purple-600 to-purple-500',
-              bg: 'bg-purple-50 dark:bg-purple-500/10',
-              textColor: 'text-purple-600 dark:text-purple-400',
-            },
-            {
-              label: 'অ্যাপ্রুভাল রেট',
-              value: `${stats.approvalRate}%`,
-              icon: TrendingUp,
-              gradient: 'from-blue-600 to-blue-500',
-              bg: 'bg-blue-50 dark:bg-blue-500/10',
-              textColor: 'text-blue-600 dark:text-blue-400',
-            },
-          ].map((stat, i) => (
+  if (isLoading) {
+    return (
+      <div className="p-8 space-y-8 animate-pulse">
+        <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded-lg w-1/4"></div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[1.5rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div
-                  className={`p-2 sm:p-3 rounded-xl ${stat.bg} text-white bg-gradient-to-br ${stat.gradient}`}
-                >
-                  <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] sm:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">
-                  {stat.label}
-                </p>
-                <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
-                  {stat.value}
-                </p>
-              </div>
-            </div>
+              className="h-32 bg-neutral-200 dark:bg-neutral-800 rounded-2xl"
+            ></div>
           ))}
         </div>
+        <div className="h-96 bg-neutral-200 dark:bg-neutral-800 rounded-2xl"></div>
+      </div>
+    );
+  }
 
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-[1600px] mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
+            সাবস্ক্রিপশন ও পেমেন্ট
+          </h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+            পেমেন্ট ভেরিফিকেশন, অ্যাক্টিভ সাবস্ক্রাইবার ও মেয়াদ নিয়ন্ত্রণ করুন
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* View Toggle */}
+          <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl flex items-center gap-1 border border-neutral-200 dark:border-neutral-700">
+            <button
+              onClick={() => setViewStyle('responsive')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewStyle === 'responsive'
+                  ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+              title="Responsive View (Auto)"
+            >
+              Auto
+            </button>
+            <button
+              onClick={() => setViewStyle('table')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewStyle === 'table'
+                  ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+              title="Table View"
+            >
+              <List size={16} />
+            </button>
+            <button
+              onClick={() => setViewStyle('card')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewStyle === 'card'
+                  ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+              title="Card View"
+            >
+              <LayoutGrid size={16} />
+            </button>
+          </div>
+
+          <button
+            onClick={() => fetchData(true)}
+            className="p-2.5 sm:px-4 sm:py-2.5 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-700 dark:text-neutral-200 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-sm active:scale-95"
+            title="Refresh Data"
+          >
+            <RefreshCw size={16} />
+            <span className="hidden sm:inline">রিফ্রেশ</span>
+          </button>
+
+          <button
+            onClick={exportData}
+            className="p-2.5 sm:px-4 sm:py-2.5 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-700 dark:text-neutral-200 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-sm active:scale-95"
+            title="Export CSV"
+          >
+            <Download size={16} />
+            <span className="hidden sm:inline">এক্সপোর্ট CSV</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Global Server Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                মোট আয়
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
+                ৳{serverStats.totalRevenue.toLocaleString()}
+              </p>
+            </div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                পেন্ডিং রিকোয়েস্ট
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
+                {serverStats.pendingRequests}
+              </p>
+            </div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 dark:bg-amber-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                এক্টিভ ইউজার
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
+                {serverStats.activeSubscriptions}
+              </p>
+            </div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 dark:bg-purple-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                অনুমোদনের হার
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
+                {serverStats.approvalRate}%
+              </p>
+            </div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 dark:bg-blue-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="space-y-6">
         {/* Tabs */}
         <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-          {[
-            { id: 'requests', label: 'পেমেন্ট রিকোয়েস্ট', icon: FileText },
-            { id: 'subscriptions', label: 'এক্টিভ ইউজার', icon: Crown },
-            { id: 'plans', label: 'প্লান ম্যানেজমেন্ট', icon: CreditCard },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
-                  : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
-              }`}
-            >
-              <tab.icon size={18} />
-              {tab.label}
-            </button>
-          ))}
+          <button
+            onClick={() => setActiveTab('requests')}
+            className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
+              activeTab === 'requests'
+                ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+            }`}
+          >
+            <FileText size={18} />
+            <span>পেমেন্ট রিকোয়েস্ট</span>
+            {serverStats.pendingRequests > 0 && (
+              <span className="px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full font-bold animate-pulse">
+                {serverStats.pendingRequests}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
+              activeTab === 'subscriptions'
+                ? 'border-purple-600 text-purple-600 dark:text-purple-400'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+            }`}
+          >
+            <Crown size={18} />
+            <span>এক্টিভ ইউজার</span>
+            <span className="px-2 py-0.5 text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-full font-bold">
+              {serverStats.activeSubscriptions}
+            </span>
+          </button>
         </div>
 
-        {/* Payment Requests Tab */}
+        {/* Tab 1: Payment Requests */}
         {activeTab === 'requests' && (
           <div className="space-y-6">
-            {/* Filters */}
-            <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-              <div className="flex flex-col gap-4">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                  <input
-                    type="text"
-                    placeholder="ট্রানজেকশন আইডি দিয়ে খুঁজুন..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setReqPage(1);
-                    }}
-                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm"
-                  />
-                </div>
+            {/* Filter Bar */}
+            <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
+              {/* Search Box: TrxID, Phone, Name, Email */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="ফোন নম্বর (017...), ট্রানজেকশন আইডি, ইউজারের নাম বা ইমেইল দিয়ে খুঁজুন..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setReqPage(1);
+                  }}
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm font-medium"
+                />
+              </div>
 
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+              {/* Status, Method, and Sort Controls */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-2">
+                {/* Status Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                   {(['All', 'Pending', 'Approved', 'Rejected'] as const).map(
                     (status) => (
                       <button
                         key={status}
                         onClick={() => {
                           setStatusFilter(status);
-                          setReqPage(1); // Reset page on filter change
+                          setReqPage(1);
                         }}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                           statusFilter === status
-                            ? 'bg-red-600 text-white shadow-md'
+                            ? 'bg-emerald-600 text-white shadow-md'
                             : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         }`}
                       >
-                        {status === 'All' ? 'সবগুলো' : status}
+                        {status === 'All'
+                          ? `সব (${rawRequests.length})`
+                          : status === 'Pending'
+                          ? `পেন্ডিং (${serverStats.pendingRequests})`
+                          : status}
                       </button>
                     ),
                   )}
+                </div>
+
+                {/* Method & Sort Dropdowns */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {/* Method Filter */}
+                  <div className="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                    <Filter size={14} className="text-neutral-400" />
+                    <span className="text-xs text-neutral-500 font-medium">মেথড:</span>
+                    <select
+                      value={methodFilter}
+                      onChange={(e) => {
+                        setMethodFilter(e.target.value as typeof methodFilter);
+                        setReqPage(1);
+                      }}
+                      className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 focus:outline-none cursor-pointer"
+                    >
+                      <option value="All">সব মেথড</option>
+                      <option value="bKash">bKash</option>
+                      <option value="Nagad">Nagad</option>
+                      <option value="Rocket">Rocket</option>
+                      <option value="Manual">Manual</option>
+                    </select>
+                  </div>
+
+                  {/* Sort Dropdown */}
+                  <div className="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                    <ArrowUpDown size={14} className="text-neutral-400" />
+                    <span className="text-xs text-neutral-500 font-medium">সর্ট:</span>
+                    <select
+                      value={reqSort}
+                      onChange={(e) => {
+                        setReqSort(e.target.value as typeof reqSort);
+                        setReqPage(1);
+                      }}
+                      className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 focus:outline-none cursor-pointer"
+                    >
+                      <option value="newest">নতুন আগে</option>
+                      <option value="oldest">পুরনো আগে</option>
+                      <option value="amount_high">টাকা (বেশি থেকে কম)</option>
+                      <option value="amount_low">টাকা (কম থেকে বেশি)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
@@ -615,25 +779,29 @@ export default function SubscriptionsPage() {
               <div
                 className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
               >
-                {filteredRequests.map((request) => (
+                {paginatedRequests.map((request) => (
                   <div
                     key={request.id}
                     className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
                   >
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 font-bold text-sm">
+                      <Link
+                        href={`/admin/user-management/${request.user_id}`}
+                        className="flex items-center gap-3 group"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 font-bold text-sm">
                           {request.user?.name?.charAt(0) || '?'}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
+                          <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 transition-colors flex items-center gap-1">
                             {request.user?.name || 'Unknown'}
+                            <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                           </p>
                           <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
                             {request.user?.email || 'N/A'}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
                           request.status,
@@ -646,6 +814,22 @@ export default function SubscriptionsPage() {
                     <div className="grid grid-cols-2 gap-3 py-3 border-y border-neutral-100 dark:border-neutral-800">
                       <div>
                         <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          ফোন নম্বর
+                        </p>
+                        <div className="mt-0.5">
+                          {renderPhoneCell(request.user?.phone)}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          মেথড
+                        </p>
+                        <div className="mt-0.5">
+                          {renderMethodBadge(request.payment_method)}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
                           প্যাক
                         </p>
                         <p className="text-[13px] font-bold text-neutral-800 dark:text-neutral-200">
@@ -656,7 +840,7 @@ export default function SubscriptionsPage() {
                         <p className="text-[10px] text-neutral-400 font-bold uppercase">
                           টাকা
                         </p>
-                        <p className="text-[13px] font-bold text-red-600 dark:text-red-400">
+                        <p className="text-[13px] font-bold text-emerald-600 dark:text-emerald-400">
                           ৳{request.amount.toLocaleString()}
                         </p>
                       </div>
@@ -664,30 +848,45 @@ export default function SubscriptionsPage() {
                         <p className="text-[10px] text-neutral-400 font-bold uppercase">
                           Transaction ID
                         </p>
-                        <p className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 truncate">
-                          {request.transaction_id || 'N/A'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 truncate">
+                            {request.transaction_id || 'N/A'}
+                          </p>
+                          {request.transaction_id && (
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(request.transaction_id || '');
+                                toast.success('TrxID কপি করা হয়েছে');
+                              }}
+                              className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5"
+                              title="Copy TrxID"
+                            >
+                              <Copy size={12} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-500">
-                        <Calendar size={12} />
-                        {new Date(request.requested_at).toLocaleDateString()}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500">
+                        <Clock size={13} className="text-neutral-400" />
+                        <span>{formatTimestamp24h(request.requested_at).full}</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-end gap-2">
                         {request.payment_proof_url && (
                           <button
                             onClick={() => {
                               setSelectedProof(request.payment_proof_url);
                               setShowProofModal(true);
                             }}
-                            className="p-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-900/30"
+                            className="p-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                            title="প্রুফ দেখুন"
                           >
-                            <Eye size={16} />
+                            <Eye size={15} />
                           </button>
                         )}
-                        {request.status === 'Pending' && (
+                        {request.status === 'Pending' ? (
                           <>
                             <button
                               onClick={() => {
@@ -695,7 +894,7 @@ export default function SubscriptionsPage() {
                                 setReviewAction('approve');
                                 setShowReviewModal(true);
                               }}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20"
+                              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all"
                             >
                               <Check size={14} /> Approve
                             </button>
@@ -705,11 +904,22 @@ export default function SubscriptionsPage() {
                                 setReviewAction('reject');
                                 setShowReviewModal(true);
                               }}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-red-500/20"
+                              className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all"
                             >
                               <X size={14} /> Reject
                             </button>
                           </>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setReviewingRequest(request);
+                              setReviewAction(request.status === 'Approved' ? 'reject' : 'approve');
+                              setShowReviewModal(true);
+                            }}
+                            className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg text-xs font-bold transition-all"
+                          >
+                            পরিবর্তন
+                          </button>
                         )}
                       </div>
                     </div>
@@ -718,7 +928,7 @@ export default function SubscriptionsPage() {
               </div>
             )}
 
-            {/* Requests Table */}
+            {/* Desktop Table View */}
             {(viewStyle === 'responsive' || viewStyle === 'table') && (
               <div
                 className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
@@ -735,69 +945,93 @@ export default function SubscriptionsPage() {
                     <table className="w-full">
                       <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
                         <tr>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             User
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Plan
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Phone Number
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Amount
-                          </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Method
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Transaction ID
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Plan
+                          </th>
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Date
+                          <th className="px-5 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Date & Time (24h)
                           </th>
-                          <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                        {filteredRequests.map((request) => (
+                        {paginatedRequests.map((request) => (
                           <tr
                             key={request.id}
                             className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
                           >
-                            <td className="px-6 py-4">
-                              <div>
-                                <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                  {request.user?.name || 'Unknown'}
-                                </p>
-                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                  {request.user?.email || 'N/A'}
-                                </p>
+                            <td className="px-5 py-4">
+                              <Link
+                                href={`/admin/user-management/${request.user_id}`}
+                                className="group flex items-center gap-2"
+                              >
+                                <div>
+                                  <p className="text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                                    {request.user?.name || 'Unknown'}
+                                    <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </p>
+                                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                    {request.user?.email || 'N/A'}
+                                  </p>
+                                </div>
+                              </Link>
+                            </td>
+                            <td className="px-5 py-4">
+                              {renderPhoneCell(request.user?.phone)}
+                            </td>
+                            <td className="px-5 py-4">
+                              {renderMethodBadge(request.payment_method)}
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono text-neutral-700 dark:text-neutral-300 font-semibold">
+                                  {request.transaction_id || 'N/A'}
+                                </span>
+                                {request.transaction_id && (
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(request.transaction_id || '');
+                                      toast.success('TrxID কপি করা হয়েছে');
+                                    }}
+                                    className="p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded transition-colors"
+                                    title="Copy TrxID"
+                                  >
+                                    <Copy size={13} />
+                                  </button>
+                                )}
                               </div>
                             </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm font-medium text-neutral-900 dark:text-white">
+                            <td className="px-5 py-4">
+                              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
                                 {request.plan_name}
-                              </p>
+                              </span>
                             </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm font-bold text-neutral-900 dark:text-white">
+                            <td className="px-5 py-4">
+                              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                                 ৳{request.amount.toLocaleString()}
                               </p>
                             </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                {request.payment_method}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
-                              <p className="text-xs font-mono text-neutral-600 dark:text-neutral-400">
-                                {request.transaction_id || 'N/A'}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
+                            <td className="px-5 py-4">
                               <span
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
                                   request.status,
@@ -815,16 +1049,20 @@ export default function SubscriptionsPage() {
                                 {request.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400">
-                                <Calendar className="w-3.5 h-3.5" />
-                                {new Date(
-                                  request.requested_at,
-                                ).toLocaleDateString()}
+                            <td className="px-5 py-4 whitespace-nowrap">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                                  <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                                  {formatTimestamp24h(request.requested_at).date}
+                                </span>
+                                <span className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 flex items-center gap-1 pl-5">
+                                  <Clock className="w-3 h-3 text-neutral-400" />
+                                  {formatTimestamp24h(request.requested_at).time}
+                                </span>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center justify-end gap-2">
+                            <td className="px-5 py-4 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
                                 {request.payment_proof_url && (
                                   <button
                                     onClick={() => {
@@ -833,13 +1071,13 @@ export default function SubscriptionsPage() {
                                       );
                                       setShowProofModal(true);
                                     }}
-                                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                                    title="View Proof"
+                                    className="p-1.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 rounded-lg transition-colors text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
+                                    title="প্রুফ দেখুন (View Proof)"
                                   >
-                                    <Eye className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                                    <Eye className="w-4 h-4" />
                                   </button>
                                 )}
-                                {request.status === 'Pending' && (
+                                {request.status === 'Pending' ? (
                                   <>
                                     <button
                                       onClick={() => {
@@ -847,10 +1085,11 @@ export default function SubscriptionsPage() {
                                         setReviewAction('approve');
                                         setShowReviewModal(true);
                                       }}
-                                      className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
-                                      title="Approve"
+                                      className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95"
+                                      title="অনুমোদন করুন (Approve)"
                                     >
-                                      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                      <Check className="w-3.5 h-3.5" />
+                                      <span>Approve</span>
                                     </button>
                                     <button
                                       onClick={() => {
@@ -858,12 +1097,25 @@ export default function SubscriptionsPage() {
                                         setReviewAction('reject');
                                         setShowReviewModal(true);
                                       }}
-                                      className="p-2 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
-                                      title="Reject"
+                                      className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all active:scale-95"
+                                      title="বাতিল করুন (Reject)"
                                     >
-                                      <X className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                      <X className="w-3.5 h-3.5" />
+                                      <span>Reject</span>
                                     </button>
                                   </>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setReviewingRequest(request);
+                                      setReviewAction(request.status === 'Approved' ? 'reject' : 'approve');
+                                      setShowReviewModal(true);
+                                    }}
+                                    className="px-2.5 py-1 text-[11px] font-bold text-neutral-500 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                                    title="স্ট্যাটাস পরিবর্তন করুন"
+                                  >
+                                    পরিবর্তন
+                                  </button>
                                 )}
                               </div>
                             </td>
@@ -875,85 +1127,202 @@ export default function SubscriptionsPage() {
                 )}
               </div>
             )}
+
+            {/* Pagination for Requests */}
+            {filteredRequests.length > pageSize && (
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
+                <p className="text-xs text-neutral-500">
+                  দেখাচ্ছে {(reqPage - 1) * pageSize + 1} থেকে {Math.min(reqPage * pageSize, filteredRequests.length)} (মোট {filteredRequests.length} টি)
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={reqPage === 1}
+                    onClick={() => setReqPage((p) => p - 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    আগের পেজ
+                  </button>
+                  <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    পেজ {reqPage} / {Math.ceil(filteredRequests.length / pageSize)}
+                  </span>
+                  <button
+                    disabled={reqPage * pageSize >= filteredRequests.length}
+                    onClick={() => setReqPage((p) => p + 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    পরের পেজ
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Active Subscriptions Tab */}
+        {/* Tab 2: Active Subscriptions */}
         {activeTab === 'subscriptions' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Filter Bar for Active Subscriptions */}
+            <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
+              {/* Search Box */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="ফোন নম্বর (017...), ইউজারের নাম, ইমেইল অথবা প্লান দিয়ে খুঁজুন..."
+                  value={subSearchQuery}
+                  onChange={(e) => {
+                    setSubSearchQuery(e.target.value);
+                    setSubPage(1);
+                  }}
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-sm font-medium"
+                />
+              </div>
+
+              {/* Status Pills and Sorting */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+                  {(['All', 'Active', 'Expiring', 'Expired'] as const).map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        setSubStatusFilter(status);
+                        setSubPage(1);
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                        subStatusFilter === status
+                          ? 'bg-purple-600 text-white shadow-md'
+                          : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                      }`}
+                    >
+                      {status === 'All'
+                        ? `সব (${rawSubscriptions.length})`
+                        : status === 'Active'
+                        ? 'এক্টিভ'
+                        : status === 'Expiring'
+                        ? 'মেয়াদ শেষের দিকে (≤ ৭ দিন)'
+                        : 'মেয়াদোত্তীর্ণ'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                  <ArrowUpDown size={14} className="text-neutral-400" />
+                  <span className="text-xs text-neutral-500 font-medium">সর্ট:</span>
+                  <select
+                    value={subSort}
+                    onChange={(e) => {
+                      setSubSort(e.target.value as typeof subSort);
+                      setSubPage(1);
+                    }}
+                    className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 focus:outline-none cursor-pointer"
+                  >
+                    <option value="expiring_soon">মেয়াদ শেষের দিকে আগে</option>
+                    <option value="newest">নতুন সাবস্ক্রাইবার আগে</option>
+                    <option value="name">ইউজারের নাম (A-Z)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             {/* Mobile Card List */}
             {(viewStyle === 'responsive' || viewStyle === 'card') && (
               <div
                 className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
               >
-                {subscriptions.length === 0 ? (
-                  <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center">
+                {filteredSubscriptions.length === 0 ? (
+                  <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center col-span-2">
                     <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
                     <p className="text-neutral-600 dark:text-neutral-400 font-medium">
                       কোন এক্টিভ ইউজার নেই
                     </p>
                   </div>
                 ) : (
-                  subscriptions.map((sub) => (
-                    <div
-                      key={sub.id}
-                      className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 font-bold text-sm">
-                            <Crown size={18} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
-                              {sub.user?.name || 'Unknown'}
-                            </p>
-                            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
-                              {sub.user?.email || 'N/A'}
-                            </p>
-                          </div>
-                        </div>
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
-                            sub.is_active ? 'Active' : 'Expired',
-                          )}`}
-                        >
-                          {sub.is_active ? 'Active' : 'Expired'}
-                        </span>
-                      </div>
+                  paginatedSubscriptions.map((sub) => {
+                    const daysRemaining = sub.expires_at
+                      ? Math.ceil((new Date(sub.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                      : null;
 
-                      <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
-                        <div className="flex justify-between items-center mb-1">
-                          <p className="text-[10px] text-neutral-400 font-bold uppercase">
-                            প্যাক
-                          </p>
-                          <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                            {sub.plan?.display_name || 'Unknown'}
-                          </p>
-                        </div>
-                        <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-neutral-500">
-                            Exp: {new Date(sub.expires_at).toLocaleDateString()}
-                          </span>
-                          <span className="text-red-600 font-bold">
-                            ৳{sub.plan?.price || 0}
+                    return (
+                      <div
+                        key={sub.id}
+                        className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                      >
+                        <div className="flex justify-between items-start">
+                          <Link
+                            href={`/admin/user-management/${sub.user_id}`}
+                            className="flex items-center gap-3 group"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 font-bold text-sm">
+                              <Crown size={18} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-purple-600 transition-colors flex items-center gap-1">
+                                {sub.user?.name || 'Unknown'}
+                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </p>
+                              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                                {sub.user?.email || 'N/A'}
+                              </p>
+                            </div>
+                          </Link>
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
+                              sub.is_active ? 'Active' : 'Expired',
+                            )}`}
+                          >
+                            {sub.is_active ? 'Active' : 'Expired'}
                           </span>
                         </div>
-                      </div>
 
-                      <div className="flex items-center justify-end pt-1">
-                        <button
-                          onClick={() => {
-                            setExtendingSubscription(sub);
-                            setShowExtendModal(true);
-                          }}
-                          className="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                          <RefreshCw size={14} /> মেয়াদ বাড়ান
-                        </button>
+                        <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-neutral-400 font-bold uppercase">
+                              ফোন নম্বর
+                            </span>
+                            {renderPhoneCell(sub.user?.phone)}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-neutral-400 font-bold uppercase">
+                              প্লান
+                            </span>
+                            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                              {sub.plan_name || sub.plan?.display_name || 'Premium'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-[11px] pt-1 border-t border-neutral-200 dark:border-neutral-800">
+                            <span className="text-neutral-500 font-mono">
+                              Exp: {sub.expires_at ? formatTimestamp24h(sub.expires_at).full : 'Unlimited'}
+                            </span>
+                            {daysRemaining !== null && (
+                              <span className={`text-[10px] font-bold ${daysRemaining <= 3 ? 'text-red-500' : 'text-emerald-600'}`}>
+                                {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expired'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end pt-1 gap-2">
+                          <button
+                            onClick={() => {
+                              setExtendingSubscription(sub);
+                              setShowExtendModal(true);
+                            }}
+                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                          >
+                            <RefreshCw size={14} /> মেয়াদ বাড়ান
+                          </button>
+                          <Link
+                            href={`/admin/user-management/${sub.user_id}`}
+                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
+                            title="প্রোফাইল দেখুন"
+                          >
+                            <ExternalLink size={16} />
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             )}
@@ -963,7 +1332,7 @@ export default function SubscriptionsPage() {
               <div
                 className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
               >
-                {subscriptions.length === 0 ? (
+                {filteredSubscriptions.length === 0 ? (
                   <div className="py-24 flex flex-col items-center justify-center">
                     <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
                     <p className="text-neutral-600 dark:text-neutral-400 font-medium">
@@ -979,13 +1348,16 @@ export default function SubscriptionsPage() {
                             User
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Phone Number
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Plan
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Started
+                            Started (24h)
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Expires
+                            Expires (24h)
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                             Status
@@ -996,189 +1368,123 @@ export default function SubscriptionsPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                        {subscriptions.map((sub) => (
-                          <tr
-                            key={sub.id}
-                            className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-                          >
-                            <td className="px-6 py-4">
-                              <div>
-                                <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                  {sub.user?.name || 'Unknown'}
+                        {paginatedSubscriptions.map((sub) => {
+                          const daysRemaining = sub.expires_at
+                            ? Math.ceil((new Date(sub.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                            : null;
+
+                          return (
+                            <tr
+                              key={sub.id}
+                              className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                            >
+                              <td className="px-6 py-4">
+                                <Link
+                                  href={`/admin/user-management/${sub.user_id}`}
+                                  className="group flex items-center gap-2"
+                                >
+                                  <div>
+                                    <p className="text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-purple-600 transition-colors flex items-center gap-1.5">
+                                      {sub.user?.name || 'Unknown'}
+                                      <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </p>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                      {sub.user?.email || 'N/A'}
+                                    </p>
+                                  </div>
+                                </Link>
+                              </td>
+                              <td className="px-6 py-4">
+                                {renderPhoneCell(sub.user?.phone)}
+                              </td>
+                              <td className="px-6 py-4">
+                                <p className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                                  <Crown className="w-4 h-4 text-amber-500" />
+                                  {sub.plan_name || sub.plan?.display_name || 'Premium'}
                                 </p>
-                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                  {sub.user?.email || 'N/A'}
-                                </p>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
-                                <Crown className="w-4 h-4 text-red-500" />
-                                {sub.plan?.display_name || 'Unknown Plan'}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                {new Date(sub.started_at).toLocaleDateString()}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
-                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                {new Date(sub.expires_at).toLocaleDateString()}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
-                                  sub.is_active ? 'Active' : 'Expired',
-                                )}`}
-                              >
-                                {sub.is_active ? (
-                                  <CheckCircle className="w-3.5 h-3.5" />
-                                ) : (
-                                  <XCircle className="w-3.5 h-3.5" />
-                                )}
-                                {sub.is_active ? 'Active' : 'Expired'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <button
-                                onClick={() => {
-                                  setExtendingSubscription(sub);
-                                  setShowExtendModal(true);
-                                }}
-                                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-                              >
-                                Extend
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                    {formatTimestamp24h(sub.started_at).date}
+                                  </span>
+                                  <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-neutral-400" />
+                                    {formatTimestamp24h(sub.started_at).time}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="space-y-1">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                      {sub.expires_at ? formatTimestamp24h(sub.expires_at).date : 'Unlimited'}
+                                    </span>
+                                    {sub.expires_at && (
+                                      <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-1">
+                                        <Clock className="w-3 h-3 text-neutral-400" />
+                                        {formatTimestamp24h(sub.expires_at).time}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {daysRemaining !== null && (
+                                    <span
+                                      className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                        daysRemaining <= 3
+                                          ? 'bg-red-50 dark:bg-red-950/40 text-red-600'
+                                          : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600'
+                                      }`}
+                                    >
+                                      {daysRemaining > 0 ? `${daysRemaining} দিন বাকি` : 'মেয়াদোত্তীর্ণ'}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
+                                    sub.is_active ? 'Active' : 'Expired',
+                                  )}`}
+                                >
+                                  {sub.is_active ? (
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                  ) : (
+                                    <XCircle className="w-3.5 h-3.5" />
+                                  )}
+                                  {sub.is_active ? 'Active' : 'Expired'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setExtendingSubscription(sub);
+                                      setShowExtendModal(true);
+                                    }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-xs font-bold rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800/50 shadow-sm active:scale-95"
+                                    title="মেয়াদ বাড়িয়ে দিন"
+                                  >
+                                    <RefreshCw size={13} />
+                                    <span>মেয়াদ বাড়ান</span>
+                                  </button>
+                                  <Link
+                                    href={`/admin/user-management/${sub.user_id}`}
+                                    className="p-1.5 text-neutral-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border border-neutral-200 dark:border-neutral-800"
+                                    title="ইউজারের বিস্তারিত প্রোফাইল দেখুন"
+                                  >
+                                    <ExternalLink size={14} />
+                                  </Link>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
                 )}
               </div>
             )}
-
-            {/* Pagination Controls for Subscriptions */}
-            <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
-              <p className="text-[10px] md:text-sm text-neutral-600 dark:text-neutral-400">
-                Showing{' '}
-                <span className="font-bold text-neutral-900 dark:text-white">
-                  {subscriptions.length > 0 ? (subPage - 1) * pageSize + 1 : 0}
-                </span>{' '}
-                to{' '}
-                <span className="font-bold text-neutral-900 dark:text-white">
-                  {Math.min(subPage * pageSize, subTotal)}
-                </span>{' '}
-                of{' '}
-                <span className="font-bold text-neutral-900 dark:text-white">
-                  {subTotal}
-                </span>{' '}
-                subscriptions
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSubPage((p) => Math.max(1, p - 1))}
-                  disabled={subPage === 1 || isLoading}
-                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium px-2 py-1.5">
-                  Page {subPage} of{' '}
-                  {Math.max(1, Math.ceil(subTotal / pageSize))}
-                </span>
-                <button
-                  onClick={() =>
-                    setSubPage((p) =>
-                      Math.min(Math.ceil(subTotal / pageSize), p + 1),
-                    )
-                  }
-                  disabled={
-                    subPage >= Math.ceil(subTotal / pageSize) || isLoading
-                  }
-                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Plans Tab */}
-        {activeTab === 'plans' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className="bg-white dark:bg-neutral-900 p-5 sm:p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
-                        {plan.display_name}
-                      </h3>
-                      <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider mt-1">
-                        মেয়াদ: {plan.duration_days} দিন
-                      </p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                        plan.is_active
-                          ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                          : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
-                      }`}
-                    >
-                      {plan.is_active ? 'এক্টিভ' : 'ইনএক্টিভ'}
-                    </span>
-                  </div>
-
-                  <div className="mb-6">
-                    <p className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">
-                      ৳{plan.price.toLocaleString()}
-                    </p>
-                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase">
-                      {plan.currency}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400"
-                      >
-                        <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditingPlan(plan);
-                      setShowPlanModal(true);
-                    }}
-                    className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5"
-                  >
-                    <Edit size={16} />
-                    এডিট
-                  </button>
-                  <button
-                    onClick={() => handleDeletePlan(plan.id)}
-                    className="py-3 px-4 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl transition-all active:scale-95 flex items-center justify-center"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         )}
 
@@ -1327,218 +1633,6 @@ export default function SubscriptionsPage() {
                   {reviewAction === 'approve'
                     ? 'অ্যাপ্রুভ করো'
                     : 'রিজেক্ট করো'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Plan Modal */}
-        {showPlanModal && (
-          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-emerald-600 to-emerald-700">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <CreditCard className="w-6 h-6" />
-                      {editingPlan.id ? 'প্লান এডিট করো' : 'নতুন প্লান তৈরি'}
-                    </h3>
-                    <p className="text-emerald-100 text-xs sm:text-sm mt-1">
-                      সাবস্ক্রিপশন প্লানের সকল তথ্য এখানে প্রদান করো
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowPlanModal(false);
-                      setEditingPlan({
-                        currency: 'BDT',
-                        features: [],
-                        is_active: true,
-                      });
-                    }}
-                    className="p-1 hover:bg-white/20 rounded-full text-white transition-colors"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
-                      প্লান আইডি (নাম)
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPlan.name || ''}
-                      onChange={(e) =>
-                        setEditingPlan({ ...editingPlan, name: e.target.value })
-                      }
-                      disabled={!!editingPlan.id}
-                      placeholder="premium_monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all disabled:opacity-50 text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
-                      ডিসপ্লে নাম
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPlan.display_name || ''}
-                      onChange={(e) =>
-                        setEditingPlan({
-                          ...editingPlan,
-                          display_name: e.target.value,
-                        })
-                      }
-                      placeholder="Premium Monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
-                      টাকার পরিমাণ (Price)
-                    </label>
-                    <input
-                      type="number"
-                      value={editingPlan.price || ''}
-                      onChange={(e) =>
-                        setEditingPlan({
-                          ...editingPlan,
-                          price: parseFloat(e.target.value),
-                        })
-                      }
-                      placeholder="299"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm font-bold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
-                      মেয়াদ (দিন)
-                    </label>
-                    <input
-                      type="number"
-                      value={editingPlan.duration_days || ''}
-                      onChange={(e) =>
-                        setEditingPlan({
-                          ...editingPlan,
-                          duration_days: parseInt(e.target.value),
-                        })
-                      }
-                      placeholder="30"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
-                    ফিচারসমূহ (প্রতিটি আলাদা লাইনে)
-                  </label>
-                  <textarea
-                    value={editingPlan.features?.join('\n') || ''}
-                    onChange={(e) =>
-                      setEditingPlan({
-                        ...editingPlan,
-                        features: e.target.value
-                          .split('\n')
-                          .filter((f) => f.trim()),
-                      })
-                    }
-                    placeholder="অনিমিত এক্সাম&#10;সকল চ্যাপ্টার এক্সেস&#10;বিস্তারিত এনালাইটিক্স"
-                    rows={5}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none text-sm leading-relaxed"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-3xl border border-neutral-100 dark:border-neutral-800">
-                  <div>
-                    <label className="block text-[10px] font-bold text-neutral-400 uppercase mb-2">
-                      থিম কালার সিলেক্ট করো
-                    </label>
-                    <select
-                      value={editingPlan.color_theme || 'border-neutral-200'}
-                      onChange={(e) =>
-                        setEditingPlan({
-                          ...editingPlan,
-                          color_theme: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
-                    >
-                      <option value="border-neutral-200">Gray (Default)</option>
-                      <option value="border-emerald-500">Blue (Premium)</option>
-                      <option value="border-red-500">Rose (Popular)</option>
-                      <option value="border-emerald-500">Green (Growth)</option>
-                      <option value="border-red-500">Amber (Gold)</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col justify-center gap-3">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={editingPlan.is_active}
-                          onChange={(e) =>
-                            setEditingPlan({
-                              ...editingPlan,
-                              is_active: e.target.checked,
-                            })
-                          }
-                          className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-0"
-                        />
-                      </div>
-                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-emerald-600 transition-colors">
-                        প্লানটি এক্টিভ রাখো
-                      </span>
-                    </label>
-
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={editingPlan.is_popular}
-                        onChange={(e) =>
-                          setEditingPlan({
-                            ...editingPlan,
-                            is_popular: e.target.checked,
-                          })
-                        }
-                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-red-500 focus:ring-0"
-                      />
-                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-red-500 transition-colors">
-                        জনপ্রিয় (Highlighed) হিসেবে দেখান
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 bg-neutral-50 dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => {
-                    setShowPlanModal(false);
-                    setEditingPlan({
-                      currency: 'BDT',
-                      features: [],
-                      is_active: true,
-                    });
-                  }}
-                  className="flex-1 px-6 py-3 bg-white dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl border border-neutral-200 dark:border-neutral-800 transition-all active:scale-95"
-                >
-                  বাতিল
-                </button>
-                <button
-                  onClick={handleCreatePlan}
-                  className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
-                >
-                  {editingPlan.id ? 'আপডেট করো' : 'তৈরি করো'}
                 </button>
               </div>
             </div>

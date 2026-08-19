@@ -333,13 +333,23 @@ export default function AdminReportsPage() {
 
                       {/* Date */}
                       <td className="p-4 text-neutral-500 dark:text-zinc-400 text-[11px] font-mono whitespace-nowrap">
-                        {new Date(r.created_at).toLocaleString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: '2-digit',
-                          hour12: true,
-                        })}
+                        <div className="flex flex-col gap-0.5">
+                          <span>
+                            {new Date(r.created_at).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                            })}
+                          </span>
+                          <span className="text-[10px] text-neutral-400">
+                            {new Date(r.created_at).toLocaleTimeString('en-GB', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false,
+                            })}
+                          </span>
+                        </div>
                       </td>
 
                       {/* Status */}

@@ -159,14 +159,14 @@ export function ReportInspectorDrawer({
                   {report.status}
                 </span>
               </div>
-              <p className="text-xs text-neutral-500 dark:text-zinc-400">
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-mono">
                 রিপোর্ট আইডি: #{String(report.id).slice(0, 8)} •{' '}
-                {new Date(report.created_at).toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
+                {new Date(report.created_at).toLocaleDateString('en-GB')}{' '}
+                {new Date(report.created_at).toLocaleTimeString('en-GB', {
+                  hour: '2-digit',
                   minute: '2-digit',
-                  hour12: true,
+                  second: '2-digit',
+                  hour12: false,
                 })}
               </p>
             </div>

@@ -99,25 +99,38 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
     let cursor: string | undefined = undefined;
 
     do {
-      const response = await (
-        notion.databases as unknown as {
-          query: (...args: unknown[]) => Promise<{
-            results: unknown[];
-            has_more: boolean;
-            next_cursor: string | null;
-          }>;
-        }
-      ).query({
-        database_id: process.env.NOTION_DATABASE_ID,
-        page_size: 100,
-        start_cursor: cursor,
-        filter: {
-          property: 'Status',
-          status: { equals: 'Published' },
-        },
-        sorts: [{ property: 'PublishedAt', direction: 'descending' }],
-      });
-      allPages.push(...(response.results as NotionPage[]));
+      let response: { results?: unknown[]; has_more?: boolean; next_cursor?: string | null } = {};
+
+      if (typeof (notion as any).dataSources?.query === 'function') {
+        response = await (notion as any).dataSources.query({
+          data_source_id: process.env.NOTION_DATABASE_ID,
+          page_size: 100,
+          start_cursor: cursor,
+          filter: {
+            property: 'Status',
+            status: { equals: 'Published' },
+          },
+          sorts: [{ property: 'PublishedAt', direction: 'descending' }],
+        });
+      } else if (typeof (notion as any).databases?.query === 'function') {
+        response = await (notion as any).databases.query({
+          database_id: process.env.NOTION_DATABASE_ID,
+          page_size: 100,
+          start_cursor: cursor,
+          filter: {
+            property: 'Status',
+            status: { equals: 'Published' },
+          },
+          sorts: [{ property: 'PublishedAt', direction: 'descending' }],
+        });
+      } else {
+        console.warn('Notion query method not found on client.');
+        break;
+      }
+
+      if (response.results) {
+        allPages.push(...(response.results as NotionPage[]));
+      }
       cursor = response.has_more
         ? (response.next_cursor ?? undefined)
         : undefined;

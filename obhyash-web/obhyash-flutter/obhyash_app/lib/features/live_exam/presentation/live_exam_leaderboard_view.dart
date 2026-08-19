@@ -25,6 +25,19 @@ class LiveExamLeaderboardView extends ConsumerStatefulWidget {
 class _LiveExamLeaderboardViewState
     extends ConsumerState<LiveExamLeaderboardView> {
   String _searchQuery = '';
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,12 +90,14 @@ class _LiveExamLeaderboardViewState
             return const Center(child: Text('কোনো মেধা তালিকা পাওয়া যায়নি'));
           }
 
-          final filteredEntries = entries.where((e) {
-            final name = e.userName.toLowerCase();
-            final institute = e.userInstitute.toLowerCase();
-            final q = _searchQuery.toLowerCase();
-            return name.contains(q) || institute.contains(q);
-          }).toList();
+          final q = _searchQuery.trim().toLowerCase();
+          final filteredEntries = q.isEmpty
+              ? entries
+              : entries.where((e) {
+                  final name = e.userName.toLowerCase();
+                  final institute = e.userInstitute.toLowerCase();
+                  return name.contains(q) || institute.contains(q);
+                }).toList();
 
           // Find current user entry
           final myIndex = entries.indexWhere((e) =>
@@ -127,21 +142,23 @@ class _LiveExamLeaderboardViewState
                     ),
                   ),
 
-                // Current User Spotlight Card (If candidate took the exam)
+                // Current User Spotlight Card in Premium Grey
                 if (myEntry != null && myRank != null) ...[
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0B6B42), Color(0xFF0F766E)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: isDark ? const Color(0xFF18181B) : Colors.white,
                       borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                        width: 1.2,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF0B6B42).withOpacity(0.3),
-                          blurRadius: 12,
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : const Color(0x0A000000),
+                          blurRadius: 14,
                           offset: const Offset(0, 4),
                         ),
                       ],
@@ -149,20 +166,23 @@ class _LiveExamLeaderboardViewState
                     child: Row(
                       children: [
                         Container(
-                          width: 50,
-                          height: 50,
+                          width: 48,
+                          height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white.withOpacity(0.3)),
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                            ),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             '#$myRank',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Anek Bangla',
+                              fontSize: 17,
                             ),
                           ),
                         ),
@@ -171,29 +191,33 @@ class _LiveExamLeaderboardViewState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'আপনার অবস্থান',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                   fontSize: 11,
-                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Anek Bangla',
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
+                              const SizedBox(height: 1),
                               Text(
                                 myEntry.userName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                style: TextStyle(
+                                  color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Anek Bangla',
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 'মোট ${entries.length} জনের মধ্যে $myRankম স্থান',
-                                style: const TextStyle(
-                                  color: Colors.white70,
+                                style: TextStyle(
+                                  color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                                   fontSize: 11,
+                                  fontFamily: 'Anek Bangla',
                                 ),
                               ),
                             ],
@@ -205,24 +229,30 @@ class _LiveExamLeaderboardViewState
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(14),
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                            ),
                           ),
                           child: Column(
                             children: [
                               Text(
                                 '${myEntry.score}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                style: TextStyle(
+                                  color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 17,
+                                  fontFamily: 'Anek Bangla',
                                 ),
                               ),
-                              const Text(
-                                'নম্বর',
+                              Text(
+                                'মার্কস',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                   fontSize: 10,
+                                  fontFamily: 'Anek Bangla',
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -295,38 +325,100 @@ class _LiveExamLeaderboardViewState
                   const SizedBox(height: 24),
                 ],
 
-                // Search Bar
+                // Reduced Size Compact Search Bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  height: 42,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    color: isDark ? const Color(0xFF141417) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
                           ? const Color(0xFF27272A)
-                          : const Color(0xFFE4E4E7),
+                          : const Color(0xFFE2E8F0),
+                      width: 1.1,
                     ),
                   ),
-                  child: TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                      });
-                    },
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                      fontSize: 13,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: 'নাম বা প্রতিষ্ঠান দিয়ে খুঁজুন...',
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-                      prefixIcon: Icon(LucideIcons.search, size: 16, color: Colors.grey),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
-                    ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.search, size: 15, color: Color(0xFF94A3B8)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (val) {
+                            setState(() {
+                              _searchQuery = val;
+                            });
+                          },
+                          style: TextStyle(
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            fontSize: 13,
+                            fontFamily: 'Anek Bangla',
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'শিক্ষার্থী বা কলেজের নাম দিয়ে খুঁজুন...',
+                            hintStyle: TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12.5,
+                              fontFamily: 'Anek Bangla',
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                      if (_searchQuery.isNotEmpty)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _searchController.clear();
+                              _searchQuery = '';
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                            ),
+                            child: Icon(
+                              LucideIcons.x,
+                              size: 13,
+                              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
+
+                // Empty Search Result Notice
+                if (filteredEntries.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(28),
+                    alignment: Alignment.center,
+                    child: Column(
+                      children: [
+                        Icon(
+                          LucideIcons.searchX,
+                          size: 36,
+                          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'কোনো শিক্ষার্থী বা কলেজ পাওয়া যায়নি',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontFamily: 'Anek Bangla',
+                            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                 // Candidates List
                 ...filteredEntries.asMap().entries.map((entry) {
@@ -337,28 +429,42 @@ class _LiveExamLeaderboardViewState
                           (currentUser.userMetadata?['full_name'] ??
                               currentUser.email));
 
+                  final totalAttempted = candidate.correctCount + candidate.wrongCount;
+                  final accuracy = totalAttempted > 0
+                      ? ((candidate.correctCount / totalAttempted) * 100).round()
+                      : (candidate.score > 0 ? 100 : 0);
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: isMe
-                          ? const Color(0xFF0B6B42).withOpacity(0.08)
-                          : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
-                      borderRadius: BorderRadius.circular(16),
+                          ? const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.06)
+                          : (isDark ? const Color(0xFF141417) : Colors.white),
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(
                         color: isMe
-                            ? const Color(0xFF0B6B42).withOpacity(0.4)
+                            ? const Color(0xFF059669).withValues(alpha: isDark ? 0.4 : 0.25)
                             : (isDark
                                 ? const Color(0xFF27272A)
-                                : const Color(0xFFF4F4F5)),
+                                : const Color(0xFFE2E8F0)),
+                        width: 1.2,
                       ),
+                      boxShadow: [
+                        if (!isDark)
+                          BoxShadow(
+                            color: const Color(0x06000000),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                      ],
                     ),
                     child: Row(
                       children: [
                         // Rank Badge
                         Container(
-                          width: 30,
-                          height: 30,
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             color: rank == 1
                                 ? const Color(0xFFF59E0B)
@@ -368,18 +474,19 @@ class _LiveExamLeaderboardViewState
                                         ? const Color(0xFFB45309)
                                         : (isDark
                                             ? const Color(0xFF27272A)
-                                            : const Color(0xFFF4F4F5)))),
+                                            : const Color(0xFFF1F5F9)))),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            '$rank',
+                            '#$rank',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'Anek Bangla',
                               color: rank <= 3
                                   ? Colors.white
-                                  : (isDark ? Colors.white : Colors.black87),
+                                  : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                             ),
                           ),
                         ),
@@ -396,11 +503,12 @@ class _LiveExamLeaderboardViewState
                                     child: Text(
                                       candidate.userName,
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Anek Bangla',
                                         color: isDark
-                                            ? Colors.white
-                                            : Colors.black87,
+                                            ? const Color(0xFFF8FAFC)
+                                            : const Color(0xFF0F172A),
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -414,79 +522,103 @@ class _LiveExamLeaderboardViewState
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF0B6B42)
-                                            .withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(4),
+                                        color: const Color(0xFF059669)
+                                            .withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Text(
                                         'আপনি',
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0B6B42),
+                                          color: Color(0xFF059669),
+                                          fontFamily: 'Anek Bangla',
                                         ),
                                       ),
                                     ),
                                   ],
                                 ],
                               ),
-                              if (candidate.userInstitute.isNotEmpty)
-                                Text(
-                                  candidate.userInstitute,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark
-                                        ? Colors.white54
-                                        : Colors.black54,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                            ],
-                          ),
-                        ),
-
-                        // Correct / Wrong summary
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
+                              const SizedBox(height: 2),
                               Text(
-                                '${candidate.correctCount} সঠিক',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF10B981),
+                                candidate.userInstitute.isNotEmpty
+                                    ? candidate.userInstitute
+                                    : 'প্রতিষ্ঠান নেই',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontFamily: 'Anek Bangla',
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF64748B),
                                 ),
-                              ),
-                              Text(
-                                '${candidate.wrongCount} ভুল',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xFFEF4444),
-                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         ),
 
-                        // Score
+                        const SizedBox(width: 8),
+
+                        // Accuracy info
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '$accuracy% নির্ভুলতা',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Anek Bangla',
+                                color: accuracy >= 80
+                                    ? const Color(0xFF10B981)
+                                    : (accuracy >= 50
+                                        ? const Color(0xFFF59E0B)
+                                        : const Color(0xFFEF4444)),
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              '${candidate.correctCount} সঠিক • ${candidate.wrongCount} ভুল',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'Anek Bangla',
+                                color: isDark
+                                    ? const Color(0xFF71717A)
+                                    : const Color(0xFF94A3B8),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        // Marks Got / Score Pill
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 4,
+                            vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF0B6B42).withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8),
+                            color: isDark
+                                ? const Color(0xFF1F2937)
+                                : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF374151)
+                                  : const Color(0xFFE2E8F0),
+                            ),
                           ),
                           child: Text(
-                            '${candidate.score}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0B6B42),
+                            '${candidate.score} মার্কস',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Anek Bangla',
+                              color: isDark
+                                  ? const Color(0xFFF8FAFC)
+                                  : const Color(0xFF0F172A),
                             ),
                           ),
                         ),
@@ -563,7 +695,7 @@ class _LiveExamLeaderboardViewState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(

@@ -35,7 +35,7 @@ export default function GlobalError({
             ক্যাশ সমস্যার কারণে এটি হতে পারে।
           </p>
           <button
-            onClick={() => reset()}
+            onClick={() => window.location.reload()}
             className="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 mx-auto"
           >
             <RefreshCw size={18} />

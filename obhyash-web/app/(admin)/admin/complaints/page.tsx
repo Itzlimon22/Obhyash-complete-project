@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { AppComplaint, ComplaintStatus } from '@/lib/types';
@@ -16,6 +17,8 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import { ComplaintResolutionModal } from '@/components/admin/complaints/complaint-resolution-modal';
 import { Button } from '@/components/ui/button';
@@ -71,6 +74,34 @@ export default function AdminComplaintsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const exportCSV = () => {
+    if (!complaints || complaints.length === 0) {
+      toast.error('No complaints to export');
+      return;
+    }
+
+    const csvContent = [
+      ['ID', 'Reporter Name', 'Email', 'Type', 'Description', 'Status', 'Date & Time (24h)'],
+      ...complaints.map((c) => [
+        c.id,
+        c.user?.name || 'Unknown',
+        c.user?.email || 'N/A',
+        c.type,
+        `"${(c.description || '').replace(/"/g, '""')}"`,
+        c.status,
+        `${new Date(c.created_at).toLocaleDateString('en-GB')} ${new Date(c.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+      ]),
+    ]
+      .map((e) => e.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `complaints_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
   };
 
   const getStatusColor = (status: ComplaintStatus) => {
@@ -134,6 +165,15 @@ export default function AdminComplaintsPage() {
                 </div>
               </div>
             </div>
+
+            <button
+              onClick={exportCSV}
+              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 text-xs font-bold"
+              title="Export CSV"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Export</span>
+            </button>
             <button
               onClick={() => fetchComplaints(true)}
               className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
@@ -156,7 +196,7 @@ export default function AdminComplaintsPage() {
             />
             <input
               type="text"
-              placeholder="Search by student or problem..."
+              placeholder="Search by student, email, problem or type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all text-xs md:text-sm font-bold"
@@ -209,34 +249,24 @@ export default function AdminComplaintsPage() {
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
                 No complaints found
               </h3>
-              <p className="text-neutral-500 dark:text-neutral-400">
-                Everything seems to be running smoothly! 🎉
+              <p className="text-neutral-500 text-sm mt-1">
+                No student complaints match your current filter criteria.
               </p>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-4">
             {/* Desktop Table View (Hidden on mobile) */}
             <div className="hidden lg:block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm">
-              <table className="w-full text-left">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-neutral-50 dark:bg-neutral-950/50 border-b border-neutral-200 dark:border-neutral-800">
-                    <th className="px-6 py-4 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                      Student
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                      Category
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                      Problem
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                      Date
-                    </th>
-                    <th className="px-6 py-4 text-right"></th>
+                  <tr className="border-b border-neutral-100 dark:border-neutral-800 text-[10px] font-black text-neutral-400 uppercase tracking-wider bg-neutral-50/50 dark:bg-neutral-950/50">
+                    <th className="px-6 py-4">User</th>
+                    <th className="px-6 py-4">Type</th>
+                    <th className="px-6 py-4">Problem Description</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Date & Time (24h)</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -245,17 +275,32 @@ export default function AdminComplaintsPage() {
                     return (
                       <tr
                         key={c.id}
-                        className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors group"
+                        className="hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40 transition-colors"
                       >
                         <td className="px-6 py-5">
-                          <div>
-                            <p className="font-bold text-neutral-900 dark:text-white capitalize">
-                              {c.user?.name || 'Unknown'}
-                            </p>
-                            <p className="text-[10px] text-neutral-500 font-medium">
-                              {c.user?.email}
-                            </p>
-                          </div>
+                          {c.user_id ? (
+                            <Link
+                              href={`/admin/user-management/${c.user_id}`}
+                              className="group block"
+                            >
+                              <p className="font-bold text-neutral-900 dark:text-white capitalize group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors flex items-center gap-1">
+                                <span>{c.user?.name || 'Unknown'}</span>
+                                <ExternalLink size={11} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </p>
+                              <p className="text-[10px] text-neutral-500 font-medium">
+                                {c.user?.email || 'N/A'}
+                              </p>
+                            </Link>
+                          ) : (
+                            <div>
+                              <p className="font-bold text-neutral-900 dark:text-white capitalize">
+                                {c.user?.name || 'Unknown'}
+                              </p>
+                              <p className="text-[10px] text-neutral-500 font-medium">
+                                {c.user?.email || 'N/A'}
+                              </p>
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-5">
                           <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300 px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
@@ -275,8 +320,24 @@ export default function AdminComplaintsPage() {
                             {c.status}
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-sm text-neutral-500 font-medium">
-                          {new Date(c.created_at).toLocaleDateString()}
+                        <td className="px-6 py-5 text-xs text-neutral-500 font-mono whitespace-nowrap">
+                          <div className="flex flex-col gap-0.5">
+                            <span>
+                              {new Date(c.created_at).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                              })}
+                            </span>
+                            <span className="text-[10px] text-neutral-400">
+                              {new Date(c.created_at).toLocaleTimeString('en-GB', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false,
+                              })}
+                            </span>
+                          </div>
                         </td>
                         <td className="px-6 py-5 text-right">
                           <Button
@@ -328,8 +389,13 @@ export default function AdminComplaintsPage() {
                         </p>
                       </div>
                       <div className="flex justify-between items-center pt-1.5 border-t border-neutral-100 dark:border-neutral-800">
-                        <span className="text-[9px] text-neutral-400 font-black uppercase tracking-tighter">
-                          {new Date(c.created_at).toLocaleDateString()}
+                        <span className="text-[10px] text-neutral-400 font-mono">
+                          {new Date(c.created_at).toLocaleDateString('en-GB')}{' '}
+                          {new Date(c.created_at).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                          })}
                         </span>
                         <div className="flex items-center gap-1 text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-tight cursor-pointer">
                           <span>Review</span>
