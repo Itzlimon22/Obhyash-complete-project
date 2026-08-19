@@ -14,17 +14,14 @@ import {
   Save,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 type TabId = 'general' | 'security' | 'notifications';
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('general');
   const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme !== 'light';
-  });
+  const { isDark, setTheme } = useTheme();
 
   const handleSave = () => {
     setLoading(true);
@@ -33,17 +30,6 @@ export default function AdminSettingsPage() {
       setLoading(false);
       toast.success('Settings saved successfully');
     }, 1000);
-  };
-
-  const toggleTheme = (checked: boolean) => {
-    setIsDarkMode(checked);
-    if (checked) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
   };
 
   return (
@@ -115,9 +101,9 @@ export default function AdminSettingsPage() {
                 <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-[2rem] p-6 border border-neutral-100 dark:border-neutral-800 flex items-center justify-between transition-all hover:bg-neutral-100 dark:hover:bg-neutral-800">
                   <div className="flex items-center gap-5">
                     <div
-                      className={`p-4 rounded-2xl shadow-lg transition-all ${isDarkMode ? 'bg-neutral-900 text-red-400 shadow-red-900/20' : 'bg-white text-red-600 shadow-neutral-200'}`}
+                      className={`p-4 rounded-2xl shadow-lg transition-all ${isDark ? 'bg-neutral-900 text-emerald-400 shadow-emerald-900/20' : 'bg-white text-emerald-600 shadow-neutral-200'}`}
                     >
-                      {isDarkMode ? (
+                      {isDark ? (
                         <Moon size={24} strokeWidth={3} />
                       ) : (
                         <Sun size={24} strokeWidth={3} />
@@ -135,11 +121,11 @@ export default function AdminSettingsPage() {
                   <label className="relative inline-flex items-center cursor-pointer active:scale-90 transition-transform">
                     <input
                       type="checkbox"
-                      checked={isDarkMode}
-                      onChange={(e) => toggleTheme(e.target.checked)}
+                      checked={isDark}
+                      onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
                       className="sr-only peer"
                     />
-                    <div className="w-14 h-8 bg-neutral-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
+                    <div className="w-14 h-8 bg-neutral-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-600"></div>
                   </label>
                 </div>
               </section>

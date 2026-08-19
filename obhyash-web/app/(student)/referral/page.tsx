@@ -23,6 +23,8 @@ import { UserProfile } from '@/lib/types';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
+import { useTheme } from '@/components/providers/ThemeProvider';
+
 interface ReferralInfo {
   referral?: { id: string; code: string; created_at: string } | null;
   history: Array<{
@@ -36,6 +38,7 @@ interface ReferralInfo {
 export default function ReferralPage() {
   const router = useRouter();
   const supabase = createClient();
+  const { theme, toggleTheme } = useTheme();
 
   const [data, setData] = useState<ReferralInfo>({
     referral: null,
@@ -45,18 +48,12 @@ export default function ReferralPage() {
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isEditing, setIsEditing] = useState(false);
   const [customCodeInput, setCustomCodeInput] = useState('');
 
   /* ─── Initialise ─── */
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme') as 'light' | 'dark';
-      if (stored) {
-        setTheme(stored);
-        document.documentElement.classList.toggle('dark', stored === 'dark');
-      }
       const cachedUser = localStorage.getItem('obhyash_user_profile');
       if (cachedUser) {
         try {
@@ -73,14 +70,6 @@ export default function ReferralPage() {
       })
       .catch(() => setLoading(false));
   }, []);
-
-  /* ─── Theme ─── */
-  const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    localStorage.setItem('theme', next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
-  };
 
   /* ─── Navigation helpers ─── */
   const goTo = (tab: string) => {

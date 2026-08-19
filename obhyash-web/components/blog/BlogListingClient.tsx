@@ -352,7 +352,7 @@ export default function BlogListingClient({
                       শিক্ষার্থীদের কাছে জনপ্রিয়
                     </h2>
                   </div>
-                  <div className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-6 sm:p-8 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                  <div id="blog-guest-account-banner" className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-6 sm:p-8 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] inapp-hide">
                     <p className="text-slate-600 dark:text-slate-400 font-medium text-[15px] sm:text-[16px] text-left max-w-2xl leading-[1.6]">
                       <strong>এখানে নতুন?</strong> অভ্যাস-এ রেজিস্টার করে তোমার
                       অনুশীলনের তথ্যের ওপর ভিত্তি করে তোমার দুর্বল বিষয়গুলোর

@@ -5,10 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/main_sidebar.dart';
-import 'widgets/facebook_refresh_indicator.dart';
 import '../utils/global_refresh.dart';
 import 'widgets/main_bottom_nav.dart';
 import 'widgets/user_avatar.dart';
@@ -845,10 +843,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         avatarUrl: user?.avatarUrl,
       ),
 
-      body: FacebookRefreshIndicator(
-        onRefresh: () => globalRefresh(ref),
-        child: widget.navigationShell,
-      ),
+      body: widget.navigationShell,
 
       bottomNavigationBar: _shouldShowBottomNav(location)
           ? MainBottomNav(

@@ -1,37 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LandingPage from './LandingPage';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 export default function LandingPageClient() {
   const router = useRouter();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme');
-      const dark = stored === 'dark';
-      // Defer to avoid synchronous setState inside an effect
-      queueMicrotask(() => {
-        setIsDarkMode(dark);
-        document.documentElement.classList.toggle('dark', dark);
-      });
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    localStorage.setItem('theme', next ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', next);
-  };
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <LandingPage
       onGetStarted={() => router.push('/signup')}
       onLogin={() => router.push('/login')}
-      isDarkMode={isDarkMode}
+      isDarkMode={isDark}
       toggleTheme={toggleTheme}
     />
   );

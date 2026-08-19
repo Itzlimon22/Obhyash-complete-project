@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
@@ -92,12 +93,16 @@ class StudyGuideline {
   final String tag;
   final String title;
   final String description;
+  final IconData icon;
+  final String? metric;
 
   const StudyGuideline({
     required this.color,
     required this.tag,
     required this.title,
     required this.description,
+    required this.icon,
+    this.metric,
   });
 }
 
@@ -358,11 +363,13 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         final best = subjectData.first;
         guidelines.add(
           StudyGuideline(
-            color: AppColors.deepGreen,
-            tag: 'সর্বোচ্চ শক্তির বিষয়',
+            color: const Color(0xFF059669),
+            icon: LucideIcons.sparkles,
+            tag: 'সর্বোচ্চ শক্তি',
             title: best.displayName,
+            metric: '${BanglaNameHelper.toBanglaNumeral(best.accuracy.round())}% নির্ভুলতা',
             description:
-                'এই বিষয়ে তোমার নির্ভুলতা ${BanglaNameHelper.toBanglaNumeral(best.accuracy.round())}%! নিয়মিত রিভিশন রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।',
+                'এই বিষয়ে তোমার নির্ভুলতা সবচেয়ে বেশি! নিয়মিত রিভিশন বজায় রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।',
           ),
         );
 
@@ -371,11 +378,13 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           if (worst.accuracy < 75) {
             guidelines.add(
               StudyGuideline(
-                color: AppColors.crimson,
-                tag: 'অগ্রাধিকার রিভিশন ক্ষেত্র',
+                color: const Color(0xFFF59E0B),
+                icon: LucideIcons.alertTriangle,
+                tag: 'অগ্রাধিকার রিভিশন',
                 title: worst.displayName,
+                metric: '${BanglaNameHelper.toBanglaNumeral(worst.accuracy.round())}% নির্ভুলতা',
                 description:
-                    'এই বিষয়ে নির্ভুলতা ${BanglaNameHelper.toBanglaNumeral(worst.accuracy.round())}%। অধ্যায়ের মূল সূত্র ও গুরুত্বপূর্ণ কনসেপ্টগুলো প্রতিদিন ১০ মিনিট অনুশীলন করো।',
+                    'অধ্যায়ের মূল সূত্র ও গুরুত্বপূর্ণ কনসেপ্টগুলো প্রতিদিন অন্তত ১০ মিনিট অনুশীলন করে দুর্বলতা কাটিয়ে ওঠো।',
               ),
             );
           }
@@ -387,31 +396,37 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         if (avgTimePerQ < 25) {
           guidelines.add(
             StudyGuideline(
-              color: AppColors.deepBlue,
+              color: const Color(0xFF0284C7),
+              icon: LucideIcons.zap,
               tag: 'টাইমিং বিশ্লেষণ',
               title: 'উচ্চ সমাধান গতি',
+              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
               description:
-                  'তুমি প্রতি প্রশ্নে গড়ে ${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সেকেন্ড নিচ্ছো। তাড়াহুড়ো না করে প্রশ্ন ও অপশনগুলো মনোযোগ দিয়ে পড়ো।',
+                  'প্রশ্নের উত্তর করার গতি চমৎকার। তবে তাড়াহুড়ো এড়িয়ে প্রতিটি প্রশ্নের অপশন মনোযোগ দিয়ে পড়ার অভ্যাস করো।',
             ),
           );
         } else if (avgTimePerQ <= 50) {
           guidelines.add(
             StudyGuideline(
-              color: AppColors.deepGreen,
+              color: const Color(0xFF059669),
+              icon: LucideIcons.timer,
               tag: 'টাইমিং বিশ্লেষণ',
               title: 'আদর্শ গতি ও ব্যালান্স',
+              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
               description:
-                  'প্রতি প্রশ্নে গড় সময় ${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সেকেন্ড, যা পরীক্ষার জন্য নিখুঁত ও আদর্শ।',
+                  'প্রতি প্রশ্নে গড় সময় পরীক্ষার জন্য নিখুঁত ও আদর্শ। এই ইতিবাচক রিদম ধরে রাখো।',
             ),
           );
         } else {
           guidelines.add(
             StudyGuideline(
-              color: AppColors.slateGray,
+              color: const Color(0xFF8B5CF6),
+              icon: LucideIcons.hourglass,
               tag: 'টাইমিং পরামর্শ',
-              title: 'গতি বৃদ্ধির কৌশল',
+              title: 'গতি বৃদ্ধির সুযোগ',
+              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
               description:
-                  'প্রতি প্রশ্নে গড় সময় ${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সেকেন্ড। নিয়মিত প্র্যাকটিস ও শর্টকাট মেথড কাজে লাগাও।',
+                  'নিয়মিত প্র্যাকটিস ও শর্টকাট টেকনিক কাজে লাগিয়ে প্রশ্ন সমাধানের সময় আরও কিছুটা কমিয়ে আনো।',
             ),
           );
         }
@@ -421,12 +436,13 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       if (totalWrong > 0) {
         guidelines.add(
           StudyGuideline(
-            color: AppColors.deepRed,
-            tag: 'নেগেটিভ মার্কিং পুনরুদ্ধার',
-            title:
-                '${BanglaNameHelper.toBanglaNumeral(totalNegativeDeduction.toStringAsFixed(1))} নম্বর পুনরুদ্ধারের সুযোগ',
+            color: const Color(0xFFE11D48),
+            icon: LucideIcons.target,
+            tag: 'স্কোর রিকভারি',
+            title: 'নেগেটিভ মার্কিং পুনরুদ্ধার',
+            metric: '+${BanglaNameHelper.toBanglaNumeral(totalNegativeDeduction.toStringAsFixed(1))} নম্বর সুযোগ',
             description:
-                'ভুল উত্তরের জন্য মোট ${BanglaNameHelper.toBanglaNumeral(totalWrong)}টি প্রশ্নে নম্বর কেটেছে। নিশ্চিত না হয়ে আন্দাজে দাগানো কমালেই স্কোর অনেক বাড়বে।',
+                'ভুল উত্তরের কারণে মোট ${BanglaNameHelper.toBanglaNumeral(totalWrong)}টি প্রশ্নে নম্বর কেটেছে। নিশ্চিত না হয়ে আন্দাজে দাগানো কমালেই স্কোর অনেক বাড়বে।',
           ),
         );
       }
@@ -923,66 +939,149 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
   }
 
   Widget _buildGuidelineCard(StudyGuideline g, bool isDark) {
-    final cardBg = isDark ? AppColors.darkCard : AppColors.slateLight;
-    final cardBorder = isDark ? AppColors.darkBorder : AppColors.slateBorder;
+    final cardBg = isDark ? const Color(0xFF141417) : Colors.white;
+    final cardBorder = isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSub = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569);
+    final textSub = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: cardBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  g.title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
-                    color: textPrimary,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                decoration: BoxDecoration(
-                  color: g.color.withValues(alpha: isDark ? 0.2 : 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  g.tag,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
-                    color: g.color,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            g.description,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
-              color: textSub,
-              height: 1.4,
-            ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? cardBorder : g.color.withValues(alpha: 0.2),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.25)
+                : g.color.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            // Left colored accent bar
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 4.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: g.color,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top Row: Category Tag Pill + Metric Highlight Badge
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: g.color.withValues(alpha: isDark ? 0.2 : 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          g.icon,
+                          size: 15,
+                          color: g.color,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 3.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: g.color.withValues(alpha: isDark ? 0.16 : 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          g.tag,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Anek Bangla',
+                            color: g.color,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (g.metric != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 3.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1C1C21)
+                                : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF2C2C34)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          child: Text(
+                            g.metric!,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'Anek Bangla',
+                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Title
+                  Text(
+                    g.title,
+                    style: TextStyle(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Anek Bangla',
+                      color: textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  // Description
+                  Text(
+                    g.description,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Anek Bangla',
+                      color: textSub,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

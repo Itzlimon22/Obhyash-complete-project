@@ -293,6 +293,9 @@ class _BlogViewState extends ConsumerState<BlogView> {
             footer,
             [class*="BlogFooter"],
             #blog-cta-banner,
+            #blog-guest-account-banner,
+            .inapp-hide,
+            [class*="inapp-hide"],
             section:has(#blog-cta-banner),
             section:has(a[href="/"]):has(h2),
             a[href*="rss.xml"],
@@ -322,12 +325,20 @@ class _BlogViewState extends ConsumerState<BlogView> {
             'nav',
             'footer',
             '[class*="BlogFooter"]',
-            '#blog-cta-banner'
+            '#blog-cta-banner',
+            '#blog-guest-account-banner',
+            '.inapp-hide',
+            '[class*="inapp-hide"]'
           ];
           selectors.forEach(sel => {
             document.querySelectorAll(sel).forEach(el => {
               el.style.setProperty('display', 'none', 'important');
             });
+          });
+
+          // Specifically find and hide any 'অ্যাকাউন্ট খোলো' card containers
+          document.querySelectorAll('#blog-guest-account-banner, .inapp-hide').forEach(el => {
+            el.style.setProperty('display', 'none', 'important');
           });
 
           // Adjust sticky bars

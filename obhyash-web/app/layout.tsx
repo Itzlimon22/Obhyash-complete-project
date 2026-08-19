@@ -10,6 +10,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ReferralCatcher from "@/components/ReferralCatcher";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
@@ -89,7 +90,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // ✅ Added 'dark' class for theme and font variables
     <html
       lang="en"
       className={`${inter.variable} ${anekBangla.variable}`}
@@ -97,33 +97,51 @@ export default function RootLayout({
     >
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'dark' || (!storedTheme && true)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {
+                document.documentElement.classList.add('dark');
+              }
+            `,
+          }}
+        />
       </head>
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
         <Suspense fallback={null}>
-          <AuthProvider>
-            <ReferralCatcher />
-            <NetworkStatusListener />
-            <SWRProvider>
-              {children}
+          <ThemeProvider>
+            <AuthProvider>
+              <ReferralCatcher />
+              <NetworkStatusListener />
+              <SWRProvider>
+                {children}
 
-              {/* ✅ Render the Toast Container (Overlay) */}
-              <Toaster
-                position="bottom-center"
-                richColors
-                expand={false}
-                closeButton
-                theme="dark"
-                toastOptions={{
-                  className: "font-anek !rounded-2xl shadow-2xl !border-0",
-                  style: {
-                    padding: "16px",
-                  },
-                }}
-              />
-              <Analytics />
-              <SpeedInsights />
-            </SWRProvider>
-          </AuthProvider>
+                {/* ✅ Render the Toast Container (Overlay) */}
+                <Toaster
+                  position="bottom-center"
+                  richColors
+                  expand={false}
+                  closeButton
+                  theme="dark"
+                  toastOptions={{
+                    className: "font-anek !rounded-2xl shadow-2xl !border-0",
+                    style: {
+                      padding: "16px",
+                    },
+                  }}
+                />
+                <Analytics />
+                <SpeedInsights />
+              </SWRProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </Suspense>
       </body>
     </html>

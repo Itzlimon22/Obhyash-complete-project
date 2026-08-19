@@ -16,17 +16,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthProvider';
 import Link from 'next/link';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme !== 'light';
-  });
+  const { isDark, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const pathname = usePathname();
@@ -34,28 +31,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   // Use the already-fetched profile from AuthProvider — avoids calling getUser()
   // which acquires the Supabase auth lock and blocks all concurrent .from() queries.
   const { profile: user, signOut } = useAuth();
-
-  // Load Theme Preference from LocalStorage
-  useLayoutEffect(() => {
-    const isLight = !isDarkMode;
-    if (isLight) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   const handleLogout = async () => {
     await signOut();
@@ -134,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           onClick={toggleTheme}
           className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
         >
-          {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
+          {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
         </button>
 
         {/* Notifications */}

@@ -103,7 +103,8 @@ class _LoginViewState extends ConsumerState<LoginView>
           backgroundColor: bgColor,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: AnimatedBuilder(
                 animation: _animController,
                 builder: (context, child) {
@@ -115,49 +116,48 @@ class _LoginViewState extends ConsumerState<LoginView>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
                     // Logo Section
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: const Color(0xFF141417),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: const Color(0xFF27272A)),
                         ),
                         child: const Icon(
                           LucideIcons.graduationCap,
-                          size: 48,
+                          size: 38,
                           color: Color(0xFF059669),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 14),
 
-                    // Welcome Text
+                    // Login Title & Subtitle
                     const Text(
-                      'স্বাগতম!',
+                      'লগইন করো',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 38,
+                        fontSize: 26,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Anek Bangla',
-                        height: 1.2,
                         letterSpacing: -0.5,
                         color: textColor,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     const Text(
-                      'তোমার অ্যাকাউন্টে লগইন করো',
+                      'তোমার অ্যাকাউন্টে প্রবেশ করতে তথ্য দাও',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14,
                         fontFamily: 'Anek Bangla',
                         color: Color(0xFFA1A1AA),
                       ),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 24),
 
                     // Form
                     _buildInputField(
@@ -167,7 +167,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                       hint: '017XXXXXXXX অথবা example@gmail.com',
                       keyboardType: TextInputType.text,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
                     _buildInputField(
                       label: 'পাসওয়ার্ড',
                       icon: LucideIcons.lock,
@@ -180,6 +180,10 @@ class _LoginViewState extends ConsumerState<LoginView>
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                        ),
                         onPressed: () {
                           showModalBottomSheet(
                             context: context,
@@ -195,12 +199,13 @@ class _LoginViewState extends ConsumerState<LoginView>
                             fontFamily: 'Anek Bangla',
                             color: Color(0xFFEF4444),
                             fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
 
                     // Submit Button
                     ElevatedButton(
@@ -208,7 +213,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -216,24 +221,24 @@ class _LoginViewState extends ConsumerState<LoginView>
                       ),
                       child: isLoading
                           ? const SizedBox(
-                              height: 24,
-                              width: 24,
+                              height: 22,
+                              width: 22,
                               child: CircularProgressIndicator(
-                                strokeWidth: 3,
+                                strokeWidth: 2.5,
                                 color: Colors.white,
                               ),
                             )
                           : const Text(
                               'লগইন করো',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 18),
 
                     // Divider "অথবা"
                     const Row(
@@ -249,7 +254,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                             'অথবা',
                             style: TextStyle(
                               color: Color(0xFF71717A),
-                              fontSize: 14,
+                              fontSize: 13,
                               fontFamily: 'Anek Bangla',
                               fontWeight: FontWeight.bold,
                             ),
@@ -263,13 +268,13 @@ class _LoginViewState extends ConsumerState<LoginView>
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Google Login Button (Account Linking)
                     OutlinedButton(
                       onPressed: isLoading ? null : _handleGoogleLogin,
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(
                           color: Color(0xFF27272A),
                         ),
@@ -283,20 +288,20 @@ class _LoginViewState extends ConsumerState<LoginView>
                         children: [
                           Image.network(
                             'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                            width: 20,
-                            height: 20,
+                            width: 18,
+                            height: 18,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(
                               LucideIcons.globe,
-                              size: 20,
+                              size: 18,
                               color: Color(0xFF4285F4),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           const Text(
                             'Google দিয়ে লগইন করো',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Anek Bangla',
                               color: Colors.white,
@@ -306,7 +311,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                       ),
                     ),
 
-                    const SizedBox(height: 36),
+                    const SizedBox(height: 24),
 
                     // Footer
                     Row(
@@ -316,7 +321,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                           'অ্যাকাউন্ট নেই? ',
                           style: TextStyle(
                             fontFamily: 'Anek Bangla',
-                            fontSize: 17,
+                            fontSize: 15,
                             color: Color(0xFFA1A1AA),
                           ),
                         ),
@@ -326,7 +331,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                             'নতুন অ্যাকাউন্ট খুলুন',
                             style: TextStyle(
                               fontFamily: 'Anek Bangla',
-                              fontSize: 17,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF059669),
                             ),
@@ -359,13 +364,13 @@ class _LoginViewState extends ConsumerState<LoginView>
         Text(
           label,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontFamily: 'Anek Bangla',
             fontWeight: FontWeight.w700,
             color: Color(0xFFA1A1AA),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
@@ -387,7 +392,7 @@ class _LoginViewState extends ConsumerState<LoginView>
             filled: true,
             fillColor: bgColor,
             contentPadding: const EdgeInsets.symmetric(
-              vertical: 18,
+              vertical: 14,
               horizontal: 16,
             ),
             border: OutlineInputBorder(

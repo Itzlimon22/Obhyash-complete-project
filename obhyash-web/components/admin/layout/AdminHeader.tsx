@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
+import { useTheme } from '@/components/providers/ThemeProvider';
+
 interface AdminHeaderProps {
   toggleSidebar: () => void;
   adminName?: string;
@@ -46,26 +48,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   adminEmail = 'admin@obhyash.com',
 }) => {
   const pathname = usePathname();
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const supabase = createClient();
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setIsDarkMode(isDark);
-  }, []);
-
-  const toggleTheme = () => {
-    const nextMode = !isDarkMode;
-    setIsDarkMode(nextMode);
-    if (nextMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -113,9 +98,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <button
           onClick={toggleTheme}
           className="p-2 rounded-xl text-neutral-600 dark:text-zinc-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-neutral-200/70 dark:border-zinc-800 transition-all"
-          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          {isDarkMode ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
+          {isDark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
         </button>
 
         <div className="h-5 w-px bg-neutral-200 dark:bg-zinc-800 mx-1 hidden sm:block" />
