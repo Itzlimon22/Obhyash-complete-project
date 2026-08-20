@@ -121,12 +121,16 @@ export async function POST(request: NextRequest) {
       }
 
       const now = new Date().toISOString();
+      const targetRoute = body.route || body.link || null;
       const notifications = recipientIds.map((uid) => ({
         user_id: uid,
         title,
         message,
+        body: message,
         type,
         priority,
+        link: targetRoute,
+        data: targetRoute ? { route: targetRoute } : null,
         is_read: false,
         created_at: now,
       }));

@@ -35,6 +35,7 @@ export default function NotificationManagementPage() {
   const [formData, setFormData] = useState({
     title: '',
     message: '',
+    route: '/exam-setup',
     type: 'announcement' as NotificationType,
     priority: 'normal' as NotificationPriority,
     target: 'all' as 'all' | 'specific',
@@ -69,6 +70,18 @@ export default function NotificationManagementPage() {
     loadData();
   }, []);
 
+  const applyTemplate = (tmpl: { title: string; message: string; route: string; type: NotificationType; priority: NotificationPriority }) => {
+    setFormData((prev) => ({
+      ...prev,
+      title: tmpl.title,
+      message: tmpl.message,
+      route: tmpl.route,
+      type: tmpl.type,
+      priority: tmpl.priority,
+    }));
+    toast.info('টেমপ্লেট লোড করা হয়েছে');
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.message.trim()) {
@@ -91,6 +104,7 @@ export default function NotificationManagementPage() {
           action: 'broadcast',
           title: formData.title,
           message: formData.message,
+          route: formData.route,
           type: formData.type,
           priority: formData.priority,
           target: formData.target,
@@ -105,6 +119,7 @@ export default function NotificationManagementPage() {
         setFormData({
           title: '',
           message: '',
+          route: '/exam-setup',
           type: 'announcement',
           priority: 'normal',
           target: 'all',
@@ -113,6 +128,14 @@ export default function NotificationManagementPage() {
         loadData();
       } else {
         toast.error(json.error || 'নোটিফিকেশন পাঠাতে সমস্যা হয়েছে');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('একটি অনাকাঙ্ক্ষিত ত্রুটি ঘটেছে');
+    } finally {
+      setIsLoading(false);
+    }
+  };
       }
     } catch (error) {
       console.error(error);
@@ -244,6 +267,76 @@ export default function NotificationManagementPage() {
               নতুন নোটিফিকেশন তৈরি করুন
             </h2>
 
+            {/* Quick Templates Bar */}
+            <div className="mb-6 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200/70 dark:border-neutral-800">
+              <p className="text-[11px] font-black text-neutral-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                <Sparkles size={14} className="text-amber-500" />
+                কুইক টেমপ্লেট (১ ক্লিকে লোড করুন)
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    applyTemplate({
+                      title: '🚨 তোমার স্ট্রিক পুড়ছে!',
+                      message: 'আর মাত্র কয়েক ঘণ্টা বাকি! এখনই ১টি ছোট প্র্যাকটিস দিয়ে স্ট্রিকটা বাঁচাও 🔥',
+                      route: '/exam-setup',
+                      type: 'warning',
+                      priority: 'high',
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold transition-all"
+                >
+                  🔥 স্ট্রিক সেভার
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    applyTemplate({
+                      title: '🎯 লাইভ পরীক্ষা শুরু হয়েছে!',
+                      message: 'আজকের স্পেশাল লাইভ এক্সাম এখনই লাইভ হয়েছে। অংশ নিয়ে লিডারবোর্ডে এগিয়ে যাও! 🏆',
+                      route: '/live-exams',
+                      type: 'announcement',
+                      priority: 'high',
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/50 dark:hover:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs font-bold transition-all"
+                >
+                  🎯 লাইভ এক্সাম
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    applyTemplate({
+                      title: 'ঘুম থেকে উঠো, পড়াশোনা ডাকছে! ☕',
+                      message: 'চা খাওয়ার ফাঁকে মাত্র ৫ মিনিটের আজকের টেস্টটা দিয়ে দিনটা শুরু করো! ⏱️',
+                      route: '/exam-setup',
+                      type: 'info',
+                      priority: 'normal',
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/50 dark:hover:bg-purple-900/50 text-purple-800 dark:text-purple-300 text-xs font-bold transition-all"
+                >
+                  ☕ সকালের কুইজ
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    applyTemplate({
+                      title: '✨ নতুন প্রো সাবস্ক্রিপশন অফার!',
+                      message: 'সকল প্রিমিয়াম ফিচার ও স্পেশাল কোশ্চেন আনলক করতে এখনই প্রো সাবস্ক্রাইব করো 🎁',
+                      route: '/profile/my-subscription',
+                      type: 'success',
+                      priority: 'normal',
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold transition-all"
+                >
+                  🎁 অফার ও প্রো
+                </button>
+              </div>
+            </div>
+
             <form onSubmit={handleSend} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -290,7 +383,7 @@ export default function NotificationManagementPage() {
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
@@ -298,6 +391,39 @@ export default function NotificationManagementPage() {
                   className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all resize-none text-xs sm:text-sm font-medium leading-relaxed"
                   placeholder="বিস্তারিত বার্তাটি এখানে সুন্দরভাবে লিখুন..."
                 />
+              </div>
+
+              {/* Destination Deep-Link Route */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5 ml-1">
+                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">
+                    গন্তব্য পেইজ / ডিপ-লিঙ্ক (Destination Route)
+                  </label>
+                  <span className="text-[10px] text-neutral-400">ট্যাপ করলে যেখানে যাবে</span>
+                </div>
+                <input
+                  type="text"
+                  value={formData.route}
+                  onChange={(e) => setFormData({ ...formData, route: e.target.value })}
+                  placeholder="/exam-setup, /live-exams, /history..."
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none text-xs font-mono"
+                />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {['/exam-setup', '/live-exams', '/history', '/profile/my-subscription', '/question-bank'].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, route: r })}
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border transition-all ${
+                        formData.route === r
+                          ? 'border-red-500 bg-red-50 dark:bg-red-950/40 text-red-600'
+                          : 'border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

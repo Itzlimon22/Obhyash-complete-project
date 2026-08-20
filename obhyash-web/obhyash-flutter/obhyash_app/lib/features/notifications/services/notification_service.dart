@@ -1,10 +1,20 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    await Firebase.initializeApp();
+  } catch (_) {}
+}
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -57,17 +67,26 @@ class NotificationService {
     },
   ];
 
-  /// Initialize local notification plugin and channels
+  /// Initialize Firebase & local notification plugin and channels
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
+      // 1. Initialize Firebase
+      try {
+        await Firebase.initializeApp();
+        FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      } catch (e) {
+        debugPrint('[NotificationService] Firebase init warning: $e');
+      }
+
+      // 2. Initialize Timezone
       tz.initializeTimeZones();
-      // Default to Asia/Dhaka
       try {
         tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
       } catch (_) {}
 
+      // 3. Local notification settings
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const iosSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
@@ -98,7 +117,7 @@ class NotificationService {
         },
       );
 
-      // Create Android Notification Channels
+      // 4. Create Android Notification Channels
       final androidPlugin = _localNotif.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
 
@@ -136,8 +155,30 @@ class NotificationService {
         );
       }
 
+      // 5. Foreground FCM Message Handler
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        final notif = message.notification;
+        if (notif != null) {
+          showNotification(
+            id: message.hashCode,
+            title: notif.title ?? 'অভ্যাস',
+            body: notif.body ?? '',
+            route: message.data['route']?.toString(),
+            channelId: message.data['channel_id']?.toString() ?? channelGeneral,
+          );
+        }
+      });
+
+      // 6. Notification Tap (App in background opened by tap)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        final route = message.data['route']?.toString();
+        if (route != null && onNotificationTapped != null) {
+          onNotificationTapped!(route);
+        }
+      });
+
       _isInitialized = true;
-      debugPrint('[NotificationService] initialized successfully');
+      debugPrint('[NotificationService] initialized successfully with Firebase FCM');
     } catch (e) {
       debugPrint('[NotificationService] initialize error: $e');
     }
@@ -146,27 +187,50 @@ class NotificationService {
   /// Request runtime permissions (Android 13+ & iOS)
   Future<bool> requestPermission() async {
     try {
+      // Local notification permission
       final androidPlugin = _localNotif.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin != null) {
-        final granted = await androidPlugin.requestNotificationsPermission();
-        return granted ?? false;
+        await androidPlugin.requestNotificationsPermission();
       }
 
-      final iosPlugin = _localNotif.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
-      if (iosPlugin != null) {
-        final granted = await iosPlugin.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        return granted ?? false;
-      }
+      // Firebase permission
+      final fcmSettings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+
+      return fcmSettings.authorizationStatus == AuthorizationStatus.authorized;
     } catch (e) {
       debugPrint('[NotificationService] requestPermission error: $e');
     }
     return true;
+  }
+
+  /// Syncs Device FCM Token with Supabase user_fcm_tokens table
+  Future<void> syncFCMToken(String userId) async {
+    if (userId.isEmpty) return;
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null && token.isNotEmpty) {
+        final sb = Supabase.instance.client;
+        await sb.from('user_fcm_tokens').upsert(
+          {
+            'user_id': userId,
+            'fcm_token': token,
+            'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+            'is_active': true,
+            'last_seen_at': DateTime.now().toIso8601String(),
+          },
+          onConflict: 'fcm_token',
+        );
+        debugPrint('[NotificationService] FCM token successfully registered to Supabase');
+      }
+    } catch (e) {
+      debugPrint('[NotificationService] syncFCMToken warning: $e');
+    }
   }
 
   /// Displays an instant heads-up / local notification
