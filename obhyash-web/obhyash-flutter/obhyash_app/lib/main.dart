@@ -24,10 +24,9 @@ void main() async {
   // Initialize Download Notifications
   await DownloadNotificationService().init();
 
-  // Initialize Notification Service
+  // Initialize Notification Service (Channels & Engine)
   final notifService = NotificationService();
   await notifService.initialize();
-  await notifService.requestPermission();
 
   // Initialize Supabase with real keys
   await Supabase.initialize(

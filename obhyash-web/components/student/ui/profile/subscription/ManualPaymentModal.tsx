@@ -3,9 +3,10 @@ import {
   SubscriptionPlan,
   PaymentMethod,
 } from '@/lib/types';
-import { ArrowLeft, Clock, Info, Headphones, X, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, Info, Headphones, X, Plus, Trash2, Zap, FileText, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { addPaymentMethod, deletePaymentMethod } from '@/services/subscription-service';
+import { createClient } from '@/utils/supabase/client';
 
 interface ManualPaymentModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   onConfirm,
 }) => {
   const [activeTab, setActiveTab] = useState<TabId>('details');
+  const [paymentMode, setPaymentMode] = useState<'instant' | 'manual'>('instant');
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('bKash');
   const [senderNumber, setSenderNumber] = useState('');
   const [trxId, setTrxId] = useState('');
@@ -39,6 +42,37 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   const [isSavingMethod, setIsSavingMethod] = useState(false);
 
   if (!isOpen || !plan) return null;
+
+  const handleInstantPayment = async () => {
+    try {
+      setIsRedirecting(true);
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const res = await fetch('/api/payment/uddoktapay/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          planId: plan.id,
+          planName: plan.name,
+          amount: plan.price,
+          customerEmail: user?.email,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        toast.error(data.error || 'পেমেন্ট গেটওয়ে লোড করা সম্ভব হয়নি');
+      }
+    } catch (e: any) {
+      toast.error('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (e.message || 'Error'));
+    } finally {
+      setIsRedirecting(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,7 +230,77 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </div>
               </div>
 
-              <div className="w-full bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-800/80 rounded-2xl p-5 text-center shadow-sm">
+              {/* Payment Mode Selector */}
+              <div className="flex p-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMode('instant')}
+                  className={`flex-1 py-2.5 rounded-lg font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    paymentMode === 'instant'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>ইনস্ট্যান্ট (অটো)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMode('manual')}
+                  className={`flex-1 py-2.5 rounded-lg font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    paymentMode === 'manual'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>ম্যানুয়াল (TrxID)</span>
+                </button>
+              </div>
+
+              {paymentMode === 'instant' ? (
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/10 border border-emerald-500/30 rounded-2xl p-5 text-center shadow-sm">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-emerald-600/20">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-base font-black text-neutral-900 dark:text-white mb-1">
+                      সরাসরি অনলাইন পেমেন্ট
+                    </h4>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-4 max-w-sm mx-auto">
+                      বিকাশ, নগদ, রকেট বা ভিসা/মাস্টারকার্ড দিয়ে নিরাপদে পেমেন্ট করুন। পেমেন্ট শেষে স্বয়ংক্রিয়ভাবে প্রো প্ল্যান চালু হবে।
+                    </p>
+
+                    <div className="flex items-center justify-center gap-2 mb-5 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-lg bg-[#D11559]/10 text-[#D11559] border border-[#D11559]/20 font-mono text-xs font-bold">bKash</span>
+                      <span className="px-2.5 py-1 rounded-lg bg-[#E11D48]/10 text-[#E11D48] border border-[#E11D48]/20 font-mono text-xs font-bold">Nagad</span>
+                      <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 font-mono text-xs font-bold">Rocket</span>
+                      <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-mono text-xs font-bold">Cards</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleInstantPayment}
+                      disabled={isRedirecting}
+                      className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/25 disabled:opacity-60 flex justify-center items-center gap-2 transition-all cursor-pointer"
+                    >
+                      {isRedirecting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>পেমেন্ট গেটওয়েতে পাঠানো হচ্ছে...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5" />
+                          <span>৳ {plan.price}.00 পে করুন (অটোমেটিক)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="w-full bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-800/80 rounded-2xl p-5 text-center shadow-sm">
                 <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3">
                   অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
                 </h4>
@@ -354,8 +458,10 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   {isSubmitting ? 'যাচাই করা হচ্ছে...' : 'পেমেন্ট সম্পন্ন করুন'}
                 </button>
               </form>
-            </div>
+            </>
           )}
+        </div>
+      )}
 
           {activeTab === 'support' && (
             <div className="space-y-4 animate-fade-in pb-4">

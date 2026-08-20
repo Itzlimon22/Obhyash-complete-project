@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../domain/notification_templates.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -288,18 +289,12 @@ class NotificationService {
     if (!_isInitialized) await initialize();
 
     try {
-      // Pick a random witty template
-      final random = Random();
-      final template = wittyStreakSaviorTemplates[random.nextInt(wittyStreakSaviorTemplates.length)];
-      final name = userName.isNotEmpty ? userName : 'শিক্ষার্থী';
-      final streakStr = currentStreak > 0 ? currentStreak.toString() : '১';
-
-      final title = template['title']!
-          .replaceAll('{name}', name)
-          .replaceAll('{streak}', streakStr);
-      final body = template['body']!
-          .replaceAll('{name}', name)
-          .replaceAll('{streak}', streakStr);
+      final formatted = NotificationTemplateLibrary.getRandomStreakSaver().format(
+        name: userName,
+        streak: currentStreak,
+      );
+      final title = formatted['title']!;
+      final body = formatted['body']!;
 
       final now = tz.TZDateTime.now(tz.local);
       

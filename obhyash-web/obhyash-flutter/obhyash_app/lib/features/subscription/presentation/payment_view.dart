@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
 import 'widgets/coupon_bottom_sheet.dart';
+import 'uddoktapay_webview_screen.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class SavedPaymentMethod {
@@ -57,6 +58,9 @@ class _PaymentViewState extends State<PaymentView>
   String? _pendingTrxId;
   String? _pendingRequestId;
   bool _isCancellingPending = false;
+
+  // Payment Mode: 0 = Instant (Auto), 1 = Manual (TrxID)
+  int _paymentMode = 0;
 
   // Coupon state
   late SubscriptionPlan _currentPlan;
@@ -565,6 +569,26 @@ class _PaymentViewState extends State<PaymentView>
     );
   }
 
+  Widget _paymentMethodBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          fontFamily: 'monospace',
+        ),
+      ),
+    );
+  }
+
   // ── Details Tab ─────────────────────────────────────────────────────────
 
   Widget _buildDetailsTab(bool isDark) {
@@ -655,20 +679,256 @@ class _PaymentViewState extends State<PaymentView>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Merchant number instruction card
+          // ── Payment Mode Segmented Selector ───────────────────────────
           Container(
+            margin: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF141416) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark
-                    ? const Color(0xFF059669)
-                    : const Color(0xFFA7F3D0),
-                width: 1.5,
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
               ),
             ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _paymentMode = 0),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _paymentMode == 0
+                            ? const Color(0xFF059669)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: _paymentMode == 0
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.zap,
+                            size: 15,
+                            color: _paymentMode == 0
+                                ? Colors.white
+                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ইনস্ট্যান্ট (অটো)',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: _paymentMode == 0
+                                  ? Colors.white
+                                  : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _paymentMode = 1),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _paymentMode == 1
+                            ? const Color(0xFF059669)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: _paymentMode == 1
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.fileText,
+                            size: 15,
+                            color: _paymentMode == 1
+                                ? Colors.white
+                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ম্যানুয়াল (TrxID)',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: _paymentMode == 1
+                                  ? Colors.white
+                                  : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── OPTION 0: Instant Online Payment (UddoktaPay) ────────────────
+          if (_paymentMode == 0) ...[
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF064E3B), const Color(0xFF022C22)]
+                      : [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF059669).withValues(alpha: 0.35),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF059669),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(LucideIcons.zap, color: Colors.white, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'সরাসরি অনলাইন পেমেন্ট',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Anek Bangla',
+                                color: isDark ? Colors.white : const Color(0xFF065F46),
+                              ),
+                            ),
+                            Text(
+                              'বিকাশ, নগদ, রকেট ও কার্ডে ১-ক্লিকে সরাসরি পেমেন্ট',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF047857),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.black26 : Colors.white60,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _paymentMethodBadge('bKash', const Color(0xFFD11559)),
+                        _paymentMethodBadge('Nagad', const Color(0xFFE11D48)),
+                        _paymentMethodBadge('Rocket', const Color(0xFF6B21A8)),
+                        _paymentMethodBadge('Cards', const Color(0xFF0284C7)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final user = Supabase.instance.client.auth.currentUser;
+                      if (user == null) {
+                        AppPopups.error(context, message: 'অনুগ্রহ করে প্রথমে লগইন করুন');
+                        return;
+                      }
+                      final success = await UddoktaPayWebViewScreen.open(
+                        context,
+                        userId: user.id,
+                        planId: _currentPlan.id,
+                        planName: _currentPlan.name,
+                        amount: _currentPlan.price,
+                        customerEmail: user.email,
+                      );
+                      if (success == true) {
+                        if (mounted) {
+                          setState(() => _showSuccess = true);
+                          AppPopups.success(
+                            context,
+                            message: '🎉 অভিনন্দন! আপনার প্রো সাবস্ক্রিপশন সফলভাবে চালু হয়েছে!',
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF059669),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 2,
+                    ),
+                    child: Text(
+                      '৳ ${_currentPlan.price}.00 পে করুন (অটোমেটিক)',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Anek Bangla',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ] else ...[
+            // ── OPTION 1: Manual Payment with TrxID ────────────────────────
+            // Merchant number instruction card
+            Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF141416) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF059669)
+                      : const Color(0xFFA7F3D0),
+                  width: 1.5,
+                ),
+              ),
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1263,6 +1523,7 @@ class _PaymentViewState extends State<PaymentView>
                     ),
             ),
           ),
+          ],
           const SizedBox(height: 24),
         ],
       ),

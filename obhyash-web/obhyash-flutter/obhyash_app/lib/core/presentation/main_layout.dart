@@ -25,6 +25,7 @@ import '../../features/notifications/domain/notification_model.dart';
 import '../../features/notifications/providers/notification_providers.dart';
 import '../../features/notifications/presentation/widgets/in_app_notification_banner.dart';
 import '../../features/notifications/services/notification_service.dart';
+import '../../features/notifications/services/notification_permission_manager.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -446,7 +447,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     });
 
-    // Schedule local witty daily streak saver reminder (Chorcha style) + sync FCM
+    // Schedule local witty daily streak saver reminder (Chorcha style) + sync FCM + Smart Soft-Ask
     ref.listen(userProfileProvider, (prev, next) {
       final u = next.value;
       if (u != null) {
@@ -455,6 +456,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           currentStreak: u.streakCount,
         );
         NotificationService().syncFCMToken(u.id);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            NotificationPermissionManager.maybeShowPrompt(context);
+          }
+        });
       }
     });
 

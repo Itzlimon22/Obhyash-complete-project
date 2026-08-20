@@ -63,13 +63,20 @@ export async function GET(request: NextRequest) {
 
     const broadcastHistory = Array.from(groupedMap.values()).slice(0, 20);
 
+    const totalSent = totalCountRes.count || 0;
+    const unread = unreadCountRes.count || 0;
+    const readCount = Math.max(totalSent - unread, 0);
+    const readRate = totalSent > 0 ? Math.round((readCount / totalSent) * 100) : 0;
+
     return NextResponse.json({
       success: true,
       data: {
         history: broadcastHistory,
         stats: {
-          totalSent: totalCountRes.count || 0,
-          unread: unreadCountRes.count || 0,
+          totalSent,
+          unread,
+          readCount,
+          readRate,
           announcements: announcementsRes.count || 0,
           systemAlerts: systemRes.count || 0,
         },

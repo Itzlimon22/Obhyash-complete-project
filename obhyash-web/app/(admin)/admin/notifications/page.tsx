@@ -136,14 +136,6 @@ export default function NotificationManagementPage() {
       setIsLoading(false);
     }
   };
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('একটি অনাকাঙ্ক্ষিত ত্রুটি ঘটেছে');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleDeleteHistory = async (item: any) => {
     try {
@@ -229,21 +221,21 @@ export default function NotificationManagementPage() {
 
         <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="flex items-center justify-between text-neutral-500 dark:text-neutral-400 text-xs font-bold mb-1">
-            <span>ঘোষণা (Announcements)</span>
-            <Sparkles size={16} className="text-purple-500" />
+            <span>পড়ার হার (Read Rate)</span>
+            <CheckCircle2 size={16} className="text-emerald-500" />
           </div>
-          <p className="text-2xl font-black text-purple-600 dark:text-purple-400">
-            {stats.announcements}
+          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+            {(stats as any).readRate || 0}%
           </p>
         </div>
 
         <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="flex items-center justify-between text-neutral-500 dark:text-neutral-400 text-xs font-bold mb-1">
-            <span>সিস্টেম অ্যালার্ট</span>
-            <AlertTriangle size={16} className="text-amber-500" />
+            <span>ঘোষণা ও আপডেট</span>
+            <Sparkles size={16} className="text-purple-500" />
           </div>
-          <p className="text-2xl font-black text-amber-600 dark:text-amber-400">
-            {stats.systemAlerts}
+          <p className="text-2xl font-black text-purple-600 dark:text-purple-400">
+            {stats.announcements}
           </p>
         </div>
 
@@ -256,6 +248,24 @@ export default function NotificationManagementPage() {
             {stats.unread}
           </p>
         </div>
+      </div>
+
+      {/* Automated Background Services Status */}
+      <div className="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <div>
+            <p className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+              অটোমেটিক ব্যাকগ্রাউন্ড সার্ভিস সক্রিয় রয়েছে
+            </p>
+            <p className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80">
+              দৈনিক স্ট্রিক রিমাইন্ডার (রাত ৮:৩০), রেজাল্ট ঘোষণা ও ২ দিনের ইনঅ্যাক্টিভিটি অ্যালার্ট স্বয়ংক্রিয়ভাবে চলছে।
+            </p>
+          </div>
+        </div>
+        <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          ALL SERVICES OPERATIONAL
+        </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
