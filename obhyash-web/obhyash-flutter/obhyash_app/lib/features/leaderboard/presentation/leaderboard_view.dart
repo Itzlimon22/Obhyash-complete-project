@@ -11,6 +11,7 @@ import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/data/college_list.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -495,12 +496,12 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                   rankings: _instituteRankings,
                   isLoading: _isLoadingRankings,
                   isDark: isDark,
+                  onRefresh: _fetchInstituteRankings,
                 )
               : _viewMode == 'level'
               ? (_isLoading && _users.isEmpty
                     ? const LeaderboardSkeleton()
-                    : RefreshIndicator(
-                        color: const Color(0xFF004633),
+                    : AppRefreshIndicator(
                         onRefresh: () async {
                           await _fetchCounts();
                           await _fetch();
@@ -1001,11 +1002,13 @@ class _InstituteRankingsBody extends StatelessWidget {
   final List<_InstituteRank> rankings;
   final bool isLoading;
   final bool isDark;
+  final Future<void> Function()? onRefresh;
 
   const _InstituteRankingsBody({
     required this.rankings,
     required this.isLoading,
     required this.isDark,
+    this.onRefresh,
   });
 
   @override
@@ -1028,7 +1031,7 @@ class _InstituteRankingsBody extends StatelessWidget {
     }
 
     if (rankings.isEmpty) {
-      return Center(
+      Widget emptyContent = Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
@@ -1064,9 +1067,30 @@ class _InstituteRankingsBody extends StatelessWidget {
           ),
         ),
       );
+
+      if (onRefresh != null) {
+        return AppRefreshIndicator(
+          onRefresh: onRefresh!,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: emptyContent,
+              ),
+            ],
+          ),
+        );
+      }
+      return emptyContent;
     }
 
-    return ListView(
+    Widget list = ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
       children: [
         Padding(
@@ -1224,6 +1248,14 @@ class _InstituteRankingsBody extends StatelessWidget {
         }),
       ],
     );
+
+    if (onRefresh != null) {
+      return AppRefreshIndicator(
+        onRefresh: onRefresh!,
+        child: list,
+      );
+    }
+    return list;
   }
 }
 

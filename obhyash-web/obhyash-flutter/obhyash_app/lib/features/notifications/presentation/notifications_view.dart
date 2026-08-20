@@ -8,6 +8,7 @@ import '../domain/notification_model.dart';
 import '../providers/notification_providers.dart';
 import '../services/notification_router.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 // --- Utils ---
 Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
@@ -293,40 +294,55 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
           child: _isLoading
               ? const NotificationsListSkeleton()
               : _notifications.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  ? AppRefreshIndicator(
+                      onRefresh: () => _fetchNotifications(),
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
                         children: [
-                          Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              LucideIcons.bellOff,
-                              size: 32,
-                              color: isDark ? const Color(0xFF71717A) : const Color(0xFFA1A1AA),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            _filter == 'unread' ? 'কোনো অপঠিত নোটিফিকেশন নেই' : 'কোনো নোটিফিকেশন নেই',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
-                              fontFamily: 'HindSiliguri',
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.55,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 72,
+                                    height: 72,
+                                    decoration: BoxDecoration(
+                                      color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      LucideIcons.bellOff,
+                                      size: 32,
+                                      color: isDark ? const Color(0xFF71717A) : const Color(0xFFA1A1AA),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  Text(
+                                    _filter == 'unread' ? 'কোনো অপঠিত নোটিফিকেশন নেই' : 'কোনো নোটিফিকেশন নেই',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                                      fontFamily: 'HindSiliguri',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     )
-                  : RefreshIndicator(
+                  : AppRefreshIndicator(
                       onRefresh: () => _fetchNotifications(),
-                      color: const Color(0xFF004633),
                       child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                         itemCount: _notifications.length + (_hasMore ? 1 : 0),
                         separatorBuilder: (context, index) => const SizedBox(height: 10),

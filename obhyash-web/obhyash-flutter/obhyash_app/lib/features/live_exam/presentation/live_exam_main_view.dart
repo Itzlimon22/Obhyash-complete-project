@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/live_exam_providers.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 class LiveExamMainView extends ConsumerStatefulWidget {
   const LiveExamMainView({super.key});
@@ -78,8 +79,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAFA),
-      body: RefreshIndicator(
-        color: const Color(0xFF004633),
+      body: AppRefreshIndicator(
         onRefresh: () async {
           ref.invalidate(liveExamsProvider);
           try {

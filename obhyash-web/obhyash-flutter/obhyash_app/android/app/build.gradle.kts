@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.obhyash_app"
+    namespace = "com.obhyash.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "30.0.15729638"
 
@@ -21,10 +21,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.obhyash_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.obhyash.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

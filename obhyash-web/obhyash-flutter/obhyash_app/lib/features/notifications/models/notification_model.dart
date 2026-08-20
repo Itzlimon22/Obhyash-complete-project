@@ -1,41 +1,31 @@
 class AppNotification {
   final String id;
-  final String userId;
   final String title;
-  final String message;
-  final String type;
-  final String? link;
-  final Map<String, dynamic>? data;
+  final String body;
+  final String type; // 'streak', 'live_exam', 'result', 'announcement', 'system', 'leaderboard', 'milestone'
+  final Map<String, dynamic> data;
   final bool isRead;
   final DateTime createdAt;
 
   const AppNotification({
     required this.id,
-    required this.userId,
     required this.title,
-    required this.message,
+    required this.body,
     required this.type,
-    this.link,
-    this.data,
+    required this.data,
     required this.isRead,
     required this.createdAt,
   });
 
-  String get body => message;
-
   factory AppNotification.fromJson(Map<String, dynamic> json) {
-    final rawMsg = json['message'] ?? json['body'] ?? '';
-    final rawLink = json['link'] ?? (json['data'] is Map ? json['data']['route'] : null);
     return AppNotification(
       id: json['id']?.toString() ?? '',
-      userId: json['user_id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
-      message: rawMsg.toString(),
-      type: json['type']?.toString() ?? 'info',
-      link: rawLink?.toString(),
+      body: json['body']?.toString() ?? '',
+      type: json['type']?.toString() ?? 'system',
       data: json['data'] is Map<String, dynamic>
           ? json['data'] as Map<String, dynamic>
-          : (json['data'] is Map ? Map<String, dynamic>.from(json['data'] as Map) : null),
+          : (json['data'] is Map ? Map<String, dynamic>.from(json['data'] as Map) : {}),
       isRead: json['is_read'] == true,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())?.toLocal() ?? DateTime.now()
@@ -45,22 +35,18 @@ class AppNotification {
 
   AppNotification copyWith({
     String? id,
-    String? userId,
     String? title,
-    String? message,
+    String? body,
     String? type,
-    String? link,
     Map<String, dynamic>? data,
     bool? isRead,
     DateTime? createdAt,
   }) {
     return AppNotification(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       title: title ?? this.title,
-      message: message ?? this.message,
+      body: body ?? this.body,
       type: type ?? this.type,
-      link: link ?? this.link,
       data: data ?? this.data,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,

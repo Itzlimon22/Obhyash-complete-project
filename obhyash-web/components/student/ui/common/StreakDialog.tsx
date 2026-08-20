@@ -41,36 +41,9 @@ export default function StreakDialog({
     const fetchWeeklyActivity = async () => {
       setIsLoading(true);
       try {
-        const supabase = createClient();
-        
-        // Find most recent Sunday
-        const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
-
-        const { data, error } = await supabase
-          .from("exam_results")
-          .select("created_at, date")
-          .eq("user_id", userId)
-          .gte("created_at", startOfWeek.toISOString());
-
-        if (error) throw error;
-
-        const updatedActiveDays = Array(7).fill(false);
-        data?.forEach((row: any) => {
-          const dateStr = row.date || row.created_at;
-          if (!dateStr) return;
-          const date = new Date(dateStr);
-          const diffDays = Math.floor(
-            (date.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          if (diffDays >= 0 && diffDays < 7) {
-            updatedActiveDays[diffDays] = true;
-          }
-        });
-
-        setActiveDays(updatedActiveDays);
+        const { fetchUserStreakInfo } = await import("@/services/streak-service");
+        const streakInfo = await fetchUserStreakInfo(userId);
+        setActiveDays(streakInfo.weekActivity);
       } catch (err) {
         console.error("Error fetching weekly activity:", err);
       } finally {

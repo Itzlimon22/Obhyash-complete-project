@@ -9,6 +9,7 @@ import 'obhyash_tooltip.dart';
 import '../../../features/dashboard/services/streak_service.dart';
 import '../../../features/dashboard/providers/dashboard_providers.dart';
 
+
 class StreakDialog extends ConsumerStatefulWidget {
   final int currentStreak;
   final String userId;
@@ -36,79 +37,40 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
   void initState() {
     super.initState();
     _streakCount = widget.currentStreak;
+    // Load both tabs' data in parallel so leaderboard is ready immediately
     _fetchWeeklyActivity();
+    _fetchTopStreaks();
   }
 
   Future<void> _fetchWeeklyActivity() async {
     try {
-      final now = DateTime.now();
-      // Find the most recent Sunday (Dart weekday: 1=Mon, 7=Sun)
-      final daysSinceSunday = now.weekday == DateTime.sunday ? 0 : now.weekday;
-      final startOfWeek = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysSinceSunday));
-      
-      final data = await Supabase.instance.client
-          .from('exam_results')
-          .select('created_at, date')
-          .eq('user_id', widget.userId)
-          .gte('created_at', startOfWeek.toUtc().toIso8601String());
-          
-      final activeDays = List.filled(7, false);
-      for (final row in data as List<dynamic>) {
-        final dateStr = row['date'] ?? row['created_at'];
-        if (dateStr == null) continue;
-        final date = DateTime.tryParse(dateStr)?.toLocal();
-        if (date != null) {
-          final diff = date.difference(startOfWeek).inDays;
-          if (diff >= 0 && diff < 7) {
-            activeDays[diff] = true;
-          }
-        }
-      }
-
-      // Also fetch live exam attempts this week
-      try {
-        final liveData = await Supabase.instance.client
-            .from('live_exam_attempts')
-            .select('submit_time')
-            .eq('user_id', widget.userId)
-            .eq('status', 'submitted')
-            .gte('submit_time', startOfWeek.toUtc().toIso8601String());
-
-        for (final row in (liveData as List<dynamic>)) {
-          final dateStr = row['submit_time'] as String?;
-          if (dateStr == null) continue;
-          final date = DateTime.tryParse(dateStr)?.toLocal();
-          if (date != null) {
-            final diff = date.difference(startOfWeek).inDays;
-            if (diff >= 0 && diff < 7) {
-              activeDays[diff] = true;
-            }
-          }
-        }
-      } catch (_) {}
-
-      // Today the user is active in the app
-      final todayIndex = now.weekday == DateTime.sunday ? 0 : now.weekday;
-      if (todayIndex >= 0 && todayIndex < 7) {
-        activeDays[todayIndex] = true;
-      }
-      
-      // Sync fresh streak count from database / service
-      final freshStreak = await StreakService.checkAndUpdateStreak(widget.userId, forceSync: true);
+      // Single call — streak count and week circles from same data source.
+      final data = await StreakService.syncStreak(widget.userId);
 
       if (mounted) {
-        ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
+        ref.read(userProfileProvider.notifier).updateStreak(data.streakCount);
         setState(() {
-          _activeDays = activeDays;
-          _streakCount = freshStreak;
+          _activeDays = data.weekActiveDays;
+          _streakCount = data.streakCount;
           _isLoading = false;
+
+          // Patch current user's row in the leaderboard if already loaded
+          final idx = _topStreaks.indexWhere((u) => u['id'] == widget.userId);
+          if (idx != -1) {
+            final updated = Map<String, dynamic>.from(
+                _topStreaks[idx] as Map<String, dynamic>);
+            updated['streak'] = data.streakCount;
+            _topStreaks[idx] = updated;
+            // Re-sort
+            _topStreaks.sort((a, b) =>
+                ((b['streak'] as int?) ?? 0)
+                    .compareTo((a['streak'] as int?) ?? 0));
+          }
         });
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -122,15 +84,30 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
           .from('public_profiles')
           .select('id, name, avatar_url, streak')
           .order('streak', ascending: false)
-          .limit(5);
-          
+          .limit(10);
+
+      final List<Map<String, dynamic>> rows = (response as List<dynamic>)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+
+      // Override current user's entry with freshly-computed streak
+      for (int i = 0; i < rows.length; i++) {
+        if (rows[i]['id'] == widget.userId) {
+          rows[i] = {...rows[i], 'streak': _streakCount};
+          break;
+        }
+      }
+
+      // Re-sort and take top 5
+      rows.sort((a, b) =>
+          ((b['streak'] as num?)?.toInt() ?? 0)
+              .compareTo((a['streak'] as num?)?.toInt() ?? 0));
+
       if (mounted) {
-        setState(() {
-          _topStreaks = response as List<dynamic>;
-        });
+        setState(() => _topStreaks = rows.take(5).toList());
       }
     } catch (e) {
-      debugPrint("Error fetching leaderboard: $e");
+      debugPrint('[StreakDialog] leaderboard fetch error: $e');
     } finally {
       if (mounted) setState(() => _isLoadingLeaderboard = false);
     }
@@ -209,7 +186,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() => _tabIndex = 1);
-                              _fetchTopStreaks();
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -259,7 +235,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${ref.watch(userProfileProvider).value?.streakCount ?? _streakCount} দিনের স্ট্রাইক',
+                      '$_streakCount দিনের স্ট্রাইক',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,

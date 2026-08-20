@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/live_exam_providers.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../domain/models.dart';
 import 'widgets/live_exam_routine_sheet.dart';
 
@@ -44,15 +45,15 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final filteredExams = ref.watch(filteredLiveExamsProvider);
-    final isLoading = ref.watch(liveExamsProvider).isLoading;
+    final liveExamsAsync = ref.watch(liveExamsProvider);
+    final isLoading = liveExamsAsync.isLoading;
     final filter = ref.watch(liveExamFilterProvider);
 
     return Scaffold(
       backgroundColor: isDark
           ? const Color(0xFF0C0A09)
           : const Color(0xFFFAFAFA),
-      body: RefreshIndicator(
-        color: const Color(0xFF004633),
+      body: AppRefreshIndicator(
         onRefresh: () async {
           ref.invalidate(liveExamsProvider);
           try {

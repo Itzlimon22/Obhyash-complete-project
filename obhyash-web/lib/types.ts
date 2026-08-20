@@ -314,6 +314,7 @@ export interface UserProfile extends Partial<User> {
   createdAt?: string; // Mapped from DB created_at
   bio?: string;
   streakCount?: number;
+  streak?: number;
   lastStreakDate?: string;
 }
 

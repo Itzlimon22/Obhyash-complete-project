@@ -2,165 +2,167 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/providers/auth_provider.dart';
-import '../../../core/services/haptics_service.dart';
 import '../domain/notification_model.dart';
+import '../services/notification_service.dart';
+import '../../../core/providers/auth_provider.dart';
 
-/// Holds the single active Realtime Channel for notifications
-class NotificationRealtimeService {
-  final SupabaseClient _client;
-  RealtimeChannel? _channel;
-  String? _subscribedUserId;
+class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
+  RealtimeChannel? _subscription;
 
-  NotificationRealtimeService(this._client);
-
-  void subscribe({
-    required String userId,
-    required void Function(AppNotification newNotification) onInsert,
-    required void Function(String id, bool isRead) onUpdate,
-    required void Function(String id) onDelete,
-  }) {
-    if (_subscribedUserId == userId && _channel != null) {
-      return; // Already subscribed
-    }
-
-    unsubscribe();
-    _subscribedUserId = userId;
-
-    _channel = _client.channel('realtime_user_notifications_$userId');
-
-    _channel!.onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'notifications',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'user_id',
-        value: userId,
-      ),
-      callback: (payload) {
-        try {
-          final eventType = payload.eventType;
-          if (eventType == PostgresChangeEvent.insert) {
-            final newRecord = payload.newRecord;
-            if (newRecord.isNotEmpty) {
-              final notif = AppNotification.fromJson(newRecord);
-              onInsert(notif);
-              AppHaptics.light();
-            }
-          } else if (eventType == PostgresChangeEvent.update) {
-            final newRecord = payload.newRecord;
-            if (newRecord.isNotEmpty) {
-              final id = newRecord['id']?.toString() ?? '';
-              final isRead = newRecord['is_read'] as bool? ?? false;
-              onUpdate(id, isRead);
-            }
-          } else if (eventType == PostgresChangeEvent.delete) {
-            final oldRecord = payload.oldRecord;
-            final id = (oldRecord['id'] ?? payload.newRecord['id'])?.toString() ?? '';
-            if (id.isNotEmpty) {
-              onDelete(id);
-            }
-          }
-        } catch (e) {
-          debugPrint('[NotificationRealtime] Error processing payload: $e');
-        }
-      },
-    ).subscribe((status, [error]) {
-      if (status == RealtimeSubscribeStatus.subscribed) {
-        debugPrint('[NotificationRealtime] Subscribed to notifications for user: $userId');
-      } else if (status == RealtimeSubscribeStatus.channelError) {
-        debugPrint('[NotificationRealtime] Channel error for user $userId: $error');
-      }
-    });
-  }
-
-  void unsubscribe() {
-    if (_channel != null) {
-      _client.removeChannel(_channel!);
-      _channel = null;
-      _subscribedUserId = null;
-      debugPrint('[NotificationRealtime] Unsubscribed from notification channel.');
-    }
-  }
-}
-
-final notificationRealtimeServiceProvider = Provider<NotificationRealtimeService>((ref) {
-  final service = NotificationRealtimeService(Supabase.instance.client);
-  ref.onDispose(() => service.unsubscribe());
-  return service;
-});
-
-// ─── Stream of Latest Foreground Notification for In-App Toasts ───────────────
-class LatestNotificationNotifier extends Notifier<AppNotification?> {
   @override
-  AppNotification? build() => null;
+  Future<List<AppNotification>> build() async {
+    final authId = ref.watch(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+    if (authId == null) return [];
 
-  void notify(AppNotification notification) {
-    state = notification;
+    _listenRealtime(authId);
+    return _fetchNotifications(authId);
+  }
+
+  Future<List<AppNotification>> _fetchNotifications(String userId) async {
+    try {
+      final sb = Supabase.instance.client;
+      final response = await sb
+          .from('notifications')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(50);
+
+      final List list = response is List ? response : [];
+      return list.map((json) => AppNotification.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      debugPrint('[NotificationsNotifier] fetch error: $e');
+      return [];
+    }
+  }
+
+  void _listenRealtime(String userId) {
+    _subscription?.unsubscribe();
+    final sb = Supabase.instance.client;
+
+    _subscription = sb
+        .channel('public:notifications:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            try {
+              final newRow = payload.newRecord;
+              final notification = AppNotification.fromJson(newRow);
+
+              // Update local state
+              state = state.whenData((current) => [notification, ...current]);
+              ref.read(latestNotificationEventProvider.notifier).emit(notification);
+
+              // Trigger heads up local alert
+              final targetRoute = notification.data?['route']?.toString() ?? notification.link;
+              NotificationService().showNotification(
+                id: notification.id.hashCode,
+                title: notification.title,
+                body: notification.body,
+                route: targetRoute,
+                channelId: notification.type == 'live_exam'
+                    ? NotificationService.channelLiveExams
+                    : (notification.type == 'streak'
+                        ? NotificationService.channelStreak
+                        : NotificationService.channelGeneral),
+              );
+            } catch (e) {
+              debugPrint('[NotificationsNotifier] realtime insert error: $e');
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  Future<void> markAsRead(String id) async {
+    final sb = Supabase.instance.client;
+    try {
+      await sb.from('notifications').update({'is_read': true}).eq('id', id);
+      state = state.whenData((list) {
+        return list.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
+      });
+      ref.read(unreadNotificationCountProvider.notifier).decrement();
+    } catch (e) {
+      debugPrint('[NotificationsNotifier] markAsRead error: $e');
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+    if (authId == null) return;
+
+    final sb = Supabase.instance.client;
+    try {
+      await sb.from('notifications').update({'is_read': true}).eq('user_id', authId);
+      state = state.whenData((list) {
+        return list.map((n) => n.copyWith(isRead: true)).toList();
+      });
+      ref.read(unreadNotificationCountProvider.notifier).markAllRead();
+    } catch (e) {
+      debugPrint('[NotificationsNotifier] markAllAsRead error: $e');
+    }
+  }
+
+  Future<void> deleteNotification(String id) async {
+    final sb = Supabase.instance.client;
+    try {
+      await sb.from('notifications').delete().eq('id', id);
+      state = state.whenData((list) {
+        return list.where((n) => n.id != id).toList();
+      });
+    } catch (e) {
+      debugPrint('[NotificationsNotifier] delete error: $e');
+    }
   }
 }
 
-final latestNotificationEventProvider = NotifierProvider<LatestNotificationNotifier, AppNotification?>(
-  () => LatestNotificationNotifier(),
+final notificationsProvider =
+    AsyncNotifierProvider<NotificationsNotifier, List<AppNotification>>(
+  NotificationsNotifier.new,
 );
 
-// ─── Production Unread Count Notifier (Zero-Poll, Live WebSocket Sync) ─────────
 class UnreadNotificationCountNotifier extends Notifier<int> {
   @override
   int build() {
-    final user = ref.watch(authProvider);
-    if (user == null) {
-      ref.read(notificationRealtimeServiceProvider).unsubscribe();
-      return 0;
-    }
-
-    // Initial fetch from DB
-    _fetchInitialCount(user.id);
-
-    // Setup Live Realtime Listener
-    ref.read(notificationRealtimeServiceProvider).subscribe(
-      userId: user.id,
-      onInsert: (notif) {
-        if (!notif.isRead) {
-          state = state + 1;
-          ref.read(latestNotificationEventProvider.notifier).notify(notif);
-        }
-      },
-      onUpdate: (id, isRead) {
-        // If an unread notification became read, decrement
-        _fetchInitialCount(user.id);
-      },
-      onDelete: (id) {
-        _fetchInitialCount(user.id);
-      },
-    );
-
-    return 0;
-  }
-
-  Future<void> _fetchInitialCount(String userId) async {
-    try {
-      final res = await Supabase.instance.client
-          .from('notifications')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('is_read', false);
-      state = (res as List).length;
-    } catch (e) {
-      debugPrint('[UnreadNotificationCount] Fetch error: $e');
-    }
+    final notifs = ref.watch(notificationsProvider).value ?? [];
+    return notifs.where((n) => !n.isRead).length;
   }
 
   void decrement() {
-    if (state > 0) state = state - 1;
+    if (state > 0) state--;
   }
 
   void markAllRead() {
     state = 0;
   }
+
+  void set(int count) {
+    state = count;
+  }
 }
 
-final unreadNotificationCountProvider = NotifierProvider<UnreadNotificationCountNotifier, int>(
-  () => UnreadNotificationCountNotifier(),
+final unreadNotificationCountProvider =
+    NotifierProvider<UnreadNotificationCountNotifier, int>(
+  UnreadNotificationCountNotifier.new,
+);
+
+class LatestNotificationEventNotifier extends Notifier<AppNotification?> {
+  @override
+  AppNotification? build() => null;
+
+  void emit(AppNotification notification) {
+    state = notification;
+  }
+}
+
+final latestNotificationEventProvider =
+    NotifierProvider<LatestNotificationEventNotifier, AppNotification?>(
+  LatestNotificationEventNotifier.new,
 );

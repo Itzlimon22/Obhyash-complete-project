@@ -455,3 +455,17 @@ final dashboardLiveExamsProvider =
     AsyncNotifierProvider<DashboardLiveExamsNotifier, List<LiveExam>>(() {
   return DashboardLiveExamsNotifier();
 });
+
+class ExamHistoryRefreshTriggerNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void trigger() => state++;
+}
+
+/// Shared reactive trigger to notify History page to refresh immediately when an exam completes
+final examHistoryRefreshTriggerProvider =
+    NotifierProvider<ExamHistoryRefreshTriggerNotifier, int>(
+  ExamHistoryRefreshTriggerNotifier.new,
+);
+

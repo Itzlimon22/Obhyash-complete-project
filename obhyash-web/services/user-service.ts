@@ -202,10 +202,11 @@ export const updateUserProfile = async (
 
     console.log('📦 Data being sent to DB (Sanitized):', dbPayload);
 
-    // Using upsert ensures the row is created if the Auth trigger missed it
+    // Use update on users table for existing user profile edits
     const { data, error } = await supabase
       .from('users')
-      .upsert(dbPayload)
+      .update(dbPayload)
+      .eq('id', user.id)
       .select();
 
     if (error) {

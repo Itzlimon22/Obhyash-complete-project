@@ -231,6 +231,46 @@ class ExamResult {
     'status': status,
   };
 
+  ExamResult copyWith({
+    String? id,
+    String? subject,
+    String? subjectLabel,
+    String? examType,
+    String? date,
+    double? score,
+    double? totalMarks,
+    int? totalQuestions,
+    int? correctCount,
+    int? wrongCount,
+    int? timeTaken,
+    double? negativeMarking,
+    List<Question>? questions,
+    List<String>? flaggedQuestions,
+    String? submissionType,
+    Map<String, int>? userAnswers,
+    String? status,
+  }) {
+    return ExamResult(
+      id: id ?? this.id,
+      subject: subject ?? this.subject,
+      subjectLabel: subjectLabel ?? this.subjectLabel,
+      examType: examType ?? this.examType,
+      date: date ?? this.date,
+      score: score ?? this.score,
+      totalMarks: totalMarks ?? this.totalMarks,
+      totalQuestions: totalQuestions ?? this.totalQuestions,
+      correctCount: correctCount ?? this.correctCount,
+      wrongCount: wrongCount ?? this.wrongCount,
+      timeTaken: timeTaken ?? this.timeTaken,
+      negativeMarking: negativeMarking ?? this.negativeMarking,
+      questions: questions ?? this.questions,
+      flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
+      submissionType: submissionType ?? this.submissionType,
+      userAnswers: userAnswers ?? this.userAnswers,
+      status: status ?? this.status,
+    );
+  }
+
   factory ExamResult.fromJson(Map<String, dynamic> j) {
     List<Question> qList = [];
     if (j['questions'] is List) {

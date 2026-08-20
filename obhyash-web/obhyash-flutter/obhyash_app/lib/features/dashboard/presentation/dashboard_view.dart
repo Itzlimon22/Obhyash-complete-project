@@ -16,6 +16,7 @@ import '../../exam/services/offline_question_bank_service.dart';
 
 import '../../../core/utils/global_refresh.dart';
 import '../../../core/presentation/widgets/global_announcement_banner.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
@@ -44,9 +45,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   void _checkStreak(UserProfile? user) {
     if (_hasCheckedStreak || user == null) return;
     _hasCheckedStreak = true;
-    StreakService.checkAndUpdateStreak(user.id).then((freshStreak) {
+    StreakService.syncStreak(user.id).then((data) {
       if (mounted) {
-        ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
+        ref.read(userProfileProvider.notifier).updateStreak(data.streakCount);
       }
     });
   }
@@ -67,11 +68,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     final isLoading = subjectStatsAsync.isLoading;
 
-    return RefreshIndicator(
-      color: const Color(0xFF004633),
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF18181B)
-          : Colors.white,
+    return AppRefreshIndicator(
       onRefresh: () => globalRefresh(ref),
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(

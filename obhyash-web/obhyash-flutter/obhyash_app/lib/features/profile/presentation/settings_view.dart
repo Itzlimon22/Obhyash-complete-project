@@ -6,7 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
-import '../../../core/services/haptics_service.dart';
 import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
 import 'widgets/account_info_modal.dart';
@@ -55,7 +54,6 @@ class SettingsView extends ConsumerWidget {
   List<_SettingsGroup> _buildGroups(
     BuildContext context,
     ThemeMode themeMode,
-    bool hapticsEnabled,
   ) {
     return [
       _SettingsGroup(
@@ -169,18 +167,18 @@ class SettingsView extends ConsumerWidget {
             actionId: 'accountInfo',
           ),
           _SettingsItem(
+            label: 'অ্যাকাউন্ট লিংকিং',
+            description: 'গুগল ও অন্যান্য অ্যাকাউন্ট সংযুক্ত ও ম্যানেজ করো',
+            icon: LucideIcons.link2,
+            type: _ItemType.navigate,
+            route: '/profile/account-linking',
+          ),
+          _SettingsItem(
             label: themeMode == ThemeMode.dark ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
             description: 'অ্যাপের কালার থিম পরিবর্তন করো',
             icon: themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon,
             type: _ItemType.action,
             actionId: 'toggleTheme',
-          ),
-          _SettingsItem(
-            label: hapticsEnabled ? 'হ্যাপটিক ভাইব্রেশন: চালু' : 'হ্যাপটিক ভাইব্রেশন: বন্ধ',
-            description: 'প্রশ্নের উত্তর ও বাটনে টাচ ভাইব্রেশন ফিডব্যাক',
-            icon: hapticsEnabled ? LucideIcons.vibrate : LucideIcons.vibrateOff,
-            type: _ItemType.action,
-            actionId: 'toggleHaptics',
           ),
           _SettingsItem(
             label: 'লগ আউট',
@@ -227,8 +225,6 @@ class SettingsView extends ConsumerWidget {
           DeleteAccountModal.show(context, user);
         } else if (item.actionId == 'toggleTheme') {
           ref.read(themeModeProvider.notifier).toggle();
-        } else if (item.actionId == 'toggleHaptics') {
-          ref.read(hapticsProvider.notifier).toggle();
         } else if (item.actionId == 'logout') {
           final confirmed = await showDialog<bool>(
             context: context,
@@ -270,10 +266,9 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
-    final hapticsEnabled = ref.watch(hapticsProvider);
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA);
     final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
-    final groups = _buildGroups(context, themeMode, hapticsEnabled);
+    final groups = _buildGroups(context, themeMode);
 
     final nameParts = user.name.trim().split(' ');
     final initials = nameParts.length >= 2

@@ -80,21 +80,26 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.hasSize) return;
 
-    final targetOffset = renderBox.localToGlobal(Offset.zero);
+    final overlayState = Overlay.of(context);
+    final overlayRenderBox = overlayState.context.findRenderObject() as RenderBox?;
+    if (overlayRenderBox == null || !overlayRenderBox.hasSize) return;
+
+    // Local coordinates mapped directly into the Overlay coordinate space
+    final targetOffset = renderBox.localToGlobal(Offset.zero, ancestor: overlayRenderBox);
     final targetSize = renderBox.size;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenSize = MediaQuery.of(context).size;
+    final overlaySize = overlayRenderBox.size;
 
-    // Smart placement calculation: keep tight (4px) to target
+    // Smart placement calculation: keep tight to target inside the Overlay
     final double spaceAbove = targetOffset.dy;
-    final double spaceBelow = screenSize.height - (targetOffset.dy + targetSize.height);
+    final double spaceBelow = overlaySize.height - (targetOffset.dy + targetSize.height);
 
     final bool showOnTop = widget.preferredPosition == TooltipPosition.top
         ? (spaceAbove >= 90 || spaceAbove > spaceBelow)
         : (spaceBelow < 90 && spaceAbove > spaceBelow);
 
     final double targetCenter = targetOffset.dx + (targetSize.width / 2);
-    final bool isLeft = targetCenter < screenSize.width / 2;
+    final bool isLeft = targetCenter < overlaySize.width / 2;
     final Alignment animOrigin = showOnTop
         ? (isLeft ? Alignment.bottomLeft : Alignment.bottomRight)
         : (isLeft ? Alignment.topLeft : Alignment.topRight);
@@ -144,7 +149,7 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
       },
     );
 
-    Overlay.of(context).insert(_overlayEntry!);
+    overlayState.insert(_overlayEntry!);
     _animCtrl.forward();
 
     // Auto-dismiss timer
@@ -214,27 +219,32 @@ class _TooltipPositionDelegate extends SingleChildLayoutDelegate {
   @override
   Offset getPositionForChild(Size size, Size childSize) {
     final double targetCenter = targetOffset.dx + (targetSize.width / 2);
-    final double screenMid = size.width / 2;
 
     double x;
-    if (targetCenter < screenMid) {
-      // Left side: start the bubble right at the icon button (16px to left of icon center)
+    if (targetCenter < size.width * 0.4) {
+      // Left side: align tooltip left edge near the icon button
       x = targetCenter - 16.0;
-    } else {
-      // Right side: end the bubble right at the icon button (16px to right of icon center)
+    } else if (targetCenter > size.width * 0.6) {
+      // Right side: align tooltip right edge near the icon button
       x = targetCenter - childSize.width + 16.0;
+    } else {
+      // Center: align tooltip center with icon center
+      x = targetCenter - (childSize.width / 2);
     }
 
     // Keep 12px margin from screen edges
     x = x.clamp(12.0, (size.width - childSize.width - 12.0).clamp(12.0, double.infinity));
 
-    // Tight 2px vertical gap right next to the button
+    // Tight 4px vertical gap right next to the button
     double y;
     if (showOnTop) {
-      y = targetOffset.dy - childSize.height - 2.0;
+      y = targetOffset.dy - childSize.height - 4.0;
     } else {
-      y = targetOffset.dy + targetSize.height + 2.0;
+      y = targetOffset.dy + targetSize.height + 4.0;
     }
+
+    // Keep y within overlay bounds
+    y = y.clamp(8.0, (size.height - childSize.height - 8.0).clamp(8.0, double.infinity));
 
     return Offset(x, y);
   }

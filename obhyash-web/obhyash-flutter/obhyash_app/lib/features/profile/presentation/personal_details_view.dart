@@ -140,24 +140,33 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     try {
       final supabase = Supabase.instance.client;
 
-      final updates = {
+      final updates = <String, dynamic>{
         'name': _nameController.text.trim(),
-        'dob': _dobController.text.isEmpty ? null : _dobController.text,
-        'gender': _gender.isEmpty ? null : _gender,
-        'address': _addressController.text.isEmpty
+        'dob': _dobController.text.trim().isEmpty ? null : _dobController.text.trim(),
+        'gender': _gender.trim().isEmpty ? null : _gender.trim(),
+        'address': _addressController.text.trim().isEmpty
             ? null
-            : _addressController.text,
+            : _addressController.text.trim(),
         'institute': normalizeCollegeName(_instituteController.text),
-        'stream': _stream,
-        'division': _group,
-        'batch': _batch,
-        'target': _target,
-        'ssc_roll': _sscRollController.text,
-        'ssc_reg': _sscRegController.text,
-        'ssc_board': _sscBoard,
-        'ssc_passing_year': _sscYear,
-        'optional_subject': _optionalSubject,
+        'stream': _stream.trim().isEmpty ? null : _stream.trim(),
+        'division': _group.trim().isEmpty ? null : _group.trim(),
+        'batch': _batch.trim().isEmpty ? null : _batch.trim(),
+        'target': _target.trim().isEmpty ? null : _target.trim(),
+        'optional_subject': _optionalSubject.trim().isEmpty ? null : _optionalSubject.trim(),
       };
+
+      if (_sscRollController.text.trim().isNotEmpty) {
+        updates['ssc_roll'] = _sscRollController.text.trim();
+      }
+      if (_sscRegController.text.trim().isNotEmpty) {
+        updates['ssc_reg'] = _sscRegController.text.trim();
+      }
+      if (_sscBoard.trim().isNotEmpty) {
+        updates['ssc_board'] = _sscBoard.trim();
+      }
+      if (_sscYear.trim().isNotEmpty) {
+        updates['ssc_passing_year'] = _sscYear.trim();
+      }
 
       if (_newPasswordController.text.isNotEmpty) {
         await supabase.auth.updateUser(
@@ -890,185 +899,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                   ),
                 ),
 
-                // 3. Account Linking
-                Container(
-                  decoration: cardDecoration,
-                  margin: const EdgeInsets.only(bottom: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildSectionHeader(
-                        'অ্যাকাউন্ট লিংকিং',
-                        isDark,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            _buildTextField(
-                              label: 'Email',
-                              controller: _emailController,
-                              isDark: isDark,
-                              readOnly: true,
-                              suffixIcon: const Icon(
-                                LucideIcons.checkCircle2,
-                                color: Color(0xFF10B981),
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Builder(
-                              builder: (context) {
-                                final supabase = Supabase.instance.client;
-                                final identities =
-                                    supabase.auth.currentUser?.identities ?? [];
-                                final isGoogleLinked = identities.any(
-                                  (id) => id.provider == 'google',
-                                );
-
-                                return Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF1C1C1E)
-                                        : const Color(0xFFF9FAFB),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? const Color(0xFF2C2C2E)
-                                          : const Color(0xFFE5E7EB),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Google অ্যাকাউন্ট',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Anek Bangla',
-                                                color: isDark
-                                                    ? Colors.white
-                                                    : Colors.black87,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              isGoogleLinked
-                                                  ? 'গুগল সফলভাবে লিঙ্ক করা আছে'
-                                                  : '১-ক্লিকে লগইন করার জন্য গুগল লিঙ্ক করুন',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontFamily: 'HindSiliguri',
-                                                color: isDark
-                                                    ? Colors.white54
-                                                    : Colors.black54,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      if (isGoogleLinked)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF059669)
-                                                .withValues(alpha: 0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            border: Border.all(
-                                              color: const Color(0xFF059669)
-                                                  .withValues(alpha: 0.4),
-                                            ),
-                                          ),
-                                          child: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                LucideIcons.checkCheck,
-                                                size: 14,
-                                                color: Color(0xFF059669),
-                                              ),
-                                              SizedBox(width: 6),
-                                              Text(
-                                                'লিঙ্কড',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Anek Bangla',
-                                                  color: Color(0xFF059669),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      else
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            try {
-                                              await supabase.auth.linkIdentity(
-                                                OAuthProvider.google,
-                                                redirectTo:
-                                                    'io.supabase.obhyash://login-callback/',
-                                              );
-                                            } catch (e) {
-                                              if (context.mounted) {
-                                                AppPopups.show(
-                                                  context,
-                                                  message:
-                                                      'গুগল অ্যাকাউন্ট লিঙ্ক করা সম্ভব হয়নি: $e',
-                                                  isError: true,
-                                                );
-                                              }
-                                            }
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(
-                                              color: Color(0xFF059669),
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 8,
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'লিঙ্ক করুন',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Anek Bangla',
-                                              color: Color(0xFF059669),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 4. Password Change
+                // 3. Password Change
                 Container(
                   decoration: cardDecoration,
                   margin: const EdgeInsets.only(bottom: 24),

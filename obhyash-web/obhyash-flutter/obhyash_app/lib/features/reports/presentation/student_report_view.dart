@@ -8,6 +8,7 @@ import '../../../core/providers/auth_provider.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 // ─── Models ──────────────────────────────────────────────────────────────────────
 class ReportQuestionData {
@@ -291,10 +292,12 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
               ? const ExamHistorySkeleton()
               : _hasError
               ? _errorState(isDark)
-              : RefreshIndicator(
+              : AppRefreshIndicator(
                   onRefresh: () => _fetchReports(),
                   child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     slivers: [
                       // ── Top 3 Compact Centered Stat Boxes ───────────────────
                       if (_reports.isNotEmpty)

@@ -29,10 +29,12 @@ import {
   Phone,
   X,
   Trash2,
+  Link2,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
+import AccountLinkingPanel from './settings/AccountLinkingPanel';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
@@ -52,6 +54,7 @@ interface SettingsViewProps {
 
 type PanelSection =
   | 'personal'
+  | 'account-linking'
   | 'reports'
   | 'my-subscription'
   | 'notifications'
@@ -97,6 +100,13 @@ const GROUPS: SettingsGroup[] = [
         label: 'ব্যক্তিগত তথ্য',
         description: 'নাম, ছবি, একাডেমিক তথ্য',
         Icon: User,
+      },
+      {
+        type: 'panel',
+        id: 'account-linking',
+        label: 'অ্যাকাউন্ট লিংকিং',
+        description: 'Google ও অন্যান্য অ্যাকাউন্ট সংযুক্ত ও ম্যানেজ করো',
+        Icon: Link2,
       },
       {
         type: 'action',
@@ -413,6 +423,7 @@ export default function SettingsView({
   const renderPanel = (section: PanelSection) => {
     const panelTitles: Record<PanelSection, string> = {
       personal: 'ব্যক্তিগত তথ্য',
+      'account-linking': 'অ্যাকাউন্ট লিংকিং',
       reports: 'আমার রিপোর্ট',
       'my-subscription': 'আমার সাবসক্রিপশন',
       notifications: 'নোটিফিকেশন',
@@ -422,7 +433,8 @@ export default function SettingsView({
       switch (section) {
         case 'personal':
           return <PersonalDetailsPanel user={user} onSave={onSave} />;
-
+        case 'account-linking':
+          return <AccountLinkingPanel user={user} />;
         case 'reports':
           return <ReportsPanel user={user} />;
         case 'my-subscription':

@@ -23,6 +23,7 @@ import '../features/profile/presentation/about_us_view.dart';
 import '../features/profile/presentation/privacy_policy_view.dart';
 import '../features/profile/presentation/terms_conditions_view.dart';
 import '../features/profile/presentation/faq_view.dart';
+import '../features/profile/presentation/account_linking_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
 import '../features/analysis/presentation/analysis_view.dart';
 import '../features/history/presentation/exam_history_view.dart';
@@ -387,6 +388,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'referral',
                     builder: (context, state) => const ReferralView(),
+                  ),
+                  GoRoute(
+                    path: 'account-linking',
+                    builder: (context, state) => const AccountLinkingView(),
                   ),
                 ],
               ),

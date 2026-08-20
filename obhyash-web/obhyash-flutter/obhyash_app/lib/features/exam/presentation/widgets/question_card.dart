@@ -681,21 +681,22 @@ class _ExplanationPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 color: bodyBg,
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(9)),
-                border: Border(
-                  top: BorderSide(
-                    color: dividerColor,
-                    width: 1,
-                  ),
-                ),
               ),
-              child: LatexText(
-                text: question.explanation!,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'HindSiliguri',
-                  height: 1.6,
-                  color: bodyTextColor,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(height: 1, thickness: 1, color: dividerColor),
+                  const SizedBox(height: 8),
+                  LatexText(
+                    text: question.explanation!,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'HindSiliguri',
+                      height: 1.6,
+                      color: bodyTextColor,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

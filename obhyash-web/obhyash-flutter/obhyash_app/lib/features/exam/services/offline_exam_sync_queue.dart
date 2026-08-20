@@ -85,7 +85,7 @@ class OfflineExamSyncQueueService {
           });
 
           // Sync streak
-          await StreakService.checkAndUpdateStreak(uid, forceSync: true);
+          await StreakService.syncStreak(uid);
 
           // Award XP
           final xpEarned = (result.correctCount * 10 - result.wrongCount * 2).clamp(0, 9999);
@@ -113,6 +113,9 @@ class OfflineExamSyncQueueService {
       return 0;
     }
   }
+
+  /// Alias for syncPendingExams
+  static Future<int> syncOfflineExams() => syncPendingExams();
 
   /// Get pending sync count
   static Future<int> getPendingSyncCount() async {

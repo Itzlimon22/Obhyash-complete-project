@@ -119,13 +119,6 @@ class ResultStats extends StatelessWidget {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isDark
-                          ? const Color(0xFF27272A)
-                          : const Color(0xFFE2E8F0),
-                    ),
-                  ),
                 ),
                 child: Row(
                   children: [
@@ -140,6 +133,11 @@ class ResultStats extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
               ),
 
               // Rows Content
@@ -209,6 +207,11 @@ class ResultStats extends StatelessWidget {
                 ),
               ),
 
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              ),
               // Footer
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -218,13 +221,6 @@ class ResultStats extends StatelessWidget {
                       : const Color(0xFFF8FAFC),
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16),
-                  ),
-                  border: Border(
-                    top: BorderSide(
-                      color: isDark
-                          ? const Color(0xFF27272A)
-                          : const Color(0xFFE2E8F0),
-                    ),
                   ),
                 ),
                 child: Row(

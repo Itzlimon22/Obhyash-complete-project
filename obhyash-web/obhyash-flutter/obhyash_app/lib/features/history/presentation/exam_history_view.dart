@@ -16,6 +16,7 @@ import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../exam/services/local_exam_cache_service.dart';
 import '../../dashboard/services/streak_service.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -56,9 +57,22 @@ class _ExamRecord {
     final wrong = toInt(j['wrong_count']);
     final score = total > 0 ? (correct / total * 100) : 0.0;
 
-    final dateStr = j['date']?.toString() ?? j['created_at']?.toString() ?? '';
-    final parsed = DateTime.tryParse(dateStr);
-    final createdAt = parsed != null ? parsed.toLocal() : DateTime.now();
+    final dateStr = j['created_at']?.toString() ?? j['date']?.toString() ?? '';
+    DateTime createdAt;
+    if (dateStr.isNotEmpty) {
+      final parsed = DateTime.tryParse(dateStr);
+      if (parsed != null) {
+        if (parsed.isUtc || dateStr.endsWith('Z') || dateStr.contains('+')) {
+          createdAt = parsed.toLocal();
+        } else {
+          createdAt = parsed;
+        }
+      } else {
+        createdAt = DateTime.now();
+      }
+    } else {
+      createdAt = DateTime.now();
+    }
 
     return _ExamRecord(
       id: j['id']?.toString() ?? '',
@@ -918,7 +932,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
       final uid = ref.read(authProvider)?.id;
       if (uid != null) {
-        StreakService.checkAndUpdateStreak(uid);
+        StreakService.syncStreak(uid);
       }
       ref.invalidate(userProfileProvider);
       ref.invalidate(dashboardSubjectStatsProvider);
@@ -935,7 +949,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       await LocalExamCacheService.deleteExamFromCache(record.id);
       final uid = ref.read(authProvider)?.id;
       if (uid != null) {
-        StreakService.checkAndUpdateStreak(uid);
+        StreakService.syncStreak(uid);
       }
       ref.invalidate(userProfileProvider);
       ref.invalidate(dashboardSubjectStatsProvider);
@@ -1069,7 +1083,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   Widget build(BuildContext context) {
     ref.listen(authProvider, (prev, next) {
       if (next != null && prev == null) {
-        _fetchExams();
+        _fetchExams(refresh: true);
+        _fetchQuestions(refresh: true);
+      }
+    });
+
+    ref.listen<int>(examHistoryRefreshTriggerProvider, (prev, next) {
+      if (prev != null && next > prev) {
+        _fetchExams(refresh: true);
         _fetchQuestions(refresh: true);
       }
     });
@@ -1473,11 +1494,12 @@ class _ExamsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (records.isEmpty) {
-      return RefreshIndicator(
+      return AppRefreshIndicator(
         onRefresh: onRefresh,
-        color: const Color(0xFF10B981),
         child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
           children: [
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.45,
@@ -1504,11 +1526,12 @@ class _ExamsTab extends StatelessWidget {
         ? 0.0
         : records.map((r) => r.score).reduce((a, b) => a + b) / records.length;
 
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: onRefresh,
-      color: const Color(0xFF10B981),
       child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           // ── Compact Center-Aligned 3-Card Stat Row ─────────────────────────────
@@ -2035,11 +2058,12 @@ class _QuestionsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
-      return RefreshIndicator(
+      return AppRefreshIndicator(
         onRefresh: onRefresh,
-        color: const Color(0xFF10B981),
         child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
           children: [
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.45,
@@ -2056,11 +2080,12 @@ class _QuestionsTab extends StatelessWidget {
 
     final itemCount = questions.length + (hasMore ? 1 : 0);
 
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: onRefresh,
-      color: const Color(0xFF10B981),
       child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: itemCount,
         itemBuilder: (context, index) {

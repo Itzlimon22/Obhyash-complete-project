@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../services/streak_service.dart';
+import '../../providers/dashboard_providers.dart';
 
 class DailyStreakCard extends ConsumerStatefulWidget {
   final int userStreak;
@@ -15,111 +17,55 @@ class DailyStreakCard extends ConsumerStatefulWidget {
 class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
   static List<int>? _cachedActivity;
   late List<int> _last30DaysActivity;
+  int _streakCount = 0;
 
   @override
   void initState() {
     super.initState();
     _last30DaysActivity = _cachedActivity ?? List.filled(30, 0);
-    _fetchActivityData();
+    _streakCount = widget.userStreak;
+    _fetchData();
   }
 
   @override
   void didUpdateWidget(covariant DailyStreakCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.userStreak != widget.userStreak) {
-      _fetchActivityData();
+      _fetchData();
     }
   }
 
-  Future<void> _fetchActivityData() async {
+  /// Fetches exam activity using StreakService (single source of truth) for
+  /// the streak count and 30-day heatmap data.
+  Future<void> _fetchData() async {
+    final supabase = Supabase.instance.client;
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return;
+
     try {
-      final supabase = Supabase.instance.client;
-      final userId = supabase.auth.currentUser?.id;
-      if (userId == null) return;
-
-      final today = DateTime.now();
-      final thirtyDaysAgo = today.subtract(const Duration(days: 29));
-      final startDate = DateTime(thirtyDaysAgo.year, thirtyDaysAgo.month, thirtyDaysAgo.day);
-
-      final data = await supabase
-          .from('exam_results')
-          .select('created_at, date')
-          .eq('user_id', userId)
-          .gte('created_at', startDate.toUtc().toIso8601String())
-          .order('created_at', ascending: false);
-
-      final rows = (data as List).toList();
-
-      // Also include live exam attempts
-      try {
-        final liveData = await supabase
-            .from('live_exam_attempts')
-            .select('submit_time')
-            .eq('user_id', userId)
-            .eq('status', 'submitted')
-            .gte('submit_time', startDate.toUtc().toIso8601String());
-
-        for (final row in (liveData as List)) {
-          if (row['submit_time'] != null) {
-            rows.add({'created_at': row['submit_time']});
-          }
-        }
-      } catch (_) {}
-
-      // Compute activity per day (index 0 is oldest, 29 is today)
-      final List<int> activity = List.filled(30, 0);
-
-      for (final row in rows) {
-        final dateStr = (row['created_at'] ?? row['date']) as String?;
-        if (dateStr == null) continue;
-
-        final date = DateTime.tryParse(dateStr)?.toLocal();
-        if (date == null) continue;
-
-        final d = DateTime(date.year, date.month, date.day);
-        final diff = d.difference(startDate).inDays;
-
-        if (diff >= 0 && diff < 30) {
-          activity[diff]++;
-        }
-      }
-
-      // Today active in app
-      if (activity[29] == 0) {
-        activity[29] = 1;
-      }
-
-      // Compute consecutive streak backwards from today (index 29)
-      int consecutive = 0;
-      for (int i = 29; i >= 0; i--) {
-        if (activity[i] > 0) {
-          consecutive++;
-        } else {
-          break;
-        }
-      }
-
-      _cachedActivity = activity;
+      final data = await StreakService.syncStreak(userId);
       if (mounted) {
+        ref.read(userProfileProvider.notifier).updateStreak(data.streakCount);
         setState(() {
-          _last30DaysActivity = activity;
-          if (consecutive > 0) {
-            _streakCount = consecutive;
-          }
+          _streakCount = data.streakCount;
+          _last30DaysActivity = data.last30DaysActivity;
+          _cachedActivity = data.last30DaysActivity;
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[DailyStreakCard] _fetchData error: $e');
+    }
   }
-
-  int _streakCount = 0;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentStreak = _streakCount > 0 ? _streakCount : widget.userStreak;
-    
-    final Color surfaceColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final Color borderColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
+
+    final Color surfaceColor =
+        isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final Color borderColor =
+        isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
     const Color primaryAccent = Color(0xFFEF4444); // Red
 
     return Container(
@@ -158,6 +104,32 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
               ),
+              const Spacer(),
+              // Streak badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🔥', style: TextStyle(fontSize: 13)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$currentStreak দিন',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: 'Anek Bangla',
+                        color: Color(0xFFEF4444),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -175,39 +147,41 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-            // Find ideal box size for 10 columns (3 rows of 10)
-            final totalSpacing = 9 * 6.0; 
-            final boxSize = ((constraints.maxWidth - totalSpacing) / 10).floorToDouble();
-            
-            return Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: List.generate(30, (index) {
-                final activityCount = _last30DaysActivity[index];
-                
-                Color boxColor = emptyBoxColor;
-                if (activityCount > 0) {
-                  double opacity = 0.3;
-                  if (activityCount == 2) opacity = 0.6;
-                  if (activityCount >= 3) opacity = 1.0;
-                  boxColor = primaryAccent.withValues(alpha: opacity);
-                }
-                
-                return ObhyashTooltip(
-                  message: activityCount > 0 ? '$activityCountটি পরীক্ষা দেওয়া হয়েছে' : 'কোনো পরীক্ষা দেওয়া হয়নি',
-                  preferredPosition: TooltipPosition.top,
-                  child: Container(
-                    width: boxSize,
-                    height: boxSize,
-                    decoration: BoxDecoration(
-                      color: boxColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                );
-              }),
+        final totalSpacing = 9 * 6.0;
+        final boxSize =
+            ((constraints.maxWidth - totalSpacing) / 10).floorToDouble();
+
+        return Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: List.generate(30, (index) {
+            final activityCount = _last30DaysActivity[index];
+
+            Color boxColor = emptyBoxColor;
+            if (activityCount > 0) {
+              double opacity = 0.3;
+              if (activityCount == 2) opacity = 0.6;
+              if (activityCount >= 3) opacity = 1.0;
+              boxColor = primaryAccent.withValues(alpha: opacity);
+            }
+
+            return ObhyashTooltip(
+              message: activityCount > 0
+                  ? '$activityCountটি পরীক্ষা দেওয়া হয়েছে'
+                  : 'কোনো পরীক্ষা দেওয়া হয়নি',
+              preferredPosition: TooltipPosition.top,
+              child: Container(
+                width: boxSize,
+                height: boxSize,
+                decoration: BoxDecoration(
+                  color: boxColor,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
             );
-          },
+          }),
+        );
+      },
     );
   }
 }

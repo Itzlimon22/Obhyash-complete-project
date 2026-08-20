@@ -237,7 +237,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'start_time': _sessionStartTime.toIso8601String(),
               'submit_time': submitTime.toIso8601String(),
             });
-            await StreakService.checkAndUpdateStreak(user.id);
+            await StreakService.syncStreak(user.id);
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
             isPracticeMode = true;
@@ -253,7 +253,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                 'time_taken_seconds': timeTakenSeconds,
                 'submit_time': submitTime.toIso8601String(),
               });
-              await StreakService.checkAndUpdateStreak(user.id);
+              await StreakService.syncStreak(user.id);
             } catch (_) {}
           }
         }

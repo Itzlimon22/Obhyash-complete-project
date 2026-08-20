@@ -9,9 +9,29 @@ import '../notifications_view.dart';
 class InAppNotificationBanner {
   static OverlayEntry? _currentEntry;
   static Timer? _dismissTimer;
+  static final Map<String, int> _recentlyShownTimestamps = {};
 
-  /// Display a luxury top-sliding in-app floating banner
+  /// Display a luxury top-sliding in-app floating banner with deduplication protection
   static void show(BuildContext context, AppNotification notif) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // Clean up cache older than 15 seconds
+    _recentlyShownTimestamps.removeWhere((_, time) => (now - time) > 15000);
+
+    // Generate unique fingerprint (ID or Title+Message)
+    final dedupeKey = notif.id.isNotEmpty ? notif.id : '${notif.title}_${notif.message}';
+
+    // If identical notification was shown within the last 10 seconds, ignore duplicate!
+    if (_recentlyShownTimestamps.containsKey(dedupeKey)) {
+      final lastShown = _recentlyShownTimestamps[dedupeKey]!;
+      if ((now - lastShown) < 10000) {
+        debugPrint('[InAppNotificationBanner] Ignored duplicate banner for: $dedupeKey');
+        return;
+      }
+    }
+
+    _recentlyShownTimestamps[dedupeKey] = now;
+
     // If a banner is already active, remove it cleanly
     dismiss();
 

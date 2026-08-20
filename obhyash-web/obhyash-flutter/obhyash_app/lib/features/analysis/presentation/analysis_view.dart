@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 // ─── Domain Models ──────────────────────────────────────────────────────────────
 
@@ -534,7 +535,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.darkBg : AppColors.slateLight;
 
-    if (_isLoading) {
+    if (_isLoading && _analytics == null) {
       return Scaffold(
         backgroundColor: bgColor,
         body: const ExamHistorySkeleton(),
@@ -544,7 +545,18 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     if (_analytics == null || _analytics!.totalExams == 0) {
       return Scaffold(
         backgroundColor: bgColor,
-        body: _buildEmptyState(isDark),
+        body: AppRefreshIndicator(
+          onRefresh: _fetchAnalytics,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: _buildEmptyState(isDark),
+            ),
+          ),
+        ),
       );
     }
 
@@ -553,9 +565,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
-        child: RefreshIndicator(
+        child: AppRefreshIndicator(
           onRefresh: _fetchAnalytics,
-          color: AppColors.deepGreen,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../dashboard/providers/dashboard_providers.dart';
 import '../../models/formula_models.dart';
+import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 
 class FormulaSubjectsView extends ConsumerWidget {
   const FormulaSubjectsView({super.key});
@@ -37,8 +38,7 @@ class FormulaSubjectsView extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: RefreshIndicator(
-                color: const Color(0xFF004633),
+              child: AppRefreshIndicator(
                 onRefresh: () async {
                   ref.invalidate(userProfileProvider);
                   try {

@@ -44,9 +44,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(authProvider);
       if (user != null) {
-        StreakService.checkAndUpdateStreak(user.id, forceSync: true).then((freshStreak) {
+        StreakService.syncStreak(user.id).then((data) {
           if (mounted) {
-            ref.read(userProfileProvider.notifier).updateStreak(freshStreak);
+            ref.read(userProfileProvider.notifier).updateStreak(data.streakCount);
           }
         });
       }
@@ -89,6 +89,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/profile/stats')) return 'stats';
     if (location.startsWith('/profile/bookmarks') || location.startsWith('/bookmarks')) return 'bookmarks';
     if (location.startsWith('/profile/feature-requests')) return 'feature-requests';
+    if (location.startsWith('/profile/account-linking')) return 'account-linking';
     if (location.startsWith('/profile')) return 'settings';
     if (location.startsWith('/subject') || location.contains('/subject')) {
       try {
@@ -99,7 +100,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         }
         final user = ref.read(authProvider);
         if (user != null && mounted) {
-          StreakService.checkAndUpdateStreak(user.id);
+          StreakService.syncStreak(user.id);
           ref.invalidate(userProfileProvider);
         }
       } catch (e) {}
@@ -256,6 +257,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'শর্তাবলী';
       case 'faq':
         return 'সাহায্য';
+      case 'account-linking':
+        return 'অ্যাকাউন্ট লিংকিং';
       case 'user_profile':
         return 'প্রোফাইল';
       case 'subject_report':
@@ -442,6 +445,17 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     });
 
+    // Schedule local witty daily streak saver reminder (Chorcha style)
+    ref.listen(userProfileProvider, (prev, next) {
+      final u = next.value;
+      if (u != null) {
+        NotificationService().scheduleDailyStreakReminders(
+          userName: u.name,
+          currentStreak: u.streakCount,
+        );
+      }
+    });
+
     // Realtime in-app notification luxury top-sliding floating banner listener
     ref.listen<AppNotification?>(latestNotificationEventProvider, (prev, next) {
       if (next != null && mounted) {
@@ -525,6 +539,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 'privacy',
                                 'terms',
                                 'faq',
+                                'account-linking',
                                 'referral',
                                 'blog',
                                 'bookmarks',

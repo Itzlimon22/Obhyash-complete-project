@@ -356,50 +356,24 @@ export default function StudentRoot({
     }
   }, [authLoading, currentUser?.id]);
 
-  // Streak System Check - Uses localStorage guard to run ONCE per calendar day
+  // Streak System Check - Loads unified production streak info from DB
   useEffect(() => {
     let isMounted = true;
 
-    // Do not initiate DB calls until auth initialization completes to avoid Supabase JS deadlock
     if (authLoading || !currentUser?.id) return;
 
     const handleStreakAndHistory = async () => {
       try {
-        // ✅ Immediately compute the display streak from existing data
-        // This prevents stale streak showing in header before async check runs
-        const { getDisplayStreak } = await import("@/services/streak-service");
-        const displayStreak = getDisplayStreak(currentUser);
-        if (isMounted && displayStreak !== (currentUser.streakCount || 0)) {
+        const { fetchUserStreakInfo } = await import("@/services/streak-service");
+        const streakInfo = await fetchUserStreakInfo(currentUser.id);
+        
+        if (isMounted && streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
           setCurrentUser((prev) =>
-            prev ? { ...prev, streakCount: displayStreak } : prev,
+            prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev,
           );
         }
 
-        // ✅ localStorage guard: use LOCAL date (matching streak-service logic)
-        const now = new Date();
-        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-        const streakKey = `streak_checked_${currentUser.id}`;
-        const lastCheckedDate = localStorage.getItem(streakKey);
-
-        if (lastCheckedDate !== today) {
-          // ✅ Set guard IMMEDIATELY (optimistic lock) — prevents race on fast refreshes
-          localStorage.setItem(streakKey, today);
-
-          const { checkAndUpdateStreak } =
-            await import("@/services/streak-service");
-          const updatedUser = await checkAndUpdateStreak(currentUser);
-
-          if (updatedUser && isMounted) {
-            setNewStreakCount(updatedUser.streakCount || 0);
-            setShowStreakCelebration(true);
-            setCurrentUser(updatedUser);
-          }
-        }
-
-        // 2. Fetch History (always, regardless of streak)
-        // Pass the userId directly to avoid an extra auth.getUser() round-trip
-        // inside getExamHistory, which acquires the JS auth lock and blocks all
-        // concurrent DB queries — causing the "keeps loading" state on the dashboard.
+        // Fetch History
         const { getExamHistory } = await import("@/services/database");
         const dbHistory = await getExamHistory(currentUser.id);
         if (dbHistory && isMounted) {
@@ -529,6 +503,24 @@ export default function StudentRoot({
     // Update daily completions
     incrementDailyCompletions(currentUser.id);
     addDailyMCQs(currentUser.id, result.totalQuestions);
+
+    // Sync Streak from database
+    try {
+      const { fetchUserStreakInfo } = await import("@/services/streak-service");
+      const streakInfo = await fetchUserStreakInfo(currentUser.id);
+      if (streakInfo.currentStreak > 0) {
+        const prevStreak = currentUser.streakCount || 0;
+        setCurrentUser((prev) =>
+          prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev,
+        );
+        if (streakInfo.currentStreak > prevStreak || (prevStreak === 0 && streakInfo.currentStreak === 1)) {
+          setNewStreakCount(streakInfo.currentStreak);
+          setShowStreakCelebration(true);
+        }
+      }
+    } catch (e) {
+      console.warn("Streak sync after exam completion failed:", e);
+    }
 
     // Provide feedback & Celebrations
     if (newLevel !== oldLevel) {

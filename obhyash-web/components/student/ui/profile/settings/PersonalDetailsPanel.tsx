@@ -82,27 +82,7 @@ export default function PersonalDetailsPanel({
   const [showPassword, setShowPassword] = useState(false);
   const [showCollegeSuggestions, setShowCollegeSuggestions] = useState(false);
 
-  const { user: currentUser } = useAuth();
-  const [isLinking, setIsLinking] = useState(false);
-  const isGoogleLinked = currentUser?.identities?.some(
-    (identity) => identity.provider === 'google',
-  );
 
-  const handleLinkGoogle = async () => {
-    setIsLinking(true);
-    const supabase = createClient();
-    try {
-      const { error } = await supabase.auth.linkIdentity({
-        provider: 'google',
-        options: { redirectTo: `${window.location.origin}/dashboard` },
-      });
-      if (error) throw error;
-    } catch (error: unknown) {
-      console.error('Linking error:', error);
-      toast.error(getErrorMessage(error));
-      setIsLinking(false);
-    }
-  };
 
   const [formData, setFormData] = useState({
     name: user.name || '',
@@ -699,80 +679,6 @@ export default function PersonalDetailsPanel({
                 <ChevronDownIcon />
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Account Linking */}
-      <div className={cardClass}>
-        <div className={headerClass}>
-          <h3 className={headerTitleClass}>অ্যাকাউন্ট লিংকিং</h3>
-        </div>
-        <div className={bodyClass}>
-          <div className={inputGroupClass}>
-            <label className={labelClass}>Email</label>
-            <div className="relative">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                readOnly
-                className={`${inputClass} bg-neutral-100 dark:bg-neutral-800 text-neutral-500 cursor-default pr-10`}
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-green-700">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl border-dashed">
-            <span className="font-bold text-neutral-700 dark:text-neutral-300 text-sm">
-              লিংক অ্যাকাউন্ট
-            </span>
-            <button
-              onClick={handleLinkGoogle}
-              disabled={isGoogleLinked || isLinking}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isGoogleLinked ? 'bg-green-50 dark:bg-green-900/20 border-green-700 dark:border-green-800 text-green-700 dark:text-green-400 cursor-default' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700'}`}
-            >
-              {isLinking ? (
-                <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
-              ) : (
-                <Image
-                  src="https://www.google.com/favicon.ico"
-                  alt="Google"
-                  width={16}
-                  height={16}
-                  className="w-4 h-4"
-                />
-              )}
-              <span className="text-sm font-medium">
-                {isGoogleLinked ? 'Connected' : 'Connect Google'}
-              </span>
-              {isGoogleLinked && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4 h-4 text-green-700"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </button>
           </div>
         </div>
       </div>

@@ -546,12 +546,12 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
     final finalScore = (rawScore - negativeMarks).clamp(0, double.infinity);
 
-    final result = ExamResult(
+    var result = ExamResult(
       id: state.dbSessionId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       subject: state.examDetails?.subject ?? 'Unknown',
       subjectLabel: state.examDetails?.subjectLabel,
       examType: state.examDetails?.examType,
-      date: DateTime.now().toIso8601String(),
+      date: DateTime.now().toUtc().toIso8601String(),
       score: finalScore,
       totalMarks: state.examDetails?.totalMarks ?? 0,
       totalQuestions: state.questions.length,
@@ -598,7 +598,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           state.userAnswers.entries.map((e) => MapEntry(e.key, e.value)),
         );
 
-        await supabase.from('exam_results').insert({
+        final insertRes = await supabase.from('exam_results').insert({
           'user_id': authId,
           'subject': result.subject,
           'subject_label': result.subjectLabel,
@@ -614,10 +614,16 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'user_answers': userAnswersJson,
           'negative_marking': result.negativeMarking,
           'status': 'evaluated',
-        });
+        }).select('id').maybeSingle();
 
-        // Instantly force-sync streak so the UI is immediately correct
-        await StreakService.checkAndUpdateStreak(authId, forceSync: true);
+        if (insertRes != null && insertRes['id'] != null) {
+          final serverId = insertRes['id'].toString();
+          result = result.copyWith(id: serverId);
+          await LocalExamCacheService.saveExamResult(result);
+        }
+
+        // Instantly sync streak so the UI is immediately correct
+        await StreakService.syncStreak(authId);
 
         // Award XP: 10 per correct, -2 per wrong (min 0)
         final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
@@ -657,14 +663,19 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         );
       }
 
-      // Invalidate dashboard cache so updated stats show immediately
+      // Sync any queued offline exams in background
+      unawaited(OfflineExamSyncQueueService.syncPendingExams());
+
+      // Invalidate dashboard and profile providers so updated stats show immediately
       ref.invalidate(dashboardSubjectStatsProvider);
       ref.invalidate(userProfileProvider);
+      ref.read(examHistoryRefreshTriggerProvider.notifier).trigger();
       // Clear SharedPreferences stats cache so next build() re-fetches from DB
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('subject_stats_$authId');
         await prefs.remove('profile_$authId');
+        await prefs.remove('cached_history_list');
       } catch (_) {}
     }
 

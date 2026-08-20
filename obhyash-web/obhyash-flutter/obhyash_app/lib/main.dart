@@ -13,6 +13,7 @@ import 'core/providers/app_config_provider.dart';
 import 'core/presentation/screens/force_update_screen.dart';
 import 'core/presentation/screens/maintenance_screen.dart';
 import 'core/presentation/widgets/offline_banner_wrapper.dart';
+import 'features/notifications/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,11 @@ void main() async {
 
   // Initialize Download Notifications
   await DownloadNotificationService().init();
+
+  // Initialize Notification Service
+  final notifService = NotificationService();
+  await notifService.initialize();
+  await notifService.requestPermission();
 
   // Initialize Supabase with real keys
   await Supabase.initialize(
@@ -47,6 +53,9 @@ class ObhyashApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    NotificationService.onNotificationTapped = (route) {
+      router.push(route);
+    };
     final themeMode = ref.watch(themeModeProvider);
     final configAsync = ref.watch(appConfigStreamProvider);
     final isForceUpdate = ref.watch(isForceUpdateRequiredProvider);
