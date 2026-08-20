@@ -598,12 +598,14 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           state.userAnswers.entries.map((e) => MapEntry(e.key, e.value)),
         );
 
+        final nowIso = DateTime.now().toUtc().toIso8601String();
         final insertRes = await supabase.from('exam_results').insert({
           'user_id': authId,
           'subject': result.subject,
           'subject_label': result.subjectLabel,
           'exam_type': result.examType,
-          'date': DateTime.now().toUtc().toIso8601String(),
+          'date': nowIso,
+          'created_at': nowIso,
           'score': result.score,
           'total_marks': result.totalMarks,
           'correct_count': result.correctCount,

@@ -1089,7 +1089,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     });
 
     ref.listen<int>(examHistoryRefreshTriggerProvider, (prev, next) {
-      if (prev != null && next > prev) {
+      if (next > (prev ?? 0)) {
         _fetchExams(refresh: true);
         _fetchQuestions(refresh: true);
       }
