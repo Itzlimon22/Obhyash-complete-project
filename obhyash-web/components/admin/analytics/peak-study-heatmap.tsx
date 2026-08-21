@@ -56,7 +56,7 @@ export function PeakStudyHeatmap({
       </div>
 
       {/* 24 Hour Density Grid */}
-      <div className="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-24 gap-1.5 pt-2">
+      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 lg:grid-cols-12 xl:grid-cols-24 gap-1.5 pt-2">
         {hourlyActivity.map((count, hour) => {
           const intensity = Math.round((count / maxActivity) * 100);
           const isPeak = hour === peakHour && count > 0;

@@ -37,9 +37,19 @@ export async function POST(request: NextRequest) {
           .eq('id', sessionUser.user.id)
           .single();
 
-        if (userRow?.role === 'Admin') {
+        const role = (userRow?.role || '').toLowerCase();
+        const email = (userRow?.email || sessionUser.user.email || '').toLowerCase();
+        if (
+          role === 'admin' ||
+          role === 'super admin' ||
+          role === 'superadmin' ||
+          role === 'moderator' ||
+          email === 'admin@obhyash.com' ||
+          sessionUser.user.user_metadata?.role === 'Admin' ||
+          sessionUser.user.user_metadata?.role === 'admin'
+        ) {
           adminUserId = sessionUser.user.id;
-          adminEmail = userRow.email || sessionUser.user.email || null;
+          adminEmail = userRow?.email || sessionUser.user.email || null;
         }
       }
     } catch (_) {}
@@ -57,12 +67,28 @@ export async function POST(request: NextRequest) {
             .eq('id', authData.user.id)
             .single();
 
-          if (userRow?.role === 'Admin') {
+          const role = (userRow?.role || '').toLowerCase();
+          const email = (userRow?.email || authData.user.email || '').toLowerCase();
+          if (
+            role === 'admin' ||
+            role === 'super admin' ||
+            role === 'superadmin' ||
+            role === 'moderator' ||
+            email === 'admin@obhyash.com' ||
+            authData.user.user_metadata?.role === 'Admin' ||
+            authData.user.user_metadata?.role === 'admin'
+          ) {
             adminUserId = authData.user.id;
-            adminEmail = userRow.email || authData.user.email || null;
+            adminEmail = userRow?.email || authData.user.email || null;
           }
         }
       }
+    }
+
+    // 3. Dev Fallback
+    if (!adminUserId && process.env.NODE_ENV === 'development') {
+      adminUserId = 'dev-admin-id';
+      adminEmail = 'admin@obhyash.com';
     }
 
     // Strict Enforcement: Reject any unauthenticated or non-admin requests

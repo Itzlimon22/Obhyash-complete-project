@@ -32,10 +32,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         tag: 'ইঞ্জিনিয়ারিং',
         title: 'ইঞ্জিনিয়ারিং',
         subtitle: 'উইকলি মডেল টেস্ট',
-        description: 'বুয়েট • কুয়েট • রুয়েট • চুয়েট',
+        description: 'বুয়েট • কুয়েট • রুয়েট • চুয়েট • আইইউটি',
+        icon: Icons.architecture_rounded,
         gradientColors: isDark
-            ? [const Color(0xFF1E3A8A), const Color(0xFF172554)]
-            : [const Color(0xFF2563EB), const Color(0xFF1D4ED8)],
+            ? [const Color(0xFF1E3A8A), const Color(0xFF172554), const Color(0xFF0F172A)]
+            : [const Color(0xFF2563EB), const Color(0xFF1D4ED8), const Color(0xFF1E40AF)],
+        accentColor: const Color(0xFF60A5FA),
         shadowColor: const Color(0xFF2563EB),
         hasLive: _hasLive(exams, 'engineering'),
       ),
@@ -44,10 +46,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         tag: 'মেডিকেল',
         title: 'মেডিকেল',
         subtitle: 'উইকলি মডেল টেস্ট',
-        description: 'মেডিকেল ও ডেন্টাল ভর্তি পরীক্ষা',
+        description: 'মেডিকেল ও ডেন্টাল সরকারি ভর্তি পরীক্ষা',
+        icon: Icons.medical_services_rounded,
         gradientColors: isDark
-            ? [const Color(0xFF881337), const Color(0xFF4C0519)]
-            : [const Color(0xFFE11D48), const Color(0xFFBE123C)],
+            ? [const Color(0xFF881337), const Color(0xFF4C0519), const Color(0xFF2E020D)]
+            : [const Color(0xFFE11D48), const Color(0xFFBE123C), const Color(0xFF9F1239)],
+        accentColor: const Color(0xFFFB7185),
         shadowColor: const Color(0xFFE11D48),
         hasLive: _hasLive(exams, 'medical'),
       ),
@@ -56,10 +60,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         tag: 'ভার্সিটি',
         title: 'ভার্সিটি ক-ইউনিট',
         subtitle: 'উইকলি মডেল টেস্ট',
-        description: 'ঢাকা বিশ্ববিদ্যালয় • সমন্বিত গুচ্ছ',
+        description: 'ঢাকা বিশ্ববিদ্যালয় • সমন্বিত গুচ্ছ • জাহাঙ্গীরনগর',
+        icon: Icons.school_rounded,
         gradientColors: isDark
-            ? [const Color(0xFF581C87), const Color(0xFF3B0764)]
-            : [const Color(0xFF7C3AED), const Color(0xFF6D28D9)],
+            ? [const Color(0xFF581C87), const Color(0xFF3B0764), const Color(0xFF240342)]
+            : [const Color(0xFF7C3AED), const Color(0xFF6D28D9), const Color(0xFF5B21B6)],
+        accentColor: const Color(0xFFA78BFA),
         shadowColor: const Color(0xFF7C3AED),
         hasLive: _hasLive(exams, 'varsity'),
       ),
@@ -68,17 +74,19 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         tag: 'এইচএসসি',
         title: 'এইচএসসি স্পেশাল',
         subtitle: 'অধ্যায়ভিত্তিক পরীক্ষা',
-        description: 'বিজ্ঞান বিভাগ বোর্ড টেস্ট',
+        description: 'বিজ্ঞান বিভাগ বোর্ড প্রশ্ন ও পূর্ণাঙ্গ প্রস্তুতি',
+        icon: Icons.menu_book_rounded,
         gradientColors: isDark
-            ? [const Color(0xFF064E3B), const Color(0xFF022C22)]
-            : [const Color(0xFF059669), const Color(0xFF047857)],
+            ? [const Color(0xFF064E3B), const Color(0xFF022C22), const Color(0xFF011812)]
+            : [const Color(0xFF059669), const Color(0xFF047857), const Color(0xFF065F46)],
+        accentColor: const Color(0xFF34D399),
         shadowColor: const Color(0xFF059669),
         hasLive: _hasLive(exams, 'hsc'),
       ),
     ];
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFF8FAFC),
       body: AppRefreshIndicator(
         onRefresh: () async {
           ref.invalidate(liveExamsProvider);
@@ -86,36 +94,16 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             await ref.read(liveExamsProvider.future);
           } catch (_) {}
         },
-        child: SingleChildScrollView(
+        child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 2x2 Grid of Vibrant Colored Cards (No Icons)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isTablet = constraints.maxWidth >= 650;
-                  final crossAxisCount = isTablet ? 4 : 2;
-                  const spacing = 12.0;
-                  final itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
-
-                  return Wrap(
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    children: categories.map((cat) {
-                      return SizedBox(
-                        width: itemWidth,
-                        child: _buildVibrantCard(context, isDark, cat),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ],
-          ),
+          itemCount: categories.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 14),
+          itemBuilder: (context, index) {
+            return _buildPremiumSingleCard(context, isDark, categories[index]);
+          },
         ),
       ),
     );
@@ -130,172 +118,257 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
     });
   }
 
-  Widget _buildVibrantCard(BuildContext context, bool isDark, _ObhyashCategoryData cat) {
-    final String key = cat.key;
-    final String tag = cat.tag;
-    final String title = cat.title;
-    final String subtitle = cat.subtitle;
-    final String description = cat.description;
-    final List<Color> gradientColors = cat.gradientColors;
-    final Color shadowColor = cat.shadowColor;
-    final bool hasLive = cat.hasLive;
-
-    return GestureDetector(
-      onTap: () {
-        context.push('/live_exam/$key');
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradientColors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.25),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor.withValues(alpha: isDark ? 0.35 : 0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
+  Widget _buildPremiumSingleCard(
+    BuildContext context,
+    bool isDark,
+    _ObhyashCategoryData cat,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          context.push('/live_exam/${cat.key}');
+        },
+        borderRadius: BorderRadius.circular(24),
+        splashColor: Colors.white.withValues(alpha: 0.15),
+        highlightColor: Colors.white.withValues(alpha: 0.08),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: cat.gradientColors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Top Row: Category Tag Pill + Live Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: isDark ? 0.14 : 0.28),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: cat.shadowColor.withValues(alpha: isDark ? 0.35 : 0.22),
+                blurRadius: 18,
+                spreadRadius: -2,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              // Ambient Decorative Light Sphere (Top-Right)
+              Positioned(
+                right: -25,
+                top: -25,
+                child: Container(
+                  width: 130,
+                  height: 130,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    tag,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: "HindSiliguri",
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withValues(alpha: isDark ? 0.15 : 0.22),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
                     ),
                   ),
                 ),
-                if (hasLive)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+              ),
+
+              // Main Card Content
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Header Row: Icon Emblem + Tag + Live Badge
+                    Row(
                       children: [
+                        // Glass Icon Emblem
                         Container(
-                          width: 6,
-                          height: 6,
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
-                            color: gradientColors.first,
-                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.25),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            cat.icon,
+                            color: Colors.white,
+                            size: 24,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "LIVE",
-                          style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w900,
-                            color: gradientColors.first,
-                            letterSpacing: 0.5,
+                        const SizedBox(width: 12),
+
+                        // Tag Pill
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Text(
+                            cat.tag,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              fontFamily: "HindSiliguri",
+                            ),
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Live Status Badge
+                        if (cat.hasLive)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.25),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    color: cat.gradientColors.first,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "LIVE NOW",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: cat.gradientColors.first,
+                                    letterSpacing: 0.6,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.bolt_rounded,
+                                  size: 13,
+                                  color: cat.accentColor,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  "সাপ্তাহিক",
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: cat.accentColor,
+                                    fontFamily: "HindSiliguri",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        const SizedBox(width: 8),
+
+                        // Sleek Chevron Arrow Indicator
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.14),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              width: 0.8,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.white,
+                            size: 12,
                           ),
                         ),
                       ],
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 18),
 
-            // Middle: Title, Subtitle, Description
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    fontFamily: "HindSiliguri",
-                    letterSpacing: -0.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontFamily: "HindSiliguri",
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 11,
-                    height: 1.3,
-                    color: Colors.white.withValues(alpha: 0.75),
-                    fontFamily: "HindSiliguri",
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
+                    const SizedBox(height: 14),
 
-            // Bottom: Clean action strip
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 7),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
+                    // Title and Subtitle Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          cat.title,
+                          style: const TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            fontFamily: "HindSiliguri",
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "• ${cat.subtitle}",
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontFamily: "HindSiliguri",
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // Target Institutions / Details
+                    Text(
+                      cat.description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.35,
+                        color: Colors.white.withValues(alpha: 0.78),
+                        fontFamily: "HindSiliguri",
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-              alignment: Alignment.center,
-              child: const Text(
-                "পরীক্ষা দেখুন",
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  fontFamily: "HindSiliguri",
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -308,7 +381,9 @@ class _ObhyashCategoryData {
   final String title;
   final String subtitle;
   final String description;
+  final IconData icon;
   final List<Color> gradientColors;
+  final Color accentColor;
   final Color shadowColor;
   final bool hasLive;
 
@@ -318,7 +393,9 @@ class _ObhyashCategoryData {
     required this.title,
     required this.subtitle,
     required this.description,
+    required this.icon,
     required this.gradientColors,
+    required this.accentColor,
     required this.shadowColor,
     required this.hasLive,
   });

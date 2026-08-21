@@ -32,6 +32,11 @@ import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
 
 const AUTH_TIMEOUT_MS = 30000;
 
+// Feature Toggle for SMS OTP Verification
+// - Set to false when Bulk SMS is not active (bypasses OTP verification)
+// - Set to true when Bulk SMS is purchased to instantly re-enable SMS OTP
+const ENABLE_PHONE_OTP_VERIFICATION = false;
+
 async function withTimeout<T>(
   promise: PromiseLike<T>,
   timeoutMessage: string,
@@ -240,9 +245,17 @@ function SignupForm() {
       return;
     }
 
-    // Step 1: Enforce OTP Verification
+    // Step 1: Enforce OTP Verification (if enabled)
     if (step === 1) {
       const cleanPhone = formData.phone.trim();
+
+      if (!ENABLE_PHONE_OTP_VERIFICATION) {
+        setIsPhoneVerified(true);
+        setVerifiedPhone(cleanPhone);
+        setStep(step + 1);
+        return;
+      }
+
       const isAlreadyVerified = isPhoneVerified && verifiedPhone === cleanPhone;
 
       if (!isAlreadyVerified) {

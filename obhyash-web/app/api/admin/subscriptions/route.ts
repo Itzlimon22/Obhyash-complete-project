@@ -174,6 +174,33 @@ export async function GET(request: NextRequest) {
       const uPlan = u.plan;
       const uLevel = u.level;
 
+      const rawPlan =
+        sub.plan ||
+        sub.plan_name ||
+        subTier ||
+        uPlan ||
+        (uLevel && String(uLevel).toLowerCase() === 'pro' ? 'Pro' : '');
+
+      const isExplicitlyFree =
+        !rawPlan ||
+        String(rawPlan).toLowerCase() === 'free' ||
+        String(rawPlan).toLowerCase() === 'rookie' ||
+        String(rawPlan).toLowerCase() === 'basic' ||
+        String(rawPlan).toLowerCase() === 'explorer';
+
+      const hasProFlag =
+        u.is_subscribed === true ||
+        u.is_pro === true ||
+        (uLevel && String(uLevel).toLowerCase() === 'pro') ||
+        (uPlan && String(uPlan).toLowerCase() === 'pro') ||
+        (subTier && String(subTier).toLowerCase().includes('pro')) ||
+        (rawPlan && !isExplicitlyFree);
+
+      // If user is clearly on Free plan or has no Pro flag, skip immediately!
+      if (!hasProFlag || isExplicitlyFree) {
+        return;
+      }
+
       const expiry =
         sub.expiry ||
         sub.expires_at ||
@@ -182,34 +209,15 @@ export async function GET(request: NextRequest) {
         '';
 
       const isExpired = expiry ? new Date(expiry).getTime() < Date.now() : false;
-
-      // Strict check: only genuine Pro/Subscribed users
-      const hasProFlag =
-        u.is_subscribed === true ||
-        u.is_pro === true ||
-        (uLevel && String(uLevel).toLowerCase() === 'pro') ||
-        (uPlan && String(uPlan).toLowerCase() === 'pro') ||
-        (subTier && String(subTier).toLowerCase().includes('pro')) ||
-        (sub.status && String(sub.status).toLowerCase() === 'active') ||
-        u.subscription_status === 'Active' ||
-        u.subscription_status === 'Expired';
-
-      // Check if user has an expiry date recorded
-      const hasExpiryRecord = Boolean(expiry);
-
-      if (!hasProFlag && !hasExpiryRecord) {
-        return; // skip standard Free/Rookie users completely!
-      }
+      const isExplicitlyExpired = u.subscription_status === 'Expired' || sub.status === 'Expired';
 
       seenUserSubIds.add(u.id);
-      const isActive = hasProFlag && !isExpired && u.subscription_status !== 'Expired';
+      const isActive = !isExpired && !isExplicitlyExpired;
 
       const planName =
-        sub.plan ||
-        sub.plan_name ||
-        u.subscription_tier ||
-        u.plan ||
-        (hasProFlag ? 'Pro Premium' : 'Free');
+        rawPlan && !isExplicitlyFree
+          ? String(rawPlan)
+          : 'Pro Premium';
 
       mappedSubscriptions.push({
         id: u.id,
@@ -227,7 +235,7 @@ export async function GET(request: NextRequest) {
         started_at: u.updated_at || u.created_at || new Date().toISOString(),
         expires_at: expiry || (isActive ? new Date(Date.now() + 30 * 86400000).toISOString() : ''),
         is_active: isActive,
-        status: isExpired ? 'Expired' : (isActive ? 'Active' : (u.subscription_status || 'Expired')),
+        status: isActive ? 'Active' : 'Expired',
       });
     });
 
@@ -499,11 +507,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    // ── Action: Extend Subscription ──
+    // ── Action: Extend / Reactivate Subscription ──
     if (action === 'extend_subscription') {
-      const { userId, extensionDays = 30 } = body;
+      const { userId, subscriptionId, days, extensionDays = 30, planName } = body;
+      const targetUserId = userId || subscriptionId;
+      const numDays = Number(days || extensionDays) || 30;
 
-      if (!userId) {
+      if (!targetUserId) {
         return NextResponse.json(
           { success: false, error: 'userId is required' },
           { status: 400 },
@@ -513,7 +523,7 @@ export async function POST(request: NextRequest) {
       const { data: userData, error: uErr } = await supabaseAdmin
         .from('users')
         .select('subscription, subscription_expires_at')
-        .eq('id', userId)
+        .eq('id', targetUserId)
         .single();
 
       if (uErr || !userData) {
@@ -527,13 +537,12 @@ export async function POST(request: NextRequest) {
       const currentExpiry =
         currentSub.expiry || currentSub.expires_at || userData.subscription_expires_at;
       const baseDate =
-        currentExpiry && new Date(currentExpiry) > new Date()
+        currentExpiry && new Date(currentExpiry).getTime() > Date.now()
           ? new Date(currentExpiry)
           : new Date();
 
-      const newExpiry = new Date(baseDate);
-      newExpiry.setDate(newExpiry.getDate() + Number(extensionDays));
-      const planTitle = currentSub.plan && currentSub.plan !== 'Free' ? currentSub.plan : 'Premium';
+      const newExpiry = new Date(baseDate.getTime() + numDays * 86400000);
+      const planTitle = planName || (currentSub.plan && currentSub.plan !== 'Free' ? currentSub.plan : 'Pro Premium');
 
       const { error: updateErr } = await supabaseAdmin
         .from('users')
@@ -552,7 +561,7 @@ export async function POST(request: NextRequest) {
           status: 'Active',
           updated_at: new Date().toISOString(),
         })
-        .eq('id', userId);
+        .eq('id', targetUserId);
 
       if (updateErr) throw updateErr;
 
@@ -561,13 +570,101 @@ export async function POST(request: NextRequest) {
         await supabaseAdmin
           .from('subscription_history')
           .update({ expires_at: newExpiry.toISOString(), is_active: true })
-          .eq('user_id', userId)
-          .eq('is_active', true);
+          .eq('user_id', targetUserId);
       } catch (histErr) {
         console.error('Error updating subscription_history on extend:', histErr);
       }
 
+      // Notify User
+      try {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: targetUserId,
+          title: 'প্রিমিয়াম সাবস্ক্রিপশন আপডেট 🎉',
+          message: `আপনার ${planTitle} সাবস্ক্রিপশন সফলভাবে ${numDays} দিনের জন্য বাড়ানো হয়েছে। নতুন মেয়াদ: ${newExpiry.toLocaleDateString('bn-BD')}।`,
+          type: 'success',
+          read: false,
+          created_at: new Date().toISOString(),
+        });
+      } catch (_) {}
+
       return NextResponse.json({ success: true, newExpiry: newExpiry.toISOString() });
+    }
+
+    // ── Action: Cancel / Revoke Subscription ──
+    if (action === 'cancel_subscription') {
+      const { userId, reason = 'অ্যাডমিন কর্তৃক সাবস্ক্রিপশন বাতিল করা হয়েছে' } = body;
+
+      if (!userId) {
+        return NextResponse.json(
+          { success: false, error: 'userId is required' },
+          { status: 400 },
+        );
+      }
+
+      const { error: cancelErr } = await supabaseAdmin
+        .from('users')
+        .update({
+          subscription: {
+            plan: 'Free',
+            expiry: new Date().toISOString(),
+            expires_at: new Date().toISOString(),
+            status: 'Expired',
+          },
+          subscription_status: 'Expired',
+          subscription_expires_at: new Date().toISOString(),
+          is_subscribed: false,
+          level: 'Rookie',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+
+      if (cancelErr) throw cancelErr;
+
+      // Update subscription_history
+      try {
+        await supabaseAdmin
+          .from('subscription_history')
+          .update({ is_active: false })
+          .eq('user_id', userId);
+      } catch (_) {}
+
+      // Notify User
+      try {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: userId,
+          title: 'সাবস্ক্রিপশন স্ট্যাটাস আপডেট ⚠️',
+          message: reason,
+          type: 'warning',
+          read: false,
+          created_at: new Date().toISOString(),
+        });
+      } catch (_) {}
+
+      return NextResponse.json({ success: true });
+    }
+
+    // ── Action: Send Custom In-App Notification ──
+    if (action === 'send_notification') {
+      const { userId, title, message, type = 'info' } = body;
+
+      if (!userId || !title || !message) {
+        return NextResponse.json(
+          { success: false, error: 'userId, title, and message are required' },
+          { status: 400 },
+        );
+      }
+
+      const { error: notifErr } = await supabaseAdmin.from('notifications').insert({
+        user_id: userId,
+        title,
+        message,
+        type,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
+
+      if (notifErr) throw notifErr;
+      return NextResponse.json({ success: true });
     }
 
     // ── Action: Grant Manual Subscription ──

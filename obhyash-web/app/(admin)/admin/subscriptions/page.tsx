@@ -32,6 +32,14 @@ import {
   PhoneCall,
   Filter,
   ArrowUpDown,
+  Send,
+  Bell,
+  ShieldAlert,
+  Sparkles,
+  UserMinus,
+  UserCheck,
+  MessageSquare,
+  AlertTriangle,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
@@ -146,11 +154,29 @@ export default function SubscriptionsPage() {
   );
   const [adminNotes, setAdminNotes] = useState('');
 
-  // Manual Subscription Management
+  // Manual Subscription Management (Extend / Upgrade)
   const [showExtendModal, setShowExtendModal] = useState(false);
   const [extendingSubscription, setExtendingSubscription] =
     useState<SubscriptionHistory | null>(null);
   const [extensionDays, setExtensionDays] = useState(30);
+  const [extensionPlan, setExtensionPlan] = useState('');
+  const [isSubmittingExtend, setIsSubmittingExtend] = useState(false);
+
+  // Send Direct Notification Modal
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [notifTargetUser, setNotifTargetUser] =
+    useState<SubscriptionHistory | null>(null);
+  const [notifTitle, setNotifTitle] = useState('প্রিমিয়াম সাবস্ক্রিপশন রিমাইন্ডার 🔔');
+  const [notifMessage, setNotifMessage] = useState('');
+  const [notifType, setNotifType] = useState<'info' | 'success' | 'warning'>('info');
+  const [isSendingNotif, setIsSendingNotif] = useState(false);
+
+  // Cancel / Revoke Subscription Modal
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingSubscription, setCancellingSubscription] =
+    useState<SubscriptionHistory | null>(null);
+  const [cancelReason, setCancelReason] = useState('পেমেন্ট সমস্যা বা ব্যবহারকারীর অনুরোধে সাবস্ক্রিপশন বাতিল');
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Global Server Aggregate Stats
   const [serverStats, setServerStats] = useState({
@@ -250,7 +276,14 @@ export default function SubscriptionsPage() {
 
   // Filtered & Sorted Active Subscriptions
   const filteredActiveSubscriptions = useMemo(() => {
-    let list = rawSubscriptions.filter((s) => s.is_active);
+    let list = rawSubscriptions.filter((s) => {
+      if (!s.is_active) return false;
+      const plan = (s.plan_name || s.plan?.display_name || '').toLowerCase();
+      if (plan === 'free' || plan === 'rookie' || plan.includes('free plan') || plan === 'basic') {
+        return false;
+      }
+      return true;
+    });
 
     // Search by Phone, Name, Email, Plan
     if (subSearchQuery.trim()) {
@@ -290,7 +323,14 @@ export default function SubscriptionsPage() {
 
   // Filtered & Sorted Expired Subscriptions
   const filteredExpiredSubscriptions = useMemo(() => {
-    let list = rawSubscriptions.filter((s) => !s.is_active);
+    let list = rawSubscriptions.filter((s) => {
+      if (s.is_active) return false;
+      const plan = (s.plan_name || s.plan?.display_name || '').toLowerCase();
+      if (plan === 'free' || plan === 'rookie' || plan.includes('free plan') || plan === 'basic') {
+        return false;
+      }
+      return true;
+    });
 
     // Search by Phone, Name, Email, Plan
     if (subSearchQuery.trim()) {
@@ -362,28 +402,115 @@ export default function SubscriptionsPage() {
     if (!extendingSubscription) return;
 
     try {
+      setIsSubmittingExtend(true);
       const res = await fetch('/api/admin/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'extend_subscription',
+          userId: extendingSubscription.user_id,
           subscriptionId: extendingSubscription.id,
           days: extensionDays,
+          planName: extensionPlan || undefined,
         }),
       });
 
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Failed to extend subscription');
 
-      toast.success(`Subscription extended by ${extensionDays} days`);
+      toast.success(`${extendingSubscription.user?.name || 'User'} এর মেয়াদ সফলভাবে +${extensionDays} দিন বাড়ানো হয়েছে! 🎉`);
       setShowExtendModal(false);
       setExtendingSubscription(null);
+      setExtensionPlan('');
       fetchData();
     } catch (error: unknown) {
       console.error('Error extending subscription:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to extend subscription';
       toast.error(errorMessage);
+    } finally {
+      setIsSubmittingExtend(false);
+    }
+  };
+
+  // Quick 1-Click Bonus Gift (+7 Days)
+  const handleQuickGiftBonus = async (sub: SubscriptionHistory, days = 7) => {
+    try {
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'extend_subscription',
+          userId: sub.user_id,
+          subscriptionId: sub.id,
+          days,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to gift bonus');
+      toast.success(`${sub.user?.name || 'User'} কে সফলভাবে +${days} দিন বোনাস গিফট দেওয়া হয়েছে! 🎁`);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to gift bonus');
+    }
+  };
+
+  // Cancel / Revoke Subscription
+  const handleCancelSubscription = async () => {
+    if (!cancellingSubscription) return;
+    try {
+      setIsCancelling(true);
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'cancel_subscription',
+          userId: cancellingSubscription.user_id,
+          reason: cancelReason,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to cancel subscription');
+      toast.success('সাবস্ক্রিপশন সফলভাবে বাতিল করা হয়েছে।');
+      setShowCancelModal(false);
+      setCancellingSubscription(null);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to cancel subscription');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  // Send Direct In-App Notification
+  const handleSendNotification = async () => {
+    if (!notifTargetUser || !notifTitle.trim() || !notifMessage.trim()) {
+      toast.error('অনুগ্রহ করে শিরোনাম ও মেসেজ লিখুন');
+      return;
+    }
+    try {
+      setIsSendingNotif(true);
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_notification',
+          userId: notifTargetUser.user_id,
+          title: notifTitle.trim(),
+          message: notifMessage.trim(),
+          type: notifType,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to send notification');
+      toast.success(`${notifTargetUser.user?.name || 'User'} এর কাছে নোটিফিকেশন পাঠানো হয়েছে! 🚀`);
+      setShowNotifModal(false);
+      setNotifTargetUser(null);
+      setNotifMessage('');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to send notification');
+    } finally {
+      setIsSendingNotif(false);
     }
   };
 
@@ -495,30 +622,26 @@ export default function SubscriptionsPage() {
       exportToCSV({
         filename: `payment_requests_${new Date().toISOString().split('T')[0]}.csv`,
         headers: [
-          'Request ID',
           'User Name',
           'Email',
-          'Phone',
-          'Plan Name',
-          'Amount (BDT)',
+          'Phone Number',
           'Payment Method',
           'Transaction ID',
+          'Plan Name',
+          'Amount (BDT)',
           'Status',
           'Requested Date & Time (24h)',
-          'Admin Notes',
         ],
         rows: filteredRequests.map((r) => [
-          r.id,
           r.user?.name || 'N/A',
           r.user?.email || 'N/A',
           r.user?.phone || 'N/A',
-          r.plan_name,
-          r.amount,
-          r.payment_method,
+          r.payment_method?.toUpperCase() || 'N/A',
           r.transaction_id || 'N/A',
-          r.status,
+          r.plan_name || 'N/A',
+          r.amount || 0,
+          r.status ? r.status.charAt(0).toUpperCase() + r.status.slice(1) : 'Pending',
           formatTimestamp24h(r.requested_at).full,
-          r.admin_notes || '',
         ]),
       });
       toast.success('পেমেন্ট রিকোয়েস্ট শিট সফলভাবে ডাউনলোড হয়েছে');
@@ -530,25 +653,37 @@ export default function SubscriptionsPage() {
       exportToCSV({
         filename: `active_premium_users_${new Date().toISOString().split('T')[0]}.csv`,
         headers: [
-          'User ID',
           'User Name',
           'Email',
-          'Phone',
-          'Plan Name',
+          'Phone Number',
+          'Subscription Plan',
           'Started Date & Time (24h)',
           'Expires Date & Time (24h)',
+          'Remaining Days',
           'Status',
         ],
-        rows: filteredActiveSubscriptions.map((s) => [
-          s.id,
-          s.user?.name || 'N/A',
-          s.user?.email || 'N/A',
-          s.user?.phone || 'N/A',
-          s.plan_name || s.plan?.display_name || 'Premium',
-          formatTimestamp24h(s.started_at).full,
-          s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
-          'Active',
-        ]),
+        rows: filteredActiveSubscriptions.map((s) => {
+          const daysLeft = s.expires_at
+            ? Math.ceil((new Date(s.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+            : null;
+          const remainingText =
+            daysLeft !== null
+              ? daysLeft <= 0
+                ? 'আজকে শেষ হবে'
+                : `${daysLeft} দিন বাকি`
+              : 'আজীবন / আনলিমিটেড';
+
+          return [
+            s.user?.name || 'N/A',
+            s.user?.email || 'N/A',
+            s.user?.phone || 'N/A',
+            s.plan_name || s.plan?.display_name || 'Pro Premium',
+            formatTimestamp24h(s.started_at).full,
+            s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
+            remainingText,
+            'Active',
+          ];
+        }),
       });
       toast.success('অ্যাক্টিভ প্রিমিয়াম ইউজার শিট সফলভাবে ডাউনলোড হয়েছে');
     } else {
@@ -559,25 +694,37 @@ export default function SubscriptionsPage() {
       exportToCSV({
         filename: `expired_premium_users_${new Date().toISOString().split('T')[0]}.csv`,
         headers: [
-          'User ID',
           'User Name',
           'Email',
-          'Phone',
-          'Plan Name',
+          'Phone Number',
+          'Last Plan',
           'Started Date & Time (24h)',
           'Expired Date & Time (24h)',
+          'Expired Ago',
           'Status',
         ],
-        rows: filteredExpiredSubscriptions.map((s) => [
-          s.id,
-          s.user?.name || 'N/A',
-          s.user?.email || 'N/A',
-          s.user?.phone || 'N/A',
-          s.plan_name || s.plan?.display_name || 'Premium',
-          formatTimestamp24h(s.started_at).full,
-          s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Expired',
-          'Expired',
-        ]),
+        rows: filteredExpiredSubscriptions.map((s) => {
+          const daysAgo = s.expires_at
+            ? Math.floor((Date.now() - new Date(s.expires_at).getTime()) / (1000 * 60 * 60 * 24))
+            : null;
+          const expiredAgoText =
+            daysAgo !== null
+              ? daysAgo <= 0
+                ? 'আজকে শেষ হয়েছে'
+                : `${daysAgo} দিন আগে`
+              : 'N/A';
+
+          return [
+            s.user?.name || 'N/A',
+            s.user?.email || 'N/A',
+            s.user?.phone || 'N/A',
+            s.plan_name || s.plan?.display_name || 'Pro Premium',
+            formatTimestamp24h(s.started_at).full,
+            s.expires_at ? formatTimestamp24h(s.expires_at).full : 'N/A',
+            expiredAgoText,
+            'Expired',
+          ];
+        }),
       });
       toast.success('মেয়াদোত্তীর্ণ ইউজার শিট সফলভাবে ডাউনলোড হয়েছে');
     }
@@ -1415,22 +1562,65 @@ export default function SubscriptionsPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end pt-1 gap-2">
+                        {/* Active Subscriber Card Actions */}
+                        <div className="flex items-center justify-between pt-2 gap-1.5 border-t border-neutral-100 dark:border-neutral-800">
+                          {/* Extend Button */}
                           <button
                             onClick={() => {
                               setExtendingSubscription(sub);
+                              setExtensionPlan(sub.plan_name || sub.plan?.display_name || 'Pro Premium');
                               setShowExtendModal(true);
                             }}
-                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                            title="মেয়াদ বাড়ান"
                           >
-                            <RefreshCw size={14} /> মেয়াদ বাড়ান
+                            <RefreshCw size={13} />
+                            <span>মেয়াদ বাড়ান</span>
                           </button>
+
+                          {/* Quick +7d Bonus */}
+                          <button
+                            onClick={() => handleQuickGiftBonus(sub, 7)}
+                            className="p-2 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 transition-colors"
+                            title="১-ক্লিকে +৭ দিন ফ্রি গিফট করুন"
+                          >
+                            <Gift size={15} />
+                          </button>
+
+                          {/* Send Notification */}
+                          <button
+                            onClick={() => {
+                              setNotifTargetUser(sub);
+                              setNotifTitle('প্রিমিয়াম সাবস্ক্রিপশন আপডেট 🌟');
+                              setNotifMessage(`প্রিয় ${sub.user?.name || 'শিক্ষার্থী'}, অভ্যাস প্রিমিয়ামে আপনার সক্রিয় থাকার জন্য ধন্যবাদ!`);
+                              setNotifType('info');
+                              setShowNotifModal(true);
+                            }}
+                            className="p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800/50 hover:bg-blue-100 transition-colors"
+                            title="ইন-অ্যাপ বার্তা পাঠান"
+                          >
+                            <Bell size={15} />
+                          </button>
+
+                          {/* Cancel Subscription */}
+                          <button
+                            onClick={() => {
+                              setCancellingSubscription(sub);
+                              setShowCancelModal(true);
+                            }}
+                            className="p-2 text-rose-500 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800/50 hover:bg-rose-100 transition-colors"
+                            title="সাবস্ক্রিপশন বাতিল করুন"
+                          >
+                            <UserMinus size={15} />
+                          </button>
+
+                          {/* View Profile */}
                           <Link
                             href={`/admin/user-management/${sub.user_id}`}
-                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
-                            title="প্রোফাইল দেখুন"
+                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-colors"
+                            title="ইউজারের বিস্তারিত প্রোফাইল"
                           >
-                            <ExternalLink size={16} />
+                            <ExternalLink size={15} />
                           </Link>
                         </div>
                       </div>
@@ -1476,7 +1666,7 @@ export default function SubscriptionsPage() {
                             Status
                           </th>
                           <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Action
+                            Actions
                           </th>
                         </tr>
                       </thead>
@@ -1560,18 +1750,58 @@ export default function SubscriptionsPage() {
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-right whitespace-nowrap">
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {/* Extend Button */}
                                   <button
                                     onClick={() => {
                                       setExtendingSubscription(sub);
+                                      setExtensionPlan(sub.plan_name || sub.plan?.display_name || 'Pro Premium');
                                       setShowExtendModal(true);
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-xs font-bold rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800/50 shadow-sm active:scale-95"
-                                    title="মেয়াদ বাড়িয়ে দিন"
+                                    className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-xs font-bold rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800/60 shadow-sm active:scale-95"
+                                    title="মেয়াদ বা প্লান বাড়ান"
                                   >
                                     <RefreshCw size={13} />
                                     <span>মেয়াদ বাড়ান</span>
                                   </button>
+
+                                  {/* Quick +7d Bonus */}
+                                  <button
+                                    onClick={() => handleQuickGiftBonus(sub, 7)}
+                                    className="p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors active:scale-95"
+                                    title="১-ক্লিকে +৭ দিন ফ্রি গিফট করুন"
+                                  >
+                                    <Gift size={14} />
+                                  </button>
+
+                                  {/* Send In-App Notification */}
+                                  <button
+                                    onClick={() => {
+                                      setNotifTargetUser(sub);
+                                      setNotifTitle('প্রিমিয়াম সাবস্ক্রিপশন আপডেট 🌟');
+                                      setNotifMessage(`প্রিয় ${sub.user?.name || 'শিক্ষার্থী'}, অভ্যাস প্রিমিয়ামে আপনার সক্রিয় থাকার জন্য ধন্যবাদ!`);
+                                      setNotifType('info');
+                                      setShowNotifModal(true);
+                                    }}
+                                    className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg border border-blue-200 dark:border-blue-800/50 transition-colors active:scale-95"
+                                    title="ইন-অ্যাপ বার্তা পাঠান"
+                                  >
+                                    <Bell size={14} />
+                                  </button>
+
+                                  {/* Cancel Subscription */}
+                                  <button
+                                    onClick={() => {
+                                      setCancellingSubscription(sub);
+                                      setShowCancelModal(true);
+                                    }}
+                                    className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg border border-rose-200 dark:border-rose-800/50 transition-colors active:scale-95"
+                                    title="সাবস্ক্রিপশন বাতিল করুন"
+                                  >
+                                    <UserMinus size={14} />
+                                  </button>
+
+                                  {/* Profile View */}
                                   <Link
                                     href={`/admin/user-management/${sub.user_id}`}
                                     className="p-1.5 text-neutral-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border border-neutral-200 dark:border-neutral-800"
@@ -1715,22 +1945,53 @@ export default function SubscriptionsPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end pt-1 gap-2">
+                        {/* Expired Subscriber Card Actions */}
+                        <div className="flex items-center justify-between pt-2 gap-1.5 border-t border-neutral-100 dark:border-neutral-800">
+                          {/* Reactivate Button */}
                           <button
                             onClick={() => {
                               setExtendingSubscription(sub);
+                              setExtensionPlan(sub.plan_name || sub.plan?.display_name || 'Pro Premium');
                               setShowExtendModal(true);
                             }}
-                            className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                            className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                            title="পুনরায় সাবস্ক্রিপশন এক্টিভ করুন"
                           >
-                            <RefreshCw size={14} /> পুনরায় এক্টিভ করুন
+                            <RefreshCw size={13} />
+                            <span>এক্টিভ করুন</span>
                           </button>
+
+                          {/* Quick +7d Winback Gift */}
+                          <button
+                            onClick={() => handleQuickGiftBonus(sub, 7)}
+                            className="p-2 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 transition-colors"
+                            title="উইনব্যাক অফার: ১-ক্লিকে +৭ দিন ফ্রি দিন"
+                          >
+                            <Gift size={15} />
+                          </button>
+
+                          {/* Send Renewal Offer Notification */}
+                          <button
+                            onClick={() => {
+                              setNotifTargetUser(sub);
+                              setNotifTitle('বিশেষ রিনিউয়াল ছাড় অফার 🎁');
+                              setNotifMessage(`প্রিয় ${sub.user?.name || 'শিক্ষার্থী'}, অভ্যাস প্রো-তে পুনরায় ফিরে আসতে বিশেষ ২০% ছাড় উপভোগ করুন!`);
+                              setNotifType('success');
+                              setShowNotifModal(true);
+                            }}
+                            className="p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800/50 hover:bg-blue-100 transition-colors"
+                            title="রিনিউয়াল অফার নোটিফিকেশন পাঠান"
+                          >
+                            <Bell size={15} />
+                          </button>
+
+                          {/* Profile Link */}
                           <Link
                             href={`/admin/user-management/${sub.user_id}`}
-                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
-                            title="প্রোফাইল দেখুন"
+                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-colors"
+                            title="ইউজারের প্রোফাইল দেখুন"
                           >
-                            <ExternalLink size={16} />
+                            <ExternalLink size={15} />
                           </Link>
                         </div>
                       </div>
@@ -1776,7 +2037,7 @@ export default function SubscriptionsPage() {
                             Status
                           </th>
                           <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                            Action
+                            Actions
                           </th>
                         </tr>
                       </thead>
@@ -1854,18 +2115,46 @@ export default function SubscriptionsPage() {
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-right whitespace-nowrap">
-                                <div className="flex items-center justify-end gap-2">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  {/* Reactivate Button */}
                                   <button
                                     onClick={() => {
                                       setExtendingSubscription(sub);
+                                      setExtensionPlan(sub.plan_name || sub.plan?.display_name || 'Pro Premium');
                                       setShowExtendModal(true);
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold rounded-lg transition-colors border border-purple-200 dark:border-purple-800/50 shadow-sm active:scale-95"
+                                    className="flex items-center gap-1 px-2.5 py-1.5 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold rounded-lg transition-colors border border-purple-200 dark:border-purple-800/60 shadow-sm active:scale-95"
                                     title="পুনরায় এক্টিভ করুন"
                                   >
                                     <RefreshCw size={13} />
-                                    <span>পুনরায় এক্টিভ করুন</span>
+                                    <span>এক্টিভ করুন</span>
                                   </button>
+
+                                  {/* Quick +7d Winback Bonus */}
+                                  <button
+                                    onClick={() => handleQuickGiftBonus(sub, 7)}
+                                    className="p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors active:scale-95"
+                                    title="উইনব্যাক বোনাস: ১-ক্লিকে +৭ দিন ফ্রি দিন"
+                                  >
+                                    <Gift size={14} />
+                                  </button>
+
+                                  {/* Send Renewal Offer Notification */}
+                                  <button
+                                    onClick={() => {
+                                      setNotifTargetUser(sub);
+                                      setNotifTitle('বিশেষ রিনিউয়াল ছাড় অফার 🎁');
+                                      setNotifMessage(`প্রিয় ${sub.user?.name || 'শিক্ষার্থী'}, অভ্যাস প্রো-তে পুনরায় ফিরে আসতে বিশেষ ২০% ছাড় উপভোগ করুন!`);
+                                      setNotifType('success');
+                                      setShowNotifModal(true);
+                                    }}
+                                    className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg border border-blue-200 dark:border-blue-800/50 transition-colors active:scale-95"
+                                    title="রিনিউয়াল অফার নোটিফিকেশন পাঠান"
+                                  >
+                                    <Bell size={14} />
+                                  </button>
+
+                                  {/* Profile View */}
                                   <Link
                                     href={`/admin/user-management/${sub.user_id}`}
                                     className="p-1.5 text-neutral-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border border-neutral-200 dark:border-neutral-800"
@@ -2066,76 +2355,118 @@ export default function SubscriptionsPage() {
           </div>
         )}
 
-        {/* Extend Subscription Modal */}
+        {/* ── 1. Extend / Upgrade Subscription Modal ── */}
         {showExtendModal && extendingSubscription && (
           <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-sm w-full overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-red-600 to-red-700">
-                <h3 className="text-xl font-bold text-white mb-1">
-                  মেয়াদ বাড়িয়ে দিন
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full overflow-hidden">
+              <div className="p-6 bg-gradient-to-br from-[#004633] to-[#00664B] text-white">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/20 border border-emerald-400/30 uppercase tracking-widest text-emerald-200">
+                    {extendingSubscription.is_active ? 'Extend Active Plan' : 'Reactivate Plan'}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setShowExtendModal(false);
+                      setExtendingSubscription(null);
+                    }}
+                    className="p-1 text-white/70 hover:text-white rounded-lg transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <h3 className="text-lg font-bold text-white">
+                  {extendingSubscription.is_active ? 'সাবস্ক্রিপশন মেয়াদ বাড়ান' : 'পুনরায় সাবস্ক্রিপশন এক্টিভ করুন'}
                 </h3>
-                <p className="text-white/80 text-xs">
-                  {extendingSubscription.user?.name} এর সাবস্ক্রিপশন মেয়াদ বাড়ান
+                <p className="text-white/80 text-xs mt-0.5">
+                  {extendingSubscription.user?.name} ({extendingSubscription.user?.phone || extendingSubscription.user?.email})
                 </p>
               </div>
 
               <div className="p-6 space-y-5">
-                <div className="bg-neutral-50 dark:bg-neutral-950 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800 space-y-2">
+                {/* Expiry Overview Box */}
+                <div className="bg-neutral-50 dark:bg-neutral-950 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-neutral-500">বর্তমান মেয়াদ:</span>
-                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
-                      {new Date(
-                        extendingSubscription.expires_at,
-                      ).toLocaleDateString()}
+                    <span className="text-neutral-500">বর্তমান স্ট্যাটাস:</span>
+                    <span className={`font-bold ${extendingSubscription.is_active ? 'text-emerald-600' : 'text-rose-500'}`}>
+                      {extendingSubscription.is_active ? 'এক্টিভ' : 'মেয়াদোত্তীর্ণ'}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-neutral-500">নতুন মেয়াদ:</span>
-                    <span className="font-bold text-emerald-600">
+                    <span className="text-neutral-500">বর্তমান মেয়াদ:</span>
+                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                      {extendingSubscription.expires_at ? new Date(extendingSubscription.expires_at).toLocaleDateString('bn-BD') : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs pt-1.5 border-t border-neutral-200 dark:border-neutral-800">
+                    <span className="text-neutral-500">নতুন বর্ধিত মেয়াদ:</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
                       {new Date(
-                        new Date(extendingSubscription.expires_at).getTime() +
+                        (extendingSubscription.expires_at && new Date(extendingSubscription.expires_at).getTime() > Date.now()
+                          ? new Date(extendingSubscription.expires_at).getTime()
+                          : Date.now()) +
                           extensionDays * 24 * 60 * 60 * 1000,
-                      ).toLocaleDateString()}
+                      ).toLocaleDateString('bn-BD')}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                    কতদিন বাড়াবেন?
+                {/* Quick Presets */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    কতদিন মেয়াদ বাড়াবেন?
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {[7, 30, 365].map((days) => (
+                    {[
+                      { days: 7, label: '+৭ দিন' },
+                      { days: 15, label: '+১৫ দিন' },
+                      { days: 30, label: '+৩০ দিন' },
+                      { days: 90, label: '+৩ মাস' },
+                      { days: 180, label: '+৬ মাস' },
+                      { days: 365, label: '+১ বছর' },
+                    ].map((item) => (
                       <button
-                        key={days}
-                        onClick={() => setExtensionDays(days)}
+                        key={item.days}
+                        type="button"
+                        onClick={() => setExtensionDays(item.days)}
                         className={`py-2 text-xs font-bold rounded-xl border transition-all ${
-                          extensionDays === days
-                            ? 'bg-red-600 border-red-600 text-white shadow-lg shadow-red-500/20'
-                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500'
+                          extensionDays === item.days
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700'
                         }`}
                       >
-                        {days === 7
-                          ? '৭ দিন'
-                          : days === 30
-                            ? '৩০ দিন'
-                            : '১ বছর'}
+                        {item.label}
                       </button>
                     ))}
                   </div>
-                  <div className="relative">
+
+                  {/* Custom Number Input */}
+                  <div className="relative mt-2">
                     <input
                       type="number"
+                      min={1}
                       value={extensionDays}
-                      onChange={(e) =>
-                        setExtensionDays(parseInt(e.target.value) || 0)
-                      }
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-red-600 dark:text-red-400 font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
+                      onChange={(e) => setExtensionDays(Math.max(1, parseInt(e.target.value) || 0))}
+                      className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-emerald-600 dark:text-emerald-400 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                      placeholder="কাস্টম দিন সংখ্যা লিখুন"
                     />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neutral-400 uppercase">
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400 uppercase">
                       Days
                     </span>
                   </div>
+                </div>
+
+                {/* Plan Upgrade Selector */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    প্লানের নাম (ঐচ্ছিক)
+                  </label>
+                  <input
+                    type="text"
+                    value={extensionPlan}
+                    onChange={(e) => setExtensionPlan(e.target.value)}
+                    placeholder={extendingSubscription.plan_name || 'Pro Premium'}
+                    className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
                 </div>
               </div>
 
@@ -2145,15 +2476,284 @@ export default function SubscriptionsPage() {
                     setShowExtendModal(false);
                     setExtendingSubscription(null);
                   }}
-                  className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-bold rounded-2xl transition-all active:scale-95"
+                  className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl transition-all active:scale-95 text-xs"
                 >
                   বাতিল
                 </button>
                 <button
                   onClick={handleExtendSubscription}
-                  className="flex-1 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                  disabled={isSubmittingExtend || extensionDays <= 0}
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 transition-all active:scale-95 text-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  নিশ্চিত করো
+                  {isSubmittingExtend ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>সেভ হচ্ছে...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={14} />
+                      <span>মেয়াদ নিশ্চিত করুন</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── 2. Send In-App Notification Modal ── */}
+        {showNotifModal && notifTargetUser && (
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full overflow-hidden">
+              <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-white/20 uppercase tracking-widest text-white">
+                    Direct Notification
+                  </span>
+                  <button
+                    onClick={() => {
+                      setShowNotifModal(false);
+                      setNotifTargetUser(null);
+                    }}
+                    className="p-1 text-white/70 hover:text-white rounded-lg transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Bell size={18} /> ইউজারকে নোটিফিকেশন পাঠান
+                </h3>
+                <p className="text-white/80 text-xs mt-0.5">
+                  প্রাপক: {notifTargetUser.user?.name} ({notifTargetUser.user?.phone || notifTargetUser.user?.email})
+                </p>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Template Presets */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    কুইক টেমপ্লেট
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNotifTitle('সাবস্ক্রিপশনের মেয়াদ শেষের সতর্কবার্তা ⏰');
+                        setNotifMessage(`প্রিয় ${notifTargetUser.user?.name || 'শিক্ষার্থী'}, আপনার প্রিমিয়াম সাবস্ক্রিপশনের মেয়াদ শীঘ্রই শেষ হতে যাচ্ছে। নিরবচ্ছিন্ন অ্যাক্সেস পেতে এখনই রিনিউ করুন!`);
+                        setNotifType('warning');
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100"
+                    >
+                      ⏰ মেয়াদ শেষের রিমাইন্ডার
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNotifTitle('বিশেষ রিনিউয়াল ছাড় অফার 🎁');
+                        setNotifMessage(`প্রিয় ${notifTargetUser.user?.name || 'শিক্ষার্থী'}, আপনার জন্য বিশেষ ২০% ডিসকাউন্ট! কোড PRO20 ব্যবহার করে রিনিউ করুন।`);
+                        setNotifType('success');
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-100"
+                    >
+                      🎁 রিনিউয়াল অফার
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNotifTitle('অভ্যাস প্রিমিয়ামে আপনাকে স্বাগতম 🌟');
+                        setNotifMessage(`প্রিয় ${notifTargetUser.user?.name || 'শিক্ষার্থী'}, অভ্যাস প্রো ব্যবহার করার জন্য ধন্যবাদ। কোনো সমস্যা হলে আমাদের জানান।`);
+                        setNotifType('info');
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 hover:bg-blue-100"
+                    >
+                      🌟 শুভেচ্ছা বার্তা
+                    </button>
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    নোটিফিকেশনের শিরোনাম
+                  </label>
+                  <input
+                    type="text"
+                    value={notifTitle}
+                    onChange={(e) => setNotifTitle(e.target.value)}
+                    placeholder="নোটিফিকেশন টাইটেল..."
+                    className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Message */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    মেসেজের বিবরণ
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={notifMessage}
+                    onChange={(e) => setNotifMessage(e.target.value)}
+                    placeholder="ইউজারের কাছে প্রদর্শিত বার্তা লিখুন..."
+                    className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+
+                {/* Type */}
+                <div className="flex items-center gap-4">
+                  <label className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    টাইপ:
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { id: 'info', label: 'তথ্য (Info)' },
+                      { id: 'success', label: 'সাফল্য (Success)' },
+                      { id: 'warning', label: 'সতর্কতা (Warning)' },
+                    ].map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setNotifType(t.id as any)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                          notifType === t.id
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 pt-0 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowNotifModal(false);
+                    setNotifTargetUser(null);
+                  }}
+                  className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl transition-all active:scale-95 text-xs"
+                >
+                  বাতিল
+                </button>
+                <button
+                  onClick={handleSendNotification}
+                  disabled={isSendingNotif || !notifTitle.trim() || !notifMessage.trim()}
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/25 transition-all active:scale-95 text-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSendingNotif ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>পাঠানো হচ্ছে...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={14} />
+                      <span>নোটিফিকেশন পাঠান</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── 3. Cancel / Revoke Subscription Modal ── */}
+        {showCancelModal && cancellingSubscription && (
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full overflow-hidden">
+              <div className="p-6 bg-gradient-to-br from-rose-600 to-rose-700 text-white">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-white/20 uppercase tracking-widest text-white">
+                    Danger Action
+                  </span>
+                  <button
+                    onClick={() => {
+                      setShowCancelModal(false);
+                      setCancellingSubscription(null);
+                    }}
+                    className="p-1 text-white/70 hover:text-white rounded-lg transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <ShieldAlert size={18} /> সাবস্ক্রিপশন বাতিল করবেন?
+                </h3>
+                <p className="text-white/80 text-xs mt-0.5">
+                  ইউজার: {cancellingSubscription.user?.name} ({cancellingSubscription.user?.phone || cancellingSubscription.user?.email})
+                </p>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800/60 text-xs text-rose-700 dark:text-rose-300 font-medium">
+                  ⚠️ <strong>সতর্কতা:</strong> সাবস্ক্রিপশন বাতিল করলে ব্যবহারকারীর অ্যাকাউন্ট সাথে সাথে Rookie/Free প্ল্যানে ডাউনগ্রেড হয়ে যাবে এবং সে আর প্রিমিয়াম কনটেন্ট অ্যাক্সেস করতে পারবে না।
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                    বাতিল করার কারণ
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      'পেমেন্ট রিফান্ড করা হয়েছে',
+                      'ব্যবহারকারীর সরাসরি অনুরোধ',
+                      'নিয়ম লঙ্ঘন বা অপব্যবহার',
+                      'ভুল বা জাল ট্রানজেকশন',
+                    ].map((reason) => (
+                      <button
+                        key={reason}
+                        type="button"
+                        onClick={() => setCancelReason(reason)}
+                        className={`p-2 text-left text-[11px] font-bold rounded-xl border transition-all ${
+                          cancelReason === reason
+                            ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-600 dark:text-rose-300'
+                            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        {reason}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input
+                    type="text"
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="অন্য কোনো কারণ থাকলে লিখুন..."
+                    className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 mt-2"
+                  />
+                </div>
+              </div>
+
+              <div className="p-6 pt-0 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setCancellingSubscription(null);
+                  }}
+                  className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl transition-all active:scale-95 text-xs"
+                >
+                  ফিরে যান
+                </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={isCancelling || !cancelReason.trim()}
+                  className="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl shadow-lg shadow-rose-600/25 transition-all active:scale-95 text-xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isCancelling ? (
+                    <>
+                      <RefreshCw size={14} className="animate-spin" />
+                      <span>বাতিল হচ্ছে...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserMinus size={14} />
+                      <span>হ্যাঁ, বাতিল নিশ্চিত করুন</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

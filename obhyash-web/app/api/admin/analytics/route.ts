@@ -54,17 +54,15 @@ export async function GET(request: NextRequest) {
       questionsCountRes,
       usersCountRes,
       proUsersCountRes,
-      dauExamsRes,
-      mauExamsRes,
-      topUsersRes,
+      allUsersRes,
     ] = await Promise.all([
-      // 1. Exams in selected time range (with score, total_marks, subject, time_taken)
+      // 1. Exams in selected time range (with score, total_marks, subject, time_taken, date)
       supabaseAdmin
         .from('exam_results')
-        .select('id, score, total_marks, time_taken_seconds, created_at, subject, subject_label, user_id')
+        .select('id, score, total_marks, time_taken, created_at, date, subject, user_id, correct_count, wrong_count')
         .gte('created_at', startDate.toISOString())
         .order('created_at', { ascending: false })
-        .limit(2000),
+        .limit(3000),
       // 2. All exams count
       supabaseAdmin
         .from('exam_results')
@@ -82,22 +80,12 @@ export async function GET(request: NextRequest) {
         .from('users')
         .select('*', { count: 'exact', head: true })
         .or('plan.eq.pro,plan.eq.premium,is_subscribed.eq.true'),
-      // 6. DAU - Unique active exam takers in last 24h
-      supabaseAdmin
-        .from('exam_results')
-        .select('user_id')
-        .gte('created_at', oneDayAgo.toISOString()),
-      // 7. MAU - Unique active exam takers in last 30d
-      supabaseAdmin
-        .from('exam_results')
-        .select('user_id')
-        .gte('created_at', thirtyDaysAgo.toISOString()),
-      // 8. Top Performers
+      // 6. All registered users for name & xp mapping
       supabaseAdmin
         .from('users')
-        .select('id, name, email, exams_taken, xp')
-        .order('exams_taken', { ascending: false })
-        .limit(8),
+        .select('id, name, email, xp')
+        .order('xp', { ascending: false })
+        .limit(100),
     ]);
 
     const rangeExams = rangeExamsRes.data || [];
@@ -105,10 +93,23 @@ export async function GET(request: NextRequest) {
     const totalQuestions = questionsCountRes.count || 0;
     const totalUsers = usersCountRes.count || 0;
     const proUsers = proUsersCountRes.count || 0;
+    const usersList = allUsersRes.data || [];
+    const userMap = new Map(usersList.map((u: any) => [u.id, u]));
 
-    // DAU & MAU calculation
-    const dauSet = new Set((dauExamsRes.data || []).map((e: any) => e.user_id).filter(Boolean));
-    const mauSet = new Set((mauExamsRes.data || []).map((e: any) => e.user_id).filter(Boolean));
+    // DAU (24h) & MAU (30d) calculation from actual timestamps
+    const oneDayAgoTime = oneDayAgo.getTime();
+    const thirtyDaysAgoTime = thirtyDaysAgo.getTime();
+    const dauSet = new Set<string>();
+    const mauSet = new Set<string>();
+
+    rangeExams.forEach((exam: any) => {
+      const examTime = new Date(exam.created_at || exam.date || 0).getTime();
+      if (exam.user_id) {
+        if (examTime >= oneDayAgoTime) dauSet.add(exam.user_id);
+        if (examTime >= thirtyDaysAgoTime) mauSet.add(exam.user_id);
+      }
+    });
+
     const dau = dauSet.size || (rangeExams.length > 0 ? Math.min(rangeExams.length, 5) : 0);
     const mau = mauSet.size || Math.max(dau, rangeExams.length > 0 ? Math.min(rangeExams.length, 25) : 0);
     const stickinessRatio = mau > 0 ? Math.round((dau / mau) * 100) : 0;
@@ -118,15 +119,23 @@ export async function GET(request: NextRequest) {
     let totalSeconds = 0;
     let validTimeCount = 0;
 
+    const userExamCounts: Record<string, number> = {};
+
     rangeExams.forEach((exam: any) => {
       const score = Number(exam.score) || 0;
       const total = Number(exam.total_marks) || 0;
       const pct = total > 0 ? (score / total) * 100 : score;
-      totalScorePct += pct;
+      totalScorePct += Math.min(100, Math.max(0, pct));
 
-      if (exam.time_taken_seconds && exam.time_taken_seconds > 0) {
-        totalSeconds += Number(exam.time_taken_seconds);
+      // Time taken in seconds
+      const seconds = Number(exam.time_taken) || 0;
+      if (seconds > 0) {
+        totalSeconds += seconds;
         validTimeCount++;
+      }
+
+      if (exam.user_id) {
+        userExamCounts[exam.user_id] = (userExamCounts[exam.user_id] || 0) + 1;
       }
     });
 
@@ -143,7 +152,7 @@ export async function GET(request: NextRequest) {
     const dateCounts: Record<string, number> = {};
 
     rangeExams.forEach((exam: any) => {
-      const subjectName = exam.subject_label || exam.subject || 'General';
+      const subjectName = (exam.subject || 'সাধারণ / অন্যান্য').trim();
       if (!subjectMap.has(subjectName)) {
         subjectMap.set(subjectName, { scores: [], users: new Set(), totalTime: 0 });
       }
@@ -151,12 +160,13 @@ export async function GET(request: NextRequest) {
       const score = Number(exam.score) || 0;
       const total = Number(exam.total_marks) || 0;
       const pct = total > 0 ? (score / total) * 100 : score;
-      sData.scores.push(pct);
+      sData.scores.push(Math.min(100, Math.max(0, pct)));
       if (exam.user_id) sData.users.add(exam.user_id);
-      if (exam.time_taken_seconds) sData.totalTime += Number(exam.time_taken_seconds);
+      if (exam.time_taken) sData.totalTime += Number(exam.time_taken);
 
-      if (exam.created_at) {
-        const d = new Date(exam.created_at);
+      const timestampStr = exam.created_at || exam.date;
+      if (timestampStr) {
+        const d = new Date(timestampStr);
         const hour = d.getHours();
         if (hour >= 0 && hour < 24) hourlyActivity[hour]++;
 
@@ -172,8 +182,8 @@ export async function GET(request: NextRequest) {
       .map(([subject, sData]) => {
         const avg = sData.scores.reduce((a, b) => a + b, 0) / (sData.scores.length || 1);
         let masteryTier: 'Mastered' | 'Moderate' | 'Needs Focus' = 'Moderate';
-        if (avg >= 75) masteryTier = 'Mastered';
-        else if (avg < 55) masteryTier = 'Needs Focus';
+        if (avg >= 70) masteryTier = 'Mastered';
+        else if (avg < 50) masteryTier = 'Needs Focus';
 
         return {
           subject,
@@ -187,7 +197,6 @@ export async function GET(request: NextRequest) {
 
     // User / Exam Velocity Timeline
     const userGrowth: { date: string; users: number; exams: number }[] = [];
-    const dateKeys = Object.keys(dateCounts);
 
     // Build timeline entries
     for (let i = daysAgo; i >= 0; i--) {
@@ -204,15 +213,44 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Top performers list
-    const topPerformers = (topUsersRes.data || []).map((u: any, idx: number) => ({
-      rank: idx + 1,
-      id: u.id,
-      name: u.name || 'Anonymous Student',
-      email: u.email ? u.email.split('@')[0] + '@...' : '',
-      xp: u.xp || 0,
-      examsCompleted: u.exams_taken || 0,
-    }));
+    // Top performers list sorted by exams completed or XP
+    const sortedUserIds = Object.keys(userExamCounts).sort(
+      (a, b) => userExamCounts[b] - userExamCounts[a],
+    );
+
+    const topPerformers: Array<{
+      rank: number;
+      id: string;
+      name: string;
+      email: string;
+      xp: number;
+      examsCompleted: number;
+    }> = [];
+
+    if (sortedUserIds.length > 0) {
+      sortedUserIds.slice(0, 8).forEach((uid, idx) => {
+        const u = userMap.get(uid);
+        topPerformers.push({
+          rank: idx + 1,
+          id: uid,
+          name: u?.name || 'শিক্ষার্থী',
+          email: u?.email ? u.email.split('@')[0] + '@...' : '',
+          xp: u?.xp || 0,
+          examsCompleted: userExamCounts[uid] || 0,
+        });
+      });
+    } else {
+      usersList.slice(0, 5).forEach((u: any, idx: number) => {
+        topPerformers.push({
+          rank: idx + 1,
+          id: u.id,
+          name: u.name || 'শিক্ষার্থী',
+          email: u.email ? u.email.split('@')[0] + '@...' : '',
+          xp: u.xp || 0,
+          examsCompleted: 0,
+        });
+      });
+    }
 
     const payload = {
       timeRange,

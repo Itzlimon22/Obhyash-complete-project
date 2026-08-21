@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
+import '../../../core/config/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/otp_verification_dialog.dart';
 
@@ -165,6 +166,17 @@ class _SignupViewState extends ConsumerState<SignupView>
     // Step 1: Enforce OTP Verification before proceeding
     if (_step == 1) {
       final currentPhone = _phoneController.text.trim();
+
+      // Check if SMS verification is enabled or bypassed
+      if (!AppConfig.enableSmsOtpVerification) {
+        setState(() {
+          _isPhoneVerified = true;
+          _verifiedPhone = currentPhone;
+          _step = 2;
+        });
+        return;
+      }
+
       final isAlreadyVerified =
           _isPhoneVerified && _verifiedPhone == currentPhone;
 

@@ -104,8 +104,8 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
               className={cn(
                 'text-[9px] font-black tracking-tight transition-colors duration-300 truncate w-full text-center relative z-10 uppercase',
                 isActive
-                  ? 'text-red-600 dark:text-red-400 mt-0.5'
-                  : 'text-neutral-500 dark:text-neutral-500',
+                  ? 'text-emerald-600 dark:text-emerald-400 mt-0.5'
+                  : 'text-neutral-500 dark:text-neutral-400',
               )}
             >
               {item.label}
@@ -118,7 +118,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
         onClick={onMenuClick}
         className="flex flex-col items-center justify-center gap-1 group flex-1 min-w-0 py-2 h-full"
       >
-        <div className="flex items-center justify-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:text-red-600 transition-all duration-300 relative shadow-inner">
+        <div className="flex items-center justify-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-all duration-300 relative shadow-inner">
           <Menu size={22} strokeWidth={3} className="relative z-10" />
         </div>
         <span className="text-[9px] font-black tracking-tight text-neutral-500 uppercase mt-0.5">

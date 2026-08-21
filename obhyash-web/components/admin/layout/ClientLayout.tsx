@@ -31,7 +31,7 @@ export default function ClientLayout({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black text-neutral-900 dark:text-zinc-100 font-sans flex transition-colors">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black text-neutral-900 dark:text-zinc-100 font-anek antialiased flex transition-colors">
       {/* Dedicated Admin Sidebar */}
       <AdminSidebar
         isOpen={isSidebarOpen}

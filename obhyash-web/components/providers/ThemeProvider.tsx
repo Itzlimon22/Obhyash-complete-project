@@ -42,10 +42,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Determine initial theme:
-    // 1. Check localStorage
-    // 2. Check current class on html
-    // 3. Fallback to 'dark' (luxury brand default)
+    // Determine initial theme on mount:
     let currentTheme: Theme = 'dark';
     try {
       const stored = localStorage.getItem(THEME_KEY);
@@ -53,6 +50,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         currentTheme = stored;
       } else if (document.documentElement.classList.contains('dark')) {
         currentTheme = 'dark';
+      } else {
+        currentTheme = 'light';
       }
     } catch {
       // Fallback
@@ -70,13 +69,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const handleCustomThemeChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ theme: Theme }>;
-      if (customEvent.detail?.theme && customEvent.detail.theme !== theme) {
-        setThemeState(customEvent.detail.theme);
-        if (customEvent.detail.theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+      if (customEvent.detail?.theme) {
+        applyTheme(customEvent.detail.theme, false);
       }
     };
 
@@ -87,7 +81,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(THEME_EVENT, handleCustomThemeChange);
     };
-  }, [applyTheme, theme]);
+  }, [applyTheme]);
 
   const setTheme = useCallback(
     (newTheme: Theme) => {

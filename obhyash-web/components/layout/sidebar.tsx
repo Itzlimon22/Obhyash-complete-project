@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   MessageSquare,
   Radio,
+  HeartPulse,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -76,6 +77,12 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
         label: 'প্রশ্ন ব্যাংক',
         icon: FileQuestion,
         href: '/admin/question-management',
+      },
+      {
+        id: 'question-health',
+        label: 'প্রশ্ন হেলথ ও কোয়ালিটি',
+        icon: HeartPulse,
+        href: '/admin/question-health',
       },
       {
         id: 'live-exams',

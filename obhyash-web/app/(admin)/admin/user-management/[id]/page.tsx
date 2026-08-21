@@ -36,12 +36,11 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '@/lib/types';
 import { toast } from 'sonner';
-
-// Reusable Modals
 import EditUserModal from '@/components/admin/user-management/EditUserModal';
 import ResetPasswordModal from '@/components/admin/user-management/ResetPasswordModal';
 import ManageSubscriptionModal from '@/components/admin/user-management/ManageSubscriptionModal';
 import SuspendUserModal from '@/components/admin/user-management/SuspendUserModal';
+import { createClient } from '@/utils/supabase/client';
 
 type DetailTab = 'overview' | 'exams' | 'payments' | 'devices' | 'notes';
 
@@ -126,7 +125,18 @@ export default function UserDetailsPage({
     else setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/users/details?userId=${userId}`);
+      const supabase = createClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`/api/admin/users/details?userId=${userId}`, {
+        headers,
+      });
       const json = await res.json();
 
       if (!res.ok || !json.success) {

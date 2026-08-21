@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config = {
-  darkMode: ['class', '.dark'], // ✅ Preserved existing dark mode config
+  darkMode: 'class', // ✅ Standard Tailwind class-based dark mode
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -91,8 +91,10 @@ const config = {
         },
       },
       fontFamily: {
-        // --- 🟢 NEW: Font Integration ---
         sans: ['var(--font-inter)', 'var(--font-anek)', 'sans-serif'],
+        anek: ['var(--font-anek)', 'var(--font-inter)', 'sans-serif'],
+        bengali: ['var(--font-anek)', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',

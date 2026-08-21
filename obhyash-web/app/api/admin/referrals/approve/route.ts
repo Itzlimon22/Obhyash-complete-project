@@ -6,7 +6,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export const POST = async (req: Request) => {
   try {
-    const { historyId, action } = await req.json(); // action: 'approve' | 'reject'
+    const body = await req.json();
+    const historyId = body.historyId || body.id;
+    const action = body.action; // action: 'approve' | 'reject'
 
     if (!historyId || !['approve', 'reject'].includes(action)) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
