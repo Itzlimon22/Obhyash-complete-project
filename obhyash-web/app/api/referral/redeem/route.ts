@@ -42,7 +42,17 @@ export const POST = async (req: Request) => {
   );
 
   if (txnError) {
-    return NextResponse.json({ error: txnError.message }, { status: 400 });
+    const raw = txnError.message || '';
+    let msg = raw;
+    const lower = raw.toLowerCase();
+    if (lower.includes('own referral') || lower.includes('own')) {
+      msg = 'তুমি নিজের রেফারেল কোড ব্যবহার করতে পারবে না!';
+    } else if (lower.includes('invalid') || lower.includes('not found')) {
+      msg = 'ভুল রেফারেল কোড! অনুগ্রহ করে সঠিক কোড দিন।';
+    } else if (lower.includes('already') || lower.includes('used')) {
+      msg = 'তুমি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছো!';
+    }
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
   // Notify the user that they successfully redeemed

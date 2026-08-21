@@ -263,6 +263,50 @@ class _PaymentViewState extends State<PaymentView>
     }
   }
 
+  bool _isValidTrxId(String rawTrxId, String method) {
+    final trx = rawTrxId.trim().toUpperCase();
+    final isBkash = method.toLowerCase().contains('bkash');
+    final isNagad = method.toLowerCase().contains('nagad');
+
+    // Exact length check: bKash = 10 chars, Nagad = 8 chars, Others = 8 or 10 chars
+    if (isBkash && trx.length != 10) return false;
+    if (isNagad && trx.length != 8) return false;
+    if (!isBkash && !isNagad && trx.length != 8 && trx.length != 10) return false;
+
+    // Only uppercase English letters and numbers allowed
+    final alphanumericRegex = RegExp(r'^[A-Z0-9]+$');
+    if (!alphanumericRegex.hasMatch(trx)) return false;
+
+    // Must have combination of letters and digits (real TrxIDs never consist solely of letters or solely of numbers)
+    final hasLetter = RegExp(r'[A-Z]').hasMatch(trx);
+    final hasDigit = RegExp(r'[0-9]').hasMatch(trx);
+    if (!hasLetter || !hasDigit) return false;
+
+    // Anti-spam: Reject strings with too many repeating characters (e.g. AAAAAAAA, 11111111)
+    if (trx.split('').toSet().length <= 2) return false;
+
+    // Block obvious dummy strings
+    const dummyTrx = {
+      '12345678',
+      '1234567890',
+      '00000000',
+      '0000000000',
+      'AAAAAAAA',
+      'AAAAAAAAAA',
+      'ABCDEFGH',
+      'ABCDEFGHIJ',
+      'TEST1234',
+      'TEST123456',
+      'ASDFGHJK',
+      'ASDFGHJKLM',
+      'TRANSACTIO',
+      'TRANSACTION',
+    };
+    if (dummyTrx.contains(trx)) return false;
+
+    return true;
+  }
+
   Future<void> _submit() async {
     if (_hasPendingPayment) {
       AppPopups.warning(
@@ -285,33 +329,11 @@ class _PaymentViewState extends State<PaymentView>
       return;
     }
 
-    // 2. TrxID Format validation (6 to 25 alphanumeric chars)
-    final trxRegex = RegExp(r'^[A-Z0-9]{6,25}$');
-    if (!trxRegex.hasMatch(trxId)) {
+    // 2. Strict Anti-Spam TrxID Validation (bKash: 10 chars, Nagad: 8 chars, Alphanumeric)
+    if (!_isValidTrxId(trxId, _selectedMethod)) {
       AppPopups.warning(
         context,
-        message: 'সঠিক ট্রানজেকশন আইডি দিন (ন্যূনতম ৬ ও সর্বোচ্চ ২৫ অক্ষর)',
-      );
-      return;
-    }
-
-    // 3. Block known dummy / fake TrxIDs
-    const dummyTrx = {
-      '123456',
-      '12345678',
-      '00000000',
-      'AAAAAAAA',
-      'TEST1234',
-      'ASDFGHJK',
-      'ABCDEF1234',
-      '11111111',
-      '1234567890',
-      'TRANSACTION',
-    };
-    if (dummyTrx.contains(trxId)) {
-      AppPopups.warning(
-        context,
-        message: 'অনুগ্রহ করে পেমেন্ট করার পর প্রাপ্ত আসল ট্রানজেকশন আইডি (TrxID) দিন।',
+        message: 'ভুল ট্রানজেকশন আইডি! অনুগ্রহ করে সঠিক ট্রানজেকশন আইডি দিন।',
       );
       return;
     }
@@ -801,16 +823,27 @@ class _PaymentViewState extends State<PaymentView>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isDark
-                      ? [const Color(0xFF064E3B), const Color(0xFF022C22)]
-                      : [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)],
+                      ? [const Color(0xFF1F2024), const Color(0xFF18191B)]
+                      : [const Color(0xFFFFFFFF), const Color(0xFFF8FAFC)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF059669).withValues(alpha: 0.35),
+                  color: isDark
+                      ? const Color(0xFF2E3036)
+                      : const Color(0xFFE2E8F0),
                   width: 1.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.4)
+                        : Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -820,10 +853,21 @@ class _PaymentViewState extends State<PaymentView>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF059669),
+                          color: isDark
+                              ? const Color(0xFF27272A)
+                              : const Color(0xFFE4E4E7),
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF3F3F46)
+                                : const Color(0xFFD4D4D8),
+                          ),
                         ),
-                        child: const Icon(LucideIcons.zap, color: Colors.white, size: 20),
+                        child: Icon(
+                          LucideIcons.zap,
+                          color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF0F172A),
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -836,7 +880,7 @@ class _PaymentViewState extends State<PaymentView>
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Anek Bangla',
-                                color: isDark ? Colors.white : const Color(0xFF065F46),
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
                             Text(
@@ -844,7 +888,7 @@ class _PaymentViewState extends State<PaymentView>
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontFamily: 'HindSiliguri',
-                                color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF047857),
+                                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -856,8 +900,15 @@ class _PaymentViewState extends State<PaymentView>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.black26 : Colors.white60,
-                      borderRadius: BorderRadius.circular(10),
+                      color: isDark
+                          ? const Color(0xFF121214)
+                          : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE2E8F0),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -896,11 +947,18 @@ class _PaymentViewState extends State<PaymentView>
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669),
+                      backgroundColor: const Color(0xFF022C22),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(
+                          color: Color(0xFF065F46),
+                          width: 1,
+                        ),
+                      ),
+                      elevation: 3,
+                      shadowColor: const Color(0xFF022C22).withValues(alpha: 0.5),
                     ),
                     child: Text(
                       '৳ ${_currentPlan.price}.00 পে করুন (অটোমেটিক)',
@@ -908,6 +966,7 @@ class _PaymentViewState extends State<PaymentView>
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Anek Bangla',
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -1572,6 +1631,41 @@ class _PaymentViewState extends State<PaymentView>
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          // Notice banner for payment issues
+          Container(
+            padding: const EdgeInsets.all(14),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1F2024) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFFDE68A),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  LucideIcons.alertCircle,
+                  size: 20,
+                  color: Color(0xFFD97706),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'পেমেন্টে কোনো ভুল (টাকা কম বা বেশি পাঠানো) হলে কিংবা ভেরিফিকেশনে সমস্যা হলে নিচের হোয়াটসঅ্যাপে আপনার TrxID সহ মেসেজ দিন। আমাদের টিম দ্রুত সমাধান করে দেবে।',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           ...items.map(
             (item) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -1683,12 +1777,20 @@ class _PaymentViewState extends State<PaymentView>
   Widget _buildInfoTab(bool isDark) {
     final faqs = [
       (
+        q: 'ভুলবশত প্যাকেজের চেয়ে কম বা বেশি টাকা পাঠালে কী হবে?',
+        a: '• যদি কম টাকা পাঠান: স্বয়ংক্রিয় পেমেন্ট সিস্টেমে প্যাকেজের এক্সাক্ট টাকার পরিমাণ মিলতে হয়। কম টাকা পাঠালে সিস্টেম স্বয়ংক্রিয়ভাবে পাস করবে না। তবে আপনার পাঠানো টাকা আমাদের বিকাশ একাউন্টে নিরাপদে থাকবে। আপনি অবিলম্বে আপনার TrxID সহ "সাপোর্ট" ট্যাবে (WhatsApp: 01409583992) মেসেজ দিন—বাকি টাকা পরিশোধ সাপেক্ষে আমাদের টিম ম্যানুয়ালি আপনার প্রো একাউন্ট চালু করে দেবে।\n\n• যদি বেশি টাকা পাঠান: আপনার অতিরিক্ত টাকা সম্পূর্ণ নিরাপদ। আমাদের সাপোর্ট নম্বরে মেসেজ দিলে সাথে সাথে আপনার প্রো একাউন্ট চালু করে অতিরিক্ত টাকা আপনার বিকাশ নম্বরে রিফান্ড করে দেওয়া হবে।',
+      ),
+      (
+        q: 'টাকার পরিমাণ হুবহু পাঠাব কীভাবে?',
+        a: 'পেমেন্ট স্ক্রিনে থাকা "টাকার পরিমাণ কপি করুন" বাটনে চাপ দিলে সঠিক টাকার পরিমাণ কপি হয়ে যায়। বিকাশ বা নগদ অ্যাপে গিয়ে শুধু পেস্ট করলেই আর টাকার পরিমাণে কোনো ভুল হবে না।',
+      ),
+      (
         q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
         a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01749591456 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
       ),
       (
         q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
-        a: 'তথ্য সাবমিট করার পর সাধারণত ৫ থেকে ৩০ মিনিটের মধ্যে আমাদের ভেরিফিকেশন টিম যাচাই করে আপনার একাউন্ট স্বয়ংক্রিয়ভাবে প্রিমিয়াম করে দেয়। সর্বোচ্চ ১-২ ঘণ্টার মধ্যে নিশ্চিতভাবে এক্টিভেশন সম্পন্ন হয়।',
+        a: 'অটোমেটিক গেটওয়েতে TrxID দিয়ে Verify বাটনে চাপ দেওয়ার সাথে সাথে (১-৫ সেকেন্ডে) একাউন্ট প্রিমিয়াম হয়ে যায়। ম্যানুয়াল আবেদনের ক্ষেত্রে ৫ থেকে ৩০ মিনিটের মধ্যে অ্যাডমিন ভেরিফাই করে চালু করে দেয়।',
       ),
       (
         q: 'ট্রানজেকশন আইডি (TrxID) কোথায় পাব?',

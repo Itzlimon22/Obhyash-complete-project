@@ -26,25 +26,76 @@ class MyProfileView extends ConsumerWidget {
     this.onSubjectClick,
   });
 
-  String _getRankName(int xp) {
-    if (xp < 1000) return 'রকি';
-    if (xp < 2000) return 'স্কাউট';
-    if (xp < 3000) return 'ওয়ারিয়র';
-    if (xp < 4000) return 'টাইটান';
-    return 'লিজেন্ড';
-  }
-
-  String _getNextRankName(int xp) {
-    if (xp < 1000) return 'স্কাউট';
-    if (xp < 2000) return 'ওয়ারিয়র';
-    if (xp < 3000) return 'টাইটান';
-    if (xp < 4000) return 'লিজেন্ড';
-    return 'লিজেন্ড';
+  ({
+    String currentRank,
+    String nextRank,
+    double progress,
+    int percent,
+    int currentXp,
+    int nextTargetXp,
+    String xpText,
+  }) _getLevelInfo(int xp) {
+    if (xp < 500) {
+      final p = (xp / 500.0).clamp(0.0, 1.0);
+      return (
+        currentRank: 'রুকি',
+        nextRank: 'স্কাউট',
+        progress: p,
+        percent: (p * 100).round(),
+        currentXp: xp,
+        nextTargetXp: 500,
+        xpText: '$xp / ৫০০ XP',
+      );
+    } else if (xp < 2000) {
+      final p = ((xp - 500) / 1500.0).clamp(0.0, 1.0);
+      return (
+        currentRank: 'স্কাউট',
+        nextRank: 'ওয়ারিয়র',
+        progress: p,
+        percent: (p * 100).round(),
+        currentXp: xp,
+        nextTargetXp: 2000,
+        xpText: '$xp / ২,০০০ XP',
+      );
+    } else if (xp < 5000) {
+      final p = ((xp - 2000) / 3000.0).clamp(0.0, 1.0);
+      return (
+        currentRank: 'ওয়ারিয়র',
+        nextRank: 'টাইটান',
+        progress: p,
+        percent: (p * 100).round(),
+        currentXp: xp,
+        nextTargetXp: 5000,
+        xpText: '$xp / ৫,০০০ XP',
+      );
+    } else if (xp < 10000) {
+      final p = ((xp - 5000) / 5000.0).clamp(0.0, 1.0);
+      return (
+        currentRank: 'টাইটান',
+        nextRank: 'লিজেন্ড',
+        progress: p,
+        percent: (p * 100).round(),
+        currentXp: xp,
+        nextTargetXp: 10000,
+        xpText: '$xp / ১০,০০০ XP',
+      );
+    } else {
+      return (
+        currentRank: 'লিজেন্ড',
+        nextRank: 'সর্বোচ্চ স্তর',
+        progress: 1.0,
+        percent: 100,
+        currentXp: xp,
+        nextTargetXp: 10000,
+        xpText: '$xp XP (সর্বোচ্চ স্তর)',
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final levelInfo = _getLevelInfo(user.xp);
 
     final evaluatedExams =
         history; // Assuming all history are evaluated for now
@@ -66,10 +117,10 @@ class MyProfileView extends ConsumerWidget {
         children: [
           // User Profile Card
           _UserProfileCard(user: user, isDark: isDark),
-          const SizedBox(height: 24), // mb-6
+          const SizedBox(height: 20),
           // Level Progress Bar (Premium Design)
           Container(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDark
@@ -79,11 +130,11 @@ class MyProfileView extends ConsumerWidget {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x4D312E81),
-                  blurRadius: 15,
-                  offset: Offset(0, 8),
+                  color: isDark ? Colors.black38 : const Color(0x4D312E81),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
@@ -91,11 +142,11 @@ class MyProfileView extends ConsumerWidget {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -60,
-                  right: -40,
+                  top: -40,
+                  right: -20,
                   child: Icon(
                     Icons.stars_rounded,
-                    size: 160,
+                    size: 130,
                     color: Colors.white.withValues(alpha: 0.05),
                   ),
                 ),
@@ -104,73 +155,106 @@ class MyProfileView extends ConsumerWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0x33F59E0B),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0x80F59E0B),
-                                  width: 1,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0x33F59E0B),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0x80F59E0B),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.emoji_events_rounded,
+                                      color: Color(0xFFFBBF24),
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      levelInfo.currentRank,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFFBBF24),
+                                        fontFamily: 'Anek Bangla',
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.emoji_events_rounded,
-                                    color: Color(0xFFFBBF24),
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    _getRankName(user.xp),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFFFBBF24),
-                                      fontFamily: 'Anek Bangla',
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 10),
+                              const Text(
+                                'পরবর্তী লেভেল রিওয়ার্ড',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                  fontFamily: 'Anek Bangla',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${levelInfo.percent}%',
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                fontFamily: 'Anek Bangla',
+                                height: 1,
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'পরবর্তী লেভেল রিওয়ার্ড',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white70,
-                                fontFamily: 'Anek Bangla',
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black26,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: Colors.white12,
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                levelInfo.xpText,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFFDE047),
+                                  fontFamily: 'Anek Bangla',
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        Text(
-                          '${((user.xp % 1000) / 10).floor()}%',
-                          style: const TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            fontFamily: 'Anek Bangla',
-                            height: 1,
-                          ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 18),
                     // The Bar
                     Container(
-                      height: 12,
+                      height: 10,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         borderRadius: BorderRadius.circular(12),
@@ -181,13 +265,13 @@ class MyProfileView extends ConsumerWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: FractionallySizedBox(
-                          widthFactor: ((user.xp % 1000) / 10) / 100,
+                          widthFactor: levelInfo.progress,
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               gradient: const LinearGradient(
                                 colors: [
-                                  Color(0xFF1E3A8A),
+                                  Color(0xFF60A5FA),
                                   Color(0xFFFDE047),
                                 ],
                               ),
@@ -203,27 +287,25 @@ class MyProfileView extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _getRankName(user.xp),
+                          levelInfo.currentRank,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white60,
-                            letterSpacing: 1.5,
                             fontFamily: 'Anek Bangla',
                           ),
                         ),
                         Text(
-                          _getNextRankName(user.xp),
+                          levelInfo.nextRank,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white60,
-                            letterSpacing: 1.5,
                             fontFamily: 'Anek Bangla',
                           ),
                         ),
@@ -234,7 +316,7 @@ class MyProfileView extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Key Stats Grid
           StatsGrid(
@@ -243,11 +325,11 @@ class MyProfileView extends ConsumerWidget {
             xp: user.xp,
             streak: user.streakCount,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Badges Showcase
           BadgesShowcaseSection(userId: user.id),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Main Content Layout (Left Column & Right Column mimic from Web)
           LayoutBuilder(
@@ -260,7 +342,7 @@ class MyProfileView extends ConsumerWidget {
                     subjectStats: subjectStats,
                     onSubjectClick: onSubjectClick,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   RecentActivitySection(history: history),
                 ],
               );
@@ -271,7 +353,6 @@ class MyProfileView extends ConsumerWidget {
                     calendarData: calendarData,
                     streakCount: user.streakCount,
                   ),
-                  // Weekly Activity Graph is omitted to avoid FlChart boilerplate noise for now
                 ],
               );
 
@@ -280,14 +361,14 @@ class MyProfileView extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: leftColumn),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 20),
                     Expanded(child: rightColumn),
                   ],
                 );
               }
 
               return Column(
-                children: [leftColumn, const SizedBox(height: 24), rightColumn],
+                children: [leftColumn, const SizedBox(height: 20), rightColumn],
               );
             },
           ),
@@ -298,7 +379,6 @@ class MyProfileView extends ConsumerWidget {
   }
 }
 
-
 // ── User Profile Card ─────────────────────────────────────────────────────────
 
 class _UserProfileCard extends StatelessWidget {
@@ -307,48 +387,77 @@ class _UserProfileCard extends StatelessWidget {
 
   const _UserProfileCard({required this.user, required this.isDark});
 
-  String get _initials {
-    final parts = user.name.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return parts[0].isNotEmpty ? parts[0][0].toUpperCase() : '?';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x05000000),
-            blurRadius: 2,
-            offset: Offset(0, 1),
+            color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Avatar
+          // Avatar with Camera Edit Badge
           GestureDetector(
             onTap: () => AvatarPickerModal.show(context, user),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
-                UserAvatar(
-                  id: user.id,
-                  name: user.name,
-                  avatarUrl: user.avatarUrl,
-                  gender: user.gender,
-                  size: 64,
-                  showBorder: true,
-                  borderColor: Colors.white,
-                  borderWidth: 2,
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                      width: 2,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: UserAvatar(
+                      id: user.id,
+                      name: user.name,
+                      avatarUrl: user.avatarUrl,
+                      gender: user.gender,
+                      size: 64,
+                      showBorder: false,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -2,
+                  right: -2,
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF059669),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF18181B) : Colors.white,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      size: 13,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -364,7 +473,7 @@ class _UserProfileCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF000000),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     fontFamily: 'Anek Bangla',
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -374,10 +483,10 @@ class _UserProfileCard extends StatelessWidget {
                   Text(
                     user.email!,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF737373),
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF64748B),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -385,7 +494,7 @@ class _UserProfileCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
-                  runSpacing: 4,
+                  runSpacing: 5,
                   children: [
                     if (user.institute != null && user.institute!.isNotEmpty)
                       _InfoChip(label: user.institute!, isDark: isDark),
@@ -413,17 +522,21 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(6),
+        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+          width: 0.8,
+        ),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46),
           fontFamily: 'Anek Bangla',
         ),
       ),

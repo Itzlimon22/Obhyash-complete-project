@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter/services.dart';
 
 class StatsGrid extends StatelessWidget {
   final int examsTaken;
@@ -19,133 +19,126 @@ class StatsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // use 2 columns on mobile, 4 columns on tablet/desktop
+        // 2 columns on mobile, 4 columns on desktop/tablet
         final isMobile = constraints.maxWidth < 600;
         final crossAxisCount = isMobile ? 2 : 4;
 
         return GridView.count(
           crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 12, // sm:gap-4
-          mainAxisSpacing: 12,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: isMobile ? 1.05 : 1.2,
+          childAspectRatio: isMobile ? 1.65 : 2.1,
           children: [
-            _buildStatCard(
-              context,
+            _StatCard(
               title: 'মোট পরীক্ষা',
               value: examsTaken.toString(),
-              icon: LucideIcons.fileEdit,
-              color: const Color(0xFFB91C1C), // rose-600
-              bgColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x33e11d48) // rose-900/20
-                  : const Color(0xFFFFF1F2), // rose-50
             ),
-            _buildStatCard(
-              context,
+            _StatCard(
               title: 'গড় স্কোর',
               value: '$avgScore%',
-              icon: LucideIcons.crosshair,
-              color: const Color(0xFF059669), // emerald-600
-              bgColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x33047857) // emerald-900/20
-                  : const Color(0xFFECFDF5), // emerald-50
             ),
-            _buildStatCard(
-              context,
+            _StatCard(
               title: 'মোট XP',
               value: xp.toString(),
-              icon: LucideIcons.target,
-              color: const Color(0xFFD97706), // amber-600
-              bgColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x33b45309) // amber-900/20
-                  : const Color(0xFFFFFBEB), // amber-50
             ),
-            _buildStatCard(
-              context,
+            _StatCard(
               title: 'স্ট্রিক',
               value: '$streak দিন',
-              icon: LucideIcons.flame,
-              color: const Color(0xFFEA580C), // orange-600
-              bgColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x339a3412) // orange-900/20
-                  : const Color(0xFFFFF7ED), // orange-50
             ),
           ],
         );
       },
     );
   }
+}
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-  }) {
+class _StatCard extends StatefulWidget {
+  final String title;
+  final String value;
+
+  const _StatCard({
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  State<_StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<_StatCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(16), // sm:p-6
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white, // neutral-900
-        borderRadius: BorderRadius.circular(20), // sm:rounded-3xl
-        border: Border.all(
-          color: isDark
-              ? const Color(0xFF1C1C1E)
-              : const Color(0xFFE5E5E5), // neutral-800 : neutral-200
+    return GestureDetector(
+      onTapDown: (_) {
+        HapticFeedback.lightImpact();
+        setState(() => _isPressed = true);
+      },
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.93 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFE4E4E7),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? const Color(0xFFA1A1AA)
+                      : const Color(0xFF71717A),
+                  fontFamily: 'Anek Bangla',
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 3),
+              Text(
+                widget.value,
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w900,
+                  color: isDark
+                      ? Colors.white
+                      : const Color(0xFF0F172A),
+                  letterSpacing: -0.3,
+                  fontFamily: 'Anek Bangla',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x05000000), // shadow-sm
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8), // sm:p-2.5
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(10), // sm:rounded-xl
-            ),
-            child: Icon(icon, color: color, size: 20), // sm:w-6
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16, // sm:text-sm
-              fontWeight: FontWeight.bold,
-              color: isDark
-                  ? const Color(0xFFA3A3A3)
-                  : const Color(0xFF737373), // neutral-400 : neutral-500
-              letterSpacing: 0.5,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 26, // sm:text-3xl
-              fontWeight: FontWeight.w900, // font-black
-              color: isDark
-                  ? Colors.white
-                  : const Color(0xFF000000), // neutral-900
-              letterSpacing: -0.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

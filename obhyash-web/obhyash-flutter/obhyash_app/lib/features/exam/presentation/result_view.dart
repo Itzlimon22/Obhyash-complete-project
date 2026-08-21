@@ -54,10 +54,9 @@ class _ResultViewState extends State<ResultView> {
           GamificationService.checkAndUnlockBadges(
             context: context,
             userId: uid,
-            totalExamsCompleted: 1,
-            userStreak: 1,
             latestScore: widget.result.correctCount,
             totalQuestions: widget.result.totalQuestions,
+            timeTakenSeconds: widget.result.timeTaken,
           );
         }
       });

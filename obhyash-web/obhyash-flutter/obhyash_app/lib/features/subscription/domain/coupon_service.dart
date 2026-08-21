@@ -70,6 +70,20 @@ const Map<String, Coupon> _activeCoupons = {
       599: 399,
     },
   ),
+  'TEST10': Coupon(
+    code: 'TEST10',
+    name: 'টেস্ট পেমেন্ট অফার',
+    discountPercentage: 95.0,
+    description: 'যেকোনো প্যাকেজের দাম মাত্র ১০ টাকা (টেস্টিং উদ্দেশ্যে)',
+    isActive: true,
+    fixedPrices: {
+      149: 10,
+      249: 10,
+      349: 10,
+      599: 10,
+      999: 10,
+    },
+  ),
 };
 
 /// Service class for coupon validation and price calculation.

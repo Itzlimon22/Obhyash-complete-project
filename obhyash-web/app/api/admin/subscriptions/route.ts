@@ -170,36 +170,46 @@ export async function GET(request: NextRequest) {
 
     (usersData || []).forEach((u) => {
       const sub = u.subscription || {};
-      const planName =
-        sub.plan ||
-        sub.plan_name ||
-        u.subscription_tier ||
-        u.plan ||
-        u.level ||
-        'Pro Premium';
+      const subTier = u.subscription_tier;
+      const uPlan = u.plan;
+      const uLevel = u.level;
 
       const expiry =
         sub.expiry ||
         sub.expires_at ||
         u.subscription_expires_at ||
+        u.subscription_end_date ||
         '';
 
       const isExpired = expiry ? new Date(expiry).getTime() < Date.now() : false;
-      const isProUser =
+
+      // Strict check: only genuine Pro/Subscribed users
+      const hasProFlag =
         u.is_subscribed === true ||
         u.is_pro === true ||
-        u.level === 'Pro' ||
-        u.plan === 'Pro' ||
-        u.subscription_status === 'Active' ||
+        (uLevel && String(uLevel).toLowerCase() === 'pro') ||
+        (uPlan && String(uPlan).toLowerCase() === 'pro') ||
+        (subTier && String(subTier).toLowerCase().includes('pro')) ||
         (sub.status && String(sub.status).toLowerCase() === 'active') ||
-        (planName && planName !== 'Free' && planName !== 'Rookie');
+        u.subscription_status === 'Active' ||
+        u.subscription_status === 'Expired';
 
-      if (!isProUser && (!expiry || isExpired)) {
-        return; // skip non-pro users
+      // Check if user has an expiry date recorded
+      const hasExpiryRecord = Boolean(expiry);
+
+      if (!hasProFlag && !hasExpiryRecord) {
+        return; // skip standard Free/Rookie users completely!
       }
 
       seenUserSubIds.add(u.id);
-      const isActive = isProUser && !isExpired;
+      const isActive = hasProFlag && !isExpired && u.subscription_status !== 'Expired';
+
+      const planName =
+        sub.plan ||
+        sub.plan_name ||
+        u.subscription_tier ||
+        u.plan ||
+        (hasProFlag ? 'Pro Premium' : 'Free');
 
       mappedSubscriptions.push({
         id: u.id,
@@ -217,7 +227,7 @@ export async function GET(request: NextRequest) {
         started_at: u.updated_at || u.created_at || new Date().toISOString(),
         expires_at: expiry || (isActive ? new Date(Date.now() + 30 * 86400000).toISOString() : ''),
         is_active: isActive,
-        status: isExpired ? 'Expired' : (isActive ? 'Active' : (u.subscription_status || 'Inactive')),
+        status: isExpired ? 'Expired' : (isActive ? 'Active' : (u.subscription_status || 'Expired')),
       });
     });
 
@@ -275,6 +285,7 @@ export async function GET(request: NextRequest) {
         ? Math.round((approvedRequests.length / totalRequestsCount) * 100)
         : 0;
     const activeSubscribersCount = mappedSubscriptions.filter((s) => s.is_active).length;
+    const expiredSubscribersCount = mappedSubscriptions.filter((s) => !s.is_active).length;
 
     return NextResponse.json({
       success: true,
@@ -286,6 +297,7 @@ export async function GET(request: NextRequest) {
           totalRevenue,
           pendingRequests: pendingRequests.length,
           activeSubscriptions: activeSubscribersCount,
+          expiredSubscriptions: expiredSubscribersCount,
           approvalRate,
           approvedRequests: approvedRequests.length,
           rejectedRequests: rejectedRequests.length,

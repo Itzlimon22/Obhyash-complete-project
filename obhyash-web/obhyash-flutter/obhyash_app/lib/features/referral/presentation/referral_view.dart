@@ -295,22 +295,59 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
     } catch (e) {
       if (mounted) {
         setState(() => _isClaiming = false);
-        final err = e.toString();
-        if (err.contains('১০ মিনিট') || err.contains('লক')) {
-          _startLockoutTimer(600); // 10 mins lockout
-          AppPopups.error(
-            context,
-            message: 'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।',
-          );
-        } else if (err.contains('চেষ্টা করা যাবে')) {
-          final match = RegExp(r'আর (\d+) বার').firstMatch(err);
+        String rawMsg = '';
+        if (e is PostgrestException) {
+          rawMsg = e.message;
+        } else {
+          rawMsg = e.toString();
+        }
+
+        final lowerMsg = rawMsg.toLowerCase();
+        String userFriendlyMsg = '';
+
+        if (lowerMsg.contains('own referral') ||
+            lowerMsg.contains('নিজের রেফারেল') ||
+            lowerMsg.contains('cannot redeem own') ||
+            lowerMsg.contains('own code')) {
+          userFriendlyMsg = 'তুমি নিজের রেফারেল কোড ব্যবহার করতে পারবে না!';
+        } else if (lowerMsg.contains('invalid') ||
+            lowerMsg.contains('not found') ||
+            lowerMsg.contains('does not exist') ||
+            lowerMsg.contains('ভুল কোড') ||
+            lowerMsg.contains('সঠিক নয়')) {
+          userFriendlyMsg = 'ভুল রেফারেল কোড! অনুগ্রহ করে সঠিক কোড দিন।';
+        } else if (lowerMsg.contains('already') ||
+            lowerMsg.contains('ইতিমধ্যে') ||
+            lowerMsg.contains('used') ||
+            lowerMsg.contains('পূর্বে')) {
+          userFriendlyMsg = 'তুমি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছো!';
+        } else if (lowerMsg.contains('১০ মিনিট') ||
+            lowerMsg.contains('লক') ||
+            lowerMsg.contains('lock') ||
+            lowerMsg.contains('3 failed')) {
+          _startLockoutTimer(600);
+          userFriendlyMsg =
+              'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।';
+          AppPopups.error(context, message: userFriendlyMsg);
+          return;
+        } else if (lowerMsg.contains('চেষ্টা করা যাবে')) {
+          final match = RegExp(r'আর (\d+) বার').firstMatch(rawMsg);
           if (match != null) {
             setState(() => _remainingAttempts = int.tryParse(match.group(1)!) ?? 1);
           }
-          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+          userFriendlyMsg = rawMsg.replaceAll('Exception:', '').trim();
         } else {
-          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+          userFriendlyMsg = rawMsg
+              .replaceAll('Exception:', '')
+              .replaceAll(RegExp(r'PostgrestException\(message:\s*'), '')
+              .replaceAll(RegExp(r',\s*code:.*'), '')
+              .trim();
+          if (userFriendlyMsg.isEmpty) {
+            userFriendlyMsg = 'রেফারেল ক্লেইম ব্যর্থ হয়েছে। সঠিক কোড দিয়ে চেষ্টা করুন।';
+          }
         }
+
+        AppPopups.warning(context, message: userFriendlyMsg);
       }
     }
   }
@@ -371,14 +408,14 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 children: [
                   // ── Hero Banner ──────────────────────────────────────────
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [Color(0xFFB91C1C), Color(0xFFBE123C)],
                       ),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(
@@ -389,57 +426,18 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                LucideIcons.gift,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'রেফারেল প্রোগ্রাম',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Anek Bangla',
-                              ),
-                            ),
-                          ],
+                    child: const Center(
+                      child: Text(
+                        'বন্ধুদের আমন্ত্রণ জানাও,\nপ্রতি ৩ রেফারে পাও একটি স্ক্র্যাচ কার্ড!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Anek Bangla',
+                          height: 1.4,
                         ),
-                        const SizedBox(height: 14),
-                        const Text(
-                          'বন্ধুদের আমন্ত্রণ জানাও,\nপ্রতি ৩ রেফারে পাও একটি স্ক্র্যাচ কার্ড!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Anek Bangla',
-                            height: 1.3,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'তোমার কোড দিয়ে কোনো বন্ধু যুক্ত হলে সে পাবে ১ মাসের ফ্রি প্রিমিয়াম, আর তুমি প্রতি ৩ জন বন্ধুর জন্য পাবে একটি দারুণ স্ক্র্যাচ কার্ড!',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            fontFamily: 'Anek Bangla',
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
 
@@ -696,21 +694,23 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 child: Text(
                                   _code ?? '— — — — — — — —',
                                   style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 4,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 2,
                                     color: textPrimary,
                                     fontFamily: 'monospace',
                                   ),
-                                 maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  maxLines: 1,
+                                ),
                               ),
+                              const SizedBox(width: 8),
                               GestureDetector(
                                 onTap: _copyCode,
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 7,
+                                    horizontal: 10,
+                                    vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
                                     color: _isCopied
@@ -734,14 +734,14 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        _isCopied ? 'কপি হয়েছে' : 'কপি করো',
+                                        _isCopied ? 'কপি হয়েছে' : 'কপি করো',
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'Anek Bangla',
+                                          fontFamily: 'HindSiliguri',
                                           color: _isCopied
                                               ? Colors.white
-                                              : textSecondary,
+                                              : (isDark ? Colors.white70 : const Color(0xFF334155)),
                                         ),
                                       ),
                                     ],
@@ -796,131 +796,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                   _buildLeaderboardSection(isDark),
                   const SizedBox(height: 16),
 
-                  // ── Benefits ─────────────────────────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: card,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.auto_awesome_rounded,
-                              color: Color(0xFF1E3A8A),
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'রেফারেল প্রোগ্রামের সুবিধা',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Anek Bangla',
-                                color: textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        ...[
-                          (
-                            '১',
-                            'বন্ধুর জন্য ১ মাস ফ্রি প্রিমিয়াম',
-                            'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
-                          ),
-                          (
-                            '২',
-                            'তোমার জন্য স্ক্র্যাচ কার্ড',
-                            'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখানে থাকতে পারে ফ্রি প্রিমিয়াম।',
-                          ),
-                          (
-                            '৩',
-                            'আনলিমিটেড রেফারেল',
-                            'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি স্ক্র্যাচ কার্ড জেতার সুযোগ পাবে।',
-                          ),
-                        ].map(
-                          (item) => Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF1C1C1E)
-                                  : const Color(0xFFFAFAF9),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isDark
-                                    ? const Color(0xFF27272A)
-                                    : const Color(0xFFF5F5F5),
-                              ),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(
-                                            0xFF7F1D1D,
-                                          ).withValues(alpha: 0.4)
-                                        : const Color(0xFFFFF1F2),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      item.$1,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xFFB91C1C),
-                                        fontFamily: 'Anek Bangla',
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.$2,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Anek Bangla',
-                                          color: textPrimary,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        item.$3,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Anek Bangla',
-                                          color: textSecondary,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  const SizedBox(height: 16),
 
                   // ── How It Works ─────────────────────────────────────────
                   Container(
@@ -1126,6 +1002,122 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                       ),
                     ),
                   ],
+
+                  const SizedBox(height: 16),
+
+                  // ── Benefits (Moved to Page End) ─────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: card,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'রেফারেল প্রোগ্রামের সুবিধা',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Anek Bangla',
+                            color: textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        ...[
+                          (
+                            '১',
+                            'বন্ধুর জন্য ১ মাস ফ্রি প্রিমিয়াম',
+                            'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
+                          ),
+                          (
+                            '২',
+                            'তোমার জন্য স্ক্র্যাচ কার্ড',
+                            'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখানে থাকতে পারে ফ্রি প্রিমিয়াম।',
+                          ),
+                          (
+                            '৩',
+                            'আনলিমিটেড রেফারেল',
+                            'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি স্ক্র্যাচ কার্ড জেতার সুযোগ পাবে।',
+                          ),
+                        ].map(
+                          (item) => Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF1C1C1E)
+                                  : const Color(0xFFFAFAF9),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFF27272A)
+                                    : const Color(0xFFF5F5F5),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(
+                                            0xFF7F1D1D,
+                                          ).withValues(alpha: 0.4)
+                                        : const Color(0xFFFFF1F2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      item.$1,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFB91C1C),
+                                        fontFamily: 'Anek Bangla',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.$2,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Anek Bangla',
+                                          color: textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        item.$3,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Anek Bangla',
+                                          color: textSecondary,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 32),
                 ],

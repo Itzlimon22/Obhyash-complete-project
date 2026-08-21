@@ -98,7 +98,7 @@ interface SubscriptionHistory {
 
 export default function SubscriptionsPage() {
   const [activeTab, setActiveTab] = useState<
-    'requests' | 'subscriptions'
+    'requests' | 'active_subscriptions' | 'expired_subscriptions'
   >('requests');
   const [rawRequests, setRawRequests] = useState<PaymentRequest[]>([]);
   const [rawSubscriptions, setRawSubscriptions] = useState<SubscriptionHistory[]>([]);
@@ -119,7 +119,7 @@ export default function SubscriptionsPage() {
   // Subscriptions Filters & Sorting
   const [subSearchQuery, setSubSearchQuery] = useState('');
   const [subStatusFilter, setSubStatusFilter] = useState<
-    'All' | 'Active' | 'Expiring' | 'Expired'
+    'All' | 'Expiring'
   >('All');
   const [subSort, setSubSort] = useState<
     'expiring_soon' | 'newest' | 'name'
@@ -157,6 +157,7 @@ export default function SubscriptionsPage() {
     totalRevenue: 0,
     pendingRequests: 0,
     activeSubscriptions: 0,
+    expiredSubscriptions: 0,
     approvalRate: 0,
   });
 
@@ -177,6 +178,7 @@ export default function SubscriptionsPage() {
           totalRevenue: Number(json.data.stats.totalRevenue) || 0,
           pendingRequests: Number(json.data.stats.pendingRequests) || 0,
           activeSubscriptions: Number(json.data.stats.activeSubscriptions) || 0,
+          expiredSubscriptions: Number(json.data.stats.expiredSubscriptions) || 0,
           approvalRate: Number(json.data.stats.approvalRate) || 0,
         });
       }
@@ -246,9 +248,9 @@ export default function SubscriptionsPage() {
     return filteredRequests.slice(from, from + pageSize);
   }, [filteredRequests, reqPage]);
 
-  // Filtered & Sorted Subscriptions
-  const filteredSubscriptions = useMemo(() => {
-    let list = [...rawSubscriptions];
+  // Filtered & Sorted Active Subscriptions
+  const filteredActiveSubscriptions = useMemo(() => {
+    let list = rawSubscriptions.filter((s) => s.is_active);
 
     // Search by Phone, Name, Email, Plan
     if (subSearchQuery.trim()) {
@@ -262,16 +264,12 @@ export default function SubscriptionsPage() {
     }
 
     // Status Filter
-    if (subStatusFilter === 'Active') {
-      list = list.filter((s) => s.is_active);
-    } else if (subStatusFilter === 'Expiring') {
+    if (subStatusFilter === 'Expiring') {
       list = list.filter((s) => {
         if (!s.expires_at || !s.is_active) return false;
         const days = Math.ceil((new Date(s.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
         return days <= 7 && days >= 0;
       });
-    } else if (subStatusFilter === 'Expired') {
-      list = list.filter((s) => !s.is_active);
     }
 
     // Sorting
@@ -290,11 +288,42 @@ export default function SubscriptionsPage() {
     return list;
   }, [rawSubscriptions, subSearchQuery, subStatusFilter, subSort]);
 
-  // Paginated Subscriptions
-  const paginatedSubscriptions = useMemo(() => {
+  // Filtered & Sorted Expired Subscriptions
+  const filteredExpiredSubscriptions = useMemo(() => {
+    let list = rawSubscriptions.filter((s) => !s.is_active);
+
+    // Search by Phone, Name, Email, Plan
+    if (subSearchQuery.trim()) {
+      const q = subSearchQuery.toLowerCase().trim();
+      list = list.filter((s) =>
+        (s.user?.phone && s.user.phone.toLowerCase().includes(q)) ||
+        (s.user?.name && s.user.name.toLowerCase().includes(q)) ||
+        (s.user?.email && s.user.email.toLowerCase().includes(q)) ||
+        (s.plan_name && s.plan_name.toLowerCase().includes(q))
+      );
+    }
+
+    // Default newest expired first
+    list.sort((a, b) => {
+      const aTime = a.expires_at ? new Date(a.expires_at).getTime() : 0;
+      const bTime = b.expires_at ? new Date(b.expires_at).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    return list;
+  }, [rawSubscriptions, subSearchQuery]);
+
+  // Paginated Active Subscriptions
+  const paginatedActiveSubscriptions = useMemo(() => {
     const from = (subPage - 1) * pageSize;
-    return filteredSubscriptions.slice(from, from + pageSize);
-  }, [filteredSubscriptions, subPage]);
+    return filteredActiveSubscriptions.slice(from, from + pageSize);
+  }, [filteredActiveSubscriptions, subPage]);
+
+  // Paginated Expired Subscriptions
+  const paginatedExpiredSubscriptions = useMemo(() => {
+    const from = (subPage - 1) * pageSize;
+    return filteredExpiredSubscriptions.slice(from, from + pageSize);
+  }, [filteredExpiredSubscriptions, subPage]);
 
   const handleReviewPayment = async () => {
     if (!reviewingRequest) return;
@@ -493,15 +522,15 @@ export default function SubscriptionsPage() {
         ]),
       });
       toast.success('পেমেন্ট রিকোয়েস্ট শিট সফলভাবে ডাউনলোড হয়েছে');
-    } else {
-      if (!filteredSubscriptions || filteredSubscriptions.length === 0) {
-        toast.error('এক্সপোর্ট করার মতো কোনো অ্যাক্টিভ সাবস্ক্রিপশন নেই');
+    } else if (activeTab === 'active_subscriptions') {
+      if (!filteredActiveSubscriptions || filteredActiveSubscriptions.length === 0) {
+        toast.error('এক্সপোর্ট করার মতো কোনো অ্যাক্টিভ প্রিমিয়াম ইউজার নেই');
         return;
       }
       exportToCSV({
-        filename: `active_subscriptions_${new Date().toISOString().split('T')[0]}.csv`,
+        filename: `active_premium_users_${new Date().toISOString().split('T')[0]}.csv`,
         headers: [
-          'Subscription ID',
+          'User ID',
           'User Name',
           'Email',
           'Phone',
@@ -510,7 +539,7 @@ export default function SubscriptionsPage() {
           'Expires Date & Time (24h)',
           'Status',
         ],
-        rows: filteredSubscriptions.map((s) => [
+        rows: filteredActiveSubscriptions.map((s) => [
           s.id,
           s.user?.name || 'N/A',
           s.user?.email || 'N/A',
@@ -518,10 +547,39 @@ export default function SubscriptionsPage() {
           s.plan_name || s.plan?.display_name || 'Premium',
           formatTimestamp24h(s.started_at).full,
           s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Unlimited',
-          s.is_active ? 'Active' : 'Expired',
+          'Active',
         ]),
       });
-      toast.success('সাবস্ক্রিপশন শিট সফলভাবে ডাউনলোড হয়েছে');
+      toast.success('অ্যাক্টিভ প্রিমিয়াম ইউজার শিট সফলভাবে ডাউনলোড হয়েছে');
+    } else {
+      if (!filteredExpiredSubscriptions || filteredExpiredSubscriptions.length === 0) {
+        toast.error('এক্সপোর্ট করার মতো কোনো মেয়াদোত্তীর্ণ ইউজার নেই');
+        return;
+      }
+      exportToCSV({
+        filename: `expired_premium_users_${new Date().toISOString().split('T')[0]}.csv`,
+        headers: [
+          'User ID',
+          'User Name',
+          'Email',
+          'Phone',
+          'Plan Name',
+          'Started Date & Time (24h)',
+          'Expired Date & Time (24h)',
+          'Status',
+        ],
+        rows: filteredExpiredSubscriptions.map((s) => [
+          s.id,
+          s.user?.name || 'N/A',
+          s.user?.email || 'N/A',
+          s.user?.phone || 'N/A',
+          s.plan_name || s.plan?.display_name || 'Premium',
+          formatTimestamp24h(s.started_at).full,
+          s.expires_at ? formatTimestamp24h(s.expires_at).full : 'Expired',
+          'Expired',
+        ]),
+      });
+      toast.success('মেয়াদোত্তীর্ণ ইউজার শিট সফলভাবে ডাউনলোড হয়েছে');
     }
   };
 
@@ -551,7 +609,7 @@ export default function SubscriptionsPage() {
             সাবস্ক্রিপশন ও পেমেন্ট
           </h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            পেমেন্ট ভেরিফিকেশন, অ্যাক্টিভ সাবস্ক্রাইবার ও মেয়াদ নিয়ন্ত্রণ করুন
+            পেমেন্ট ভেরিফিকেশন, অ্যাক্টিভ প্রিমিয়াম ইউজার ও মেয়াদ নিয়ন্ত্রণ করুন
           </p>
         </div>
 
@@ -651,14 +709,14 @@ export default function SubscriptionsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                এক্টিভ ইউজার
+                এক্টিভ প্রিমিয়াম ইউজার
               </p>
               <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
                 {serverStats.activeSubscriptions}
               </p>
             </div>
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 dark:bg-purple-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
         </div>
@@ -667,14 +725,14 @@ export default function SubscriptionsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                অনুমোদনের হার
+                মেয়াদোত্তীর্ণ প্রিমিয়াম
               </p>
               <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mt-1 sm:mt-2">
-                {serverStats.approvalRate}%
+                {serverStats.expiredSubscriptions}
               </p>
             </div>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 dark:bg-blue-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
-              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-50 dark:bg-red-950/40 rounded-xl sm:rounded-2xl flex items-center justify-center text-red-600 dark:text-red-400">
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
         </div>
@@ -701,17 +759,37 @@ export default function SubscriptionsPage() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('subscriptions')}
+            onClick={() => {
+              setActiveTab('active_subscriptions');
+              setSubPage(1);
+            }}
             className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
-              activeTab === 'subscriptions'
+              activeTab === 'active_subscriptions'
                 ? 'border-purple-600 text-purple-600 dark:text-purple-400'
                 : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
             }`}
           >
             <Crown size={18} />
-            <span>এক্টিভ ইউজার</span>
+            <span>এক্টিভ প্রিমিয়াম ইউজার</span>
             <span className="px-2 py-0.5 text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-full font-bold">
               {serverStats.activeSubscriptions}
+            </span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('expired_subscriptions');
+              setSubPage(1);
+            }}
+            className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
+              activeTab === 'expired_subscriptions'
+                ? 'border-red-600 text-red-600 dark:text-red-400'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+            }`}
+          >
+            <Clock size={18} />
+            <span>সম্প্রতি মেয়াদোত্তীর্ণ</span>
+            <span className="px-2 py-0.5 text-xs bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-full font-bold">
+              {serverStats.expiredSubscriptions}
             </span>
           </button>
         </div>
@@ -1193,8 +1271,8 @@ export default function SubscriptionsPage() {
           </div>
         )}
 
-        {/* Tab 2: Active Subscriptions */}
-        {activeTab === 'subscriptions' && (
+        {/* Tab 2: Active Premium Subscriptions */}
+        {activeTab === 'active_subscriptions' && (
           <div className="space-y-6">
             {/* Filter Bar for Active Subscriptions */}
             <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
@@ -1216,28 +1294,32 @@ export default function SubscriptionsPage() {
               {/* Status Pills and Sorting */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                  {(['All', 'Active', 'Expiring', 'Expired'] as const).map((status) => (
-                    <button
-                      key={status}
-                      onClick={() => {
-                        setSubStatusFilter(status);
-                        setSubPage(1);
-                      }}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                        subStatusFilter === status
-                          ? 'bg-purple-600 text-white shadow-md'
-                          : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                      }`}
-                    >
-                      {status === 'All'
-                        ? `সব (${rawSubscriptions.length})`
-                        : status === 'Active'
-                        ? 'এক্টিভ'
-                        : status === 'Expiring'
-                        ? 'মেয়াদ শেষের দিকে (≤ ৭ দিন)'
-                        : 'মেয়াদোত্তীর্ণ'}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => {
+                      setSubStatusFilter('All');
+                      setSubPage(1);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      subStatusFilter === 'All'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    সব এক্টিভ ({filteredActiveSubscriptions.length})
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSubStatusFilter('Expiring');
+                      setSubPage(1);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      subStatusFilter === 'Expiring'
+                        ? 'bg-amber-600 text-white shadow-md'
+                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    মেয়াদ শেষের দিকে (≤ ৭ দিন)
+                  </button>
                 </div>
 
                 {/* Sort Dropdown */}
@@ -1265,15 +1347,15 @@ export default function SubscriptionsPage() {
               <div
                 className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
               >
-                {filteredSubscriptions.length === 0 ? (
+                {filteredActiveSubscriptions.length === 0 ? (
                   <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center col-span-2">
                     <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
                     <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-                      কোন এক্টিভ ইউজার নেই
+                      কোন অ্যাক্টিভ প্রিমিয়াম ইউজার নেই
                     </p>
                   </div>
                 ) : (
-                  paginatedSubscriptions.map((sub) => {
+                  paginatedActiveSubscriptions.map((sub) => {
                     const daysRemaining = sub.expires_at
                       ? Math.ceil((new Date(sub.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                       : null;
@@ -1301,12 +1383,8 @@ export default function SubscriptionsPage() {
                               </p>
                             </div>
                           </Link>
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
-                              sub.is_active ? 'Active' : 'Expired',
-                            )}`}
-                          >
-                            {sub.is_active ? 'Active' : 'Expired'}
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            Active
                           </span>
                         </div>
 
@@ -1322,7 +1400,7 @@ export default function SubscriptionsPage() {
                               প্লান
                             </span>
                             <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                              {sub.plan_name || sub.plan?.display_name || 'Premium'}
+                              {sub.plan_name || sub.plan?.display_name || 'Pro Premium'}
                             </span>
                           </div>
                           <div className="flex justify-between items-center text-[11px] pt-1 border-t border-neutral-200 dark:border-neutral-800">
@@ -1330,7 +1408,7 @@ export default function SubscriptionsPage() {
                               Exp: {sub.expires_at ? formatTimestamp24h(sub.expires_at).full : 'Unlimited'}
                             </span>
                             {daysRemaining !== null && (
-                              <span className={`text-[10px] font-bold ${daysRemaining <= 3 ? 'text-red-500' : 'text-emerald-600'}`}>
+                              <span className={`text-[10px] font-bold ${daysRemaining <= 7 ? 'text-amber-500' : 'text-emerald-600'}`}>
                                 {daysRemaining > 0 ? `${daysRemaining} days left` : 'Expired'}
                               </span>
                             )}
@@ -1362,16 +1440,16 @@ export default function SubscriptionsPage() {
               </div>
             )}
 
-            {/* Subscriptions Table */}
+            {/* Active Subscriptions Table */}
             {(viewStyle === 'responsive' || viewStyle === 'table') && (
               <div
                 className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
               >
-                {filteredSubscriptions.length === 0 ? (
+                {filteredActiveSubscriptions.length === 0 ? (
                   <div className="py-24 flex flex-col items-center justify-center">
                     <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
                     <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-                      কোন এক্টিভ ইউজার পাওয়া যায়নি
+                      কোন অ্যাক্টিভ প্রিমিয়াম ইউজার পাওয়া যায়নি
                     </p>
                   </div>
                 ) : (
@@ -1403,7 +1481,7 @@ export default function SubscriptionsPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                        {paginatedSubscriptions.map((sub) => {
+                        {paginatedActiveSubscriptions.map((sub) => {
                           const daysRemaining = sub.expires_at
                             ? Math.ceil((new Date(sub.expires_at).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                             : null;
@@ -1435,7 +1513,7 @@ export default function SubscriptionsPage() {
                               <td className="px-6 py-4">
                                 <p className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                                   <Crown className="w-4 h-4 text-amber-500" />
-                                  {sub.plan_name || sub.plan?.display_name || 'Premium'}
+                                  {sub.plan_name || sub.plan?.display_name || 'Pro Premium'}
                                 </p>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
@@ -1465,28 +1543,20 @@ export default function SubscriptionsPage() {
                                   {daysRemaining !== null && (
                                     <span
                                       className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                        daysRemaining <= 3
-                                          ? 'bg-red-50 dark:bg-red-950/40 text-red-600'
+                                        daysRemaining <= 7
+                                          ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600'
                                           : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600'
                                       }`}
                                     >
-                                      {daysRemaining > 0 ? `${daysRemaining} দিন বাকি` : 'মেয়াদোত্তীর্ণ'}
+                                      {daysRemaining > 0 ? `${daysRemaining} দিন বাকি` : 'শেষ হয়েছে'}
                                     </span>
                                   )}
                                 </div>
                               </td>
                               <td className="px-6 py-4">
-                                <span
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
-                                    sub.is_active ? 'Active' : 'Expired',
-                                  )}`}
-                                >
-                                  {sub.is_active ? (
-                                    <CheckCircle className="w-3.5 h-3.5" />
-                                  ) : (
-                                    <XCircle className="w-3.5 h-3.5" />
-                                  )}
-                                  {sub.is_active ? 'Active' : 'Expired'}
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  Active
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-right whitespace-nowrap">
@@ -1518,6 +1588,328 @@ export default function SubscriptionsPage() {
                     </table>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Pagination for Active Subscriptions */}
+            {filteredActiveSubscriptions.length > pageSize && (
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
+                <p className="text-xs text-neutral-500">
+                  দেখাচ্ছে {(subPage - 1) * pageSize + 1} থেকে {Math.min(subPage * pageSize, filteredActiveSubscriptions.length)} (মোট {filteredActiveSubscriptions.length} জন)
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={subPage === 1}
+                    onClick={() => setSubPage((p) => p - 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    আগের পেজ
+                  </button>
+                  <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    পেজ {subPage} / {Math.ceil(filteredActiveSubscriptions.length / pageSize)}
+                  </span>
+                  <button
+                    disabled={subPage * pageSize >= filteredActiveSubscriptions.length}
+                    onClick={() => setSubPage((p) => p + 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    পরের পেজ
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 3: Recently Expired Subscriptions */}
+        {activeTab === 'expired_subscriptions' && (
+          <div className="space-y-6">
+            {/* Filter Bar for Expired Subscriptions */}
+            <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
+              {/* Search Box */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="ফোন নম্বর (017...), ইউজারের নাম, ইমেইল অথবা প্লান দিয়ে খুঁজুন..."
+                  value={subSearchQuery}
+                  onChange={(e) => {
+                    setSubSearchQuery(e.target.value);
+                    setSubPage(1);
+                  }}
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Mobile Card List */}
+            {(viewStyle === 'responsive' || viewStyle === 'card') && (
+              <div
+                className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
+              >
+                {filteredExpiredSubscriptions.length === 0 ? (
+                  <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center col-span-2">
+                    <Clock className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                      কোন মেয়াদোত্তীর্ণ প্রিমিয়াম ইউজার নেই
+                    </p>
+                  </div>
+                ) : (
+                  paginatedExpiredSubscriptions.map((sub) => {
+                    const daysAgo = sub.expires_at
+                      ? Math.floor((Date.now() - new Date(sub.expires_at).getTime()) / (1000 * 60 * 60 * 24))
+                      : null;
+
+                    return (
+                      <div
+                        key={sub.id}
+                        className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                      >
+                        <div className="flex justify-between items-start">
+                          <Link
+                            href={`/admin/user-management/${sub.user_id}`}
+                            className="flex items-center gap-3 group"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 font-bold text-sm">
+                              <Clock size={18} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-red-600 transition-colors flex items-center gap-1">
+                                {sub.user?.name || 'Unknown'}
+                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </p>
+                              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                                {sub.user?.email || 'N/A'}
+                              </p>
+                            </div>
+                          </Link>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                            Expired
+                          </span>
+                        </div>
+
+                        <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-neutral-400 font-bold uppercase">
+                              ফোন নম্বর
+                            </span>
+                            {renderPhoneCell(sub.user?.phone)}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-neutral-400 font-bold uppercase">
+                              পূর্ববর্তী প্লান
+                            </span>
+                            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                              {sub.plan_name || sub.plan?.display_name || 'Pro Premium'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-[11px] pt-1 border-t border-neutral-200 dark:border-neutral-800">
+                            <span className="text-neutral-500 font-mono">
+                              শেষ হয়েছে: {sub.expires_at ? formatTimestamp24h(sub.expires_at).full : 'N/A'}
+                            </span>
+                            {daysAgo !== null && (
+                              <span className="text-[10px] font-bold text-red-500">
+                                {daysAgo <= 0 ? 'আজকে শেষ হয়েছে' : `${daysAgo} দিন আগে`}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end pt-1 gap-2">
+                          <button
+                            onClick={() => {
+                              setExtendingSubscription(sub);
+                              setShowExtendModal(true);
+                            }}
+                            className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                          >
+                            <RefreshCw size={14} /> পুনরায় এক্টিভ করুন
+                          </button>
+                          <Link
+                            href={`/admin/user-management/${sub.user_id}`}
+                            className="p-2 text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
+                            title="প্রোফাইল দেখুন"
+                          >
+                            <ExternalLink size={16} />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
+
+            {/* Expired Subscriptions Table */}
+            {(viewStyle === 'responsive' || viewStyle === 'table') && (
+              <div
+                className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
+              >
+                {filteredExpiredSubscriptions.length === 0 ? (
+                  <div className="py-24 flex flex-col items-center justify-center">
+                    <Clock className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                      কোন মেয়াদোত্তীর্ণ প্রিমিয়াম ইউজার পাওয়া যায়নি
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
+                        <tr>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            User
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Phone Number
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Last Plan
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Started (24h)
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Expired (24h)
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                        {paginatedExpiredSubscriptions.map((sub) => {
+                          const daysAgo = sub.expires_at
+                            ? Math.floor((Date.now() - new Date(sub.expires_at).getTime()) / (1000 * 60 * 60 * 24))
+                            : null;
+
+                          return (
+                            <tr
+                              key={sub.id}
+                              className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                            >
+                              <td className="px-6 py-4">
+                                <Link
+                                  href={`/admin/user-management/${sub.user_id}`}
+                                  className="group flex items-center gap-2"
+                                >
+                                  <div>
+                                    <p className="text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-red-600 transition-colors flex items-center gap-1.5">
+                                      {sub.user?.name || 'Unknown'}
+                                      <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </p>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                      {sub.user?.email || 'N/A'}
+                                    </p>
+                                  </div>
+                                </Link>
+                              </td>
+                              <td className="px-6 py-4">
+                                {renderPhoneCell(sub.user?.phone)}
+                              </td>
+                              <td className="px-6 py-4">
+                                <p className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                                  <Crown className="w-4 h-4 text-amber-500" />
+                                  {sub.plan_name || sub.plan?.display_name || 'Pro Premium'}
+                                </p>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                    {formatTimestamp24h(sub.started_at).date}
+                                  </span>
+                                  <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-neutral-400" />
+                                    {formatTimestamp24h(sub.started_at).time}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="space-y-1">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                      {sub.expires_at ? formatTimestamp24h(sub.expires_at).date : 'N/A'}
+                                    </span>
+                                    {sub.expires_at && (
+                                      <span className="text-[11px] font-mono text-neutral-500 flex items-center gap-1">
+                                        <Clock className="w-3 h-3 text-neutral-400" />
+                                        {formatTimestamp24h(sub.expires_at).time}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {daysAgo !== null && (
+                                    <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/40 text-red-600">
+                                      {daysAgo <= 0 ? 'আজকে শেষ হয়েছে' : `${daysAgo} দিন আগে`}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                                  <XCircle className="w-3.5 h-3.5" />
+                                  Expired
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setExtendingSubscription(sub);
+                                      setShowExtendModal(true);
+                                    }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold rounded-lg transition-colors border border-purple-200 dark:border-purple-800/50 shadow-sm active:scale-95"
+                                    title="পুনরায় এক্টিভ করুন"
+                                  >
+                                    <RefreshCw size={13} />
+                                    <span>পুনরায় এক্টিভ করুন</span>
+                                  </button>
+                                  <Link
+                                    href={`/admin/user-management/${sub.user_id}`}
+                                    className="p-1.5 text-neutral-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors border border-neutral-200 dark:border-neutral-800"
+                                    title="ইউজারের বিস্তারিত প্রোফাইল দেখুন"
+                                  >
+                                    <ExternalLink size={14} />
+                                  </Link>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Pagination for Expired Subscriptions */}
+            {filteredExpiredSubscriptions.length > pageSize && (
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
+                <p className="text-xs text-neutral-500">
+                  দেখাচ্ছে {(subPage - 1) * pageSize + 1} থেকে {Math.min(subPage * pageSize, filteredExpiredSubscriptions.length)} (মোট {filteredExpiredSubscriptions.length} জন)
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={subPage === 1}
+                    onClick={() => setSubPage((p) => p - 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    আগের পেজ
+                  </button>
+                  <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    পেজ {subPage} / {Math.ceil(filteredExpiredSubscriptions.length / pageSize)}
+                  </span>
+                  <button
+                    disabled={subPage * pageSize >= filteredExpiredSubscriptions.length}
+                    onClick={() => setSubPage((p) => p + 1)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 disabled:opacity-40"
+                  >
+                    পরের পেজ
+                  </button>
+                </div>
               </div>
             )}
           </div>

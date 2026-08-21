@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -7,8 +8,10 @@ class XpGuideBottomSheet extends StatelessWidget {
   static void show(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.55),
       builder: (_) => const XpGuideBottomSheet(),
     );
   }
@@ -22,47 +25,59 @@ class XpGuideBottomSheet extends StatelessWidget {
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subtitleColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.88,
-      ),
+    // Height strictly capped at half of screen (50% max)
+    final sheetHeight = MediaQuery.of(context).size.height * 0.50;
+
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      child: Container(
+        height: sheetHeight,
+        constraints: BoxConstraints(
+          maxHeight: sheetHeight,
+        ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Top Drag Handle
-          const SizedBox(height: 12),
+          // ── Pinned Top Header (Non-Scrolling) ──
+          const SizedBox(height: 10),
           Container(
-            width: 44,
-            height: 5,
+            width: 40,
+            height: 4,
             decoration: BoxDecoration(
               color: isDark ? Colors.white24 : Colors.black12,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     LucideIcons.zap,
                     color: Color(0xFFF59E0B),
-                    size: 22,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,13 +86,13 @@ class XpGuideBottomSheet extends StatelessWidget {
                         'XP ও রিওয়ার্ড গাইডলাইন',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: titleColor,
                         ),
                       ),
                       Text(
-                        'কীভাবে দ্রুত XP অর্জন করে লিডারবোর্ডে এগিয়ে থাকবে',
+                        'কীভাবে পয়েন্ট ও লেভেল অর্জন করবে',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
                           fontSize: 12,
@@ -88,19 +103,21 @@ class XpGuideBottomSheet extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(LucideIcons.x, size: 20, color: subtitleColor),
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(LucideIcons.x, size: 19, color: subtitleColor),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Divider(height: 1, color: borderColor),
 
-          // Scrollable List of Rules
-          Flexible(
+          // ── Scrollable Body Content (Niche Scrolling) ──
+          Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
               children: [
                 // 1. Core Exam XP
                 _buildRuleCard(
@@ -117,7 +134,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // 2. Attendance / Participation
                 _buildRuleCard(
@@ -134,7 +151,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // 3. Perfect Score
                 _buildRuleCard(
@@ -151,7 +168,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // 4. Speed Bonus
                 _buildRuleCard(
@@ -168,7 +185,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // 5. Streak Booster
                 _buildRuleCard(
@@ -185,7 +202,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // 6. Live Exam Ranks
                 _buildRuleCard(
@@ -202,11 +219,11 @@ class XpGuideBottomSheet extends StatelessWidget {
                   subtitleColor: subtitleColor,
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Level Milestones
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -214,7 +231,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                         const Color(0xFF059669).withValues(alpha: 0.05),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: const Color(0xFF059669).withValues(alpha: 0.25),
                     ),
@@ -224,20 +241,20 @@ class XpGuideBottomSheet extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(LucideIcons.shield, color: Color(0xFF059669), size: 18),
+                          const Icon(LucideIcons.shield, color: Color(0xFF059669), size: 16),
                           const SizedBox(width: 8),
                           Text(
                             'লেভেল টাইটেল ও ধাপসমূহ',
                             style: TextStyle(
                               fontFamily: 'Anek Bangla',
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w800,
                               color: titleColor,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Text(
                         '🌱 রুকি (Rookie): ০ - ৪৯৯ XP\n'
                         '🏹 স্কাউট (Scout): ৫০০ - ১,৯৯৯ XP\n'
@@ -246,8 +263,8 @@ class XpGuideBottomSheet extends StatelessWidget {
                         '👑 লিজেন্ড (Legend): ১০,০০০+ XP',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 13,
-                          height: 1.6,
+                          fontSize: 12.5,
+                          height: 1.55,
                           fontWeight: FontWeight.w600,
                           color: subtitleColor,
                         ),
@@ -260,7 +277,8 @@ class XpGuideBottomSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildRuleCard({
@@ -276,24 +294,25 @@ class XpGuideBottomSheet extends StatelessWidget {
     required Color subtitleColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(9),
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                child: Icon(icon, color: iconColor, size: 15),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -301,8 +320,8 @@ class XpGuideBottomSheet extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontFamily: 'Anek Bangla',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
                     color: titleColor,
                   ),
                 ),
@@ -316,8 +335,8 @@ class XpGuideBottomSheet extends StatelessWidget {
                 child: Text(
                   points,
                   style: TextStyle(
-                    fontFamily: 'Anek Bangla',
-                    fontSize: 11,
+                    fontFamily: 'HindSiliguri',
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     color: pointsColor,
                   ),
@@ -325,13 +344,13 @@ class XpGuideBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           Text(
             description,
             style: TextStyle(
               fontFamily: 'Anek Bangla',
               fontSize: 12,
-              height: 1.5,
+              height: 1.45,
               color: subtitleColor,
             ),
           ),

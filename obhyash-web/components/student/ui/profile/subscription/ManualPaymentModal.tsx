@@ -74,6 +74,48 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     }
   };
 
+  const isValidTrxId = (rawTrx: string, method: string) => {
+    const trx = rawTrx.trim().toUpperCase();
+    const isBkash = method.toLowerCase().includes('bkash');
+    const isNagad = method.toLowerCase().includes('nagad');
+
+    // Length check: bKash = 10, Nagad = 8, Others = 8 or 10
+    if (isBkash && trx.length !== 10) return false;
+    if (isNagad && trx.length !== 8) return false;
+    if (!isBkash && !isNagad && trx.length !== 8 && trx.length !== 10) return false;
+
+    // Only alphanumeric
+    if (!/^[A-Z0-9]+$/.test(trx)) return false;
+
+    // Must combine letters and digits
+    const hasLetter = /[A-Z]/.test(trx);
+    const hasDigit = /[0-9]/.test(trx);
+    if (!hasLetter || !hasDigit) return false;
+
+    // Anti-spam repetition filter
+    if (new Set(trx.split('')).size <= 2) return false;
+
+    const dummyTrx = new Set([
+      '12345678',
+      '1234567890',
+      '00000000',
+      '0000000000',
+      'AAAAAAAA',
+      'AAAAAAAAAA',
+      'ABCDEFGH',
+      'ABCDEFGHIJ',
+      'TEST1234',
+      'TEST123456',
+      'ASDFGHJK',
+      'ASDFGHJKLM',
+      'TRANSACTIO',
+      'TRANSACTION',
+    ]);
+    if (dummyTrx.has(trx)) return false;
+
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,15 +124,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
       return;
     }
 
-    const phoneRegex = /^01\d{9}$/;
-    if (!phoneRegex.test(senderNumber)) {
-      toast.error('সঠিক মোবাইল নম্বর দাও (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
+    const phoneRegex = /^01[3-9]\d{8}$/;
+    if (!phoneRegex.test(senderNumber.trim())) {
+      toast.error('সঠিক মোবাইল নম্বর দাও (১১ ডিজিটের মোবাইল নম্বর)');
       return;
     }
 
-    const trxIdRegex = /^[A-Z0-9]{5,25}$/;
-    if (!trxIdRegex.test(trxId.toUpperCase())) {
-      toast.error('সঠিক ট্রানজেকশন আইডি দাও');
+    if (!isValidTrxId(trxId, paymentMethod)) {
+      toast.error('ভুল ট্রানজেকশন আইডি! অনুগ্রহ করে সঠিক ট্রানজেকশন আইডি দিন।');
       return;
     }
 
@@ -99,7 +140,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
       onConfirm({
         method: paymentMethod,
         number: senderNumber,
-        trxId: trxId.toUpperCase(),
+        trxId: trxId.trim().toUpperCase(),
       });
       setIsSubmitting(false);
     }, 1500);

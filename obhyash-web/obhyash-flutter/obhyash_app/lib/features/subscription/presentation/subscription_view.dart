@@ -694,9 +694,13 @@ class _CompactPlanCard extends StatelessWidget {
 
     final activeBorderColor = isSelected
         ? (isMasterPro
-            ? const Color(0xFFD97706)
-            : const Color(0xFF004633))
+            ? (isDark ? const Color(0xFFF59E0B) : const Color(0xFFD97706))
+            : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669)))
         : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
+
+    final accentBrandColor = isMasterPro
+        ? const Color(0xFFD97706)
+        : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669));
 
     return InkWell(
       onTap: onTap,
@@ -707,7 +711,7 @@ class _CompactPlanCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark
               ? (isSelected
-                  ? (isMasterPro ? const Color(0xFF251A08) : const Color(0xFF0D251D))
+                  ? (isMasterPro ? const Color(0xFF271A0A) : const Color(0xFF062319))
                   : const Color(0xFF18181B))
               : (isSelected
                   ? (isMasterPro ? const Color(0xFFFFFBEB) : const Color(0xFFF0FDF4))
@@ -720,7 +724,7 @@ class _CompactPlanCard extends StatelessWidget {
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                color: (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF059669))
                     .withValues(alpha: isDark ? 0.25 : 0.12),
                 blurRadius: 14,
                 offset: const Offset(0, 4),
@@ -737,12 +741,12 @@ class _CompactPlanCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected
-                      ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                      ? accentBrandColor
                       : (isDark ? Colors.white38 : Colors.black26),
                   width: 2,
                 ),
                 color: isSelected
-                    ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
+                    ? accentBrandColor
                     : Colors.transparent,
               ),
               child: isSelected
@@ -772,9 +776,13 @@ class _CompactPlanCard extends StatelessWidget {
             Builder(builder: (context) {
               final effectivePrice = CouponService.effectivePrice(plan.price, appliedCoupon);
               final hasDiscount = plan.price > 0 && effectivePrice != plan.price;
-              final priceColor = isSelected
-                  ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF004633))
-                  : (isDark ? Colors.white : const Color(0xFF0F172A));
+              final priceColor = isDark
+                  ? (isSelected
+                      ? (isMasterPro ? const Color(0xFFFDE68A) : const Color(0xFF6EE7B7))
+                      : Colors.white)
+                  : (isSelected
+                      ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF047857))
+                      : const Color(0xFF0F172A));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -797,17 +805,19 @@ class _CompactPlanCard extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontFamily: 'HindSiliguri',
                       color: hasDiscount
-                          ? const Color(0xFF16A34A)
+                          ? (isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A))
                           : priceColor,
                     ),
                   ),
                   Text(
                     '/${plan.durationDays} দিন',
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                      color: isDark
+                          ? (isSelected ? const Color(0xFFA7F3D0) : const Color(0xFFA1A1AA))
+                          : (isSelected ? const Color(0xFF065F46) : const Color(0xFF64748B)),
                     ),
                   ),
                 ],

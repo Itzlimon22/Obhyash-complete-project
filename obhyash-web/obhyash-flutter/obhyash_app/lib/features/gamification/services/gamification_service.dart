@@ -193,72 +193,135 @@ class GamificationService {
   static Future<List<BadgeItem>> checkAndUnlockBadges({
     required BuildContext context,
     required String userId,
-    required int totalExamsCompleted,
-    required int userStreak,
-    required int latestScore,
-    required int totalQuestions,
+    int? totalExamsCompleted,
+    int? userStreak,
+    int? latestScore,
+    int? totalQuestions,
+    int? timeTakenSeconds,
+    String? examType,
+    bool? isLiveExamTopper,
   }) async {
     final newUnlocked = <BadgeItem>[];
 
     try {
       final currentBadges = await getUserBadges(userId);
-      final unlockedIds = currentBadges.where((b) => b.isUnlocked).map((b) => b.id).toSet();
+      final unlockedIds =
+          currentBadges.where((b) => b.isUnlocked).map((b) => b.id).toSet();
 
-      // Check conditions
+      // Fetch accurate user stats from DB
+      int totalExams = totalExamsCompleted ?? 0;
+      int streak = userStreak ?? 0;
+      int userXp = 0;
+      int totalCorrectAnswers = 0;
+
+      try {
+        final userRow = await _supabase
+            .from('users')
+            .select('xp, streak_count')
+            .eq('id', userId)
+            .maybeSingle();
+        if (userRow != null) {
+          userXp = (userRow['xp'] as num?)?.toInt() ?? 0;
+          final dbStreak = (userRow['streak_count'] as num?)?.toInt() ?? 0;
+          if (dbStreak > streak) streak = dbStreak;
+        }
+
+        final examCountRes = await _supabase
+            .from('exam_results')
+            .select('correct_count')
+            .eq('user_id', userId);
+        final list = examCountRes as List;
+        if (list.length > totalExams) totalExams = list.length;
+        for (final r in list) {
+          totalCorrectAnswers += (r['correct_count'] as num?)?.toInt() ?? 0;
+        }
+      } catch (_) {}
+
+      final now = DateTime.now();
+      final isNightTime = now.hour >= 23 || now.hour < 5;
+
       final toUnlock = <String>[];
 
-      // First Step (1 exam)
-      if (totalExamsCompleted >= 1 && !unlockedIds.contains('first_step')) {
+      // 1. First Step (1 exam completed)
+      if (totalExams >= 1 && !unlockedIds.contains('first_step')) {
         toUnlock.add('first_step');
       }
 
-      // Perfect 100% Score
-      if (totalQuestions > 0 && latestScore == totalQuestions && !unlockedIds.contains('centurion')) {
-        toUnlock.add('centurion');
+      // 2. Perfect Score (100% accuracy on >= 5 questions)
+      if ((totalQuestions ?? 0) >= 5 &&
+          (latestScore ?? 0) == totalQuestions &&
+          !unlockedIds.contains('precision_master')) {
+        toUnlock.add('precision_master');
       }
 
-      // Streak 3 Days
-      if (userStreak >= 3 && !unlockedIds.contains('streak_3')) {
+      // 3. Streak 3 Days
+      if (streak >= 3 && !unlockedIds.contains('streak_3')) {
         toUnlock.add('streak_3');
       }
 
-      // Streak 7 Days
-      if (userStreak >= 7 && !unlockedIds.contains('streak_7')) {
+      // 4. Streak 7 Days
+      if (streak >= 7 && !unlockedIds.contains('streak_7')) {
         toUnlock.add('streak_7');
       }
 
-      // 10 Exams Completed
-      if (totalExamsCompleted >= 10 && !unlockedIds.contains('veteran_10')) {
-        toUnlock.add('veteran_10');
+      // 5. Speed Demon (<= 60s and >= 80% accuracy)
+      if ((timeTakenSeconds ?? 999) <= 60 &&
+          (totalQuestions ?? 0) >= 5 &&
+          ((latestScore ?? 0) / (totalQuestions ?? 1)) >= 0.8 &&
+          !unlockedIds.contains('speed_demon')) {
+        toUnlock.add('speed_demon');
       }
 
-      // 50 Exams Completed
-      if (totalExamsCompleted >= 50 && !unlockedIds.contains('master_50')) {
-        toUnlock.add('master_50');
+      // 6. Night Owl (Late night exam)
+      if (isNightTime && !unlockedIds.contains('night_owl')) {
+        toUnlock.add('night_owl');
+      }
+
+      // 7. Century Scholar (100+ correct questions)
+      if (totalCorrectAnswers >= 100 &&
+          !unlockedIds.contains('knowledge_sage')) {
+        toUnlock.add('knowledge_sage');
+      }
+
+      // 8. Legend Trophy (5000+ XP)
+      if (userXp >= 5000 && !unlockedIds.contains('apex_legend')) {
+        toUnlock.add('apex_legend');
+      }
+
+      // 9. Live Exam Champion (Live exam participation & topper)
+      if ((isLiveExamTopper == true || examType == 'live') &&
+          !unlockedIds.contains('live_champion')) {
+        toUnlock.add('live_champion');
       }
 
       for (final badgeId in toUnlock) {
         try {
-          await _supabase.from('user_badges').insert({
+          await _supabase.from('user_badges').upsert({
             'user_id': userId,
             'badge_id': badgeId,
+            'unlocked_at': DateTime.now().toIso8601String(),
           });
 
-          final badgeItem = ObhyashBadges.allBadges.firstWhere((b) => b.id == badgeId);
+          final badgeItem =
+              ObhyashBadges.allBadges.firstWhere((b) => b.id == badgeId);
           newUnlocked.add(badgeItem);
 
-          // Trigger Celebration Dialog if context is mounted
+          // Trigger Celebration Dialog with haptic feedback
           if (context.mounted) {
-            CelebrationDialog.show(
-              context,
-              title: 'নতুন ব্যাজ অর্জিত! 🎉',
-              subtitle: '${badgeItem.titleBangla} (${badgeItem.name}) - ${badgeItem.description}',
-              badgeLabel: badgeItem.titleBangla,
-              icon: badgeItem.icon,
-              primaryColor: badgeItem.gradientStart,
-              secondaryColor: badgeItem.gradientEnd,
-              xpAwarded: 50,
-            );
+            await Future.delayed(const Duration(milliseconds: 300));
+            if (context.mounted) {
+              CelebrationDialog.show(
+                context,
+                title: 'নতুন ব্যাজ অর্জিত! 🏆',
+                subtitle:
+                    '${badgeItem.titleBangla} (${badgeItem.name})\n${badgeItem.description}',
+                badgeLabel: badgeItem.titleBangla,
+                icon: badgeItem.icon,
+                primaryColor: badgeItem.gradientStart,
+                secondaryColor: badgeItem.gradientEnd,
+                xpAwarded: 50,
+              );
+            }
           }
         } catch (_) {}
       }

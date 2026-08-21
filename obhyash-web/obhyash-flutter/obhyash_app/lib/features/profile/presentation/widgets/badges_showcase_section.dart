@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../gamification/domain/gamification_models.dart';
@@ -14,7 +15,6 @@ class BadgesShowcaseSection extends StatefulWidget {
 
 class _BadgesShowcaseSectionState extends State<BadgesShowcaseSection> {
   List<BadgeItem> _badges = ObhyashBadges.allBadges;
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -27,7 +27,6 @@ class _BadgesShowcaseSectionState extends State<BadgesShowcaseSection> {
     if (mounted) {
       setState(() {
         _badges = badges;
-        _isLoading = false;
       });
     }
   }
@@ -37,8 +36,8 @@ class _BadgesShowcaseSectionState extends State<BadgesShowcaseSection> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final unlockedCount = _badges.where((b) => b.isUnlocked).length;
 
-    final Color surfaceColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final Color borderColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
+    final Color surfaceColor = isDark ? const Color(0xFF18181B) : Colors.white;
+    final Color borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -132,85 +131,267 @@ class _BadgeCard extends StatelessWidget {
     required this.isDark,
   });
 
+  void _showBadgeDetail(BuildContext context) {
+    final isUnlocked = badge.isUnlocked;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.55),
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.50,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+            ),
+          ),
+          child: Column(
+          children: [
+            // Pinned Handle
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        gradient: isUnlocked
+                            ? LinearGradient(
+                                colors: [badge.gradientStart, badge.gradientEnd],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : null,
+                        color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                        shape: BoxShape.circle,
+                        boxShadow: isUnlocked
+                            ? [
+                                BoxShadow(
+                                  color: badge.gradientStart.withValues(alpha: 0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Icon(
+                        isUnlocked ? badge.icon : LucideIcons.lock,
+                        color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
+                        size: 34,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      badge.titleBangla,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    Text(
+                      badge.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isUnlocked
+                            ? const Color(0xFF10B981).withValues(alpha: 0.12)
+                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isUnlocked
+                              ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                              : (isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isUnlocked ? LucideIcons.checkCircle : LucideIcons.lock,
+                            size: 14,
+                            color: isUnlocked
+                                ? const Color(0xFF10B981)
+                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isUnlocked ? 'আনলকড সম্পন্ন' : 'লকড অর্জন',
+                            style: TextStyle(
+                              fontFamily: 'HindSiliguri',
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isUnlocked
+                                  ? const Color(0xFF10B981)
+                                  : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      badge.description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 15,
+                        color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF3F3F46),
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                          foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: BorderSide(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+                            ),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'ঠিক আছে',
+                          style: TextStyle(
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isUnlocked = badge.isUnlocked;
 
-    return Tooltip(
-      message: badge.description,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: isDark
-              ? (isUnlocked ? const Color(0xFF141416) : const Color(0xFF111113))
-              : (isUnlocked ? const Color(0xFFF8FAFC) : const Color(0xFFF1F5F9)),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isUnlocked
-                ? badge.gradientStart.withValues(alpha: 0.3)
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+    return GestureDetector(
+      onTap: () => _showBadgeDetail(context),
+      child: Tooltip(
+        message: badge.description,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          decoration: BoxDecoration(
+            color: isDark
+                ? (isUnlocked ? const Color(0xFF18181B) : const Color(0xFF131316))
+                : (isUnlocked ? const Color(0xFFF8FAFC) : const Color(0xFFF1F5F9)),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isUnlocked
+                  ? badge.gradientStart.withValues(alpha: 0.4)
+                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon Bubble
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: isUnlocked
-                    ? LinearGradient(
-                        colors: [badge.gradientStart, badge.gradientEnd],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-                color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1)),
-                shape: BoxShape.circle,
-                boxShadow: isUnlocked
-                    ? [
-                        BoxShadow(
-                          color: badge.gradientStart.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : null,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon Bubble
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: isUnlocked
+                      ? LinearGradient(
+                          colors: [badge.gradientStart, badge.gradientEnd],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1)),
+                  shape: BoxShape.circle,
+                  boxShadow: isUnlocked
+                      ? [
+                          BoxShadow(
+                            color: badge.gradientStart.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Icon(
+                  isUnlocked ? badge.icon : LucideIcons.lock,
+                  color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
+                  size: 20,
+                ),
               ),
-              child: Icon(
-                isUnlocked ? badge.icon : LucideIcons.lock,
-                color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
-                size: 20,
+              const SizedBox(height: 8),
+              Text(
+                badge.titleBangla,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 13,
+                  fontWeight: isUnlocked ? FontWeight.bold : FontWeight.normal,
+                  color: isUnlocked
+                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                      : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              badge.titleBangla,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 13,
-                fontWeight: isUnlocked ? FontWeight.bold : FontWeight.normal,
-                color: isUnlocked
-                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                    : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
+              const SizedBox(height: 2),
+              Text(
+                isUnlocked ? 'অর্জন সম্পন্ন' : 'লকড',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 10,
+                  color: isUnlocked
+                      ? const Color(0xFF10B981)
+                      : (isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA)),
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              isUnlocked ? 'অর্জন সম্পন্ন' : 'লকড',
-              style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 10,
-                color: isUnlocked
-                    ? const Color(0xFF10B981)
-                    : (isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA)),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

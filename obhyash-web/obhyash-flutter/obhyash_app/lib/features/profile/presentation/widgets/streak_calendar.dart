@@ -65,23 +65,39 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
   Color _getColorClass(int examCount, bool isCurrentMonth, bool isDark) {
     if (!isCurrentMonth) {
       return isDark
-          ? const Color(0x4D262626)
-          : const Color(0xFFF5F5F5); // neutral-800/30 : neutral-100
+          ? const Color(0x3327272A)
+          : const Color(0xFFF4F4F5);
     }
     if (examCount == 0) {
       return isDark
           ? const Color(0xFF27272A)
-          : const Color(0xFFE5E5E5); // neutral-700 : neutral-200
+          : const Color(0xFFE4E4E7);
     }
     if (examCount == 1) {
       return isDark
-          ? const Color(0xFF059669)
-          : const Color(0xFF6EE7B7); // emerald-700 : emerald-300
+          ? const Color(0xFF065F46) // Level 1: Deep forest emerald
+          : const Color(0xFFA7F3D0); // Level 1 light
     }
     if (examCount == 2) {
-      return const Color(0xFF059669); // emerald-600 : emerald-400
+      return isDark
+          ? const Color(0xFF059669) // Level 2: Vibrant emerald
+          : const Color(0xFF34D399); // Level 2 light
     }
-    return const Color(0xFF059669); // emerald-500 : emerald-500
+    return isDark
+        ? const Color(0xFF10B981) // Level 3+: Bright glowing emerald
+        : const Color(0xFF059669); // Level 3+ light
+  }
+
+  Color _getTextColor(int examCount, bool isCurrentMonth, bool isDark) {
+    if (!isCurrentMonth) {
+      return isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA);
+    }
+    if (examCount == 0) {
+      return isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B);
+    }
+    return isDark
+        ? Colors.white
+        : (examCount == 1 ? const Color(0xFF064E3B) : Colors.white);
   }
 
   String _getMonthName(DateTime date) {
@@ -99,7 +115,7 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
       'নভেম্বর',
       'ডিসেম্বর',
     ];
-    return '${months[date.month - 1]}';
+    return months[date.month - 1];
   }
 
   @override
@@ -160,18 +176,18 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
         (_displayedMonth.year == prevMonthDate.year && _displayedMonth.month <= prevMonthDate.month);
 
     return Container(
-      padding: const EdgeInsets.all(20), // sm:p-8
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
-        borderRadius: BorderRadius.circular(24), // sm:rounded-3xl
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x05000000),
-            blurRadius: 2,
-            offset: Offset(0, 1),
+            color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -198,16 +214,17 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '${_getMonthName(_displayedMonth)} কার্যক্রম',
+                        _getMonthName(_displayedMonth),
                         style: TextStyle(
-                          fontSize: 20, // sm:text-2xl
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF000000), // neutral-900
+                              : const Color(0xFF0F172A),
                           fontFamily: 'Anek Bangla',
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -343,19 +360,14 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
                                         child: Text(
                                           week[i].dayOfMonth.toString(),
                                           style: TextStyle(
-                                            fontSize: 16, // text-sm
-                                            fontWeight: FontWeight.w900, // font-black
-                                            color: week[i].isCurrentMonth
-                                                ? (isDark
-                                                      ? const Color(0xFFF5F5F5)
-                                                      : const Color(
-                                                          0xFF000000,
-                                                        )) // neutral-100 : neutral-900
-                                                : (isDark
-                                                      ? const Color(0xFF525252)
-                                                      : const Color(
-                                                          0xFFA3A3A3,
-                                                        )), // neutral-600 : neutral-400
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: _getTextColor(
+                                              week[i].examCount,
+                                              week[i].isCurrentMonth,
+                                              isDark,
+                                            ),
+                                            fontFamily: 'Anek Bangla',
                                           ),
                                         ),
                                       ),

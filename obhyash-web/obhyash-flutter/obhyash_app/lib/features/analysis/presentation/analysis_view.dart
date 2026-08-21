@@ -200,7 +200,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       var query = supabase
           .from('exam_results')
           .select(
-              'score, total_questions, correct_count, wrong_count, time_taken, subject, subject_label, negative_marking, date, created_at')
+              'score, total_marks, total_questions, correct_count, wrong_count, time_taken, subject, subject_label, negative_marking, date, created_at')
           .eq('user_id', userId);
 
       if (_timeFilter == 'week') {
@@ -263,8 +263,18 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         final correct = (row['correct_count'] as num?)?.toInt() ?? 0;
         final wrong = (row['wrong_count'] as num?)?.toInt() ?? 0;
         final time = (row['time_taken'] as num?)?.toInt() ?? 0;
-        final score = total > 0 ? (correct / total * 100) : 0.0;
+        final totalMarks = (row['total_marks'] as num?)?.toDouble() ??
+            (total > 0 ? total.toDouble() : 1.0);
+        final rawDbScore = (row['score'] as num?)?.toDouble();
         final negRate = (row['negative_marking'] as num?)?.toDouble() ?? 0.25;
+
+        // Exact net score with negative marking deduction
+        final netScore = rawDbScore ??
+            (correct - (wrong * negRate)).clamp(0.0, totalMarks);
+        final score = totalMarks > 0
+            ? ((netScore / totalMarks) * 100.0).clamp(0.0, 100.0)
+            : 0.0;
+
         final createdAt =
             DateTime.tryParse(row['created_at'] ?? row['date'] ?? '') ??
                 DateTime.now();
