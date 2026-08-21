@@ -72,7 +72,7 @@ CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
 }
 
 // Global navigator keys
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authStateStream = Supabase.instance.client.auth.onAuthStateChange;
@@ -88,7 +88,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   });
 
   router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: _GoRouterRefreshStream(authStateStream),
     redirect: (context, state) {
@@ -111,38 +111,38 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/welcome',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const WelcomeView(), state),
       ),
       GoRoute(
         path: '/update-password',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const UpdatePasswordView(), state),
       ),
       GoRoute(
         path: '/login',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const LoginView(), state),
       ),
       GoRoute(
         path: '/signup',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const SignupView(), state),
       ),
       GoRoute(
         path: '/dashboard',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         redirect: (context, state) => '/',
       ),
       GoRoute(
         path: '/exam',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
       ),
       GoRoute(
         path: '/live_exam_details/:id',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final examId = state.pathParameters['id']!;
           final exam = state.extra as LiveExam?;
@@ -154,7 +154,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/live_exam_session/:id',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final examId = state.pathParameters['id']!;
           final exam = state.extra as LiveExam?;
@@ -166,7 +166,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/live_exam_solution/:id',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final examId = state.pathParameters['id']!;
           final exam = state.extra as LiveExam?;
@@ -178,7 +178,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/live_exam_leaderboard/:id',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) {
           final examId = state.pathParameters['id']!;
           final exam = state.extra as LiveExam?;
@@ -190,13 +190,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/blog',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const BlogView(), state),
       ),
       GoRoute(
         path: '/profile/blog',
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const BlogView(), state),
       ),

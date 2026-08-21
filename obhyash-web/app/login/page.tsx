@@ -41,7 +41,7 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('error') === 'unregistered_google') {
       setTimeout(() => {
-        setError('এই Google অ্যাকাউন্টটি আমাদের সিস্টেমে নেই। দয়া করে আগে সাইন আপ করো অথবা লিংক করা ইমেইল ব্যবহার করো।');
+        setError('এই গুগল ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে আগে নতুন অ্যাকাউন্ট খুলুন।');
       }, 0);
       window.history.replaceState({}, '', '/login');
     }

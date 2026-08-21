@@ -810,7 +810,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               label: 'এসএসসি রোল নম্বর',
                               controller: _sscRollController,
                               isDark: isDark,
-                              readOnly: widget.user.isSscLocked,
+                              readOnly: false,
                               placeholder: 'রোল নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
@@ -818,66 +818,54 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               label: 'এসএসসি রেজিস্ট্রেশন নম্বর',
                               controller: _sscRegController,
                               isDark: isDark,
-                              readOnly: widget.user.isSscLocked,
+                              readOnly: false,
                               placeholder: 'রেজিস্ট্রেশন নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
                             Row(
                               children: [
                                 Expanded(
-                                  child: widget.user.isSscLocked
-                                      ? _buildTextField(
-                                          label: 'এসএসসি বোর্ড',
-                                          controller: TextEditingController(text: _sscBoard),
-                                          isDark: isDark,
-                                          readOnly: true,
-                                        )
-                                      : _buildDropdown(
-                                          label: 'এসএসসি বোর্ড',
-                                          value: _sscBoard,
-                                          items: const [
-                                            'Dhaka',
-                                            'Rajshahi',
-                                            'Chittagong',
-                                            'Jessore',
-                                            'Comilla',
-                                            'Barisal',
-                                            'Sylhet',
-                                            'Dinajpur',
-                                            'Mymensingh',
-                                            'Madrasah',
-                                          ],
-                                          onChanged: (val) => setState(
-                                            () => _sscBoard = val ?? 'Dhaka',
-                                          ),
-                                          isDark: isDark,
-                                        ),
+                                  child: _buildDropdown(
+                                    label: 'এসএসসি বোর্ড',
+                                    value: _sscBoard,
+                                    items: const [
+                                      'Dhaka',
+                                      'Rajshahi',
+                                      'Chittagong',
+                                      'Jessore',
+                                      'Comilla',
+                                      'Barisal',
+                                      'Sylhet',
+                                      'Dinajpur',
+                                      'Mymensingh',
+                                      'Madrasah',
+                                    ],
+                                    onChanged: (val) => setState(
+                                      () => _sscBoard = val ?? 'Dhaka',
+                                    ),
+                                    isDark: isDark,
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
-                                  child: widget.user.isSscLocked
-                                      ? _buildTextField(
-                                          label: 'এসএসসি পাসিং ইয়ার',
-                                          controller: TextEditingController(text: _sscYear),
-                                          isDark: isDark,
-                                          readOnly: true,
-                                        )
-                                      : _buildDropdown(
-                                          label: 'এসএসসি পাসিং ইয়ার',
-                                          value: _sscYear,
-                                          items: const [
-                                            '2027',
-                                            '2026',
-                                            '2025',
-                                            '2024',
-                                            '2023',
-                                            '2022',
-                                          ],
-                                          onChanged: (val) => setState(
-                                            () => _sscYear = val ?? '2023',
-                                          ),
-                                          isDark: isDark,
-                                        ),
+                                  child: _buildDropdown(
+                                    label: 'এসএসসি পাসিং ইয়ার',
+                                    value: _sscYear,
+                                    items: const [
+                                      '2027',
+                                      '2026',
+                                      '2025',
+                                      '2024',
+                                      '2023',
+                                      '2022',
+                                      '2021',
+                                      '2020',
+                                    ],
+                                    onChanged: (val) => setState(
+                                      () => _sscYear = val ?? '2023',
+                                    ),
+                                    isDark: isDark,
+                                  ),
                                 ),
                               ],
                             ),

@@ -212,17 +212,20 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
   }
 
   Future<void> _handleSubmit() async {
-    if (_titleController.text.trim().length < 3) {
+    final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    if (title.length < 2) {
       AppPopups.warning(
         context,
-        message: 'ফিচারের একটি সংক্ষিপ্ত শিরোনাম লেখো',
+        message: 'ফিচারের একটি সংক্ষিপ্ত শিরোনাম লেখো (কমপক্ষে ২ অক্ষর)',
       );
       return;
     }
-    if (_descriptionController.text.trim().length < 8) {
+    if (description.length < 4) {
       AppPopups.warning(
         context,
-        message: 'ফিচারটির বিবরণ একটু বিস্তারিত লেখো',
+        message: 'ফিচারটির বিবরণ আরও একটু বিস্তারিত লেখো',
       );
       return;
     }
@@ -231,13 +234,15 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
 
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('No user logged in');
+      if (user == null) {
+        throw Exception('ফিচার প্রস্তাব পাঠাতে প্রথমে লগইন করো');
+      }
 
       await supabase.from('app_feature_requests').insert({
         'user_id': user.id,
         'category': _selectedCategory,
-        'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim(),
+        'title': title,
+        'description': description,
         'status': 'Under Review',
       });
 
@@ -251,11 +256,27 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
         );
       }
     } catch (e) {
+      debugPrint('[FeatureRequestsView] Submit error: $e');
       if (mounted) {
-        AppPopups.error(
-          context,
-          message: 'প্রস্তাব পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।',
-        );
+        final rawMsg = e.toString();
+        // Check for Bengali backend constraint/trigger messages
+        if (rawMsg.contains('কমপক্ষে') ||
+            rawMsg.contains('অপেক্ষা') ||
+            rawMsg.contains('সীমা') ||
+            rawMsg.contains('ইতিপূর্বে') ||
+            rawMsg.contains('সর্বোচ্চ')) {
+          final cleanMsg = rawMsg
+              .replaceAll(RegExp(r'^Exception:\s*|PostgrestException\(message:\s*|,\s*code:.*$'), '')
+              .trim();
+          AppPopups.warning(context, message: cleanMsg);
+        } else if (e is PostgrestException) {
+          AppPopups.error(context, message: e.message);
+        } else {
+          AppPopups.error(
+            context,
+            message: 'প্রস্তাব পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করো।',
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

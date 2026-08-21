@@ -167,6 +167,9 @@ class UserProfile {
   final bool admissionTrackInterest;
   final String? lastStreakDate;
   final int batchChangeCount;
+  final bool requiresPhoneVerification;
+  final bool isEmailVerified;
+  final bool requiresEmailVerification;
   final bool isSubscribed;
   final String? subscriptionStatus;
   final String? subscriptionExpiresAt;
@@ -199,6 +202,9 @@ class UserProfile {
     this.dailyExamsGoal = 3,
     this.admissionTrackInterest = false,
     this.lastStreakDate,
+    this.requiresPhoneVerification = false,
+    this.isEmailVerified = false,
+    this.requiresEmailVerification = false,
     this.isSubscribed = false,
     this.subscriptionStatus,
     this.subscriptionExpiresAt,
@@ -207,7 +213,15 @@ class UserProfile {
   bool get isBatchLocked =>
       (batch != null && batch!.trim().isNotEmpty) && batchChangeCount >= 1;
 
-  bool get isSscLocked => (sscRoll != null && sscRoll!.trim().isNotEmpty);
+  bool get isSscLocked => false; // SSC exam details can now be edited anytime
+
+  bool get isPhoneLocked =>
+      (phone != null && phone!.trim().isNotEmpty) && !requiresPhoneVerification;
+
+  bool get isEmailLocked =>
+      (email != null && email!.trim().isNotEmpty) &&
+      isEmailVerified &&
+      !requiresEmailVerification;
 
   int get batchChangesRemaining => isBatchLocked ? 0 : 1;
 
@@ -345,6 +359,11 @@ class UserProfile {
       admissionTrackInterest:
           json['admission_track_interest'] as bool? ?? false,
       lastStreakDate: json['last_streak_date'] as String?,
+      requiresPhoneVerification:
+          json['requires_phone_verification'] == true ||
+          json['is_phone_verified'] == false,
+      isEmailVerified: json['is_email_verified'] == true,
+      requiresEmailVerification: json['requires_email_verification'] == true,
       isSubscribed: isSub,
       subscriptionStatus: subJson?['status'] as String? ?? json['subscription_status'] as String?,
       subscriptionExpiresAt: rawExp,

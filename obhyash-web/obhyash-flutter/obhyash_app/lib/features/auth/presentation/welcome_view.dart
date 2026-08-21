@@ -155,16 +155,17 @@ class _WelcomeViewState extends State<WelcomeView> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 10),
 
-                          // Showcase Image — constrained to 50% screen height
+                          // Showcase Image — perfectly centered in viewport
                           Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 28.0),
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxHeight: MediaQuery.of(context).size.height * 0.50,
+                                  maxHeight: MediaQuery.of(context).size.height * 0.47,
                                 ),
                                 child: _buildShowcaseCard(slide),
                               ),
@@ -176,7 +177,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                           // Minimal Tag Pill
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 11,
+                              horizontal: 12,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -189,14 +190,14 @@ class _WelcomeViewState extends State<WelcomeView> {
                               children: [
                                 Icon(
                                   slide.icon,
-                                  size: 12,
+                                  size: 13,
                                   color: slide.accentColor,
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
                                   slide.tag,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                     fontFamily: 'Anek Bangla',
                                     color: slide.accentColor,
@@ -209,12 +210,12 @@ class _WelcomeViewState extends State<WelcomeView> {
 
                           // Slide Title
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
                             child: Text(
                               slide.title,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 18.5,
                                 fontWeight: FontWeight.w800,
                                 fontFamily: 'Anek Bangla',
                                 height: 1.3,
@@ -223,7 +224,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 4),
                         ],
                       ),
                     );
@@ -231,7 +231,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
               // Minimal Grey Indicator Dots
               Row(
@@ -252,8 +252,8 @@ class _WelcomeViewState extends State<WelcomeView> {
                 }),
               ),
 
-              // Generous breathing space between upper content & buttons
-              const SizedBox(height: 24),
+              // Breathing space between indicator & buttons
+              const SizedBox(height: 18),
 
               // Bottom CTA Buttons in a single Row
               Padding(

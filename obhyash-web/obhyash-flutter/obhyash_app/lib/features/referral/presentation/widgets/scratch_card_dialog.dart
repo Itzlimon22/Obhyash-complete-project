@@ -18,7 +18,6 @@ class ScratchCardDialog extends StatefulWidget {
 }
 
 class _ScratchCardDialogState extends State<ScratchCardDialog> {
-  bool _isScratched = false;
   bool _isProcessing = false;
   String? _rewardType;
   String? _errorMessage;
@@ -36,8 +35,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
           .rpc('reveal_scratch_card_tx', params: {'p_card_id': widget.cardId});
 
       setState(() {
-        _rewardType = res as String;
-        _isScratched = true;
+        _rewardType = res?.toString() ?? 'FREE_MONTH';
         _isProcessing = false;
       });
       widget.onScratched();

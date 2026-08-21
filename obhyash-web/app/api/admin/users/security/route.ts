@@ -339,14 +339,15 @@ export async function POST(request: NextRequest) {
         console.warn('phone_verifications insert note:', pvErr);
       }
 
-      // 2. Update users table phone_verified if column exists or update activity log
+      // 2. Update users table phone_verified and reset requires_phone_verification
       if (targetUserId) {
         try {
           await supabaseAdmin
             .from('users')
             .update({
               phone: targetPhone,
-              status: 'Active',
+              is_phone_verified: true,
+              requires_phone_verification: false,
               updated_at: new Date().toISOString(),
             })
             .eq('id', targetUserId);
@@ -355,12 +356,159 @@ export async function POST(request: NextRequest) {
 
       await logSecurityAudit(
         'MANUAL_PHONE_VERIFIED',
-        `Admin manually verified phone number ${targetPhone} for user`,
+        `Admin manually verified phone number ${targetPhone} for user ${targetEmail || targetUserId}`,
       );
 
       return NextResponse.json({
         success: true,
         message: `Phone number ${targetPhone} verified successfully`,
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ACTION 5B: ASK USER TO RE-VERIFY / UPDATE PHONE
+    // ─────────────────────────────────────────────────────────────
+    if (action === 'ask_phone_reverification') {
+      if (!targetUserId) {
+        return NextResponse.json(
+          { success: false, error: 'User ID is required' },
+          { status: 400 },
+        );
+      }
+
+      try {
+        await supabaseAdmin
+          .from('users')
+          .update({
+            requires_phone_verification: true,
+            is_phone_verified: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', targetUserId);
+      } catch (err: any) {
+        console.error('Failed to set requires_phone_verification:', err);
+        return NextResponse.json(
+          { success: false, error: err.message || 'Failed to update user' },
+          { status: 500 },
+        );
+      }
+
+      // Send in-app notification to the user
+      try {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: targetUserId,
+          title: 'মোবাইল নম্বর রি-ভেরিফিকেশন অনুরোধ',
+          message:
+            'অ্যাডমিন আপনার মোবাইল নম্বরটি রি-ভেরিফাই বা আপডেট করার অনুরোধ জানিয়েছেন। অ্যাকাউন্ট লিঙ্কিং অপশন থেকে আপনার সঠিক নম্বরটি যুক্ত ও ভেরিফাই করুন।',
+          type: 'system',
+          is_read: false,
+        });
+      } catch (_) {}
+
+      await logSecurityAudit(
+        'ASK_PHONE_REVERIFICATION',
+        `Admin requested phone reverification for user ${targetEmail || targetUserId}`,
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: 'Phone re-verification request sent to user successfully',
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ACTION 5C: MANUAL EMAIL VERIFICATION BY ADMIN
+    // ─────────────────────────────────────────────────────────────
+    if (action === 'verify_email_manually') {
+      const { userEmail } = body;
+      const targetEmail = (userEmail || body.email || '').trim().toLowerCase();
+
+      if (!targetEmail) {
+        return NextResponse.json(
+          { success: false, error: 'Email address is required' },
+          { status: 400 },
+        );
+      }
+
+      if (targetUserId) {
+        try {
+          await supabaseAdmin
+            .from('users')
+            .update({
+              email: targetEmail,
+              is_email_verified: true,
+              requires_email_verification: false,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', targetUserId);
+        } catch (err: any) {
+          console.error('Failed to manually verify email:', err);
+          return NextResponse.json(
+            { success: false, error: err.message || 'Failed to update email' },
+            { status: 500 },
+          );
+        }
+      }
+
+      await logSecurityAudit(
+        'MANUAL_EMAIL_VERIFIED',
+        `Admin manually verified email address ${targetEmail} for user ${targetEmail || targetUserId}`,
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: `Email address ${targetEmail} verified successfully`,
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ACTION 5D: ASK USER TO RE-VERIFY / UPDATE EMAIL
+    // ─────────────────────────────────────────────────────────────
+    if (action === 'ask_email_reverification') {
+      if (!targetUserId) {
+        return NextResponse.json(
+          { success: false, error: 'User ID is required' },
+          { status: 400 },
+        );
+      }
+
+      try {
+        await supabaseAdmin
+          .from('users')
+          .update({
+            requires_email_verification: true,
+            is_email_verified: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', targetUserId);
+      } catch (err: any) {
+        console.error('Failed to set requires_email_verification:', err);
+        return NextResponse.json(
+          { success: false, error: err.message || 'Failed to update user' },
+          { status: 500 },
+        );
+      }
+
+      // Send in-app notification to the user
+      try {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: targetUserId,
+          title: 'ইমেইল রি-ভেরিফিকেশন অনুরোধ',
+          message:
+            'অ্যাডমিন আপনার ইমেইল অ্যাড্রেসটি রি-ভেরিফাই বা আপডেট করার অনুরোধ জানিয়েছেন। অ্যাকাউন্ট লিঙ্কিং অপশন থেকে ওটিপি দিয়ে আপনার সঠিক ইমেইলটি ভেরিফাই করুন।',
+          type: 'system',
+          is_read: false,
+        });
+      } catch (_) {}
+
+      await logSecurityAudit(
+        'ASK_EMAIL_REVERIFICATION',
+        `Admin requested email reverification for user ${targetEmail || targetUserId}`,
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: 'Email re-verification request sent to user successfully',
       });
     }
 

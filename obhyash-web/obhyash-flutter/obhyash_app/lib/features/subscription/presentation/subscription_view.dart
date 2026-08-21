@@ -313,208 +313,232 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             const SizedBox(height: 28),
           ],
 
-          // PRICING HEADER
-          Center(
+          // MASTER PRICING & PLAN CARD
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF141417) : Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                width: 1.0,
+              ),
+              boxShadow: [
+                if (!isDark)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+              ],
+            ),
             child: Column(
               children: [
+                // PRICING HEADER
                 Text(
                   'তোমার প্ল্যান বেছে নাও',
                   style: TextStyle(
-                    fontSize: 23,
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   'সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে',
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 14,
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     fontFamily: 'HindSiliguri',
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
-          // COMPACT PLAN SELECTOR CARDS
-          if (_isLoading)
-            ...[1, 2, 3].map(
-              (i) => Container(
-                height: 84,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF18181B) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-            )
-          else if (premiumPlans.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF18181B) : Colors.white,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Center(
-                child: Text('কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।'),
-              ),
-            )
-          else ...[
-            // Compact Interactive Selectable Cards
-            ...premiumPlans.asMap().entries.map((entry) {
-              final index = entry.key;
-              final plan = entry.value;
-              final isSelected = _selectedPlanIndex == index;
-              final isCurrent = _currentPlanId == plan.id ||
-                  (_activeSubscription != null &&
-                      (_activeSubscription!.id == plan.id ||
-                          _activeSubscription!.name.toLowerCase().trim() ==
-                              plan.name.toLowerCase().trim()));
+                // COMPACT PLAN SELECTOR CARDS
+                if (_isLoading)
+                  ...[1, 2, 3].map(
+                    (i) => Container(
+                      height: 84,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  )
+                else if (premiumPlans.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।',
+                        style: TextStyle(fontFamily: 'HindSiliguri'),
+                      ),
+                    ),
+                  )
+                else ...[
+                  // Compact Interactive Selectable Cards
+                  ...premiumPlans.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final plan = entry.value;
+                    final isSelected = _selectedPlanIndex == index;
+                    final isCurrent = _currentPlanId == plan.id ||
+                        (_activeSubscription != null &&
+                            (_activeSubscription!.id == plan.id ||
+                                _activeSubscription!.name.toLowerCase().trim() ==
+                                    plan.name.toLowerCase().trim()));
 
-              return _CompactPlanCard(
-                plan: plan,
-                isSelected: isSelected,
-                isCurrent: isCurrent,
-                isDark: isDark,
-                appliedCoupon: _appliedCoupon,
-                onTap: () {
-                  setState(() {
-                    _selectedPlanIndex = index;
-                  });
-                },
-              );
-            }),
+                    return _CompactPlanCard(
+                      plan: plan,
+                      isSelected: isSelected,
+                      isCurrent: isCurrent,
+                      isDark: isDark,
+                      appliedCoupon: _appliedCoupon,
+                      onTap: () {
+                        setState(() {
+                          _selectedPlanIndex = index;
+                        });
+                      },
+                    );
+                  }),
 
-            const SizedBox(height: 10),
+                  const SizedBox(height: 4),
 
-            // ── Coupon prompt / remove coupon text link (no box) ──────────
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 8),
-                child: GestureDetector(
-                  onTap: () {
-                    if (_appliedCoupon != null) {
-                      setState(() => _appliedCoupon = null);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'কুপন মুছে ফেলা হয়েছে',
-                            style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+                  // ── Coupon prompt / remove coupon text link (no box) ──────────
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_appliedCoupon != null) {
+                          setState(() => _appliedCoupon = null);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                'কুপন মুছে ফেলা হয়েছে',
+                                style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+                              ),
+                              backgroundColor: Colors.grey[700],
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                          );
+                        } else {
+                          _openCouponSheet();
+                        }
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Text(
+                          _appliedCoupon != null ? 'কুপন রিমুভ করুন' : 'কুপন আছে?',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                            color: _appliedCoupon != null
+                                ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                            decoration: TextDecoration.underline,
+                            decorationColor: _appliedCoupon != null
+                                ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
+                                : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
                           ),
-                          backgroundColor: Colors.grey[700],
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                      );
-                    } else {
-                      _openCouponSheet();
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(
-                      _appliedCoupon != null ? 'কুপন রিমুভ করুন' : 'কুপন আছে?',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                        color: _appliedCoupon != null
-                            ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
-                            : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                        decoration: TextDecoration.underline,
-                        decorationColor: _appliedCoupon != null
-                            ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
-                            : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ),
 
-            // PRIMARY CTA BUTTON FOR SELECTED PLAN
-            if (selectedPlan != null)
-              Builder(builder: (ctx) {
-                final effectivePrice = CouponService.effectivePrice(selectedPlan.price, _appliedCoupon);
-                final hasDiscount = effectivePrice != selectedPlan.price;
-                return Container(
-                  margin: const EdgeInsets.only(top: 4, bottom: 28),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004633),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      elevation: 3,
-                      shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
-                    ),
-                    onPressed: () => _handlePlanSelect(selectedPlan),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'পেমেন্ট করতে এগিয়ে যান',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            fontFamily: 'HindSiliguri',
-                            letterSpacing: 0.2,
+                  const SizedBox(height: 6),
+
+                  // PRIMARY CTA BUTTON FOR SELECTED PLAN
+                  if (selectedPlan != null)
+                    Builder(builder: (ctx) {
+                      final effectivePrice = CouponService.effectivePrice(selectedPlan.price, _appliedCoupon);
+                      final hasDiscount = effectivePrice != selectedPlan.price;
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF004633),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            elevation: 3,
+                            shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          onPressed: () => _handlePlanSelect(selectedPlan),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (hasDiscount) ...[
-                                Text(
-                                  '৳${selectedPlan.price}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'HindSiliguri',
-                                    color: Colors.white60,
-                                    decoration: TextDecoration.lineThrough,
-                                    decorationColor: Colors.white60,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                              ],
-                              Text(
-                                '৳$effectivePrice',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
+                              const Text(
+                                'পেমেন্ট করতে এগিয়ে যান',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
                                   fontFamily: 'HindSiliguri',
-                                  color: Colors.white,
+                                  letterSpacing: 0.2,
                                 ),
                               ),
+                              const SizedBox(width: 10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (hasDiscount) ...[
+                                      Text(
+                                        '৳${selectedPlan.price}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'HindSiliguri',
+                                          color: Colors.white60,
+                                          decoration: TextDecoration.lineThrough,
+                                          decorationColor: Colors.white60,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                    ],
+                                    Text(
+                                      '৳$effectivePrice',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'HindSiliguri',
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(LucideIcons.arrowRight, size: 18),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        const Icon(LucideIcons.arrowRight, size: 18),
-                      ],
-                    ),
-                  ),
-                );
-              }),
+                      );
+                    }),
+                ],
+              ],
+            ),
+          ),
 
-            // UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE (SHOWN ONCE)
-            _UnifiedFeaturesShowcase(isDark: isDark),
-          ],
+          const SizedBox(height: 24),
+
+          // UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE (SHOWN ONCE)
+          _UnifiedFeaturesShowcase(isDark: isDark),
 
           const SizedBox(height: 16),
 
@@ -710,10 +734,10 @@ class _CompactPlanCard extends StatelessWidget {
           color: isDark
               ? (isSelected
                   ? (isMasterPro ? const Color(0xFF271A0A) : const Color(0xFF062319))
-                  : const Color(0xFF18181B))
+                  : const Color(0xFF1C1C20))
               : (isSelected
                   ? (isMasterPro ? const Color(0xFFFFFBEB) : const Color(0xFFF0FDF4))
-                  : Colors.white),
+                  : const Color(0xFFF8FAFC)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: activeBorderColor,

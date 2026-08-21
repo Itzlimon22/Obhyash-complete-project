@@ -66,16 +66,58 @@ export async function GET(request: Request) {
       );
       let redirectPath = next;
       if (user) {
-        const { data: profile } = await withTimeout(
-          supabase.from('users').select('role').eq('id', user.id).single(),
-          'Auth profile lookup timed out',
-        );
+        // Verify if user is registered in public.users
+        let isRegistered = false;
+        try {
+          const { data: rpcRes, error: rpcErr } = await supabase.rpc('check_user_registered', {
+            p_user_id: user.id,
+            p_email: user.email || null,
+          });
+          if (!rpcErr && typeof rpcRes === 'boolean') {
+            isRegistered = rpcRes;
+          } else {
+            const { data: directProfile } = await supabase
+              .from('users')
+              .select('id, role')
+              .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
+              .maybeSingle();
+            isRegistered = !!directProfile;
+          }
+        } catch {
+          const { data: directProfile } = await supabase
+            .from('users')
+            .select('id, role')
+            .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
+            .maybeSingle();
+          isRegistered = !!directProfile;
+        }
 
         // Deny Google login if user has no profile (not registered)
-        if (!profile && user.app_metadata?.provider === 'google') {
+        if (!isRegistered) {
           await supabase.auth.signOut();
           return NextResponse.redirect(`${origin}/login?error=unregistered_google`);
         }
+
+        // If registered, sync Google OAuth user if needed
+        if (user.email) {
+          try {
+            await supabase.rpc('sync_google_login_user', {
+              p_auth_id: user.id,
+              p_email: user.email,
+            });
+          } catch {
+            // non-fatal
+          }
+        }
+
+        const { data: profile } = await withTimeout(
+          supabase
+            .from('users')
+            .select('role')
+            .or(`id.eq.${user.id},email.ilike.${user.email || ''}`)
+            .maybeSingle(),
+          'Auth profile lookup timed out',
+        );
 
         const role = profile?.role?.toLowerCase() || 'student';
         if (role === 'admin') redirectPath = '/admin/dashboard';

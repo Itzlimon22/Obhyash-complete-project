@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../core/providers/auth_provider.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'widgets/scratch_card_dialog.dart';
@@ -88,27 +88,42 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         debugPrint('[ReferralView] usedCheck error: $e');
       }
 
-      // Check existing lockout or attempt logs
+      int remainingAttempts = _remainingAttempts;
+      // Check existing lockout or attempt logs via RPC or table
       try {
-        final log = await sb
-            .from('referral_attempt_logs')
-            .select('failed_attempts, locked_until')
-            .eq('user_id', uid)
-            .maybeSingle();
-
-        if (log != null) {
-          final lockedUntilStr = log['locked_until']?.toString();
-          if (lockedUntilStr != null) {
-            final lockedUntil = DateTime.tryParse(lockedUntilStr);
-            if (lockedUntil != null && lockedUntil.isAfter(DateTime.now())) {
-              final diff = lockedUntil.difference(DateTime.now()).inSeconds;
-              _startLockoutTimer(diff);
-            }
+        final statusRes = await sb.rpc('get_referral_attempt_status', params: {
+          'p_user_id': uid,
+        });
+        if (statusRes is Map<String, dynamic>) {
+          remainingAttempts = (statusRes['remaining_attempts'] as num?)?.toInt() ?? 3;
+          final lockSec = (statusRes['lock_seconds'] as num?)?.toInt() ?? 0;
+          if (lockSec > 0) {
+            _startLockoutTimer(lockSec);
           }
-          final failed = (log['failed_attempts'] as num?)?.toInt() ?? 0;
-          _remainingAttempts = (3 - failed).clamp(1, 3);
+        } else {
+          // Fallback direct table check
+          final log = await sb
+              .from('referral_attempt_logs')
+              .select('failed_attempts, locked_until')
+              .eq('user_id', uid)
+              .maybeSingle();
+
+          if (log != null) {
+            final lockedUntilStr = log['locked_until']?.toString();
+            if (lockedUntilStr != null) {
+              final lockedUntil = DateTime.tryParse(lockedUntilStr);
+              if (lockedUntil != null && lockedUntil.isAfter(DateTime.now())) {
+                final diff = lockedUntil.difference(DateTime.now()).inSeconds;
+                _startLockoutTimer(diff);
+              }
+            }
+            final failed = (log['failed_attempts'] as num?)?.toInt() ?? 0;
+            remainingAttempts = (3 - failed).clamp(0, 3);
+          }
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[ReferralView] attempt status check error: $e');
+      }
 
       // Try fetching existing code or create one
       String code = '';
@@ -141,10 +156,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           referralId = existing['id']?.toString() ?? '';
         }
       } catch (e) {
-        debugPrint('[ReferralView] Fetch/create code error: $e');
-        if (code.isEmpty) {
-          code = uid.substring(0, 8).toUpperCase();
-        }
+        debugPrint('[ReferralView] code create/fetch error: $e');
       }
 
       // Fetch redemption history
@@ -239,6 +251,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           _scratchCards = scratchCards;
           _leaderboard = leaderboard;
           _totalReferrals = totalApproved;
+          _remainingAttempts = remainingAttempts;
           _isLoading = false;
         });
       }
@@ -276,78 +289,84 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         'p_user_id': uid,
       });
 
-      if (mounted) {
-        HapticFeedback.mediumImpact();
-        _claimCodeController.clear();
-        setState(() {
-          _hasUsedReferral = true;
-          _isClaiming = false;
-          _remainingAttempts = 3;
-        });
-        AppPopups.success(
-          context,
-          message: (res != null && res['message'] != null)
-              ? res['message'].toString()
-              : 'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉',
-        );
-        _loadReferral();
+      if (!mounted) return;
+
+      if (res is Map<String, dynamic>) {
+        if (res['success'] == true) {
+          HapticFeedback.mediumImpact();
+          _claimCodeController.clear();
+          setState(() {
+            _hasUsedReferral = true;
+            _isClaiming = false;
+            _remainingAttempts = 3;
+          });
+          AppPopups.success(
+            context,
+            message: res['message']?.toString() ??
+                'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉',
+          );
+          _loadReferral();
+          return;
+        } else {
+          // Failed attempt from server response
+          final isLocked = res['locked'] == true;
+          final lockSec = (res['lock_seconds'] as num?)?.toInt() ?? 0;
+          final remaining = (res['remaining_attempts'] as num?)?.toInt() ??
+              (_remainingAttempts - 1).clamp(0, 3);
+          final errorMsg = res['error']?.toString() ?? 'ভুল রেফারেল কোড!';
+
+          setState(() {
+            _isClaiming = false;
+            _remainingAttempts = remaining;
+          });
+
+          if (isLocked || lockSec > 0) {
+            _startLockoutTimer(lockSec > 0 ? lockSec : 600);
+            AppPopups.error(context, message: errorMsg);
+          } else {
+            AppPopups.warning(context, message: errorMsg);
+          }
+          return;
+        }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isClaiming = false);
-        String rawMsg = '';
-        if (e is PostgrestException) {
-          rawMsg = e.message;
-        } else {
-          rawMsg = e.toString();
-        }
+        final rawMsg = e is PostgrestException ? e.message : e.toString();
 
-        final lowerMsg = rawMsg.toLowerCase();
-        String userFriendlyMsg = '';
-
-        if (lowerMsg.contains('own referral') ||
-            lowerMsg.contains('নিজের রেফারেল') ||
-            lowerMsg.contains('cannot redeem own') ||
-            lowerMsg.contains('own code')) {
-          userFriendlyMsg = 'তুমি নিজের রেফারেল কোড ব্যবহার করতে পারবে না!';
-        } else if (lowerMsg.contains('invalid') ||
-            lowerMsg.contains('not found') ||
-            lowerMsg.contains('does not exist') ||
-            lowerMsg.contains('ভুল কোড') ||
-            lowerMsg.contains('সঠিক নয়')) {
-          userFriendlyMsg = 'ভুল রেফারেল কোড! অনুগ্রহ করে সঠিক কোড দিন।';
-        } else if (lowerMsg.contains('already') ||
-            lowerMsg.contains('ইতিমধ্যে') ||
-            lowerMsg.contains('used') ||
-            lowerMsg.contains('পূর্বে')) {
-          userFriendlyMsg = 'তুমি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছো!';
-        } else if (lowerMsg.contains('১০ মিনিট') ||
-            lowerMsg.contains('লক') ||
-            lowerMsg.contains('lock') ||
-            lowerMsg.contains('3 failed')) {
+        if (rawMsg.contains('১০ মিনিট') || rawMsg.contains('লক')) {
           _startLockoutTimer(600);
-          userFriendlyMsg =
-              'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।';
-          AppPopups.error(context, message: userFriendlyMsg);
-          return;
-        } else if (lowerMsg.contains('চেষ্টা করা যাবে')) {
+          setState(() => _remainingAttempts = 0);
+          AppPopups.error(
+            context,
+            message:
+                'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।',
+          );
+        } else if (rawMsg.contains('চেষ্টা করা যাবে')) {
           final match = RegExp(r'আর (\d+) বার').firstMatch(rawMsg);
           if (match != null) {
-            setState(() => _remainingAttempts = int.tryParse(match.group(1)!) ?? 1);
+            final parsed = int.tryParse(match.group(1)!);
+            if (parsed != null) {
+              setState(() => _remainingAttempts = parsed);
+            }
           }
-          userFriendlyMsg = rawMsg.replaceAll('Exception:', '').trim();
+          AppPopups.warning(
+            context,
+            message: rawMsg.replaceAll('Exception:', '').trim(),
+          );
         } else {
-          userFriendlyMsg = rawMsg
+          final cleanMsg = rawMsg
               .replaceAll('Exception:', '')
               .replaceAll(RegExp(r'PostgrestException\(message:\s*'), '')
               .replaceAll(RegExp(r',\s*code:.*'), '')
               .trim();
-          if (userFriendlyMsg.isEmpty) {
-            userFriendlyMsg = 'রেফারেল ক্লেইম ব্যর্থ হয়েছে। সঠিক কোড দিয়ে চেষ্টা করুন।';
-          }
+          AppPopups.warning(
+            context,
+            message: cleanMsg.isNotEmpty
+                ? cleanMsg
+                : 'রেফারেল ক্লেইম ব্যর্থ হয়েছে। সঠিক কোড দিয়ে চেষ্টা করুন।',
+          );
         }
-
-        AppPopups.warning(context, message: userFriendlyMsg);
       }
     }
   }
@@ -364,12 +383,19 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   void _shareCode() async {
     if (_code == null) return;
     final text =
-        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১ মাসের প্রিমিয়াম সাবস্ক্রিপশন! 🎉\n\nকোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
-    final encoded = Uri.encodeComponent(text);
-    final whatsappUrl = Uri.parse('https://wa.me/?text=$encoded');
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-    } else {
+        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১ মাসের প্রিমিয়াম সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
+    try {
+      final box = context.findRenderObject() as RenderBox?;
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: 'অভ্যাস অ্যাপ - ১ মাসের ফ্রি প্রিমিয়াম রেফারেল কোড',
+          sharePositionOrigin: box != null
+              ? (box.localToGlobal(Offset.zero) & box.size)
+              : null,
+        ),
+      );
+    } catch (e) {
       // Fallback: copy to clipboard
       await Clipboard.setData(ClipboardData(text: text));
       if (mounted) {

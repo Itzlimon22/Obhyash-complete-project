@@ -108,6 +108,7 @@ export default function DetailsModal({
 
   // Phone verification state
   const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
+  const [isAskingReverify, setIsAskingReverify] = useState(false);
 
   useEffect(() => {
     setUserData(user);
@@ -193,7 +194,7 @@ export default function DetailsModal({
   };
 
   const handleManualVerifyPhone = async () => {
-    if (!user.phone) {
+    if (!userData.phone) {
       toast.error('User does not have a phone number');
       return;
     }
@@ -205,19 +206,125 @@ export default function DetailsModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'verify_phone_manually',
-          userId: user.id,
-          userPhone: user.phone,
+          userId: userData.id,
+          userPhone: userData.phone,
         }),
       });
 
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Failed to verify phone');
 
-      toast.success(`Phone ${user.phone} marked as verified`);
+      setUserData((prev: any) => ({
+        ...prev,
+        is_phone_verified: true,
+        requires_phone_verification: false,
+      }));
+      toast.success(`Phone ${userData.phone} marked as verified by Admin`);
     } catch (err: any) {
       toast.error(err.message || 'Verification failed');
     } finally {
       setIsVerifyingPhone(false);
+    }
+  };
+
+  const handleAskPhoneReverification = async () => {
+    if (!confirm('Are you sure you want to request this student to re-verify / update their phone number?')) {
+      return;
+    }
+
+    setIsAskingReverify(true);
+    try {
+      const res = await fetch('/api/admin/users/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ask_phone_reverification',
+          userId: userData.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to send re-verification request');
+
+      setUserData((prev: any) => ({
+        ...prev,
+        is_phone_verified: false,
+        requires_phone_verification: true,
+      }));
+      toast.success('Re-verification request sent to student successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Request failed');
+    } finally {
+      setIsAskingReverify(false);
+    }
+  };
+
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [isAskingEmailReverify, setIsAskingEmailReverify] = useState(false);
+
+  const handleManualVerifyEmail = async () => {
+    if (!userData.email) {
+      toast.error('User does not have an email address');
+      return;
+    }
+
+    setIsVerifyingEmail(true);
+    try {
+      const res = await fetch('/api/admin/users/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify_email_manually',
+          userId: userData.id,
+          userEmail: userData.email,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to verify email');
+
+      setUserData((prev: any) => ({
+        ...prev,
+        is_email_verified: true,
+        requires_email_verification: false,
+      }));
+      toast.success(`Email ${userData.email} marked as verified by Admin`);
+    } catch (err: any) {
+      toast.error(err.message || 'Verification failed');
+    } finally {
+      setIsVerifyingEmail(false);
+    }
+  };
+
+  const handleAskEmailReverification = async () => {
+    if (!confirm('Are you sure you want to request this student to re-verify / update their email address?')) {
+      return;
+    }
+
+    setIsAskingEmailReverify(true);
+    try {
+      const res = await fetch('/api/admin/users/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ask_email_reverification',
+          userId: userData.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to send email re-verification request');
+
+      setUserData((prev: any) => ({
+        ...prev,
+        is_email_verified: false,
+        requires_email_verification: true,
+      }));
+      toast.success('Email re-verification request sent to student successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Request failed');
+    } finally {
+      setIsAskingEmailReverify(false);
     }
   };
 
@@ -368,33 +475,124 @@ export default function DetailsModal({
                 </div>
               </div>
 
-              {/* Phone Verification Support Banner */}
-              <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 text-xs">
+              {/* Email Verification Support Banner */}
+              <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded-xl border border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
-                    <Phone size={16} />
+                  <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0">
+                    <Mail size={16} />
                   </div>
                   <div>
-                    <p className="font-bold text-neutral-900 dark:text-white">
-                      Phone Number: {userData.phone || 'Not provided'}
-                    </p>
-                    <p className="text-[11px] text-neutral-500">
-                      OTP SMS System Support & Verification Status
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-neutral-900 dark:text-white">
+                        Email: {userData.email || 'Not provided'}
+                      </p>
+                      {userData.requires_email_verification ? (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                          Re-verification Pending
+                        </span>
+                      ) : userData.is_email_verified ? (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                          Verified
+                        </span>
+                      ) : userData.email ? (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                          Unverified
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-200 dark:bg-zinc-700 text-neutral-600 dark:text-zinc-300">
+                          No Email
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                      Admin direct email verification & user re-verification request controls
                     </p>
                   </div>
                 </div>
 
-                {userData.phone && (
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  {userData.email && (
+                    <button
+                      type="button"
+                      onClick={handleManualVerifyEmail}
+                      disabled={isVerifyingEmail}
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+                      title="Directly verify user's email address"
+                    >
+                      <CheckCircle2 size={13} />
+                      <span>{isVerifyingEmail ? 'Verifying...' : 'Verify Email'}</span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
-                    onClick={handleManualVerifyPhone}
-                    disabled={isVerifyingPhone}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    onClick={handleAskEmailReverification}
+                    disabled={isAskingEmailReverify}
+                    className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Send a request to user to re-verify/edit their email"
                   >
-                    <CheckCircle2 size={13} />
-                    <span>{isVerifyingPhone ? 'Verifying...' : 'Manual Verify Phone'}</span>
+                    <AlertCircle size={13} />
+                    <span>{isAskingEmailReverify ? 'Sending...' : 'Ask Re-verify'}</span>
                   </button>
-                )}
+                </div>
+              </div>
+
+              {/* Phone Verification Support Banner */}
+              <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded-xl border border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <Phone size={16} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-neutral-900 dark:text-white">
+                        Phone: {userData.phone || 'Not provided'}
+                      </p>
+                      {userData.requires_phone_verification ? (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                          Re-verification Pending
+                        </span>
+                      ) : (userData.is_phone_verified || userData.phone) ? (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                          Verified
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-200 dark:bg-zinc-700 text-neutral-600 dark:text-zinc-300">
+                          No Phone
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                      Admin direct verification & user re-verification request controls
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  {userData.phone && (
+                    <button
+                      type="button"
+                      onClick={handleManualVerifyPhone}
+                      disabled={isVerifyingPhone}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+                      title="Directly verify user's phone number"
+                    >
+                      <CheckCircle2 size={13} />
+                      <span>{isVerifyingPhone ? 'Verifying...' : 'Verify Number'}</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleAskPhoneReverification}
+                    disabled={isAskingReverify}
+                    className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Send a request to user to re-verify/edit their number"
+                  >
+                    <AlertCircle size={13} />
+                    <span>{isAskingReverify ? 'Sending...' : 'Ask Re-verify'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Academic & Track Card */}

@@ -84,24 +84,11 @@ class NotificationPermissionSheet extends StatelessWidget {
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
-            const SizedBox(height: 8),
-
-            // Subtitle
-            Text(
-              'তোমার পরীক্ষার প্রস্তুতি আরও গোছানো রাখতে গুরুত্বপূর্ণ আপডেটগুলো সময়মতো জেনে নাও',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'HindSiliguri',
-                height: 1.4,
-                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
-              ),
-            ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
 
             // Feature points
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF242730) : const Color(0xFFF9FAFB),
                 borderRadius: BorderRadius.circular(20),
@@ -115,23 +102,20 @@ class NotificationPermissionSheet extends StatelessWidget {
                     icon: LucideIcons.flame,
                     iconColor: const Color(0xFFEF4444),
                     title: 'স্ট্রিক সেভার অ্যালার্ট',
-                    desc: 'রাত ৮:৩০ টায় স্ট্রিক বাঁচানোর মজার রিমাইন্ডার',
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _buildBenefitRow(
                     icon: LucideIcons.timer,
                     iconColor: const Color(0xFF3B82F6),
                     title: 'লাইভ পরীক্ষা রিমাইন্ডার',
-                    desc: 'পরীক্ষা শুরুর ১৫ মিনিট আগে বিশেষ সংকেত',
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _buildBenefitRow(
                     icon: LucideIcons.trophy,
                     iconColor: const Color(0xFFEAB308),
                     title: 'ফলাফল ও র‍্যাংকিং',
-                    desc: 'পরীক্ষার রেজাল্ট প্রকাশের সাথে সাথে নোটিশ',
                     isDark: isDark,
                   ),
                 ],
@@ -200,7 +184,6 @@ class NotificationPermissionSheet extends StatelessWidget {
     required IconData icon,
     required Color iconColor,
     required String title,
-    required String desc,
     required bool isDark,
   }) {
     return Row(
@@ -213,29 +196,16 @@ class NotificationPermissionSheet extends StatelessWidget {
           ),
           child: Icon(icon, color: iconColor, size: 18),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 14),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Anek Bangla',
-                  color: isDark ? Colors.white : const Color(0xFF111827),
-                ),
-              ),
-              Text(
-                desc,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'HindSiliguri',
-                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
-                ),
-              ),
-            ],
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Anek Bangla',
+              color: isDark ? Colors.white : const Color(0xFF111827),
+            ),
           ),
         ),
       ],

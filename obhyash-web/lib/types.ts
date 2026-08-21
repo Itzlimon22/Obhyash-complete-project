@@ -248,6 +248,10 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
+  is_phone_verified?: boolean;
+  requires_phone_verification?: boolean;
+  is_email_verified?: boolean;
+  requires_email_verification?: boolean;
   avatarUrl?: string;
   role: UserRole;
   status: UserStatus;
