@@ -236,7 +236,7 @@ class _ResultViewState extends State<ResultView> {
           // ── Top Summary & Stats Section ──
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
               child: Column(
                 children: [
 
@@ -364,7 +364,7 @@ class _ResultViewState extends State<ResultView> {
           // ── Section Title ──
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
+              padding: const EdgeInsets.fromLTRB(10, 28, 10, 8),
               child: Text(
                 'উত্তরপত্র পর্যালোচনা',
                 style: TextStyle(
@@ -384,7 +384,7 @@ class _ResultViewState extends State<ResultView> {
               isDark: isDark,
               child: Container(
                 color: isDark ? Colors.black : const Color(0xFFFAFAFA),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 alignment: Alignment.centerLeft,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -434,7 +434,7 @@ class _ResultViewState extends State<ResultView> {
 
           // ── Virtualized Question Cards ──
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             sliver: SliverList.builder(
               itemCount: filteredQuestions.length,
               itemBuilder: (context, index) {
@@ -468,7 +468,7 @@ class _ResultViewState extends State<ResultView> {
           if (!widget.isHistoryMode)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                padding: const EdgeInsets.fromLTRB(10, 12, 10, 24),
                 child: SizedBox(
                   width: double.infinity,
                   height: 48,

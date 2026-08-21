@@ -103,7 +103,6 @@ class _PaymentViewState extends State<PaymentView>
               expiresAt: widget.plan.expiresAt,
             );
           });
-          Navigator.pop(context);
           AppPopups.success(
             context,
             message: "🎉 '${res.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
@@ -120,7 +119,6 @@ class _PaymentViewState extends State<PaymentView>
           _appliedCoupon = null;
           _currentPlan = widget.plan;
         });
-        Navigator.pop(context);
         AppPopups.info(context, message: 'কুপন মুছে ফেলা হয়েছে');
       },
     );

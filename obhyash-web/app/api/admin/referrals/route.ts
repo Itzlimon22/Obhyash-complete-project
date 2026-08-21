@@ -115,12 +115,14 @@ export async function GET(request: NextRequest) {
       const approvedUses = referees.filter((r) => r.admin_status === 'Approved').length;
       const pendingUses = referees.filter((r) => r.admin_status === 'Pending' || !r.admin_status).length;
       const rejectedUses = referees.filter((r) => r.admin_status === 'Rejected').length;
+      const isBlocked = ref.expires_at ? new Date(ref.expires_at) < new Date() : false;
 
       return {
         id: ref.id,
         code: ref.code,
         created_at: ref.created_at,
         expires_at: ref.expires_at,
+        isBlocked,
         owner,
         totalUses,
         approvedUses,
@@ -264,6 +266,66 @@ export async function PATCH(request: NextRequest) {
       if (insertErr) throw insertErr;
 
       return NextResponse.json({ success: true, message: 'নতুন রেফারেল কোড সফলভাবে তৈরি হয়েছে!' });
+    }
+
+    if (action === 'toggle_block') {
+      if (!referralId) {
+        return NextResponse.json({ error: 'Referral ID required' }, { status: 400 });
+      }
+
+      // 1. Fetch current referral
+      const { data: ref, error: refFetchErr } = await supabaseAdmin
+        .from('referrals')
+        .select('*')
+        .eq('id', referralId)
+        .single();
+
+      if (refFetchErr || !ref) {
+        return NextResponse.json({ error: 'Referral not found' }, { status: 404 });
+      }
+
+      const isCurrentlyBlocked = ref.expires_at ? new Date(ref.expires_at) < new Date() : false;
+      const willBlock = !isCurrentlyBlocked;
+      const newExpiresAt = willBlock ? '1970-01-01T00:00:00.000Z' : null;
+
+      const { error: updateRefErr } = await supabaseAdmin
+        .from('referrals')
+        .update({ expires_at: newExpiresAt })
+        .eq('id', referralId);
+
+      if (updateRefErr) throw updateRefErr;
+
+      // 2. Also update user profile subscription JSON
+      if (ref.owner_id) {
+        try {
+          const { data: userData } = await supabaseAdmin
+            .from('users')
+            .select('subscription')
+            .eq('id', ref.owner_id)
+            .single();
+
+          const sub = userData?.subscription || {};
+          await supabaseAdmin
+            .from('users')
+            .update({
+              subscription: {
+                ...sub,
+                is_referral_blocked: willBlock,
+              },
+            })
+            .eq('id', ref.owner_id);
+        } catch (e) {
+          console.warn('Could not sync user subscription block flag:', e);
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        isBlocked: willBlock,
+        message: willBlock
+          ? 'ইউজারের রেফারেল সুবিধা সফলভাবে ব্লক করা হয়েছে।'
+          : 'ইউজারের রেফারেল সুবিধা সফলভাবে আনব্লক করা হয়েছে।',
+      });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

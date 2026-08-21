@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 import '../../services/streak_service.dart';
 import '../../providers/dashboard_providers.dart';
 
@@ -15,16 +16,64 @@ class DailyStreakCard extends ConsumerStatefulWidget {
 }
 
 class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
-  static List<int>? _cachedActivity;
-  late List<int> _last30DaysActivity;
+  List<int> _last30DaysActivity = List.filled(30, 0);
   int _streakCount = 0;
+  RealtimeChannel? _realtimeChannel;
 
   @override
   void initState() {
     super.initState();
-    _last30DaysActivity = _cachedActivity ?? List.filled(30, 0);
     _streakCount = widget.userStreak;
     _fetchData();
+    _setupRealtimeSubscription();
+  }
+
+  @override
+  void dispose() {
+    if (_realtimeChannel != null) {
+      Supabase.instance.client.removeChannel(_realtimeChannel!);
+      _realtimeChannel = null;
+    }
+    super.dispose();
+  }
+
+  void _setupRealtimeSubscription() {
+    final supabase = Supabase.instance.client;
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return;
+
+    try {
+      _realtimeChannel = supabase.channel('realtime_streak_exams_$userId');
+      _realtimeChannel!.onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'exam_results',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'user_id',
+          value: userId,
+        ),
+        callback: (payload) {
+          if (mounted) _fetchData();
+        },
+      );
+      _realtimeChannel!.onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'live_exam_attempts',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'user_id',
+          value: userId,
+        ),
+        callback: (payload) {
+          if (mounted) _fetchData();
+        },
+      );
+      _realtimeChannel!.subscribe();
+    } catch (e) {
+      debugPrint('[DailyStreakCard] Realtime setup error: $e');
+    }
   }
 
   @override
@@ -35,8 +84,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     }
   }
 
-  /// Fetches exam activity using StreakService (single source of truth) for
-  /// the streak count and 30-day heatmap data.
+  /// Fetches exam activity using StreakService for the streak count and 30-day heatmap data.
   Future<void> _fetchData() async {
     final supabase = Supabase.instance.client;
     final userId = supabase.auth.currentUser?.id;
@@ -49,11 +97,41 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
         setState(() {
           _streakCount = data.streakCount;
           _last30DaysActivity = data.last30DaysActivity;
-          _cachedActivity = data.last30DaysActivity;
         });
       }
     } catch (e) {
       debugPrint('[DailyStreakCard] _fetchData error: $e');
+    }
+  }
+
+  static String _getBanglaMonth(int month) {
+    const months = [
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর'
+    ];
+    if (month >= 1 && month <= 12) return months[month - 1];
+    return '';
+  }
+
+  static String _formatBoxDate(int index) {
+    final nowDhaka = DateTime.now().toUtc().add(const Duration(hours: 6));
+    final targetDate = nowDhaka.subtract(Duration(days: 29 - index));
+    if (index == 29) {
+      return 'আজ (${BanglaNameHelper.toBanglaNumeral(targetDate.day)} ${_getBanglaMonth(targetDate.month)})';
+    } else if (index == 28) {
+      return 'গতকাল (${BanglaNameHelper.toBanglaNumeral(targetDate.day)} ${_getBanglaMonth(targetDate.month)})';
+    } else {
+      return '${BanglaNameHelper.toBanglaNumeral(targetDate.day)} ${_getBanglaMonth(targetDate.month)}';
     }
   }
 
@@ -89,10 +167,10 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
           // Header
           Row(
             children: [
-              Icon(
+              const Icon(
                 LucideIcons.calendar,
                 size: 20,
-                color: const Color(0xFF059669),
+                color: Color(0xFF059669),
               ),
               const SizedBox(width: 8),
               Text(
@@ -119,7 +197,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                     const Text('🔥', style: TextStyle(fontSize: 13)),
                     const SizedBox(width: 4),
                     Text(
-                      '$currentStreak দিন',
+                      '${BanglaNameHelper.toBanglaNumeral(currentStreak)} দিন',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
@@ -156,6 +234,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
           runSpacing: 6,
           children: List.generate(30, (index) {
             final activityCount = _last30DaysActivity[index];
+            final dateLabel = _formatBoxDate(index);
 
             Color boxColor = emptyBoxColor;
             if (activityCount > 0) {
@@ -165,17 +244,24 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
               boxColor = primaryAccent.withValues(alpha: opacity);
             }
 
-            return ObhyashTooltip(
-              message: activityCount > 0
-                  ? '$activityCountটি পরীক্ষা দেওয়া হয়েছে'
-                  : 'কোনো পরীক্ষা দেওয়া হয়নি',
-              preferredPosition: TooltipPosition.top,
-              child: Container(
-                width: boxSize,
-                height: boxSize,
-                decoration: BoxDecoration(
-                  color: boxColor,
-                  borderRadius: BorderRadius.circular(6),
+            final tooltipText = activityCount > 0
+                ? '$dateLabel: ${BanglaNameHelper.toBanglaNumeral(activityCount)}টি পরীক্ষা দেওয়া হয়েছে'
+                : '$dateLabel: কোনো পরীক্ষা দেওয়া হয়নি';
+
+            return GestureDetector(
+              onTap: () {
+                _fetchData();
+              },
+              child: ObhyashTooltip(
+                message: tooltipText,
+                preferredPosition: TooltipPosition.top,
+                child: Container(
+                  width: boxSize,
+                  height: boxSize,
+                  decoration: BoxDecoration(
+                    color: boxColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
               ),
             );

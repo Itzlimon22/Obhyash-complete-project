@@ -32,11 +32,41 @@ export const POST = async (req: Request) => {
     );
   }
 
+  const cleanCode = code.trim().toUpperCase();
+
+  // 1. Check if the redeeming user is referral-blocked
+  const { data: redeemerProfile } = await supabaseAdmin
+    .from('users')
+    .select('subscription')
+    .eq('id', targetUserId)
+    .single();
+
+  if (redeemerProfile?.subscription?.is_referral_blocked) {
+    return NextResponse.json(
+      { error: 'আপনার অ্যাকাউন্ট থেকে রেফারেল কোড ব্যবহারের সুবিধা স্থগিত রয়েছে।' },
+      { status: 403 },
+    );
+  }
+
+  // 2. Check if the referral code itself is blocked/expired
+  const { data: refRecord } = await supabaseAdmin
+    .from('referrals')
+    .select('expires_at, owner_id')
+    .eq('code', cleanCode)
+    .maybeSingle();
+
+  if (refRecord?.expires_at && new Date(refRecord.expires_at) < new Date()) {
+    return NextResponse.json(
+      { error: 'এই রেফারেল কোডটি বর্তমানে অ্যাডমিন কর্তৃক নিষ্ক্রিয় বা স্থগিত রয়েছে।' },
+      { status: 400 },
+    );
+  }
+
   // Use atomic stored procedure with anti-brute-force rate limiting (3 failed attempts = 10 min lockout)
   const { data: redeemRes, error: txnError } = await supabaseAdmin.rpc(
     'redeem_referral_by_code',
     {
-      p_code: code.trim().toUpperCase(),
+      p_code: cleanCode,
       p_user_id: targetUserId,
     },
   );

@@ -87,6 +87,29 @@ class GamificationService {
       final assigned = [pool[idx1], pool[idx2]];
       final claimedList = prefs.getStringList('claimed_quests_$todayStr') ?? [];
 
+      // Fetch server claimed state
+      final serverClaimed = <String>{};
+      try {
+        final stateRes = await _supabase
+            .from('daily_quests_state')
+            .select('claimed_ids, quest_date')
+            .eq('user_id', userId)
+            .order('quest_date', ascending: false)
+            .limit(3);
+
+        for (final row in stateRes) {
+          final qDate = row['quest_date']?.toString();
+          if (qDate == todayStr) {
+            final claimed = row['claimed_ids'];
+            if (claimed is List) {
+              for (final c in claimed) {
+                serverClaimed.add(c.toString());
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
       return assigned.map((m) {
         final id = m['id'] as String;
         final type = m['type'] as String;
@@ -107,6 +130,14 @@ class GamificationService {
           current = totalMcqsToday;
         }
 
+        final isServerClaimed = serverClaimed.contains(id);
+        final isLocalClaimed = claimedList.contains(id) || (prefs.getBool('quest_claimed_${userId}_${todayStr}_$id') ?? false);
+        final isClaimed = isServerClaimed || isLocalClaimed;
+
+        if (isServerClaimed && !isLocalClaimed) {
+          prefs.setBool('quest_claimed_${userId}_${todayStr}_$id', true);
+        }
+
         return DailyQuest(
           id: id,
           title: m['title'] as String,
@@ -116,7 +147,7 @@ class GamificationService {
           xpReward: m['xp'] as int,
           icon: m['icon'] as IconData,
           color: m['color'] as Color,
-          isClaimed: claimedList.contains(id) || (prefs.getBool('quest_claimed_${userId}_${todayStr}_$id') ?? false),
+          isClaimed: isClaimed,
         );
       }).toList();
     } catch (_) {
@@ -143,13 +174,22 @@ class GamificationService {
           'p_user_id': userId,
           'p_quest_id': questId,
           'p_xp_reward': xpReward,
+          'p_quest_date': todayStr,
         });
       } catch (_) {
-        // Fallback: direct update
-        await _supabase.rpc('increment_user_xp', params: {
-          'p_user_id': userId,
-          'p_xp': xpReward,
-        });
+        try {
+          await _supabase.rpc('claim_daily_quest', params: {
+            'p_user_id': userId,
+            'p_quest_id': questId,
+            'p_xp_reward': xpReward,
+          });
+        } catch (_) {
+          // Fallback: direct update
+          await _supabase.rpc('increment_user_xp', params: {
+            'p_user_id': userId,
+            'p_xp': xpReward,
+          });
+        }
       }
 
       // 2. Mark local claimed

@@ -215,7 +215,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -458,7 +458,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(

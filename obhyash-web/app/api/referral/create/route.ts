@@ -28,12 +28,19 @@ export const POST = async (req: Request) => {
     // Ignore cases where body is empty
   }
 
-  // Fetch user profile to check admin status
+  // Fetch user profile to check admin status & referral block
   const { data: profile } = await supabase
     .from('users')
-    .select('role')
+    .select('role, subscription')
     .eq('id', user.id)
     .single();
+
+  if (profile?.subscription?.is_referral_blocked) {
+    return NextResponse.json(
+      { error: 'আপনার অ্যাকাউন্টে রেফারেল কোড তৈরি বা শেয়ার করার সুবিধা সাময়িকভাবে স্থগিত রয়েছে।' },
+      { status: 403 },
+    );
+  }
 
   const isAdmin = profile?.role === 'Admin';
 

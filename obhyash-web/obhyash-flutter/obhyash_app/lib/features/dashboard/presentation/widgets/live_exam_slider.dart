@@ -66,7 +66,7 @@ class LiveExamSlider extends ConsumerWidget {
               autoPlay: exams.length > 1,
               autoPlayInterval: const Duration(seconds: 5),
               enlargeCenterPage: false,
-              viewportFraction: 0.94,
+              viewportFraction: 0.95,
               enableInfiniteScroll: exams.length > 1,
             ),
             items: exams.map((exam) {

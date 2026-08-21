@@ -45,6 +45,8 @@ interface UserReferralItem {
   id: string;
   code: string;
   created_at: string;
+  expires_at?: string | null;
+  isBlocked?: boolean;
   owner: {
     id: string;
     name: string;
@@ -187,6 +189,28 @@ export default function AdminReferralsPage() {
   const handleOpenEditCode = (item: UserReferralItem) => {
     setEditCodeItem(item);
     setNewCodeValue(item.code);
+  };
+
+  // Toggle user referral block / unblock
+  const handleToggleBlock = async (item: UserReferralItem) => {
+    const actionLabel = item.isBlocked ? 'আনব্লক' : 'ব্লক';
+    try {
+      const res = await fetch('/api/admin/referrals', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'toggle_block',
+          referralId: item.id,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      toast.success(data.message || `রেফারেল সুবিধা সফলভাবে ${actionLabel} করা হয়েছে!`);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.message || `${actionLabel} করা সম্ভব হয়নি`);
+    }
   };
 
   // Save updated referral code

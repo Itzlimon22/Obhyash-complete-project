@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%" fx="50%" fy="30%">
+      <stop offset="0%" stop-color="#0E2D1F" />
+      <stop offset="60%" stop-color="#061911" />
+      <stop offset="100%" stop-color="#020B07" />
+    </radialGradient>
+
+    <!-- Ribbon Gradients for Isometric Depth -->
+    <!-- Top-Right Ribbon Layer (Bright Neon Lime) -->
+    <linearGradient id="facetTop" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#F2FF59" />
+      <stop offset="100%" stop-color="#C5F724" />
+    </linearGradient>
+
+    <!-- Right-Down Fold (Vibrant Lime-Green) -->
+    <linearGradient id="facetRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C5F724" />
+      <stop offset="100%" stop-color="#80E61A" />
+    </linearGradient>
+
+    <!-- Bottom Fold Layer (Bright Volt Neon) -->
+    <linearGradient id="facetBottom" x1="80%" y1="100%" x2="20%" y2="0%">
+      <stop offset="0%" stop-color="#E8FF42" />
+      <stop offset="100%" stop-color="#B2F219" />
+    </linearGradient>
+
+    <!-- Left-Up Fold (Mid Lime) -->
+    <linearGradient id="facetLeft" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#B2F219" />
+      <stop offset="100%" stop-color="#72D612" />
+    </linearGradient>
+
+    <!-- Inner Shadow & Depth Facet 1 (Dark Emerald Fold) -->
+    <linearGradient id="innerShadow1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#092B1B" />
+      <stop offset="100%" stop-color="#04150D" />
+    </linearGradient>
+
+    <!-- Inner Shadow & Depth Facet 2 (Deep Greenish Shade) -->
+    <linearGradient id="innerShadow2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0D3521" />
+      <stop offset="100%" stop-color="#05180E" />
+    </linearGradient>
+
+    <!-- Center Glow -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Drop Shadow for Upper Ribbons -->
+    <filter id="foldShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="-2" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <!-- Background Rounded Canvas -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+
+  <!-- Subtle Ambient Glow Behind Logo -->
+  <circle cx="256" cy="256" r="140" fill="#80E61A" opacity="0.12" filter="blur(40px)" />
+
+  <!-- MAIN EMBLEM: Isometric Continuous "O" Habit Loop -->
+  <g transform="translate(0, 0)">
+    
+    <!-- 1. Background Inner Shadow Segment (Top-Right to Center depth) -->
+    <path d="M 256,136 L 356,236 L 306,286 L 256,236 Z" 
+          fill="url(#innerShadow1)" />
+
+    <!-- 2. Background Inner Shadow Segment (Bottom-Left to Center depth) -->
+    <path d="M 256,376 L 156,276 L 206,226 L 256,276 Z" 
+          fill="url(#innerShadow2)" />
+
+    <!-- 3. Left Ribbon Wing (Folding Upward into 'O') -->
+    <path d="M 198,162 
+             C 186,146 160,154 142,180 
+             L 116,218 
+             C 100,240 100,272 116,294 
+             L 174,374 
+             C 188,394 212,398 230,384 
+             L 282,342 
+             L 194,254 
+             Z" 
+          fill="url(#facetLeft)" 
+          filter="url(#foldShadow)" />
+
+    <!-- 4. Bottom-Right Fold Ribbon (Isometric Corner) -->
+    <path d="M 230,384 
+             L 304,384 
+             C 328,384 350,370 362,350 
+             L 396,294 
+             C 412,268 406,238 384,222 
+             L 318,174 
+             L 256,236 
+             L 312,292 
+             L 282,342 
+             Z" 
+          fill="url(#facetBottom)" />
+
+    <!-- 5. Top Ribbon Cap (Forming the complete 'O' Loop) -->
+    <path d="M 204,136 
+             C 214,126 232,120 256,120 
+             L 326,120 
+             C 350,120 372,134 384,154 
+             L 404,188 
+             C 418,212 412,240 392,256 
+             L 338,298 
+             L 256,216 
+             L 336,156 
+             L 242,156 
+             C 222,156 208,148 204,136 
+             Z" 
+          fill="url(#facetTop)" 
+          filter="url(#foldShadow)" />
+
+    <!-- 6. Center Connecting Isometric Core Facet (Bright Highlight) -->
+    <path d="M 256,216 
+             L 306,266 
+             L 256,316 
+             L 206,266 
+             Z" 
+          fill="#D6FF38" 
+          opacity="0.95" />
+
+  </g>
+</svg>

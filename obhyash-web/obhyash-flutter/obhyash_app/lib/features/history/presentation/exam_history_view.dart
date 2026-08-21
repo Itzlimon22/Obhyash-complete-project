@@ -1102,7 +1102,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       children: [
         // ── Top Bar: Right Aligned Smaller Tabs ─────────────────────────────
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -1170,7 +1170,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         // ── Single Row Filter: Subject | Chapter | Date ─────────────────────
         // Guaranteed to stay in a single row for all mobile screen sizes
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           child: Row(
             children: [
               // 1. Subject Dropdown
@@ -1532,7 +1532,7 @@ class _ExamsTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         children: [
           // ── Compact Center-Aligned 3-Card Stat Row ─────────────────────────────
           Row(
@@ -2086,7 +2086,7 @@ class _QuestionsTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         itemCount: itemCount,
         itemBuilder: (context, index) {
           if (index == questions.length) {

@@ -27,7 +27,7 @@
         </intent>
     </queries>
     <application
-        android:label="obhyash_app"
+        android:label="Obhyash"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

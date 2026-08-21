@@ -259,7 +259,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
       body: Column(
         children: [
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            margin: const EdgeInsets.fromLTRB(10, 16, 10, 8),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
               borderRadius: BorderRadius.circular(12),
@@ -350,7 +350,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF000000) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -626,7 +626,7 @@ class _OverviewTab extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       children: [
         // Hero card
         Container(
@@ -1037,7 +1037,7 @@ class _HistoryTab extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       children: [
         // Summary row
         Row(

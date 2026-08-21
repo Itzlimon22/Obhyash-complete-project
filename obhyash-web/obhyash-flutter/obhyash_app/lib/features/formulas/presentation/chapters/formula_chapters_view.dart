@@ -88,7 +88,7 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
       body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 24),
         itemCount: chapters.length,
         itemBuilder: (context, index) {
           final chapter = chapters[index];

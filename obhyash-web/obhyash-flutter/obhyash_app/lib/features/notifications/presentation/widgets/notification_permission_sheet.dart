@@ -6,8 +6,8 @@ import '../../services/notification_service.dart';
 class NotificationPermissionSheet extends StatelessWidget {
   const NotificationPermissionSheet({super.key});
 
-  static void show(BuildContext context) {
-    showModalBottomSheet(
+  static Future<void> show(BuildContext context) async {
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

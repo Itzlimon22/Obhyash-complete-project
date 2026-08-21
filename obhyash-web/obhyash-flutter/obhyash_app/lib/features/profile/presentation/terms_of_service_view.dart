@@ -204,7 +204,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: 10,
                     vertical: 8,
                   ),
                   child: Row(
@@ -282,7 +282,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                 // Content Area
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

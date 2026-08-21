@@ -103,7 +103,7 @@ class _LoginViewState extends ConsumerState<LoginView>
           backgroundColor: bgColor,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 32.0),
               child: AnimatedBuilder(
                 animation: _animController,
                 builder: (context, child) {

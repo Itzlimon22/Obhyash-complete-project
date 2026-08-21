@@ -581,7 +581,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
             ),
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
+            padding: const EdgeInsets.fromLTRB(10, 16, 10, 90),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -599,8 +599,13 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
 
                 // ── 4. SMART GUIDELINES (CENTER-ALIGNED CARDS) ──
                 if (a.guidelines.isNotEmpty) ...[
-                  _buildSectionTitle('স্মার্ট গাইডলাইন ও উন্নতির সুযোগ', isDark),
                   const SizedBox(height: 12),
+                  _buildSectionTitle(
+                    'স্মার্ট গাইডলাইন ও উন্নতির সুযোগ',
+                    isDark,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 14),
                   ...a.guidelines.map((g) => _buildGuidelineCard(g, isDark)),
                   const SizedBox(height: 20),
                 ],
@@ -778,7 +783,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 BanglaNameHelper.toBanglaNumeral(a.masteryIndex.round()),
                 style: const TextStyle(
-                  fontSize: 50,
+                  fontSize: 42,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'HindSiliguri',
                   color: Colors.white,
@@ -789,7 +794,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               const Text(
                 '/১০০',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'HindSiliguri',
                   color: Colors.white70,
@@ -802,7 +807,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           Text(
             'মাস্টারি সূচক · ${a.masterySubtitle}',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: Colors.white.withValues(alpha: 0.9),
@@ -905,7 +910,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
               fontFamily: 'HindSiliguri',
               color: textSub,
@@ -916,7 +921,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             value,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.w900,
               fontFamily: 'HindSiliguri',
               color: textPrimary,
@@ -928,7 +933,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11.5,
               fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: textSub,
@@ -945,13 +950,14 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
   // 4. Smart Guidelines (Left-Aligned Reading Flow)
   // ─────────────────────────────────────────────────────────────────────────────
 
-  Widget _buildSectionTitle(String title, bool isDark) {
+  Widget _buildSectionTitle(String title, bool isDark, {TextAlign textAlign = TextAlign.start}) {
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Text(
       title,
+      textAlign: textAlign,
       style: TextStyle(
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: FontWeight.w800,
         fontFamily: 'HindSiliguri',
         color: textPrimary,
@@ -1079,7 +1085,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                   Text(
                     g.title,
                     style: TextStyle(
-                      fontSize: 16.5,
+                      fontSize: 14.5,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Anek Bangla',
                       color: textPrimary,
@@ -1091,7 +1097,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                   Text(
                     g.description,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'Anek Bangla',
                       color: textSub,
@@ -1132,7 +1138,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 'স্কোর ও অগ্রগতির টাইমলাইন',
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 15.5,
                   fontWeight: FontWeight.w800,
                   fontFamily: 'HindSiliguri',
                   color: textPrimary,
@@ -1147,7 +1153,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   'সর্বোচ্চ: ${BanglaNameHelper.toBanglaNumeral(a.highestScore.round())}%',
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'HindSiliguri',
                     color: AppColors.deepBlue,
@@ -1294,7 +1300,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 'বিষয়ভিত্তিক দক্ষতা ও পারদর্শিতা',
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 15.5,
                   fontWeight: FontWeight.w800,
                   fontFamily: 'HindSiliguri',
                   color: textPrimary,
@@ -1303,7 +1309,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 '${BanglaNameHelper.toBanglaNumeral(a.subjectData.length)}টি বিষয়',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'HindSiliguri',
                   color: textSub,
@@ -1358,7 +1364,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             child: Text(
                               s.displayName,
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14.5,
                                 fontWeight: FontWeight.w800,
                                 fontFamily: 'HindSiliguri',
                                 color: textPrimary,
@@ -1368,7 +1374,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           Text(
                             '${BanglaNameHelper.toBanglaNumeral(s.total)}টি প্রশ্ন  ·  ${BanglaNameHelper.toBanglaNumeral(pct)}%',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w800,
                               fontFamily: 'HindSiliguri',
                               color: badgeColor,
@@ -1444,7 +1450,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           Text(
             'উত্তরের সামগ্রিক বিভাজন',
             style: TextStyle(
-              fontSize: 17,
+              fontSize: 15.5,
               fontWeight: FontWeight.w800,
               fontFamily: 'HindSiliguri',
               color: textPrimary,
@@ -1550,7 +1556,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 'মাইলফলক ও অর্জন',
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 15.5,
                   fontWeight: FontWeight.w800,
                   fontFamily: 'HindSiliguri',
                   color: textPrimary,
@@ -1559,7 +1565,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 '${BanglaNameHelper.toBanglaNumeral(unlockedCount)}/${BanglaNameHelper.toBanglaNumeral(a.achievements.length)} অর্জিত',
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.w800,
                   fontFamily: 'HindSiliguri',
                   color: AppColors.deepBlue,
@@ -1607,7 +1613,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     Text(
                       ach.label,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'HindSiliguri',
                         color: isUnlocked ? textPrimary : textSub,
@@ -1620,7 +1626,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     Text(
                       isUnlocked ? 'আনলকড' : 'লকড',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isUnlocked ? ach.accentColor : textSub,
@@ -1656,7 +1662,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               'কোনো পারফরম্যান্স রেকর্ড নেই',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 21,
+                fontSize: 17,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'HindSiliguri',
                 color: textPrimary,
@@ -1666,7 +1672,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             Text(
               'বিশ্লেষণ ও স্মার্ট গাইডলাইন দেখতে অন্তত একটি অনলাইন পরীক্ষা সম্পন্ন করো।',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'HindSiliguri',
                 color: textSub,
@@ -1688,7 +1694,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               child: const Text(
                 'পরীক্ষা শুরু করো',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'HindSiliguri',
                 ),

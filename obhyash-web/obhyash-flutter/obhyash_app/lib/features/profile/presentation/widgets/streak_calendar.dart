@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../dashboard/providers/dashboard_providers.dart';
 
 // Since MonthCalendarDay isn't defined in dart models yet
 class MonthCalendarDay {
@@ -17,7 +15,7 @@ class MonthCalendarDay {
   });
 }
 
-class StreakCalendar extends ConsumerStatefulWidget {
+class StreakCalendar extends StatefulWidget {
   final List<MonthCalendarDay> calendarData;
   final int streakCount;
 
@@ -28,10 +26,10 @@ class StreakCalendar extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<StreakCalendar> createState() => _StreakCalendarState();
+  State<StreakCalendar> createState() => _StreakCalendarState();
 }
 
-class _StreakCalendarState extends ConsumerState<StreakCalendar> {
+class _StreakCalendarState extends State<StreakCalendar> {
   late DateTime _displayedMonth;
 
   @override
@@ -276,7 +274,7 @@ class _StreakCalendarState extends ConsumerState<StreakCalendar> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${ref.watch(userProfileProvider).value?.streakCount ?? widget.streakCount} দিন স্ট্রিক',
+                      '${widget.streakCount} দিন স্ট্রিক',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,

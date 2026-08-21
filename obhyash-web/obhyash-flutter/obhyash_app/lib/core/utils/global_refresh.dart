@@ -23,6 +23,7 @@ Future<void> globalRefresh(WidgetRef ref) async {
   ref.invalidate(dashboardLiveExamsProvider);
   ref.invalidate(liveExamsProvider);
   ref.read(examHistoryRefreshTriggerProvider.notifier).trigger();
+  ref.read(dailyQuestsRefreshTriggerProvider.notifier).trigger();
 
   // 3. Concurrently fetch refreshed futures + streak sync
   final futures = <Future<dynamic>>[

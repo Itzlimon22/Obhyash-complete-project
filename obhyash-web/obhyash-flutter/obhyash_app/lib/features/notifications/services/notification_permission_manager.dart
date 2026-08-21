@@ -8,8 +8,11 @@ class NotificationPermissionManager {
   static const String keyDismissCount = 'notif_prompt_dismiss_count';
   static const String keyGranted = 'notif_prompt_granted';
 
+  static bool _isPromptActiveOrScheduled = false;
+
   /// Checks if the soft prompt should be displayed based on smart cooldown logic
   static Future<bool> shouldShowPrompt() async {
+    if (_isPromptActiveOrScheduled) return false;
     try {
       // 1. Check OS permission status first
       final status = await Permission.notification.status;
@@ -62,15 +65,27 @@ class NotificationPermissionManager {
     } catch (_) {}
   }
 
-  /// Evaluates and shows the soft bottom sheet if eligible
+  /// Evaluates and shows the soft bottom sheet if eligible (guaranteed exactly once)
   static Future<void> maybeShowPrompt(BuildContext context) async {
+    if (_isPromptActiveOrScheduled) return;
+
     final shouldShow = await shouldShowPrompt();
     if (!shouldShow || !context.mounted) return;
 
+    // Lock immediately so concurrent listener triggers cannot double-prompt
+    _isPromptActiveOrScheduled = true;
+
     // Small delay to ensure the screen transition is complete
     await Future.delayed(const Duration(seconds: 2));
-    if (!context.mounted) return;
+    if (!context.mounted) {
+      _isPromptActiveOrScheduled = false;
+      return;
+    }
 
-    NotificationPermissionSheet.show(context);
+    try {
+      await NotificationPermissionSheet.show(context);
+    } catch (e) {
+      debugPrint('[NotificationPermissionManager] maybeShowPrompt show error: $e');
+    }
   }
 }

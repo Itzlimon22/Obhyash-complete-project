@@ -298,7 +298,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           backgroundColor: bgColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 32),
           child: AnimatedBuilder(
             animation: _animController,
             builder: (context, child) {

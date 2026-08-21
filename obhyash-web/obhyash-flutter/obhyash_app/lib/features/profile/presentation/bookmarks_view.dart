@@ -262,7 +262,7 @@ class _BookmarksViewState extends State<BookmarksView> {
         .toList();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Row(
         children: [
           // Subject Dropdown
@@ -547,7 +547,7 @@ class _BookmarksViewState extends State<BookmarksView> {
     final itemCount = displayList.length > _displayCount ? _displayCount + 1 : displayList.length;
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
       itemCount: itemCount,
       itemBuilder: (context, index) {
         if (index == _displayCount) {

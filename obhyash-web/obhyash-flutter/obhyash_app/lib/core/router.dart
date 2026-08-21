@@ -44,6 +44,7 @@ import '../features/profile/presentation/bookmarks_view.dart';
 import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
 import '../features/formulas/presentation/chapters/formula_chapters_view.dart';
 import '../features/formulas/presentation/detail/formula_detail_view.dart';
+import '../features/legends_league/presentation/legends_league_view.dart';
 import 'presentation/main_layout.dart';
 import 'services/deep_link_service.dart';
 
@@ -336,7 +337,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                       return UserProfileView(userId: userId);
                     },
                   ),
+                  GoRoute(
+                    path: 'legends-league',
+                    builder: (context, state) => const LegendsLeagueView(),
+                  ),
                 ],
+              ),
+              GoRoute(
+                path: '/legends-league',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const LegendsLeagueView(), state),
               ),
             ],
           ),

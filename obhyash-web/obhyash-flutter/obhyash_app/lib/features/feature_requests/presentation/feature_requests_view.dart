@@ -295,7 +295,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
           // Sticky Top Segmented Tabs
           Container(
             color: isDark ? const Color(0xFF0F0F11) : const Color(0xFFF9FAFB),
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
@@ -341,7 +341,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               color: const Color(0xFF059669),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

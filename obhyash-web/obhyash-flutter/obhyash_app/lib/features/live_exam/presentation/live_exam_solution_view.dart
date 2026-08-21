@@ -133,7 +133,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
           }).toList();
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

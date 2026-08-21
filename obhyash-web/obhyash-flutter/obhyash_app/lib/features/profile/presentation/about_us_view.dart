@@ -23,7 +23,7 @@ class AboutUsView extends StatelessWidget {
       backgroundColor: bgColor,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -93,13 +93,13 @@ class AboutUsView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'স্মার্ট প্রস্তুতি, নিশ্চিত সাফল্য',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
-                      color: const Color(0xFF10B981),
+                      color: Color(0xFF10B981),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -127,12 +127,12 @@ class AboutUsView extends StatelessWidget {
             ),
             const SizedBox(height: 18),
 
-            // ── 4 Stats Counter Row ──────────────────────────────────────────
+            // ── 3 Stats Counter Row ──────────────────────────────────────────
             Row(
               children: [
                 _StatBadge(
                   count: '৫০,০০০+',
-                  label: 'প্রশ্নব্যাংক',
+                  label: 'মানসম্মত প্রশ্ন',
                   color: const Color(0xFF3B82F6),
                   isDark: isDark,
                   cardBg: cardBg,
@@ -140,8 +140,8 @@ class AboutUsView extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 _StatBadge(
-                  count: '১০০% AI',
-                  label: 'বিশ্লেষণ',
+                  count: 'বিস্তারিত',
+                  label: 'ব্যাখ্যা ও ট্রিকস',
                   color: const Color(0xFF10B981),
                   isDark: isDark,
                   cardBg: cardBg,
@@ -149,8 +149,8 @@ class AboutUsView extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 _StatBadge(
-                  count: 'তাৎক্ষণিক',
-                  label: 'ফলাফল ও র‍্যাংক',
+                  count: 'তাত্ক্ষণিক',
+                  label: 'মেধাতালিকা',
                   color: const Color(0xFFF59E0B),
                   isDark: isDark,
                   cardBg: cardBg,
@@ -169,7 +169,7 @@ class AboutUsView extends StatelessWidget {
               iconColor: const Color(0xFF059669),
               title: 'আমাদের ভিশন ও লক্ষ্য',
               description:
-                  'বাংলাদেশের প্রতিটি এইচএসসি, এসএসসি ও ভর্তি পরীক্ষার্থীর কাছে সাশ্রয়ী মূল্যে কৃত্রিম বুদ্ধিমত্তা (AI) চালিত আধুনিক ও স্মার্ট পরীক্ষার পরিবেশ পৌঁছে দেওয়া আমাদের প্রধান লক্ষ্য। আমরা বিশ্বাস করি, মুখস্থ বিদ্যার চেয়ে নিয়মিত কার্যকর অনুশীলনই শিক্ষার্থীর প্রকৃত মেধা বিকাশ ঘটায়।',
+                  'বাংলাদেশের প্রতিটি শিক্ষার্থীর কাছে সহজ, সাশ্রয়ী ও আধুনিক পরীক্ষার পরিবেশ পৌঁছে দেওয়াই ‘অভ্যাস’-এর মূল লক্ষ্য। আমরা বিশ্বাস করি, গতানুগতিক পড়ার চেয়ে নিয়মিত সঠিক মূল্যায়ন ও স্মার্ট অনুশীলনই একজন শিক্ষার্থীকে কাঙ্ক্ষিত লক্ষ্যে পৌঁছে দেয়।',
             ),
             const SizedBox(height: 14),
 
@@ -209,26 +209,32 @@ class AboutUsView extends StatelessWidget {
                   const SizedBox(height: 14),
                   _FeatureRow(
                     icon: LucideIcons.layers,
-                    title: 'কাস্টম চ্যাপ্টার টেস্ট',
+                    title: 'কাস্টম চ্যাপ্টার ও বিষয়ভিত্তিক টেস্ট',
                     desc: 'পছন্দমতো এক বা একাধিক অধ্যায় ও সময় নির্ধারণ করে সাথে সাথে অনলাইন পরীক্ষা।',
                     isDark: isDark,
                   ),
                   _FeatureRow(
-                    icon: LucideIcons.brain,
-                    title: 'AI ভুল সংশোধন ও বিস্তারিত ব্যাখ্যা',
-                    desc: 'প্রতিটি প্রশ্নের পেছনে নির্ভুল লজিক এবং বিষয়ভিত্তিক দুর্বলতার সমাধান।',
+                    icon: LucideIcons.bookOpen,
+                    title: 'প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা',
+                    desc: 'ভুল উত্তরের সঠিক লজিক, শর্টকাট ট্রিকস ও সূত্রের বিস্তারিত আলোচনা।',
                     isDark: isDark,
                   ),
                   _FeatureRow(
                     icon: LucideIcons.trophy,
-                    title: 'লাইভ এক্সাম ও ন্যাশনাল লিডারবোর্ড',
-                    desc: 'সারাদেশের শিক্ষার্থীদের সাথে একই সাথে লাইভ মডেল টেস্টে অংশগ্রহণ।',
+                    title: 'লাইভ পরীক্ষা ও জাতীয় মেধা তালিকা',
+                    desc: 'সারাদেশের শিক্ষার্থীদের সাথে একই সাথে লাইভ মডেল টেস্টে অংশগ্রহণ ও পারসেন্টাইল র‍্যাংক।',
+                    isDark: isDark,
+                  ),
+                  _FeatureRow(
+                    icon: LucideIcons.lineChart,
+                    title: 'স্মার্ট পারফরম্যান্স অ্যানালিটিক্স',
+                    desc: 'দুর্বল টপিক ট্র্যাকার ও বিষয়ভিত্তিক সফলতার প্রোগ্রেস গ্রাফ।',
                     isDark: isDark,
                   ),
                   _FeatureRow(
                     icon: LucideIcons.flame,
-                    title: 'ডেইলি স্ট্রিক ও ফ্ল্যাশকার্ড অনুশীলন',
-                    desc: 'প্রতিদিন অল্প সময় ব্যয় করে দীর্ঘমেয়াদী পড়া মনে রাখার বৈজ্ঞানিক পদ্ধতি।',
+                    title: 'ডেইলি স্ট্রিক ও ফ্ল্যাশকার্ড রিভিশন',
+                    desc: 'প্রতিদিনের পড়া মনে রাখার বৈজ্ঞানিক ফ্ল্যাশকার্ড ও স্ট্রিক ট্র্যাকিং।',
                     isDark: isDark,
                     isLast: true,
                   ),

@@ -182,7 +182,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
         children: [
           // Search and Filter Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
             child: Row(
               children: [
                 Expanded(
@@ -297,7 +297,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+                    padding: const EdgeInsets.fromLTRB(10, 4, 10, 32),
                     itemCount: filteredFormulas.length,
                     itemBuilder: (context, index) {
                       final formula = filteredFormulas[index];

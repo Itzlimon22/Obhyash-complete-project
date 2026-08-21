@@ -859,7 +859,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     return Container(
       color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 32),
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1447,7 +1447,7 @@ class _SubjectDropdownModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final maxHeight = MediaQuery.of(context).size.height * 0.5;
+    final maxHeight = MediaQuery.of(context).size.height * 0.78;
 
     return Material(
       color: Colors.transparent,

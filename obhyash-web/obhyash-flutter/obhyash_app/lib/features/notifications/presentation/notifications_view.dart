@@ -228,7 +228,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
       children: [
         // Filter Tabs & Mark All Read Action
         Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+          padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
           child: Row(
             children: [
               _buildFilterTab(
@@ -343,7 +343,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
                         ),
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                        padding: const EdgeInsets.fromLTRB(10, 4, 10, 24),
                         itemCount: _notifications.length + (_hasMore ? 1 : 0),
                         separatorBuilder: (context, index) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {

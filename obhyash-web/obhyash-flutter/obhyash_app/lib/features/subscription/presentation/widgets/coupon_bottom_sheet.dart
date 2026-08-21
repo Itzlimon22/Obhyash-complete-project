@@ -67,7 +67,15 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
       setState(() => _errorText = 'কুপন কোড লিখুন');
       return;
     }
+
+    final res = CouponService.validate(trimmed, widget.planPrice ?? 149);
+    if (!res.isValid || res.appliedCoupon == null) {
+      setState(() => _errorText = res.errorMessage ?? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন কোড!');
+      return;
+    }
+
     setState(() => _errorText = '');
+    Navigator.of(context).pop();
     widget.onApply(trimmed);
   }
 
@@ -204,7 +212,10 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                             color: Color(0xFF991B1B),
                           ),
                         ),
-                        onPressed: widget.onRemove,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onRemove();
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           side: const BorderSide(color: Color(0xFFFCA5A5)),

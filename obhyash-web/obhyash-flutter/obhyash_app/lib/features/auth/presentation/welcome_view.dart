@@ -156,24 +156,27 @@ class _WelcomeViewState extends State<WelcomeView> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         children: [
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
 
-                          // Showcase Image / Minimal Smartphone Frame
-                          Expanded(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                          // Showcase Image — constrained to 50% screen height
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.50,
+                                ),
                                 child: _buildShowcaseCard(slide),
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 14),
 
                           // Minimal Tag Pill
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
+                              horizontal: 11,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
@@ -186,14 +189,14 @@ class _WelcomeViewState extends State<WelcomeView> {
                               children: [
                                 Icon(
                                   slide.icon,
-                                  size: 13,
+                                  size: 12,
                                   color: slide.accentColor,
                                 ),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 5),
                                 Text(
                                   slide.tag,
                                   style: TextStyle(
-                                    fontSize: 11.5,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                     fontFamily: 'Anek Bangla',
                                     color: slide.accentColor,
@@ -205,19 +208,22 @@ class _WelcomeViewState extends State<WelcomeView> {
                           const SizedBox(height: 8),
 
                           // Slide Title
-                          Text(
-                            slide.title,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 21,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'Anek Bangla',
-                              height: 1.25,
-                              color: Colors.white,
-                              letterSpacing: -0.3,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              slide.title,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'Anek Bangla',
+                                height: 1.3,
+                                color: Colors.white,
+                                letterSpacing: -0.2,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4),
                         ],
                       ),
                     );
@@ -251,7 +257,7 @@ class _WelcomeViewState extends State<WelcomeView> {
 
               // Bottom CTA Buttons in a single Row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Column(
                   children: [
                     Row(
@@ -375,19 +381,19 @@ class _WelcomeViewState extends State<WelcomeView> {
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFF09090B),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF27272A), width: 1.5),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFF27272A), width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  blurRadius: 24,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(21),
               child: Image.asset(
                 slide.imageAssetPath!,
                 fit: BoxFit.cover,

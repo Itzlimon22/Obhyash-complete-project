@@ -181,6 +181,28 @@ class DailyQuest {
 
   bool get isCompleted => current >= target;
   double get progress => (target > 0) ? (current / target).clamp(0.0, 1.0) : 0.0;
+
+  DailyQuest copyWith({
+    String? id,
+    String? title,
+    String? description,
+    int? target,
+    int? current,
+    int? xpReward,
+    bool? isClaimed,
+    Color? deepColor,
+  }) {
+    return DailyQuest(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      target: target ?? this.target,
+      current: current ?? this.current,
+      xpReward: xpReward ?? this.xpReward,
+      isClaimed: isClaimed ?? this.isClaimed,
+      deepColor: deepColor ?? this.deepColor,
+    );
+  }
 }
 
 class DailyQuestsCard extends ConsumerStatefulWidget {
@@ -190,14 +212,89 @@ class DailyQuestsCard extends ConsumerStatefulWidget {
   ConsumerState<DailyQuestsCard> createState() => _DailyQuestsCardState();
 }
 
-class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
+class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
+    with WidgetsBindingObserver {
   List<DailyQuest> _quests = [];
   bool _isLoading = true;
+  RealtimeChannel? _questsChannel;
+  RealtimeChannel? _examsChannel;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _setupRealtime();
     _loadQuests();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _cleanupRealtime();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadQuests();
+    }
+  }
+
+  void _setupRealtime() {
+    final user = ref.read(authProvider);
+    if (user == null) return;
+    final sb = Supabase.instance.client;
+
+    try {
+      _cleanupRealtime();
+
+      // 1. Listen for daily quests claim state updates from other devices
+      _questsChannel = sb.channel('realtime_daily_quests_${user.id}');
+      _questsChannel!.onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'daily_quests_state',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'user_id',
+          value: user.id,
+        ),
+        callback: (_) {
+          if (mounted) _loadQuests();
+        },
+      ).subscribe();
+
+      // 2. Listen for newly submitted exams to update mission progress in real-time
+      _examsChannel = sb.channel('realtime_exam_results_quests_${user.id}');
+      _examsChannel!.onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'exam_results',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'user_id',
+          value: user.id,
+        ),
+        callback: (_) {
+          if (mounted) _loadQuests();
+        },
+      ).subscribe();
+    } catch (e) {
+      debugPrint('[DailyQuests] Realtime subscription error: $e');
+    }
+  }
+
+  void _cleanupRealtime() {
+    final sb = Supabase.instance.client;
+    if (_questsChannel != null) {
+      sb.removeChannel(_questsChannel!);
+      _questsChannel = null;
+    }
+    if (_examsChannel != null) {
+      sb.removeChannel(_examsChannel!);
+      _examsChannel = null;
+    }
   }
 
   static String _toBanglaDigits(dynamic number) {
@@ -276,12 +373,45 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
       // 4. Select the 2 Random Missions for Today
       final assignedMissions = MasterMissionsPool.getTodaysMissions(user.id, now);
 
-      // 5. Check claimed states
+      // 5. Fetch server claimed state from Supabase daily_quests_state
+      final Set<String> serverClaimedIds = {};
+      try {
+        final stateRes = await sb
+            .from('daily_quests_state')
+            .select('claimed_ids, quest_date')
+            .eq('user_id', user.id)
+            .order('quest_date', ascending: false)
+            .limit(3);
+
+        for (final row in stateRes) {
+          final qDate = row['quest_date']?.toString();
+          if (qDate == todayKey || qDate == todayDateOnly.toIso8601String().substring(0, 10)) {
+            final claimed = row['claimed_ids'];
+            if (claimed is List) {
+              for (final c in claimed) {
+                serverClaimedIds.add(c.toString());
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[DailyQuests] Error fetching daily_quests_state: $e');
+      }
+
+      // 6. Check claimed states merging server truth with local cache
       final prefs = await SharedPreferences.getInstance();
       final List<DailyQuest> resolvedQuests = [];
 
       for (final m in assignedMissions) {
-        final isClaimed = prefs.getBool('quest_claimed_${user.id}_${todayKey}_${m.id}') ?? false;
+        final isServerClaimed = serverClaimedIds.contains(m.id);
+        final isLocalClaimed = prefs.getBool('quest_claimed_${user.id}_${todayKey}_${m.id}') ?? false;
+        final isClaimed = isServerClaimed || isLocalClaimed;
+
+        // Keep local cache synced
+        if (isServerClaimed && !isLocalClaimed) {
+          prefs.setBool('quest_claimed_${user.id}_${todayKey}_${m.id}', true);
+        }
+
         int currentVal = 0;
 
         switch (m.metricType) {
@@ -343,6 +473,13 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('quest_claimed_${user.id}_${todayKey}_${quest.id}', true);
 
+    // Optimistic UI update
+    setState(() {
+      _quests = _quests
+          .map((q) => q.id == quest.id ? q.copyWith(isClaimed: true) : q)
+          .toList();
+    });
+
     try {
       final sb = Supabase.instance.client;
       // Try atomic RPC claim
@@ -351,12 +488,21 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
           'p_user_id': user.id,
           'p_quest_id': quest.id,
           'p_xp_reward': quest.xpReward,
+          'p_quest_date': todayKey,
         });
       } catch (_) {
-        await sb.rpc('increment_user_xp', params: {
-          'p_user_id': user.id,
-          'p_xp': quest.xpReward,
-        });
+        try {
+          await sb.rpc('claim_daily_quest', params: {
+            'p_user_id': user.id,
+            'p_quest_id': quest.id,
+            'p_xp_reward': quest.xpReward,
+          });
+        } catch (_) {
+          await sb.rpc('increment_user_xp', params: {
+            'p_user_id': user.id,
+            'p_xp': quest.xpReward,
+          });
+        }
       }
       ref.invalidate(userProfileProvider);
     } catch (e) {
@@ -368,6 +514,10 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to global pull-to-refresh trigger
+    ref.listen(dailyQuestsRefreshTriggerProvider, (prev, next) {
+      _loadQuests();
+    });
     if (_isLoading) {
       return const SizedBox.shrink();
     }
@@ -411,23 +561,6 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
                       fontWeight: FontWeight.w800,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                       letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 1.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF004633).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'ডেইলি ২ মিশন',
-                      style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF004633),
-                      ),
                     ),
                   ),
                   const SizedBox(width: 6),

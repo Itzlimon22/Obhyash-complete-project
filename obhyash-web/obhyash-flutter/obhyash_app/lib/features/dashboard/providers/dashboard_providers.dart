@@ -469,3 +469,16 @@ final examHistoryRefreshTriggerProvider =
   ExamHistoryRefreshTriggerNotifier.new,
 );
 
+class DailyQuestsRefreshTriggerNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void trigger() => state++;
+}
+
+/// Shared reactive trigger to notify Daily Quests card to refresh immediately
+final dailyQuestsRefreshTriggerProvider =
+    NotifierProvider<DailyQuestsRefreshTriggerNotifier, int>(
+  DailyQuestsRefreshTriggerNotifier.new,
+);
+

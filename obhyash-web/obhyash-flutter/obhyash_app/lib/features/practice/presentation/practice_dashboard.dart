@@ -585,8 +585,41 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (qs.isEmpty) return;
     if (_shuffle) qs = (qs..shuffle());
 
+    // Daily 1 practice session quota for free users
+    final profile = ref.read(userProfileProvider).value;
+    final isPro = profile?.isPro ?? false;
+
+    if (!isPro) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final now = DateTime.now();
+        final todayStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+        final key = 'daily_practice_${user.id}_$todayStr';
+        final alreadyPracticed = prefs.getBool(key) ?? false;
+
+        if (alreadyPracticed) {
+          if (mounted) {
+            ProUpgradeModal.show(
+              context,
+              title: 'আজকের প্র্যাকটিস কোটা শেষ 🎯',
+              message: 'ফ্রি অ্যাকাউন্টে দিনে মাত্র ১ বার প্র্যাকটিস সেশন করা যায়। প্রতিদিন সীমাহীন প্র্যাকটিস করতে প্রো সাবস্ক্রিপশন নাও।',
+              featurePill: 'দৈনিক প্র্যাকটিস কোটা: ১/১',
+              icon: LucideIcons.flame,
+            );
+          }
+          return;
+        }
+
+        // Mark as practiced for today
+        await prefs.setBool(key, true);
+      }
+    }
+
     _markReviewed(qs.map((q) => q.id).toList());
     HapticFeedback.mediumImpact();
+
+    if (!mounted) return;
 
     await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
@@ -635,7 +668,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 8),
                   child: Row(
                     children: [
                       _StatBox(
@@ -734,7 +767,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 )
               else ...[
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -773,7 +806,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (!hasMore || filtered.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 36),
+      padding: const EdgeInsets.fromLTRB(10, 12, 10, 36),
       child: Center(
         child: SizedBox(
           width: 220,

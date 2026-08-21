@@ -213,7 +213,7 @@ class _LiveExamLeaderboardViewState
           final myRank = myIndex != -1 ? myIndex + 1 : null;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

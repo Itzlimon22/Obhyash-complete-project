@@ -15,7 +15,7 @@ class PrivacyPolicyView extends StatelessWidget {
       backgroundColor: bgColor,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -136,9 +136,9 @@ class PrivacyPolicyView extends StatelessWidget {
               iconColor: const Color(0xFF10B981),
               title: '২. তথ্য যেভাবে সুরক্ষিত রাখা হয়',
               items: const [
-                'সকল যোগাযোগ ও ডেটা ট্রানজেকশন SSL/TLS এনক্রিপশনের মাধ্যমে সুরক্ষিত।',
-                'ইউজারের পাসওয়ার্ড আধুনিক হ্যাশিং অ্যালগরিদম (Bcrypt) দিয়ে সুরক্ষিত থাকে।',
-                'Supabase এন্টারপ্রাইজ ক্লাউড স্টোরেজে কঠোর এক্সেস কন্ট্রোলে ডেটা সংরক্ষিত হয়।',
+                'সকল যোগাযোগ ও ডেটা ট্রানজেকশন আন্তর্জাতিক মানের এনক্রিপশনের মাধ্যমে সুরক্ষিত।',
+                'শিক্ষার্থীর পাসওয়ার্ড অত্যন্ত শক্তিশালী নিরাপত্তা পদ্ধতিতে সংরক্ষিত থাকে।',
+                'নিরাপদ ও আধুনিক ক্লাউড সার্ভারে ২৪/৭ কঠোর সুরক্ষায় ডেটা সংরক্ষিত হয়।',
               ],
             ),
             const SizedBox(height: 14),
@@ -149,10 +149,10 @@ class PrivacyPolicyView extends StatelessWidget {
               isDark: isDark,
               icon: LucideIcons.shieldAlert,
               iconColor: const Color(0xFFF59E0B),
-              title: '৩. কোনো থার্ড-পার্টি ডেটা শেয়ার নয়',
+              title: '৩. তথ্যের গোপনীয়তা ও বিশ্বস্ততা',
               items: const [
-                'Obhyash কখনোই শিক্ষার্থীদের কোনো ব্যক্তিগত তথ্য তৃতীয় কোনো পক্ষের কাছে বিক্রি করে না।',
-                'তথ্য শুধুমাত্র অ্যাপের ভেতর পারসোনালাইজড সাজেশন ও পরীক্ষার রিপোর্ট তৈরিতে ব্যবহৃত হয়।',
+                'Obhyash কখনোই শিক্ষার্থীদের কোনো ব্যক্তিগত তথ্য তৃতীয় কোনো পক্ষের কাছে বিক্রি বা শেয়ার করে না।',
+                'তথ্য শুধুমাত্র অ্যাপের ভেতর পারসোনালাইজড প্র্যাকটিস রিপোর্ট ও পরীক্ষার পারফরম্যান্স ট্র্যাক করতে ব্যবহৃত হয়।',
               ],
             ),
             const SizedBox(height: 14),

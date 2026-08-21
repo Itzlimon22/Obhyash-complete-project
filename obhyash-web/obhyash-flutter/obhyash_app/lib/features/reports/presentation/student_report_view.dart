@@ -302,7 +302,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                       // ── Top 3 Compact Centered Stat Boxes ───────────────────
                       if (_reports.isNotEmpty)
                         SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                          padding: const EdgeInsets.fromLTRB(10, 16, 10, 12),
                           sliver: SliverToBoxAdapter(
                             child: Row(
                               children: [
@@ -397,7 +397,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
 
                       // ── Report List Content ──────────────────────────────
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                        padding: const EdgeInsets.fromLTRB(10, 12, 10, 80),
                         sliver: _filteredReports.isEmpty
                             ? SliverToBoxAdapter(
                                 child: Container(
@@ -830,7 +830,7 @@ class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
   ) {
     return Container(
       color: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       alignment: Alignment.center,
       child: child,
     );

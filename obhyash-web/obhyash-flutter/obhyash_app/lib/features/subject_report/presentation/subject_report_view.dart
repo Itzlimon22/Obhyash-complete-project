@@ -148,10 +148,10 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
               : <String, dynamic>{};
           for (final q in questions) {
             if (q is! Map) continue;
-            final cName =
-                ((q['topic'] ?? q['chapter'] ?? 'General') as Object?)
-                    ?.toString() ??
-                'General';
+            final raw = q['chapter'] ?? q['topic'];
+            final cName = (raw != null && raw.toString().trim().isNotEmpty)
+                ? raw.toString().trim()
+                : 'General';
             final prev = chapMap[cName];
             final qId = q['id']?.toString() ?? '';
             final userAns = answersMap[qId];
@@ -190,6 +190,14 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
 
       final chapters =
           chapMap.entries
+              .where((e) {
+                final k = e.key.trim().toLowerCase();
+                return k.isNotEmpty &&
+                    k != 'general' &&
+                    k != 'সাধারণ' &&
+                    k != 'সাধারণ প্রশ্ন' &&
+                    k != 'null';
+              })
               .map(
                 (e) => _Chapter(
                   name: e.key,
@@ -240,7 +248,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
       children: [
         // ── Time Filter ───────────────────────────────────────────────────
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -281,7 +289,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                         f.$2,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.bold,
                           color: _filter == f.$1
                               ? Colors.white
@@ -302,7 +310,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
               ? const ExamHistorySkeleton()
               : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -464,7 +472,7 @@ class _SRDonut extends StatelessWidget {
           Text(
             'ফলাফল বিশ্লেষণ',
             style: TextStyle(
-              fontSize: 17,
+              fontSize: 15.5,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF000000),
             ),
@@ -491,7 +499,7 @@ class _SRDonut extends StatelessWidget {
                         Text(
                           '${stats.accuracy}%',
                           style: TextStyle(
-                            fontSize: 26,
+                            fontSize: 24,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'Anek Bangla',
                             color: isDark
@@ -590,7 +598,7 @@ class _SRLegend extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontFamily: 'Anek Bangla',
                   fontWeight: FontWeight.w600,
                   color: isDark
@@ -602,7 +610,7 @@ class _SRLegend extends StatelessWidget {
             Text(
               value.toString(),
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w800,
                 color: isDark ? Colors.white : const Color(0xFF000000),
               ),
@@ -635,7 +643,7 @@ class _SRChapterList extends StatelessWidget {
         Text(
           'অধ্যায়ভিত্তিক দক্ষতা',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 15.5,
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : const Color(0xFF000000),
           ),
@@ -678,7 +686,7 @@ class _SRChapterRow extends StatelessWidget {
               child: Text(
                 BanglaNameHelper.formatChapter(c.name),
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: isDark
@@ -692,7 +700,7 @@ class _SRChapterRow extends StatelessWidget {
             Text(
               '${c.accuracy}%',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: bar,
               ),
@@ -710,10 +718,6 @@ class _SRChapterRow extends StatelessWidget {
                 : const Color(0xFFF0F0F0),
             valueColor: AlwaysStoppedAnimation<Color>(bar),
           ),
-        ),
-        Text(
-          '${c.total} প্রশ্ন',
-          style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
         ),
       ],
     );
@@ -791,7 +795,7 @@ class _SRWeakness extends StatelessWidget {
                 Text(
                   'দুর্বলতা ও ভুলের ধরণ',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
@@ -881,7 +885,7 @@ class _SRWeakness extends StatelessWidget {
                                       const Text(
                                         'সর্বাধিক ভুল',
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w900,
                                           color: Color(0xFFE11D48),
                                           letterSpacing: 0.5,
@@ -890,7 +894,7 @@ class _SRWeakness extends StatelessWidget {
                                       Text(
                                         weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name,
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: isDark ? Colors.white : const Color(0xFF000000),
                                         ),
@@ -907,7 +911,7 @@ class _SRWeakness extends StatelessWidget {
                                   child: Text(
                                     '${weak.first.wrong}টি ভুল',
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -931,11 +935,11 @@ class _SRWeakness extends StatelessWidget {
                                     child: Text(
                                       '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি পুনরায় রিভিশন ও অনুশীলন করলে তোমার স্কোর উল্লেখযোগ্যভাবে বাড়বে।',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 13.5,
                                         color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
-                                        height: 1.4,
+                                        height: 1.35,
                                       ),
-                                     maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -955,7 +959,7 @@ class _SRWeakness extends StatelessWidget {
                                   elevation: 0,
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  textStyle: const TextStyle(fontSize: 16, fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold),
+                                  textStyle: const TextStyle(fontSize: 14.5, fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -967,7 +971,7 @@ class _SRWeakness extends StatelessWidget {
                         Text(
                           'অন্যান্য দুর্বল বিষয়সমূহ',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
                           ),
@@ -987,7 +991,7 @@ class _SRWeakness extends StatelessWidget {
                                       child: Text(
                                         w.name == 'General' ? 'সাধারণ প্রশ্ন' : w.name,
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                           color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         ),
@@ -997,7 +1001,7 @@ class _SRWeakness extends StatelessWidget {
                                     Text(
                                       '${w.wrong}টি ভুল',
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFE11D48),
                                       ),

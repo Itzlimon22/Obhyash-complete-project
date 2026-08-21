@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
+import '../../../core/providers/title_provider.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../profile/presentation/widgets/badges_showcase_section.dart';
@@ -225,6 +226,10 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       }
 
       if (mounted) {
+        // Set the title in MainLayout's shared header
+        final location = '/leaderboard/user-profile/${widget.userId}';
+        ref.read(locationTitleProvider.notifier).updateTitle(location, user.name);
+
         setState(() {
           _user = user;
           _targetA = targetA;
@@ -257,23 +262,15 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     final myProfile = ref.watch(userProfileProvider).whenOrNull(data: (u) => u);
 
     if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('প্রোফাইল', style: TextStyle(fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: const Center(child: CircularProgressIndicator()),
+      return const Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_user == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('প্রোফাইল', style: TextStyle(fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
+        backgroundColor: Colors.transparent,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -311,18 +308,12 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     final targetExams = _targetA.totalExams > 0 ? _targetA.totalExams : targetUser.examsTaken;
     final targetAvgScore = _targetA.avgScore;
 
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        title: Text(
-          isViewingSelf ? 'আমার প্রোফাইল' : targetUser.name,
-          style: const TextStyle(fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

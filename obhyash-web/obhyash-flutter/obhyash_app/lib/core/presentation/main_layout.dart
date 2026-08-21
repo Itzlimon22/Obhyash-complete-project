@@ -76,6 +76,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/setup')) return 'setup';
     if (location.startsWith('/practice')) return 'practice';
     if (location.contains('/user-profile')) return 'user_profile';
+    if (location.contains('legends-league')) return 'legends-league';
     if (location.startsWith('/leaderboard')) return 'leaderboard';
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
@@ -156,6 +157,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       if (location.startsWith('/my-reports') || location.startsWith('/analysis')) return false;
       if (location.startsWith('/profile/') && location != '/profile') return false;
       if (location.startsWith('/history/') && location != '/history') return false;
+      if (location.contains('legends-league')) return false;
       if (location.startsWith('/leaderboard/') && location != '/leaderboard') return false;
       if (location.startsWith('/exam')) return false;
       if (location.contains('/user-profile')) return false;
@@ -234,6 +236,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'অনুশীলন';
       case 'leaderboard':
         return 'লিডারবোর্ড';
+      case 'legends-league':
+        return 'লেজেন্ডস লিগ';
       case 'analysis':
         return 'এনালাইসিস';
       case 'my-reports':
@@ -456,11 +460,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         );
         NotificationService().syncFCMToken(u.id);
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            NotificationPermissionManager.maybeShowPrompt(context);
-          }
-        });
+        if (prev?.value == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              NotificationPermissionManager.maybeShowPrompt(context);
+            }
+          });
+        }
       }
     });
 
@@ -562,6 +568,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   currentLoc.startsWith('/notifications');
 
                               final showBackButton = isSettingsSubPage ||
+                                  activeTab == 'legends-league' ||
                                   activeTab == 'setup' ||
                                   activeTab == 'practice' ||
                                   activeTab == 'analysis' ||
@@ -579,6 +586,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         HapticFeedback.lightImpact();
                                         if (context.canPop()) {
                                           context.pop();
+                                        } else if (activeTab == 'legends-league') {
+                                          widget.navigationShell.goBranch(3);
+                                          context.go('/leaderboard');
                                         } else if (isSettingsSubPage) {
                                           widget.navigationShell.goBranch(4);
                                           context.go('/profile');
@@ -841,6 +851,49 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 ),
                               );
                             },
+                          )
+                        else if (activeTab == 'leaderboard')
+                          Animate(
+                            onPlay: (controller) => controller.repeat(reverse: true),
+                            effects: [
+                              ScaleEffect(
+                                begin: const Offset(0.94, 0.94),
+                                end: const Offset(1.08, 1.08),
+                                duration: 900.ms,
+                                curve: Curves.easeInOut,
+                              ),
+                            ],
+                            child: GestureDetector(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                context.push('/legends-league');
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.crown,
+                                      size: 16,
+                                      color: Color(0xFFEF4444),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      'লেজেন্ডস লিগ',
+                                      style: TextStyle(
+                                        fontFamily: 'Anek Bangla',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFEF4444),
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                       ],
                     ),

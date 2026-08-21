@@ -67,7 +67,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
           children: [
             // ── Top Summary Card ──────────────────────────────────────────
             Container(
