@@ -625,7 +625,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         }
 
         // Instantly sync streak so the UI is immediately correct
-        await StreakService.syncStreak(authId);
+        final streakData = await StreakService.syncStreak(authId);
+        ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
 
         // Award XP: 10 per correct, -2 per wrong (min 0)
         final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)

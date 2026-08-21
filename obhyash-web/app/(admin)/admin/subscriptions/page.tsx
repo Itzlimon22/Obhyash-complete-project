@@ -110,7 +110,7 @@ export default function SubscriptionsPage() {
     'All' | 'Pending' | 'Approved' | 'Rejected'
   >('All');
   const [methodFilter, setMethodFilter] = useState<
-    'All' | 'bKash' | 'Nagad' | 'Rocket' | 'Manual'
+    'All' | 'bKash' | 'Nagad' | 'Rocket' | 'UddoktaPay' | 'Manual'
   >('All');
   const [reqSort, setReqSort] = useState<
     'newest' | 'oldest' | 'amount_high' | 'amount_low'
@@ -394,6 +394,14 @@ export default function SubscriptionsPage() {
 
   const renderMethodBadge = (method?: string) => {
     const m = (method || '').toLowerCase();
+    if (m.includes('uddokta')) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          {method || 'UddoktaPay'}
+        </span>
+      );
+    }
     if (m.includes('bkash')) {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800">
@@ -771,6 +779,7 @@ export default function SubscriptionsPage() {
                       className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 focus:outline-none cursor-pointer"
                     >
                       <option value="All">সব মেথড</option>
+                      <option value="UddoktaPay">UddoktaPay</option>
                       <option value="bKash">bKash</option>
                       <option value="Nagad">Nagad</option>
                       <option value="Rocket">Rocket</option>

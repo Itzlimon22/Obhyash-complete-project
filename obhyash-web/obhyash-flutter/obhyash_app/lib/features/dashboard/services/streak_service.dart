@@ -58,8 +58,6 @@ class StreakService {
   /// Fetches distinct calendar dates (last 90 days) on which the user completed
   /// at least one exam (from exam_results + live_exam_attempts).
   static Future<Map<String, int>> _fetchActiveDatesWithCounts(String userId) async {
-    final now = DateTime.now();
-    final since = _dhakaMidnight(now).subtract(const Duration(days: 89));
     final dateCounts = <String, int>{};
 
     // --- exam_results ---
@@ -68,7 +66,8 @@ class StreakService {
           .from('exam_results')
           .select('created_at, date')
           .eq('user_id', userId)
-          .gte('created_at', since.toUtc().toIso8601String());
+          .order('created_at', ascending: false)
+          .limit(300);
 
       for (final row in rows as List) {
         final dateStr = (row['created_at'] ?? row['date']) as String?;
@@ -89,8 +88,8 @@ class StreakService {
           .from('live_exam_attempts')
           .select('submit_time, created_at')
           .eq('user_id', userId)
-          .eq('status', 'submitted')
-          .gte('created_at', since.toUtc().toIso8601String());
+          .order('created_at', ascending: false)
+          .limit(300);
 
       for (final row in rows as List) {
         final dateStr = (row['submit_time'] ?? row['created_at']) as String?;

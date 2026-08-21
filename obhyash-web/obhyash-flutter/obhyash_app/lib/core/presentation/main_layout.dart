@@ -148,14 +148,14 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return true;
       }
 
-      // 3. Detail sub-routes that hide bottom nav
+      // 3. Detail sub-routes and setup form that hide bottom nav
+      if (location.startsWith('/setup') || location.contains('/setup')) return false;
       if (location.startsWith('/notifications')) return false;
       if (location.startsWith('/bookmarks') || location.contains('/bookmarks')) return false;
       if (location.startsWith('/subject') || location.contains('/subject/')) return false;
       if (location.startsWith('/my-reports') || location.startsWith('/analysis')) return false;
       if (location.startsWith('/profile/') && location != '/profile') return false;
       if (location.startsWith('/history/') && location != '/history') return false;
-      if (location.startsWith('/setup/') && location != '/setup') return false;
       if (location.startsWith('/leaderboard/') && location != '/leaderboard') return false;
       if (location.startsWith('/exam')) return false;
       if (location.contains('/user-profile')) return false;
@@ -164,7 +164,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return location == '/' ||
           location.isEmpty ||
           location == '/history' ||
-          location == '/setup' ||
           location == '/practice' ||
           location == '/leaderboard' ||
           location == '/profile' ||

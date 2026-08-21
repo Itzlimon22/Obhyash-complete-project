@@ -516,7 +516,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
 
       final data = await query
-          .order('date', ascending: false)
+          .order('created_at', ascending: false)
           .range(currentOffset, currentOffset + _examPageSize - 1);
 
       if (mounted) {

@@ -64,18 +64,37 @@ export async function POST(request: NextRequest) {
       expiresAt.setDate(expiresAt.getDate() + 30);
     }
 
-    // 3. Update User Subscription in Database
+    const planDisplayName =
+      metadata.plan_name ||
+      metadata.plan_title ||
+      (planId.includes('year') ? 'Yearly Pro' : (planId.includes('6month') ? 'Half-Yearly Pro' : 'Monthly Pro'));
+
+    // 3. Update User Subscription in Database (Comprehensive across all auth/profile fields)
     await supabaseAdmin
       .from('users')
       .update({
         is_pro: true,
+        is_subscribed: true,
+        level: 'Pro',
+        plan: 'Pro',
         subscription_tier: planId,
+        subscription_status: 'Active',
         subscription_expires_at: expiresAt.toISOString(),
+        subscription: {
+          plan: planDisplayName,
+          plan_name: planDisplayName,
+          expiry: expiresAt.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          status: 'Active',
+          gateway: 'uddoktapay',
+          invoice_id: invoiceId,
+          amount: Number(amount) || 0,
+        },
         updated_at: now.toISOString(),
       })
       .eq('id', userId);
 
-    // 4. Log Payment Transaction
+    // 4. Log Payment Transaction (Automated Gateway Record)
     try {
       await supabaseAdmin.from('payment_transactions').insert({
         user_id: userId,
@@ -89,17 +108,49 @@ export async function POST(request: NextRequest) {
         metadata,
         created_at: now.toISOString(),
       });
-    } catch (_) {
-      // Table might have slight variation, fallback smoothly
-    }
+    } catch (_) {}
 
-    // 5. Send In-App Notification to Student
+    // 5. Also log into payment_requests for full Admin Dashboard compatibility
+    try {
+      await supabaseAdmin.from('payment_requests').insert({
+        user_id: userId,
+        plan_name: planDisplayName,
+        amount: Number(amount) || 0,
+        currency: 'BDT',
+        payment_method: payment_method ? `UddoktaPay (${payment_method})` : 'UddoktaPay',
+        transaction_id: transaction_id || invoiceId,
+        status: 'Approved',
+        admin_notes: `Automated UddoktaPay Payment (Invoice: ${invoiceId})`,
+        requested_at: now.toISOString(),
+        reviewed_at: now.toISOString(),
+        reviewed_by: 'UddoktaPay Gateway',
+        created_at: now.toISOString(),
+      });
+    } catch (_) {}
+
+    // 6. Record in subscription_history
+    try {
+      await supabaseAdmin
+        .from('subscription_history')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+
+      await supabaseAdmin.from('subscription_history').insert({
+        user_id: userId,
+        started_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
+        is_active: true,
+        created_at: now.toISOString(),
+      });
+    } catch (_) {}
+
+    // 7. Send In-App Notification to Student
     try {
       await supabaseAdmin.from('notifications').insert({
         user_id: userId,
         title: '🎉 অভিনন্দন! তোমার প্রো সাবস্ক্রিপশন অ্যাক্টিভ হয়েছে',
-        message: 'সকল প্রিমিয়াম ফিচার, আনলিমিটেড মডেল টেস্ট ও স্পেশাল কোশ্চেন ব্যাংক আনলক করা হয়েছে।',
-        body: 'সকল প্রিমিয়াম ফিচার, আনলিমিটেড মডেল টেস্ট ও স্পেশাল কোশ্চেন ব্যাংক আনলক করা হয়েছে।',
+        message: `আপনার ${planDisplayName} প্ল্যান সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${expiresAt.toLocaleDateString('bn-BD')} পর্যন্ত।`,
+        body: `আপনার ${planDisplayName} প্ল্যান সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${expiresAt.toLocaleDateString('bn-BD')} পর্যন্ত।`,
         link: '/profile/my-subscription',
         data: { route: '/profile/my-subscription' },
         type: 'success',

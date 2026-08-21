@@ -9,42 +9,176 @@ export async function GET(request: NextRequest) {
     await connection();
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Fetch Payment Requests with User details
-    const { data: requestsData, error: requestsError } = await supabaseAdmin
-      .from('payment_requests')
-      .select('*, user:users!payment_requests_user_id_fkey(name, email, phone)')
-      .order('requested_at', { ascending: false });
+    // 1. Safely Fetch Payment Requests (Manual & Gateway requests)
+    let paymentRequestsRaw: any[] = [];
+    try {
+      const { data: reqs, error: reqsError } = await supabaseAdmin
+        .from('payment_requests')
+        .select('*')
+        .order('requested_at', { ascending: false });
 
-    if (requestsError) {
-      console.error('Error fetching payment requests:', requestsError);
-      throw requestsError;
+      if (!reqsError && reqs) {
+        paymentRequestsRaw = reqs;
+      }
+    } catch (e) {
+      console.warn('Error fetching payment_requests:', e);
     }
 
-    // 2. Fetch Users with active/paid Subscriptions
-    const { data: usersData, error: usersError } = await supabaseAdmin
-      .from('users')
-      .select('id, name, email, phone, subscription, is_subscribed, subscription_expires_at, created_at, updated_at')
-      .or('subscription.is.not.null,is_subscribed.eq.true,subscription_expires_at.is.not.null')
-      .order('created_at', { ascending: false });
+    // 2. Safely Fetch UddoktaPay & Online Payment Transactions
+    let paymentTransactionsRaw: any[] = [];
+    try {
+      const { data: txs, error: txsError } = await supabaseAdmin
+        .from('payment_transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (usersError) {
-      console.error('Error fetching users subscription:', usersError);
-      throw usersError;
+      if (!txsError && txs) {
+        paymentTransactionsRaw = txs;
+      }
+    } catch (e) {
+      console.warn('Error fetching payment_transactions:', e);
+    }
+
+    // Collect all user IDs involved in payments
+    const userIdsSet = new Set<string>();
+    paymentRequestsRaw.forEach((r) => {
+      if (r.user_id) userIdsSet.add(r.user_id);
+    });
+    paymentTransactionsRaw.forEach((t) => {
+      if (t.user_id) userIdsSet.add(t.user_id);
+    });
+
+    // 3. Batch Fetch Users for all payments
+    const userMap: Record<string, { name: string; email: string; phone?: string }> = {};
+    if (userIdsSet.size > 0) {
+      try {
+        const { data: usersInfo } = await supabaseAdmin
+          .from('users')
+          .select('id, name, email, phone')
+          .in('id', Array.from(userIdsSet));
+
+        if (usersInfo) {
+          usersInfo.forEach((u) => {
+            userMap[u.id] = {
+              name: u.name || 'Student',
+              email: u.email || '',
+              phone: u.phone || '',
+            };
+          });
+        }
+      } catch (e) {
+        console.warn('Error batch fetching users for payments:', e);
+      }
+    }
+
+    // Existing transaction IDs in paymentRequests to prevent duplicate display
+    const existingTrxIds = new Set<string>();
+    paymentRequestsRaw.forEach((r) => {
+      if (r.transaction_id) existingTrxIds.add(String(r.transaction_id).trim().toLowerCase());
+    });
+
+    // Map Payment Requests with User details
+    const mappedRequests: any[] = paymentRequestsRaw.map((r) => ({
+      id: r.id,
+      user_id: r.user_id,
+      user: userMap[r.user_id] || { name: 'Student', email: '', phone: '' },
+      plan_name: r.plan_name || 'Premium',
+      plan_id: r.plan_id,
+      amount: Number(r.amount) || 0,
+      currency: r.currency || 'BDT',
+      payment_method: r.payment_method || 'Manual',
+      transaction_id: r.transaction_id,
+      payment_proof_url: r.payment_proof_url,
+      status: r.status || 'Pending',
+      admin_notes: r.admin_notes,
+      requested_at: r.requested_at || r.created_at || new Date().toISOString(),
+      reviewed_at: r.reviewed_at,
+      reviewed_by: r.reviewed_by,
+    }));
+
+    // Map UddoktaPay Transactions and merge if not already present
+    paymentTransactionsRaw.forEach((tx) => {
+      const txId = (tx.transaction_id || tx.invoice_id || '').toString().trim().toLowerCase();
+      if (txId && existingTrxIds.has(txId)) return;
+
+      const metadata = tx.metadata || {};
+      const planName =
+        metadata.plan_name ||
+        metadata.plan_title ||
+        metadata.plan_id ||
+        'Pro Subscription';
+
+      const isCompleted =
+        tx.status === 'COMPLETED' ||
+        tx.status === 'completed' ||
+        tx.status === 'SUCCESS' ||
+        tx.status === 'Approved';
+
+      const isPending =
+        tx.status === 'PENDING' ||
+        tx.status === 'pending' ||
+        tx.status === 'Pending';
+
+      const displayMethod = tx.payment_method
+        ? (tx.payment_method.toLowerCase().includes('uddokta') ? tx.payment_method : `UddoktaPay (${tx.payment_method})`)
+        : 'UddoktaPay';
+
+      mappedRequests.push({
+        id: tx.id || tx.invoice_id || `tx_${Math.random()}`,
+        user_id: tx.user_id,
+        user: userMap[tx.user_id] || { name: 'Student', email: '', phone: '' },
+        plan_name: planName,
+        amount: Number(tx.amount) || 0,
+        currency: tx.currency || 'BDT',
+        payment_method: displayMethod,
+        transaction_id: tx.transaction_id || tx.invoice_id,
+        payment_proof_url: null,
+        status: isCompleted ? 'Approved' : isPending ? 'Pending' : 'Rejected',
+        admin_notes: tx.invoice_id ? `Invoice ID: ${tx.invoice_id}` : 'UddoktaPay Automated',
+        requested_at: tx.created_at || new Date().toISOString(),
+        reviewed_at: isCompleted ? (tx.created_at || new Date().toISOString()) : null,
+        reviewed_by: 'UddoktaPay Gateway',
+      });
+    });
+
+    // Sort all payment requests newest first
+    mappedRequests.sort(
+      (a, b) => new Date(b.requested_at).getTime() - new Date(a.requested_at).getTime(),
+    );
+
+    // 4. Fetch Users with active/paid Subscriptions (including is_pro, is_subscribed, subscription, subscription_tier)
+    let usersData: any[] = [];
+    try {
+      const { data: uData, error: uErr } = await supabaseAdmin
+        .from('users')
+        .select('id, name, email, phone, is_pro, is_subscribed, level, plan, subscription_tier, subscription, subscription_status, subscription_expires_at, created_at, updated_at')
+        .or('subscription.is.not.null,is_subscribed.eq.true,is_pro.eq.true,subscription_expires_at.is.not.null')
+        .order('created_at', { ascending: false });
+
+      if (!uErr && uData) {
+        usersData = uData;
+      }
+    } catch (e) {
+      console.warn('Error fetching subscribed users:', e);
     }
 
     // Map users to subscription history format expected by Admin UI
     const mappedSubscriptions = (usersData || [])
       .filter((u) => {
-        const plan = u.subscription?.plan || u.subscription?.plan_name;
-        const isSubscribed = u.is_subscribed === true;
+        const plan = u.subscription?.plan || u.subscription?.plan_name || u.subscription_tier;
+        const isSubscribed = u.is_subscribed === true || u.is_pro === true;
         return (plan && plan !== 'Free') || isSubscribed;
       })
       .map((u) => {
         const sub = u.subscription || {};
         const expiry = sub.expiry || sub.expires_at || u.subscription_expires_at || '';
         const isExpired = expiry ? new Date(expiry) < new Date() : false;
-        const isActive = (sub.status === 'Active' || u.is_subscribed === true) && !isExpired;
-        const planName = sub.plan || sub.plan_name || (u.is_subscribed ? 'Premium' : 'Free');
+        const isActive = (sub.status === 'Active' || u.is_subscribed === true || u.is_pro === true) && !isExpired;
+        const planName =
+          sub.plan ||
+          sub.plan_name ||
+          u.subscription_tier ||
+          (u.is_subscribed || u.is_pro ? 'Pro Premium' : 'Free');
 
         return {
           id: u.id,
@@ -66,33 +200,27 @@ export async function GET(request: NextRequest) {
         };
       });
 
-    // 3. Fetch Subscription Plans
-    const { data: plansData, error: plansError } = await supabaseAdmin
-      .from('subscription_plans')
-      .select('*')
-      .order('price', { ascending: true });
-
-    if (plansError) {
-      console.error('Error fetching plans:', plansError);
-      throw plansError;
+    // 5. Fetch Subscription Plans
+    let plansData: any[] = [];
+    try {
+      const { data: pData } = await supabaseAdmin
+        .from('subscription_plans')
+        .select('*')
+        .order('price', { ascending: true });
+      if (pData) plansData = pData;
+    } catch (e) {
+      console.warn('Error fetching subscription plans:', e);
     }
 
-    // 4. Calculate Stats
-    const paymentRequests = requestsData || [];
-    const approvedRequests = paymentRequests.filter(
-      (r) => r.status === 'Approved',
-    );
-    const pendingRequests = paymentRequests.filter(
-      (r) => r.status === 'Pending',
-    );
-    const rejectedRequests = paymentRequests.filter(
-      (r) => r.status === 'Rejected',
-    );
+    // 6. Calculate Aggregated Stats
+    const approvedRequests = mappedRequests.filter((r) => r.status === 'Approved');
+    const pendingRequests = mappedRequests.filter((r) => r.status === 'Pending');
+    const rejectedRequests = mappedRequests.filter((r) => r.status === 'Rejected');
     const totalRevenue = approvedRequests.reduce(
       (sum, r) => sum + (Number(r.amount) || 0),
       0,
     );
-    const totalRequestsCount = paymentRequests.length;
+    const totalRequestsCount = mappedRequests.length;
     const approvalRate =
       totalRequestsCount > 0
         ? Math.round((approvedRequests.length / totalRequestsCount) * 100)
@@ -102,9 +230,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        paymentRequests,
+        paymentRequests: mappedRequests,
         subscriptions: mappedSubscriptions,
-        plans: plansData || [],
+        plans: plansData,
         stats: {
           totalRevenue,
           pendingRequests: pendingRequests.length,

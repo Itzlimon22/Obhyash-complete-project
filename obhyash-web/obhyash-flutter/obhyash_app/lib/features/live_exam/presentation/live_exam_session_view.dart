@@ -15,6 +15,7 @@ import '../domain/models.dart';
 import '../providers/live_exam_providers.dart';
 import '../../exam/presentation/result_view.dart';
 import '../../dashboard/services/streak_service.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
@@ -237,7 +238,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'start_time': _sessionStartTime.toIso8601String(),
               'submit_time': submitTime.toIso8601String(),
             });
-            await StreakService.syncStreak(user.id);
+            final streakData = await StreakService.syncStreak(user.id);
+            ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
             isPracticeMode = true;
@@ -253,12 +255,39 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                 'time_taken_seconds': timeTakenSeconds,
                 'submit_time': submitTime.toIso8601String(),
               });
-              await StreakService.syncStreak(user.id);
+              final streakData = await StreakService.syncStreak(user.id);
+              ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
             } catch (_) {}
           }
         }
       } else {
         isPracticeMode = true;
+        final supabase = Supabase.instance.client;
+        final user = supabase.auth.currentUser;
+        if (user != null) {
+          final nowIso = DateTime.now().toUtc().toIso8601String();
+          try {
+            await supabase.from('exam_results').insert({
+              'user_id': user.id,
+              'subject': widget.exam?.title ?? 'মডেল টেস্ট',
+              'subject_label': widget.exam?.category ?? 'mock',
+              'exam_type': 'mock',
+              'date': nowIso,
+              'created_at': nowIso,
+              'score': finalScore.toDouble(),
+              'total_marks': widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+              'correct_count': correctCount,
+              'wrong_count': wrongCount,
+              'time_taken': timeTakenSeconds,
+              'total_questions': questions.length,
+              'status': 'evaluated',
+            });
+            final streakData = await StreakService.syncStreak(user.id);
+            ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+          } catch (err) {
+            debugPrint('[LiveExamSessionView] Mock exam insert error: $err');
+          }
+        }
       }
 
       // Invalidate details & history so it reloads attempt status & practice records
@@ -276,7 +305,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
             subjectLabel: widget.exam?.category ?? 'অনুশীলন',
             examType: 'live_exam_practice',
             date: DateTime.now().toIso8601String(),
-            score: (finalScore is double) ? finalScore : (finalScore as num).toDouble(),
+            score: (finalScore is double) ? finalScore : finalScore.toDouble(),
             totalMarks: widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
             totalQuestions: questions.length,
             correctCount: correctCount,
