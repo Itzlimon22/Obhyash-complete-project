@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../providers/dashboard_providers.dart';
+import '../../../gamification/presentation/widgets/xp_guide_bottom_sheet.dart';
 
 /// ─── Master Daily Mission Template ───────────────────────────────────────────
 class MasterDailyMission {
@@ -257,7 +259,7 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
             .gte('submit_time', todayStart);
 
         todayLiveOrPracticeCount += (liveAttempts as List).length;
-        todayExamsCount += (liveAttempts).length;
+        todayExamsCount += (liveAttempts as List).length;
 
         for (final l in liveAttempts) {
           final c = (l['correct_count'] as num?)?.toInt() ?? 0;
@@ -425,6 +427,19 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard> {
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF004633),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () => XpGuideBottomSheet.show(context),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(
+                        LucideIcons.helpCircle,
+                        size: 15,
+                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                       ),
                     ),
                   ),

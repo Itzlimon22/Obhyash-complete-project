@@ -147,57 +147,106 @@ export async function GET(request: NextRequest) {
     );
 
     // 4. Fetch Users with active/paid Subscriptions (including is_pro, is_subscribed, subscription, subscription_tier)
+    // 4. Fetch Users with active/paid Subscriptions
     let usersData: any[] = [];
     try {
       const { data: uData, error: uErr } = await supabaseAdmin
         .from('users')
-        .select('id, name, email, phone, is_pro, is_subscribed, level, plan, subscription_tier, subscription, subscription_status, subscription_expires_at, created_at, updated_at')
-        .or('subscription.is.not.null,is_subscribed.eq.true,is_pro.eq.true,subscription_expires_at.is.not.null')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (!uErr && uData) {
         usersData = uData;
+      } else if (uErr) {
+        console.warn('Error fetching users for subscriptions:', uErr);
       }
     } catch (e) {
       console.warn('Error fetching subscribed users:', e);
     }
 
     // Map users to subscription history format expected by Admin UI
-    const mappedSubscriptions = (usersData || [])
-      .filter((u) => {
-        const plan = u.subscription?.plan || u.subscription?.plan_name || u.subscription_tier;
-        const isSubscribed = u.is_subscribed === true || u.is_pro === true;
-        return (plan && plan !== 'Free') || isSubscribed;
-      })
-      .map((u) => {
-        const sub = u.subscription || {};
-        const expiry = sub.expiry || sub.expires_at || u.subscription_expires_at || '';
-        const isExpired = expiry ? new Date(expiry) < new Date() : false;
-        const isActive = (sub.status === 'Active' || u.is_subscribed === true || u.is_pro === true) && !isExpired;
-        const planName =
-          sub.plan ||
-          sub.plan_name ||
-          u.subscription_tier ||
-          (u.is_subscribed || u.is_pro ? 'Pro Premium' : 'Free');
+    const mappedSubscriptions: any[] = [];
+    const seenUserSubIds = new Set<string>();
 
-        return {
-          id: u.id,
-          user_id: u.id,
-          user: {
-            name: u.name || 'Student',
-            email: u.email || '',
-            phone: u.phone || '',
-          },
-          plan_name: planName,
-          plan: {
-            display_name: planName,
-            price: Number(sub.amount) || Number(sub.price) || 0,
-          },
-          started_at: u.updated_at || u.created_at,
-          expires_at: expiry,
-          is_active: isActive,
-          status: isExpired ? 'Expired' : (isActive ? 'Active' : (sub.status || 'Inactive')),
-        };
+    (usersData || []).forEach((u) => {
+      const sub = u.subscription || {};
+      const planName =
+        sub.plan ||
+        sub.plan_name ||
+        u.subscription_tier ||
+        u.plan ||
+        u.level ||
+        'Pro Premium';
+
+      const expiry =
+        sub.expiry ||
+        sub.expires_at ||
+        u.subscription_expires_at ||
+        '';
+
+      const isExpired = expiry ? new Date(expiry).getTime() < Date.now() : false;
+      const isProUser =
+        u.is_subscribed === true ||
+        u.is_pro === true ||
+        u.level === 'Pro' ||
+        u.plan === 'Pro' ||
+        u.subscription_status === 'Active' ||
+        (sub.status && String(sub.status).toLowerCase() === 'active') ||
+        (planName && planName !== 'Free' && planName !== 'Rookie');
+
+      if (!isProUser && (!expiry || isExpired)) {
+        return; // skip non-pro users
+      }
+
+      seenUserSubIds.add(u.id);
+      const isActive = isProUser && !isExpired;
+
+      mappedSubscriptions.push({
+        id: u.id,
+        user_id: u.id,
+        user: {
+          name: u.name || 'Student',
+          email: u.email || '',
+          phone: u.phone || '',
+        },
+        plan_name: planName,
+        plan: {
+          display_name: planName,
+          price: Number(sub.amount) || Number(sub.price) || 0,
+        },
+        started_at: u.updated_at || u.created_at || new Date().toISOString(),
+        expires_at: expiry || (isActive ? new Date(Date.now() + 30 * 86400000).toISOString() : ''),
+        is_active: isActive,
+        status: isExpired ? 'Expired' : (isActive ? 'Active' : (u.subscription_status || 'Inactive')),
+      });
+    });
+
+    // Also include any approved payment request users who may not have been flagged in users
+    mappedRequests
+      .filter((r) => r.status === 'Approved')
+      .forEach((req) => {
+        if (req.user_id && !seenUserSubIds.has(req.user_id)) {
+          seenUserSubIds.add(req.user_id);
+          const reqDate = req.reviewed_at || req.requested_at || new Date().toISOString();
+          const expiryDate = new Date(new Date(reqDate).getTime() + 30 * 86400000).toISOString();
+          const isExpired = new Date(expiryDate).getTime() < Date.now();
+          const isActive = !isExpired;
+
+          mappedSubscriptions.push({
+            id: req.user_id,
+            user_id: req.user_id,
+            user: req.user || { name: 'Student', email: '', phone: '' },
+            plan_name: req.plan_name || 'Pro Premium',
+            plan: {
+              display_name: req.plan_name || 'Pro Premium',
+              price: Number(req.amount) || 0,
+            },
+            started_at: reqDate,
+            expires_at: expiryDate,
+            is_active: isActive,
+            status: isActive ? 'Active' : 'Expired',
+          });
+        }
       });
 
     // 5. Fetch Subscription Plans

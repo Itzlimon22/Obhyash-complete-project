@@ -72,16 +72,21 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
       if (uid == null) {
-        setState(() => _isLoading = false);
+        if (mounted) setState(() => _isLoading = false);
         return;
       }
 
-      // Check if user already used a referral code
-      final usedCheck = await sb
-          .from('referral_history')
-          .select('id')
-          .eq('redeemed_by', uid)
-          .maybeSingle();
+      bool hasUsed = false;
+      try {
+        final usedCheck = await sb
+            .from('referral_history')
+            .select('id')
+            .eq('redeemed_by', uid)
+            .maybeSingle();
+        hasUsed = usedCheck != null;
+      } catch (e) {
+        debugPrint('[ReferralView] usedCheck error: $e');
+      }
 
       // Check existing lockout or attempt logs
       try {
@@ -105,104 +110,140 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         }
       } catch (_) {}
 
-      // Try fetching existing code
-      final existing = await sb
-          .from('referrals')
-          .select('id, code')
-          .eq('owner_id', uid)
-          .maybeSingle();
+      // Try fetching existing code or create one
+      String code = '';
+      String referralId = '';
 
-      String code;
-      String referralId;
-
-      if (existing == null) {
-        // Auto-create code
-        final chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        final rand = List.generate(8, (i) {
-          return chars[(DateTime.now().millisecondsSinceEpoch + i * 7) %
-              chars.length];
-        });
-        code = rand.join();
-
-        final created = await sb
+      try {
+        final existing = await sb
             .from('referrals')
-            .insert({'owner_id': uid, 'code': code})
             .select('id, code')
-            .single();
-        referralId = created['id'] as String;
-        code = created['code'] as String;
-      } else {
-        code = existing['code'] as String;
-        referralId = existing['id'] as String;
-      }
+            .eq('owner_id', uid)
+            .maybeSingle();
 
-      // Fetch redemption history
-      final history = await sb
-          .from('referral_history')
-          .select('redeemed_at, admin_status, redeemed_by')
-          .eq('referral_id', referralId)
-          .order('redeemed_at', ascending: false)
-          .limit(20);
+        if (existing == null) {
+          final chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+          final rand = List.generate(8, (i) {
+            return chars[(DateTime.now().millisecondsSinceEpoch + i * 7) %
+                chars.length];
+          });
+          code = rand.join();
 
-      // Fetch names for redeemed_by users
-      final historyList = (history as List).cast<Map<String, dynamic>>();
-      final userIds = historyList
-          .map((h) => h['redeemed_by'] as String?)
-          .where((id) => id != null)
-          .toSet()
-          .toList();
-
-      Map<String, String> nameMap = {};
-      if (userIds.isNotEmpty) {
-        final profiles = await sb
-            .from('public_profiles')
-            .select('id, name')
-            .inFilter('id', userIds);
-        for (final p in (profiles as List)) {
-          nameMap[p['id'] as String] = p['name'] as String? ?? 'ব্যবহারকারী';
+          final created = await sb
+              .from('referrals')
+              .insert({'owner_id': uid, 'code': code})
+              .select('id, code')
+              .single();
+          referralId = created['id']?.toString() ?? '';
+          code = created['code']?.toString() ?? code;
+        } else {
+          code = existing['code']?.toString() ?? '';
+          referralId = existing['id']?.toString() ?? '';
+        }
+      } catch (e) {
+        debugPrint('[ReferralView] Fetch/create code error: $e');
+        if (code.isEmpty) {
+          code = uid.substring(0, 8).toUpperCase();
         }
       }
 
-      final enriched = historyList.map((h) {
-        final userId = h['redeemed_by'] as String?;
-        return {
-          ...h,
-          'name': userId != null
-              ? (nameMap[userId] ?? 'ব্যবহারকারী')
-              : 'ব্যবহারকারী',
-        };
-      }).toList();
+      // Fetch redemption history
+      List<Map<String, dynamic>> enrichedHistory = [];
+      if (referralId.isNotEmpty) {
+        try {
+          final history = await sb
+              .from('referral_history')
+              .select('redeemed_at, admin_status, redeemed_by')
+              .eq('referral_id', referralId)
+              .order('redeemed_at', ascending: false)
+              .limit(20);
+
+          final historyList = (history as List).cast<Map<String, dynamic>>();
+          final userIds = historyList
+              .map((h) => h['redeemed_by'] as String?)
+              .where((id) => id != null)
+              .toSet()
+              .toList();
+
+          Map<String, String> nameMap = {};
+          if (userIds.isNotEmpty) {
+            try {
+              final profiles = await sb
+                  .from('public_profiles')
+                  .select('id, name')
+                  .inFilter('id', userIds);
+              for (final p in (profiles as List)) {
+                nameMap[p['id'] as String] =
+                    p['name'] as String? ?? 'ব্যবহারকারী';
+              }
+            } catch (_) {}
+          }
+
+          enrichedHistory = historyList.map((h) {
+            final userId = h['redeemed_by'] as String?;
+            return {
+              ...h,
+              'name': userId != null
+                  ? (nameMap[userId] ?? 'ব্যবহারকারী')
+                  : 'ব্যবহারকারী',
+            };
+          }).toList();
+        } catch (e) {
+          debugPrint('[ReferralView] history fetch error: $e');
+        }
+      }
 
       // Fetch scratch cards
-      final cards = await sb
-          .from('scratch_cards')
-          .select('*')
-          .eq('user_id', uid)
-          .order('created_at', ascending: false);
+      List<Map<String, dynamic>> scratchCards = [];
+      try {
+        final cards = await sb
+            .from('scratch_cards')
+            .select('*')
+            .eq('user_id', uid)
+            .order('created_at', ascending: false);
+        scratchCards = (cards as List).cast<Map<String, dynamic>>();
+      } catch (e) {
+        debugPrint('[ReferralView] scratch cards fetch error: $e');
+      }
 
       // Get exact count of successful referrals
-      final countRes = await sb
-          .from('referral_history')
-          .select('id')
-          .eq('referral_id', referralId)
-          .eq('admin_status', 'Approved')
-          .count(CountOption.exact);
+      int totalApproved = 0;
+      if (referralId.isNotEmpty) {
+        try {
+          final countRes = await sb
+              .from('referral_history')
+              .select('id')
+              .eq('referral_id', referralId)
+              .eq('admin_status', 'Approved')
+              .count(CountOption.exact);
+          totalApproved = countRes.count;
+        } catch (_) {}
+      }
 
       // Get leaderboard
-      final leaderboardRes = await sb.rpc('get_monthly_leaderboard');
+      List<Map<String, dynamic>> leaderboard = [];
+      try {
+        final leaderboardRes = await sb.rpc('get_monthly_leaderboard');
+        if (leaderboardRes is List) {
+          leaderboard = leaderboardRes.cast<Map<String, dynamic>>();
+        }
+      } catch (e) {
+        debugPrint('[ReferralView] leaderboard fetch error: $e');
+      }
 
       if (mounted) {
         setState(() {
           _code = code;
-          _history = enriched;
-          _hasUsedReferral = usedCheck != null;
-          _scratchCards = (cards as List).cast<Map<String, dynamic>>();
-          _leaderboard = (leaderboardRes as List).cast<Map<String, dynamic>>();
-          _totalReferrals = countRes.count;
+          _history = enrichedHistory;
+          _hasUsedReferral = hasUsed;
+          _scratchCards = scratchCards;
+          _leaderboard = leaderboard;
+          _totalReferrals = totalApproved;
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ReferralView] unexpected error in _loadReferral: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }

@@ -119,85 +119,103 @@ $$;
 GRANT EXECUTE ON FUNCTION public.recalculate_user_streak(UUID) TO anon, authenticated, service_role;
 
 
--- 3. Unified Streak Info RPC (Bulletproof)
-CREATE OR REPLACE FUNCTION public.get_user_streak_info(p_user_id UUID)
+-- 3. Unified Streak Info RPC (Bulletproof & Exact Daily Exam Counts)
+CREATE OR REPLACE FUNCTION public.get_user_streak_info(p_user_id UUID DEFAULT auth.uid())
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-    v_streak_res JSONB;
+    v_uid UUID := COALESCE(p_user_id, auth.uid());
+    v_today DATE := (NOW() AT TIME ZONE 'Asia/Dhaka')::DATE;
+    v_thirty_days_ago DATE := v_today - INTERVAL '29 days';
+    v_day_of_week INT;
+    v_start_of_week DATE;
+    v_week_activity BOOLEAN[] := ARRAY[false, false, false, false, false, false, false];
+    v_last_30_days INT[] := ARRAY_FILL(0, ARRAY[30]);
+    v_sync_res JSONB;
     v_streak INT := 0;
     v_has_today BOOLEAN := FALSE;
-    v_last_active TEXT := NULL;
-    v_today DATE := (NOW() AT TIME ZONE 'Asia/Dhaka')::DATE;
-    v_week_start DATE := v_today - ((EXTRACT(DOW FROM (NOW() AT TIME ZONE 'Asia/Dhaka'))::INT + 1) % 7);
-    v_30_days_ago DATE := v_today - INTERVAL '30 days';
-    v_week_activity JSONB := '[]'::JSONB;
-    v_last_30_days JSONB := '[]'::JSONB;
-    v_active_dates_set DATE[];
+    v_last_active DATE := NULL;
+    r RECORD;
+    v_diff INT;
 BEGIN
-    IF p_user_id IS NULL THEN
+    IF v_uid IS NULL THEN
         RETURN jsonb_build_object('error', 'user_id is required');
     END IF;
 
     -- Trigger atomic recalculation
-    v_streak_res := public.recalculate_user_streak(p_user_id);
-    v_streak := COALESCE((v_streak_res->>'streak')::INT, 0);
-    v_has_today := COALESCE((v_streak_res->>'has_completed_today')::BOOLEAN, FALSE);
-    v_last_active := v_streak_res->>'last_active_date';
+    v_sync_res := public.recalculate_user_streak(v_uid);
+    v_streak := COALESCE((v_sync_res->>'streak')::INT, 0);
+    v_has_today := COALESCE((v_sync_res->>'has_completed_today')::BOOLEAN, FALSE);
+    IF (v_sync_res->>'last_active_date') IS NOT NULL THEN
+        v_last_active := (v_sync_res->>'last_active_date')::DATE;
+    END IF;
 
-    -- Collect all distinct active calendar dates in last 35 days
-    WITH combined_dates AS (
-        SELECT (COALESCE(created_at, date, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
-        FROM public.exam_results
-        WHERE user_id = p_user_id
-          AND (status IS NULL OR status = 'evaluated' OR score IS NOT NULL)
-          AND COALESCE(created_at, date, NOW()) >= (NOW() - INTERVAL '35 days')
+    -- Calculate current week (Sun=0 to Sat=6) in Asia/Dhaka
+    v_day_of_week := EXTRACT(DOW FROM v_today)::INT;
+    v_start_of_week := v_today - (v_day_of_week * INTERVAL '1 day')::INTERVAL;
 
-        UNION
+    -- Compute week activity (Sun=1 to Sat=7 in 1-based PG array)
+    FOR r IN (
+        WITH all_exams AS (
+            SELECT (COALESCE(created_at, date, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
+            FROM public.exam_results
+            WHERE user_id = v_uid
+              AND (status IS NULL OR status = 'evaluated' OR score IS NOT NULL)
+              AND (COALESCE(created_at, date, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE >= v_start_of_week
 
-        SELECT (COALESCE(submit_time, created_at, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
-        FROM public.live_exam_attempts
-        WHERE user_id = p_user_id
-          AND (status = 'submitted' OR score IS NOT NULL)
-          AND COALESCE(submit_time, created_at, NOW()) >= (NOW() - INTERVAL '35 days')
-    )
-    SELECT ARRAY_AGG(exam_date)
-    INTO v_active_dates_set
-    FROM (SELECT DISTINCT exam_date FROM combined_dates WHERE exam_date IS NOT NULL) sub;
+            UNION ALL
 
-    -- Build 7-day current week breakdown (Sat to Fri)
-    SELECT jsonb_agg(
-        jsonb_build_object(
-            'day_name', TO_CHAR(d, 'Dy'),
-            'date', TO_CHAR(d, 'YYYY-MM-DD'),
-            'is_completed', (v_active_dates_set IS NOT NULL AND d = ANY(v_active_dates_set)),
-            'is_today', (d = v_today)
+            SELECT (COALESCE(submit_time, created_at, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
+            FROM public.live_exam_attempts
+            WHERE user_id = v_uid
+              AND (status = 'submitted' OR score IS NOT NULL)
+              AND (COALESCE(submit_time, created_at, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE >= v_start_of_week
         )
-        ORDER BY d ASC
-    )
-    INTO v_week_activity
-    FROM generate_series(v_week_start, v_week_start + INTERVAL '6 days', INTERVAL '1 day') AS d;
+        SELECT DISTINCT exam_date FROM all_exams
+    ) LOOP
+        v_diff := (r.exam_date - v_start_of_week);
+        IF v_diff >= 0 AND v_diff < 7 THEN
+            v_week_activity[v_diff + 1] := true;
+        END IF;
+    END LOOP;
 
-    -- Build 30-day history array
-    SELECT jsonb_agg(
-        jsonb_build_object(
-            'date', TO_CHAR(d, 'YYYY-MM-DD'),
-            'is_active', (v_active_dates_set IS NOT NULL AND d = ANY(v_active_dates_set))
+    -- Compute 30 days activity heatmap with EXACT COUNT of exams per day (index 1 to 30: 1 = 29 days ago, 30 = today)
+    FOR r IN (
+        WITH all_exams AS (
+            SELECT (COALESCE(created_at, date, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
+            FROM public.exam_results
+            WHERE user_id = v_uid
+              AND (status IS NULL OR status = 'evaluated' OR score IS NOT NULL)
+              AND (COALESCE(created_at, date, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE >= v_thirty_days_ago
+
+            UNION ALL
+
+            SELECT (COALESCE(submit_time, created_at, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE AS exam_date
+            FROM public.live_exam_attempts
+            WHERE user_id = v_uid
+              AND (status = 'submitted' OR score IS NOT NULL)
+              AND (COALESCE(submit_time, created_at, NOW()) AT TIME ZONE 'Asia/Dhaka')::DATE >= v_thirty_days_ago
         )
-        ORDER BY d ASC
-    )
-    INTO v_last_30_days
-    FROM generate_series(v_30_days_ago, v_today, INTERVAL '1 day') AS d;
+        SELECT exam_date, COUNT(*)::INT AS cnt
+        FROM all_exams
+        WHERE exam_date IS NOT NULL
+        GROUP BY exam_date
+    ) LOOP
+        v_diff := (r.exam_date - v_thirty_days_ago);
+        IF v_diff >= 0 AND v_diff < 30 THEN
+            v_last_30_days[v_diff + 1] := r.cnt;
+        END IF;
+    END LOOP;
 
     RETURN jsonb_build_object(
         'current_streak', v_streak,
         'has_completed_today', v_has_today,
         'last_active_date', v_last_active,
-        'week_activity', COALESCE(v_week_activity, '[]'::JSONB),
-        'last_30_days', COALESCE(v_last_30_days, '[]'::JSONB)
+        'week_activity', v_week_activity,
+        'last_30_days', v_last_30_days
     );
 EXCEPTION WHEN OTHERS THEN
     RETURN jsonb_build_object(
@@ -334,7 +352,41 @@ AFTER INSERT ON public.exam_results
 FOR EACH ROW
 EXECUTE FUNCTION public.trg_notify_on_exam_evaluated();
 
--- 6. Backfill streak for all users right now
+-- 6. Atomic XP Increment Function
+CREATE OR REPLACE FUNCTION public.increment_user_xp(
+    uid UUID DEFAULT NULL,
+    amount INT DEFAULT NULL,
+    p_user_id UUID DEFAULT NULL,
+    p_xp INT DEFAULT NULL,
+    p_xp_delta INT DEFAULT NULL
+)
+RETURNS INT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    v_target_id UUID := COALESCE(uid, p_user_id, auth.uid());
+    v_target_amount INT := COALESCE(amount, p_xp, p_xp_delta, 0);
+    v_new_xp INT := 0;
+BEGIN
+    IF v_target_id IS NULL OR v_target_amount <= 0 THEN
+        RETURN 0;
+    END IF;
+
+    UPDATE public.users
+    SET xp = COALESCE(xp, 0) + v_target_amount,
+        updated_at = NOW()
+    WHERE id = v_target_id
+    RETURNING xp INTO v_new_xp;
+
+    RETURN v_new_xp;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.increment_user_xp(UUID, INT, UUID, INT, INT) TO anon, authenticated, service_role;
+
+-- 7. Backfill streak for all users right now
 DO $$
 DECLARE
     r RECORD;
@@ -348,3 +400,4 @@ BEGIN
     END LOOP;
 END;
 $$;
+

@@ -196,8 +196,23 @@ class StreakService {
 
         final raw30 = response['last_30_days_activity'] ?? response['last_30_days'];
         final List<int> last30Days = raw30 is List
-            ? raw30.map((e) => (e as num?)?.toInt() ?? 0).toList()
+            ? raw30.map((e) {
+                if (e is num) return e.toInt();
+                if (e is Map) {
+                  final cnt = e['cnt'] ?? e['count'] ?? e['exam_count'];
+                  if (cnt is num) return cnt.toInt();
+                  if (e['is_active'] == true) return 1;
+                }
+                return 0;
+              }).toList()
             : List.filled(30, 0);
+
+        // Ensure array is always exactly 30 items
+        final List<int> final30Days = last30Days.length == 30
+            ? last30Days
+            : (last30Days.length < 30
+                ? [...List.filled(30 - last30Days.length, 0), ...last30Days]
+                : last30Days.sublist(last30Days.length - 30));
 
         _updateLocalCache(userId, streakCount).catchError((_) {});
 
@@ -205,7 +220,7 @@ class StreakService {
           streakCount: streakCount,
           hasCompletedToday: hasCompletedToday,
           weekActiveDays: weekActiveDays,
-          last30DaysActivity: last30Days,
+          last30DaysActivity: final30Days,
         );
       }
     } catch (e) {

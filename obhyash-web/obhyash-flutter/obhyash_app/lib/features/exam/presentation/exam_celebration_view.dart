@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
+import '../../gamification/services/exam_xp_calculator.dart';
+import '../../gamification/presentation/widgets/xp_guide_bottom_sheet.dart';
 import 'result_view.dart';
 
 class ExamCelebrationView extends StatefulWidget {
@@ -31,6 +34,8 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
   late final Animation<int> _xpAnimation;
   late final Animation<double> _achievementScaleAnim;
 
+  late final ExamXpBreakdown _xpBreakdown;
+
   Timer? _autoTransitionTimer;
   bool _hasNavigated = false;
 
@@ -39,8 +44,16 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
     super.initState();
 
     final result = widget.result;
-    final xpEarned =
-        (result.correctCount * 10 - result.wrongCount * 2).clamp(0, 9999);
+    _xpBreakdown = ExamXpCalculator.calculateExamXp(
+      totalQuestions: result.totalQuestions,
+      correctCount: result.correctCount,
+      wrongCount: result.wrongCount,
+      timeTakenSeconds: result.timeTaken,
+      durationMinutes: 25,
+      currentStreak: 1,
+      isLiveExam: result.examType == 'live' || result.examType == 'live_exam_practice',
+    );
+    final xpEarned = _xpBreakdown.totalXpEarned;
 
     // Confetti
     _confettiController =
@@ -269,7 +282,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                 const SizedBox(height: 6),
 
                                 Text(
-                                  '${BanglaNameHelper.toBanglaNumeral(result.correctCount)}টি সঠিক (+${BanglaNameHelper.toBanglaNumeral(result.correctCount * 10)}) · ${BanglaNameHelper.toBanglaNumeral(result.wrongCount)}টি ভুল (-${BanglaNameHelper.toBanglaNumeral(result.wrongCount * 2)})',
+                                  '${BanglaNameHelper.toBanglaNumeral(result.correctCount)}টি সঠিক (+${BanglaNameHelper.toBanglaNumeral(result.correctCount * 2)}) · ${BanglaNameHelper.toBanglaNumeral(result.wrongCount)}টি ভুল (-${BanglaNameHelper.toBanglaNumeral(result.wrongCount * 1)})',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -277,6 +290,43 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                     color: isDark
                                         ? Colors.white70
                                         : const Color(0xFF065F46),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Interactive XP Rules Button
+                                InkWell(
+                                  onTap: () => XpGuideBottomSheet.show(context),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: (isDark ? Colors.white : const Color(0xFF004633)).withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: (isDark ? Colors.white : const Color(0xFF004633)).withValues(alpha: 0.15),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          LucideIcons.helpCircle,
+                                          size: 13,
+                                          color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          'কীভাবে XP হিসেব হয়?',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Anek Bangla',
+                                            color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],

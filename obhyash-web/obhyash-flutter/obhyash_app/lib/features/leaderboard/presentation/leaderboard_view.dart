@@ -12,6 +12,7 @@ import '../../../core/data/college_list.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
+import '../../gamification/presentation/widgets/xp_guide_bottom_sheet.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -447,45 +448,71 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
         Container(
           color: isDark ? const Color(0xFF080808) : Colors.white,
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF141414) : const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                _ViewModeTab(
-                  label: 'র‍্যাংকিং',
-                  isActive: _viewMode == 'level',
-                  isDark: isDark,
-                  onTap: () => setState(() => _viewMode = 'level'),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF141414) : const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      _ViewModeTab(
+                        label: 'র‍্যাংকিং',
+                        isActive: _viewMode == 'level',
+                        isDark: isDark,
+                        onTap: () => setState(() => _viewMode = 'level'),
+                      ),
+                      const SizedBox(width: 4),
+                      _ViewModeTab(
+                        label: myInstTabLabel,
+                        isActive: _viewMode == 'college',
+                        isDark: isDark,
+                        onTap: () {
+                          setState(() => _viewMode = 'college');
+                          final inst = myProfile?.institute;
+                          if (inst != null && inst.isNotEmpty) {
+                            _fetchCollege(inst);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      _ViewModeTab(
+                        label: allInstTabLabel,
+                        isActive: _viewMode == 'rankings',
+                        isDark: isDark,
+                        onTap: () {
+                          setState(() => _viewMode = 'rankings');
+                          _fetchInstituteRankings();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 4),
-                _ViewModeTab(
-                  label: myInstTabLabel,
-                  isActive: _viewMode == 'college',
-                  isDark: isDark,
-                  onTap: () {
-                    setState(() => _viewMode = 'college');
-                    final inst = myProfile?.institute;
-                    if (inst != null && inst.isNotEmpty) {
-                      _fetchCollege(inst);
-                    }
-                  },
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () => XpGuideBottomSheet.show(context),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF141414) : const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+                    ),
+                  ),
+                  child: const Icon(
+                    LucideIcons.helpCircle,
+                    size: 18,
+                    color: Color(0xFFF59E0B),
+                  ),
                 ),
-                const SizedBox(width: 4),
-                _ViewModeTab(
-                  label: allInstTabLabel,
-                  isActive: _viewMode == 'rankings',
-                  isDark: isDark,
-                  onTap: () {
-                    setState(() => _viewMode = 'rankings');
-                    _fetchInstituteRankings();
-                  },
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
 

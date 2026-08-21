@@ -1,6 +1,7 @@
 import { ExamConfig, Question, ExamResult, UserAnswers } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+import { ExamXpCalculator } from '@/lib/exam-xp-calculator';
 
 // --- DB TYPES ---
 interface QuestionDbRow {
@@ -591,6 +592,27 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         bulkUpdateQuestionAnalytics(user.id, result.questions, result.userAnswers);
       }
 
+      // Calculate and award balanced XP on web
+      if (user) {
+        try {
+          const xpBreakdown = ExamXpCalculator.calculateExamXp({
+            totalQuestions: result.totalQuestions,
+            correctCount: result.correctCount,
+            wrongCount: result.wrongCount,
+            timeTakenSeconds: result.timeTaken,
+            isLiveExam: false,
+          });
+          if (xpBreakdown.totalXpEarned > 0) {
+            await supabase.rpc('increment_user_xp', {
+              uid: user.id,
+              amount: xpBreakdown.totalXpEarned,
+            });
+          }
+        } catch (xpErr) {
+          console.warn('[Exam Submit] XP award error:', xpErr);
+        }
+      }
+
       if (success) {
         console.log('✅ Exam session updated in database successfully');
         return;
@@ -630,6 +652,25 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       }
 
       console.log('✅ Exam result inserted to database successfully');
+
+      // Calculate and award balanced XP on web
+      try {
+        const xpBreakdown = ExamXpCalculator.calculateExamXp({
+          totalQuestions: result.totalQuestions,
+          correctCount: result.correctCount,
+          wrongCount: result.wrongCount,
+          timeTakenSeconds: result.timeTaken,
+          isLiveExam: false,
+        });
+        if (xpBreakdown.totalXpEarned > 0) {
+          await supabase.rpc('increment_user_xp', {
+            uid: user.id,
+            amount: xpBreakdown.totalXpEarned,
+          });
+        }
+      } catch (xpErr) {
+        console.warn('[Exam Submit] XP award error:', xpErr);
+      }
 
       if (result.questions && result.userAnswers) {
         bulkUpdateQuestionAnalytics(user.id, result.questions, result.userAnswers);

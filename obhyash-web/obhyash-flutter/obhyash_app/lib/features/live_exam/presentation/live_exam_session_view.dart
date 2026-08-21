@@ -16,6 +16,7 @@ import '../providers/live_exam_providers.dart';
 import '../../exam/presentation/result_view.dart';
 import '../../dashboard/services/streak_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../gamification/services/exam_xp_calculator.dart';
 
 class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
@@ -257,6 +258,25 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               });
               final streakData = await StreakService.syncStreak(user.id);
               ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+
+              // Calculate and award Live Exam XP (Live Exam Participation: +30 XP + accuracy)
+              final liveXpBreakdown = ExamXpCalculator.calculateExamXp(
+                totalQuestions: questions.length,
+                correctCount: correctCount,
+                wrongCount: wrongCount,
+                timeTakenSeconds: timeTakenSeconds,
+                durationMinutes: widget.exam?.durationMinutes ?? 25,
+                currentStreak: streakData.streakCount,
+                isLiveExam: true,
+              );
+              if (liveXpBreakdown.totalXpEarned > 0) {
+                try {
+                  await supabase.rpc('increment_user_xp', params: {
+                    'uid': user.id,
+                    'amount': liveXpBreakdown.totalXpEarned,
+                  });
+                } catch (_) {}
+              }
             } catch (_) {}
           }
         }
@@ -284,6 +304,24 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
             });
             final streakData = await StreakService.syncStreak(user.id);
             ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+
+            final practiceXp = ExamXpCalculator.calculateExamXp(
+              totalQuestions: questions.length,
+              correctCount: correctCount,
+              wrongCount: wrongCount,
+              timeTakenSeconds: timeTakenSeconds,
+              durationMinutes: widget.exam?.durationMinutes ?? 25,
+              currentStreak: streakData.streakCount,
+              isLiveExam: false,
+            );
+            if (practiceXp.totalXpEarned > 0) {
+              try {
+                await supabase.rpc('increment_user_xp', params: {
+                  'uid': user.id,
+                  'amount': practiceXp.totalXpEarned,
+                });
+              } catch (_) {}
+            }
           } catch (err) {
             debugPrint('[LiveExamSessionView] Mock exam insert error: $err');
           }

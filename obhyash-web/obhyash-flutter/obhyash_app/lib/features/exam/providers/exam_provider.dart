@@ -11,6 +11,7 @@ import '../services/offline_question_bank_service.dart';
 import '../services/offline_exam_sync_queue.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../dashboard/services/streak_service.dart';
+import '../../gamification/services/exam_xp_calculator.dart';
 
 enum AppState {
   idle,
@@ -628,9 +629,18 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         final streakData = await StreakService.syncStreak(authId);
         ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
 
-        // Award XP: 10 per correct, -2 per wrong (min 0)
-        final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
-            .clamp(0, 9999);
+        // Calculate comprehensive production-grade XP
+        final xpBreakdown = ExamXpCalculator.calculateExamXp(
+          totalQuestions: result.totalQuestions,
+          correctCount: result.correctCount,
+          wrongCount: result.wrongCount,
+          timeTakenSeconds: result.timeTaken,
+          durationMinutes: state.examDetails?.durationMinutes ?? 25,
+          currentStreak: streakData.streakCount,
+          isLiveExam: false,
+        );
+        final xpEarned = xpBreakdown.totalXpEarned;
+
         if (xpEarned > 0) {
           bool rpcSuccess = false;
           // Atomic RPC call with retry (prevents race conditions)

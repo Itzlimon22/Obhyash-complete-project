@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 import '../../dashboard/services/streak_service.dart';
+import '../../gamification/services/exam_xp_calculator.dart';
 
 class OfflineExamSyncQueueService {
   static const String _kSyncQueueKey = 'obhyash_offline_exam_sync_queue_v1';
@@ -85,15 +86,25 @@ class OfflineExamSyncQueueService {
           });
 
           // Sync streak
-          await StreakService.syncStreak(uid);
+          final streakData = await StreakService.syncStreak(uid);
 
-          // Award XP
-          final xpEarned = (result.correctCount * 10 - result.wrongCount * 2).clamp(0, 9999);
+          // Calculate and award comprehensive production XP
+          final xpBreakdown = ExamXpCalculator.calculateExamXp(
+            totalQuestions: result.totalQuestions,
+            correctCount: result.correctCount,
+            wrongCount: result.wrongCount,
+            timeTakenSeconds: result.timeTaken,
+            durationMinutes: 25,
+            currentStreak: streakData.streakCount,
+            isLiveExam: false,
+          );
+          final xpEarned = xpBreakdown.totalXpEarned;
+
           if (xpEarned > 0) {
             try {
-              await sb.rpc('increment_profile_xp', params: {
-                'p_user_id': uid,
-                'p_xp_delta': xpEarned,
+              await sb.rpc('increment_user_xp', params: {
+                'uid': uid,
+                'amount': xpEarned,
               });
             } catch (_) {}
           }
