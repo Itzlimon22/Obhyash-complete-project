@@ -346,6 +346,10 @@ export interface UserProfile extends Partial<User> {
   streakCount?: number;
   streak?: number;
   lastStreakDate?: string;
+  monthly_xp?: number;
+  monthlyXp?: number;
+  allTimeXp?: number;
+  allTimeLevel?: string;
 }
 
 // ==========================================

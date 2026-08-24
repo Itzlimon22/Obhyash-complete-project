@@ -52,9 +52,10 @@ export const getLeaderboardUsers = async (
   level: string,
   offset = 0,
   limit = 20,
+  timeframe: 'monthly' | 'all_time' = 'monthly',
 ): Promise<LeaderboardPage> => {
   try {
-    const url = `/api/leaderboard/level?level=${encodeURIComponent(level)}&offset=${offset}&limit=${limit}`;
+    const url = `/api/leaderboard/level?level=${encodeURIComponent(level)}&offset=${offset}&limit=${limit}&timeframe=${timeframe}`;
     const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -118,7 +119,9 @@ export const getInstituteRankings = async (): Promise<InstituteRankEntry[]> => {
   }
 };
 
-export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
+export const getLevelUserCounts = async (
+  timeframe: 'monthly' | 'all_time' = 'monthly',
+): Promise<Record<string, number>> => {
   const zeroCounts = (): Record<string, number> => {
     const counts: Record<string, number> = {};
     LEVELS.forEach((l: (typeof LEVELS)[number]) => {
@@ -129,57 +132,34 @@ export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
 
   if (isSupabaseConfigured() && supabase) {
     try {
-      // Try the RPC function first
-      const { data, error } = await supabase.rpc('get_level_user_counts');
+      const xpCol = timeframe === 'monthly' ? 'monthly_xp' : 'xp';
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select(xpCol);
 
-      if (!error && data) {
-        const counts: Record<string, number> = {};
-        data.forEach((item: { level: string; user_count: number }) => {
-          // Normalize 'Beginner' to 'Rookie' for display
-          const levelKey = item.level === 'Beginner' ? 'Rookie' : item.level;
-          counts[levelKey] = (counts[levelKey] || 0) + item.user_count;
-        });
-
-        LEVELS.forEach((l: (typeof LEVELS)[number]) => {
-          if (!(l.id in counts)) {
-            counts[l.id] = 0;
-          }
-        });
-
-        return counts;
-      }
-
-      // RPC failed — fall back to counting from public_profiles directly
-      console.warn(
-        'Leaderboard: RPC get_level_user_counts failed, falling back to direct query:',
-        error?.message,
-      );
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('public_profiles')
-        .select('level')
-        .ilike('role', 'student'); // match only students, same as leaderboard queries
-
-      if (!profilesError && profilesData) {
+      if (!usersError && usersData) {
         const counts = zeroCounts();
-        profilesData.forEach((row: { level: string | null }) => {
-          if (row.level) {
-            const levelKey = row.level === 'Beginner' ? 'Rookie' : row.level;
-            if (levelKey in counts) {
-              counts[levelKey]++;
-            }
+        usersData.forEach((row: any) => {
+          const val = row[xpCol] || 0;
+          let lvl = 'Explorer';
+          if (val >= 15000) lvl = 'Legend';
+          else if (val >= 7000) lvl = 'Scholar';
+          else if (val >= 3000) lvl = 'Warrior';
+          else if (val >= 1000) lvl = 'Challenger';
+
+          if (lvl in counts) {
+            counts[lvl]++;
           }
         });
         return counts;
       }
 
-      console.error('Error fetching level counts (fallback):', profilesError);
+      console.error('Error fetching level counts:', usersError);
     } catch (error) {
       console.error('Failed to fetch level counts:', error);
     }
   }
 
-  console.warn('Leaderboard: Database not configured, returning zero counts');
   return zeroCounts();
 };
 

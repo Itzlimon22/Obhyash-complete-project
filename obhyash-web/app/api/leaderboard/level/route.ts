@@ -3,36 +3,34 @@ import { createClient } from '@/utils/supabase/server';
 
 const PAGE_SIZE = 20;
 
-interface LeaderboardUserRow {
-  id: string;
-  name: string | null;
-  institute: string | null;
-  xp: number | null;
-  level: string | null;
-  exams_taken: number | null;
-  avatar_url: string | null;
-  avatar_color: string | null;
-  streak: number | null;
-  batch?: string | null;
+interface LevelThreshold {
+  min: number;
+  max: number;
 }
 
-function getLevelAliases(level: string): string[] {
-  const l = level.toLowerCase();
-  if (l === 'explorer' || l === 'rookie') {
-    return ['Explorer', 'Rookie', 'explorer', 'rookie', 'Beginner'];
-  } else if (l === 'challenger' || l === 'scout') {
-    return ['Challenger', 'Scout', 'challenger', 'scout'];
-  } else if (l === 'warrior') {
-    return ['Warrior', 'warrior'];
-  } else if (l === 'scholar' || l === 'titan') {
-    return ['Scholar', 'Titan', 'scholar', 'titan'];
-  }
-  return ['Legend', 'legend'];
+const LEVEL_THRESHOLDS: Record<string, LevelThreshold> = {
+  explorer: { min: 0, max: 999 },
+  rookie: { min: 0, max: 999 },
+  challenger: { min: 1000, max: 2999 },
+  scout: { min: 1000, max: 2999 },
+  warrior: { min: 3000, max: 6999 },
+  scholar: { min: 7000, max: 14999 },
+  titan: { min: 7000, max: 14999 },
+  legend: { min: 15000, max: 999999999 },
+};
+
+function calculateLevelFromXp(xp: number): string {
+  if (xp >= 15000) return 'Legend';
+  if (xp >= 7000) return 'Scholar';
+  if (xp >= 3000) return 'Warrior';
+  if (xp >= 1000) return 'Challenger';
+  return 'Explorer';
 }
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const level = searchParams.get('level');
+  const timeframe = searchParams.get('timeframe') || 'monthly';
   const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10));
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? String(PAGE_SIZE), 10)));
 
@@ -41,50 +39,61 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  const aliases = getLevelAliases(level);
+  const levelKey = level.toLowerCase();
+  const threshold = LEVEL_THRESHOLDS[levelKey] || LEVEL_THRESHOLDS.explorer;
+  const isMonthly = timeframe === 'monthly';
+  const xpColumn = isMonthly ? 'monthly_xp' : 'xp';
 
-  // Try indexed RPC first — pass offset/limit for server-side pagination
-  const { data: rpcData, error: rpcError } = await supabase.rpc(
-    'leaderboard_by_level',
-    { p_level: level, p_offset: offset, p_limit: limit },
-  );
+  // Direct query based on monthly_xp (for monthly reset) or all-time xp
+  let query = supabase
+    .from('users')
+    .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, avatar_color, streak, batch')
+    .gte(xpColumn, threshold.min);
 
-  let rows: LeaderboardUserRow[] | null = rpcData;
-
-  // Fallback: direct query with .range() for server-side slicing
-  if (rpcError || !rows || rows.length === 0) {
-    const { data, error } = await supabase
-      .from('public_profiles')
-      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, batch')
-      .in('level', aliases)
-      .order('xp', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (error || !data) {
-      return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
-    }
-    rows = data;
+  if (threshold.max < 999999999) {
+    query = query.lte(xpColumn, threshold.max);
   }
 
-  const users = rows.map((user, index) => ({
-    id: user.id,
-    name: user.name || 'Unknown User',
-    institute: user.institute || 'Unknown Institute',
-    xp: user.xp || 0,
-    level: user.level || level,
-    examsTaken: user.exams_taken || 0,
-    avatarUrl: user.avatar_url || undefined,
-    avatarColor: user.avatar_color || undefined,
-    streak: user.streak || 0,
-    batch: user.batch || undefined,
-    rank: offset + index + 1,
-  }));
+  query = query
+    .order(xpColumn, { ascending: false, nullsFirst: false })
+    .range(offset, offset + limit - 1);
+
+  const { data: rows, error } = await query;
+
+  if (error || !rows) {
+    console.error('Leaderboard query error:', error);
+    return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
+  }
+
+  const users = rows.map((user: any, index: number) => {
+    const effectiveXp = isMonthly
+      ? (user.monthly_xp ?? 0)
+      : (user.xp ?? 0);
+
+    const calculatedLevel = calculateLevelFromXp(effectiveXp);
+
+    return {
+      id: user.id,
+      name: user.name || 'Unknown User',
+      institute: user.institute || 'Unknown Institute',
+      xp: effectiveXp,
+      allTimeXp: user.xp || 0,
+      monthlyXp: user.monthly_xp || 0,
+      level: calculatedLevel,
+      allTimeLevel: user.level || calculateLevelFromXp(user.xp || 0),
+      examsTaken: user.exams_taken || 0,
+      avatarUrl: user.avatar_url || undefined,
+      avatarColor: user.avatar_color || undefined,
+      streak: user.streak || 0,
+      batch: user.batch || undefined,
+      rank: offset + index + 1,
+    };
+  });
 
   return NextResponse.json(
     { users, hasMore: rows.length === limit, nextOffset: offset + rows.length },
     {
       headers: {
-        // Short cache — paginated responses depend on offset
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     },

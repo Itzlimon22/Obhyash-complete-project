@@ -124,23 +124,25 @@ class _LBUser {
     this.isPro = false,
   });
 
-  factory _LBUser.fromJson(Map<String, dynamic> j, {String? me}) {
+  factory _LBUser.fromJson(Map<String, dynamic> j, {String? me, String timeframe = 'monthly'}) {
     final rawPlan = j['plan']?.toString().toLowerCase();
     final isPro = j['is_pro'] == true ||
         j['is_subscribed'] == true ||
         (rawPlan != null && rawPlan.isNotEmpty && rawPlan != 'free');
 
     final fullXp = (j['xp'] as num?)?.toInt() ?? 0;
-    final mXp = (j['monthly_xp'] as num?)?.toInt() ?? fullXp;
+    final mXp = (j['monthly_xp'] as num?)?.toInt() ?? 0;
+    final effectiveXp = timeframe == 'monthly' ? mXp : fullXp;
+    final calculatedLevel = _calculateLevelFromXp(effectiveXp);
 
     return _LBUser(
       id: j['id'] ?? '',
       name: j['name'] ?? 'অজানা',
       institute: j['institute'] ?? '',
-      level: j['level'] ?? 'Explorer',
+      level: calculatedLevel,
       batch: j['batch']?.toString(),
       avatarUrl: j['avatar_url'] as String?,
-      xp: fullXp,
+      xp: effectiveXp,
       monthlyXp: mXp,
       examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
       isCurrentUser: j['id'] == me,
@@ -166,19 +168,27 @@ class _InstituteRank {
 
 final _numFmt = NumberFormat('#,##0');
 
-List<String> _dbLevelAliases(String levelId) {
+(int, int) _getLevelThreshold(String levelId) {
   final lower = levelId.toLowerCase();
   if (lower.contains('explorer') || lower.contains('rookie')) {
-    return ['Explorer', 'Rookie', 'explorer', 'rookie', 'Beginner', 'seeker'];
+    return (0, 999);
   } else if (lower.contains('challenger') || lower.contains('scout')) {
-    return ['Challenger', 'Scout', 'challenger', 'scout', 'Pioneer'];
+    return (1000, 2999);
   } else if (lower.contains('warrior')) {
-    return ['Warrior', 'warrior', 'Conqueror'];
+    return (3000, 6999);
   } else if (lower.contains('scholar') || lower.contains('titan')) {
-    return ['Scholar', 'Titan', 'scholar', 'titan', 'Luminary'];
+    return (7000, 14999);
   } else {
-    return ['Legend', 'legend', 'Apex'];
+    return (15000, 999999999);
   }
+}
+
+String _calculateLevelFromXp(int xp) {
+  if (xp >= 15000) return 'Legend';
+  if (xp >= 7000) return 'Scholar';
+  if (xp >= 3000) return 'Warrior';
+  if (xp >= 1000) return 'Challenger';
+  return 'Explorer';
 }
 
 // ─── View ──────────────────────────────────────────────────────────────────────
@@ -217,13 +227,15 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   Future<void> _fetchCounts() async {
     try {
       final supabase = Supabase.instance.client;
+      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
+
       final futures = _levels.map((lvl) async {
-        final aliases = _dbLevelAliases(lvl.id);
-        final data = await supabase
-            .from('public_profiles')
-            .select('id')
-            .inFilter('level', aliases)
-            .limit(9999);
+        final (minXp, maxXp) = _getLevelThreshold(lvl.id);
+        var query = supabase.from('users').select('id').gte(sortColumn, minXp);
+        if (maxXp < 999999999) {
+          query = query.lte(sortColumn, maxXp);
+        }
+        final data = await query.limit(9999);
         return MapEntry(lvl.id, (data as List).length);
       });
       final results = await Future.wait(futures);
@@ -249,20 +261,26 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     try {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
-      final aliases = _dbLevelAliases(_selectedLevel);
+      final (minXp, maxXp) = _getLevelThreshold(_selectedLevel);
       final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
 
-      final data = await supabase
-          .from('public_profiles')
+      var query = supabase
+          .from('users')
           .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
-          .inFilter('level', aliases)
-          .order(sortColumn, ascending: false)
+          .gte(sortColumn, minXp);
+
+      if (maxXp < 999999999) {
+        query = query.lte(sortColumn, maxXp);
+      }
+
+      final data = await query
+          .order(sortColumn, ascending: false, nullsFirst: false)
           .range(_offset, _offset + _limit - 1);
 
       if (mounted) {
         setState(() {
           final fetchedUsers = (data as List)
-              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me))
+              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
               .toList();
 
           if (fetchedUsers.length < _limit) {
@@ -299,16 +317,16 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
 
       final data = await supabase
-          .from('public_profiles')
+          .from('users')
           .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
           .eq('institute', institute)
-          .order(sortColumn, ascending: false)
+          .order(sortColumn, ascending: false, nullsFirst: false)
           .limit(100);
 
       if (mounted) {
         setState(() {
           _collegeUsers = (data as List)
-              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me))
+              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
               .toList();
           _isLoadingCollege = false;
         });
@@ -528,6 +546,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             onTimeframeChanged: (t) {
                               if (_timeframe != t) {
                                 setState(() => _timeframe = t);
+                                _fetchCounts();
                                 _fetch();
                               }
                             },

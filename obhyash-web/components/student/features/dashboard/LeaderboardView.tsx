@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
 import { searchColleges } from '@/lib/college-mapping';
+import { calculateLevel } from '@/lib/utils';
 
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile, rank: number) => void;
@@ -30,6 +31,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
   const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
   const [viewMode, setViewMode] = usePersistedState<'level' | 'college' | 'rankings'>('lb_view_mode', 'level');
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'all_time'>('monthly');
   // Track which college is being viewed in college mode (defaults to own college)
   const [selectedCollege, setSelectedCollege] = useState<string | null>(null);
 
@@ -52,17 +54,18 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.institute]);
 
-  // Set selectedLevel once we know the user's level
+  // Set selectedLevel once we know the user's level (monthly vs all_time)
   const resolvedLevel: LevelType = useMemo(() => {
     if (selectedLevel) return selectedLevel;
-    const ul = currentUser?.level as LevelType | undefined;
-    return ul && LEVELS.some((l) => l.id === ul) ? ul : 'Rookie';
-  }, [currentUser, selectedLevel]);
+    const userXp = timeframe === 'all_time' ? (currentUser?.xp ?? 0) : (currentUser?.monthly_xp ?? 0);
+    const lvl = (calculateLevel(userXp) as LevelType) || 'Explorer';
+    return LEVELS.some((l) => l.id === lvl) ? lvl : 'Explorer';
+  }, [currentUser, selectedLevel, timeframe]);
 
   // ── SWR: level user counts (cached) ─────────────────────────────────────────
   const { data: levelCounts = {} } = useSWR(
-    authLoading ? null : 'leaderboard:levelCounts',
-    getLevelUserCounts,
+    authLoading ? null : `leaderboard:levelCounts:${timeframe}`,
+    () => getLevelUserCounts(timeframe === 'all_time' ? 'all_time' : 'monthly'),
     { revalidateOnFocus: false, dedupingInterval: 120_000 },
   );
 
@@ -71,7 +74,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     if (authLoading) return null;
     if (prev && !prev.hasMore) return null; // stop when no more pages
     const offset = prev ? prev.nextOffset : 0;
-    return `leaderboard:level:${resolvedLevel}:offset:${offset}`;
+    return `leaderboard:level:${resolvedLevel}:timeframe:${timeframe}:offset:${offset}`;
   };
   const {
     data: levelPages,
@@ -83,7 +86,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     getLevelKey,
     (key) => {
       const offset = parseInt(key.split(':offset:')[1], 10);
-      return getLeaderboardUsers(resolvedLevel, offset);
+      const tf = timeframe === 'all_time' ? 'all_time' : 'monthly';
+      return getLeaderboardUsers(resolvedLevel, offset, 20, tf);
     },
     { revalidateOnFocus: false, revalidateFirstPage: false, dedupingInterval: 60_000 },
   );
@@ -120,12 +124,10 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
   const userRankInOwnLevel = useMemo(() => {
     if (!currentUser) return 0;
-    if (currentUser.level === resolvedLevel) {
-      const idx = leaderboardUsers.findIndex((u) => u.id === currentUser.id);
-      if (idx !== -1) return idx + 1;
-    }
+    const idx = leaderboardUsers.findIndex((u) => u.id === currentUser.id);
+    if (idx !== -1) return idx + 1;
     return 0;
-  }, [currentUser, leaderboardUsers, resolvedLevel]);
+  }, [currentUser, leaderboardUsers]);
 
   // ── SWR: all colleges list (for dropdown filter + rankings tab) ──────────────
   const { data: allCollegesRaw = [], isLoading: isLoadingCollegesList } = useSWR(
@@ -141,7 +143,6 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const instituteRankings = viewMode === 'rankings' ? allCollegesRaw : [];
   const isLoadingRankings = viewMode === 'rankings' && isLoadingCollegesList;
 
-  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'all_time'>('weekly');
   const userBatchLabel = currentUser?.batch?.trim() || 'HSC 2027';
 
   const displayedLeaderboardUsers = useMemo(() => {
@@ -152,22 +153,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
       return cleanU.includes(cleanTarget) || cleanTarget.includes(cleanU);
     });
 
-    let list = batchFiltered.length > 0 ? batchFiltered : leaderboardUsers;
-
-    if (timeframe === 'weekly') {
-      list = list.map((u) => ({
-        ...u,
-        xp: Math.round((u.xp ?? 0) * 0.28),
-      }));
-    } else if (timeframe === 'monthly') {
-      list = list.map((u) => ({
-        ...u,
-        xp: Math.round((u.xp ?? 0) * 0.65),
-      }));
-    }
-
-    return list;
-  }, [leaderboardUsers, userBatchLabel, timeframe]);
+    return batchFiltered.length > 0 ? batchFiltered : leaderboardUsers;
+  }, [leaderboardUsers, userBatchLabel]);
 
   if (isLoading && !leaderboardUsers.length && viewMode === 'level') {
     return <LeaderboardSkeleton />;
