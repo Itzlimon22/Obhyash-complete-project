@@ -5,12 +5,16 @@
     "description": "মূলবিন্দুর সাপেক্ষে যেকোনো বিন্দু P(x, y, z) এর অবস্থান নির্দেশক ভেক্টর এবং তার পরম মান।",
     "practiceQuestions": [
       {
-        "question": "একটি বিন্দুর স্থানাঙ্ক $P(3, 4, 12)$ হলে মূলবিন্দু থেকে এর সরণ বা অবস্থান ভেক্টরের মান কত একক?",
-        "answer": "Ans: $13\\text{ একক}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       },
       {
-        "question": "কোনো কণার অবস্থান ভেক্টর $\\vec{r} = 2\\hat{i} - 3\\hat{j} + 6\\hat{k}$ হলে $xy$ সমতলে এর অভিক্ষেপের মান কত?",
-        "answer": "Ans: $\\sqrt{2^2 + (-3)^2} = \\sqrt{13} \\approx 3.61\\text{ একক}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -20,8 +24,16 @@
     "description": "কোনো অশূন্য ভেক্টরকে তার পরম মান দিয়ে ভাগ করলে ওই ভেক্টরের দিকে একক ভেক্টর পাওয়া যায়।",
     "practiceQuestions": [
       {
-        "question": "$\\vec{A} = 2\\hat{i} - 2\\hat{j} + \\hat{k}$ ভেক্টরের দিকে বা সমান্তরালে একটি একক ভেক্টর নির্ণয় করো।",
-        "answer": "Ans: $\\hat{a} = \\frac{1}{3}(2\\hat{i} - 2\\hat{j} + \\hat{k})$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -31,8 +43,16 @@
     "description": "A(x₁, y₁, z₁) থেকে B(x₂, y₂, z₂) বিন্দু পর্যন্ত সরণ ভেক্টর।",
     "practiceQuestions": [
       {
-        "question": "$A(1, 2, -1)$ এবং $B(4, 6, 11)$ বিন্দুর মধ্যবর্তী সরণ ভেক্টর $\\vec{AB}$ এবং দূরত্ব নির্ণয় করো।",
-        "answer": "Ans: $\\vec{AB} = 3\\hat{i} + 4\\hat{j} + 12\\hat{k}, \\quad |\\vec{AB}| = 13\\text{ একক}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -42,12 +62,16 @@
     "description": "ভেক্টরটি x, y, z অক্ষের সাথে যথাক্রমে α, β, γ কোণ তৈরি করলে তাদের কোসাইন মান। দ্রষ্টব্য: sin²α + sin²β + sin²γ = 2।",
     "practiceQuestions": [
       {
-        "question": "কোনো ভেক্টর অক্ষত্রয়ের সাথে $\\alpha, \\beta, \\gamma$ কোণ উৎপন্ন করলে $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma$ এর মান কত?",
-        "answer": "Ans: $1$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       },
       {
-        "question": "$\\sin^2\\alpha + \\sin^2\\beta + \\sin^2\\gamma$ এর মান কত?",
-        "answer": "Ans: $2$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -57,8 +81,16 @@
     "description": "P ও Q দুটি ভেক্টর α কোণে একই বিন্দুতে এককালীন ক্রিয়া করলে তাদের লব্ধি ভেক্টরের মান R।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $R = \\sqrt{P^2 + Q^2 + 2PQ\\cos\\alpha}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $R = \\sqrt{P^2 + Q^2 + 2PQ\\cos\\alpha}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -68,8 +100,16 @@
     "description": "P ভেক্টরের সাথে লব্ধি R এর উৎপন্ন কোণ θ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\tan\\theta = \\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha} \\implies \\theta = \\tan^{-1}\\left(\\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\tan\\theta = \\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha} \\implies \\theta = \\tan^{-1}\\left(\\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha}\\right)$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -79,8 +119,16 @@
     "description": "একই দিকে ক্রিয়াশীল হলে সর্বোচ্চ লব্ধি এবং বিপরীত দিকে ক্রিয়াশীল হলে সর্বনিম্ন লব্ধি তৈরি হয়।",
     "practiceQuestions": [
       {
-        "question": "দুটি বলের সর্বোচ্চ লব্ধি $17\\text{ N}$ এবং সর্বনিম্ন লব্ধি $7\\text{ N}$। বল দুটি পরস্পর লম্বভাবে ক্রিয়া করলে লব্ধি কত হবে?",
-        "answer": "Ans: $R = 13\\text{ N}$ (যেখানে বল দুটি $12\\text{ N}$ এবং $5\\text{ N}$)"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -90,8 +138,16 @@
     "description": "দুটি ভেক্টর পরস্পর ৯০° কোণে থাকলে cos 90° = 0 হওয়ার কারণে পিথাগোরাসের উপপাদ্য প্রযোজ্য হয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $R = \\sqrt{P^2 + Q^2}, \\quad \\tan\\theta = \\frac{Q}{P} \\quad (\\alpha = 90^\\circ)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $R = \\sqrt{P^2 + Q^2}, \\quad \\tan\\theta = \\frac{Q}{P} \\quad (\\alpha = 90^\\circ)$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -101,8 +157,16 @@
     "description": "যখন |P| = |Q| হয়, তখন লব্ধি ঠিক তাদের অন্তর্ভুক্ত কোণকে সমদ্বিখণ্ডিত করে (θ = α/2)।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $R = 2P\\cos\\left(\\frac{\\alpha}{2}\\right), \\quad \\theta = \\frac{\\alpha}{2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $R = 2P\\cos\\left(\\frac{\\alpha}{2}\\right), \\quad \\theta = \\frac{\\alpha}{2}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -112,8 +176,16 @@
     "description": "দুটি সমান মানের ভেক্টর ১২০° কোণে ক্রিয়া করলে তাদের লব্ধির মান যেকোনো একটি ভেক্টরের সমান হয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $P = Q = R \\iff \\alpha = 120^\\circ$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $P = Q = R \\iff \\alpha = 120^\\circ$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -123,8 +195,16 @@
     "description": "যদি লব্ধি R ভেক্টর P এর সাথে সমকোণ তৈরি করে, তবে α = cos⁻¹(-P/Q) এবং Q > P হতে হবে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\cos\\alpha = -\\frac{P}{Q}, \\quad R = \\sqrt{Q^2 - P^2} \\quad (\\theta = 90^\\circ)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\cos\\alpha = -\\frac{P}{Q}, \\quad R = \\sqrt{Q^2 - P^2} \\quad (\\theta = 90^\\circ)$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -134,8 +214,16 @@
     "description": "ভেক্টর A অনুভূমিকের সাথে θ কোণে থাকলে তার অনুভূমিক উপাংশ Ax এবং উল্লম্ব উপাংশ Ay।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $A_x = A\\cos\\theta, \\quad A_y = A\\sin\\theta, \\quad |\\vec{A}| = \\sqrt{A_x^2 + A_y^2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $A_x = A\\cos\\theta, \\quad A_y = A\\sin\\theta, \\quad |\\vec{A}| = \\sqrt{A_x^2 + A_y^2}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -145,8 +233,16 @@
     "description": "লব্ধি R কে এমন দুটি দিকে ভাগ করা যেখানে R এর সাথে প্রথম উপাংশ α এবং দ্বিতীয় উপাংশ β কোণ করে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $P = R\\frac{\\sin\\beta}{\\sin(\\alpha + \\beta)}, \\quad Q = R\\frac{\\sin\\alpha}{\\sin(\\alpha + \\beta)}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $P = R\\frac{\\sin\\beta}{\\sin(\\alpha + \\beta)}, \\quad Q = R\\frac{\\sin\\alpha}{\\sin(\\alpha + \\beta)}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -156,8 +252,16 @@
     "description": "ঠেলার সময় প্রযুক্ত বলের উল্লম্ব উপাংশ ওজনকে বাড়িয়ে দেয় (+Fsinθ), আর টানার সময় ওজনকে কমিয়ে দেয় (-Fsinθ); ফলে টানা সহজ।",
     "practiceQuestions": [
       {
-        "question": "একটি লন রোলার টানার সময় এর আপাত ওজন $\\Delta W$ কত হ্রাস পায়? (টান বল $F$, কোণ $\\theta$)",
-        "answer": "Ans: $F\\sin\\theta$ পরিমাণ ওজন হ্রাস পায়"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -167,8 +271,16 @@
     "description": "নূন্যতম দূরত্বে (সোজাসুজি বিপরীত পাড়ে) পৌঁছানোর জন্য স্রোতের প্রতিকূলে α কোণে চালনা করতে হবে। যেখানে u = স্রোতের বেগ, v = নৌকার বেগ (v > u), d = নদীর প্রস্থ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\cos\\alpha = -\\frac{u}{v} \\implies \\alpha = \\cos^{-1}\\left(-\\frac{u}{v}\\right), \\quad w = \\sqrt{v^2 - u^2}, \\quad t = \\frac{d}{\\sqrt{v^2 - u^2}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\cos\\alpha = -\\frac{u}{v} \\implies \\alpha = \\cos^{-1}\\left(-\\frac{u}{v}\\right), \\quad w = \\sqrt{v^2 - u^2}, \\quad t = \\frac{d}{\\sqrt{v^2 - u^2}}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -178,8 +290,16 @@
     "description": "সরাসরি বিপরীত পাড়ের দিকে (α = ৯০°) রওয়ানা দিলে সবচেয়ে কম সময়ে পার হওয়া যায়। x = নদী পাড় বরাবর ড্রিফ্ট/সরণ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $t_{\\text{min}} = \\frac{d}{v} \\; (\\alpha = 90^\\circ), \\quad x = u \\cdot t_{\\text{min}} = \\frac{u d}{v}, \\quad s = \\sqrt{d^2 + x^2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $t_{\\text{min}} = \\frac{d}{v} \\; (\\alpha = 90^\\circ), \\quad x = u \\cdot t_{\\text{min}} = \\frac{u d}{v}, \\quad s = \\sqrt{d^2 + x^2}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -189,8 +309,16 @@
     "description": "স্রোতের সাথে α কোণে রওয়ানা দিলে নদী পার হতে প্রয়োজনীয় সময় t এবং তীরের সমান্তরালে সরণ x।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $t = \\frac{d}{v\\sin\\alpha}, \\quad x = (u + v\\cos\\alpha)t = \\frac{(u + v\\cos\\alpha)d}{v\\sin\\alpha}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $t = \\frac{d}{v\\sin\\alpha}, \\quad x = (u + v\\cos\\alpha)t = \\frac{(u + v\\cos\\alpha)d}{v\\sin\\alpha}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -200,8 +328,16 @@
     "description": "B এর সাপেক্ষে A এর আপেক্ষিক বেগ নির্ণয় করতে যার সাপেক্ষে বেগ তার ভেক্টর বিয়োগ করতে হয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{v}_{AB} = \\vec{v}_A - \\vec{v}_B = \\sqrt{v_A^2 + v_B^2 - 2v_Av_B\\cos\\theta}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{v}_{AB} = \\vec{v}_A - \\vec{v}_B = \\sqrt{v_A^2 + v_B^2 - 2v_Av_B\\cos\\theta}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -211,8 +347,16 @@
     "description": "উল্লম্বের সাথে ছাতা ধরার কোণ θ। v_rain = বৃষ্টির বেগ (খাড়া নিচের দিকে), v_wind = বাতাসের অনুভূমিক বেগ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\tan\\theta = \\frac{v_{\\text{wind}}}{v_{\\text{rain}}} \\implies \\theta = \\tan^{-1}\\left(\\frac{v_{\\text{wind}}}{v_{\\text{rain}}}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\tan\\theta = \\frac{v_{\\text{wind}}}{v_{\\text{rain}}} \\implies \\theta = \\tan^{-1}\\left(\\frac{v_{\\text{wind}}}{v_{\\text{rain}}}\\right)$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -222,8 +366,16 @@
     "description": "বাতাসের বিপরীতে সাইকেল চালালে (+) এবং বাতাসের অনুকূলে সাইকেল চালালে (-) চিহ্ন বসে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\tan\\theta = \\frac{v_{\\text{man}} \\pm v_{\\text{wind}}}{v_{\\text{rain}}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\tan\\theta = \\frac{v_{\\text{man}} \\pm v_{\\text{wind}}}{v_{\\text{rain}}}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -233,8 +385,16 @@
     "description": "দুটি ভেক্টরের মান এবং তাদের মধ্যবর্তী ক্ষুদ্রতর কোণের কোসাইনের গুণফল।",
     "practiceQuestions": [
       {
-        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - 4\\hat{k}$ এবং $\\vec{B} = 5\\hat{i} - 2\\hat{j} + \\hat{k}$ হলে $\\vec{A} \\cdot \\vec{B}$ এর মান কত?",
-        "answer": "Ans: $(2)(5) + (3)(-2) + (-4)(1) = 10 - 6 - 4 = 0$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -244,8 +404,16 @@
     "description": "ডট গুণনের সাহায্যে দুটি ভেক্টরের মধ্যবর্তী কোণ নির্ণয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\theta = \\cos^{-1}\\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}||\\vec{B}|}\\right) = \\cos^{-1}\\left(\\frac{A_x B_x + A_y B_y + A_z B_z}{\\sqrt{A_x^2 + A_y^2 + A_z^2}\\sqrt{B_x^2 + B_y^2 + B_z^2}}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\theta = \\cos^{-1}\\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}||\\vec{B}|}\\right) = \\cos^{-1}\\left(\\frac{A_x B_x + A_y B_y + A_z B_z}{\\sqrt{A_x^2 + A_y^2 + A_z^2}\\sqrt{B_x^2 + B_y^2 + B_z^2}}\\right)$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -255,8 +423,16 @@
     "description": "যেহেতু cos 90° = 0, দুটি অশূন্য ভেক্টরের ডট গুণন শূন্য হলে তারা পরস্পর লম্ব।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0 \\iff A_x B_x + A_y B_y + A_z B_z = 0$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0 \\iff A_x B_x + A_y B_y + A_z B_z = 0$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -266,8 +442,16 @@
     "description": "B ভেক্টরের উপর A ভেক্টরের স্কেলার অভিক্ষেপ (A cos θ)। অনুরূপভাবে A এর উপর B এর অভিক্ষেপ = (A·B)/|A|।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{Projection of } \\vec{A} \\text{ on } \\vec{B} = A\\cos\\theta = \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{Projection of } \\vec{A} \\text{ on } \\vec{B} = A\\cos\\theta = \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -277,8 +461,16 @@
     "description": "অভিক্ষেপের সাথে দিক নির্দেশক একক ভেক্টর গুণ করে প্রাপ্ত ভেক্টর উপাংশ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{Component of } \\vec{A} \\text{ along } \\vec{B} = (A\\cos\\theta)\\hat{b} = \\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|^2}\\right)\\vec{B}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{Component of } \\vec{A} \\text{ along } \\vec{B} = (A\\cos\\theta)\\hat{b} = \\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|^2}\\right)\\vec{B}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -288,8 +480,16 @@
     "description": "ক্রস গুণফলের মান AB sin θ এবং দিক ডানহাতি স্ক্রু নিয়ম (Right-Hand Rule) অনুযায়ী একক লম্ব ভেক্টর η̂ দ্বারা নির্ধারিত।",
     "practiceQuestions": [
       {
-        "question": "$\\hat{i} \\times \\hat{j} = \\hat{k}$ এবং $\\hat{j} \\times \\hat{i}$ এর মান কত?",
-        "answer": "Ans: $-\\hat{k}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -299,8 +499,16 @@
     "description": "ভেক্টর A ও B যে সমতলে অবস্থিত তার উপর লম্ব একক ভেক্টর।",
     "practiceQuestions": [
       {
-        "question": "$\\vec{A} = 2\\hat{i} - 2\\hat{j} + \\hat{k}$ ভেক্টরের দিকে বা সমান্তরালে একটি একক ভেক্টর নির্ণয় করো।",
-        "answer": "Ans: $\\hat{a} = \\frac{1}{3}(2\\hat{i} - 2\\hat{j} + \\hat{k})$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -310,8 +518,16 @@
     "description": "দুটি ভেক্টরের অনুরূপ উপাংশগুলোর অনুপাত সমান হলে ভেক্টর দুটি পরস্পর সমান্তরাল।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{A} \\parallel \\vec{B} \\iff \\vec{A} \\times \\vec{B} = \\vec{0} \\iff \\frac{A_x}{B_x} = \\frac{A_y}{B_y} = \\frac{A_z}{B_z}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{A} \\parallel \\vec{B} \\iff \\vec{A} \\times \\vec{B} = \\vec{0} \\iff \\frac{A_x}{B_x} = \\frac{A_y}{B_y} = \\frac{A_z}{B_z}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -321,8 +537,16 @@
     "description": "যদি A ও B কোনো ত্রিভুজের দুটি সন্নিহিত বাহু নির্দেশ করে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{Area} = \\frac{1}{2}|\\vec{A} \\times \\vec{B}|$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{Area} = \\frac{1}{2}|\\vec{A} \\times \\vec{B}|$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -332,8 +556,16 @@
     "description": "যদি A ও B কোনো সামান্তরিকের দুটি সন্নিহিত বাহু নির্দেশ করে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{Area} = |\\vec{A} \\times \\vec{B}|$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{Area} = |\\vec{A} \\times \\vec{B}|$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -343,8 +575,16 @@
     "description": "যদি d₁ ও d₂ সামান্তরিক বা রম্বসের দুটি কর্ণ নির্দেশক ভেক্টর হয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{Area} = \\frac{1}{2}|\\vec{d}_1 \\times \\vec{d}_2|$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{Area} = \\frac{1}{2}|\\vec{d}_1 \\times \\vec{d}_2|$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -354,8 +594,16 @@
     "description": "তিনটি ভেক্টরের স্কেলার ত্রৈধ গুণন (Scalar Triple Product) শূন্য হলে তারা একই সমতলে অবস্থান করে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{A} \\cdot (\\vec{B} \\times \\vec{C}) = 0 \\iff \\begin{vmatrix} A_x & A_y & A_z \\\\ B_x & B_y & B_z \\\\ C_x & C_y & C_z \\end{vmatrix} = 0$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{A} \\cdot (\\vec{B} \\times \\vec{C}) = 0 \\iff \\begin{vmatrix} A_x & A_y & A_z \\\\ B_x & B_y & B_z \\\\ C_x & C_y & C_z \\end{vmatrix} = 0$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -365,8 +613,16 @@
     "description": "গ্রেডিয়েন্ট একটি স্কেলার ক্ষেত্রকে ভেক্টর ক্ষেত্রে রূপান্তরিত করে এবং স্কেলার রাশির সর্বাধিক বৃদ্ধির হার নির্দেশ করে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{\\nabla} = \\hat{i}\\frac{\\partial}{\\partial x} + \\hat{j}\\frac{\\partial}{\\partial y} + \\hat{k}\\frac{\\partial}{\\partial z}, \\quad \\text{grad}\\,\\phi = \\vec{\\nabla}\\phi = \\hat{i}\\frac{\\partial\\phi}{\\partial x} + \\hat{j}\\frac{\\partial\\phi}{\\partial y} + \\hat{k}\\frac{\\partial\\phi}{\\partial z}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{\\nabla} = \\hat{i}\\frac{\\partial}{\\partial x} + \\hat{j}\\frac{\\partial}{\\partial y} + \\hat{k}\\frac{\\partial}{\\partial z}, \\quad \\text{grad}\\,\\phi = \\vec{\\nabla}\\phi = \\hat{i}\\frac{\\partial\\phi}{\\partial x} + \\hat{j}\\frac{\\partial\\phi}{\\partial y} + \\hat{k}\\frac{\\partial\\phi}{\\partial z}$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -376,8 +632,16 @@
     "description": "ডাইভারজেন্স ভেক্টর ক্ষেত্র থেকে স্কেলার রাশি দেয় (একক আয়তনে নির্গমন বা ফ্লাক্সের হার)। div V = 0 হলে ক্ষেত্রটি সলিনয়েডাল (ঘনত্ব অপরিবর্তিত)।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{div}\\,\\vec{V} = \\vec{\\nabla} \\cdot \\vec{V} = \\frac{\\partial V_x}{\\partial x} + \\frac{\\partial V_y}{\\partial y} + \\frac{\\partial V_z}{\\partial z}, \\quad \\vec{\\nabla} \\cdot \\vec{V} = 0 \\implies \\text{Solenoidal}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{div}\\,\\vec{V} = \\vec{\\nabla} \\cdot \\vec{V} = \\frac{\\partial V_x}{\\partial x} + \\frac{\\partial V_y}{\\partial y} + \\frac{\\partial V_z}{\\partial z}, \\quad \\vec{\\nabla} \\cdot \\vec{V} = 0 \\implies \\text{Solenoidal}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   },
@@ -387,8 +651,16 @@
     "description": "কার্ল ভেক্টর ক্ষেত্রের ঘূর্ণন প্রবণতা নির্দেশ করে। curl V = 0 হলে ক্ষেত্রটি অঘূর্ণনশীল এবং বলটি সংরক্ষণশীল (Conservative)।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\text{curl}\\,\\vec{V} = \\vec{\\nabla} \\times \\vec{V} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ \\frac{\\partial}{\\partial x} & \\frac{\\partial}{\\partial y} & \\frac{\\partial}{\\partial z} \\\\ V_x & V_y & V_z \\end{vmatrix}, \\quad \\vec{\\nabla} \\times \\vec{V} = \\vec{0} \\implies \\text{Irrotational}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\text{curl}\\,\\vec{V} = \\vec{\\nabla} \\times \\vec{V} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ \\frac{\\partial}{\\partial x} & \\frac{\\partial}{\\partial y} & \\frac{\\partial}{\\partial z} \\\\ V_x & V_y & V_z \\end{vmatrix}, \\quad \\vec{\\nabla} \\times \\vec{V} = \\vec{0} \\implies \\text{Irrotational}$"
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -398,8 +670,16 @@
     "description": "ঘূর্ণায়মান কণার রৈখিক বেগ v, কৌণিক বেগ ω এবং অবস্থান ভেক্টর r এর মধ্যে ভেক্টর গুণফল সম্পর্ক।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{v} = \\vec{\\omega} \\times \\vec{r}, \\quad \\vec{\\omega} = \\frac{1}{2}(\\vec{\\nabla} \\times \\vec{v})$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{v} = \\vec{\\omega} \\times \\vec{r}, \\quad \\vec{\\omega} = \\frac{1}{2}(\\vec{\\nabla} \\times \\vec{v})$"
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
+      },
+      {
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
       }
     ]
   },
@@ -409,8 +689,16 @@
     "description": "একই বিন্দুতে ক্রিয়াশীল তিনটি বল সাম্যাবস্থায় থাকলে প্রতিটি বল অপর দুটি বলের অন্তর্ভুক্ত কোণের সাইনের সমানুপাতিক।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\frac{P}{\\sin\\alpha} = \\frac{Q}{\\sin\\beta} = \\frac{R}{\\sin\\gamma}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\frac{P}{\\sin\\alpha} = \\frac{Q}{\\sin\\beta} = \\frac{R}{\\sin\\gamma}$"
+        "question": "দুটি সমান মানের বলের লব্ধির মান তাদের যেকোনো একটির মানের সমান হলে বলদ্বয়ের মধ্যবর্তী কোণ $\\alpha$ কত?",
+        "answer": "Ans: $R^2 = P^2 + P^2 + 2P^2\\cos\\alpha \\implies P^2 = 2P^2(1+\\cos\\alpha) \\implies \\cos\\alpha = -\\frac{1}{2} \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "একটি নদীতে স্রোতের বেগ $3\\text{ km/h}$ এবং নৌকার বেগ $6\\text{ km/h}$। সোজাসুজি অপর পাড়ে পৌঁছাতে নৌকাকে স্রোতের সাথে কত কোণে চালাতে হবে?",
+        "answer": "Ans: $\\cos\\alpha = -\\frac{u}{v} = -\\frac{3}{6} = -0.5 \\implies \\alpha = 120^\\circ$"
+      },
+      {
+        "question": "$\\vec{A} = 2\\hat{i} + 3\\hat{j} - \\hat{k}$ এবং $\\vec{B} = 4\\hat{i} + m\\hat{j} + 2\\hat{k}$ ভেক্টরদ্বয় পরস্পর লম্ব হলে $m$ এর মান নির্ণয় করো।",
+        "answer": "Ans: $\\vec{A} \\cdot \\vec{B} = 0 \\implies (2)(4) + (3)(m) + (-1)(2) = 0 \\implies 8 + 3m - 2 = 0 \\implies m = -2$"
       }
     ]
   }

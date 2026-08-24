@@ -471,44 +471,6 @@ class _BookFormulaCard extends StatelessWidget {
                     ),
                   ),
                 ],
-
-                // 4. Clickable Bottom Action Bar for BUET Written Practice Questions
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: const Color(0xFF059669).withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        LucideIcons.penTool,
-                        size: 13,
-                        color: Color(0xFF059669),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'বুয়েট ও বোর্ড লিখিত প্রশ্ন প্র্যাকটিস করুন',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'HindSiliguri',
-                          color: Color(0xFF059669),
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(
-                        LucideIcons.chevronRight,
-                        size: 14,
-                        color: Color(0xFF059669),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),

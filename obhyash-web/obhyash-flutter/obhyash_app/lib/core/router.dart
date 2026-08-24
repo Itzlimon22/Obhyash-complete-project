@@ -200,6 +200,39 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             _fadeRoute(const BlogView(), state),
       ),
+      GoRoute(
+        path: '/formulas',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const FormulaSubjectsView(), state),
+        routes: [
+          GoRoute(
+            path: ':subjectId',
+            parentNavigatorKey: rootNavigatorKey,
+            pageBuilder: (context, state) {
+              final subjectId = state.pathParameters['subjectId']!;
+              return _fadeRoute(FormulaChaptersView(subjectId: subjectId), state);
+            },
+            routes: [
+              GoRoute(
+                path: ':chapterId',
+                parentNavigatorKey: rootNavigatorKey,
+                pageBuilder: (context, state) {
+                  final subjectId = state.pathParameters['subjectId']!;
+                  final chapterId = state.pathParameters['chapterId']!;
+                  return _fadeRoute(
+                    FormulaDetailView(
+                      subjectId: subjectId,
+                      chapterId: chapterId,
+                    ),
+                    state,
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
       // Stateful shell route for bottom tabs and drawer items
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -266,32 +299,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                               state.pathParameters['category'] ?? 'all';
                           return LiveExamCategoryView(category: category);
                         },
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: 'formulas',
-                    builder: (context, state) => const FormulaSubjectsView(),
-                    routes: [
-                      GoRoute(
-                        path: ':subjectId',
-                        builder: (context, state) {
-                          final subjectId = state.pathParameters['subjectId']!;
-                          return FormulaChaptersView(subjectId: subjectId);
-                        },
-                        routes: [
-                          GoRoute(
-                            path: ':chapterId',
-                            builder: (context, state) {
-                              final subjectId = state.pathParameters['subjectId']!;
-                              final chapterId = state.pathParameters['chapterId']!;
-                              return FormulaDetailView(
-                                subjectId: subjectId,
-                                chapterId: chapterId,
-                              );
-                            },
-                          ),
-                        ],
                       ),
                     ],
                   ),

@@ -5,8 +5,16 @@
     "description": "ভরবেগের পরিবর্তনের হার প্রযুক্ত বলের সমানুপাতিক এবং বল যেদিকে ক্রিয়া করে ভরবেগের পরিবর্তনও সেদিকে ঘটে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{p} = m\\vec{v}, \\quad \\vec{F} = \\frac{d\\vec{p}}{dt} = m\\vec{a} = m\\frac{v - u}{t}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{p} = m\\vec{v}, \\quad \\vec{F} = \\frac{d\\vec{p}}{dt} = m\\vec{a} = m\\frac{v - u}{t}$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -16,8 +24,16 @@
     "description": "খুব অল্প সময়ের জন্য প্রযুক্ত বৃহৎ বল এবং সময়ের গুণফল হলো বলের ঘাত, যা ভরবেগের পরিবর্তনের সমান।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $J = \\vec{F} \\Delta t = \\Delta \\vec{p} = m(v - u) = \\int_{t_1}^{t_2} F\\,dt$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $J = \\vec{F} \\Delta t = \\Delta \\vec{p} = m(v - u) = \\int_{t_1}^{t_2} F\\,dt$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -27,8 +43,16 @@
     "description": "বাহ্যিক বল শূন্য হলে কোনো ব্যবস্থার আদি ভরবেগ ও শেষ ভরবেগ অপরিবর্তিত থাকে। V = সংঘর্ষের পর মিলিত বস্তুর বেগ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2, \\quad V_{\\text{combined}} = \\frac{m_1 u_1 + m_2 u_2}{m_1 + m_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2, \\quad V_{\\text{combined}} = \\frac{m_1 u_1 + m_2 u_2}{m_1 + m_2}$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -38,8 +62,16 @@
     "description": "ভর সমান হলে (m₁ = m₂) সংঘর্ষের পর বেগ পরস্পর বিনিময় হয় (v₁ = u₂, v₂ = u₁)।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $v_1 = \\left(\\frac{m_1 - m_2}{m_1 + m_2}\\right)u_1 + \\left(\\frac{2m_2}{m_1 + m_2}\\right)u_2, \\quad v_2 = \\left(\\frac{2m_1}{m_1 + m_2}\\right)u_1 + \\left(\\frac{m_2 - m_1}{m_1 + m_2}\\right)u_2$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $v_1 = \\left(\\frac{m_1 - m_2}{m_1 + m_2}\\right)u_1 + \\left(\\frac{2m_2}{m_1 + m_2}\\right)u_2, \\quad v_2 = \\left(\\frac{2m_1}{m_1 + m_2}\\right)u_1 + \\left(\\frac{m_2 - m_1}{m_1 + m_2}\\right)u_2$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -49,8 +81,16 @@
     "description": "e = 1 হলে পূর্ণ স্থিতিস্থাপক, e = 0 হলে পূর্ণ অস্থিতিস্থাপক (মিলিত বস্তু), 0 < e < 1 হলে আংশিক স্থিতিস্থাপক।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $e = \\frac{v_2 - v_1}{u_1 - u_2}, \\quad \\Delta E_k = \\frac{1}{2}\\frac{m_1 m_2}{m_1 + m_2}(1 - e^2)(u_1 - u_2)^2$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $e = \\frac{v_2 - v_1}{u_1 - u_2}, \\quad \\Delta E_k = \\frac{1}{2}\\frac{m_1 m_2}{m_1 + m_2}(1 - e^2)(u_1 - u_2)^2$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -60,8 +100,16 @@
     "description": "e = পুনর্গঠন গুণাঙ্ক, h₀ = আদি উচ্চতা, hn = n-তম বাউন্সের পর অর্জিত উচ্চতা।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $h_n = e^{2n}h_0, \\quad v_n = e^n v_0, \\quad t_{\\text{total}} = \\sqrt{\\frac{2h_0}{g}}\\left(\\frac{1 + e}{1 - e}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $h_n = e^{2n}h_0, \\quad v_n = e^n v_0, \\quad t_{\\text{total}} = \\sqrt{\\frac{2h_0}{g}}\\left(\\frac{1 + e}{1 - e}\\right)$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -71,8 +119,16 @@
     "description": "M = বন্দুকের ভর, V = বন্দুকের পশ্চাৎ বেগ, m = গুলির ভর, v = গুলির বেগ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $MV + mv = 0 \\implies V = -\\frac{mv}{M}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $MV + mv = 0 \\implies V = -\\frac{mv}{M}$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -82,8 +138,16 @@
     "description": "ve = নির্গত গ্যাসের আপেক্ষিক বেগ, (Δm/Δt) = জ্বালানি খরচের হার, m = রকেটের তাৎক্ষণিক ভর।",
     "practiceQuestions": [
       {
-        "question": "$5000\\text{ kg}$ ভরের রকেট থেকে প্রতি সেকেন্ডে $40\\text{ kg}$ গ্যাস $1500\\text{ m/s}$ বেগে নির্গত হলে ধাক্কা বল কত?",
-        "answer": "Ans: $F = 60,000\\text{ N} = 60\\text{ kN}$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -93,8 +157,16 @@
     "description": "m₀ = জ্বালানিসহ আদি ভর, m = অবশিষ্ট ভর, ve = জ্বালানি নির্গমন বেগ।",
     "practiceQuestions": [
       {
-        "question": "$5000\\text{ kg}$ ভরের রকেট থেকে প্রতি সেকেন্ডে $40\\text{ kg}$ গ্যাস $1500\\text{ m/s}$ বেগে নির্গত হলে ধাক্কা বল কত?",
-        "answer": "Ans: $F = 60,000\\text{ N} = 60\\text{ kN}$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -104,8 +176,16 @@
     "description": "একটি কপিকেলের দুই পাশে মুক্তভাবে ঝুলন্ত m₁ ও m₂ ভরের জন্য সাধারণ ত্বরণ ও সুতার টান।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $a = \\frac{(m_1 - m_2)g}{m_1 + m_2}, \\quad T = \\frac{2m_1 m_2 g}{m_1 + m_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $a = \\frac{(m_1 - m_2)g}{m_1 + m_2}, \\quad T = \\frac{2m_1 m_2 g}{m_1 + m_2}$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -115,8 +195,16 @@
     "description": "m₂ টেবিলের উপর ঘর্ষণযুক্ত তলে এবং m₁ প্রান্তে ঝুলন্ত অবস্থায় থাকলে।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $a = \\frac{m_1 - \\mu m_2}{m_1 + m_2}g, \\quad T = \\frac{m_1 m_2(1 + \\mu)g}{m_1 + m_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $a = \\frac{m_1 - \\mu m_2}{m_1 + m_2}g, \\quad T = \\frac{m_1 m_2(1 + \\mu)g}{m_1 + m_2}$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -126,8 +214,16 @@
     "description": "লিফট a ত্বরণে উপরে উঠলে আপাত ওজন বৃদ্ধি পায়, নিচে নামলে হ্রাস পায় এবং মুক্ত পতনে ওজনহীনতা অনুভূত হয়।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $R = m(g + a) \\; (\\text{উপরে}), \\quad R = m(g - a) \\; (\\text{নিচে}), \\quad R = 0 \\; (\\text{মুক্ত পতন } a = g)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $R = m(g + a) \\; (\\text{উপরে}), \\quad R = m(g - a) \\; (\\text{নিচে}), \\quad R = 0 \\; (\\text{মুক্ত পতন } a = g)$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -137,8 +233,16 @@
     "description": "μs = স্থৈতিক ঘর্ষণ গুণাঙ্ক, μk = গতীয় ঘর্ষণ গুণাঙ্ক, θs = নিশ্চল কোণ (Angle of repose)।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $f_s = \\mu_s R = \\mu_s mg, \\quad \\mu_s = \\tan\\theta_s, \\quad f_k = \\mu_k R = \\mu_k mg$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $f_s = \\mu_s R = \\mu_s mg, \\quad \\mu_s = \\tan\\theta_s, \\quad f_k = \\mu_k R = \\mu_k mg$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -148,8 +252,16 @@
     "description": "θ কোণের আনত তল বেয়ে বস্তু নিচে নামার সময় ত্বরণ এবং উপরে ওঠার সময় মন্দন।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $a_{\\text{down}} = g(\\sin\\theta - \\mu_k\\cos\\theta), \\quad a_{\\text{up}} = g(\\sin\\theta + \\mu_k\\cos\\theta)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $a_{\\text{down}} = g(\\sin\\theta - \\mu_k\\cos\\theta), \\quad a_{\\text{up}} = g(\\sin\\theta + \\mu_k\\cos\\theta)$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -159,8 +271,16 @@
     "description": "ω = কৌণিক বেগ (rad/s), T = পর্যায়কাল, f = কম্পাঙ্ক, r = ব্যাসার্ধ, α = কৌণিক ত্বরণ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\omega = \\frac{\\theta}{t} = \\frac{2\\pi}{T} = 2\\pi f, \\quad v = \\omega r, \\quad a_t = \\alpha r$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\omega = \\frac{\\theta}{t} = \\frac{2\\pi}{T} = 2\\pi f, \\quad v = \\omega r, \\quad a_t = \\alpha r$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -170,8 +290,16 @@
     "description": "বৃত্তাকার পথে ঘূর্ণনরত বস্তুর কেন্দ্রাভিমুখী কার্যকর ত্বরণ এবং প্রয়োজনীয় কেন্দ্রমুখী বল।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $a_c = \\frac{v^2}{r} = \\omega^2 r = v\\omega, \\quad F_c = \\frac{mv^2}{r} = m\\omega^2 r$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $a_c = \\frac{v^2}{r} = \\omega^2 r = v\\omega, \\quad F_c = \\frac{mv^2}{r} = m\\omega^2 r$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -181,8 +309,16 @@
     "description": "উল্লম্ব তলে বৃত্তাকার ঘূর্ণন সম্পন্ন করার জন্য সর্বনিম্ন ও সর্বোচ্চ বিন্দুর নূন্যতম বেগ এবং টানের পার্থক্য।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $v_{\\text{bottom}} \\ge \\sqrt{5gr}, \\quad v_{\\text{top}} \\ge \\sqrt{gr}, \\quad T_{\\text{bottom}} - T_{\\text{top}} = 6mg$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $v_{\\text{bottom}} \\ge \\sqrt{5gr}, \\quad v_{\\text{top}} \\ge \\sqrt{gr}, \\quad T_{\\text{bottom}} - T_{\\text{top}} = 6mg$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -192,8 +328,16 @@
     "description": "L = সুতার দৈর্ঘ্য, θ = উল্লম্বের সাথে কোণ, r = L sin θ = বৃত্তাকার পথের ব্যাসার্ধ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $T = 2\\pi\\sqrt{\\frac{L\\cos\\theta}{g}}, \\quad v = \\sqrt{rg\\tan\\theta}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $T = 2\\pi\\sqrt{\\frac{L\\cos\\theta}{g}}, \\quad v = \\sqrt{rg\\tan\\theta}$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -203,8 +347,16 @@
     "description": "θ = ব্যাংকিং কোণ, h = বাইরের প্রান্তের উচ্চতা, d = রাস্তার প্রস্থ, r = বাঁকের ব্যাসার্ধ, v = নিরাপদ সর্বোচ্চ বেগ।",
     "practiceQuestions": [
       {
-        "question": "$50\\text{ m}$ ব্যাসার্ধের বাঁকে $14\\text{ m/s}$ বেগে মোড় নিতে কত কোণে ব্যাংকিং করতে হবে? ($g = 9.8\\text{ m/s}^2$)",
-        "answer": "Ans: $\\theta = \\tan^{-1}\\left(\\frac{14^2}{50 \\times 9.8}\\right) = \\tan^{-1}(0.4) \\approx 21.8^\\circ$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -214,8 +366,16 @@
     "description": "ঘর্ষণ গুণাঙ্ক μs বিদ্যমান থাকলে সর্বোচ্চ স্কিড না করে বাঁক নেওয়ার বেগ।",
     "practiceQuestions": [
       {
-        "question": "$50\\text{ m}$ ব্যাসার্ধের বাঁকে $14\\text{ m/s}$ বেগে মোড় নিতে কত কোণে ব্যাংকিং করতে হবে? ($g = 9.8\\text{ m/s}^2$)",
-        "answer": "Ans: $\\theta = \\tan^{-1}\\left(\\frac{14^2}{50 \\times 9.8}\\right) = \\tan^{-1}(0.4) \\approx 21.8^\\circ$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -225,8 +385,16 @@
     "description": "কোনো অক্ষের সাপেক্ষে ঘূর্ণনরত কণাগুলোর ভর এবং দূরত্বের বর্গের গুণফলের সমষ্টি। k = চক্রগতির ব্যাসার্ধ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $I = \\sum m_i r_i^2 = \\int r^2\\,dm = Mk^2 \\implies k = \\sqrt{\\frac{I}{M}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $I = \\sum m_i r_i^2 = \\int r^2\\,dm = Mk^2 \\implies k = \\sqrt{\\frac{I}{M}}$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -236,8 +404,16 @@
     "description": "IG = ভরকেন্দ্রগামী অক্ষের সাপেক্ষে জড়তার ভ্রামক, h = দুটি সমান্তরাল অক্ষের দূরত্ব।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $I = I_G + Mh^2 \\; (\\text{সমান্তরাল অক্ষ}), \\quad I_z = I_x + I_y \\; (\\text{লম্ব অক্ষ})$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $I = I_G + Mh^2 \\; (\\text{সমান্তরাল অক্ষ}), \\quad I_z = I_x + I_y \\; (\\text{লম্ব অক্ষ})$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -247,8 +423,16 @@
     "description": "সরু সুষম দণ্ড (মাঝখান ও একপ্রান্ত), নিরেট চাকতি, নিরেট গোলক এবং ফাঁপা গোলকের কেন্দ্রগামী জড়তার ভ্রামক।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $I_{\\text{rod, center}} = \\frac{1}{12}ML^2, \\; I_{\\text{rod, end}} = \\frac{1}{3}ML^2, \\; I_{\\text{disc}} = \\frac{1}{2}MR^2, \\; I_{\\text{solid sphere}} = \\frac{2}{5}MR^2, \\; I_{\\text{hollow sphere}} = \\frac{2}{3}MR^2$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $I_{\\text{rod, center}} = \\frac{1}{12}ML^2, \\; I_{\\text{rod, end}} = \\frac{1}{3}ML^2, \\; I_{\\text{disc}} = \\frac{1}{2}MR^2, \\; I_{\\text{solid sphere}} = \\frac{2}{5}MR^2, \\; I_{\\text{hollow sphere}} = \\frac{2}{3}MR^2$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   },
@@ -258,8 +442,16 @@
     "description": "টর্ক τ হলো ঘূর্ণন সৃষ্টিকারী বলের ভ্রামক এবং L হলো কৌণিক ভরবেগ।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $\\vec{\\tau} = \\vec{r} \\times \\vec{F} = I\\vec{\\alpha}, \\quad \\vec{L} = \\vec{r} \\times \\vec{p} = I\\vec{\\omega}, \\quad \\vec{\\tau} = \\frac{d\\vec{L}}{dt}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $\\vec{\\tau} = \\vec{r} \\times \\vec{F} = I\\vec{\\alpha}, \\quad \\vec{L} = \\vec{r} \\times \\vec{p} = I\\vec{\\omega}, \\quad \\vec{\\tau} = \\frac{d\\vec{L}}{dt}$"
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
       }
     ]
   },
@@ -269,8 +461,16 @@
     "description": "বাহ্যিক টর্ক শূন্য হলে কৌণিক ভরবেগ ধ্রুব থাকে (I₁ω₁ = I₂ω₂)। Ek = ঘূর্ণন গতিশক্তি।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $I_1\\omega_1 = I_2\\omega_2, \\quad E_k = \\frac{1}{2}I\\omega^2 = \\frac{L^2}{2I}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $I_1\\omega_1 = I_2\\omega_2, \\quad E_k = \\frac{1}{2}I\\omega^2 = \\frac{L^2}{2I}$"
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
+      },
+      {
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
       }
     ]
   },
@@ -280,8 +480,16 @@
     "description": "স্লিপ ছাড়া গড়াগড়ি খাওয়া বস্তুর রৈখিক গতিশক্তি ও ঘূর্ণন গতিশক্তির সমষ্টি।",
     "practiceQuestions": [
       {
-        "question": "প্রদত্ত সূত্র $E_{\\text{total}} = \\frac{1}{2}mv^2 + \\frac{1}{2}I\\omega^2 = \\frac{1}{2}mv^2\\left(1 + \\frac{k^2}{R^2}\\right), \\quad a = \\frac{g\\sin\\theta}{1 + \\frac{k^2}{R^2}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
-        "answer": "Ans: সূত্র সমীকরণ: $E_{\\text{total}} = \\frac{1}{2}mv^2 + \\frac{1}{2}I\\omega^2 = \\frac{1}{2}mv^2\\left(1 + \\frac{k^2}{R^2}\\right), \\quad a = \\frac{g\\sin\\theta}{1 + \\frac{k^2}{R^2}}$"
+        "question": "$100\\text{ m}$ ব্যাসার্ধের একটি অনুভূমিক বাঁকে $50\\text{ km/h}$ বেগে গাড়ি নিরাপদভাবে মোড় নিতে ব্যাংকিং কোণ $\\theta$ কত হওয়া প্রয়োজন?",
+        "answer": "Ans: $v = \\frac{50}{3.6} = 13.89\\text{ m/s} \\implies \\tan\\theta = \\frac{v^2}{rg} = \\frac{(13.89)^2}{100 \\times 9.8} = 0.1968 \\implies \\theta \\approx 11.13^\\circ$"
+      },
+      {
+        "question": "$2\\text{ kg}$ ভরের একটি সুষম গোলকের ব্যাসার্ধ $0.2\\text{ m}$ হলে এর নিজস্ব ব্যাসের সাপেক্ষে জড়তার ভ্রামক ($I$) কত?",
+        "answer": "Ans: $I = \\frac{2}{5}MR^2 = \\frac{2}{5}(2)(0.2)^2 = 0.032\\text{ kg}\\cdot\\text{m}^2$"
+      },
+      {
+        "question": "$1000\\text{ kg}$ ভরের একটি গাড়ি $54\\text{ km/h}$ বেগে চলার সময় ব্রেক চেপে $15\\text{ m}$ দূরত্বে থামানো হলো। প্রযুক্ত বাধা দানকারী বলের মান কত?",
+        "answer": "Ans: $v_0 = 15\\text{ m/s} \\implies a = \\frac{v_0^2}{2s} = \\frac{225}{30} = 7.5\\text{ m/s}^2 \\implies F = ma = 1000 \\times 7.5 = 7500\\text{ N}$"
       }
     ]
   }
