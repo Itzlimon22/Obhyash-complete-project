@@ -28,7 +28,7 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
           .order('created_at', ascending: false)
           .limit(50);
 
-      final List list = response is List ? response : [];
+      final list = (response as List<dynamic>?) ?? [];
       return list.map((json) => AppNotification.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       debugPrint('[NotificationsNotifier] fetch error: $e');

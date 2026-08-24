@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -227,8 +226,28 @@ class NotificationService {
           },
           onConflict: 'fcm_token',
         );
-        debugPrint('[NotificationService] FCM token successfully registered to Supabase');
+        debugPrint('[NotificationService] FCM token successfully registered to Supabase: ${token.substring(0, 12)}...');
       }
+
+      // Listen for token refreshes
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+        try {
+          final sb = Supabase.instance.client;
+          await sb.from('user_fcm_tokens').upsert(
+            {
+              'user_id': userId,
+              'fcm_token': newToken,
+              'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+              'is_active': true,
+              'last_seen_at': DateTime.now().toIso8601String(),
+            },
+            onConflict: 'fcm_token',
+          );
+          debugPrint('[NotificationService] Refreshed FCM token updated in Supabase');
+        } catch (e) {
+          debugPrint('[NotificationService] onTokenRefresh sync error: $e');
+        }
+      });
     } catch (e) {
       debugPrint('[NotificationService] syncFCMToken warning: $e');
     }
@@ -245,10 +264,12 @@ class NotificationService {
   }) async {
     if (!_isInitialized) await initialize();
 
-    final payloadData = {
-      if (route != null) 'route': route,
-      if (extraData != null) ...extraData,
+    final payloadData = <String, dynamic>{
+      ...?extraData,
     };
+    if (route != null) {
+      payloadData['route'] = route;
+    }
 
     final androidDetails = AndroidNotificationDetails(
       channelId,

@@ -295,3 +295,64 @@ export const getUserReports = async (
     return [];
   }
 };
+
+/**
+ * Admin 1-Click Resolution for Reported / Quarantined Questions
+ */
+export const adminResolveQuestion = async (params: {
+  questionId: string;
+  action: 'APPROVE_FIXED' | 'DISMISS_FALSE_ALARM' | 'DELETE_QUESTION';
+  updatedQuestion?: string;
+  updatedOptions?: string[];
+  updatedAnswerIndices?: number[];
+  updatedExplanation?: string;
+  adminComment?: string;
+}): Promise<{ success: boolean; message?: string }> => {
+  if (!isSupabaseConfigured()) {
+    return { success: false, message: 'Database not configured' };
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('admin_resolve_question', {
+      p_question_id: params.questionId,
+      p_action: params.action,
+      p_updated_question: params.updatedQuestion || null,
+      p_updated_options: params.updatedOptions || null,
+      p_updated_answer_indices: params.updatedAnswerIndices || null,
+      p_updated_explanation: params.updatedExplanation || null,
+      p_admin_comment: params.adminComment || null,
+    });
+
+    if (error) throw error;
+    return data || { success: true };
+  } catch (err: unknown) {
+    console.error('adminResolveQuestion error:', err);
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : 'Resolution failed',
+    };
+  }
+};
+
+/**
+ * Fetch All Quarantined and High-Report Questions for Admin Review
+ */
+export const getQuarantinedReviewQueue = async (
+  stream?: string,
+  limit: number = 50,
+) => {
+  if (!isSupabaseConfigured()) return [];
+
+  try {
+    const { data, error } = await supabase.rpc('get_quarantined_review_queue', {
+      p_stream: stream || null,
+      p_limit: limit,
+    });
+
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error('getQuarantinedReviewQueue error:', err);
+    return [];
+  }
+};

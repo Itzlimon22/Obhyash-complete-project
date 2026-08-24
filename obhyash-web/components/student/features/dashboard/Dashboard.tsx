@@ -6,10 +6,10 @@ import { toast } from "sonner";
 import { ExamResult, UserProfile, Subject } from "@/lib/types";
 import { getSubjectDisplayName } from "@/lib/data/subject-name-map";
 import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
-import UserAvatar from "@/components/student/ui/common/UserAvatar";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp, hoverScale, tapScale } from "@/lib/animations";
 import { ClipboardList, Dumbbell, Clock3, Medal, TrendingUp, Bookmark } from "lucide-react";
+import DailyRevisionCard from "./DailyRevisionCard";
 interface SubjectStats {
   id: string;
   name: string;
@@ -251,6 +251,11 @@ const Dashboard: React.FC<DashboardProps> = ({
       animate="show"
       className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1"
     >
+      {/* Daily Spaced Repetition Memory Revision Card */}
+      <motion.div variants={fadeInUp} className="lg:col-span-3">
+        <DailyRevisionCard userId={user?.id} />
+      </motion.div>
+
       {/* Cards Section */}
       <motion.div variants={fadeInUp} className="lg:col-span-2 grid grid-cols-3 gap-2 sm:gap-3 h-fit">
         {/* মক পরীক্ষা */}

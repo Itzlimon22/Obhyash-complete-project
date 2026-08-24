@@ -107,9 +107,63 @@ export default function BulkUploadPage() {
     }
   }, [progressState.logs]);
 
+  // Bulk Upload Preview Pagination & Filtering State (prevents UI freeze on 1,000+ questions)
+  const [previewPage, setPreviewPage] = useState<number>(1);
+  const [previewPageSize, setPreviewPageSize] = useState<number>(20);
+  const [previewFilter, setPreviewFilter] = useState<'all' | 'valid' | 'error'>('all');
+  const [previewSearch, setPreviewSearch] = useState<string>('');
+
+  // O(1) fast error row set lookup
+  const errorRowsSet = React.useMemo(() => {
+    return new Set(validationErrors.map((e) => e.row));
+  }, [validationErrors]);
+
+  // Filtered and paginated preview index list
+  const filteredIndices = React.useMemo(() => {
+    return previewQuestions
+      .map((q, idx) => ({ q, idx }))
+      .filter(({ q, idx }) => {
+        const hasError = errorRowsSet.has(idx + 1);
+        if (previewFilter === 'valid' && hasError) return false;
+        if (previewFilter === 'error' && !hasError) return false;
+        if (previewSearch.trim()) {
+          const searchLower = previewSearch.toLowerCase().trim();
+          const text = (
+            (q.question || '') +
+            ' ' +
+            (q.subject || '') +
+            ' ' +
+            (q.chapter || '')
+          ).toLowerCase();
+          if (!text.includes(searchLower)) return false;
+        }
+        return true;
+      })
+      .map(({ idx }) => idx);
+  }, [previewQuestions, previewFilter, previewSearch, errorRowsSet]);
+
+  const totalPreviewPages = Math.max(
+    1,
+    Math.ceil(filteredIndices.length / previewPageSize),
+  );
+
+  const paginatedIndices = React.useMemo(() => {
+    const start = (previewPage - 1) * previewPageSize;
+    return filteredIndices.slice(start, start + previewPageSize);
+  }, [filteredIndices, previewPage, previewPageSize]);
+
+  // Reset page when filter or search changes
+  React.useEffect(() => {
+    setPreviewPage(1);
+  }, [previewFilter, previewSearch]);
+
   const handleFileUpload = useCallback(async (uploadedFile: File) => {
     setIsUploading(true);
     setValidationErrors([]);
+    setPreviewPage(1);
+
+    // Allow UI to render loading state before heavy parsing
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     try {
       const { questions, fileType: detectedType } =
@@ -122,15 +176,17 @@ export default function BulkUploadPage() {
         previewQuestions: preview,
         validationErrors: errors,
       } = transformAndValidateBatch(questions);
+
       setDatabaseQuestions(dbQ);
       setPreviewQuestions(preview);
       setValidationErrors(errors);
 
       // Select valid questions by default
+      const errSet = new Set(errors.map((e) => e.row));
       const validIndices = new Set(
         preview
           .map((_, idx) => idx)
-          .filter((idx) => !errors.some((e) => e.row === idx + 1)),
+          .filter((idx) => !errSet.has(idx + 1)),
       );
       setSelectedRows(validIndices);
     } catch (error) {
@@ -671,32 +727,76 @@ export default function BulkUploadPage() {
               </div>
             )}
 
-            {/* Preview Table */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-slate-600 dark:text-slate-400">
-                {selectedRows.size} selected
-              </span>
-              <div className="flex gap-2">
+            {/* Preview Toolbar: Filter Tabs + Search + Selection */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewFilter('all')}
+                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                      previewFilter === 'all'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    All ({previewQuestions.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewFilter('valid')}
+                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                      previewFilter === 'valid'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Valid ({previewQuestions.length - errorRowsSet.size})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewFilter('error')}
+                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                      previewFilter === 'error'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Errors ({errorRowsSet.size})
+                  </button>
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Filter preview questions..."
+                  value={previewSearch}
+                  onChange={(e) => setPreviewSearch(e.target.value)}
+                  className="px-3 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 justify-between md:justify-end">
+                <span className="text-xs text-slate-500 font-medium">
+                  {selectedRows.size} of {previewQuestions.length} selected
+                </span>
                 <button
-                  onClick={() =>
-                    setSelectedRows(
-                      new Set(
-                        previewQuestions
-                          .map((_, i) => i)
-                          .filter(
-                            (i) =>
-                              !validationErrors.some((e) => e.row === i + 1),
-                          ),
-                      ),
-                    )
-                  }
-                  className="px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 rounded"
+                  type="button"
+                  onClick={() => {
+                    const valid = new Set(
+                      previewQuestions
+                        .map((_, i) => i)
+                        .filter((i) => !errorRowsSet.has(i + 1)),
+                    );
+                    setSelectedRows(valid);
+                  }}
+                  className="px-2.5 py-1 text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-semibold rounded hover:bg-emerald-200 transition"
                 >
                   Select Valid
                 </button>
                 <button
+                  type="button"
                   onClick={() => setSelectedRows(new Set())}
-                  className="px-3 py-1 text-sm bg-slate-200 dark:bg-slate-700 rounded"
+                  className="px-2.5 py-1 text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 transition"
                 >
                   Clear
                 </button>
@@ -731,10 +831,10 @@ export default function BulkUploadPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {previewQuestions.map((q, idx) => {
-                    const hasError = validationErrors.some(
-                      (e) => e.row === idx + 1,
-                    );
+                  {paginatedIndices.map((idx) => {
+                    const q = previewQuestions[idx];
+                    if (!q) return null;
+                    const hasError = errorRowsSet.has(idx + 1);
                     const isExpanded = expandedRow === idx;
                     const options = q.options || [];
                     const correctIndices =
@@ -927,6 +1027,60 @@ export default function BulkUploadPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPreviewPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                <div className="text-xs text-slate-500 font-medium">
+                  Showing <strong className="text-slate-700 dark:text-slate-300">{(previewPage - 1) * previewPageSize + 1}</strong> to <strong className="text-slate-700 dark:text-slate-300">{Math.min(previewPage * previewPageSize, filteredIndices.length)}</strong> of <strong className="text-slate-700 dark:text-slate-300">{filteredIndices.length}</strong> questions
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-slate-500 mr-1">Per page:</span>
+                    {[20, 50, 100].map((ps) => (
+                      <button
+                        key={ps}
+                        type="button"
+                        onClick={() => {
+                          setPreviewPageSize(ps);
+                          setPreviewPage(1);
+                        }}
+                        className={`px-2 py-0.5 text-xs font-semibold rounded ${
+                          previewPageSize === ps
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        {ps}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 ml-2">
+                    <button
+                      type="button"
+                      disabled={previewPage <= 1}
+                      onClick={() => setPreviewPage((p) => Math.max(1, p - 1))}
+                      className="px-3 py-1 text-xs font-medium border rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-xs font-mono px-2 text-slate-700 dark:text-slate-300">
+                      {previewPage} / {totalPreviewPages}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={previewPage >= totalPreviewPages}
+                      onClick={() => setPreviewPage((p) => Math.min(totalPreviewPages, p + 1))}
+                      className="px-3 py-1 text-xs font-medium border rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

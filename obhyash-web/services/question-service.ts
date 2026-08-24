@@ -885,7 +885,6 @@ export const bulkCreateQuestions = async (
         if (matchedChap) {
           cId = matchedChap.chapter.id;
           finalChapter = matchedChap.chapter.name;
-          // Sync subject if it was missing but chapter found
           if (!sId) {
             sId = matchedChap.subject.id;
             finalSubject = matchedChap.subject.name;
@@ -900,7 +899,6 @@ export const bulkCreateQuestions = async (
         if (matchedTop) {
           tId = matchedTop.topic.id;
           finalTopic = matchedTop.topic.name;
-          // Sync hierarchy if missing
           if (!cId) {
             cId = matchedTop.chapter.id;
             finalChapter = matchedTop.chapter.name;
@@ -911,8 +909,21 @@ export const bulkCreateQuestions = async (
           }
         }
 
+        const rawStream = q.stream || 'HSC';
+        const streamId = rawStream.toUpperCase().includes('SSC')
+          ? 'SSC'
+          : rawStream.toUpperCase().includes('ADMISSION')
+          ? 'ADMISSION'
+          : rawStream.toUpperCase().includes('BCS')
+          ? 'BCS'
+          : 'HSC';
+
         return {
           question: q.question,
+          passage: q.passage,
+          parent_id: q.parentId,
+          is_composite: q.isComposite || Boolean(q.passage),
+          composite_index: q.compositeIndex || 1,
           options: q.options || [],
           correct_answer_indices: correctAnswerIndices,
           explanation: q.explanation,
@@ -924,15 +935,21 @@ export const bulkCreateQuestions = async (
           chapter_id: cId || null,
           topic: finalTopic,
           topic_id: tId || null,
-          stream: q.stream,
-          division: q.division,
+          stream: q.stream || 'HSC',
+          stream_id: streamId,
+          division: q.division || 'Science',
+          division_id: q.division?.toLowerCase().includes('hum')
+            ? 'humanities'
+            : q.division?.toLowerCase().includes('bus')
+            ? 'business_studies'
+            : 'science',
           section: q.section,
           exam_type: q.examType || "Academic",
           institutes: q.institutes || [],
           years: q.years || [],
-          status: q.status || "Pending",
-          author: q.author || "Admin",
-          author_name: q.authorName || q.author || "Admin",
+          status: q.status || "Approved",
+          author: q.author || "Bulk Upload",
+          author_name: q.authorName || q.author || "Bulk Upload",
           tags: q.tags || [],
           version: 1,
           image_url: q.imageUrl,
@@ -943,32 +960,42 @@ export const bulkCreateQuestions = async (
         };
       });
 
-      const payload = await Promise.all(payloadPromises);
+      const allPayloads = await Promise.all(payloadPromises);
 
-      // Use the modernized SQL RPC for atomic bulk merge with job support
-      const { data, error } = await supabase.rpc("bulk_merge_questions_v2", {
-        p_questions: payload,
-        p_job_id: internalJobId || null,
-      });
+      // Process in chunks of 100 to avoid payload size limit & timeouts
+      const CHUNK_SIZE = 100;
+      let totalInserted = 0;
+      let totalDuplicates = 0;
+      let totalErrors = 0;
+      const allErrors: string[] = [];
 
-      if (error) {
-        console.error("Bulk merge error:", error);
-        return {
-          success: false,
-          count: 0,
-          duplicates: 0,
-          errors: questions.length,
-          errorDetails: [error.message],
-          jobId: internalJobId,
-        };
+      for (let i = 0; i < allPayloads.length; i += CHUNK_SIZE) {
+        const chunk = allPayloads.slice(i, i + CHUNK_SIZE);
+        const { data, error } = await supabase.rpc("bulk_merge_questions_v2", {
+          p_questions: chunk,
+          p_job_id: internalJobId || null,
+        });
+
+        if (error) {
+          console.error("Chunk bulk merge error:", error);
+          totalErrors += chunk.length;
+          allErrors.push(`Chunk ${Math.floor(i / CHUNK_SIZE) + 1}: ${error.message}`);
+        } else if (data) {
+          totalInserted += data.inserted || 0;
+          totalDuplicates += data.duplicates || 0;
+          totalErrors += data.errors || 0;
+          if (data.error_details && Array.isArray(data.error_details)) {
+            allErrors.push(...data.error_details);
+          }
+        }
       }
 
       return {
-        success: true,
-        count: data.inserted || 0,
-        duplicates: data.duplicates || 0,
-        errors: data.errors || 0,
-        errorDetails: data.error_details || [],
+        success: totalInserted > 0 || (totalDuplicates > 0 && totalErrors === 0),
+        count: totalInserted,
+        duplicates: totalDuplicates,
+        errors: totalErrors,
+        errorDetails: allErrors,
         jobId: internalJobId,
       };
     } catch (err) {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
+import 'widgets/leitner_memory_box_card.dart';
 import 'widgets/badges_showcase_section.dart';
 import 'widgets/subjects_progress_section.dart';
 import 'widgets/recent_activity_section.dart';
@@ -326,6 +327,9 @@ class MyProfileView extends ConsumerWidget {
             streak: user.streakCount,
           ),
           const SizedBox(height: 20),
+
+          // Leitner 5-Box Memory Mastery Bar
+          LeitnerMemoryBoxCard(userId: user.id),
 
           // Badges Showcase
           BadgesShowcaseSection(userId: user.id),

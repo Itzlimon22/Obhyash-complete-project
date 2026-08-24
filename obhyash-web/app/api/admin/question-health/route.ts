@@ -11,122 +11,75 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = (searchParams.get('search') || '').trim();
+    const stream = (searchParams.get('stream') || '').trim();
     const subject = (searchParams.get('subject') || '').trim();
     const chapter = (searchParams.get('chapter') || '').trim();
-    const tier = (searchParams.get('tier') || 'all').trim(); // 'all' | 'critical' | 'high_error' | 'top_bookmarked' | 'healthy'
+    const tier = (searchParams.get('tier') || 'all').trim(); // 'all' | 'quarantined' | 'reported' | 'high_error' | 'slow' | 'healthy'
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const pageSize = Math.min(50, Math.max(10, parseInt(searchParams.get('pageSize') || '20', 10)));
+    const pageSize = Math.min(100, Math.max(10, parseInt(searchParams.get('pageSize') || '25', 10)));
 
-    // 1. Fetch Bookmarks counts grouped by question_id
-    const { data: bookmarksData, error: bErr } = await supabaseAdmin
-      .from('bookmarks')
-      .select('question_id');
-
-    const bookmarkCountMap: Record<string, number> = {};
-    (bookmarksData || []).forEach((b: any) => {
-      if (b.question_id) {
-        bookmarkCountMap[b.question_id] = (bookmarkCountMap[b.question_id] || 0) + 1;
-      }
-    });
-
-    // 2. Fetch Reports counts & reasons grouped by question_id
-    const { data: reportsData, error: rErr } = await supabaseAdmin
+    // 1. Fetch pending reports map to enrich report details
+    const { data: reportsData } = await supabaseAdmin
       .from('reports')
-      .select('id, question_id, reason, status, created_at')
+      .select('id, question_id, reason, description, status, created_at')
+      .eq('status', 'Pending')
       .order('created_at', { ascending: false });
 
     const reportMap: Record<
       string,
-      { total: number; pending: number; reasons: string[] }
+      { pending: number; reasons: string[]; descriptions: string[] }
     > = {};
 
     (reportsData || []).forEach((r: any) => {
       if (!r.question_id) return;
-      if (!reportMap[r.question_id]) {
-        reportMap[r.question_id] = { total: 0, pending: 0, reasons: [] };
+      const qKey = String(r.question_id);
+      if (!reportMap[qKey]) {
+        reportMap[qKey] = { pending: 0, reasons: [], descriptions: [] };
       }
-      reportMap[r.question_id].total++;
-      if (r.status === 'Pending' || !r.status) {
-        reportMap[r.question_id].pending++;
+      reportMap[qKey].pending++;
+      if (r.reason && !reportMap[qKey].reasons.includes(r.reason)) {
+        reportMap[qKey].reasons.push(r.reason);
       }
-      if (r.reason && !reportMap[r.question_id].reasons.includes(r.reason)) {
-        reportMap[r.question_id].reasons.push(r.reason);
+      if (r.description && !reportMap[qKey].descriptions.includes(r.description)) {
+        reportMap[qKey].descriptions.push(r.description);
       }
     });
 
-    // 3. Fetch Exam Results to calculate live Error Rates
-    const { data: examResultsData } = await supabaseAdmin
-      .from('exam_results')
-      .select('questions, user_answers')
-      .order('created_at', { ascending: false })
-      .limit(500);
-
-    const questionAttemptMap: Record<
-      string,
-      { totalAttempts: number; wrongAttempts: number; correctAttempts: number }
-    > = {};
-
-    (examResultsData || []).forEach((exam: any) => {
-      const qList = Array.isArray(exam.questions) ? exam.questions : [];
-      const userAnswers = exam.user_answers || {};
-
-      qList.forEach((q: any) => {
-        const qId = q.id || q.question_id;
-        if (!qId) return;
-
-        if (!questionAttemptMap[qId]) {
-          questionAttemptMap[qId] = {
-            totalAttempts: 0,
-            wrongAttempts: 0,
-            correctAttempts: 0,
-          };
-        }
-
-        const stats = questionAttemptMap[qId];
-        stats.totalAttempts++;
-
-        const userAns = userAnswers[qId];
-        const correctIndices = Array.isArray(q.correct_answer_indices)
-          ? q.correct_answer_indices
-          : typeof q.correct_answer_index === 'number'
-          ? [q.correct_answer_index]
-          : [0];
-
-        let isCorrect = false;
-        if (typeof userAns === 'number') {
-          isCorrect = correctIndices.includes(userAns);
-        } else if (typeof userAns === 'string' && q.options) {
-          const matchedIdx = q.options.findIndex((opt: string) => opt?.trim() === userAns?.trim());
-          if (matchedIdx !== -1) {
-            isCorrect = correctIndices.includes(matchedIdx);
-          }
-        }
-
-        if (isCorrect) {
-          stats.correctAttempts++;
-        } else if (userAns !== undefined && userAns !== null) {
-          stats.wrongAttempts++;
-        }
-      });
-    });
-
-    // 4. Query Questions from DB
+    // 2. Query questions directly from Partitioned Database using Telemetry & Quarantine Columns
     let query = supabaseAdmin
       .from('questions')
       .select('*', { count: 'exact' });
 
+    if (stream && stream !== 'all') {
+      query = query.or(`stream.eq.${stream},stream_id.eq.${stream}`);
+    }
     if (subject && subject !== 'all') {
-      query = query.eq('subject', subject);
+      query = query.or(`subject.eq.${subject},subject_id.eq.${subject}`);
     }
     if (chapter && chapter !== 'all') {
-      query = query.eq('chapter', chapter);
+      query = query.or(`chapter.eq.${chapter},chapter_id.eq.${chapter}`);
     }
     if (search) {
       query = query.or(`question.ilike.%${search}%,explanation.ilike.%${search}%`);
     }
 
+    // Apply Tier Filter in Query if directly indexed
+    if (tier === 'quarantined') {
+      query = query.or('is_quarantined.eq.true,status.eq.Quarantined');
+    } else if (tier === 'reported') {
+      query = query.gt('report_count', 0);
+    } else if (tier === 'high_error') {
+      query = query.lt('accuracy_rate', 35).gte('times_attempted', 2);
+    } else if (tier === 'slow') {
+      query = query.gt('avg_time_spent_seconds', 75).gte('times_attempted', 2);
+    } else if (tier === 'healthy') {
+      query = query.eq('is_quarantined', false).eq('report_count', 0).gte('accuracy_rate', 60);
+    }
+
     const { data: questionsList, count: totalCount, error: qErr } = await query
-      .order('updated_at', { ascending: false })
+      .order('is_quarantined', { ascending: false })
+      .order('report_count', { ascending: false })
+      .order('times_attempted', { ascending: false })
       .limit(1000);
 
     if (qErr) {
@@ -134,99 +87,100 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: qErr.message }, { status: 500 });
     }
 
-    // 5. Enrich Questions with Health Intelligence
+    // 3. Process & Classify Health Status
+    let quarantinedTotal = 0;
+    let reportedTotal = 0;
+    let highErrorTotal = 0;
+    let slowTotal = 0;
+    let healthyTotal = 0;
+    let totalAttemptsSum = 0;
+    let totalAccuracySum = 0;
+    let attemptedQuestionsCount = 0;
+
     const enrichedQuestions = (questionsList || []).map((q: any) => {
-      const qId = q.id;
-      const bCount = bookmarkCountMap[qId] || 0;
-      const rInfo = reportMap[qId] || { total: 0, pending: 0, reasons: [] };
-      const attemptsInfo = questionAttemptMap[qId] || {
-        totalAttempts: 0,
-        wrongAttempts: 0,
-        correctAttempts: 0,
-      };
+      const qId = String(q.id);
+      const rInfo = reportMap[qId] || { pending: 0, reasons: [], descriptions: [] };
 
-      const attempts = attemptsInfo.totalAttempts;
-      const wrong = attemptsInfo.wrongAttempts;
-      const errorRate = attempts > 0 ? Math.round((wrong / attempts) * 100) : 0;
-      const accuracyRate = attempts > 0 ? Math.round((attemptsInfo.correctAttempts / attempts) * 100) : 100;
+      const attempts = q.times_attempted || 0;
+      const accuracy = q.accuracy_rate !== null && q.accuracy_rate !== undefined ? Number(q.accuracy_rate) : null;
+      const avgTime = q.avg_time_spent_seconds !== null && q.avg_time_spent_seconds !== undefined ? Number(q.avg_time_spent_seconds) : 0;
+      const reportsCount = Math.max(q.report_count || 0, rInfo.pending);
+      const isQuarantined = Boolean(q.is_quarantined || q.status === 'Quarantined');
 
-      // Classify Health Status Tier
-      let healthTier: 'critical' | 'high_error' | 'top_bookmarked' | 'healthy' = 'healthy';
-      if (rInfo.total > 0 || rInfo.pending > 0) {
-        healthTier = 'critical';
-      } else if (errorRate >= 60 && attempts >= 2) {
+      if (attempts > 0 && accuracy !== null) {
+        totalAttemptsSum += attempts;
+        totalAccuracySum += accuracy;
+        attemptedQuestionsCount++;
+      }
+
+      // Classification
+      let healthTier: 'quarantined' | 'reported' | 'high_error' | 'slow' | 'healthy' = 'healthy';
+      if (isQuarantined) {
+        healthTier = 'quarantined';
+        quarantinedTotal++;
+      } else if (reportsCount > 0) {
+        healthTier = 'reported';
+        reportedTotal++;
+      } else if (accuracy !== null && accuracy < 35 && attempts >= 2) {
         healthTier = 'high_error';
-      } else if (bCount >= 1) {
-        healthTier = 'top_bookmarked';
+        highErrorTotal++;
+      } else if (avgTime > 75 && attempts >= 2) {
+        healthTier = 'slow';
+        slowTotal++;
       } else {
         healthTier = 'healthy';
+        healthyTotal++;
       }
 
       return {
         id: q.id,
         question: q.question,
+        passage: q.passage,
         options: q.options || [],
         correct_answer_indices: q.correct_answer_indices || [0],
         explanation: q.explanation || '',
         subject: q.subject || '',
+        subject_id: q.subject_id || '',
         chapter: q.chapter || '',
+        chapter_id: q.chapter_id || '',
         topic: q.topic || '',
+        stream: q.stream || q.stream_id || 'HSC',
         difficulty: q.difficulty || 'Medium',
+        difficulty_rating: q.difficulty_rating || 1200,
+        is_difficulty_locked: Boolean(q.is_difficulty_locked),
         status: q.status || 'Approved',
-        author: q.author || q.author_name || 'Admin',
+        author: q.author || 'Admin',
         updated_at: q.updated_at || q.created_at,
-        // Health metrics
-        bookmarksCount: bCount,
-        reportsCount: rInfo.total,
+        // Health & Telemetry Metrics (Phase D & E)
+        reportCount: reportsCount,
         pendingReportsCount: rInfo.pending,
         reportReasons: rInfo.reasons,
-        totalAttempts: attempts,
-        wrongAttempts: wrong,
-        errorRate,
-        accuracyRate,
+        reportDescriptions: rInfo.descriptions,
+        isQuarantined,
+        quarantineReason: q.quarantine_reason,
+        timesAttempted: attempts,
+        timesCorrect: q.times_correct || 0,
+        timesWrong: q.times_wrong || 0,
+        avgTimeSpentSeconds: avgTime,
+        accuracyRate: accuracy,
         healthTier,
       };
     });
 
-    // 6. Calculate Summary Metrics (KPIs)
-    let criticalTotal = 0;
-    let highErrorTotal = 0;
-    let bookmarkedTotal = 0;
-    let healthyTotal = 0;
-
-    enrichedQuestions.forEach((q) => {
-      if (q.healthTier === 'critical') criticalTotal++;
-      else if (q.healthTier === 'high_error') highErrorTotal++;
-      else if (q.healthTier === 'top_bookmarked') bookmarkedTotal++;
-      else healthyTotal++;
-    });
-
     const totalQuestions = enrichedQuestions.length;
+    const avgPlatformAccuracy =
+      attemptedQuestionsCount > 0 ? Math.round(totalAccuracySum / attemptedQuestionsCount) : 75;
+
     const platformHealthScore =
       totalQuestions > 0
-        ? Math.max(0, Math.round(((totalQuestions - criticalTotal * 2 - highErrorTotal) / totalQuestions) * 100))
+        ? Math.max(0, Math.round(((totalQuestions - quarantinedTotal * 3 - reportedTotal * 1.5 - highErrorTotal) / totalQuestions) * 100))
         : 100;
 
-    // 7. Filter by Tier if selected
-    let filteredQuestions = enrichedQuestions;
-    if (tier && tier !== 'all') {
-      filteredQuestions = enrichedQuestions.filter((q) => q.healthTier === tier);
-    }
-
-    // 8. Sort: Prioritize critical > high error > bookmarked > healthy
-    filteredQuestions.sort((a, b) => {
-      if (a.healthTier === 'critical' && b.healthTier !== 'critical') return -1;
-      if (b.healthTier === 'critical' && a.healthTier !== 'critical') return 1;
-      if (b.pendingReportsCount !== a.pendingReportsCount) return b.pendingReportsCount - a.pendingReportsCount;
-      if (b.errorRate !== a.errorRate) return b.errorRate - a.errorRate;
-      return b.bookmarksCount - a.bookmarksCount;
-    });
-
-    // 9. Paginate Results
-    const totalFiltered = filteredQuestions.length;
+    // 4. Paginate Results
+    const totalFiltered = enrichedQuestions.length;
     const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
     const startIndex = (page - 1) * pageSize;
-    const paginatedQuestions = filteredQuestions.slice(startIndex, startIndex + pageSize);
+    const paginatedQuestions = enrichedQuestions.slice(startIndex, startIndex + pageSize);
 
     return NextResponse.json({
       success: true,
@@ -240,10 +194,12 @@ export async function GET(request: NextRequest) {
         },
         kpis: {
           totalQuestions,
-          criticalCount: criticalTotal,
+          quarantinedCount: quarantinedTotal,
+          reportedCount: reportedTotal,
           highErrorCount: highErrorTotal,
-          bookmarkedCount: bookmarkedTotal,
+          slowCount: slowTotal,
           healthyCount: healthyTotal,
+          avgPlatformAccuracy,
           platformHealthScore,
         },
       },
@@ -257,54 +213,101 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Quick action endpoint to fix correct answer or explanation or resolve reports
-export async function PATCH(request: NextRequest) {
+// 1-Click Resolution & Telemetry Action Endpoint
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { questionId, correctAnswerIndices, explanation, status, resolveReports } = body;
+    const {
+      questionId,
+      action, // 'APPROVE_FIXED' | 'DISMISS_FALSE_ALARM' | 'DELETE_QUESTION' | 'TOGGLE_DIFFICULTY_LOCK' | 'SET_DIFFICULTY'
+      updatedQuestion,
+      updatedOptions,
+      updatedAnswerIndices,
+      updatedExplanation,
+      adminComment,
+      targetDifficulty,
+      isLocked,
+    } = body;
 
     if (!questionId) {
-      return NextResponse.json({ success: false, error: 'Question ID required' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Question ID is required' }, { status: 400 });
     }
 
-    const updates: Record<string, any> = {
-      updated_at: new Date().toISOString(),
-    };
+    if (action === 'TOGGLE_DIFFICULTY_LOCK') {
+      const { error } = await supabaseAdmin
+        .from('questions')
+        .update({
+          is_difficulty_locked: Boolean(isLocked),
+          ...(targetDifficulty ? { difficulty: targetDifficulty } : {}),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', questionId);
 
-    if (Array.isArray(correctAnswerIndices)) {
-      updates.correct_answer_indices = correctAnswerIndices;
-    }
-    if (explanation !== undefined) {
-      updates.explanation = explanation;
-    }
-    if (status) {
-      updates.status = status;
-    }
-
-    const { error: updateErr } = await supabaseAdmin
-      .from('questions')
-      .update(updates)
-      .eq('id', questionId);
-
-    if (updateErr) {
-      return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      if (error) throw error;
+      return NextResponse.json({ success: true, message: 'Difficulty settings updated successfully' });
     }
 
-    // If resolveReports is true, mark all pending reports for this question as Resolved
-    if (resolveReports) {
-      await supabaseAdmin
-        .from('reports')
-        .update({ status: 'Resolved' })
-        .eq('question_id', questionId);
+    // Call admin_resolve_question RPC
+    const { data: rpcData, error: rpcErr } = await supabaseAdmin.rpc('admin_resolve_question', {
+      p_question_id: questionId,
+      p_action: action || 'APPROVE_FIXED',
+      p_updated_question: updatedQuestion || null,
+      p_updated_options: updatedOptions || null,
+      p_updated_answer_indices: updatedAnswerIndices || null,
+      p_updated_explanation: updatedExplanation || null,
+      p_admin_comment: adminComment || null,
+    });
+
+    if (rpcErr) {
+      console.error('admin_resolve_question RPC error:', rpcErr);
+      // Fallback direct table update if RPC fails
+      if (action === 'APPROVE_FIXED') {
+        await supabaseAdmin
+          .from('questions')
+          .update({
+            ...(updatedQuestion ? { question: updatedQuestion } : {}),
+            ...(updatedOptions ? { options: updatedOptions } : {}),
+            ...(updatedAnswerIndices ? { correct_answer_indices: updatedAnswerIndices } : {}),
+            ...(updatedExplanation ? { explanation: updatedExplanation } : {}),
+            status: 'Approved',
+            is_quarantined: false,
+            report_count: 0,
+            quarantine_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', questionId);
+
+        await supabaseAdmin
+          .from('reports')
+          .update({ status: 'Resolved', resolved_at: new Date().toISOString() })
+          .eq('question_id', questionId);
+      } else if (action === 'DISMISS_FALSE_ALARM') {
+        await supabaseAdmin
+          .from('questions')
+          .update({
+            status: 'Approved',
+            is_quarantined: false,
+            report_count: 0,
+            quarantine_reason: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', questionId);
+
+        await supabaseAdmin
+          .from('reports')
+          .update({ status: 'Ignored', resolved_at: new Date().toISOString() })
+          .eq('question_id', questionId);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: 'প্রশ্ন স্বাস্থ্য ও সমাধান সফলভাবে আপডেট হয়েছে!',
+      message: 'Question resolved and updated successfully!',
     });
   } catch (error: any) {
+    console.error('Error in /api/admin/question-health POST:', error);
     return NextResponse.json(
-      { success: false, error: error?.message || 'Failed to update question' },
+      { success: false, error: error?.message || 'Action failed' },
       { status: 500 },
     );
   }

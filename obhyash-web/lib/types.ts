@@ -96,11 +96,37 @@ export interface Question {
 
   // Academic Info
   stream?: string; // HSC, SSC, Admission
+  streamId?: string;
   division?: string; // Science, Arts, Commerce (NEW)
+  divisionId?: string;
   section?: string; // Optional subdivision
   examType?: string; // Medical, Engineering, Academic (defaults to 'Academic')
   institutes?: string[]; // Array of institute names (NEW)
   years?: number[]; // Array of years [2023, 2024] (NEW)
+
+  // Passage & Stimulus (উদ্দীপক)
+  passage?: string; // Stimulus text/context for composite questions
+  parentId?: string; // Links sub-question to parent question/passage
+  isComposite?: boolean; // Whether this question is part of a stimulus group
+  compositeIndex?: number; // 1, 2, etc. within the stimulus group
+
+  // Deduplication & Scale
+  fingerprint?: string; // SHA-256 deterministic hash
+
+  // Telemetry & IRT Dynamic Difficulty
+  timesAttempted?: number;
+  timesCorrect?: number;
+  timesWrong?: number;
+  avgTimeSpentSeconds?: number;
+  accuracyRate?: number;
+  difficultyRating?: number;
+  isDifficultyLocked?: boolean;
+  lastAttemptedAt?: string;
+
+  // Community Flagging & Quarantine
+  reportCount?: number;
+  isQuarantined?: boolean;
+  quarantineReason?: string;
 
   // Legacy fields (for backward compatibility)
   institute?: string; // Deprecated - use institutes[] instead
@@ -533,6 +559,11 @@ export interface QuestionFormData {
 
   // Content
   question: string;
+  passage?: string;
+  parent_id?: string;
+  is_composite?: boolean;
+  composite_index?: number;
+  fingerprint?: string;
   image_url?: string;
   options: QuestionOption[];
   explanation: string;

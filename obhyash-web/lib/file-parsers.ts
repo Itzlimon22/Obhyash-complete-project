@@ -3,6 +3,52 @@ import Papa from 'papaparse';
 import { UploadQuestionFormat } from './question-upload-mapper';
 
 /**
+ * Helper to normalize spreadsheet keys (case-insensitive, trimmed, alias-mapped)
+ */
+function normalizeRowKeys(rawRow: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(rawRow)) {
+    const cleanKey = key.trim().toLowerCase().replace(/[\s_-]+/g, '');
+    
+    // Map common aliases
+    if (cleanKey === 'q' || cleanKey === 'question' || cleanKey === 'questiontext' || cleanKey === 'প্রশ্ন') {
+      normalized.question = value;
+    } else if (cleanKey === 'passage' || cleanKey === 'stimulus' || cleanKey === 'উদ্দীপক') {
+      normalized.passage = value;
+    } else if (cleanKey === 'subj' || cleanKey === 'subject' || cleanKey === 'বিষয়' || cleanKey === 'বিষয়') {
+      normalized.subject = value;
+    } else if (cleanKey === 'chap' || cleanKey === 'chapter' || cleanKey === 'অধ্যায়' || cleanKey === 'অধ্যায়') {
+      normalized.chapter = value;
+    } else if (cleanKey === 'top' || cleanKey === 'topic' || cleanKey === 'টপিক') {
+      normalized.topic = value;
+    } else if (cleanKey === 'ans' || cleanKey === 'answer' || cleanKey === 'correctanswer' || cleanKey === 'উত্তর') {
+      normalized.answer = value;
+    } else if (cleanKey === 'exp' || cleanKey === 'explanation' || cleanKey === 'ব্যাখ্যা') {
+      normalized.explanation = value;
+    } else if (cleanKey === 'diff' || cleanKey === 'difficulty' || cleanKey === 'লেভেল') {
+      normalized.difficulty = value;
+    } else if (cleanKey === 'opt1' || cleanKey === 'option1' || cleanKey === 'optiona' || cleanKey === 'opta' || cleanKey === 'ক') {
+      normalized.option1 = value;
+    } else if (cleanKey === 'opt2' || cleanKey === 'option2' || cleanKey === 'optionb' || cleanKey === 'optb' || cleanKey === 'খ') {
+      normalized.option2 = value;
+    } else if (cleanKey === 'opt3' || cleanKey === 'option3' || cleanKey === 'optionc' || cleanKey === 'optc' || cleanKey === 'গ') {
+      normalized.option3 = value;
+    } else if (cleanKey === 'opt4' || cleanKey === 'option4' || cleanKey === 'optiond' || cleanKey === 'optd' || cleanKey === 'ঘ') {
+      normalized.option4 = value;
+    } else if (cleanKey === 'opt5' || cleanKey === 'option5' || cleanKey === 'optione' || cleanKey === 'ঙ') {
+      normalized.option5 = value;
+    } else if (cleanKey === 'opt6' || cleanKey === 'option6' || cleanKey === 'optionf') {
+      normalized.option6 = value;
+    } else {
+      normalized[key.trim()] = value;
+    }
+  }
+
+  return normalized;
+}
+
+/**
  * Parse CSV file to questions array
  */
 export async function parseCSVFile(
@@ -11,11 +57,13 @@ export async function parseCSVFile(
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
-      skipEmptyLines: true,
+      skipEmptyLines: 'greedy',
+      transformHeader: (h) => h.trim(),
       complete: (results) => {
         try {
-          const questions = results.data as UploadQuestionFormat[];
-          resolve(questions);
+          const rawData = results.data as Record<string, unknown>[];
+          const questions = rawData.map(normalizeRowKeys);
+          resolve(questions as unknown as UploadQuestionFormat[]);
         } catch (error) {
           reject(error);
         }
@@ -48,7 +96,7 @@ export async function parseJSONFile(
     };
 
     reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsText(file);
+    reader.readAsText(file, 'utf-8');
   });
 }
 
@@ -64,7 +112,7 @@ export async function parseXLSXFile(
     reader.onload = (e) => {
       try {
         const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
+        const workbook = XLSX.read(data, { type: 'binary', codepage: 65001 });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
@@ -72,40 +120,10 @@ export async function parseXLSXFile(
           defval: '',
         });
 
-        // Process arrays stored as comma-separated strings
+        // Process normalized rows
         const questions = json.map((row: Record<string, unknown>) => {
-          const processed: Record<string, unknown> = { ...row };
-
-          if (processed.options && typeof processed.options === 'string') {
-            processed.options = processed.options
-              .split(',')
-              .map((opt: string) => opt.trim());
-          }
-          if (
-            processed.correctAnswers &&
-            typeof processed.correctAnswers === 'string'
-          ) {
-            processed.correctAnswers = processed.correctAnswers
-              .split(',')
-              .map((idx: string) => parseInt(idx.trim()))
-              .filter((n: number) => !isNaN(n));
-          }
-          if (
-            processed.institutes &&
-            typeof processed.institutes === 'string'
-          ) {
-            processed.institutes = processed.institutes
-              .split(',')
-              .map((i: string) => i.trim());
-          }
-          if (processed.years && typeof processed.years === 'string') {
-            processed.years = processed.years
-              .split(',')
-              .map((y: string) => parseInt(y.trim()))
-              .filter((n: number) => !isNaN(n));
-          }
-
-          return processed;
+          const normalized = normalizeRowKeys(row);
+          return normalized;
         });
 
         resolve(questions as unknown as UploadQuestionFormat[]);

@@ -217,12 +217,36 @@ export const fetchQuestionsWithDiagnostics = async (
         `examTypes: ${examTypes?.join('+') ?? 'all'}`,
     );
 
-    // ── Primary: single distributed RPC — one round-trip handles all cells ───
-    // The SQL function distributes questions evenly across every
-    // (chapter × difficulty × exam_type) combination, respects smart priority
-    // (unused → mistaken → random), and self-tops-up any shortfall.
+    // ── Primary: Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix) ──
     for (const formName of nameForms) {
       const { data, error } = await supabase.rpc(
+        'get_adaptive_mock_exam_questions',
+        {
+          p_user_id: user?.id ?? null,
+          p_subject: config.subject,
+          p_subject_name: formName,
+          p_total: config.questionCount,
+          p_chapters: chapters,
+          p_topics: topics,
+          p_difficulties: difficulties,
+          p_exam_types: examTypes,
+        },
+      );
+
+      if (!error && data && data.length > 0) {
+        const questions = fisherYatesShuffle(
+          (data as unknown as QuestionDbRow[]).map(mapDbRow),
+        );
+        debug.fetchMethod = 'ADAPTIVE_SMART_MOCK_RPC';
+        debug.resultCount = questions.length;
+        debug.diagnosis.push(
+          `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (75% New + 25% Spaced Weakness Mix)`,
+        );
+        return { questions, debug };
+      }
+
+      // Secondary Distributed Fallback
+      const { data: distData, error: distError } = await supabase.rpc(
         'get_distributed_exam_questions',
         {
           p_user_id: user?.id ?? null,
@@ -236,17 +260,17 @@ export const fetchQuestionsWithDiagnostics = async (
         },
       );
 
-      if (error) {
-        debug.rpcError = error.message;
+      if (distError) {
+        debug.rpcError = distError.message;
         debug.diagnosis.push(
-          `⚠️ Distributed RPC error (form "${formName}"): ${error.message}`,
+          `⚠️ Distributed RPC error (form "${formName}"): ${distError.message}`,
         );
         continue;
       }
 
-      if (data && data.length > 0) {
+      if (distData && distData.length > 0) {
         const questions = fisherYatesShuffle(
-          (data as unknown as QuestionDbRow[]).map(mapDbRow),
+          (distData as unknown as QuestionDbRow[]).map(mapDbRow),
         );
         debug.fetchMethod = 'DISTRIBUTED_RPC';
         debug.resultCount = questions.length;
@@ -398,11 +422,14 @@ export const updateQuestionAnalytics = async (
 };
 
 // Bulk-update analytics for all answered questions in one RPC call.
-// Replaces the N-individual-call pattern after exam submission.
+// Updates both:
+// 1. Personal user stats (bulk_update_user_question_stats)
+// 2. Global question telemetry & IRT dynamic difficulty (record_exam_telemetry)
 const bulkUpdateQuestionAnalytics = async (
   userId: string,
   questions: Question[],
   userAnswers: UserAnswers,
+  totalTimeTakenSeconds?: number,
 ) => {
   const answered = questions.filter((q) => userAnswers[q.id] !== undefined);
   if (!answered.length) return;
@@ -415,13 +442,52 @@ const bulkUpdateQuestionAnalytics = async (
         (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua))
       );
     });
-    const { error } = await supabase.rpc('bulk_update_user_question_stats', {
+
+    // 1. User Personal Stats Update
+    const userStatsPromise = supabase.rpc('bulk_update_user_question_stats', {
       p_user_id: userId,
       p_question_ids: questionIds,
       p_are_correct: areCorrect,
     });
-    if (error) {
-      console.warn('Bulk analytics update error:', error);
+
+    // 2. Global Question Telemetry & Dynamic Difficulty Calibration Update
+    const estimatedTimePerQuestion =
+      totalTimeTakenSeconds && questions.length > 0
+        ? Math.max(5, Math.round(totalTimeTakenSeconds / questions.length))
+        : 30;
+
+    const telemetryPayload = answered.map((q, idx) => ({
+      question_id: String(q.id),
+      is_correct: areCorrect[idx],
+      time_spent: estimatedTimePerQuestion,
+    }));
+
+    // 2. Global Question Telemetry & Dynamic Difficulty Calibration Update
+    const telemetryPromise = supabase.rpc('record_exam_telemetry', {
+      p_responses: telemetryPayload,
+    });
+
+    // 3. User Spaced Repetition (Leitner 5-Box & Personal Weakness Engine)
+    const spacedRepetitionPromise = supabase.rpc('record_exam_spaced_repetition', {
+      p_user_id: userId,
+      p_question_ids: questionIds,
+      p_are_correct: areCorrect,
+    });
+
+    const [userRes, telemetryRes, spacedRes] = await Promise.allSettled([
+      userStatsPromise,
+      telemetryPromise,
+      spacedRepetitionPromise,
+    ]);
+
+    if (userRes.status === 'rejected' || (userRes.status === 'fulfilled' && userRes.value?.error)) {
+      console.warn('User stats update warning:', userRes);
+    }
+    if (telemetryRes.status === 'rejected' || (telemetryRes.status === 'fulfilled' && telemetryRes.value?.error)) {
+      console.warn('Question telemetry update warning:', telemetryRes);
+    }
+    if (spacedRes.status === 'rejected' || (spacedRes.status === 'fulfilled' && spacedRes.value?.error)) {
+      console.warn('Spaced repetition update warning:', spacedRes);
     }
   } catch (e) {
     console.error('Failed to bulk update question analytics:', e);
@@ -673,7 +739,12 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       }
 
       if (result.questions && result.userAnswers) {
-        bulkUpdateQuestionAnalytics(user.id, result.questions, result.userAnswers);
+        bulkUpdateQuestionAnalytics(
+          user.id,
+          result.questions,
+          result.userAnswers,
+          result.timeTaken,
+        );
       }
     } else {
       console.warn('[Exam Submit] No authenticated user — result saved only to localStorage');

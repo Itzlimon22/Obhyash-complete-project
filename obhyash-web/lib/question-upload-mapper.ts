@@ -16,6 +16,10 @@ export interface UploadQuestionFormat {
 
   // Question Content - Array Format (Preferred)
   question: string;
+  passage?: string; // Stimulus text for composite questions
+  parentId?: string;
+  isComposite?: boolean;
+  compositeIndex?: number;
   options?: string[]; // NEW: Array of options
   correctAnswers?: number[]; // NEW: Array of correct answer indices (multi-select)
 
@@ -35,6 +39,7 @@ export interface UploadQuestionFormat {
   examType?: string;
   institutes?: string[]; // NEW: Array of institutes
   years?: number[]; // NEW: Array of years
+  fingerprint?: string;
 
   // Legacy fields (backward compatibility)
   institute?: string;
@@ -54,6 +59,11 @@ export interface UploadQuestionFormat {
 export interface DatabaseQuestionFormat {
   // Core Content
   question: string;
+  passage?: string;
+  parent_id?: string;
+  is_composite?: boolean;
+  composite_index?: number;
+  fingerprint?: string;
   options: string[];
   correct_answer_indices: number[]; // NEW: Multi-select support
   explanation?: string;
@@ -64,10 +74,15 @@ export interface DatabaseQuestionFormat {
 
   // Academic Info
   subject: string;
+  subject_id?: string;
   chapter?: string;
+  chapter_id?: string;
   topic?: string;
+  topic_id?: string;
   stream?: string;
+  stream_id?: string;
   division?: string; // NEW
+  division_id?: string;
   section?: string;
 
   // Exam Context
@@ -123,23 +138,23 @@ export function validateUploadQuestion(
     });
   }
 
-  // Validate options (support both formats)
-  let options: string[] = [];
+  // Helper to extract options from either array or individual columns
+  const extractOptions = (q: any): string[] => {
+    if (q.options && Array.isArray(q.options) && q.options.length > 0) {
+      return q.options.map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
+    }
+    const cols = [
+      q.option1 ?? q.option_1 ?? q.optionA ?? q.option_a ?? q.opt1 ?? q['Option 1'] ?? q['Option A'] ?? q['ক'],
+      q.option2 ?? q.option_2 ?? q.optionB ?? q.option_b ?? q.opt2 ?? q['Option 2'] ?? q['Option B'] ?? q['খ'],
+      q.option3 ?? q.option_3 ?? q.optionC ?? q.option_c ?? q.opt3 ?? q['Option 3'] ?? q['Option C'] ?? q['গ'],
+      q.option4 ?? q.option_4 ?? q.optionD ?? q.option_d ?? q.opt4 ?? q['Option 4'] ?? q['Option D'] ?? q['ঘ'],
+      q.option5 ?? q.option_5 ?? q.optionE ?? q.option_e ?? q.opt5 ?? q['Option 5'] ?? q['Option E'] ?? q['ঙ'],
+      q.option6 ?? q.option_6 ?? q.optionF ?? q.option_f ?? q.opt6 ?? q['Option 6'] ?? q['Option F'],
+    ];
+    return cols.filter((opt): opt is string => typeof opt === 'string' && opt.trim() !== '');
+  };
 
-  if (question.options && Array.isArray(question.options)) {
-    // Array format
-    options = question.options.filter((opt) => opt && opt.trim() !== '');
-  } else {
-    // option1-N format
-    options = [
-      question.option1,
-      question.option2,
-      question.option3,
-      question.option4,
-      question.option5,
-      question.option6,
-    ].filter((opt): opt is string => !!(opt && opt.trim() !== ''));
-  }
+  const options = extractOptions(question);
 
   if (options.length < 2) {
     errors.push({
@@ -148,49 +163,81 @@ export function validateUploadQuestion(
     });
   }
 
-  // Validate correct answers
-  if (question.correctAnswers && Array.isArray(question.correctAnswers)) {
-    // Array format (preferred)
-    if (question.correctAnswers.length === 0) {
-      errors.push({
-        field: 'correctAnswers',
-        message: `Row ${index + 1}: At least one correct answer is required`,
-      });
+  // Smart Answer Parser supporting:
+  // - Array of indices: [0, 1]
+  // - Letters: 'A', 'B', 'C', 'D' (or 'a', 'b', 'c', 'd')
+  // - Numbers: '1', '2', '3', '4' or 0, 1, 2, 3
+  // - Bengali Letters: 'ক', 'খ', 'গ', 'ঘ'
+  // - Bengali Numerals: '১', '২', '৩', '৪'
+  // - Legacy: 'option1', 'option2'
+  // - Direct Text Matching
+  const rawAnswer = question.correctAnswers ?? question.answer ?? (question as any).correct_answer ?? (question as any).correct_answer_index ?? (question as any)['Correct Answer'];
+
+  const parseSingleAnswerIndex = (ans: any): number | null => {
+    if (typeof ans === 'number') {
+      if (ans >= 0 && ans < options.length) return ans;
+      if (ans >= 1 && ans <= options.length) return ans - 1; // 1-indexed fallback
+      return null;
+    }
+    if (typeof ans !== 'string') return null;
+    const trimmed = ans.trim().toLowerCase();
+
+    // 1. Check option1, option2 ...
+    const optMatch = trimmed.match(/option\s*(\d+)/i);
+    if (optMatch) {
+      const idx = parseInt(optMatch[1], 10) - 1;
+      return idx >= 0 && idx < options.length ? idx : null;
     }
 
-    question.correctAnswers.forEach((idx) => {
-      if (idx < 0 || idx >= options.length) {
-        errors.push({
-          field: 'correctAnswers',
-          message: `Row ${index + 1}: Correct answer index ${idx} is out of range`,
-        });
-      }
-    });
-  } else if (question.answer) {
-    // Backward compatible format
-    const answers = question.answer.split(',').map((a) => a.trim());
+    // 2. Check pure English digits (0, 1, 2, 3 or 1, 2, 3, 4)
+    if (/^\d+$/.test(trimmed)) {
+      const num = parseInt(trimmed, 10);
+      if (num >= 0 && num < options.length) return num;
+      if (num >= 1 && num <= options.length) return num - 1;
+    }
 
-    answers.forEach((answerRef) => {
-      const answerMatch = answerRef.match(/option(\d+)/i);
-      if (!answerMatch) {
-        errors.push({
-          field: 'answer',
-          message: `Row ${index + 1}: Answer must be in format "option1", "option2", etc.`,
-        });
-      } else {
-        const optionIndex = parseInt(answerMatch[1]) - 1;
-        if (optionIndex < 0 || optionIndex >= options.length) {
-          errors.push({
-            field: 'answer',
-            message: `Row ${index + 1}: Answer refers to option${optionIndex + 1} which doesn't exist`,
-          });
-        }
-      }
-    });
-  } else {
+    // 3. Check English letters A, B, C, D, E, F
+    const letterMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 };
+    if (letterMap[trimmed] !== undefined && letterMap[trimmed] < options.length) {
+      return letterMap[trimmed];
+    }
+
+    // 4. Check Bengali Letters ক, খ, গ, ঘ, ঙ
+    const bengaliLetterMap: Record<string, number> = { 'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3, 'ঙ': 4 };
+    if (bengaliLetterMap[ans.trim()] !== undefined && bengaliLetterMap[ans.trim()] < options.length) {
+      return bengaliLetterMap[ans.trim()];
+    }
+
+    // 5. Check Bengali Numerals ১, ২, ৩, ৪
+    const bengaliDigitMap: Record<string, number> = { '১': 0, '২': 1, '৩': 2, '৪': 3, '৫': 4 };
+    if (bengaliDigitMap[ans.trim()] !== undefined && bengaliDigitMap[ans.trim()] < options.length) {
+      return bengaliDigitMap[ans.trim()];
+    }
+
+    // 6. Direct match with option content
+    const directIdx = options.findIndex((o) => o.trim().toLowerCase() === trimmed);
+    if (directIdx !== -1) return directIdx;
+
+    return null;
+  };
+
+  let validAnswerIndices: number[] = [];
+
+  if (Array.isArray(rawAnswer)) {
+    validAnswerIndices = rawAnswer
+      .map(parseSingleAnswerIndex)
+      .filter((idx): idx is number => idx !== null);
+  } else if (rawAnswer !== undefined && rawAnswer !== null && String(rawAnswer).trim() !== '') {
+    const parts = String(rawAnswer).split(/[,;|\/]/).map((p) => p.trim()).filter(Boolean);
+    validAnswerIndices = parts
+      .map(parseSingleAnswerIndex)
+      .filter((idx): idx is number => idx !== null);
+  }
+
+  if (validAnswerIndices.length === 0) {
     errors.push({
       field: 'answer',
-      message: `Row ${index + 1}: At least one correct answer is required`,
+      message: `Row ${index + 1}: Valid correct answer is required (e.g. A, B, C, D or 1, 2, 3, 4 or ক, খ, গ, ঘ)`,
     });
   }
 
@@ -255,51 +302,76 @@ function resolveTopicName(
 export function transformUploadToDatabase(
   uploadQuestion: UploadQuestionFormat,
 ): DatabaseQuestionFormat {
-  // Build options array
+  // Extract options from either array or individual columns
   let options: string[] = [];
-
-  if (uploadQuestion.options && Array.isArray(uploadQuestion.options)) {
-    // Array format
-    options = uploadQuestion.options.filter((opt): opt is string =>
-      Boolean(opt && opt.trim() !== ''),
-    );
+  if (uploadQuestion.options && Array.isArray(uploadQuestion.options) && uploadQuestion.options.length > 0) {
+    options = uploadQuestion.options.map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
   } else {
-    // option1-N format
-    options = [
-      uploadQuestion.option1,
-      uploadQuestion.option2,
-      uploadQuestion.option3,
-      uploadQuestion.option4,
-      uploadQuestion.option5,
-      uploadQuestion.option6,
-    ].filter((opt): opt is string => Boolean(opt && opt.trim() !== ''));
+    const q: any = uploadQuestion;
+    const cols = [
+      q.option1 ?? q.option_1 ?? q.optionA ?? q.option_a ?? q.opt1 ?? q['Option 1'] ?? q['Option A'] ?? q['ক'],
+      q.option2 ?? q.option_2 ?? q.optionB ?? q.option_b ?? q.opt2 ?? q['Option 2'] ?? q['Option B'] ?? q['খ'],
+      q.option3 ?? q.option_3 ?? q.optionC ?? q.option_c ?? q.opt3 ?? q['Option 3'] ?? q['Option C'] ?? q['গ'],
+      q.option4 ?? q.option_4 ?? q.optionD ?? q.option_d ?? q.opt4 ?? q['Option 4'] ?? q['Option D'] ?? q['ঘ'],
+      q.option5 ?? q.option_5 ?? q.optionE ?? q.option_e ?? q.opt5 ?? q['Option 5'] ?? q['Option E'] ?? q['ঙ'],
+      q.option6 ?? q.option_6 ?? q.optionF ?? q.option_f ?? q.opt6 ?? q['Option 6'] ?? q['Option F'],
+    ];
+    options = cols.filter((opt): opt is string => typeof opt === 'string' && opt.trim() !== '');
   }
 
   // Parse correct answer indices
+  const rawAns = uploadQuestion.correctAnswers ?? uploadQuestion.answer ?? (uploadQuestion as any).correct_answer ?? (uploadQuestion as any).correct_answer_index ?? (uploadQuestion as any)['Correct Answer'];
+
+  const parseSingleAnswerIndex = (ans: any): number | null => {
+    if (typeof ans === 'number') {
+      if (ans >= 0 && ans < options.length) return ans;
+      if (ans >= 1 && ans <= options.length) return ans - 1;
+      return null;
+    }
+    if (typeof ans !== 'string') return null;
+    const trimmed = ans.trim().toLowerCase();
+
+    const optMatch = trimmed.match(/option\s*(\d+)/i);
+    if (optMatch) {
+      const idx = parseInt(optMatch[1], 10) - 1;
+      return idx >= 0 && idx < options.length ? idx : null;
+    }
+
+    if (/^\d+$/.test(trimmed)) {
+      const num = parseInt(trimmed, 10);
+      if (num >= 0 && num < options.length) return num;
+      if (num >= 1 && num <= options.length) return num - 1;
+    }
+
+    const letterMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5 };
+    if (letterMap[trimmed] !== undefined && letterMap[trimmed] < options.length) {
+      return letterMap[trimmed];
+    }
+
+    const bengaliLetterMap: Record<string, number> = { 'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3, 'ঙ': 4 };
+    if (bengaliLetterMap[ans.trim()] !== undefined && bengaliLetterMap[ans.trim()] < options.length) {
+      return bengaliLetterMap[ans.trim()];
+    }
+
+    const bengaliDigitMap: Record<string, number> = { '১': 0, '২': 1, '৩': 2, '৪': 3, '৫': 4 };
+    if (bengaliDigitMap[ans.trim()] !== undefined && bengaliDigitMap[ans.trim()] < options.length) {
+      return bengaliDigitMap[ans.trim()];
+    }
+
+    const directIdx = options.findIndex((o) => o.trim().toLowerCase() === trimmed);
+    if (directIdx !== -1) return directIdx;
+
+    return null;
+  };
+
   let correctAnswerIndices: number[] = [];
-
-  if (
-    uploadQuestion.correctAnswers &&
-    Array.isArray(uploadQuestion.correctAnswers)
-  ) {
-    // Array format (preferred)
-    correctAnswerIndices = uploadQuestion.correctAnswers;
-  } else if (uploadQuestion.answer) {
-    // Backward compatible format - supports comma-separated values
-    const answers = uploadQuestion.answer.split(',').map((a) => a.trim());
-
-    answers.forEach((answerRef) => {
-      const answerMatch = answerRef.match(/option(\d+)/i);
-      if (answerMatch) {
-        const optionIndex = parseInt(answerMatch[1]) - 1;
-        if (optionIndex >= 0 && optionIndex < options.length) {
-          correctAnswerIndices.push(optionIndex);
-        }
-      }
-    });
+  if (Array.isArray(rawAns)) {
+    correctAnswerIndices = rawAns.map(parseSingleAnswerIndex).filter((idx): idx is number => idx !== null);
+  } else if (rawAns !== undefined && rawAns !== null && String(rawAns).trim() !== '') {
+    const parts = String(rawAns).split(/[,;|\/]/).map((p) => p.trim()).filter(Boolean);
+    correctAnswerIndices = parts.map(parseSingleAnswerIndex).filter((idx): idx is number => idx !== null);
   }
 
-  // Fallback to first option if no valid answers
   if (correctAnswerIndices.length === 0) {
     correctAnswerIndices = [0];
   }
@@ -309,7 +381,6 @@ export function transformUploadToDatabase(
   if (uploadQuestion.institutes && Array.isArray(uploadQuestion.institutes)) {
     institutes = uploadQuestion.institutes;
   } else if (uploadQuestion.institute) {
-    // Parse comma-separated institutes or single institute
     institutes = uploadQuestion.institute
       .split(',')
       .map((i) => i.trim())
@@ -321,7 +392,6 @@ export function transformUploadToDatabase(
   if (uploadQuestion.years && Array.isArray(uploadQuestion.years)) {
     years = uploadQuestion.years;
   } else if (uploadQuestion.year) {
-    // Parse comma-separated years or single year
     const yearStrings = uploadQuestion.year.split(',').map((y) => y.trim());
     years = yearStrings
       .map((y) => parseInt(y))
@@ -337,10 +407,24 @@ export function transformUploadToDatabase(
     optionImages = uploadQuestion.optionImages;
   }
 
+  const rawStream = uploadQuestion.stream || 'HSC';
+  const streamId = rawStream.toUpperCase().includes('SSC')
+    ? 'SSC'
+    : rawStream.toUpperCase().includes('ADMISSION')
+    ? 'ADMISSION'
+    : rawStream.toUpperCase().includes('BCS')
+    ? 'BCS'
+    : 'HSC';
+
   // Transform to database format with snake_case
   return {
     // Core Content
     question: uploadQuestion.question,
+    passage: uploadQuestion.passage,
+    parent_id: uploadQuestion.parentId,
+    is_composite: uploadQuestion.isComposite || Boolean(uploadQuestion.passage),
+    composite_index: uploadQuestion.compositeIndex || 1,
+    fingerprint: uploadQuestion.fingerprint,
     options,
     correct_answer_indices: correctAnswerIndices,
     explanation: uploadQuestion.explanation,
@@ -357,8 +441,14 @@ export function transformUploadToDatabase(
       uploadQuestion.chapter,
       uploadQuestion.topic,
     ),
-    stream: uploadQuestion.stream,
-    division: uploadQuestion.division,
+    stream: uploadQuestion.stream || 'HSC',
+    stream_id: streamId,
+    division: uploadQuestion.division || 'Science',
+    division_id: uploadQuestion.division?.toLowerCase().includes('hum')
+      ? 'humanities'
+      : uploadQuestion.division?.toLowerCase().includes('bus')
+      ? 'business_studies'
+      : 'science',
     section: uploadQuestion.section,
 
     // Exam Context
@@ -367,7 +457,7 @@ export function transformUploadToDatabase(
     years,
 
     // Metadata
-    status: 'Pending',
+    status: 'Approved',
     author: 'Bulk Upload',
     created_at: new Date().toISOString(),
     version: 1,
@@ -394,6 +484,11 @@ export function transformDatabaseToQuestion(
   return {
     id: '', // Will be set by database
     question: dbQuestion.question,
+    passage: dbQuestion.passage,
+    parentId: dbQuestion.parent_id,
+    isComposite: dbQuestion.is_composite,
+    compositeIndex: dbQuestion.composite_index,
+    fingerprint: dbQuestion.fingerprint,
     options: dbQuestion.options,
 
     // Multi-select support
@@ -407,10 +502,15 @@ export function transformDatabaseToQuestion(
     difficulty: dbQuestion.difficulty as Question['difficulty'],
 
     subject: dbQuestion.subject,
+    subjectId: dbQuestion.subject_id,
     chapter: dbQuestion.chapter,
+    chapterId: dbQuestion.chapter_id,
     topic: dbQuestion.topic,
+    topicId: dbQuestion.topic_id,
     stream: dbQuestion.stream,
+    streamId: dbQuestion.stream_id,
     division: dbQuestion.division,
+    divisionId: dbQuestion.division_id,
     section: dbQuestion.section,
     examType: dbQuestion.exam_type,
     institutes: dbQuestion.institutes,

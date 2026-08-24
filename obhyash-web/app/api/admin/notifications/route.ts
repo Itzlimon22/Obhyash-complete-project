@@ -159,10 +159,26 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Dispatch real push notifications to physical mobile devices via FCM
+      let fcmResult = { sent: 0, failed: 0, errors: [] as string[] };
+      try {
+        const { sendFCMNotificationToUsers } = await import('@/lib/fcm-server');
+        fcmResult = await sendFCMNotificationToUsers(supabaseAdmin, {
+          userIds: recipientIds,
+          title,
+          body: message,
+          data: targetRoute ? { route: targetRoute } : {},
+          channelId: type === 'live_exam' ? 'obhyash_live_exams' : 'obhyash_general',
+        });
+      } catch (fcmErr) {
+        console.error('[Admin Notifications] FCM Push dispatch error:', fcmErr);
+      }
+
       return NextResponse.json({
         success: true,
         count: successCount,
-        message: `Notification broadcasted to ${successCount} recipients`,
+        fcmSent: fcmResult.sent,
+        message: `Notification broadcasted to ${successCount} recipients (${fcmResult.sent} device pushes dispatched)`,
       });
     }
 

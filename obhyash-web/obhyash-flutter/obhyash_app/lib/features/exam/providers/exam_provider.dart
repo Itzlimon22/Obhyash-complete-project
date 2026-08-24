@@ -148,12 +148,12 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
       List<Question> generatedQuestions = [];
 
-      // 1. Try distributed RPC across subject variants
+      // 1. Try Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix)
       for (final sVar in subjectVariants) {
         if (generatedQuestions.isNotEmpty) break;
         try {
           final data = await supabase.rpc(
-            'get_distributed_exam_questions',
+            'get_adaptive_mock_exam_questions',
             params: {
               'p_user_id': supabase.auth.currentUser?.id,
               'p_subject': sVar,
@@ -175,11 +175,46 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               config.questionCount,
               chaptersList,
             );
+            debugPrint('[ExamProvider] Adaptive Smart Mock returned ${generatedQuestions.length} questions');
           }
         } catch (rpcErr) {
           debugPrint(
-            '[ExamProvider] RPC get_distributed_exam_questions error for $sVar: $rpcErr',
+            '[ExamProvider] RPC get_adaptive_mock_exam_questions error for $sVar: $rpcErr',
           );
+        }
+
+        // Secondary Distributed RPC Fallback
+        if (generatedQuestions.isEmpty) {
+          try {
+            final data = await supabase.rpc(
+              'get_distributed_exam_questions',
+              params: {
+                'p_user_id': supabase.auth.currentUser?.id,
+                'p_subject': sVar,
+                'p_subject_name': sVar,
+                'p_total': config.questionCount,
+                'p_chapters': chaptersList,
+                'p_topics': topicsList,
+                'p_difficulties': difficultiesList,
+                'p_exam_types': examTypesList,
+              },
+            );
+            final qList = (data as List<dynamic>?) ?? [];
+            if (qList.isNotEmpty) {
+              final parsed = qList
+                  .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                  .toList();
+              generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+                parsed,
+                config.questionCount,
+                chaptersList,
+              );
+            }
+          } catch (rpcErr) {
+            debugPrint(
+              '[ExamProvider] RPC get_distributed_exam_questions error for $sVar: $rpcErr',
+            );
+          }
         }
       }
 
@@ -667,6 +702,22 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               '[ExamProvider] Atomic XP update failed after retries. Will sync on next connection.',
             );
           }
+        }
+
+        // Sync Spaced Repetition (Leitner 5-Box Mistake & Weakness Tracker)
+        try {
+          final answeredQuestions = state.questions.where((q) => state.userAnswers.containsKey(q.id)).toList();
+          if (answeredQuestions.isNotEmpty) {
+            final qIds = answeredQuestions.map((q) => q.id).toList();
+            final areCorrect = answeredQuestions.map((q) => state.userAnswers[q.id] == q.correctAnswerIndex).toList();
+            await supabase.rpc('record_exam_spaced_repetition', params: {
+              'p_user_id': authId,
+              'p_question_ids': qIds,
+              'p_are_correct': areCorrect,
+            });
+          }
+        } catch (srErr) {
+          debugPrint('[ExamProvider] record_exam_spaced_repetition error: $srErr');
         }
       } catch (e) {
         debugPrint('[ExamProvider] submitExam DB error (offline): $e. Queuing for auto-sync...');

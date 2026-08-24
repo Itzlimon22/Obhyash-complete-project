@@ -29,6 +29,9 @@ const StreakCalendar = dynamic(
 const BadgesShowcaseSection = dynamic(
   () => import('@/components/student/ui/profile/dashboard/BadgesShowcaseSection'),
 );
+const LeitnerMemoryBoxCard = dynamic(
+  () => import('@/components/student/ui/profile/dashboard/LeitnerMemoryBoxCard'),
+);
 
 interface UserProfileViewProps {
   user: UserProfile;
@@ -337,13 +340,16 @@ export default function UserProfileView({
         </div>
       )}
 
-      {/* 4. বিষয়ভিত্তিক দক্ষতা */}
+      {/* 4. Leitner 5-Box মেমোরি আয়ত্ত */}
+      <LeitnerMemoryBoxCard userId={user.id} />
+
+      {/* 5. বিষয়ভিত্তিক দক্ষতা */}
       <SubjectsProgressSection subjectStats={targetSubjects} onSubjectClick={onSubjectClick} />
 
-      {/* 5. স্ট্রিক ক্যালেন্ডার */}
+      {/* 6. স্ট্রিক ক্যালেন্ডার */}
       <StreakCalendar calendarData={calendarData} streakCount={targetStreak} />
 
-      {/* 6. অর্জন ও ব্যাজসমূহ */}
+      {/* 7. অর্জন ও ব্যাজসমূহ */}
       <BadgesShowcaseSection userId={user.id} />
     </div>
   );

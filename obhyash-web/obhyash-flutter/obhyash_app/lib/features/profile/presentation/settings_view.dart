@@ -270,11 +270,6 @@ class SettingsView extends ConsumerWidget {
     final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
     final groups = _buildGroups(context, themeMode);
 
-    final nameParts = user.name.trim().split(' ');
-    final initials = nameParts.length >= 2
-        ? '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase()
-        : (nameParts[0].isNotEmpty ? nameParts[0][0].toUpperCase() : '?');
-
     return Scaffold(
       backgroundColor: bg,
       body: ListView(
