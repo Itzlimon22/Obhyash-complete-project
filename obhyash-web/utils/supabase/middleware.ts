@@ -157,7 +157,12 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Logged-in users visiting auth pages or the root get redirected to their dashboard
+    // Exception: If an error parameter is present on /login (e.g. unregistered_google), do NOT redirect
     if (isAuthRoute || isRootRoute) {
+      if (isAuthRoute && request.nextUrl.searchParams.has('error')) {
+        return supabaseResponse;
+      }
+
       const url = request.nextUrl.clone();
 
       if (role === 'admin') {

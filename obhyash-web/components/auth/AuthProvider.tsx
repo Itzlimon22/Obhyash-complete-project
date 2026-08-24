@@ -508,24 +508,34 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     const userId = user?.id;
 
-    // Instant UI feedback and redirect to landing page
+    // Instant UI feedback
     setUser(null);
     setProfile(null);
     clearCachedProfile();
-    router.push("/");
 
-    // Background cleanup
-    (async () => {
-      // Unregister this device BEFORE revoking the session (RLS requires active session)
+    try {
+      if (typeof window !== "undefined") {
+        document.cookie = "obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      }
+
       if (userId) {
         await unregisterCurrentDevice(userId).catch(() => {});
       }
+
+      // Server-side signout to clear auth cookies
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+
+      // Client-side Supabase signout
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Sign out error:", error);
       }
-    })();
-  }, [supabase, router, user]);
+    } catch (err) {
+      console.error("Signout error in AuthProvider:", err);
+    } finally {
+      window.location.replace("/login");
+    }
+  }, [supabase, user]);
 
   // ── refreshProfile ────────────────────────────────────────────────────────
   const refreshProfile = useCallback(async () => {

@@ -13,6 +13,7 @@ class FormulaSubjectsView extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Personalize level based on student profile (level or stream)
+    // 100% offline resilient: defaults to 'HSC' if profile is not available offline
     final userProfile = ref.watch(userProfileProvider).value;
     final level = (userProfile?.level?.isNotEmpty == true)
         ? userProfile!.level!
@@ -131,63 +132,40 @@ class _SubjectCardState extends State<_SubjectCard>
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(g[1]).withValues(alpha: isDark ? 0.4 : 0.2),
-                blurRadius: 12,
+                color: Color(g[0]).withValues(alpha: isDark ? 0.4 : 0.25),
+                blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Stack(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Subtle background glow
-              Positioned(
-                top: -20,
-                right: -20,
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF059669).withValues(alpha: 0.08),
-                  ),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  widget.subject.emoji,
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Emoji Icon
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          widget.subject.emoji,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      widget.subject.subjectName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Anek Bangla',
-                        color: Colors.white,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
+              Text(
+                widget.subject.subjectName,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: 'Anek Bangla',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  height: 1.2,
                 ),
               ),
             ],

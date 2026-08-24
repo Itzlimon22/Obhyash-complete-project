@@ -39,9 +39,15 @@ export default function LoginPage() {
   // Handle errors passed via URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('error') === 'unregistered_google') {
+    const err = params.get('error');
+    if (err === 'unregistered_google') {
       setTimeout(() => {
         setError('এই গুগল ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে আগে নতুন অ্যাকাউন্ট খুলুন।');
+      }, 0);
+      window.history.replaceState({}, '', '/login');
+    } else if (err === 'oauth_cancelled') {
+      setTimeout(() => {
+        setError('গুগল লগইন বাতিল বা ব্যর্থ হয়েছে। দয়া করে পুনরায় চেষ্টা করুন।');
       }, 0);
       window.history.replaceState({}, '', '/login');
     }

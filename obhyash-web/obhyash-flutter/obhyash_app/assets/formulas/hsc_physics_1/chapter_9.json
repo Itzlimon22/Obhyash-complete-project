@@ -2,76 +2,166 @@
   {
     "title": "তরঙ্গের মৌলিক সমীকরণ ও রাশিমালা (Wave Fundamentals)",
     "latex": "v = f\\lambda = \\frac{\\lambda}{T} = \\frac{\\omega}{k}, \\quad \\omega = 2\\pi f = \\frac{2\\pi}{T}, \\quad k = \\frac{2\\pi}{\\lambda}",
-    "description": "v = তরঙ্গ বেগ, f = কম্পাঙ্ক, λ = তরঙ্গদৈর্ঘ্য, T = পর্যায়কাল, ω = কৌণিক কম্পাঙ্ক, k = তরঙ্গ সংখ্যা / কৌণিক তরঙ্গ ধ্রুবক।"
+    "description": "v = তরঙ্গ বেগ, f = কম্পাঙ্ক, λ = তরঙ্গদৈর্ঘ্য, T = পর্যায়কাল, ω = কৌণিক কম্পাঙ্ক, k = তরঙ্গ সংখ্যা / কৌণিক তরঙ্গ ধ্রুবক।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $v = f\\lambda = \\frac{\\lambda}{T} = \\frac{\\omega}{k}, \\quad \\omega = 2\\pi f = \\frac{2\\pi}{T}, \\quad k = \\frac{2\\pi}{\\lambda}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $v = f\\lambda = \\frac{\\lambda}{T} = \\frac{\\omega}{k}, \\quad \\omega = 2\\pi f = \\frac{2\\pi}{T}, \\quad k = \\frac{2\\pi}{\\lambda}$"
+      }
+    ]
   },
   {
     "title": "দশা পার্থক্য ও পথ পার্থক্যের সম্পর্ক (Phase & Path Difference)",
     "latex": "\\Delta \\delta = \\frac{2\\pi}{\\lambda}\\Delta x = \\frac{2\\pi}{T}\\Delta t",
-    "description": "Δδ = দশা পার্থক্য (rad), Δx = পথ পার্থক্য (Path difference), Δt = সময় ব্যবধান।"
+    "description": "Δδ = দশা পার্থক্য (rad), Δx = পথ পার্থক্য (Path difference), Δt = সময় ব্যবধান।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\Delta \\delta = \\frac{2\\pi}{\\lambda}\\Delta x = \\frac{2\\pi}{T}\\Delta t$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\Delta \\delta = \\frac{2\\pi}{\\lambda}\\Delta x = \\frac{2\\pi}{T}\\Delta t$"
+      }
+    ]
   },
   {
     "title": "অগ্রগামী তরঙ্গের সমীকরণ (Equation of Progressive / Traveling Wave)",
     "latex": "y = A\\sin(\\omega t - kx) = A\\sin 2\\pi\\left(\\frac{t}{T} - \\frac{x}{\\lambda}\\right) = A\\sin\\frac{2\\pi}{\\lambda}(vt - x)",
-    "description": "+x দিকে ধাবমান তরঙ্গের সমীকরণ (ঋণাত্মক x দিকে হলে চিহ্নের পরিবর্তন: +kx)। A = বিস্তার।"
+    "description": "+x দিকে ধাবমান তরঙ্গের সমীকরণ (ঋণাত্মক x দিকে হলে চিহ্নের পরিবর্তন: +kx)। A = বিস্তার।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $y = A\\sin(\\omega t - kx) = A\\sin 2\\pi\\left(\\frac{t}{T} - \\frac{x}{\\lambda}\\right) = A\\sin\\frac{2\\pi}{\\lambda}(vt - x)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $y = A\\sin(\\omega t - kx) = A\\sin 2\\pi\\left(\\frac{t}{T} - \\frac{x}{\\lambda}\\right) = A\\sin\\frac{2\\pi}{\\lambda}(vt - x)$"
+      }
+    ]
   },
   {
     "title": "তরঙ্গ বেগ ও মাধ্যমের কণার বেগের সম্পর্ক (Particle Velocity vs Wave Velocity)",
     "latex": "v_{\\text{particle}} = \\frac{dy}{dt} = -v_{\\text{wave}} \\left(\\frac{dy}{dx}\\right), \\quad v_{\\text{particle, max}} = \\omega A = 2\\pi f A",
-    "description": "কণার তাৎক্ষণিক বেগ হলো তরঙ্গ বেগ ও তরঙ্গের ঢালের (-dy/dx) গুণফল।"
+    "description": "কণার তাৎক্ষণিক বেগ হলো তরঙ্গ বেগ ও তরঙ্গের ঢালের (-dy/dx) গুণফল।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $v_{\\text{particle}} = \\frac{dy}{dt} = -v_{\\text{wave}} \\left(\\frac{dy}{dx}\\right), \\quad v_{\\text{particle, max}} = \\omega A = 2\\pi f A$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $v_{\\text{particle}} = \\frac{dy}{dt} = -v_{\\text{wave}} \\left(\\frac{dy}{dx}\\right), \\quad v_{\\text{particle, max}} = \\omega A = 2\\pi f A$"
+      }
+    ]
   },
   {
     "title": "গ্যাসে শব্দের বেগ - ল্যাপলাসের সংশোধন (Speed of Sound in Gas - Laplace)",
     "latex": "v = \\sqrt{\\frac{\\gamma P}{\\rho}} = \\sqrt{\\frac{\\gamma R T}{M}} \\implies v \\propto \\sqrt{T}",
-    "description": "γ = গ্যাসের মোলার আপেক্ষিক তাপের অনুপাত (Cp/Cv), P = চাপ, ρ = ঘনত্ব, T = পরম তাপমাত্রা (K), M = আণবিক ভর।"
+    "description": "γ = গ্যাসের মোলার আপেক্ষিক তাপের অনুপাত (Cp/Cv), P = চাপ, ρ = ঘনত্ব, T = পরম তাপমাত্রা (K), M = আণবিক ভর।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $v = \\sqrt{\\frac{\\gamma P}{\\rho}} = \\sqrt{\\frac{\\gamma R T}{M}} \\implies v \\propto \\sqrt{T}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $v = \\sqrt{\\frac{\\gamma P}{\\rho}} = \\sqrt{\\frac{\\gamma R T}{M}} \\implies v \\propto \\sqrt{T}$"
+      }
+    ]
   },
   {
     "title": "তাপমাত্রার সাথে শব্দের বেগের পরিবর্তন (Temperature Effect on Sound Speed)",
     "latex": "\\frac{v_1}{v_2} = \\sqrt{\\frac{T_1}{T_2}}, \\quad v_t = v_0 + 0.61 t \\; (v_0 \\approx 332\\text{ m/s})",
-    "description": "প্রতি ১°C তাপমাত্রা বৃদ্ধিতে বায়ুতে শব্দের বেগ ০.৬১ m/s বৃদ্ধি পায়।"
+    "description": "প্রতি ১°C তাপমাত্রা বৃদ্ধিতে বায়ুতে শব্দের বেগ ০.৬১ m/s বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\frac{v_1}{v_2} = \\sqrt{\\frac{T_1}{T_2}}, \\quad v_t = v_0 + 0.61 t \\; (v_0 \\approx 332\\text{ m/s})$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\frac{v_1}{v_2} = \\sqrt{\\frac{T_1}{T_2}}, \\quad v_t = v_0 + 0.61 t \\; (v_0 \\approx 332\\text{ m/s})$"
+      }
+    ]
   },
   {
     "title": "স্থির তরঙ্গের সমীকরণ ও সুস্পন্দ/নিস্পন্দ বিন্দু (Standing Wave Nodes & Antinodes)",
     "latex": "y = 2A\\cos(kx)\\sin(\\omega t), \\quad \\text{নিস্পন্দ-সুস্পন্দ দূরত্ব} = \\frac{\\lambda}{4}, \\quad \\text{পরপর দুটি নিস্পন্দ} = \\frac{\\lambda}{2}",
-    "description": "সুস্পন্দ বিন্দুতে (Antinode) বিস্তার সর্বোচ্চ (2A) এবং নিস্পন্দ বিন্দুতে (Node) বিস্তার শূন্য (0)।"
+    "description": "সুস্পন্দ বিন্দুতে (Antinode) বিস্তার সর্বোচ্চ (2A) এবং নিস্পন্দ বিন্দুতে (Node) বিস্তার শূন্য (0)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $y = 2A\\cos(kx)\\sin(\\omega t), \\quad \\text{নিস্পন্দ-সুস্পন্দ দূরত্ব} = \\frac{\\lambda}{4}, \\quad \\text{পরপর দুটি নিস্পন্দ} = \\frac{\\lambda}{2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $y = 2A\\cos(kx)\\sin(\\omega t), \\quad \\text{নিস্পন্দ-সুস্পন্দ দূরত্ব} = \\frac{\\lambda}{4}, \\quad \\text{পরপর দুটি নিস্পন্দ} = \\frac{\\lambda}{2}$"
+      }
+    ]
   },
   {
     "title": "টানা তারের আড় কম্পনের মূল সুর (Stretched String Fundamental Frequency)",
     "latex": "f_1 = \\frac{1}{2L}\\sqrt{\\frac{T}{\\mu}} = \\frac{1}{2L}\\sqrt{\\frac{T}{\\pi r^2 \\rho}}, \\quad f_n = n f_1",
-    "description": "L = তারের দৈর্ঘ্য, T = প্রযুক্ত টান বল, μ = একক দৈর্ঘ্যের ভর (m/L = πr²ρ)।"
+    "description": "L = তারের দৈর্ঘ্য, T = প্রযুক্ত টান বল, μ = একক দৈর্ঘ্যের ভর (m/L = πr²ρ)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $f_1 = \\frac{1}{2L}\\sqrt{\\frac{T}{\\mu}} = \\frac{1}{2L}\\sqrt{\\frac{T}{\\pi r^2 \\rho}}, \\quad f_n = n f_1$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $f_1 = \\frac{1}{2L}\\sqrt{\\frac{T}{\\mu}} = \\frac{1}{2L}\\sqrt{\\frac{T}{\\pi r^2 \\rho}}, \\quad f_n = n f_1$"
+      }
+    ]
   },
   {
     "title": "খোলা ও বন্ধ অর্গান পাইপের কম্পাঙ্ক (Open & Closed Organ Pipes)",
     "latex": "f_{\\text{open}} = \\frac{nv}{2L} \\; (n=1,2,3\\dots), \\quad f_{\\text{closed}} = \\frac{(2n-1)v}{4L} \\; (n=1,2,3\\dots)",
-    "description": "খোলা নলে সকল হারমোনিক এবং বন্ধ নলে কেবল বিজোড় হারমোনিক উৎপন্ন হয়। একই দৈর্ঘ্যে fopen = 2 fclosed।"
+    "description": "খোলা নলে সকল হারমোনিক এবং বন্ধ নলে কেবল বিজোড় হারমোনিক উৎপন্ন হয়। একই দৈর্ঘ্যে fopen = 2 fclosed।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $f_{\\text{open}} = \\frac{nv}{2L} \\; (n=1,2,3\\dots), \\quad f_{\\text{closed}} = \\frac{(2n-1)v}{4L} \\; (n=1,2,3\\dots)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $f_{\\text{open}} = \\frac{nv}{2L} \\; (n=1,2,3\\dots), \\quad f_{\\text{closed}} = \\frac{(2n-1)v}{4L} \\; (n=1,2,3\\dots)$"
+      }
+    ]
   },
   {
     "title": "অর্গান পাইপের প্রান্ত সংশোধন (End Correction of Pipes)",
     "latex": "e = 0.6 r \\implies L'_{\\text{closed}} = L + 0.6r, \\quad L'_{\\text{open}} = L + 1.2r",
-    "description": "নলের মুখের বাইরে যে সামান্য দূরত্বে সুস্পন্দ বিন্দু তৈরি হয় (r = নলের ব্যাসার্ধ)।"
+    "description": "নলের মুখের বাইরে যে সামান্য দূরত্বে সুস্পন্দ বিন্দু তৈরি হয় (r = নলের ব্যাসার্ধ)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $e = 0.6 r \\implies L'_{\\text{closed}} = L + 0.6r, \\quad L'_{\\text{open}} = L + 1.2r$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $e = 0.6 r \\implies L'_{\\text{closed}} = L + 0.6r, \\quad L'_{\\text{open}} = L + 1.2r$"
+      }
+    ]
   },
   {
     "title": "বীট বা স্বরকম্পের সমীকরণ (Beats Frequency)",
     "latex": "b = |f_1 - f_2|",
-    "description": "সামান্য পার্থক্যযুক্ত দুটি সুরশলাকা একসাথে বাজালে প্রতি সেকেন্ডে b সংখ্যক শব্দের তীব্রতার হ্রাস-বৃদ্ধি (বীট) শোনা যায়।"
+    "description": "সামান্য পার্থক্যযুক্ত দুটি সুরশলাকা একসাথে বাজালে প্রতি সেকেন্ডে b সংখ্যক শব্দের তীব্রতার হ্রাস-বৃদ্ধি (বীট) শোনা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $b = |f_1 - f_2|$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $b = |f_1 - f_2|$"
+      }
+    ]
   },
   {
     "title": "শব্দের তীব্রতা ও বেল/ডেসিবেল লেবেল (Sound Intensity & Decibel Level)",
     "latex": "I = 2\\pi^2 f^2 A^2 \\rho v = \\frac{P}{4\\pi r^2}, \\quad \\beta = 10\\log_{10}\\left(\\frac{I}{I_0}\\right)\\text{ dB} \\; (I_0 = 10^{-12}\\text{ W/m}^2)",
-    "description": "I = শব্দের তীব্রতা (W/m²), β = তীব্রতা লেবেল (dB), I₀ = মানুষের শ্রবণযোগ্যতার প্রমাণ তীব্রতা।"
+    "description": "I = শব্দের তীব্রতা (W/m²), β = তীব্রতা লেবেল (dB), I₀ = মানুষের শ্রবণযোগ্যতার প্রমাণ তীব্রতা।",
+    "practiceQuestions": [
+      {
+        "question": "শব্দের তীব্রতা ১০ গুণ বৃদ্ধি পেলে তীব্রতা লেভেল ($\beta$) কত বৃদ্ধি পায়?",
+        "answer": "Ans: $10\\text{ dB}$ বৃদ্ধি পায়"
+      }
+    ]
   },
   {
     "title": "একাধিক শব্দের তীব্রতা লেবেল শর্টকাট (Multiple Sound Sources Intensity Level)",
     "latex": "\\beta_{\\text{total}} = \\beta_1 + 10\\log_{10}(n)",
-    "description": "n টি সমান তীব্রতার শব্দ উৎস একসাথে বাজালে ডেসিবেল লেবেল 10 log₁₀(n) বাড়ে (যেমন ১০টি উৎস বাজলে ১০ dB বাড়ে)।"
+    "description": "n টি সমান তীব্রতার শব্দ উৎস একসাথে বাজালে ডেসিবেল লেবেল 10 log₁₀(n) বাড়ে (যেমন ১০টি উৎস বাজলে ১০ dB বাড়ে)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\beta_{\\text{total}} = \\beta_1 + 10\\log_{10}(n)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\beta_{\\text{total}} = \\beta_1 + 10\\log_{10}(n)$"
+      }
+    ]
   },
   {
     "title": "ডপলার প্রভাবের সাধারণ সমীকরণ (Doppler Effect Equation with Wind)",
     "latex": "f' = f\\left(\\frac{(v + w) \\pm v_o}{(v + w) \\mp v_s}\\right)",
-    "description": "উৎস (vs), পর্যবেক্ষক (vo) ও বাতাস (w) গতিশীল থাকলে আপাত কম্পাঙ্ক f'। শব্দ ও উৎসের অভিমুখ বিবেচনা করে চিহ্ন নির্ধারিত হয়।"
+    "description": "উৎস (vs), পর্যবেক্ষক (vo) ও বাতাস (w) গতিশীল থাকলে আপাত কম্পাঙ্ক f'। শব্দ ও উৎসের অভিমুখ বিবেচনা করে চিহ্ন নির্ধারিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $f' = f\\left(\\frac{(v + w) \\pm v_o}{(v + w) \\mp v_s}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $f' = f\\left(\\frac{(v + w) \\pm v_o}{(v + w) \\mp v_s}\\right)$"
+      }
+    ]
   },
   {
     "title": "প্রতিফলিত তরঙ্গের ডপলার প্রভাব (Doppler Echo / Reflection from Moving Wall)",
     "latex": "f'' = f\\left(\\frac{v + v_s}{v - v_s}\\right)",
-    "description": "গতিশীল গাড়ি থেকে শব্দ প্রতিফলিত হয়ে পুনরায় চালকের কাছে ফিরে আসলে প্রাপ্ত কম্পাঙ্ক।"
+    "description": "গতিশীল গাড়ি থেকে শব্দ প্রতিফলিত হয়ে পুনরায় চালকের কাছে ফিরে আসলে প্রাপ্ত কম্পাঙ্ক।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $f'' = f\\left(\\frac{v + v_s}{v - v_s}\\right)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $f'' = f\\left(\\frac{v + v_s}{v - v_s}\\right)$"
+      }
+    ]
   }
 ]

@@ -25,7 +25,6 @@ async function withTimeout<T>(
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/dashboard';
 
   if (code) {
@@ -44,27 +43,28 @@ export async function GET(request: Request) {
                 cookieStore.set(name, value, options),
               );
             } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
+              // Ignored if called from Server Component
             }
           },
         },
       },
     );
+
     const { error } = await withTimeout(
       supabase.auth.exchangeCodeForSession(code),
       'Auth callback exchange timed out',
     );
+
     if (!error) {
-      // Fetch user role to redirect to correct dashboard
       const {
         data: { user },
       } = await withTimeout(
         supabase.auth.getUser(),
         'Auth user fetch timed out',
       );
+
       let redirectPath = next;
+
       if (user) {
         // Verify if user is registered in public.users
         let isRegistered = false;
@@ -95,7 +95,19 @@ export async function GET(request: Request) {
         // Deny Google login if user has no profile (not registered)
         if (!isRegistered) {
           await supabase.auth.signOut();
-          return NextResponse.redirect(`${origin}/login?error=unregistered_google`);
+          const redirectUrl = new URL('/login', origin);
+          redirectUrl.searchParams.set('error', 'unregistered_google');
+          const res = NextResponse.redirect(redirectUrl);
+
+          // Clear auth cookies on redirect response
+          cookieStore.getAll().forEach((c) => {
+            if (c.name.startsWith('sb-') || c.name.startsWith('sb:') || c.name.startsWith('obhyash_')) {
+              res.cookies.delete(c.name);
+            }
+          });
+          res.cookies.delete('obhyash_role_cache');
+          res.cookies.delete('obhyash_user_profile');
+          return res;
         }
 
         // If registered, sync Google OAuth user if needed
@@ -125,10 +137,9 @@ export async function GET(request: Request) {
         else redirectPath = '/dashboard';
       }
 
-      const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
+      const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
       if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
         return NextResponse.redirect(`${origin}${redirectPath}`);
       } else if (forwardedHost) {
         return NextResponse.redirect(`https://${forwardedHost}${redirectPath}`);
@@ -138,6 +149,8 @@ export async function GET(request: Request) {
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  // Return user to login page with error
+  const redirectUrl = new URL('/login', origin);
+  redirectUrl.searchParams.set('error', 'oauth_cancelled');
+  return NextResponse.redirect(redirectUrl);
 }

@@ -2,81 +2,177 @@
   {
     "title": "ভার্নিয়ার ধ্রুবক (Vernier Constant - VC)",
     "latex": "VC = s - v = \\frac{s}{n} = \\frac{1\\text{ mm}}{n}",
-    "description": "প্রধান স্কেলের ক্ষুদ্রতম ১ ভাগের মান (s) এবং ভার্নিয়ার স্কেলের মোট ভাগ সংখ্যা (n)। সাধারণত s = 1 mm হলে VC = 1/n mm।"
+    "description": "প্রধান স্কেলের ক্ষুদ্রতম ১ ভাগের মান (s) এবং ভার্নিয়ার স্কেলের মোট ভাগ সংখ্যা (n)। সাধারণত s = 1 mm হলে VC = 1/n mm।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $VC = s - v = \\frac{s}{n} = \\frac{1\\text{ mm}}{n}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $VC = s - v = \\frac{s}{n} = \\frac{1\\text{ mm}}{n}$"
+      }
+    ]
   },
   {
     "title": "স্লাইড ক্যালিপার্সে মোট দৈর্ঘ্য পাঠ (Total Length using Slide Calipers)",
     "latex": "L = M + (V \\times VC) \\pm e",
-    "description": "M = প্রধান স্কেল পাঠ (Main scale reading), V = ভার্নিয়ার সমপাতন (Vernier coincidence), VC = ভার্নিয়ার ধ্রুবক, e = যান্ত্রিক শূন্য ত্রুটি।"
+    "description": "M = প্রধান স্কেল পাঠ (Main scale reading), V = ভার্নিয়ার সমপাতন (Vernier coincidence), VC = ভার্নিয়ার ধ্রুবক, e = যান্ত্রিক শূন্য ত্রুটি।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $L = M + (V \\times VC) \\pm e$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $L = M + (V \\times VC) \\pm e$"
+      }
+    ]
   },
   {
     "title": "স্ক্রু গজের পিচ ও লঘিষ্ঠ গণন (Pitch & Least Count - LC)",
     "latex": "\\text{Pitch} = \\frac{\\text{রৈখিক সরণ}}{\\text{ঘূর্ণন সংখ্যা}}, \\quad LC = \\frac{\\text{Pitch}}{N}",
-    "description": "বৃত্তাকার স্কেলের ১ পূর্ণ ঘূর্ণনে রৈখিক স্কেল বরাবর অতিক্রান্ত দূরত্ব হলো পিচ। N = বৃত্তাকার স্কেলের মোট ভাগ সংখ্যা।"
+    "description": "বৃত্তাকার স্কেলের ১ পূর্ণ ঘূর্ণনে রৈখিক স্কেল বরাবর অতিক্রান্ত দূরত্ব হলো পিচ। N = বৃত্তাকার স্কেলের মোট ভাগ সংখ্যা।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\text{Pitch} = \\frac{\\text{রৈখিক সরণ}}{\\text{ঘূর্ণন সংখ্যা}}, \\quad LC = \\frac{\\text{Pitch}}{N}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\text{Pitch} = \\frac{\\text{রৈখিক সরণ}}{\\text{ঘূর্ণন সংখ্যা}}, \\quad LC = \\frac{\\text{Pitch}}{N}$"
+      }
+    ]
   },
   {
     "title": "স্ক্রু গজের সাহায্যে ব্যাস পাঠ (Diameter using Screw Gauge)",
     "latex": "d = L + (C \\times LC) \\pm e",
-    "description": "L = রৈখিক স্কেল পাঠ, C = বৃত্তাকার স্কেল পাঠ (Circular scale coincidence), LC = লঘিষ্ঠ গণন, e = শূন্য ত্রুটি।"
+    "description": "L = রৈখিক স্কেল পাঠ, C = বৃত্তাকার স্কেল পাঠ (Circular scale coincidence), LC = লঘিষ্ঠ গণন, e = শূন্য ত্রুটি।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $d = L + (C \\times LC) \\pm e$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $d = L + (C \\times LC) \\pm e$"
+      }
+    ]
   },
   {
     "title": "স্ফেরোমিটারের সাহায্যে বক্রতার ব্যাসার্ধ (Radius of Curvature using Spherometer)",
     "latex": "R = \\frac{d^2}{6h} + \\frac{h}{2}",
-    "description": "d = স্ফেরোমিটারের তিন পায়ের মধ্যবর্তী গড় দূরত্ব, h = উত্তল বা অবতল তলের উচ্চতা বা গভীরতা।"
+    "description": "d = স্ফেরোমিটারের তিন পায়ের মধ্যবর্তী গড় দূরত্ব, h = উত্তল বা অবতল তলের উচ্চতা বা গভীরতা।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $R = \\frac{d^2}{6h} + \\frac{h}{2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $R = \\frac{d^2}{6h} + \\frac{h}{2}$"
+      }
+    ]
   },
   {
     "title": "পরম ত্রুটি (Absolute Error)",
     "latex": "\\Delta x = |x_{\\text{true}} - x_{\\text{measured}}| = |\\bar{x} - x_i|",
-    "description": "প্রকৃত মান (বা পাঠগুলোর গড় মান) এবং পরিমাপকৃত মানের মধ্যকার পরম পার্থক্য।"
+    "description": "প্রকৃত মান (বা পাঠগুলোর গড় মান) এবং পরিমাপকৃত মানের মধ্যকার পরম পার্থক্য।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\Delta x = |x_{\\text{true}} - x_{\\text{measured}}| = |\\bar{x} - x_i|$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\Delta x = |x_{\\text{true}} - x_{\\text{measured}}| = |\\bar{x} - x_i|$"
+      }
+    ]
   },
   {
     "title": "আপেক্ষিক ত্রুটি (Relative Error)",
     "latex": "\\text{Relative Error} = \\frac{\\Delta x}{\\bar{x}} = \\frac{\\text{পরম ত্রুটি}}{\\text{প্রকৃত বা গড় মান}}",
-    "description": "পরম ত্রুটিকে মূল পরিমাপকৃত গড় মান দ্বারা ভাগ করলে আপেক্ষিক বা ভগ্নাংশীয় ত্রুটি পাওয়া যায়।"
+    "description": "পরম ত্রুটিকে মূল পরিমাপকৃত গড় মান দ্বারা ভাগ করলে আপেক্ষিক বা ভগ্নাংশীয় ত্রুটি পাওয়া যায়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\text{Relative Error} = \\frac{\\Delta x}{\\bar{x}} = \\frac{\\text{পরম ত্রুটি}}{\\text{প্রকৃত বা গড় মান}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\text{Relative Error} = \\frac{\\Delta x}{\\bar{x}} = \\frac{\\text{পরম ত্রুটি}}{\\text{প্রকৃত বা গড় মান}}$"
+      }
+    ]
   },
   {
     "title": "শতকরা ত্রুটি (Percentage Error)",
     "latex": "\\% \\text{ Error} = \\frac{\\Delta x}{\\bar{x}} \\times 100\\%",
-    "description": "আপেক্ষিক ত্রুটিকে শতকরায় প্রকাশ করার সমীকরণ।"
+    "description": "আপেক্ষিক ত্রুটিকে শতকরায় প্রকাশ করার সমীকরণ।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\% \\text{ Error} = \\frac{\\Delta x}{\\bar{x}} \\times 100\\%$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\% \\text{ Error} = \\frac{\\Delta x}{\\bar{x}} \\times 100\\%$"
+      }
+    ]
   },
   {
     "title": "যোগ ও বিয়োগে পরম ত্রুটি সঞ্চালন (Error Propagation in Addition & Subtraction)",
     "latex": "Z = A \\pm B \\implies \\Delta Z = \\Delta A + \\Delta B",
-    "description": "দুটি রাশির যোগ বা বিয়োগ উভয় ক্ষেত্রেই চূড়ান্ত রাশির পরম ত্রুটি সর্বদা উপাদান রাশির পরম ত্রুটির যোগফল হয়।"
+    "description": "দুটি রাশির যোগ বা বিয়োগ উভয় ক্ষেত্রেই চূড়ান্ত রাশির পরম ত্রুটি সর্বদা উপাদান রাশির পরম ত্রুটির যোগফল হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $Z = A \\pm B \\implies \\Delta Z = \\Delta A + \\Delta B$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $Z = A \\pm B \\implies \\Delta Z = \\Delta A + \\Delta B$"
+      }
+    ]
   },
   {
     "title": "গুণ ও ভাগে আপেক্ষিক ত্রুটি সঞ্চালন (Error Propagation in Multiplication & Division)",
     "latex": "Z = A \\times B \\text{ বা } Z = \\frac{A}{B} \\implies \\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}",
-    "description": "গুণফল ও ভাগফলের ক্ষেত্রে চূড়ান্ত রাশির আপেক্ষিক ত্রুটি হলো উপাদানগুলোর আপেক্ষিক ত্রুটির যোগফল।"
+    "description": "গুণফল ও ভাগফলের ক্ষেত্রে চূড়ান্ত রাশির আপেক্ষিক ত্রুটি হলো উপাদানগুলোর আপেক্ষিক ত্রুটির যোগফল।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $Z = A \\times B \\text{ বা } Z = \\frac{A}{B} \\implies \\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $Z = A \\times B \\text{ বা } Z = \\frac{A}{B} \\implies \\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}$"
+      }
+    ]
   },
   {
     "title": "ঘাত ও সাধারণ সূচকে ত্রুটি সঞ্চালন (Error Propagation in General Powers)",
     "latex": "Z = \\frac{A^p B^q}{C^r} \\implies \\frac{\\Delta Z}{Z} = p\\frac{\\Delta A}{A} + q\\frac{\\Delta B}{B} + r\\frac{\\Delta C}{C}",
-    "description": "সূচকের ঘাত দ্বারা প্রতিটি উপাদানের আপেক্ষিক ত্রুটিকে গুণ করে যোগ করতে হয়।"
+    "description": "সূচকের ঘাত দ্বারা প্রতিটি উপাদানের আপেক্ষিক ত্রুটিকে গুণ করে যোগ করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $Z = \\frac{A^p B^q}{C^r} \\implies \\frac{\\Delta Z}{Z} = p\\frac{\\Delta A}{A} + q\\frac{\\Delta B}{B} + r\\frac{\\Delta C}{C}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $Z = \\frac{A^p B^q}{C^r} \\implies \\frac{\\Delta Z}{Z} = p\\frac{\\Delta A}{A} + q\\frac{\\Delta B}{B} + r\\frac{\\Delta C}{C}$"
+      }
+    ]
   },
   {
     "title": "গোলকের আয়তন ও ক্ষেত্রফলের ত্রুটির শর্টকাট (Volume & Area Error Shortcut)",
     "latex": "\\frac{\\Delta V}{V} = 3\\frac{\\Delta r}{r} \\implies \\% \\Delta V \\approx 3(\\% \\Delta r), \\quad \\% \\Delta A \\approx 2(\\% \\Delta r)",
-    "description": "ব্যাসার্ধ পরিমাপে e% ত্রুটি হলে ক্ষেত্রফলে ত্রুটি প্রায় 2e% এবং আয়তনে ত্রুটি প্রায় 3e%।"
+    "description": "ব্যাসার্ধ পরিমাপে e% ত্রুটি হলে ক্ষেত্রফলে ত্রুটি প্রায় 2e% এবং আয়তনে ত্রুটি প্রায় 3e%।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\frac{\\Delta V}{V} = 3\\frac{\\Delta r}{r} \\implies \\% \\Delta V \\approx 3(\\% \\Delta r), \\quad \\% \\Delta A \\approx 2(\\% \\Delta r)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\frac{\\Delta V}{V} = 3\\frac{\\Delta r}{r} \\implies \\% \\Delta V \\approx 3(\\% \\Delta r), \\quad \\% \\Delta A \\approx 2(\\% \\Delta r)$"
+      }
+    ]
   },
   {
     "title": "ক্যালকুলাস ভিত্তিক চূড়ান্ত সম্ভাব্য ত্রুটি (Calculus-based Error Analysis)",
     "latex": "\\Delta Z = \\sqrt{\\left(\\frac{\\partial Z}{\\partial A}\\Delta A\\right)^2 + \\left(\\frac{\\partial Z}{\\partial B}\\Delta B\\right)^2}",
-    "description": "স্বাধীন চলকের ক্ষেত্রে আংশিক অন্তরীকরণ ভিত্তিক প্রমিত পরম ত্রুটি।"
+    "description": "স্বাধীন চলকের ক্ষেত্রে আংশিক অন্তরীকরণ ভিত্তিক প্রমিত পরম ত্রুটি।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\Delta Z = \\sqrt{\\left(\\frac{\\partial Z}{\\partial A}\\Delta A\\right)^2 + \\left(\\frac{\\partial Z}{\\partial B}\\Delta B\\right)^2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\Delta Z = \\sqrt{\\left(\\frac{\\partial Z}{\\partial A}\\Delta A\\right)^2 + \\left(\\frac{\\partial Z}{\\partial B}\\Delta B\\right)^2}$"
+      }
+    ]
   },
   {
     "title": "জ্যোতির্বৈজ্ঞানিক দূরত্বের একক ও রূপান্তর (Astronomical Distance Units)",
     "latex": "1\\text{ AU} = 1.496 \\times 10^{11}\\text{ m}, \\quad 1\\text{ ly} = 9.46 \\times 10^{15}\\text{ m}, \\quad 1\\text{ parsec} = 3.26\\text{ ly} = 3.08 \\times 10^{16}\\text{ m}",
-    "description": "জ্যোতির্বিদ্যা সংক্রান্ত বৃহৎ দূরত্বের এককসমূহ: ১ আলোকবর্ষ (ly), ১ পারসেক (parsec), ১ জ্যোতির্বৈজ্ঞানিক একক (AU)। ১ Å = 10⁻¹⁰ m, 1 fermi = 10⁻¹⁵ m।"
+    "description": "জ্যোতির্বিদ্যা সংক্রান্ত বৃহৎ দূরত্বের এককসমূহ: ১ আলোকবর্ষ (ly), ১ পারসেক (parsec), ১ জ্যোতির্বৈজ্ঞানিক একক (AU)। ১ Å = 10⁻¹⁰ m, 1 fermi = 10⁻¹⁵ m।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $1\\text{ AU} = 1.496 \\times 10^{11}\\text{ m}, \\quad 1\\text{ ly} = 9.46 \\times 10^{15}\\text{ m}, \\quad 1\\text{ parsec} = 3.26\\text{ ly} = 3.08 \\times 10^{16}\\text{ m}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $1\\text{ AU} = 1.496 \\times 10^{11}\\text{ m}, \\quad 1\\text{ ly} = 9.46 \\times 10^{15}\\text{ m}, \\quad 1\\text{ parsec} = 3.26\\text{ ly} = 3.08 \\times 10^{16}\\text{ m}$"
+      }
+    ]
   },
   {
     "title": "গুরুত্বপূর্ণ মাত্রা সমীকরণ (Important Dimensional Formulas)",
     "latex": "[F] = MLT^{-2}, \\quad [W] = ML^2T^{-2}, \\quad [P] = ML^{-1}T^{-2}, \\quad [G] = M^{-1}L^3T^{-2}, \\quad [h] = ML^2T^{-1}, \\quad [\\eta] = ML^{-1}T^{-1}",
-    "description": "বল [F], কাজ/শক্তি [W], চাপ [P], মহাকর্ষীয় ধ্রুবক [G], প্ল্যাঙ্কের ধ্রুবক [h], সান্দ্রতা গুণাঙ্ক [η] এর মাত্রা।"
+    "description": "বল [F], কাজ/শক্তি [W], চাপ [P], মহাকর্ষীয় ধ্রুবক [G], প্ল্যাঙ্কের ধ্রুবক [h], সান্দ্রতা গুণাঙ্ক [η] এর মাত্রা।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $[F] = MLT^{-2}, \\quad [W] = ML^2T^{-2}, \\quad [P] = ML^{-1}T^{-2}, \\quad [G] = M^{-1}L^3T^{-2}, \\quad [h] = ML^2T^{-1}, \\quad [\\eta] = ML^{-1}T^{-1}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $[F] = MLT^{-2}, \\quad [W] = ML^2T^{-2}, \\quad [P] = ML^{-1}T^{-2}, \\quad [G] = M^{-1}L^3T^{-2}, \\quad [h] = ML^2T^{-1}, \\quad [\\eta] = ML^{-1}T^{-1}$"
+      }
+    ]
   },
   {
     "title": "মাত্রার সমজাতীয়তা নীতি (Principle of Homogeneity of Dimensions)",
     "latex": "[\\text{LHS}] = [\\text{RHS}], \\quad s = ut + \\frac{1}{2}at^2 \\implies [L] = [LT^{-1}][T] + [LT^{-2}][T^2] = [L]",
-    "description": "যেকোনো সঠিক ভৌতিক সমীকরণের উভয় পাশের প্রতিটি পদের মাত্রা সমান হতে হবে।"
+    "description": "যেকোনো সঠিক ভৌতিক সমীকরণের উভয় পাশের প্রতিটি পদের মাত্রা সমান হতে হবে।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $[\\text{LHS}] = [\\text{RHS}], \\quad s = ut + \\frac{1}{2}at^2 \\implies [L] = [LT^{-1}][T] + [LT^{-2}][T^2] = [L]$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $[\\text{LHS}] = [\\text{RHS}], \\quad s = ut + \\frac{1}{2}at^2 \\implies [L] = [LT^{-1}][T] + [LT^{-2}][T^2] = [L]$"
+      }
+    ]
   }
 ]

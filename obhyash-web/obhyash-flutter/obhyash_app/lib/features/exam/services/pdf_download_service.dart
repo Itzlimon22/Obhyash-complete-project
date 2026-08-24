@@ -198,118 +198,134 @@ class PdfDownloadService {
               ),
               pw.SizedBox(height: 14),
 
-              // Questions List
-              ...result.questions.asMap().entries.map((entry) {
-                final idx = entry.key + 1;
-                final q = entry.value;
-                final meta = _renderQuestionMeta(q);
+              // Questions List (Strict 2-Column Format)
+              ...() {
+                final entries = result.questions.asMap().entries.toList();
+                final List<List<MapEntry<int, dynamic>>> chunks = [];
+                for (var i = 0; i < entries.length; i += 2) {
+                  chunks.add(entries.sublist(i, i + 2 > entries.length ? entries.length : i + 2));
+                }
 
-                return pw.Container(
-                  margin: const pw.EdgeInsets.only(bottom: 12),
-                  padding: const pw.EdgeInsets.all(8),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.white,
-                    border: pw.Border.all(color: PdfColor.fromHex('E5E7EB')),
-                    borderRadius: pw.BorderRadius.circular(6),
-                  ),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      // Question Title
-                      pw.Row(
+                return chunks.map((pair) {
+                  pw.Widget buildCard(MapEntry<int, dynamic> entry) {
+                    final idx = entry.key + 1;
+                    final q = entry.value;
+                    final meta = _renderQuestionMeta(q);
+
+                    return pw.Container(
+                      margin: const pw.EdgeInsets.only(bottom: 8),
+                      padding: const pw.EdgeInsets.all(6),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColors.white,
+                        border: pw.Border.all(color: PdfColor.fromHex('E5E7EB'), width: 0.7),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Container(
-                            width: 22,
-                            child: pw.Text(
-                              '${_toBanglaDigits(idx)}.',
-                              style: pw.TextStyle(
-                                fontSize: 10,
-                                fontWeight: pw.FontWeight.bold,
-                                color: PdfColor.fromHex('004633'),
+                          pw.Row(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Container(
+                                width: 18,
+                                child: pw.Text(
+                                  '${_toBanglaDigits(idx)}.',
+                                  style: pw.TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColor.fromHex('004633'),
+                                  ),
+                                ),
+                              ),
+                              pw.Expanded(
+                                child: pw.Text(
+                                  _cleanMathAndMarkdown(q.question),
+                                  style: pw.TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (meta.isNotEmpty)
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.only(left: 18, top: 2, bottom: 2),
+                              child: pw.Text(
+                                meta,
+                                style: pw.TextStyle(
+                                  fontSize: 7,
+                                  color: PdfColors.grey700,
+                                  fontStyle: pw.FontStyle.italic,
+                                ),
                               ),
                             ),
-                          ),
-                          pw.Expanded(
-                            child: pw.Text(
-                              _cleanMathAndMarkdown(q.question),
-                              style: pw.TextStyle(
-                                fontSize: 10,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
+                          pw.SizedBox(height: 3),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.only(left: 18),
+                            child: pw.Column(
+                              children: [
+                                pw.Row(
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                  children: [
+                                    if (q.options.isNotEmpty)
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                    if (q.options.length > 1)
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                if (q.options.length > 2) ...[
+                                  pw.SizedBox(height: 2),
+                                  pw.Row(
+                                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                    children: [
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                      if (q.options.length > 3)
+                                        pw.Expanded(
+                                          child: pw.Text(
+                                            '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
+                                            style: const pw.TextStyle(fontSize: 8),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         ],
                       ),
+                    );
+                  }
 
-                      // Meta (Board / Institute)
-                      if (meta.isNotEmpty)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 22, top: 2, bottom: 4),
-                          child: pw.Text(
-                            meta,
-                            style: pw.TextStyle(
-                              fontSize: 8,
-                              color: PdfColors.grey700,
-                              fontStyle: pw.FontStyle.italic,
-                            ),
-                          ),
-                        ),
-
-                      pw.SizedBox(height: 4),
-
-                      // Options (2x2 Grid)
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.only(left: 22),
-                        child: pw.Column(
-                          children: [
-                            pw.Row(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                if (q.options.isNotEmpty)
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                                if (q.options.length > 1)
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            if (q.options.length > 2) ...[
-                              pw.SizedBox(height: 3),
-                              pw.Row(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                                  if (q.options.length > 3)
-                                    pw.Expanded(
-                                      child: pw.Text(
-                                        '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
-                                        style: const pw.TextStyle(fontSize: 9),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
+                  return pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Expanded(child: buildCard(pair[0])),
+                      pw.SizedBox(width: 8),
+                      if (pair.length > 1)
+                        pw.Expanded(child: buildCard(pair[1]))
+                      else
+                        pw.Expanded(child: pw.Container()),
                     ],
-                  ),
-                );
-              }),
+                  );
+                });
+              }(),
             ];
           },
         ),
@@ -475,212 +491,223 @@ class PdfDownloadService {
               ),
               pw.SizedBox(height: 14),
 
-              // Questions with Solutions
-              ...result.questions.asMap().entries.map((entry) {
-                final idx = entry.key + 1;
-                final q = entry.value;
-                final userAnsIdx = result.userAnswers[q.id];
-                final isCorrect = userAnsIdx == q.correctAnswerIndex;
-                final isSkipped = userAnsIdx == null;
-                final meta = _renderQuestionMeta(q);
+              // Questions with Solutions (Strict 2-Column Format)
+              ...() {
+                final entries = result.questions.asMap().entries.toList();
+                final List<List<MapEntry<int, dynamic>>> chunks = [];
+                for (var i = 0; i < entries.length; i += 2) {
+                  chunks.add(entries.sublist(i, i + 2 > entries.length ? entries.length : i + 2));
+                }
 
-                final correctLetter = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < optionLetters.length)
-                    ? optionLetters[q.correctAnswerIndex]
-                    : '';
-                final correctText = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < q.options.length)
-                    ? q.options[q.correctAnswerIndex]
-                    : '';
+                return chunks.map((pair) {
+                  pw.Widget buildSolutionCard(MapEntry<int, dynamic> entry) {
+                    final idx = entry.key + 1;
+                    final q = entry.value;
+                    final userAnsIdx = result.userAnswers[q.id];
+                    final isCorrect = userAnsIdx == q.correctAnswerIndex;
+                    final isSkipped = userAnsIdx == null;
+                    final meta = _renderQuestionMeta(q);
 
-                return pw.Container(
-                  margin: const pw.EdgeInsets.only(bottom: 12),
-                  padding: const pw.EdgeInsets.all(8),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.white,
-                    border: pw.Border.all(color: PdfColor.fromHex('E5E7EB')),
-                    borderRadius: pw.BorderRadius.circular(6),
-                  ),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      // Question Title
-                      pw.Row(
+                    final correctLetter = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < optionLetters.length)
+                        ? optionLetters[q.correctAnswerIndex]
+                        : '';
+                    final correctText = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < q.options.length)
+                        ? q.options[q.correctAnswerIndex]
+                        : '';
+
+                    return pw.Container(
+                      margin: const pw.EdgeInsets.only(bottom: 8),
+                      padding: const pw.EdgeInsets.all(6),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColors.white,
+                        border: pw.Border.all(color: PdfColor.fromHex('E5E7EB'), width: 0.7),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Container(
-                            width: 22,
-                            child: pw.Text(
-                              '${_toBanglaDigits(idx)}.',
-                              style: pw.TextStyle(
-                                fontSize: 10,
-                                fontWeight: pw.FontWeight.bold,
-                                color: PdfColor.fromHex('004633'),
+                          // Question Title
+                          pw.Row(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Container(
+                                width: 18,
+                                child: pw.Text(
+                                  '${_toBanglaDigits(idx)}.',
+                                  style: pw.TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColor.fromHex('004633'),
+                                  ),
+                                ),
+                              ),
+                              pw.Expanded(
+                                child: pw.Text(
+                                  _cleanMathAndMarkdown(q.question),
+                                  style: pw.TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          if (meta.isNotEmpty)
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.only(left: 18, top: 2, bottom: 2),
+                              child: pw.Text(
+                                meta,
+                                style: pw.TextStyle(
+                                  fontSize: 7,
+                                  color: PdfColors.grey700,
+                                  fontStyle: pw.FontStyle.italic,
+                                ),
                               ),
                             ),
+
+                          pw.SizedBox(height: 3),
+
+                          // Options List
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.only(left: 18),
+                            child: pw.Column(
+                              children: [
+                                pw.Row(
+                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                  children: [
+                                    if (q.options.isNotEmpty)
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                    if (q.options.length > 1)
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                if (q.options.length > 2) ...[
+                                  pw.SizedBox(height: 2),
+                                  pw.Row(
+                                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                    children: [
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
+                                          style: const pw.TextStyle(fontSize: 8),
+                                        ),
+                                      ),
+                                      if (q.options.length > 3)
+                                        pw.Expanded(
+                                          child: pw.Text(
+                                            '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
+                                            style: const pw.TextStyle(fontSize: 8),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
-                          pw.Expanded(
-                            child: pw.Text(
-                              _cleanMathAndMarkdown(q.question),
-                              style: pw.TextStyle(
-                                fontSize: 10,
-                                fontWeight: pw.FontWeight.bold,
+
+                          pw.SizedBox(height: 4),
+
+                          // Solution Box
+                          pw.Container(
+                            width: double.infinity,
+                            padding: const pw.EdgeInsets.all(5),
+                            margin: const pw.EdgeInsets.only(left: 14),
+                            decoration: pw.BoxDecoration(
+                              color: PdfColor.fromHex('F9FAFB'),
+                              border: pw.Border(
+                                left: pw.BorderSide(color: PdfColor.fromHex('004633'), width: 2),
                               ),
+                              borderRadius: const pw.BorderRadius.horizontal(
+                                right: pw.Radius.circular(3),
+                              ),
+                            ),
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Row(
+                                  children: [
+                                    pw.Text(
+                                      'সঠিক: ',
+                                      style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold),
+                                    ),
+                                    pw.Expanded(
+                                      child: pw.Text(
+                                        '$correctLetter ${_cleanMathAndMarkdown(correctText)}',
+                                        style: pw.TextStyle(
+                                          fontSize: 7.5,
+                                          fontWeight: pw.FontWeight.bold,
+                                          color: PdfColor.fromHex('15803D'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (!isSkipped) ...[
+                                  pw.SizedBox(height: 2),
+                                  pw.Row(
+                                    children: [
+                                      pw.Text(
+                                        'তোমার: ',
+                                        style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold),
+                                      ),
+                                      pw.Expanded(
+                                        child: pw.Text(
+                                          '${optionLetters[userAnsIdx]} ${isCorrect ? "[সঠিক]" : "[ভুল]"}',
+                                          style: pw.TextStyle(
+                                            fontSize: 7.5,
+                                            fontWeight: pw.FontWeight.bold,
+                                            color: isCorrect
+                                                ? PdfColor.fromHex('15803D')
+                                                : PdfColor.fromHex('B91C1C'),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                if (q.explanation != null && q.explanation!.trim().isNotEmpty) ...[
+                                  pw.SizedBox(height: 2),
+                                  pw.Text(
+                                    'ব্যাখ্যা: ${_cleanMathAndMarkdown(q.explanation!)}',
+                                    style: const pw.TextStyle(
+                                      fontSize: 7.5,
+                                      color: PdfColors.grey800,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         ],
                       ),
+                    );
+                  }
 
-                      if (meta.isNotEmpty)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 22, top: 2, bottom: 4),
-                          child: pw.Text(
-                            meta,
-                            style: pw.TextStyle(
-                              fontSize: 8,
-                              color: PdfColors.grey700,
-                              fontStyle: pw.FontStyle.italic,
-                            ),
-                          ),
-                        ),
-
-                      pw.SizedBox(height: 4),
-
-                      // Options List
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.only(left: 22),
-                        child: pw.Column(
-                          children: [
-                            pw.Row(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                if (q.options.isNotEmpty)
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                                if (q.options.length > 1)
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            if (q.options.length > 2) ...[
-                              pw.SizedBox(height: 3),
-                              pw.Row(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Expanded(
-                                    child: pw.Text(
-                                      '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
-                                      style: const pw.TextStyle(fontSize: 9),
-                                    ),
-                                  ),
-                                  if (q.options.length > 3)
-                                    pw.Expanded(
-                                      child: pw.Text(
-                                        '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
-                                        style: const pw.TextStyle(fontSize: 9),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-
-                      pw.SizedBox(height: 8),
-
-                      // Solution / Explanation Box (Clean Grey Box with Left Border)
-                      pw.Container(
-                        width: double.infinity,
-                        padding: const pw.EdgeInsets.all(8),
-                        margin: const pw.EdgeInsets.only(left: 22),
-                        decoration: pw.BoxDecoration(
-                          color: PdfColor.fromHex('F9FAFB'),
-                          border: pw.Border(
-                            left: pw.BorderSide(color: PdfColor.fromHex('004633'), width: 2.5),
-                          ),
-                          borderRadius: const pw.BorderRadius.horizontal(
-                            right: pw.Radius.circular(4),
-                          ),
-                        ),
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Row(
-                              children: [
-                                pw.Text(
-                                  'সঠিক উত্তর: ',
-                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold),
-                                ),
-                                pw.Text(
-                                  '$correctLetter ${_cleanMathAndMarkdown(correctText)}',
-                                  style: pw.TextStyle(
-                                    fontSize: 8.5,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: PdfColor.fromHex('15803D'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            pw.SizedBox(height: 3),
-                            pw.Row(
-                              children: [
-                                pw.Text(
-                                  'তোমার উত্তর: ',
-                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold),
-                                ),
-                                if (isSkipped)
-                                  pw.Text(
-                                    '[অনুত্তরিত]',
-                                    style: pw.TextStyle(
-                                      fontSize: 8.5,
-                                      fontWeight: pw.FontWeight.bold,
-                                      color: PdfColor.fromHex('D97706'),
-                                    ),
-                                  )
-                                else if (isCorrect)
-                                  pw.Text(
-                                    '${optionLetters[userAnsIdx]} [সঠিক]',
-                                    style: pw.TextStyle(
-                                      fontSize: 8.5,
-                                      fontWeight: pw.FontWeight.bold,
-                                      color: PdfColor.fromHex('15803D'),
-                                    ),
-                                  )
-                                else
-                                  pw.Text(
-                                    '${optionLetters[userAnsIdx]} [ভুল]',
-                                    style: pw.TextStyle(
-                                      fontSize: 8.5,
-                                      fontWeight: pw.FontWeight.bold,
-                                      color: PdfColor.fromHex('B91C1C'),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            if (q.explanation != null && q.explanation!.trim().isNotEmpty) ...[
-                              pw.SizedBox(height: 4),
-                              pw.Text(
-                                'ব্যাখ্যা: ${_cleanMathAndMarkdown(q.explanation!)}',
-                                style: const pw.TextStyle(
-                                  fontSize: 8.5,
-                                  color: PdfColors.grey800,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
+                  return pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Expanded(child: buildSolutionCard(pair[0])),
+                      pw.SizedBox(width: 8),
+                      if (pair.length > 1)
+                        pw.Expanded(child: buildSolutionCard(pair[1]))
+                      else
+                        pw.Expanded(child: pw.Container()),
                     ],
-                  ),
-                );
-              }),
+                  );
+                });
+              }(),
             ];
           },
         ),

@@ -2,76 +2,166 @@
   {
     "title": "সরল ছন্দিত স্পন্দনের ব্যবকলনীয় সমীকরণ (Differential Equation of SHM)",
     "latex": "\\frac{d^2 x}{dt^2} + \\omega^2 x = 0 \\iff \\frac{d^2 x}{dt^2} + \\frac{k}{m} x = 0",
-    "description": "ω = কৌণিক কম্পাঙ্ক (rad/s), k = বল ধ্রুবক, m = ভর।"
+    "description": "ω = কৌণিক কম্পাঙ্ক (rad/s), k = বল ধ্রুবক, m = ভর।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\frac{d^2 x}{dt^2} + \\omega^2 x = 0 \\iff \\frac{d^2 x}{dt^2} + \\frac{k}{m} x = 0$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\frac{d^2 x}{dt^2} + \\omega^2 x = 0 \\iff \\frac{d^2 x}{dt^2} + \\frac{k}{m} x = 0$"
+      }
+    ]
   },
   {
     "title": "সরণ, বেগ ও ত্বরণের সমীকরণ (Displacement, Velocity & Acceleration in SHM)",
     "latex": "x = A\\sin(\\omega t + \\delta), \\quad v = \\omega\\sqrt{A^2 - x^2}, \\quad a = -\\omega^2 x",
-    "description": "A = বিস্তার (Amplitude), δ = আদি দশা (Epoch/Initial phase), x = সাম্যাবস্থা থেকে সরণ।"
+    "description": "A = বিস্তার (Amplitude), δ = আদি দশা (Epoch/Initial phase), x = সাম্যাবস্থা থেকে সরণ।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $x = A\\sin(\\omega t + \\delta), \\quad v = \\omega\\sqrt{A^2 - x^2}, \\quad a = -\\omega^2 x$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $x = A\\sin(\\omega t + \\delta), \\quad v = \\omega\\sqrt{A^2 - x^2}, \\quad a = -\\omega^2 x$"
+      }
+    ]
   },
   {
     "title": "সর্বোচ্চ বেগ ও সর্বোচ্চ ত্বরণ (Max Velocity & Max Acceleration)",
     "latex": "v_{\\text{max}} = \\omega A \\; (x = 0), \\quad a_{\\text{max}} = \\omega^2 A \\; (x = \\pm A)",
-    "description": "সাম্যাবস্থানে বেগ সর্বোচ্চ ও ত্বরণ শূন্য; প্রান্তবিন্দুতে বেগ শূন্য ও ত্বরণ সর্বোচ্চ।"
+    "description": "সাম্যাবস্থানে বেগ সর্বোচ্চ ও ত্বরণ শূন্য; প্রান্তবিন্দুতে বেগ শূন্য ও ত্বরণ সর্বোচ্চ।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $v_{\\text{max}} = \\omega A \\; (x = 0), \\quad a_{\\text{max}} = \\omega^2 A \\; (x = \\pm A)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $v_{\\text{max}} = \\omega A \\; (x = 0), \\quad a_{\\text{max}} = \\omega^2 A \\; (x = \\pm A)$"
+      }
+    ]
   },
   {
     "title": "SHM এ মোট যান্ত্রিক শক্তি (Total Energy in SHM)",
     "latex": "E = E_k + E_p = \\frac{1}{2}kA^2 = \\frac{1}{2}m\\omega^2 A^2 = 2\\pi^2 m f^2 A^2",
-    "description": "সরল ছন্দিত স্পন্দনে মোট যান্ত্রিক শক্তি সংরক্ষিত থাকে এবং তা বিস্তারের বর্গের সমানুপাতিক (E ∝ A²)।"
+    "description": "সরল ছন্দিত স্পন্দনে মোট যান্ত্রিক শক্তি সংরক্ষিত থাকে এবং তা বিস্তারের বর্গের সমানুপাতিক (E ∝ A²)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $E = E_k + E_p = \\frac{1}{2}kA^2 = \\frac{1}{2}m\\omega^2 A^2 = 2\\pi^2 m f^2 A^2$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $E = E_k + E_p = \\frac{1}{2}kA^2 = \\frac{1}{2}m\\omega^2 A^2 = 2\\pi^2 m f^2 A^2$"
+      }
+    ]
   },
   {
     "title": "গতিশক্তি ও বিভব শক্তির সমীকরণ (Kinetic & Potential Energy Equations)",
     "latex": "E_k = \\frac{1}{2}k(A^2 - x^2), \\quad E_p = \\frac{1}{2}kx^2",
-    "description": "যেকোনো অবস্থান x এ গতিশক্তি ও বিভব শক্তি।"
+    "description": "যেকোনো অবস্থান x এ গতিশক্তি ও বিভব শক্তি।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $E_k = \\frac{1}{2}k(A^2 - x^2), \\quad E_p = \\frac{1}{2}kx^2$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $E_k = \\frac{1}{2}k(A^2 - x^2), \\quad E_p = \\frac{1}{2}kx^2$"
+      }
+    ]
   },
   {
     "title": "সময়ের সাপেক্ষে ও দূরত্বের সাপেক্ষে গড় শক্তি (Average Energy over Time & Distance)",
     "latex": "\\langle E_k \\rangle_t = \\langle E_p \\rangle_t = \\frac{1}{4}kA^2 = \\frac{1}{2}E, \\quad \\langle E_k \\rangle_x = \\frac{2}{3}E, \\quad \\langle E_p \\rangle_x = \\frac{1}{3}E",
-    "description": "১টি পূর্ণ পর্যায়কালে সময়ের সাপেক্ষে গড় গতিশক্তি ও গড় বিভব শক্তি সমান (E/2), কিন্তু দূরত্বের সাপেক্ষে গড় গতিশক্তি 2E/3 এবং গড় বিভব শক্তি E/3।"
+    "description": "১টি পূর্ণ পর্যায়কালে সময়ের সাপেক্ষে গড় গতিশক্তি ও গড় বিভব শক্তি সমান (E/2), কিন্তু দূরত্বের সাপেক্ষে গড় গতিশক্তি 2E/3 এবং গড় বিভব শক্তি E/3।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\langle E_k \\rangle_t = \\langle E_p \\rangle_t = \\frac{1}{4}kA^2 = \\frac{1}{2}E, \\quad \\langle E_k \\rangle_x = \\frac{2}{3}E, \\quad \\langle E_p \\rangle_x = \\frac{1}{3}E$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\langle E_k \\rangle_t = \\langle E_p \\rangle_t = \\frac{1}{4}kA^2 = \\frac{1}{2}E, \\quad \\langle E_k \\rangle_x = \\frac{2}{3}E, \\quad \\langle E_p \\rangle_x = \\frac{1}{3}E$"
+      }
+    ]
   },
   {
     "title": "যে অবস্থানে গতিশক্তি ও বিভব শক্তি সমান (Position where Ek = Ep)",
     "latex": "E_k = E_p \\implies x = \\pm \\frac{A}{\\sqrt{2}} \\approx \\pm 0.707 A",
-    "description": "বিস্তারের ০.৭০৭ অংশে গতিশক্তি ও বিভব শক্তি পরস্পর সমান হয়।"
+    "description": "বিস্তারের ০.৭০৭ অংশে গতিশক্তি ও বিভব শক্তি পরস্পর সমান হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $E_k = E_p \\implies x = \\pm \\frac{A}{\\sqrt{2}} \\approx \\pm 0.707 A$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $E_k = E_p \\implies x = \\pm \\frac{A}{\\sqrt{2}} \\approx \\pm 0.707 A$"
+      }
+    ]
   },
   {
     "title": "গতিশক্তি ও বিভব শক্তির অনুপাতের সাধারণ শর্ত (General Ek = n Ep Shortcut)",
     "latex": "E_k = n E_p \\implies x = \\pm \\frac{A}{\\sqrt{n + 1}}, \\quad E_p = n E_k \\implies x = \\pm A\\sqrt{\\frac{n}{n + 1}}",
-    "description": "অর্ধেক বিস্তারে (x = A/2) বিভব শক্তি মোট শক্তির ২৫% (Ep = E/4) এবং গতিশক্তি ৭৫% (Ek = 3Ep)।"
+    "description": "অর্ধেক বিস্তারে (x = A/2) বিভব শক্তি মোট শক্তির ২৫% (Ep = E/4) এবং গতিশক্তি ৭৫% (Ek = 3Ep)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $E_k = n E_p \\implies x = \\pm \\frac{A}{\\sqrt{n + 1}}, \\quad E_p = n E_k \\implies x = \\pm A\\sqrt{\\frac{n}{n + 1}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $E_k = n E_p \\implies x = \\pm \\frac{A}{\\sqrt{n + 1}}, \\quad E_p = n E_k \\implies x = \\pm A\\sqrt{\\frac{n}{n + 1}}$"
+      }
+    ]
   },
   {
     "title": "সরল দোলকের পর্যায়কাল ও সেকেন্ড দোলক (Simple Pendulum Period & Seconds Pendulum)",
     "latex": "T = 2\\pi\\sqrt{\\frac{L}{g}}, \\quad L_{\\text{seconds}} = \\frac{g}{\\pi^2} \\approx 0.993\\text{ m} \\approx 1\\text{ m} \\; (T = 2\\text{ s})",
-    "description": "L = কার্যকরী দৈর্ঘ্য (L = l + r, যেখানে l = সুতার দৈর্ঘ্য, r = ববের ব্যাসার্ধ)।"
+    "description": "L = কার্যকরী দৈর্ঘ্য (L = l + r, যেখানে l = সুতার দৈর্ঘ্য, r = ববের ব্যাসার্ধ)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি সরল দোলকের কার্যকর দৈর্ঘ্য ৪ গুণ বৃদ্ধি করা হলে এর দোলনকাল কত গুণ হবে?",
+        "answer": "Ans: $T \\propto \\sqrt{L} \\implies \\sqrt{4} = 2$ গুণ হবে"
+      }
+    ]
   },
   {
     "title": "পাহাড়ের চূড়ায় দোলক ঘড়ির সময় হারানো (Clock on Mountain Peak)",
     "latex": "h = \\left(\\frac{n}{86400 - n}\\right)R \\approx \\frac{n R}{86400} \\quad (T' = \\frac{86400}{86400 - n} \\times 2)",
-    "description": "দোলক ঘড়ি দিনে n সেকেন্ড ধীরে চললে পাহাড়ের উচ্চতা h (R = 6400 km)।"
+    "description": "দোলক ঘড়ি দিনে n সেকেন্ড ধীরে চললে পাহাড়ের উচ্চতা h (R = 6400 km)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $h = \\left(\\frac{n}{86400 - n}\\right)R \\approx \\frac{n R}{86400} \\quad (T' = \\frac{86400}{86400 - n} \\times 2)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $h = \\left(\\frac{n}{86400 - n}\\right)R \\approx \\frac{n R}{86400} \\quad (T' = \\frac{86400}{86400 - n} \\times 2)$"
+      }
+    ]
   },
   {
     "title": "ভূগর্ভে বা খনিতে দোলক ঘড়ির সময় হারানো (Clock inside Mine)",
     "latex": "d = \\left(\\frac{2n}{86400}\\right)R \\quad (\\text{দিনে } n \\text{ সেকেন্ড ধীরে চললে})",
-    "description": "খনিতে গভীরতা বৃদ্ধির কারণে g কমে যাওয়ায় ঘড়ি ধীরে চলে।"
+    "description": "খনিতে গভীরতা বৃদ্ধির কারণে g কমে যাওয়ায় ঘড়ি ধীরে চলে।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $d = \\left(\\frac{2n}{86400}\\right)R \\quad (\\text{দিনে } n \\text{ সেকেন্ড ধীরে চললে})$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $d = \\left(\\frac{2n}{86400}\\right)R \\quad (\\text{দিনে } n \\text{ সেকেন্ড ধীরে চললে})$"
+      }
+    ]
   },
   {
     "title": "স্প্রিং দোলকের পর্যায়কাল (Mass-Spring Oscillator Period)",
     "latex": "T = 2\\pi\\sqrt{\\frac{m}{k}} = 2\\pi\\sqrt{\\frac{e}{g}}",
-    "description": "m = ঝুলানো ভর, k = স্প্রিং ধ্রুবক, e = সাম্যাবস্থায় স্প্রিং-এর স্থির প্রসারণ।"
+    "description": "m = ঝুলানো ভর, k = স্প্রিং ধ্রুবক, e = সাম্যাবস্থায় স্প্রিং-এর স্থির প্রসারণ।",
+    "practiceQuestions": [
+      {
+        "question": "$k = 200\\text{ N/m}$ স্প্রিং ধ্রুবক বিশিষ্ট স্প্রিংকে $10\\text{ cm}$ প্রসারিত করতে কৃতকাজ কত?",
+        "answer": "Ans: $W = \\frac{1}{2} k x^2 = \\frac{1}{2} \\times 200 \\times (0.1)^2 = 1.0\\text{ J}$"
+      }
+    ]
   },
   {
     "title": "স্প্রিং কেটে টুকরো করার ক্ষেত্রে পর্যায়কাল (Cutting a Spring)",
     "latex": "k' = n k \\implies T' = \\frac{T}{\\sqrt{n}}",
-    "description": "একটি স্প্রিংকে সমান n টুকরো করলে প্রতি অংশের স্প্রিং ধ্রুবক n গুণ বৃদ্ধি পায় এবং পর্যায়কাল √n গুণ হ্রাস পায়।"
+    "description": "একটি স্প্রিংকে সমান n টুকরো করলে প্রতি অংশের স্প্রিং ধ্রুবক n গুণ বৃদ্ধি পায় এবং পর্যায়কাল √n গুণ হ্রাস পায়।",
+    "practiceQuestions": [
+      {
+        "question": "$k = 200\\text{ N/m}$ স্প্রিং ধ্রুবক বিশিষ্ট স্প্রিংকে $10\\text{ cm}$ প্রসারিত করতে কৃতকাজ কত?",
+        "answer": "Ans: $W = \\frac{1}{2} k x^2 = \\frac{1}{2} \\times 200 \\times (0.1)^2 = 1.0\\text{ J}$"
+      }
+    ]
   },
   {
     "title": "U-নলে তরল স্তম্ভ ও ভাসমান বস্তুর স্পন্দন (Oscillation in U-Tube & Floating Body)",
     "latex": "T_{\\text{U-tube}} = 2\\pi\\sqrt{\\frac{h}{g}} = 2\\pi\\sqrt{\\frac{l}{2g}}, \\quad T_{\\text{floating}} = 2\\pi\\sqrt{\\frac{m}{A\\rho g}} = 2\\pi\\sqrt{\\frac{h_{\\text{sub}}}{g}}",
-    "description": "U-নলে দুই বাহুর তরল স্তম্ভের উচ্চতা h এবং l = মোট তরলের দৈর্ঘ্য। ভাসমান বস্তুর নিমজ্জিত অংশের গভীরতা h_sub।"
+    "description": "U-নলে দুই বাহুর তরল স্তম্ভের উচ্চতা h এবং l = মোট তরলের দৈর্ঘ্য। ভাসমান বস্তুর নিমজ্জিত অংশের গভীরতা h_sub।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $T_{\\text{U-tube}} = 2\\pi\\sqrt{\\frac{h}{g}} = 2\\pi\\sqrt{\\frac{l}{2g}}, \\quad T_{\\text{floating}} = 2\\pi\\sqrt{\\frac{m}{A\\rho g}} = 2\\pi\\sqrt{\\frac{h_{\\text{sub}}}{g}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $T_{\\text{U-tube}} = 2\\pi\\sqrt{\\frac{h}{g}} = 2\\pi\\sqrt{\\frac{l}{2g}}, \\quad T_{\\text{floating}} = 2\\pi\\sqrt{\\frac{m}{A\\rho g}} = 2\\pi\\sqrt{\\frac{h_{\\text{sub}}}{g}}$"
+      }
+    ]
   },
   {
     "title": "দুটি সমকম্পাঙ্কের SHM এর উপরিপাতন (Superposition of 2 SHMs)",
     "latex": "A_{\\text{net}} = \\sqrt{A_1^2 + A_2^2 + 2A_1 A_2 \\cos\\phi}, \\quad \\tan\\delta = \\frac{A_1\\sin\\delta_1 + A_2\\sin\\delta_2}{A_1\\cos\\delta_1 + A_2\\cos\\delta_2}",
-    "description": "একই সরলরেখায় চলমান দুটি সরল ছন্দিত স্পন্দনের লব্ধি বিস্তার যেখানে φ = তাদের মধ্যবর্তী দশা পার্থক্য।"
+    "description": "একই সরলরেখায় চলমান দুটি সরল ছন্দিত স্পন্দনের লব্ধি বিস্তার যেখানে φ = তাদের মধ্যবর্তী দশা পার্থক্য।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $A_{\\text{net}} = \\sqrt{A_1^2 + A_2^2 + 2A_1 A_2 \\cos\\phi}, \\quad \\tan\\delta = \\frac{A_1\\sin\\delta_1 + A_2\\sin\\delta_2}{A_1\\cos\\delta_1 + A_2\\cos\\delta_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $A_{\\text{net}} = \\sqrt{A_1^2 + A_2^2 + 2A_1 A_2 \\cos\\phi}, \\quad \\tan\\delta = \\frac{A_1\\sin\\delta_1 + A_2\\sin\\delta_2}{A_1\\cos\\delta_1 + A_2\\cos\\delta_2}$"
+      }
+    ]
   }
 ]

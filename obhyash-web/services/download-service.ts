@@ -1,19 +1,26 @@
 import { Question, ExamDetails, UserAnswers } from '@/lib/types';
 import katex from 'katex';
 
-// --- Helpers (shared with print-service, duplicated to keep services independent) ---
+// --- Bengali Number Conversion Helper ---
+const toBengaliNumber = (num: number | string): string => {
+  const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/\d/g, (d) => bnDigits[parseInt(d, 10)]);
+};
 
+// --- LaTeX & Markdown Renderer ---
 const renderLatex = (text: string): string => {
   if (!text) return '';
 
+  // 1. Display LaTeX: $$...$$
   let result = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
     try {
-      return `<div style="overflow-x:auto;margin:4px 0;text-align:left;">${katex.renderToString(math.trim(), { throwOnError: false, displayMode: true })}</div>`;
+      return `<div style="overflow-x:auto;margin:3px 0;text-align:left;">${katex.renderToString(math.trim(), { throwOnError: false, displayMode: true })}</div>`;
     } catch {
-      return `$$${math}$$`;
+      return `<span style="font-family:serif;font-style:italic;">$$${math}$$</span>`;
     }
   });
 
+  // 2. Inline LaTeX: $...$
   result = result.replace(/\$([^$\n]+?)\$/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), {
@@ -21,33 +28,35 @@ const renderLatex = (text: string): string => {
         displayMode: false,
       });
     } catch {
-      return `$${math}$`;
+      return `<span style="font-family:serif;font-style:italic;">$${math}$</span>`;
     }
   });
 
+  // 3. Markdown Formatting
   result = result
     .replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>')
     .replace(
       /`([^`\n]+?)`/g,
-      '<code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:0.9em;">$1</code>',
+      '<code style="background:#f1f5f9;padding:1px 3px;border-radius:3px;font-family:monospace;font-size:0.88em;">$1</code>',
     )
-    .replace(/\n\n+/g, '<br><br>')
+    .replace(/\n\n+/g, '<br>')
     .replace(/\n/g, '<br>');
 
   return result;
 };
 
+// --- Image Helper ---
 const renderImage = (imageUrl?: string) => {
   if (!imageUrl) return '';
-  return `<div style="margin: 10px 0; text-align: center;">
-            <img src="${imageUrl}" style="max-width: 100%; max-height: 200px; border: 1px solid #eee; border-radius: 4px;" alt="Question Image" />
+  return `<div style="margin: 6px 0; text-align: center;">
+            <img src="${imageUrl}" style="max-width: 95%; max-height: 140px; border: 1px solid #e2e8f0; border-radius: 4px;" alt="Question Image" />
           </div>`;
 };
 
+// --- Question Metadata (Board / Varsity tag) ---
 const renderQuestionMeta = (q: Question): string => {
-  const years =
-    q.years && q.years.length > 0 ? q.years : q.year ? [q.year] : [];
+  const years = q.years && q.years.length > 0 ? q.years : q.year ? [q.year] : [];
   const institutes =
     q.institutes && q.institutes.length > 0
       ? q.institutes
@@ -55,30 +64,262 @@ const renderQuestionMeta = (q: Question): string => {
         ? [q.institute]
         : [];
   if (years.length === 0 && institutes.length === 0) return '';
-  const combined = [institutes.join(', '), years.join(', ')]
+  const combined = [institutes.join(', '), years.map(toBengaliNumber).join(', ')]
     .filter(Boolean)
     .join(' ');
-  return `<div style="font-size: 8pt; color: #666; font-style: italic; margin-bottom: 5px; display: block;">[${combined}]</div>`;
+  return `<div style="font-size: 7.5pt; color: #4b5563; font-style: italic; margin-bottom: 3px; display: block;">[${combined}]</div>`;
 };
 
-/** Shared floating toolbar injected into every download page */
+// --- Floating Toolbar Injected into Print/Download Window ---
 const dlToolbar = (label: string) => `
   <div class="dl-bar">
     <button class="dl-btn" onclick="window.print()">&#11015; ${label}</button>
-    <button class="dl-close" onclick="window.close()">&#10005;</button>
+    <button class="dl-close" onclick="window.close()">&#10005; বন্ধ করুন</button>
   </div>
 `;
 
 const dlBarStyles = `
-  .dl-bar { position: fixed; top: 14px; right: 18px; z-index: 99999; display: flex; gap: 8px; }
-  .dl-btn { background: #059669; color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(5,150,105,0.4); }
+  .dl-bar { position: fixed; top: 12px; right: 18px; z-index: 99999; display: flex; gap: 8px; font-family: 'Noto Serif Bengali', sans-serif; }
+  .dl-btn { background: #059669; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(5,150,105,0.4); display: flex; align-items: center; gap: 6px; }
   .dl-btn:hover { background: #047857; }
-  .dl-close { background: #6b7280; color: #fff; border: none; padding: 9px 13px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .dl-close:hover { background: #4b5563; }
+  .dl-close { background: #4b5563; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .dl-close:hover { background: #374151; }
   @media print { .dl-bar { display: none !important; } }
 `;
 
-// ─── Exported Download Functions ───────────────────────────────────────────────
+// Shared standard 2-column exam styles
+const sharedExamStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap');
+  
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 12mm 12mm;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Noto Serif Bengali', 'Tinos', 'Times New Roman', serif;
+    font-size: 9.5pt;
+    color: #111827;
+    line-height: 1.35;
+    margin: 0;
+    padding: 0;
+    padding-top: 50px;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header-container {
+    text-align: center;
+    margin-bottom: 12px;
+    border-bottom: 1.5px solid #111;
+    padding-bottom: 6px;
+  }
+
+  .header-top {
+    font-size: 15pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin: 0 0 2px 0;
+    color: #000;
+  }
+
+  .header-sub {
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #4b5563;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .exam-title-badge {
+    display: inline-block;
+    border: 1px solid #111;
+    padding: 2px 14px;
+    border-radius: 4px;
+    font-size: 10pt;
+    font-weight: 700;
+    margin: 3px 0 6px 0;
+    background: #f8fafc;
+  }
+
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+    border-top: 0.5px solid #cbd5e1;
+    padding-top: 4px;
+  }
+
+  .meta-table td {
+    padding: 3px 2px;
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: #1f2937;
+    vertical-align: middle;
+  }
+
+  /* Strict 2-Column Newspaper/Exam Layout */
+  .content-wrapper {
+    column-count: 2;
+    column-gap: 24px;
+    column-rule: 0.5px solid #d1d5db;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 24px;
+    -webkit-column-rule: 0.5px solid #d1d5db;
+    text-align: justify;
+  }
+
+  .question-item {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 11px;
+    padding-bottom: 7px;
+    border-bottom: 0.5px dashed #e2e8f0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .question-item:last-child {
+    border-bottom: none;
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 9.5pt;
+    color: #000;
+  }
+
+  .q-num {
+    font-weight: 800;
+    min-width: 20px;
+    flex-shrink: 0;
+    padding-right: 3px;
+    font-size: 9.5pt;
+  }
+
+  .q-text {
+    flex: 1;
+    line-height: 1.35;
+  }
+
+  .options-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 3px 0 2px 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .option-item {
+    width: 50%;
+    min-width: 110px;
+    padding-right: 4px;
+    margin-bottom: 2.5px;
+    font-size: 9pt;
+    line-height: 1.3;
+    display: flex;
+    align-items: flex-start;
+    overflow-wrap: break-word;
+  }
+
+  .option-item.full-width, .option-item:has(.katex-display) {
+    width: 100%;
+  }
+
+  .opt-letter {
+    font-weight: 700;
+    margin-right: 3px;
+    flex-shrink: 0;
+    font-size: 8.5pt;
+  }
+
+  .opt-content {
+    flex: 1;
+  }
+
+  /* KaTeX mathematical typography fine-tuning */
+  .katex {
+    font-size: 1.02em;
+    text-rendering: auto;
+  }
+
+  .katex-display {
+    margin: 3px 0 !important;
+    font-size: 0.95em;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* Solution Box (Only on Solution Paper) */
+  .solution-box {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    margin-top: 5px;
+    margin-left: 18px;
+    padding: 6px 8px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #059669;
+    border-radius: 3px;
+    font-size: 8.5pt;
+    line-height: 1.35;
+  }
+
+  .sol-row {
+    margin-bottom: 2.5px;
+  }
+
+  .sol-label {
+    font-weight: 700;
+    font-size: 8pt;
+    color: #374151;
+    margin-right: 4px;
+    text-transform: uppercase;
+  }
+
+  .sol-correct {
+    font-weight: 700;
+    color: #047857;
+  }
+
+  .sol-wrong {
+    font-weight: 700;
+    color: #b91c1c;
+  }
+
+  .sol-skipped {
+    color: #d97706;
+    font-style: italic;
+  }
+
+  .sol-explanation {
+    margin-top: 4px;
+    border-top: 0.5px solid #e2e8f0;
+    padding-top: 3px;
+    color: #1f2937;
+  }
+
+  @media print {
+    body {
+      padding-top: 0;
+    }
+  }
+
+  ${dlBarStyles}
+`;
+
+// ─── 1. Download Question Paper (2-Column Exam Paper ONLY) ───────────────────
 
 export const downloadQuestionPaper = (
   details: ExamDetails,
@@ -87,73 +328,54 @@ export const downloadQuestionPaper = (
   const w = window.open('', '_blank');
   if (!w) return;
 
+  const subjectTitle = details.subjectLabel || details.subject;
+  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
   const html = `
     <!DOCTYPE html>
     <html lang="bn">
       <head>
         <meta charset="UTF-8">
-        <title>${details.subject} - Question Paper</title>
+        <title>${subjectTitle} - প্রশ্নপত্র (Question Paper)</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
-          @page { size: A4; margin: 1.2cm 1cm; }
-          body { font-family: 'Noto Serif Bengali', 'Times New Roman', serif; font-size: 10.5pt; color: #000; line-height: 1.4; margin: 0; padding: 0; }
-          .header-container { text-align: center; margin-bottom: 14px; margin-top: 60px; }
-          .header-top-bar { background: #000; color: #fff; padding: 6px 12px; }
-          .institution-name { font-size: 16pt; font-weight: 800; letter-spacing: 0.5px; margin: 0; font-family: 'Noto Serif Bengali', serif; }
-          .institution-sub { font-size: 8.5pt; font-weight: 400; letter-spacing: 1px; opacity: 0.85; margin-top: 1px; }
-          .header-body { border-left: 2.5px solid #000; border-right: 2.5px solid #000; border-bottom: 2.5px solid #000; padding: 8px 14px 10px; }
-          .subject-title { font-size: 15pt; font-weight: 800; margin: 6px 0 2px; letter-spacing: 0.3px; }
-          .exam-type-badge { display: inline-block; border: 1.5px solid #000; padding: 2px 12px; border-radius: 3px; font-size: 9pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; }
-          .meta-table { width: 100%; margin-top: 6px; border-collapse: collapse; border-top: 1px solid #ccc; padding-top: 5px; }
-          .meta-table td { padding: 4px 0 0; font-weight: 700; font-size: 9.5pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; overflow-wrap: break-word; word-break: break-word; }
-          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
-          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
-          .options-list { list-style-type: none; padding: 0; margin: 0 0 0 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9.5pt; overflow-wrap: break-word; }
-          .option-item:has(.katex-display) { width: 100%; }
-          @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
-          ${dlBarStyles}
+          ${sharedExamStyles}
         </style>
       </head>
       <body>
-        ${dlToolbar('PDF ডাউনলোড করো')}
+        ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
+        
         <div class="header-container">
-          <div class="header-top-bar">
-            <div class="institution-name">অভ্যাস (Obhyash)</div>
-            <div class="institution-sub">EXAM PLATFORM &nbsp;·&nbsp; obhyash.com</div>
-          </div>
-          <div class="header-body">
-            <div class="subject-title">${details.subjectLabel}</div>
-            <div class="exam-type-badge">${details.examType}</div>
-            <table class="meta-table">
-              <tr>
-                <td width="33%">&#128336; সময়: ${details.durationMinutes} মিনিট</td>
-                <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
-                <td width="33%" align="right">&#9998; পূর্ণমান: ${details.totalMarks}</td>
-              </tr>
-            </table>
-          </div>
+          <div class="header-top">অভ্যাস (Obhyash)</div>
+          <div class="header-sub">EXAM PLATFORM · obhyash.com</div>
+          <div class="exam-title-badge">${subjectTitle} — ${details.examType}</div>
+          <table class="meta-table">
+            <tr>
+              <td width="33%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
+              <td width="33%" align="right">&#9998; পূর্ণমান: ${toBengaliNumber(details.totalMarks)} (${toBengaliNumber(questions.length)}টি প্রশ্ন)</td>
+            </tr>
+          </table>
         </div>
+
         <div class="content-wrapper">
           ${questions
             .map(
               (q, idx) => `
             <div class="question-item">
               <div class="q-header">
-                <span class="q-num">${idx + 1}.</span>
-                <span style="flex:1">${renderLatex(q.question || '')}</span>
+                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
+                <span class="q-text">${renderLatex(q.question || '')}</span>
               </div>
               ${renderImage(q.imageUrl)}
-              <div style="margin-left:22px">${renderQuestionMeta(q)}</div>
+              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
               <ul class="options-list">
                 ${q.options
                   .map(
                     (opt, oIdx) => `
-                  <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
+                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
+                    <span class="opt-letter">${optLetters[oIdx]}</span>
+                    <span class="opt-content">${renderLatex(opt)}</span>
                   </li>
                 `,
                   )
@@ -171,6 +393,122 @@ export const downloadQuestionPaper = (
   w.document.write(html);
   w.document.close();
 };
+
+// ─── 2. Download Result & Solutions (2-Column with Answers & Explanations) ────
+
+export const downloadResult = (
+  details: ExamDetails,
+  questions: Question[],
+  userAnswers: UserAnswers = {},
+) => {
+  const w = window.open('', '_blank');
+  if (!w) return;
+
+  const subjectTitle = details.subjectLabel || details.subject;
+  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
+  const score = questions.reduce((acc, q) => {
+    const ua = userAnswers[q.id];
+    return acc + (ua === q.correctAnswerIndex ? q.points || 1 : 0);
+  }, 0);
+  const totalPoints = questions.reduce((acc, q) => acc + (q.points || 1), 0);
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="bn">
+      <head>
+        <meta charset="UTF-8">
+        <title>${subjectTitle} - উত্তর ও ব্যাখ্যা (Solution Sheet)</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <style>
+          ${sharedExamStyles}
+        </style>
+      </head>
+      <body>
+        ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
+        
+        <div class="header-container">
+          <div class="header-top">অভ্যাস (Obhyash)</div>
+          <div class="header-sub">EXAM PLATFORM · SOLUTION & EXPLANATION</div>
+          <div class="exam-title-badge">${subjectTitle} — ${details.examType} (সমাধান পত্র)</div>
+          <table class="meta-table">
+            <tr>
+              <td width="30%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="40%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
+              <td width="30%" align="right">&#127942; প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="content-wrapper">
+          ${questions
+            .map((q, idx) => {
+              const userAns = userAnswers[q.id];
+              const isCorrect = userAns === q.correctAnswerIndex;
+              const isSkipped = userAns === undefined || userAns === null;
+              const userAnsLetter = isSkipped ? 'উত্তর নেই' : optLetters[userAns];
+              const correctAnsLetter = optLetters[q.correctAnswerIndex] || optLetters[0];
+              const correctOptText = q.options[q.correctAnswerIndex] || '';
+
+              return `
+            <div class="question-item">
+              <div class="q-header">
+                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
+                <span class="q-text">${renderLatex(q.question || '')}</span>
+              </div>
+              ${renderImage(q.imageUrl)}
+              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
+              <ul class="options-list">
+                ${q.options
+                  .map(
+                    (opt, oIdx) => `
+                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
+                    <span class="opt-letter">${optLetters[oIdx]}</span>
+                    <span class="opt-content">${renderLatex(opt)}</span>
+                  </li>
+                `,
+                  )
+                  .join('')}
+              </ul>
+
+              <div class="solution-box">
+                <div class="sol-row">
+                  <span class="sol-label">সঠিক উত্তর:</span>
+                  <span class="sol-correct">${correctAnsLetter} ${renderLatex(correctOptText)}</span>
+                </div>
+                ${
+                  userAnswers && Object.keys(userAnswers).length > 0
+                    ? `
+                <div class="sol-row">
+                  <span class="sol-label">তোমার উত্তর:</span>
+                  <span class="${isSkipped ? 'sol-skipped' : isCorrect ? 'sol-correct' : 'sol-wrong'}">
+                    ${isSkipped ? 'উত্তর নেই' : `${userAnsLetter} ${renderLatex(q.options[userAns] || '')}`}
+                  </span>
+                </div>
+                `
+                    : ''
+                }
+                <div class="sol-explanation">
+                  <span class="sol-label">ব্যাখ্যা:</span>
+                  <div style="margin-top:2px;">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</div>
+                </div>
+              </div>
+            </div>
+          `;
+            })
+            .join('')}
+        </div>
+      </body>
+    </html>
+  `;
+
+  w.document.write(html);
+  w.document.close();
+};
+
+export const downloadResultWithExplanations = downloadResult;
+
+// ─── 3. Download OMR Sheet ───────────────────────────────────────────────────
 
 export const downloadOMRSheet = (
   details: ExamDetails,
@@ -298,20 +636,20 @@ export const downloadOMRSheet = (
                     <div class="column">
                         ${Array(25)
                           .fill(0)
-                          .map((_, row) => {
-                            const qNum = col * 25 + row + 1;
-                            const opacity = qNum <= totalQuestions ? 1 : 0.15;
+                          .map((_, r) => {
+                            const qNum = col * 25 + r + 1;
+                            if (qNum > totalQuestions) return '';
                             return `
-                              <div class="row" style="opacity: ${opacity}">
-                                  <span class="q-num">${qNum}</span>
-                                  <div class="options">
-                                      <div class="opt-bubble">A</div>
-                                      <div class="opt-bubble">B</div>
-                                      <div class="opt-bubble">C</div>
-                                      <div class="opt-bubble">D</div>
-                                  </div>
-                              </div>
-                          `;
+                                <div class="row">
+                                    <div class="q-num">${qNum}</div>
+                                    <div class="options">
+                                        <div class="opt-bubble">A</div>
+                                        <div class="opt-bubble">B</div>
+                                        <div class="opt-bubble">C</div>
+                                        <div class="opt-bubble">D</div>
+                                    </div>
+                                </div>
+                            `;
                           })
                           .join('')}
                     </div>
@@ -322,135 +660,19 @@ export const downloadOMRSheet = (
             <div class="footer">
                 <div class="sig-block">
                     <div class="sig-line"></div>
-                    <div class="sig-text">Signature of Candidate</div>
+                    <div class="sig-text">Student Signature</div>
                 </div>
                 <div class="qr-block">
-                    <img src="${qrUrl}" width="50" height="50" style="display:block;" />
-                    <span class="scan-text">SCAN ME</span>
+                    <img src="${qrUrl}" width="50" height="50" alt="QR" />
+                    <span class="scan-text">SCAN TO VERIFY</span>
                 </div>
                 <div class="sig-block">
                     <div class="sig-line"></div>
-                    <div class="sig-text">Signature of Invigilator</div>
+                    <div class="sig-text">Invigilator Signature</div>
                 </div>
             </div>
         </div>
     </body>
-    </html>
-  `;
-
-  w.document.write(html);
-  w.document.close();
-};
-
-export const downloadResult = (
-  details: ExamDetails,
-  questions: Question[],
-  userAnswers: UserAnswers,
-) => {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
-  const score = questions.reduce((acc, q) => {
-    const ua = userAnswers[q.id];
-    return acc + (ua === q.correctAnswerIndex ? q.points || 1 : 0);
-  }, 0);
-  const totalPoints = questions.reduce((acc, q) => acc + (q.points || 1), 0);
-
-  const html = `
-    <!DOCTYPE html>
-    <html lang="bn">
-      <head>
-        <meta charset="UTF-8">
-        <title>${details.subject} - Solution & Explanation</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
-          @page { size: A4; margin: 1cm; }
-          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 10pt; color: #000; line-height: 1.3; margin: 0; padding: 0.5cm; padding-top: 70px; }
-          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
-          .institution-name { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .exam-title { font-size: 13pt; font-weight: bold; margin: 4px 0 10px 0; border: 1px solid #000; display: inline-block; padding: 4px 15px; border-radius: 4px; }
-          .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-          .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 18px; border-bottom: 0.5px dashed #ccc; padding-bottom: 10px; overflow-wrap: break-word; word-break: break-word; }
-          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
-          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
-          .options-list { list-style-type: none; padding: 0; margin: 4px 0 4px 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9pt; overflow-wrap: break-word; }
-          .option-item:has(.katex-display) { width: 100%; }
-          .solution-box { break-inside: avoid; margin-top: 6px; padding: 8px 10px; background-color: #f9f9f9; border-left: 3px solid #555; font-size: 8.5pt; border-radius: 0 4px 4px 0; }
-          .sol-row { margin-bottom: 3px; }
-          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; color: #444; margin-right: 4px; }
-          .correct { color: #15803d; font-weight: bold; }
-          .wrong { color: #b91c1c; font-weight: bold; }
-          .skipped { color: #d97706; font-style: italic; }
-          .exp-text { color: #333; display: block; margin-top: 4px; line-height: 1.4; }
-          @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding-top: 0.5cm; } }
-          ${dlBarStyles}
-        </style>
-      </head>
-      <body>
-        ${dlToolbar('PDF ডাউনলোড করো')}
-        <div class="header-container">
-          <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
-          <div class="exam-title">${details.subject} - Solution</div>
-          <div style="font-size: 9pt; margin-top: -8px; margin-bottom: 8px;">${details.examType}</div>
-          <table class="meta-table">
-            <tr>
-              <td width="30%">সময়: ${details.durationMinutes} মিনিট</td>
-              <td width="40%" align="center">অধ্যায়: ${details.chapters}</td>
-              <td width="30%" align="right">নম্বর: ${score.toFixed(1)} / ${totalPoints}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="content-wrapper">
-          ${questions
-            .map((q, idx) => {
-              const userAns = userAnswers[q.id];
-              const isCorrect = userAns === q.correctAnswerIndex;
-              const isSkipped = userAns === undefined;
-              const userAnsLabel = isSkipped
-                ? 'উত্তর নেই'
-                : ['ক', 'খ', 'গ', 'ঘ'][userAns];
-              const correctAnsLabel = ['ক', 'খ', 'গ', 'ঘ'][
-                q.correctAnswerIndex
-              ];
-
-              return `
-            <div class="question-item">
-              <div class="q-header"><span class="q-num">${idx + 1}.</span><span style="flex:1">${renderLatex(q.question || '')}</span></div>
-              ${renderImage(q.imageUrl)}
-              <div style="margin-left:22px">${renderQuestionMeta(q)}</div>
-              <ul class="options-list">
-                ${q.options
-                  .map(
-                    (opt, oIdx) => `
-                  <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
-                  </li>
-                `,
-                  )
-                  .join('')}
-              </ul>
-              <div class="solution-box">
-                <div class="sol-row">
-                  <span class="label">সঠিক উত্তর:</span><span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
-                </div>
-                <div class="sol-row">
-                  <span class="label">তোমার উত্তর:</span><span class="${isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong'}">${isSkipped ? 'উত্তর নেই' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}</span>
-                </div>
-                <div style="margin-top:5px;border-top:0.5px solid #ddd;padding-top:4px;">
-                  <span class="label">ব্যাখ্যা:</span>
-                  <span class="exp-text">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</span>
-                </div>
-              </div>
-            </div>
-          `;
-            })
-            .join('')}
-        </div>
-      </body>
     </html>
   `;
 

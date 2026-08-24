@@ -191,7 +191,6 @@ class _ChapterTile extends StatelessWidget {
                 ],
               ),
             ),
-
             Icon(
               Icons.chevron_right_rounded,
               size: 20,

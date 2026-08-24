@@ -9,6 +9,7 @@ import '../../../../core/providers/title_provider.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../../core/presentation/widgets/formula_math_view.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
+import '../practice/formula_practice_page_view.dart';
 
 class FormulaDetailView extends ConsumerStatefulWidget {
   final String subjectId;
@@ -30,6 +31,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
   String? _errorMessage;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _isSearchOpen = false;
 
   @override
   void initState() {
@@ -174,100 +176,103 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
     }
 
     final filteredFormulas = _getFilteredFormulas();
-    final totalCount = _chapter!.formulas.length;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
       body: Column(
         children: [
-          // Search and Filter Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.08),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+          // Header Search Bar Section (Expandable via search icon)
+          if (_isSearchOpen)
+            Container(
+              margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              height: 46,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xFF059669).withValues(alpha: 0.4),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    LucideIcons.search,
+                    size: 18,
+                    color: Color(0xFF059669),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
                     child: TextField(
                       controller: _searchController,
+                      autofocus: true,
                       onChanged: (val) => setState(() => _searchQuery = val),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.5,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF111827),
                       ),
                       decoration: InputDecoration(
                         hintText: 'সূত্র বা টপিক খুঁজুন...',
                         hintStyle: TextStyle(
-                          fontSize: 13,
+                          fontSize: 13.5,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
                         ),
-                        prefixIcon: Icon(
-                          LucideIcons.search,
-                          size: 18,
-                          color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
-                        ),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(LucideIcons.x, size: 16),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                              )
-                            : null,
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        isDense: true,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                // Count Badge
-                Container(
-                  height: 44,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: isDark ? 0.15 : 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFF059669).withValues(alpha: 0.25),
+                  IconButton(
+                    icon: const Icon(LucideIcons.x, size: 18),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {
+                        _searchQuery = '';
+                        _isSearchOpen = false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _chapter?.chapterName ?? 'সূত্র তালিকা',
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white70 : const Color(0xFF475569),
                     ),
                   ),
-                  child: Center(
-                    child: Text(
-                      _searchQuery.isEmpty
-                          ? '${_toBengaliNumber(totalCount)}টি সূত্র'
-                          : '${_toBengaliNumber(filteredFormulas.length)}/${_toBengaliNumber(totalCount)}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
-                        color: Color(0xFF059669),
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(LucideIcons.search, size: 20),
+                    color: isDark ? Colors.white70 : const Color(0xFF475569),
+                    onPressed: () {
+                      setState(() {
+                        _isSearchOpen = true;
+                      });
+                    },
+                    tooltip: 'সূত্র খুঁজুন',
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
           // Formula List
           Expanded(
@@ -306,6 +311,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                         isDark: isDark,
                         index: index,
                         serialNumber: _toBengaliNumber(index + 1),
+                        chapterName: _chapter?.chapterName,
                       );
                     },
                   ),
@@ -317,8 +323,8 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
 }
 
 /// A clean, textbook-styled, minimalist formula card as requested:
+/// - Clickable to open interactive Board & Admission Practice Question Sheet.
 /// - Simple textbook flow without excessive nested boxes or icons.
-/// - No copy buttons.
 /// - Balanced LaTeX and text typography matching app's HindSiliguri font.
 /// - Soft subtle academic tinted backgrounds to naturally differentiate cards.
 class _BookFormulaCard extends StatelessWidget {
@@ -326,12 +332,14 @@ class _BookFormulaCard extends StatelessWidget {
   final bool isDark;
   final int index;
   final String serialNumber;
+  final String? chapterName;
 
   const _BookFormulaCard({
     required this.formula,
     required this.isDark,
     required this.index,
     required this.serialNumber,
+    this.chapterName,
   });
 
   static const List<_CardTheme> _palettes = [
@@ -387,65 +395,124 @@ class _BookFormulaCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
+      child: Material(
         color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: cardBorder,
-          width: 1.0,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => FormulaPracticePageView(
+                  formula: formula,
+                  chapterName: chapterName,
+                  serialNumber: serialNumber,
+                ),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          splashColor: const Color(0xFF059669).withValues(alpha: 0.1),
+          highlightColor: const Color(0xFF059669).withValues(alpha: 0.05),
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: cardBorder,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.02),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Heading: Serial + Title (Clean Textbook style, No top badge)
+                Text(
+                  '$serialNumber. $displayTitle',
+                  style: TextStyle(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'HindSiliguri',
+                    height: 1.35,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // 2. Math Formula (Centered with generous vertical padding, no overscreen cutoff)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Center(
+                    child: FormulaMathView(
+                      latex: formula.latex,
+                      isDark: isDark,
+                      fontSize: 17,
+                    ),
+                  ),
+                ),
+
+                // 3. Explanation / Description (Generous spacing and clean textbook text)
+                if (description.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  LatexText(
+                    text: description,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontFamily: 'HindSiliguri',
+                      height: 1.6,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
+                    ),
+                  ),
+                ],
+
+                // 4. Clickable Bottom Action Bar for BUET Written Practice Questions
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color(0xFF059669).withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.penTool,
+                        size: 13,
+                        color: Color(0xFF059669),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'বুয়েট ও বোর্ড লিখিত প্রশ্ন প্র্যাকটিস করুন',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'HindSiliguri',
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        LucideIcons.chevronRight,
+                        size: 14,
+                        color: Color(0xFF059669),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Heading: Serial + Title (Clean Textbook style, No Icons)
-          Text(
-            '$serialNumber. $displayTitle',
-            style: TextStyle(
-              fontSize: 16.5,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'HindSiliguri',
-              height: 1.35,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 2. Math Formula (Centered with generous vertical padding, no overscreen cutoff)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Center(
-              child: FormulaMathView(
-                latex: formula.latex,
-                isDark: isDark,
-                fontSize: 17,
-              ),
-            ),
-          ),
-
-          // 3. Explanation / Description (Generous spacing and clean textbook text)
-          if (description.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            LatexText(
-              text: description,
-              style: TextStyle(
-                fontSize: 14.5,
-                fontFamily: 'HindSiliguri',
-                height: 1.6,
-                fontWeight: FontWeight.w500,
-                color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }

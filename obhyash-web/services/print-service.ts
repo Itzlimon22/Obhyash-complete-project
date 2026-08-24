@@ -84,6 +84,12 @@ const renderQuestionMeta = (q: Question): string => {
           </div>`;
 };
 
+// --- Bengali Number Conversion Helper ---
+const toBengaliNumber = (num: number | string): string => {
+  const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/\d/g, (d) => bnDigits[parseInt(d, 10)]);
+};
+
 // --- Exported Print Functions ---
 
 export const printQuestionPaper = (
@@ -93,53 +99,55 @@ export const printQuestionPaper = (
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
+  const subjectTitle = details.subjectLabel || details.subject;
+  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="bn">
       <head>
         <meta charset="UTF-8">
-        <title>${details.subject} - Question Paper</title>
+        <title>${subjectTitle} - প্রশ্নপত্র (Question Paper)</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
-          @page { size: A4; margin: 1.2cm 1cm; }
-          body { font-family: 'Noto Serif Bengali', 'Times New Roman', serif; font-size: 10.5pt; color: #000; line-height: 1.4; margin: 0; padding: 0; }
-          .header-container { text-align: center; margin-bottom: 14px; }
-          .header-top-bar { background: #000; color: #fff; padding: 6px 12px; margin-bottom: 0; }
-          .institution-name { font-size: 16pt; font-weight: 800; letter-spacing: 0.5px; margin: 0; font-family: 'Noto Serif Bengali', serif; }
-          .institution-sub { font-size: 8.5pt; font-weight: 400; letter-spacing: 1px; opacity: 0.85; margin-top: 1px; }
-          .header-body { border-left: 2.5px solid #000; border-right: 2.5px solid #000; border-bottom: 2.5px solid #000; padding: 8px 14px 10px; }
-          .subject-title { font-size: 15pt; font-weight: 800; margin: 6px 0 2px; letter-spacing: 0.3px; }
-          .exam-type-badge { display: inline-block; border: 1.5px solid #000; padding: 2px 12px; border-radius: 3px; font-size: 9pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; }
-          .meta-table { width: 100%; margin-top: 6px; border-collapse: collapse; border-top: 1px solid #ccc; padding-top: 5px; }
-          .meta-table td { padding: 4px 0 0; font-weight: 700; font-size: 9.5pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; overflow-wrap: break-word; word-break: break-word; }
-          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
-          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
-          .options-list { list-style-type: none; padding: 0; margin: 0 0 0 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9.5pt; overflow-wrap: break-word; }
-          .option-item:has(.katex-display) { width: 100%; }
-          @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap');
+          @page { size: A4 portrait; margin: 10mm 12mm 12mm 12mm; }
+          * { box-sizing: border-box; }
+          body { font-family: 'Noto Serif Bengali', 'Tinos', 'Times New Roman', serif; font-size: 9.5pt; color: #111827; line-height: 1.35; margin: 0; padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .header-container { text-align: center; margin-bottom: 12px; border-bottom: 1.5px solid #111; padding-bottom: 6px; }
+          .header-top { font-size: 15pt; font-weight: 800; letter-spacing: 0.5px; margin: 0 0 2px 0; color: #000; }
+          .header-sub { font-size: 8pt; font-weight: 500; letter-spacing: 1px; color: #4b5563; text-transform: uppercase; margin-bottom: 4px; }
+          .exam-title-badge { display: inline-block; border: 1px solid #111; padding: 2px 14px; border-radius: 4px; font-size: 10pt; font-weight: 700; margin: 3px 0 6px 0; background: #f8fafc; }
+          .meta-table { width: 100%; border-collapse: collapse; margin-top: 4px; border-top: 0.5px solid #cbd5e1; padding-top: 4px; }
+          .meta-table td { padding: 3px 2px; font-size: 8.5pt; font-weight: 600; color: #1f2937; vertical-align: middle; }
+          .content-wrapper { column-count: 2; column-gap: 24px; column-rule: 0.5px solid #d1d5db; -webkit-column-count: 2; -webkit-column-gap: 24px; -webkit-column-rule: 0.5px solid #d1d5db; text-align: justify; }
+          .question-item { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin-bottom: 11px; padding-bottom: 7px; border-bottom: 0.5px dashed #e2e8f0; overflow-wrap: break-word; word-break: break-word; }
+          .question-item:last-child { border-bottom: none; }
+          .q-header { display: flex; align-items: flex-start; font-weight: 600; margin-bottom: 3px; font-size: 9.5pt; color: #000; }
+          .q-num { font-weight: 800; min-width: 20px; flex-shrink: 0; padding-right: 3px; font-size: 9.5pt; }
+          .q-text { flex: 1; line-height: 1.35; }
+          .options-list { list-style-type: none; padding: 0; margin: 3px 0 2px 20px; display: flex; flex-wrap: wrap; }
+          .option-item { width: 50%; min-width: 110px; padding-right: 4px; margin-bottom: 2.5px; font-size: 9pt; line-height: 1.3; display: flex; align-items: flex-start; overflow-wrap: break-word; }
+          .option-item.full-width, .option-item:has(.katex-display) { width: 100%; }
+          .opt-letter { font-weight: 700; margin-right: 3px; flex-shrink: 0; font-size: 8.5pt; }
+          .opt-content { flex: 1; }
+          .katex { font-size: 1.02em; text-rendering: auto; }
+          .katex-display { margin: 3px 0 !important; font-size: 0.95em; max-width: 100%; overflow-x: auto; }
+          @media print { button { display: none; } }
         </style>
       </head>
       <body>
         <div class="header-container">
-          <div class="header-top-bar">
-            <div class="institution-name">অভ্যাস (Obhyash)</div>
-            <div class="institution-sub">EXAM PLATFORM &nbsp;·&nbsp; obhyash.com</div>
-          </div>
-          <div class="header-body">
-            <div class="subject-title">${details.subjectLabel}</div>
-            <div class="exam-type-badge">${details.examType}</div>
-            <table class="meta-table">
-              <tr>
-                <td width="33%">&#128336; সময়: ${details.durationMinutes} মিনিট</td>
-                <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
-                <td width="33%" align="right">&#9998; পূর্ণমান: ${details.totalMarks}</td>
-              </tr>
-            </table>
-          </div>
+          <div class="header-top">অভ্যাস (Obhyash)</div>
+          <div class="header-sub">EXAM PLATFORM · obhyash.com</div>
+          <div class="exam-title-badge">${subjectTitle} — ${details.examType}</div>
+          <table class="meta-table">
+            <tr>
+              <td width="33%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
+              <td width="33%" align="right">&#9998; পূর্ণমান: ${toBengaliNumber(details.totalMarks)} (${toBengaliNumber(questions.length)}টি প্রশ্ন)</td>
+            </tr>
+          </table>
         </div>
         <div class="content-wrapper">
           ${questions
@@ -147,19 +155,18 @@ export const printQuestionPaper = (
               (q, idx) => `
             <div class="question-item">
               <div class="q-header">
-                <span class="q-num">${idx + 1}.</span>
-                <span style="flex:1">${renderLatex(q.question || '')}</span>
+                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
+                <span class="q-text">${renderLatex(q.question || '')}</span>
               </div>
               ${renderImage(q.imageUrl)}
-              <div style="margin-left:22px">
-                ${renderQuestionMeta(q)}
-              </div>
+              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
               <ul class="options-list">
                 ${q.options
                   .map(
                     (opt, oIdx) => `
-                  <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
+                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
+                    <span class="opt-letter">${optLetters[oIdx]}</span>
+                    <span class="opt-content">${renderLatex(opt)}</span>
                   </li>
                 `,
                   )
@@ -414,49 +421,60 @@ export const printResultWithExplanations = (
   }, 0);
   const totalPoints = questions.reduce((acc, q) => acc + (q.points || 1), 0);
 
+  const subjectTitle = details.subjectLabel || details.subject;
+  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="bn">
       <head>
         <meta charset="UTF-8">
-        <title>${details.subject} - Solution & Explanation</title>
+        <title>${subjectTitle} - উত্তর ও ব্যাখ্যা (Solution Sheet)</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
-          @page { size: A4; margin: 1cm; }
-          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 10pt; color: #000; line-height: 1.3; margin: 0; padding: 0.5cm; }
-          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
-          .institution-name { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .exam-title { font-size: 13pt; font-weight: bold; margin: 4px 0 10px 0; border: 1px solid #000; display: inline-block; padding: 4px 15px; border-radius: 4px; }
-          .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-          .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 18px; border-bottom: 0.5px dashed #ccc; padding-bottom: 10px; overflow-wrap: break-word; word-break: break-word; }
-          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
-          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
-          .options-list { list-style-type: none; padding: 0; margin: 4px 0 4px 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9pt; overflow-wrap: break-word; }
-          .option-item:has(.katex-display) { width: 100%; }
-          .solution-box { break-inside: avoid; margin-top: 6px; padding: 8px 10px; background-color: #f9f9f9; border-left: 3px solid #555; font-size: 8.5pt; border-radius: 0 4px 4px 0; }
-          .sol-row { margin-bottom: 3px; }
-          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; color: #444; margin-right: 4px; }
-          .correct { color: #15803d; font-weight: bold; }
-          .wrong { color: #b91c1c; font-weight: bold; }
-          .skipped { color: #d97706; font-style: italic; }
-          .exp-text { color: #333; display: block; margin-top: 4px; line-height: 1.4; }
-          @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600;700;800&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap');
+          @page { size: A4 portrait; margin: 10mm 12mm 12mm 12mm; }
+          * { box-sizing: border-box; }
+          body { font-family: 'Noto Serif Bengali', 'Tinos', 'Times New Roman', serif; font-size: 9.5pt; color: #111827; line-height: 1.35; margin: 0; padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .header-container { text-align: center; margin-bottom: 12px; border-bottom: 1.5px solid #111; padding-bottom: 6px; }
+          .header-top { font-size: 15pt; font-weight: 800; letter-spacing: 0.5px; margin: 0 0 2px 0; color: #000; }
+          .header-sub { font-size: 8pt; font-weight: 500; letter-spacing: 1px; color: #4b5563; text-transform: uppercase; margin-bottom: 4px; }
+          .exam-title-badge { display: inline-block; border: 1px solid #111; padding: 2px 14px; border-radius: 4px; font-size: 10pt; font-weight: 700; margin: 3px 0 6px 0; background: #f8fafc; }
+          .meta-table { width: 100%; border-collapse: collapse; margin-top: 4px; border-top: 0.5px solid #cbd5e1; padding-top: 4px; }
+          .meta-table td { padding: 3px 2px; font-size: 8.5pt; font-weight: 600; color: #1f2937; vertical-align: middle; }
+          .content-wrapper { column-count: 2; column-gap: 24px; column-rule: 0.5px solid #d1d5db; -webkit-column-count: 2; -webkit-column-gap: 24px; -webkit-column-rule: 0.5px solid #d1d5db; text-align: justify; }
+          .question-item { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin-bottom: 11px; padding-bottom: 7px; border-bottom: 0.5px dashed #e2e8f0; overflow-wrap: break-word; word-break: break-word; }
+          .question-item:last-child { border-bottom: none; }
+          .q-header { display: flex; align-items: flex-start; font-weight: 600; margin-bottom: 3px; font-size: 9.5pt; color: #000; }
+          .q-num { font-weight: 800; min-width: 20px; flex-shrink: 0; padding-right: 3px; font-size: 9.5pt; }
+          .q-text { flex: 1; line-height: 1.35; }
+          .options-list { list-style-type: none; padding: 0; margin: 3px 0 2px 20px; display: flex; flex-wrap: wrap; }
+          .option-item { width: 50%; min-width: 110px; padding-right: 4px; margin-bottom: 2.5px; font-size: 9pt; line-height: 1.3; display: flex; align-items: flex-start; overflow-wrap: break-word; }
+          .option-item.full-width, .option-item:has(.katex-display) { width: 100%; }
+          .opt-letter { font-weight: 700; margin-right: 3px; flex-shrink: 0; font-size: 8.5pt; }
+          .opt-content { flex: 1; }
+          .katex { font-size: 1.02em; text-rendering: auto; }
+          .katex-display { margin: 3px 0 !important; font-size: 0.95em; max-width: 100%; overflow-x: auto; }
+          .solution-box { break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; margin-top: 5px; margin-left: 18px; padding: 6px 8px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #059669; border-radius: 3px; font-size: 8.5pt; line-height: 1.35; }
+          .sol-row { margin-bottom: 2.5px; }
+          .sol-label { font-weight: 700; font-size: 8pt; color: #374151; margin-right: 4px; text-transform: uppercase; }
+          .sol-correct { font-weight: 700; color: #047857; }
+          .sol-wrong { font-weight: 700; color: #b91c1c; }
+          .sol-skipped { color: #d97706; font-style: italic; }
+          .sol-explanation { margin-top: 4px; border-top: 0.5px solid #e2e8f0; padding-top: 3px; color: #1f2937; }
+          @media print { button { display: none; } }
         </style>
       </head>
       <body>
         <div class="header-container">
-          <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
-          <div class="exam-title">${details.subject} - Solution</div>
-          <div style="font-size: 9pt; margin-top: -8px; margin-bottom: 8px;">${details.examType}</div>
+          <div class="header-top">অভ্যাস (Obhyash)</div>
+          <div class="header-sub">EXAM PLATFORM · SOLUTION & EXPLANATION</div>
+          <div class="exam-title-badge">${subjectTitle} — ${details.examType} (সমাধান পত্র)</div>
           <table class="meta-table">
             <tr>
-              <td width="30%">সময়: ${details.durationMinutes} মিনিট</td>
-              <td width="40%" align="center">অধ্যায়: ${details.chapters}</td>
-              <td width="30%" align="right">নম্বর: ${score.toFixed(1)} / ${totalPoints}</td>
+              <td width="30%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="40%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
+              <td width="30%" align="right">&#127942; প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)}</td>
             </tr>
           </table>
         </div>
@@ -465,44 +483,53 @@ export const printResultWithExplanations = (
             .map((q, idx) => {
               const userAns = userAnswers[q.id];
               const isCorrect = userAns === q.correctAnswerIndex;
-              const isSkipped = userAns === undefined;
-              const userAnsLabel = isSkipped
-                ? 'উত্তর নেই'
-                : ['ক', 'খ', 'গ', 'ঘ'][userAns];
-              const correctAnsLabel = ['ক', 'খ', 'গ', 'ঘ'][
-                q.correctAnswerIndex
-              ];
+              const isSkipped = userAns === undefined || userAns === null;
+              const userAnsLetter = isSkipped ? 'উত্তর নেই' : optLetters[userAns];
+              const correctAnsLetter = optLetters[q.correctAnswerIndex] || optLetters[0];
+              const correctOptText = q.options[q.correctAnswerIndex] || '';
 
               return `
             <div class="question-item">
-              <div class="q-header"><span class="q-num">${idx + 1}.</span><span style="flex:1">${renderLatex(q.question || '')}</span>
+              <div class="q-header">
+                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
+                <span class="q-text">${renderLatex(q.question || '')}</span>
               </div>
               ${renderImage(q.imageUrl)}
-              <div style="margin-left:22px">
-                ${renderQuestionMeta(q)}
-              </div>
+              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
               <ul class="options-list">
                 ${q.options
                   .map(
                     (opt, oIdx) => `
-                  <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
+                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
+                    <span class="opt-letter">${optLetters[oIdx]}</span>
+                    <span class="opt-content">${renderLatex(opt)}</span>
                   </li>
                 `,
                   )
                   .join('')}
               </ul>
+
               <div class="solution-box">
-                 <div class="sol-row">
-                    <span class="label">সঠিক উত্তর:</span><span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
-                 </div>
-                 <div class="sol-row">
-                    <span class="label">তোমার উত্তর:</span><span class="${isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong'}">${isSkipped ? 'উত্তর নেই' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}</span>
-                 </div>
-                 <div style="margin-top:5px;border-top:0.5px solid #ddd;padding-top:4px;">
-                    <span class="label">ব্যাখ্যা:</span>
-                    <span class="exp-text">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</span>
-                 </div>
+                <div class="sol-row">
+                  <span class="sol-label">সঠিক উত্তর:</span>
+                  <span class="sol-correct">${correctAnsLetter} ${renderLatex(correctOptText)}</span>
+                </div>
+                ${
+                  userAnswers && Object.keys(userAnswers).length > 0
+                    ? `
+                <div class="sol-row">
+                  <span class="sol-label">তোমার উত্তর:</span>
+                  <span class="${isSkipped ? 'sol-skipped' : isCorrect ? 'sol-correct' : 'sol-wrong'}">
+                    ${isSkipped ? 'উত্তর নেই' : `${userAnsLetter} ${renderLatex(q.options[userAns] || '')}`}
+                  </span>
+                </div>
+                `
+                    : ''
+                }
+                <div class="sol-explanation">
+                  <span class="sol-label">ব্যাখ্যা:</span>
+                  <div style="margin-top:2px;">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</div>
+                </div>
               </div>
             </div>
           `;

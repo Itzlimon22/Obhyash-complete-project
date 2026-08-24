@@ -1,19 +1,54 @@
+class FormulaPracticeQuestion {
+  final String question;
+  final String answer;
+
+  const FormulaPracticeQuestion({
+    required this.question,
+    required this.answer,
+  });
+
+  factory FormulaPracticeQuestion.fromJson(Map<String, dynamic> json) =>
+      FormulaPracticeQuestion(
+        question: json['question'] as String? ?? '',
+        answer: json['answer'] as String? ?? '',
+      );
+
+  Map<String, dynamic> toJson() => {
+        'question': question,
+        'answer': answer,
+      };
+}
+
 class FormulaEntry {
   final String title;
   final String latex;
   final String description;
+  final List<FormulaPracticeQuestion> practiceQuestions;
 
   const FormulaEntry({
     required this.title,
     required this.latex,
     required this.description,
+    this.practiceQuestions = const [],
   });
 
-  factory FormulaEntry.fromJson(Map<String, dynamic> json) => FormulaEntry(
-        title: json['title'] as String,
-        latex: json['latex'] as String,
-        description: json['description'] as String,
-      );
+  factory FormulaEntry.fromJson(Map<String, dynamic> json) {
+    List<FormulaPracticeQuestion> list = [];
+    if (json['practiceQuestions'] != null && json['practiceQuestions'] is List) {
+      list = (json['practiceQuestions'] as List)
+          .map((e) => FormulaPracticeQuestion.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (json['practice'] != null) {
+      list = [FormulaPracticeQuestion.fromJson(json['practice'] as Map<String, dynamic>)];
+    }
+
+    return FormulaEntry(
+      title: json['title'] as String,
+      latex: json['latex'] as String,
+      description: json['description'] as String,
+      practiceQuestions: list,
+    );
+  }
 }
 
 class FormulaChapter {
@@ -98,49 +133,28 @@ const kHscFormulaSubjects = [
     subjectName: 'রসায়ন ১ম পত্র',
     assetPath: 'assets/formulas/hsc_chemistry_1/index.json',
     emoji: '🧪',
-    gradientColors: [0xFF1A0F2E, 0xFF3D1A78],
+    gradientColors: [0xFF0D2818, 0xFF1B4332],
   ),
   SubjectMeta(
     subjectId: 'hsc_chemistry_2',
     subjectName: 'রসায়ন ২য় পত্র',
     assetPath: 'assets/formulas/hsc_chemistry_2/index.json',
     emoji: '⚗️',
-    gradientColors: [0xFF200A2E, 0xFF5B1A8C],
+    gradientColors: [0xFF1A1A2E, 0xFF16213E],
   ),
   SubjectMeta(
     subjectId: 'hsc_math_1',
     subjectName: 'উচ্চতর গণিত ১ম পত্র',
     assetPath: 'assets/formulas/hsc_math_1/index.json',
-    emoji: '∑',
-    gradientColors: [0xFF0F2818, 0xFF065F46],
+    emoji: '📐',
+    gradientColors: [0xFF2D1B69, 0xFF1B1B4B],
   ),
   SubjectMeta(
     subjectId: 'hsc_math_2',
     subjectName: 'উচ্চতর গণিত ২য় পত্র',
     assetPath: 'assets/formulas/hsc_math_2/index.json',
-    emoji: '∫',
-    gradientColors: [0xFF0A2010, 0xFF047857],
-  ),
-  SubjectMeta(
-    subjectId: 'hsc_biology_1',
-    subjectName: 'জীববিজ্ঞান ১ম পত্র',
-    assetPath: 'assets/formulas/hsc_biology_1/index.json',
-    emoji: '🌿',
-    gradientColors: [0xFF0F1A0A, 0xFF166534],
-  ),
-  SubjectMeta(
-    subjectId: 'hsc_biology_2',
-    subjectName: 'জীববিজ্ঞান ২য় পত্র',
-    assetPath: 'assets/formulas/hsc_biology_2/index.json',
-    emoji: '🧬',
-    gradientColors: [0xFF1A0F10, 0xFF991B1B],
-  ),
-  SubjectMeta(
-    subjectId: 'hsc_ict',
-    subjectName: 'তথ্য ও যোগাযোগ প্রযুক্তি',
-    assetPath: 'assets/formulas/hsc_ict/index.json',
-    emoji: '💻',
-    gradientColors: [0xFF0A1A1A, 0xFF0E7490],
+    emoji: '🔢',
+    gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
 ];
 
@@ -157,38 +171,33 @@ const kSscFormulaSubjects = [
     subjectName: 'রসায়ন',
     assetPath: 'assets/formulas/ssc_chemistry/index.json',
     emoji: '🧪',
-    gradientColors: [0xFF1A0F2E, 0xFF3D1A78],
+    gradientColors: [0xFF0D2818, 0xFF1B4332],
   ),
   SubjectMeta(
     subjectId: 'ssc_math',
     subjectName: 'সাধারণ গণিত',
     assetPath: 'assets/formulas/ssc_math/index.json',
-    emoji: '∑',
-    gradientColors: [0xFF0F2818, 0xFF065F46],
+    emoji: '📐',
+    gradientColors: [0xFF2D1B69, 0xFF1B1B4B],
   ),
   SubjectMeta(
     subjectId: 'ssc_higher_math',
     subjectName: 'উচ্চতর গণিত',
     assetPath: 'assets/formulas/ssc_higher_math/index.json',
-    emoji: '∫',
-    gradientColors: [0xFF0A2010, 0xFF047857],
-  ),
-  SubjectMeta(
-    subjectId: 'ssc_biology',
-    subjectName: 'জীববিজ্ঞান',
-    assetPath: 'assets/formulas/ssc_biology/index.json',
-    emoji: '🌿',
-    gradientColors: [0xFF0F1A0A, 0xFF166534],
+    emoji: '🔢',
+    gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
 ];
 
+List<SubjectMeta> getAllFormulaSubjects() => [
+      ...kHscFormulaSubjects,
+      ...kSscFormulaSubjects,
+    ];
+
 List<SubjectMeta> getFormulaSubjectsForLevel(String level) {
-  if (level.toUpperCase() == 'SSC') {
+  final l = level.toUpperCase();
+  if (l.contains('SSC') || l.contains('Class 10') || l.contains('Class 9')) {
     return kSscFormulaSubjects;
   }
   return kHscFormulaSubjects;
-}
-
-List<SubjectMeta> getAllFormulaSubjects() {
-  return [...kSscFormulaSubjects, ...kHscFormulaSubjects];
 }

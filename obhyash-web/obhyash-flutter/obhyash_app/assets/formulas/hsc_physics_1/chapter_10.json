@@ -2,71 +2,155 @@
   {
     "title": "আদর্শ গ্যাস সমীকরণ (Ideal Gas Equation)",
     "latex": "PV = nRT = \\left(\\frac{m}{M}\\right)RT = N k_B T, \\quad \\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}",
-    "description": "P = চাপ (Pa), V = আয়তন (m³), n = মোল সংখ্যা, R = সার্বজনীন গ্যাস ধ্রুবক (8.314 J/mol·K), kB = বোল্টজম্যান ধ্রুবক (1.38×10⁻²³ J/K), T = পরম তাপমাত্রা (K)।"
+    "description": "P = চাপ (Pa), V = আয়তন (m³), n = মোল সংখ্যা, R = সার্বজনীন গ্যাস ধ্রুবক (8.314 J/mol·K), kB = বোল্টজম্যান ধ্রুবক (1.38×10⁻²³ J/K), T = পরম তাপমাত্রা (K)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $PV = nRT = \\left(\\frac{m}{M}\\right)RT = N k_B T, \\quad \\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $PV = nRT = \\left(\\frac{m}{M}\\right)RT = N k_B T, \\quad \\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}$"
+      }
+    ]
   },
   {
     "title": "বাস্তব গ্যাসের ভ্যান ডার ওয়ালস সমীকরণ (Van der Waals Equation for Real Gases)",
     "latex": "\\left(P + \\frac{a n^2}{V^2}\\right)(V - nb) = nRT",
-    "description": "a = আন্তঃআণবিক আকর্ষণ বল সংশোধন ধ্রুবক, b = অণুসমূহের কার্যকর আয়তন সংশোধন ধ্রুবক (b = 4 × মোট অণুর আয়তন)।"
+    "description": "a = আন্তঃআণবিক আকর্ষণ বল সংশোধন ধ্রুবক, b = অণুসমূহের কার্যকর আয়তন সংশোধন ধ্রুবক (b = 4 × মোট অণুর আয়তন)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\left(P + \\frac{a n^2}{V^2}\\right)(V - nb) = nRT$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\left(P + \\frac{a n^2}{V^2}\\right)(V - nb) = nRT$"
+      }
+    ]
   },
   {
     "title": "সংকট তাপমাত্রা, চাপ ও আয়তন (Critical Constants of Gas)",
     "latex": "T_c = \\frac{8a}{27Rb}, \\quad P_c = \\frac{a}{27b^2}, \\quad V_c = 3b, \\quad T_B = \\frac{a}{Rb} \\; (\\text{বয়েল তাপমাত্রা})",
-    "description": "Tc = যে তাপমাত্রার উপরে কোনো গ্যাসকে কেবল চাপ প্রয়োগ করে তরলে রূপান্তর করা যায় না।"
+    "description": "Tc = যে তাপমাত্রার উপরে কোনো গ্যাসকে কেবল চাপ প্রয়োগ করে তরলে রূপান্তর করা যায় না।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $T_c = \\frac{8a}{27Rb}, \\quad P_c = \\frac{a}{27b^2}, \\quad V_c = 3b, \\quad T_B = \\frac{a}{Rb} \\; (\\text{বয়েল তাপমাত্রা})$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $T_c = \\frac{8a}{27Rb}, \\quad P_c = \\frac{a}{27b^2}, \\quad V_c = 3b, \\quad T_B = \\frac{a}{Rb} \\; (\\text{বয়েল তাপমাত্রা})$"
+      }
+    ]
   },
   {
     "title": "ডাল্টনের আংশিক চাপ সূত্র (Dalton's Law of Partial Pressures)",
     "latex": "P_{\\text{total}} = P_1 + P_2 + P_3 + \\dots, \\quad P_i = x_i P_{\\text{total}} = \\left(\\frac{n_i}{n_{\\text{total}}}\\right)P_{\\text{total}}",
-    "description": "পরস্পর বিক্রিয়াহীন গ্যাস মিশ্রণে কোনো উপাদানের আংশিক চাপ = তার মোল ভগ্নাংশ × মোট চাপ।"
+    "description": "পরস্পর বিক্রিয়াহীন গ্যাস মিশ্রণে কোনো উপাদানের আংশিক চাপ = তার মোল ভগ্নাংশ × মোট চাপ।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $P_{\\text{total}} = P_1 + P_2 + P_3 + \\dots, \\quad P_i = x_i P_{\\text{total}} = \\left(\\frac{n_i}{n_{\\text{total}}}\\right)P_{\\text{total}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $P_{\\text{total}} = P_1 + P_2 + P_3 + \\dots, \\quad P_i = x_i P_{\\text{total}} = \\left(\\frac{n_i}{n_{\\text{total}}}\\right)P_{\\text{total}}$"
+      }
+    ]
   },
   {
     "title": "গ্রাহামের গ্যাস ব্যাপন সূত্র (Graham's Law of Diffusion)",
     "latex": "\\frac{r_1}{r_2} = \\sqrt{\\frac{\\rho_2}{\\rho_1}} = \\sqrt{\\frac{M_2}{M_1}} = \\frac{t_2}{t_1} = \\frac{V_1 / t_1}{V_2 / t_2}",
-    "description": "নির্দিষ্ট তাপমাত্রা ও চাপে গ্যাসের ব্যাপন হার তার ঘনত্বের বা আণবিক ভরের বর্গমূলের ব্যস্তানুপাতিক।"
+    "description": "নির্দিষ্ট তাপমাত্রা ও চাপে গ্যাসের ব্যাপন হার তার ঘনত্বের বা আণবিক ভরের বর্গমূলের ব্যস্তানুপাতিক।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\frac{r_1}{r_2} = \\sqrt{\\frac{\\rho_2}{\\rho_1}} = \\sqrt{\\frac{M_2}{M_1}} = \\frac{t_2}{t_1} = \\frac{V_1 / t_1}{V_2 / t_2}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\frac{r_1}{r_2} = \\sqrt{\\frac{\\rho_2}{\\rho_1}} = \\sqrt{\\frac{M_2}{M_1}} = \\frac{t_2}{t_1} = \\frac{V_1 / t_1}{V_2 / t_2}$"
+      }
+    ]
   },
   {
     "title": "হ্রদের তলদেশের গভীরতা নির্ণয় (Lake Depth from Expanding Air Bubble)",
     "latex": "h = \\frac{(n - 1)P_0}{\\rho g} \\; (T_1 = T_2), \\quad h = \\frac{P_0}{\\rho g}\\left(n\\frac{T_1}{T_2} - 1\\right) \\; (T_1 \\neq T_2)",
-    "description": "হ্রদের তলদেশ থেকে বায়ুর বুদবুদ উপরিভাগে আসলে আয়তন n গুণ হলে গভীরতা h। P₀ = বায়ুমণ্ডলীয় চাপ (1.013×10⁵ Pa), ρ = পানির ঘনত্ব (1000 kg/m³)।"
+    "description": "হ্রদের তলদেশ থেকে বায়ুর বুদবুদ উপরিভাগে আসলে আয়তন n গুণ হলে গভীরতা h। P₀ = বায়ুমণ্ডলীয় চাপ (1.013×10⁵ Pa), ρ = পানির ঘনত্ব (1000 kg/m³)।",
+    "practiceQuestions": [
+      {
+        "question": "তলদেশ হতে উপরে আসায় বুদবুদের আয়তন ৪ গুণ ($n=4$) হলে হ্রদের গভীরতা কত? ($P_0 = 10^5\\text{ Pa}, \\rho = 1000\\text{ kg/m}^3, g = 9.8\\text{ m/s}^2$)",
+        "answer": "Ans: $h = \\frac{(4-1) \\times 10^5}{1000 \\times 9.8} \\approx 30.61\\text{ m}$"
+      }
+    ]
   },
   {
     "title": "গ্যাসের মূল গড় বর্গ বেগ / আরএমএস বেগ (Root Mean Square - RMS Velocity)",
     "latex": "c_{\\text{rms}} = \\sqrt{\\frac{3P}{\\rho}} = \\sqrt{\\frac{3RT}{M}} = \\sqrt{\\frac{3k_B T}{m}} \\implies c \\propto \\sqrt{T}",
-    "description": "T = কেলভিন তাপমাত্রা, M = মোলার ভর (কেজিতে, যেমন অক্সিজেনের জন্য 32×10⁻³ kg/mol), m = ১টি অণুর ভর।"
+    "description": "T = কেলভিন তাপমাত্রা, M = মোলার ভর (কেজিতে, যেমন অক্সিজেনের জন্য 32×10⁻³ kg/mol), m = ১টি অণুর ভর।",
+    "practiceQuestions": [
+      {
+        "question": "পরম তাপমাত্রা ৪ গুণ বৃদ্ধি করা হলে গ্যাসের RMS বেগ কত গুণ হবে?",
+        "answer": "Ans: $c_{\\text{rms}} \\propto \\sqrt{T} \\implies 2$ গুণ বৃদ্ধি পাবে"
+      }
+    ]
   },
   {
     "title": "গড় বেগ ও সর্বাধিক সম্ভাব্য বেগের তুলনা (Average & Most Probable Speeds)",
     "latex": "c_{\\text{rms}} = \\sqrt{\\frac{3RT}{M}} \\approx 1.732\\sqrt{\\frac{RT}{M}}, \\quad \\bar{c} = \\sqrt{\\frac{8RT}{\\pi M}} \\approx 1.596\\sqrt{\\frac{RT}{M}}, \\quad c_p = \\sqrt{\\frac{2RT}{M}} \\approx 1.414\\sqrt{\\frac{RT}{M}}",
-    "description": "বেগের ক্রম: c_rms > c_avg > c_most_probable (RMS বেগ সর্বদা সর্বোচ্চ)।"
+    "description": "বেগের ক্রম: c_rms > c_avg > c_most_probable (RMS বেগ সর্বদা সর্বোচ্চ)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $c_{\\text{rms}} = \\sqrt{\\frac{3RT}{M}} \\approx 1.732\\sqrt{\\frac{RT}{M}}, \\quad \\bar{c} = \\sqrt{\\frac{8RT}{\\pi M}} \\approx 1.596\\sqrt{\\frac{RT}{M}}, \\quad c_p = \\sqrt{\\frac{2RT}{M}} \\approx 1.414\\sqrt{\\frac{RT}{M}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $c_{\\text{rms}} = \\sqrt{\\frac{3RT}{M}} \\approx 1.732\\sqrt{\\frac{RT}{M}}, \\quad \\bar{c} = \\sqrt{\\frac{8RT}{\\pi M}} \\approx 1.596\\sqrt{\\frac{RT}{M}}, \\quad c_p = \\sqrt{\\frac{2RT}{M}} \\approx 1.414\\sqrt{\\frac{RT}{M}}$"
+      }
+    ]
   },
   {
     "title": "গ্যাসের গতিশক্তি (Kinetic Energy of Gas Molecules)",
     "latex": "E_{k, \\text{1 molecule}} = \\frac{3}{2}k_B T, \\quad E_{k, \\text{1 mole}} = \\frac{3}{2}RT, \\quad E_{k, n\\text{ moles}} = \\frac{3}{2}nRT = \\frac{3}{2}PV",
-    "description": "আদর্শ গ্যাসের গতিশক্তি শুধুমাত্র তাপমাত্রার উপর নির্ভর করে, চাপের উপর নয়।"
+    "description": "আদর্শ গ্যাসের গতিশক্তি শুধুমাত্র তাপমাত্রার উপর নির্ভর করে, চাপের উপর নয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $E_{k, \\text{1 molecule}} = \\frac{3}{2}k_B T, \\quad E_{k, \\text{1 mole}} = \\frac{3}{2}RT, \\quad E_{k, n\\text{ moles}} = \\frac{3}{2}nRT = \\frac{3}{2}PV$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $E_{k, \\text{1 molecule}} = \\frac{3}{2}k_B T, \\quad E_{k, \\text{1 mole}} = \\frac{3}{2}RT, \\quad E_{k, n\\text{ moles}} = \\frac{3}{2}nRT = \\frac{3}{2}PV$"
+      }
+    ]
   },
   {
     "title": "স্বাধীনতার মাত্রা ও গামা এর সম্পর্ক (Degrees of Freedom & Gamma γ)",
     "latex": "\\gamma = 1 + \\frac{2}{f}, \\quad \\gamma_{\\text{mono}} = \\frac{5}{3} = 1.67 \\; (f=3), \\quad \\gamma_{\\text{di}} = \\frac{7}{5} = 1.40 \\; (f=5), \\quad \\gamma_{\\text{poly}} = \\frac{4}{3} = 1.33 \\; (f=6)",
-    "description": "f = স্বাধীনতার মাত্রা (Degrees of freedom)। এক পরমাণুক (He, Ar), দ্বি-পরমাণুক (O₂, N₂), বহু-পরমাণুক (CO₂, H₂O)।"
+    "description": "f = স্বাধীনতার মাত্রা (Degrees of freedom)। এক পরমাণুক (He, Ar), দ্বি-পরমাণুক (O₂, N₂), বহু-পরমাণুক (CO₂, H₂O)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\gamma = 1 + \\frac{2}{f}, \\quad \\gamma_{\\text{mono}} = \\frac{5}{3} = 1.67 \\; (f=3), \\quad \\gamma_{\\text{di}} = \\frac{7}{5} = 1.40 \\; (f=5), \\quad \\gamma_{\\text{poly}} = \\frac{4}{3} = 1.33 \\; (f=6)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\gamma = 1 + \\frac{2}{f}, \\quad \\gamma_{\\text{mono}} = \\frac{5}{3} = 1.67 \\; (f=3), \\quad \\gamma_{\\text{di}} = \\frac{7}{5} = 1.40 \\; (f=5), \\quad \\gamma_{\\text{poly}} = \\frac{4}{3} = 1.33 \\; (f=6)$"
+      }
+    ]
   },
   {
     "title": "গ্যাস মিশ্রণের তুল্য আপেক্ষিক তাপ ও গামা (Mixture Molar Heat Capacity & Gamma)",
     "latex": "C_{v, \\text{mix}} = \\frac{n_1 C_{v1} + n_2 C_{v2}}{n_1 + n_2}, \\quad \\gamma_{\\text{mix}} = \\frac{n_1 C_{p1} + n_2 C_{p2}}{n_1 C_{v1} + n_2 C_{v2}}",
-    "description": "দুটি ভিন্ন পরমাণুক গ্যাস মিশ্রিত করলে মিশ্রণের কার্যকর γ এবং মোলার তাপধারণ ক্ষমতা।"
+    "description": "দুটি ভিন্ন পরমাণুক গ্যাস মিশ্রিত করলে মিশ্রণের কার্যকর γ এবং মোলার তাপধারণ ক্ষমতা।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $C_{v, \\text{mix}} = \\frac{n_1 C_{v1} + n_2 C_{v2}}{n_1 + n_2}, \\quad \\gamma_{\\text{mix}} = \\frac{n_1 C_{p1} + n_2 C_{p2}}{n_1 C_{v1} + n_2 C_{v2}}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $C_{v, \\text{mix}} = \\frac{n_1 C_{v1} + n_2 C_{v2}}{n_1 + n_2}, \\quad \\gamma_{\\text{mix}} = \\frac{n_1 C_{p1} + n_2 C_{p2}}{n_1 C_{v1} + n_2 C_{v2}}$"
+      }
+    ]
   },
   {
     "title": "গ্যাসের গড় মুক্ত পথ - ম্যাক্সওয়েলের সমীকরণ (Maxwell's Mean Free Path)",
     "latex": "\\lambda = \\frac{1}{\\sqrt{2}\\pi \\sigma^2 n} = \\frac{k_B T}{\\sqrt{2}\\pi \\sigma^2 P}",
-    "description": "σ = অণুর কার্যকরী ব্যাস, n = একক আয়তনে অণুর সংখ্যা (N/V)। চাপ বাড়লে গড় মুক্ত পথ কমে, তাপমাত্রা বাড়লে বাড়ে।"
+    "description": "σ = অণুর কার্যকরী ব্যাস, n = একক আয়তনে অণুর সংখ্যা (N/V)। চাপ বাড়লে গড় মুক্ত পথ কমে, তাপমাত্রা বাড়লে বাড়ে।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\lambda = \\frac{1}{\\sqrt{2}\\pi \\sigma^2 n} = \\frac{k_B T}{\\sqrt{2}\\pi \\sigma^2 P}$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\lambda = \\frac{1}{\\sqrt{2}\\pi \\sigma^2 n} = \\frac{k_B T}{\\sqrt{2}\\pi \\sigma^2 P}$"
+      }
+    ]
   },
   {
     "title": "গ্লেইসারের সমীকরণ ও শিশিরাঙ্ক (Glaisher's Dew Point Equation)",
     "latex": "\\theta_d = \\theta_1 - G(\\theta_1 - \\theta_2)",
-    "description": "θd = শিশিরাঙ্ক (°C), θ₁ = শুষ্ক বাল্ব থার্মোমিটারের পাঠ (বায়ুর তাপমাত্রা), θ₂ = সিক্ত বাল্ব থার্মোমিটারের পাঠ, G = গ্লেইসারের উৎপাদক।"
+    "description": "θd = শিশিরাঙ্ক (°C), θ₁ = শুষ্ক বাল্ব থার্মোমিটারের পাঠ (বায়ুর তাপমাত্রা), θ₂ = সিক্ত বাল্ব থার্মোমিটারের পাঠ, G = গ্লেইসারের উৎপাদক।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $\\theta_d = \\theta_1 - G(\\theta_1 - \\theta_2)$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $\\theta_d = \\theta_1 - G(\\theta_1 - \\theta_2)$"
+      }
+    ]
   },
   {
     "title": "আপেক্ষিক আর্দ্রতা (Relative Humidity - RH)",
     "latex": "R = \\frac{f}{F} \\times 100\\% = \\frac{\\text{শিশিরাঙ্কে সম্পৃক্ত জলীয় বাষ্পচাপ}}{\\text{বায়ুর তাপমাত্রায় সম্পৃক্ত জলীয় বাষ্পচাপ}} \\times 100\\%",
-    "description": "f = শিশিরাঙ্কের সম্পৃক্ত বাষ্পচাপ, F = বায়ুর তাপমাত্রায় সম্পৃক্ত বাষ্পচাপ। আপেক্ষিক আর্দ্রতা ৫০%-৬০% হলে আরামদায়ক অনুভূত হয়।"
+    "description": "f = শিশিরাঙ্কের সম্পৃক্ত বাষ্পচাপ, F = বায়ুর তাপমাত্রায় সম্পৃক্ত বাষ্পচাপ। আপেক্ষিক আর্দ্রতা ৫০%-৬০% হলে আরামদায়ক অনুভূত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রদত্ত সূত্র $R = \\frac{f}{F} \\times 100\\% = \\frac{\\text{শিশিরাঙ্কে সম্পৃক্ত জলীয় বাষ্পচাপ}}{\\text{বায়ুর তাপমাত্রায় সম্পৃক্ত জলীয় বাষ্পচাপ}} \\times 100\\%$ এর আলোকে রাশিগুলোর মান যথাযথ এককে প্রতিস্থাপন করে গাণিতিক সমস্যাটির চূড়ান্ত মান ও একক নির্ণয় করো।",
+        "answer": "Ans: সূত্র সমীকরণ: $R = \\frac{f}{F} \\times 100\\% = \\frac{\\text{শিশিরাঙ্কে সম্পৃক্ত জলীয় বাষ্পচাপ}}{\\text{বায়ুর তাপমাত্রায় সম্পৃক্ত জলীয় বাষ্পচাপ}} \\times 100\\%$"
+      }
+    ]
   }
 ]

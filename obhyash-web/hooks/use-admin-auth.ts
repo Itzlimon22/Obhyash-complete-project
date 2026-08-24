@@ -53,15 +53,24 @@ export function useAdminAuth() {
     try {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('obhyash_admin_cached_profile');
+        localStorage.removeItem('obhyash_user_profile');
+        document.cookie = 'obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       }
+      
+      // Server-side signout to strip server cookies
+      await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
+
+      // Client-side Supabase signout
+      const supabase = createClient();
+      await supabase.auth.signOut().catch(() => {});
+      
       if (authSignOut) {
-        await authSignOut();
-      } else {
-        const supabase = createClient();
-        await supabase.auth.signOut();
+        await authSignOut().catch(() => {});
       }
+    } catch (err) {
+      console.error('Sign out failed:', err);
     } finally {
-      window.location.href = '/login';
+      window.location.replace('/login');
     }
   }, [authSignOut]);
 
