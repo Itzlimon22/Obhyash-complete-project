@@ -1,27 +1,187 @@
 [
   {
-    "title": "ভেক্টরের লব্ধির মান",
+    "title": "অবস্থান ভেক্টর ও এর মান (Position Vector & Magnitude)",
+    "latex": "\\vec{r} = x\\hat{i} + y\\hat{j} + z\\hat{k}, \\quad |\\vec{r}| = \\sqrt{x^2 + y^2 + z^2}",
+    "description": "মূলবিন্দুর সাপেক্ষে যেকোনো বিন্দু P(x, y, z) এর অবস্থান নির্দেশক ভেক্টর এবং তার পরম মান।"
+  },
+  {
+    "title": "একক ভেক্টর (Unit Vector)",
+    "latex": "\\hat{a} = \\frac{\\vec{A}}{|\\vec{A}|} = \\frac{A_x\\hat{i} + A_y\\hat{j} + A_z\\hat{k}}{\\sqrt{A_x^2 + A_y^2 + A_z^2}}",
+    "description": "কোনো অশূন্য ভেক্টরকে তার পরম মান দিয়ে ভাগ করলে ওই ভেক্টরের দিকে একক ভেক্টর পাওয়া যায়।"
+  },
+  {
+    "title": "দুই বিন্দুর সংযোগ ভেক্টর ও সরণ (Displacement Vector between 2 Points)",
+    "latex": "\\vec{AB} = \\vec{r}_B - \\vec{r}_A = (x_2 - x_1)\\hat{i} + (y_2 - y_1)\\hat{j} + (z_2 - z_1)\\hat{k}",
+    "description": "A(x₁, y₁, z₁) থেকে B(x₂, y₂, z₂) বিন্দু পর্যন্ত সরণ ভেক্টর।"
+  },
+  {
+    "title": "দিক কোসাইন ও কোণসমূহ (Direction Cosines)",
+    "latex": "\\cos\\alpha = \\frac{A_x}{|\\vec{A}|}, \\; \\cos\\beta = \\frac{A_y}{|\\vec{A}|}, \\; \\cos\\gamma = \\frac{A_z}{|\\vec{A}|} \\implies \\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 1",
+    "description": "ভেক্টরটি x, y, z অক্ষের সাথে যথাক্রমে α, β, γ কোণ তৈরি করলে তাদের কোসাইন মান। দ্রষ্টব্য: sin²α + sin²β + sin²γ = 2।"
+  },
+  {
+    "title": "ভেক্টরের সামান্তরিক সূত্র: লব্ধির মান (Parallelogram Law: Magnitude)",
     "latex": "R = \\sqrt{P^2 + Q^2 + 2PQ\\cos\\alpha}",
-    "description": "P ও Q দুটি ভেক্টর এবং α তাদের মধ্যবর্তী কোণ"
+    "description": "P ও Q দুটি ভেক্টর α কোণে একই বিন্দুতে এককালীন ক্রিয়া করলে তাদের লব্ধি ভেক্টরের মান R।"
   },
   {
-    "title": "লব্ধির দিক",
-    "latex": "\\tan\\theta = \\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha}",
-    "description": "θ = P এর সাথে লব্ধি R এর মধ্যবর্তী কোণ"
+    "title": "লব্ধির দিক (Direction of Resultant)",
+    "latex": "\\tan\\theta = \\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha} \\implies \\theta = \\tan^{-1}\\left(\\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha}\\right)",
+    "description": "P ভেক্টরের সাথে লব্ধি R এর উৎপন্ন কোণ θ।"
   },
   {
-    "title": "ভেক্টরের উপাংশ",
-    "latex": "A_x = A\\cos\\theta, \\quad A_y = A\\sin\\theta",
-    "description": "θ = x-অক্ষ ও ভেক্টর A এর মধ্যবর্তী কোণ"
+    "title": "সর্বোচ্চ ও সর্বনিম্ন লব্ধি (Max & Min Resultant)",
+    "latex": "R_{max} = P + Q \\; (\\alpha = 0^\\circ), \\quad R_{min} = |P - Q| \\; (\\alpha = 180^\\circ)",
+    "description": "একই দিকে ক্রিয়াশীল হলে সর্বোচ্চ লব্ধি এবং বিপরীত দিকে ক্রিয়াশীল হলে সর্বনিম্ন লব্ধি তৈরি হয়।"
   },
   {
-    "title": "ডট গুণফল",
-    "latex": "\\vec{A} \\cdot \\vec{B} = AB\\cos\\theta",
-    "description": "দুটি ভেক্টরের স্কেলার গুণফল"
+    "title": "লম্বভাবে ক্রিয়াশীল দুটি ভেক্টরের লব্ধি (Perpendicular Vectors)",
+    "latex": "R = \\sqrt{P^2 + Q^2}, \\quad \\tan\\theta = \\frac{Q}{P} \\quad (\\alpha = 90^\\circ)",
+    "description": "দুটি ভেক্টর পরস্পর ৯০° কোণে থাকলে cos 90° = 0 হওয়ার কারণে পিথাগোরাসের উপপাদ্য প্রযোজ্য হয়।"
   },
   {
-    "title": "ক্রস গুণফলের মান",
-    "latex": "|\\vec{A} \\times \\vec{B}| = AB\\sin\\theta",
-    "description": "দুটি ভেক্টরের ভেক্টর গুণফলের মান"
+    "title": "সমমানের দুটি ভেক্টরের লব্ধি (Equal Vectors Resultant)",
+    "latex": "R = 2P\\cos\\left(\\frac{\\alpha}{2}\\right), \\quad \\theta = \\frac{\\alpha}{2}",
+    "description": "যখন |P| = |Q| হয়, তখন লব্ধি ঠিক তাদের অন্তর্ভুক্ত কোণকে সমদ্বিখণ্ডিত করে (θ = α/2)।"
+  },
+  {
+    "title": "লব্ধি ও বল সমান হওয়ার বিশেষ শর্ত (Resultant Equals Component Force)",
+    "latex": "P = Q = R \\iff \\alpha = 120^\\circ",
+    "description": "দুটি সমান মানের ভেক্টর ১২০° কোণে ক্রিয়া করলে তাদের লব্ধির মান যেকোনো একটি ভেক্টরের সমান হয়।"
+  },
+  {
+    "title": "লব্ধি ক্ষুদ্রতর ভেক্টরের উপর লম্ব হওয়ার শর্ত (Resultant Perpendicular to P)",
+    "latex": "\\cos\\alpha = -\\frac{P}{Q}, \\quad R = \\sqrt{Q^2 - P^2} \\quad (\\theta = 90^\\circ)",
+    "description": "যদি লব্ধি R ভেক্টর P এর সাথে সমকোণ তৈরি করে, তবে α = cos⁻¹(-P/Q) এবং Q > P হতে হবে।"
+  },
+  {
+    "title": "দ্বিমাত্রিক স্থানাঙ্কে উপাংশে বিভাজন (Rectangular Components)",
+    "latex": "A_x = A\\cos\\theta, \\quad A_y = A\\sin\\theta, \\quad |\\vec{A}| = \\sqrt{A_x^2 + A_y^2}",
+    "description": "ভেক্টর A অনুভূমিকের সাথে θ কোণে থাকলে তার অনুভূমিক উপাংশ Ax এবং উল্লম্ব উপাংশ Ay।"
+  },
+  {
+    "title": "যেকোনো দুটি দিকে উপাংশে বিভাজন (Components in Arbitrary Directions)",
+    "latex": "P = R\\frac{\\sin\\beta}{\\sin(\\alpha + \\beta)}, \\quad Q = R\\frac{\\sin\\alpha}{\\sin(\\alpha + \\beta)}",
+    "description": "লব্ধি R কে এমন দুটি দিকে ভাগ করা যেখানে R এর সাথে প্রথম উপাংশ α এবং দ্বিতীয় উপাংশ β কোণ করে।"
+  },
+  {
+    "title": "লন রোলার টানা বনাম ঠেলা (Lawn Roller Pulling vs Pushing)",
+    "latex": "W_{\\text{push}} = W + F\\sin\\theta, \\quad W_{\\text{pull}} = W - F\\sin\\theta",
+    "description": "ঠেলার সময় প্রযুক্ত বলের উল্লম্ব উপাংশ ওজনকে বাড়িয়ে দেয় (+Fsinθ), আর টানার সময় ওজনকে কমিয়ে দেয় (-Fsinθ); ফলে টানা সহজ।"
+  },
+  {
+    "title": "নৌকার সোজাসুজি / আড়াআড়ি পারাপার (Shortest Path River Crossing)",
+    "latex": "\\cos\\alpha = -\\frac{u}{v} \\implies \\alpha = \\cos^{-1}\\left(-\\frac{u}{v}\\right), \\quad w = \\sqrt{v^2 - u^2}, \\quad t = \\frac{d}{\\sqrt{v^2 - u^2}}",
+    "description": "নূন্যতম দূরত্বে (সোজাসুজি বিপরীত পাড়ে) পৌঁছানোর জন্য স্রোতের প্রতিকূলে α কোণে চালনা করতে হবে। যেখানে u = স্রোতের বেগ, v = নৌকার বেগ (v > u), d = নদীর প্রস্থ।"
+  },
+  {
+    "title": "নূন্যতম সময়ে নদী পারাপার (Shortest Time River Crossing)",
+    "latex": "t_{\\text{min}} = \\frac{d}{v} \\; (\\alpha = 90^\\circ), \\quad x = u \\cdot t_{\\text{min}} = \\frac{u d}{v}, \\quad s = \\sqrt{d^2 + x^2}",
+    "description": "সরাসরি বিপরীত পাড়ের দিকে (α = ৯০°) রওয়ানা দিলে সবচেয়ে কম সময়ে পার হওয়া যায়। x = নদী পাড় বরাবর ড্রিফ্ট/সরণ।"
+  },
+  {
+    "title": "যেকোনো কোণে নদী পারাপার (General River Crossing)",
+    "latex": "t = \\frac{d}{v\\sin\\alpha}, \\quad x = (u + v\\cos\\alpha)t = \\frac{(u + v\\cos\\alpha)d}{v\\sin\\alpha}",
+    "description": "স্রোতের সাথে α কোণে রওয়ানা দিলে নদী পার হতে প্রয়োজনীয় সময় t এবং তীরের সমান্তরালে সরণ x।"
+  },
+  {
+    "title": "আপেক্ষিক বেগ (Relative Velocity)",
+    "latex": "\\vec{v}_{AB} = \\vec{v}_A - \\vec{v}_B = \\sqrt{v_A^2 + v_B^2 - 2v_Av_B\\cos\\theta}",
+    "description": "B এর সাপেক্ষে A এর আপেক্ষিক বেগ নির্ণয় করতে যার সাপেক্ষে বেগ তার ভেক্টর বিয়োগ করতে হয়।"
+  },
+  {
+    "title": "বৃষ্টি ও বাতাসের ক্ষেত্রে ছাতা ধরার কোণ (Rain with Wind)",
+    "latex": "\\tan\\theta = \\frac{v_{\\text{wind}}}{v_{\\text{rain}}} \\implies \\theta = \\tan^{-1}\\left(\\frac{v_{\\text{wind}}}{v_{\\text{rain}}}\\right)",
+    "description": "উল্লম্বের সাথে ছাতা ধরার কোণ θ। v_rain = বৃষ্টির বেগ (খাড়া নিচের দিকে), v_wind = বাতাসের অনুভূমিক বেগ।"
+  },
+  {
+    "title": "সাইকেল/গাড়ি চালকের ক্ষেত্রে বৃষ্টির ছাতা (Rain on Moving Person)",
+    "latex": "\\tan\\theta = \\frac{v_{\\text{man}} \\pm v_{\\text{wind}}}{v_{\\text{rain}}}",
+    "description": "বাতাসের বিপরীতে সাইকেল চালালে (+) এবং বাতাসের অনুকূলে সাইকেল চালালে (-) চিহ্ন বসে।"
+  },
+  {
+    "title": "স্কেলার বা ডট গুণন (Scalar / Dot Product)",
+    "latex": "\\vec{A} \\cdot \\vec{B} = AB\\cos\\theta = A_x B_x + A_y B_y + A_z B_z",
+    "description": "দুটি ভেক্টরের মান এবং তাদের মধ্যবর্তী ক্ষুদ্রতর কোণের কোসাইনের গুণফল।"
+  },
+  {
+    "title": "দুটি ভেক্টরের মধ্যবর্তী কোণ (Angle between 2 Vectors)",
+    "latex": "\\theta = \\cos^{-1}\\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}||\\vec{B}|}\\right) = \\cos^{-1}\\left(\\frac{A_x B_x + A_y B_y + A_z B_z}{\\sqrt{A_x^2 + A_y^2 + A_z^2}\\sqrt{B_x^2 + B_y^2 + B_z^2}}\\right)",
+    "description": "ডট গুণনের সাহায্যে দুটি ভেক্টরের মধ্যবর্তী কোণ নির্ণয়।"
+  },
+  {
+    "title": "দুটি ভেক্টর পরস্পর লম্ব হওয়ার শর্ত (Condition for Perpendicular Vectors)",
+    "latex": "\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0 \\iff A_x B_x + A_y B_y + A_z B_z = 0",
+    "description": "যেহেতু cos 90° = 0, দুটি অশূন্য ভেক্টরের ডট গুণন শূন্য হলে তারা পরস্পর লম্ব।"
+  },
+  {
+    "title": "স্কেলার অভিক্ষেপ (Scalar Projection)",
+    "latex": "\\text{Projection of } \\vec{A} \\text{ on } \\vec{B} = A\\cos\\theta = \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|}",
+    "description": "B ভেক্টরের উপর A ভেক্টরের স্কেলার অভিক্ষেপ (A cos θ)। অনুরূপভাবে A এর উপর B এর অভিক্ষেপ = (A·B)/|A|।"
+  },
+  {
+    "title": "ভেক্টর উপাংশ (Vector Component / Projection Vector)",
+    "latex": "\\text{Component of } \\vec{A} \\text{ along } \\vec{B} = (A\\cos\\theta)\\hat{b} = \\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|^2}\\right)\\vec{B}",
+    "description": "অভিক্ষেপের সাথে দিক নির্দেশক একক ভেক্টর গুণ করে প্রাপ্ত ভেক্টর উপাংশ।"
+  },
+  {
+    "title": "ভেক্টর বা ক্রস গুণন (Vector / Cross Product)",
+    "latex": "\\vec{A} \\times \\vec{B} = (AB\\sin\\theta)\\hat{\\eta} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ A_x & A_y & A_z \\\\ B_x & B_y & B_z \\end{vmatrix}",
+    "description": "ক্রস গুণফলের মান AB sin θ এবং দিক ডানহাতি স্ক্রু নিয়ম (Right-Hand Rule) অনুযায়ী একক লম্ব ভেক্টর η̂ দ্বারা নির্ধারিত।"
+  },
+  {
+    "title": "লম্ব একক ভেক্টর (Unit Vector Normal to Plane)",
+    "latex": "\\hat{\\eta} = \\pm \\frac{\\vec{A} \\times \\vec{B}}{|\\vec{A} \\times \\vec{B}|}",
+    "description": "ভেক্টর A ও B যে সমতলে অবস্থিত তার উপর লম্ব একক ভেক্টর।"
+  },
+  {
+    "title": "দুটি ভেক্টর সমান্তরাল হওয়ার শর্ত (Condition for Parallel Vectors)",
+    "latex": "\\vec{A} \\parallel \\vec{B} \\iff \\vec{A} \\times \\vec{B} = \\vec{0} \\iff \\frac{A_x}{B_x} = \\frac{A_y}{B_y} = \\frac{A_z}{B_z}",
+    "description": "দুটি ভেক্টরের অনুরূপ উপাংশগুলোর অনুপাত সমান হলে ভেক্টর দুটি পরস্পর সমান্তরাল।"
+  },
+  {
+    "title": "ত্রিভুজের ক্ষেত্রফল (Area of a Triangle)",
+    "latex": "\\text{Area} = \\frac{1}{2}|\\vec{A} \\times \\vec{B}|",
+    "description": "যদি A ও B কোনো ত্রিভুজের দুটি সন্নিহিত বাহু নির্দেশ করে।"
+  },
+  {
+    "title": "সামান্তরিকের ক্ষেত্রফল: সন্নিহিত বাহু দ্বারা (Parallelogram Area: Adjacent Sides)",
+    "latex": "\\text{Area} = |\\vec{A} \\times \\vec{B}|",
+    "description": "যদি A ও B কোনো সামান্তরিকের দুটি সন্নিহিত বাহু নির্দেশ করে।"
+  },
+  {
+    "title": "সামান্তরিক ও রম্বসের ক্ষেত্রফল: কর্ণদ্বয় দ্বারা (Area by Diagonals)",
+    "latex": "\\text{Area} = \\frac{1}{2}|\\vec{d}_1 \\times \\vec{d}_2|",
+    "description": "যদি d₁ ও d₂ সামান্তরিক বা রম্বসের দুটি কর্ণ নির্দেশক ভেক্টর হয়।"
+  },
+  {
+    "title": "তিনটি ভেক্টর একতলীয় বা সমতলীয় হওয়ার শর্ত (Coplanar Vectors)",
+    "latex": "\\vec{A} \\cdot (\\vec{B} \\times \\vec{C}) = 0 \\iff \\begin{vmatrix} A_x & A_y & A_z \\\\ B_x & B_y & B_z \\\\ C_x & C_y & C_z \\end{vmatrix} = 0",
+    "description": "তিনটি ভেক্টরের স্কেলার ত্রৈধ গুণন (Scalar Triple Product) শূন্য হলে তারা একই সমতলে অবস্থান করে।"
+  },
+  {
+    "title": "নাবলা অপারেটর ও গ্রেডিয়েন্ট (Del Operator & Gradient)",
+    "latex": "\\vec{\\nabla} = \\hat{i}\\frac{\\partial}{\\partial x} + \\hat{j}\\frac{\\partial}{\\partial y} + \\hat{k}\\frac{\\partial}{\\partial z}, \\quad \\text{grad}\\,\\phi = \\vec{\\nabla}\\phi = \\hat{i}\\frac{\\partial\\phi}{\\partial x} + \\hat{j}\\frac{\\partial\\phi}{\\partial y} + \\hat{k}\\frac{\\partial\\phi}{\\partial z}",
+    "description": "গ্রেডিয়েন্ট একটি স্কেলার ক্ষেত্রকে ভেক্টর ক্ষেত্রে রূপান্তরিত করে এবং স্কেলার রাশির সর্বাধিক বৃদ্ধির হার নির্দেশ করে।"
+  },
+  {
+    "title": "ডাইভারজেন্স ও সলিনয়েডাল শর্ত (Divergence & Solenoidal Field)",
+    "latex": "\\text{div}\\,\\vec{V} = \\vec{\\nabla} \\cdot \\vec{V} = \\frac{\\partial V_x}{\\partial x} + \\frac{\\partial V_y}{\\partial y} + \\frac{\\partial V_z}{\\partial z}, \\quad \\vec{\\nabla} \\cdot \\vec{V} = 0 \\implies \\text{Solenoidal}",
+    "description": "ডাইভারজেন্স ভেক্টর ক্ষেত্র থেকে স্কেলার রাশি দেয় (একক আয়তনে নির্গমন বা ফ্লাক্সের হার)। div V = 0 হলে ক্ষেত্রটি সলিনয়েডাল (ঘনত্ব অপরিবর্তিত)।"
+  },
+  {
+    "title": "কার্ল ও অঘূর্ণনশীল / সংরক্ষণশীল শর্ত (Curl & Irrotational Field)",
+    "latex": "\\text{curl}\\,\\vec{V} = \\vec{\\nabla} \\times \\vec{V} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ \\frac{\\partial}{\\partial x} & \\frac{\\partial}{\\partial y} & \\frac{\\partial}{\\partial z} \\\\ V_x & V_y & V_z \\end{vmatrix}, \\quad \\vec{\\nabla} \\times \\vec{V} = \\vec{0} \\implies \\text{Irrotational}",
+    "description": "কার্ল ভেক্টর ক্ষেত্রের ঘূর্ণন প্রবণতা নির্দেশ করে। curl V = 0 হলে ক্ষেত্রটি অঘূর্ণনশীল এবং বলটি সংরক্ষণশীল (Conservative)।"
+  },
+  {
+    "title": "কৌণিক বেগ ও রৈখিক বেগের সম্পর্ক (Linear & Angular Velocity Relation)",
+    "latex": "\\vec{v} = \\vec{\\omega} \\times \\vec{r}, \\quad \\vec{\\omega} = \\frac{1}{2}(\\vec{\\nabla} \\times \\vec{v})",
+    "description": "ঘূর্ণায়মান কণার রৈখিক বেগ v, কৌণিক বেগ ω এবং অবস্থান ভেক্টর r এর মধ্যে ভেক্টর গুণফল সম্পর্ক।"
+  },
+  {
+    "title": "লামির উপপাদ্য (Lami's Theorem for 3 Equilibrium Forces)",
+    "latex": "\\frac{P}{\\sin\\alpha} = \\frac{Q}{\\sin\\beta} = \\frac{R}{\\sin\\gamma}",
+    "description": "একই বিন্দুতে ক্রিয়াশীল তিনটি বল সাম্যাবস্থায় থাকলে প্রতিটি বল অপর দুটি বলের অন্তর্ভুক্ত কোণের সাইনের সমানুপাতিক।"
   }
 ]

@@ -27,8 +27,8 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
 
 interface NavItem {
   id: string;
@@ -162,11 +162,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 }) => {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
-  const supabase = createClient();
+  const { signOut } = useAdminAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/login';
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Logout error in AdminSidebar:', err);
+      window.location.href = '/login';
+    }
   };
 
   const showLabel = isMobile || isOpen;
@@ -410,9 +419,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </button>
 
           <button
+            type="button"
             onClick={handleLogout}
+            disabled={isLoggingOut}
             className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all border border-transparent
+              w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all border border-transparent cursor-pointer disabled:opacity-50
               ${
                 isDark
                   ? 'text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 hover:border-rose-500/20'
@@ -422,8 +433,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             `}
             title={!isOpen && !isMobile ? 'লগ আউট' : undefined}
           >
-            <LogOut size={16} strokeWidth={2} className="shrink-0" />
-            {showLabel && <span>লগ আউট</span>}
+            <LogOut size={16} strokeWidth={2} className={`shrink-0 ${isLoggingOut ? 'animate-spin' : ''}`} />
+            {showLabel && <span>{isLoggingOut ? 'লগ আউট হচ্ছে...' : 'লগ আউট'}</span>}
           </button>
         </div>
       </aside>

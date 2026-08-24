@@ -1,1 +1,132 @@
-[]
+[
+  {
+    "title": "নিউটনের দ্বিতীয় সূত্র ও রৈখিক ভরবেগ (Newton's 2nd Law & Linear Momentum)",
+    "latex": "\\vec{p} = m\\vec{v}, \\quad \\vec{F} = \\frac{d\\vec{p}}{dt} = m\\vec{a} = m\\frac{v - u}{t}",
+    "description": "ভরবেগের পরিবর্তনের হার প্রযুক্ত বলের সমানুপাতিক এবং বল যেদিকে ক্রিয়া করে ভরবেগের পরিবর্তনও সেদিকে ঘটে।"
+  },
+  {
+    "title": "বলের ঘাত ও ভরবেগের পরিবর্তন (Impulse of Force & Momentum Change)",
+    "latex": "J = \\vec{F} \\Delta t = \\Delta \\vec{p} = m(v - u) = \\int_{t_1}^{t_2} F\\,dt",
+    "description": "খুব অল্প সময়ের জন্য প্রযুক্ত বৃহৎ বল এবং সময়ের গুণফল হলো বলের ঘাত, যা ভরবেগের পরিবর্তনের সমান।"
+  },
+  {
+    "title": "রৈখিক ভরবেগের সংরক্ষণশীলতা নীতি (Conservation of Linear Momentum)",
+    "latex": "m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2, \\quad V_{\\text{combined}} = \\frac{m_1 u_1 + m_2 u_2}{m_1 + m_2}",
+    "description": "বাহ্যিক বল শূন্য হলে কোনো ব্যবস্থার আদি ভরবেগ ও শেষ ভরবেগ অপরিবর্তিত থাকে। V = সংঘর্ষের পর মিলিত বস্তুর বেগ।"
+  },
+  {
+    "title": "একমাত্রিক পূর্ণ স্থিতিস্থাপক সংঘর্ষের শেষ বেগ (1D Elastic Collision Final Velocities)",
+    "latex": "v_1 = \\left(\\frac{m_1 - m_2}{m_1 + m_2}\\right)u_1 + \\left(\\frac{2m_2}{m_1 + m_2}\\right)u_2, \\quad v_2 = \\left(\\frac{2m_1}{m_1 + m_2}\\right)u_1 + \\left(\\frac{m_2 - m_1}{m_1 + m_2}\\right)u_2",
+    "description": "ভর সমান হলে (m₁ = m₂) সংঘর্ষের পর বেগ পরস্পর বিনিময় হয় (v₁ = u₂, v₂ = u₁)।"
+  },
+  {
+    "title": "পুনর্গঠন গুণাঙ্ক ও গতিশক্তি হ্রাস (Coefficient of Restitution & Energy Loss)",
+    "latex": "e = \\frac{v_2 - v_1}{u_1 - u_2}, \\quad \\Delta E_k = \\frac{1}{2}\\frac{m_1 m_2}{m_1 + m_2}(1 - e^2)(u_1 - u_2)^2",
+    "description": "e = 1 হলে পূর্ণ স্থিতিস্থাপক, e = 0 হলে পূর্ণ অস্থিতিস্থাপক (মিলিত বস্তু), 0 < e < 1 হলে আংশিক স্থিতিস্থাপক।"
+  },
+  {
+    "title": "মেঝেতে বাউন্স করা বলের উচ্চতা ও মোট সময় (Ball Bouncing on Floor)",
+    "latex": "h_n = e^{2n}h_0, \\quad v_n = e^n v_0, \\quad t_{\\text{total}} = \\sqrt{\\frac{2h_0}{g}}\\left(\\frac{1 + e}{1 - e}\\right)",
+    "description": "e = পুনর্গঠন গুণাঙ্ক, h₀ = আদি উচ্চতা, hn = n-তম বাউন্সের পর অর্জিত উচ্চতা।"
+  },
+  {
+    "title": "বন্দুক ও কামানের পশ্চাৎ বেগ (Recoil Velocity of Gun)",
+    "latex": "MV + mv = 0 \\implies V = -\\frac{mv}{M}",
+    "description": "M = বন্দুকের ভর, V = বন্দুকের পশ্চাৎ বেগ, m = গুলির ভর, v = গুলির বেগ।"
+  },
+  {
+    "title": "রকেটের ধাক্কা বল ও ত্বরণ (Thrust & Acceleration of Rocket)",
+    "latex": "F_{\\text{thrust}} = v_e\\left(\\frac{\\Delta m}{\\Delta t}\\right), \\quad a = \\frac{v_e}{m}\\left(\\frac{\\Delta m}{\\Delta t}\\right) - g",
+    "description": "ve = নির্গত গ্যাসের আপেক্ষিক বেগ, (Δm/Δt) = জ্বালানি খরচের হার, m = রকেটের তাৎক্ষণিক ভর।"
+  },
+  {
+    "title": "রকেটের চূড়ান্ত বেগ - সিওলকভস্কি সমীকরণ (Tsiolkovsky Rocket Equation)",
+    "latex": "v = v_0 + v_e \\ln\\left(\\frac{m_0}{m}\\right) - gt",
+    "description": "m₀ = জ্বালানিসহ আদি ভর, m = অবশিষ্ট ভর, ve = জ্বালানি নির্গমন বেগ।"
+  },
+  {
+    "title": "কপিকেল ও অ্যাটউড যন্ত্রের ত্বরণ ও টান (Atwood's Machine & Pulley)",
+    "latex": "a = \\frac{(m_1 - m_2)g}{m_1 + m_2}, \\quad T = \\frac{2m_1 m_2 g}{m_1 + m_2}",
+    "description": "একটি কপিকেলের দুই পাশে মুক্তভাবে ঝুলন্ত m₁ ও m₂ ভরের জন্য সাধারণ ত্বরণ ও সুতার টান।"
+  },
+  {
+    "title": "টেবিল ও কপিকেলে সংযুক্ত ভরের গতি (Connected Bodies on Horizontal Table)",
+    "latex": "a = \\frac{m_1 - \\mu m_2}{m_1 + m_2}g, \\quad T = \\frac{m_1 m_2(1 + \\mu)g}{m_1 + m_2}",
+    "description": "m₂ টেবিলের উপর ঘর্ষণযুক্ত তলে এবং m₁ প্রান্তে ঝুলন্ত অবস্থায় থাকলে।"
+  },
+  {
+    "title": "লিফটে প্রতিক্রিয়া বল ও আপাত ওজন (Apparent Weight in a Lift)",
+    "latex": "R = m(g + a) \\; (\\text{উপরে}), \\quad R = m(g - a) \\; (\\text{নিচে}), \\quad R = 0 \\; (\\text{মুক্ত পতন } a = g)",
+    "description": "লিফট a ত্বরণে উপরে উঠলে আপাত ওজন বৃদ্ধি পায়, নিচে নামলে হ্রাস পায় এবং মুক্ত পতনে ওজনহীনতা অনুভূত হয়।"
+  },
+  {
+    "title": "ঘর্ষণ গুণাঙ্ক ও নিশ্চল কোণ (Coefficient of Friction & Angle of Repose)",
+    "latex": "f_s = \\mu_s R = \\mu_s mg, \\quad \\mu_s = \\tan\\theta_s, \\quad f_k = \\mu_k R = \\mu_k mg",
+    "description": "μs = স্থৈতিক ঘর্ষণ গুণাঙ্ক, μk = গতীয় ঘর্ষণ গুণাঙ্ক, θs = নিশ্চল কোণ (Angle of repose)।"
+  },
+  {
+    "title": "ঘর্ষণযুক্ত আনত তলে গতির ত্বরণ (Motion on Inclined Plane with Friction)",
+    "latex": "a_{\\text{down}} = g(\\sin\\theta - \\mu_k\\cos\\theta), \\quad a_{\\text{up}} = g(\\sin\\theta + \\mu_k\\cos\\theta)",
+    "description": "θ কোণের আনত তল বেয়ে বস্তু নিচে নামার সময় ত্বরণ এবং উপরে ওঠার সময় মন্দন।"
+  },
+  {
+    "title": "কৌণিক বেগ ও রৈখিক বেগের সম্পর্ক (Angular & Linear Velocity)",
+    "latex": "\\omega = \\frac{\\theta}{t} = \\frac{2\\pi}{T} = 2\\pi f, \\quad v = \\omega r, \\quad a_t = \\alpha r",
+    "description": "ω = কৌণিক বেগ (rad/s), T = পর্যায়কাল, f = কম্পাঙ্ক, r = ব্যাসার্ধ, α = কৌণিক ত্বরণ।"
+  },
+  {
+    "title": "কেন্দ্রমুখী ত্বরণ ও কেন্দ্রমুখী বল (Centripetal Acceleration & Force)",
+    "latex": "a_c = \\frac{v^2}{r} = \\omega^2 r = v\\omega, \\quad F_c = \\frac{mv^2}{r} = m\\omega^2 r",
+    "description": "বৃত্তাকার পথে ঘূর্ণনরত বস্তুর কেন্দ্রাভিমুখী কার্যকর ত্বরণ এবং প্রয়োজনীয় কেন্দ্রমুখী বল।"
+  },
+  {
+    "title": "উল্লম্ব বৃত্তাকার পথে গতির সংকট বেগ ও টান (Motion in a Vertical Circle)",
+    "latex": "v_{\\text{bottom}} \\ge \\sqrt{5gr}, \\quad v_{\\text{top}} \\ge \\sqrt{gr}, \\quad T_{\\text{bottom}} - T_{\\text{top}} = 6mg",
+    "description": "উল্লম্ব তলে বৃত্তাকার ঘূর্ণন সম্পন্ন করার জন্য সর্বনিম্ন ও সর্বোচ্চ বিন্দুর নূন্যতম বেগ এবং টানের পার্থক্য।"
+  },
+  {
+    "title": "কোনিকাল পেন্ডুলাম বা শঙ্কু দোলক (Conical Pendulum)",
+    "latex": "T = 2\\pi\\sqrt{\\frac{L\\cos\\theta}{g}}, \\quad v = \\sqrt{rg\\tan\\theta}",
+    "description": "L = সুতার দৈর্ঘ্য, θ = উল্লম্বের সাথে কোণ, r = L sin θ = বৃত্তাকার পথের ব্যাসার্ধ।"
+  },
+  {
+    "title": "রাস্তার ব্যাংকিং কোণ ও নিরাপদ বেগ (Banking of Roads & Safe Velocity)",
+    "latex": "\\tan\\theta = \\frac{v^2}{rg} = \\frac{h}{\\sqrt{d^2 - h^2}} \\approx \\frac{h}{d} \\implies v = \\sqrt{rg\\tan\\theta}",
+    "description": "θ = ব্যাংকিং কোণ, h = বাইরের প্রান্তের উচ্চতা, d = রাস্তার প্রস্থ, r = বাঁকের ব্যাসার্ধ, v = নিরাপদ সর্বোচ্চ বেগ।"
+  },
+  {
+    "title": "ঘর্ষণসহ ব্যাংকিং রোডে সর্বোচ্চ ও সর্বনিম্ন বেগ (Banking with Friction)",
+    "latex": "v_{\\text{max}} = \\sqrt{rg\\left(\\frac{\\tan\\theta + \\mu_s}{1 - \\mu_s\\tan\\theta}\\right)}, \\quad v_{\\text{min}} = \\sqrt{rg\\left(\\frac{\\tan\\theta - \\mu_s}{1 + \\mu_s\\tan\\theta}\\right)}",
+    "description": "ঘর্ষণ গুণাঙ্ক μs বিদ্যমান থাকলে সর্বোচ্চ স্কিড না করে বাঁক নেওয়ার বেগ।"
+  },
+  {
+    "title": "জড়তার ভ্রামক ও চক্রগতির ব্যাসার্ধ (Moment of Inertia & Radius of Gyration)",
+    "latex": "I = \\sum m_i r_i^2 = \\int r^2\\,dm = Mk^2 \\implies k = \\sqrt{\\frac{I}{M}}",
+    "description": "কোনো অক্ষের সাপেক্ষে ঘূর্ণনরত কণাগুলোর ভর এবং দূরত্বের বর্গের গুণফলের সমষ্টি। k = চক্রগতির ব্যাসার্ধ।"
+  },
+  {
+    "title": "জড়তার ভ্রামকের সমান্তরাল ও লম্ব অক্ষ উপপাদ্য (Parallel & Perpendicular Axis Theorems)",
+    "latex": "I = I_G + Mh^2 \\; (\\text{সমান্তরাল অক্ষ}), \\quad I_z = I_x + I_y \\; (\\text{লম্ব অক্ষ})",
+    "description": "IG = ভরকেন্দ্রগামী অক্ষের সাপেক্ষে জড়তার ভ্রামক, h = দুটি সমান্তরাল অক্ষের দূরত্ব।"
+  },
+  {
+    "title": "কতিপয় আদর্শ বস্তুর জড়তার ভ্রামক (Moment of Inertia of Standard Geometries)",
+    "latex": "I_{\\text{rod, center}} = \\frac{1}{12}ML^2, \\; I_{\\text{rod, end}} = \\frac{1}{3}ML^2, \\; I_{\\text{disc}} = \\frac{1}{2}MR^2, \\; I_{\\text{solid sphere}} = \\frac{2}{5}MR^2, \\; I_{\\text{hollow sphere}} = \\frac{2}{3}MR^2",
+    "description": "সরু সুষম দণ্ড (মাঝখান ও একপ্রান্ত), নিরেট চাকতি, নিরেট গোলক এবং ফাঁপা গোলকের কেন্দ্রগামী জড়তার ভ্রামক।"
+  },
+  {
+    "title": "টর্ক ও কৌণিক ভরবেগ (Torque & Angular Momentum)",
+    "latex": "\\vec{\\tau} = \\vec{r} \\times \\vec{F} = I\\vec{\\alpha}, \\quad \\vec{L} = \\vec{r} \\times \\vec{p} = I\\vec{\\omega}, \\quad \\vec{\\tau} = \\frac{d\\vec{L}}{dt}",
+    "description": "টর্ক τ হলো ঘূর্ণন সৃষ্টিকারী বলের ভ্রামক এবং L হলো কৌণিক ভরবেগ।"
+  },
+  {
+    "title": "কৌণিক ভরবেগের সংরক্ষণশীলতা ও ঘূর্ণন গতিশক্তি (Conservation of L & Rotational KE)",
+    "latex": "I_1\\omega_1 = I_2\\omega_2, \\quad E_k = \\frac{1}{2}I\\omega^2 = \\frac{L^2}{2I}",
+    "description": "বাহ্যিক টর্ক শূন্য হলে কৌণিক ভরবেগ ধ্রুব থাকে (I₁ω₁ = I₂ω₂)। Ek = ঘূর্ণন গতিশক্তি।"
+  },
+  {
+    "title": "গড়াগড়ি খাওয়া বস্তুর মোট গতিশক্তি ও ত্বরণ (Rolling Motion Total Kinetic Energy)",
+    "latex": "E_{\\text{total}} = \\frac{1}{2}mv^2 + \\frac{1}{2}I\\omega^2 = \\frac{1}{2}mv^2\\left(1 + \\frac{k^2}{R^2}\\right), \\quad a = \\frac{g\\sin\\theta}{1 + \\frac{k^2}{R^2}}",
+    "description": "স্লিপ ছাড়া গড়াগড়ি খাওয়া বস্তুর রৈখিক গতিশক্তি ও ঘূর্ণন গতিশক্তির সমষ্টি।"
+  }
+]

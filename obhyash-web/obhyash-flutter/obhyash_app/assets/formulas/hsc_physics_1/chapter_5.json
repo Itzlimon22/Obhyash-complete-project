@@ -1,22 +1,92 @@
 [
   {
-    "title": "কাজ",
-    "latex": "W = Fs\\cos\\theta",
-    "description": "F = বল, s = সরণ, θ = বল ও সরণের মধ্যবর্তী কোণ"
+    "title": "ধ্রুব বল দ্বারা কৃতকাজ (Work Done by Constant Force)",
+    "latex": "W = \\vec{F} \\cdot \\vec{s} = Fs\\cos\\theta = F_x x + F_y y + F_z z",
+    "description": "F = প্রযুক্ত বল, s = সরণ, θ = বল ও সরণের মধ্যবর্তী কোণ।"
   },
   {
-    "title": "গতিশক্তি",
-    "latex": "E_k = \\frac{1}{2}mv^2",
-    "description": "m = ভর, v = বেগ"
+    "title": "কাজের প্রকারভেদ ও শর্ত (Types of Work & Conditions)",
+    "latex": "W > 0 \\; (0^\\circ \\le \\theta < 90^\\circ), \\quad W = 0 \\; (\\theta = 90^\\circ \\text{ বা } s=0), \\quad W < 0 \\; (90^\\circ < \\theta \\le 180^\\circ)",
+    "description": "বলের দ্বারা কাজ (ধনাত্মক), কাজহীন বল (লম্বভাবে ক্রিয়াশীল যেমন কেন্দ্রমুখী বল), বলের বিরুদ্ধে কাজ (ঋণাত্মক যেমন ঘর্ষণ বল)।"
   },
   {
-    "title": "বিভব শক্তি",
-    "latex": "E_p = mgh",
-    "description": "m = ভর, g = অভিকর্ষজ ত্বরণ, h = উচ্চতা"
+    "title": "পরিবর্তনশীল বল দ্বারা কৃতকাজ (Work Done by Variable Force)",
+    "latex": "W = \\int_{x_1}^{x_2} F(x)\\,dx = \\text{Area under } F\\text{-}x \\text{ Graph}",
+    "description": "বল ও সরণ লেখচিত্রের (F-x Graph) ক্ষেত্রফল মোট কৃতকাজ নির্দেশ করে।"
   },
   {
-    "title": "ক্ষমতা",
-    "latex": "P = \\frac{W}{t} = Fv",
-    "description": "P = ক্ষমতা (Watt), W = কাজ, t = সময়"
+    "title": "বিভব শক্তি ও বলের ভেক্টর সম্পর্ক (Relation between Potential Energy & Force)",
+    "latex": "\\vec{F} = -\\vec{\\nabla} U = -\\left(\\frac{\\partial U}{\\partial x}\\hat{i} + \\frac{\\partial U}{\\partial y}\\hat{j} + \\frac{\\partial U}{\\partial z}\\hat{k}\\right)",
+    "description": "সংরক্ষণশীল বল হলো বিভব শক্তির ঋণাত্মক গ্র্যাডিয়েন্ট।"
+  },
+  {
+    "title": "সাম্যাবস্থার প্রকারভেদ ও শর্ত (Types of Equilibrium)",
+    "latex": "\\frac{d^2 U}{dx^2} > 0 \\; (\\text{স্থায়ী}), \\quad \\frac{d^2 U}{dx^2} < 0 \\; (\\text{অস্থায়ী}), \\quad \\frac{d^2 U}{dx^2} = 0 \\; (\\text{নিরপেক্ষ})",
+    "description": "স্থায়ী সাম্যাবস্থায় বিভব শক্তি নূন্যতম (U_min) এবং অস্থায়ী সাম্যাবস্থায় বিভব শক্তি সর্বোচ্চ (U_max)।"
+  },
+  {
+    "title": "স্প্রিং বল ও স্থিতিশক্তি (Spring Force & Potential Energy)",
+    "latex": "F = -kx, \\quad W = U = \\frac{1}{2}kx^2 = \\frac{1}{2}k(x_2^2 - x_1^2)",
+    "description": "k = স্প্রিং ধ্রুবক (N/m), x = স্প্রিং এর প্রসারণ বা সংকোচন, U = সঞ্চিত স্থিতিশক্তি।"
+  },
+  {
+    "title": "স্প্রিং সমবায় (Spring Combinations)",
+    "latex": "k_p = k_1 + k_2 \\; (\\text{সমান্তরাল}), \\quad \\frac{1}{k_s} = \\frac{1}{k_1} + \\frac{1}{k_2} \\implies k_s = \\frac{k_1 k_2}{k_1 + k_2} \\; (\\text{শ্রেণী})",
+    "description": "স্প্রিং সমান্তরাল সমবায়ে থাকলে তুল্য স্প্রিং ধ্রুবক বৃদ্ধি পায়, শ্রেণী সমবায়ে হ্রাস পায়।"
+  },
+  {
+    "title": "কাজ-শক্তি উপপাদ্য (Work-Energy Theorem)",
+    "latex": "W_{\\text{net}} = \\Delta E_k = \\frac{1}{2}mv^2 - \\frac{1}{2}mu^2",
+    "description": "কোনো বস্তুর উপর প্রযুক্ত লব্ধি বল দ্বারা কৃতকাজ তার গতিশক্তির পরিবর্তনের সমান।"
+  },
+  {
+    "title": "গতিশক্তি ও ভরবেগের সম্পর্ক (Kinetic Energy & Momentum Relation)",
+    "latex": "E_k = \\frac{p^2}{2m} \\iff p = \\sqrt{2mE_k}",
+    "description": "ভরবেগ p দ্বিগুণ করলে গতিশক্তি চারগুণ বৃদ্ধি পায়।"
+  },
+  {
+    "title": "ভরবেগ ও গতিশক্তির শতকরা পরিবর্তন (Percentage Change Shortcut)",
+    "latex": "\\% \\Delta E_k = \\left(2x + \\frac{x^2}{100}\\right)\\% \\quad (p \\text{ বৃদ্ধি } x\\% \\text{ হলে})",
+    "description": "ভরবেগ ২০% বৃদ্ধি পেলে গতিশক্তি বৃদ্ধি পায়: (2×20 + 20²/100)% = ৪৪%।"
+  },
+  {
+    "title": "মুক্ত পতনে গতিশক্তি ও বিভব শক্তির উচ্চতা শর্টকাট (Height where Ek = n Ep)",
+    "latex": "E_k = n E_p \\implies h' = \\frac{h}{n + 1}, \\quad E_p = n E_k \\implies h' = \\frac{n h}{n + 1}",
+    "description": "ভূমি থেকে h' উচ্চতায় গতিশক্তি বিভব শক্তির n গুণ হবে (h = মোট উচ্চতা)।"
+  },
+  {
+    "title": "টেবিল থেকে ঝুলন্ত চেইন বা দড়ি টেনে তোলার কাজ (Work to Pull Hanging Chain)",
+    "latex": "W = \\frac{mgL}{2n^2} \\quad (\\text{দড়ির } \\frac{1}{n} \\text{ অংশ ঝুলে থাকলে})",
+    "description": "L দৈর্ঘ্যের ও m ভরের দড়ির 1/n অংশ ঝুলে থাকলে তা সম্পূর্ণ টেবিলে তুলতে কৃতকাজ (যেমন 1/3 অংশ ঝুললে W = mgL/18)।"
+  },
+  {
+    "title": "সম্পূর্ণ ভর্তি কুয়া বা কূপ পানিশূন্য করতে কৃতকাজ (Emptying Full Water Well)",
+    "latex": "W = mg\\left(\\frac{h}{2}\\right) = (\\rho \\pi r^2 h)g\\left(\\frac{h}{2}\\right) = \\frac{1}{2}\\rho \\pi r^2 g h^2",
+    "description": "h = কুয়ার গভীরতা, r = ব্যাসার্ধ, ρ = পানির ঘনত্ব (1000 kg/m³), ভরকেন্দ্রের সরণ = h/2।"
+  },
+  {
+    "title": "অর্ধপূর্ণ কুয়া সম্পূর্ণ খালি করার কাজ (Emptying Half-Filled Well)",
+    "latex": "W = mg\\left(\\frac{h}{2} + \\frac{h}{4}\\right) = mg\\left(\\frac{3h}{4}\\right)",
+    "description": "পানি কুয়ার নিচের অর্ধেকাংশে থাকলে ভরকেন্দ্রের গড় সরণ = 3h/4।"
+  },
+  {
+    "title": "ভর্তি কুয়ার উপরের অর্ধেক খালি করার কাজ (Emptying Upper Half of Full Well)",
+    "latex": "W = m_{\\text{half}} g \\left(\\frac{h}{4}\\right) = \\left(\\frac{1}{2}\\rho \\pi r^2 h\\right) g \\left(\\frac{h}{4}\\right) = \\frac{1}{8}\\rho \\pi r^2 g h^2",
+    "description": "উপরিভাগের অর্ধেক পানির ভরকেন্দ্রের সরণ = (0 + h/2)/2 = h/4।"
+  },
+  {
+    "title": "শঙ্কু ও গোলকীয় ট্যাঙ্ক খালি করতে কাজ (Emptying Conical & Spherical Tanks)",
+    "latex": "W_{\\text{inverted cone}} = mg\\left(\\frac{3h}{4}\\right), \\quad W_{\\text{sphere}} = mgR",
+    "description": "উল্টানো শঙ্কুর পানির ভরকেন্দ্র শীর্ষবিন্দু থেকে 3h/4 দূরত্বে এবং গোলকীয় ট্যাঙ্কের ভরকেন্দ্র কেন্দ্রে (R দূরত্বে) থাকে।"
+  },
+  {
+    "title": "ক্ষমতা ও তাৎক্ষণিক ক্ষমতা (Power & Instantaneous Power)",
+    "latex": "P = \\frac{W}{t} = \\frac{mgh}{t}, \\quad P = \\vec{F} \\cdot \\vec{v} = Fv\\cos\\theta, \\quad 1\\text{ HP} = 746\\text{ W}",
+    "description": "কাজ সম্পাদনের হার হলো ক্ষমতা। F = প্রযুক্ত বল, v = তাৎক্ষণিক বেগ।"
+  },
+  {
+    "title": "মোটর ও পাম্পের কর্মদক্ষতা (Efficiency of Machine / Pump)",
+    "latex": "\\eta = \\frac{P_{\\text{out}}}{P_{\\text{in}}} \\times 100\\% = \\frac{mgh / t}{P_{\\text{in}}} \\times 100\\%",
+    "description": "কার্যকর ক্ষমতা (Pout) এবং মোট প্রদত্ত ক্ষমতা (Pin) এর শতকরা অনুপাত।"
   }
 ]

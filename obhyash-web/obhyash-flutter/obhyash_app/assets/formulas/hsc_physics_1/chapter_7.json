@@ -1,1 +1,97 @@
-[]
+[
+  {
+    "title": "ইয়ং-এর গুণাঙ্ক (Young's Modulus)",
+    "latex": "Y = \\frac{\\text{অনুদৈর্ঘ্য পীড়ন}}{\\text{অনুদৈর্ঘ্য বিকৃতি}} = \\frac{F / A}{l / L} = \\frac{FL}{Al} = \\frac{mgL}{\\pi r^2 l}",
+    "description": "L = আদি দৈর্ঘ্য, l = দৈর্ঘ্য বৃদ্ধি, r = তারের ব্যাসার্ধ, F = mg = প্রযুক্ত টান।"
+  },
+  {
+    "title": "তাপমাত্রার পরিবর্তনে সৃষ্ট তাপীয় পীড়ন ও বল (Thermal Stress & Force)",
+    "latex": "F = Y A \\alpha \\Delta\\theta, \\quad \\text{পীড়ন} = \\frac{F}{A} = Y \\alpha \\Delta\\theta",
+    "description": "α = তারের উপাদানের দৈর্ঘ্য প্রসারণ সহগ (K⁻¹ বা °C⁻¹), Δθ = তাপমাত্রার পরিবর্তন।"
+  },
+  {
+    "title": "আয়তন গুণাঙ্ক ও সংনম্যতা (Bulk Modulus & Compressibility)",
+    "latex": "K = -\\frac{\\Delta P}{\\Delta V / V} = -\\frac{V \\Delta P}{\\Delta V}, \\quad C = \\frac{1}{K}",
+    "description": "K = আয়তন গুণাঙ্ক, ΔP = অতিরিক্ত চাপ, V = আদি আয়তন, ΔV = আয়তন পরিবর্তন, C = সংনম্যতা (Compressibility)।"
+  },
+  {
+    "title": "ব্যবর্তন বা দৃঢ়তার গুণাঙ্ক (Shear / Rigidity Modulus)",
+    "latex": "\\eta = \\frac{\\text{ব্যবর্তন পীড়ন}}{\\text{ব্যবর্তন বিকৃতি}} = \\frac{F / A}{\\theta}",
+    "description": "θ = মোচড় কোণ বা ব্যবর্তন বিকৃতি (rad এ প্রকাশিত)।"
+  },
+  {
+    "title": "পয়সনের অনুপাত (Poisson's Ratio)",
+    "latex": "\\sigma = -\\frac{\\text{পার্শ্ব বিকৃতি}}{\\text{দৈর্ঘ্য বিকৃতি}} = -\\frac{\\Delta d / d}{\\Delta L / L}, \\quad -1 < \\sigma < 0.5 \\; (\\text{তাত্ত্বিক সীমা})",
+    "description": "বাস্তব ক্ষেত্রে পয়সনের অনুপাত সাধারণত 0 থেকে 0.5 এর মধ্যে থাকে।"
+  },
+  {
+    "title": "তারের স্থিতিস্থাপক স্থিতিশক্তি ও শক্তি ঘনত্ব (Elastic Strain Energy & Energy Density)",
+    "latex": "W = \\frac{1}{2}Fl = \\frac{1}{2}\\frac{YAl^2}{L}, \\quad u = \\frac{W}{\\text{আয়তন}} = \\frac{1}{2} \\times \\text{পীড়ন} \\times \\text{বিকৃতি} = \\frac{1}{2}Y(\\text{বিকৃতি})^2",
+    "description": "u = একক আয়তনে সঞ্চিত স্থিতিশক্তি (J/m³)।"
+  },
+  {
+    "title": "অবিচ্ছিন্নতার সমীকরণ (Equation of Continuity)",
+    "latex": "A_1 v_1 = A_2 v_2 = Q = \\text{ধ্রুবক} \\implies v \\propto \\frac{1}{A} \\propto \\frac{1}{r^2}",
+    "description": "অসংনম্য ও অ-সান্দ্র তরলের প্রবাহে নলের যেকোনো প্রস্থচ্ছেদে প্রতি সেকেন্ডে প্রবাহিত তরলের আয়তন Q ধ্রুব থাকে।"
+  },
+  {
+    "title": "বার্নৌলির নীতি ও সমীকরণ (Bernoulli's Principle & Equation)",
+    "latex": "P + \\frac{1}{2}\\rho v^2 + \\rho gh = \\text{ধ্রুবক}, \\quad \\frac{P}{\\rho g} + \\frac{v^2}{2g} + h = \\text{ধ্রুবক}",
+    "description": "ধারারেখ প্রবাহে চাপ শক্তি, গতিশক্তি ও বিভব শক্তির সমষ্টি সর্বদা ধ্রুবক থাকে। চাপ শীর্ষ + বেগ শীর্ষ + উচ্চতা শীর্ষ = ধ্রুবক।"
+  },
+  {
+    "title": "টরিসেলির সূত্র - পাত্রের ছিদ্র দিয়ে তরলের বহির্গমন বেগ (Torricelli's Law of Efflux)",
+    "latex": "v = \\sqrt{2gh}, \\quad R = 2\\sqrt{h(H - h)} \\implies R_{\\text{max}} = H \\; (h = H/2)",
+    "description": "মুক্ত তল থেকে h গভীরতায় অবস্থিত ছিদ্র দিয়ে তরল নির্গমনের বেগ v এবং মেঝেতে পড়ার অনুভূমিক পাল্লা R (H = মোট উচ্চতা)।"
+  },
+  {
+    "title": "ভেন্টুরমিটার দিয়ে প্রবাহের হার পরিমাপ (Flow Rate using Venturimeter)",
+    "latex": "Q = A_1 A_2 \\sqrt{\\frac{2(P_1 - P_2)}{\\rho(A_1^2 - A_2^2)}} = A_1 A_2 \\sqrt{\\frac{2gh}{A_1^2 - A_2^2}}",
+    "description": "নলের সরু ও চওড়া অংশের ক্ষেত্রফল A₁ ও A₂ এবং ম্যানোমিটারের উচ্চতার পার্থক্য h।"
+  },
+  {
+    "title": "নিউটনের সান্দ্রতা সূত্র (Newton's Formula for Viscous Force)",
+    "latex": "F = -\\eta A \\frac{dv}{dx}",
+    "description": "η = সান্দ্রতা গুণাঙ্ক (Pa·s বা N·s/m² বা Poise; 1 Pa·s = 10 Poise), (dv/dx) = বেগ অবক্রম, A = স্তরসমূহের ক্ষেত্রফল।"
+  },
+  {
+    "title": "স্টোকসের সূত্র ও প্রান্তিক বেগ (Stokes' Law & Terminal Velocity)",
+    "latex": "F_v = 6\\pi \\eta r v, \\quad v_t = \\frac{2r^2(\\rho - \\sigma)g}{9\\eta}",
+    "description": "r = গোলকের ব্যাসার্ধ, vt = অন্ত্য বা প্রান্তিক বেগ, ρ = গোলকের ঘনত্ব, σ = সান্দ্র তরলের ঘনত্ব।"
+  },
+  {
+    "title": "পোয়েসিলির সমীকরণ (Poiseuille's Equation for Liquid Flow)",
+    "latex": "Q = \\frac{\\pi P r^4}{8\\eta L}",
+    "description": "L দৈর্ঘ্যের এবং r ব্যাসার্ধের কৈশিক নল দিয়ে প্রতি সেকেন্ডে নির্গত সান্দ্র তরলের আয়তন Q।"
+  },
+  {
+    "title": "রেনল্ডস সংখ্যা ও সংকট বেগ (Reynolds Number & Critical Velocity)",
+    "latex": "N_R = \\frac{\\rho v D}{\\eta} \\quad (N_R < 2000 \\implies \\text{ধারারেখ}, \\; N_R > 3000 \\implies \\text{বিক্ষুব্ধ})",
+    "description": "প্রবাহের প্রকৃতি (ধারারেখ নাকি অশান্ত/বিক্ষুব্ধ) নির্ধারণকারী মাত্রাহীন সংখ্যা।"
+  },
+  {
+    "title": "পৃষ্ঠটান ও পৃষ্ঠশক্তি (Surface Tension & Surface Energy)",
+    "latex": "T = \\frac{F}{L} = \\frac{W}{\\Delta A}, \\quad [T] = MT^{-2} \\; (\\text{একক: N/m বা J/m}^2)",
+    "description": "মুক্ত তলের একক দৈর্ঘ্যে স্পর্শকীয় বল অথবা একক ক্ষেত্রফল বৃদ্ধিতে প্রয়োজনীয় কৃতকাজ।"
+  },
+  {
+    "title": "সাবানের বুদবুদ ও তরলের ফোঁটায় কাজ (Work in Soap Bubble & Liquid Droplets)",
+    "latex": "W_{\\text{droplet}} = T \\cdot 4\\pi(R_2^2 - R_1^2), \\quad W_{\\text{bubble}} = T \\cdot 8\\pi(R_2^2 - R_1^2)",
+    "description": "সাবানের বুদবুদে ২টি মুক্ত তল থাকার কারণে ক্ষেত্রফল বৃদ্ধি দ্বিগুণ (8πr²) হিসেবে গণনা করা হয়।"
+  },
+  {
+    "title": "ক্ষুদ্র ফোঁটা মিলে বৃহৎ ফোঁটা গঠনের মুক্ত শক্তি (Energy Released in Droplet Merging)",
+    "latex": "R = n^{1/3}r, \\quad \\Delta W = 4\\pi T r^2 (n - n^{2/3}) = 4\\pi T R^2 (n^{1/3} - 1)",
+    "description": "n টি সমআয়তনের ক্ষুদ্র ফোঁটা যুক্ত হয়ে ১টি বড় ফোঁটা গঠন করলে মুক্ত শক্তি তাপশক্তিতে রূপান্তরিত হয়।"
+  },
+  {
+    "title": "বুদবুদ ও ফোঁটার অভ্যন্তরে অতিরিক্ত চাপ (Excess Pressure Inside Bubble & Drop)",
+    "latex": "\\Delta P_{\\text{drop}} = \\frac{2T}{r}, \\quad \\Delta P_{\\text{soap bubble}} = \\frac{4T}{r}",
+    "description": "বক্রতার কারণে অবতল তলের দিকে চাপ বেশি থাকে।"
+  },
+  {
+    "title": "কৈশিক নলে তরলের আরোহণ - জুরিনের সূত্র (Capillary Rise - Jurin's Law)",
+    "latex": "h = \\frac{2T\\cos\\theta}{r\\rho g} \\implies h \\propto \\frac{1}{r}",
+    "description": "r = কৈশিক নলের ব্যাসার্ধ, θ = স্পর্শ কোণ (কাঁচ ও বিশুদ্ধ পানির জন্য θ ≈ 8° বা 0°, পারদের জন্য θ ≈ 140°)।"
+  }
+]

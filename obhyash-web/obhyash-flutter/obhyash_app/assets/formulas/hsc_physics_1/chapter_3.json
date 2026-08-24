@@ -1,27 +1,112 @@
 [
   {
-    "title": "প্রথম সমীকরণ",
-    "latex": "v = u + at",
-    "description": "u = প্রাথমিক বেগ, v = চূড়ান্ত বেগ, a = ত্বরণ, t = সময়"
+    "title": "সরলরেখায় সুষম ত্বরণে গতির মৌলিক সমীকরণ (Linear Motion with Uniform Acceleration)",
+    "latex": "v = u + at, \\quad s = ut + \\frac{1}{2}at^2, \\quad v^2 = u^2 + 2as, \\quad s = \\frac{u + v}{2}t",
+    "description": "u = আদিবেগ, v = শেষবেগ, a = সুষম ত্বরণ, s = সরণ, t = সময়।"
   },
   {
-    "title": "দ্বিতীয় সমীকরণ",
-    "latex": "s = ut + \\frac{1}{2}at^2",
-    "description": "s = অতিক্রান্ত দূরত্ব"
+    "title": "t-তম সেকেন্ডে অতিক্রান্ত দূরত্ব (Distance in t-th Second)",
+    "latex": "s_t = u + \\frac{1}{2}a(2t - 1)",
+    "description": "নির্দিষ্ট t-তম সেকেন্ডের ১ সেকেন্ডে কোনো বস্তু কর্তৃক অতিক্রান্ত দূরত্বের পরিমাপ।"
   },
   {
-    "title": "তৃতীয় সমীকরণ",
-    "latex": "v^2 = u^2 + 2as",
-    "description": "বেগ-দূরত্ব সম্পর্ক"
+    "title": "গড় দ্রুতি ও গড় বেগ - সমান দূরত্ব ও সমান সময়ের শর্টকাট (Average Speed Conditions)",
+    "latex": "v_{\\text{avg}} = \\frac{2v_1 v_2}{v_1 + v_2} \\; (s_1 = s_2), \\quad v_{\\text{avg}} = \\frac{v_1 + v_2}{2} \\; (t_1 = t_2)",
+    "description": "পথের দুটি সমান দূরত্বের অর্ধেকাংশ v₁ ও v₂ বেগে অতিক্রম করলে গড় দ্রুতি এবং সমান সময়ে চললে গড় দ্রুতি।"
   },
   {
-    "title": "সর্বোচ্চ উচ্চতা",
-    "latex": "H = \\frac{u^2\\sin^2\\theta}{2g}",
-    "description": "উৎক্ষেপণ কোণ θ হলে প্রক্ষেপণাস্ত্রের সর্বোচ্চ উচ্চতা"
+    "title": "তিনটি সমান দূরত্বের গড় দ্রুতি (Average Speed for 3 Equal Distances)",
+    "latex": "v_{\\text{avg}} = \\frac{3v_1 v_2 v_3}{v_1 v_2 + v_2 v_3 + v_3 v_1}",
+    "description": "মোট দূরত্বের ৩টি সমান এক-তৃতীয়াংশ যথাক্রমে v₁, v₂, v₃ দ্রুতিতে অতিক্রম করলে গড় দ্রুতি।"
   },
   {
-    "title": "পাল্লা",
-    "latex": "R = \\frac{u^2\\sin 2\\theta}{g}",
-    "description": "প্রক্ষেপণাস্ত্রের অনুভূমিক পাল্লা"
+    "title": "গ্যালিলিওর বিজোড় সংখ্যার সূত্র (Galileo's Law of Odd Numbers)",
+    "latex": "s_1 : s_2 : s_3 : s_4 : \\dots = 1 : 3 : 5 : 7 : \\dots",
+    "description": "স্থিরাবস্থা থেকে মুক্তভাবে পড়ন্ত বস্তু প্রতি সমান একক সময় ব্যবধানে বিজোড় সংখ্যার অনুপাতে দূরত্ব অতিক্রম করে।"
+  },
+  {
+    "title": "খাড়া উপরের দিকে নিক্ষিপ্ত বস্তুর সর্বোচ্চ উচ্চতা (Max Height of Vertical Projectile)",
+    "latex": "H = \\frac{u^2}{2g}",
+    "description": "আদিবেগ u নিয়ে খাড়া উপরের দিকে নিক্ষিপ্ত বস্তুর সর্বোচ্চ উচ্চতা H, যেখানে শীর্ষবিন্দুতে শেষবেগ v = 0।"
+  },
+  {
+    "title": "খাড়া উপরের দিকে নিক্ষিপ্ত বস্তুর বিচরণকাল (Time of Flight for Vertical Projectile)",
+    "latex": "T = \\frac{2u}{g}, \\quad t_{\\text{rise}} = t_{\\text{fall}} = \\frac{u}{g}",
+    "description": "সর্বোচ্চ উচ্চতায় ওঠার সময় এবং ভূমিতে ফিরে আসার মোট বিচরণকাল।"
+  },
+  {
+    "title": "নির্দিষ্ট উচ্চতা h থেকে নিক্ষিপ্ত বস্তুর ভূমিতে পতনের সময় (Launch from Height h)",
+    "latex": "-h = ut - \\frac{1}{2}gt^2 \\implies \\frac{1}{2}gt^2 - ut - h = 0",
+    "description": "h উচ্চতার দালান/টাওয়ার থেকে u বেগে খাড়া উপরের দিকে নিক্ষিপ্ত বস্তু ভূমিতে পৌঁছানোর সময় t।"
+  },
+  {
+    "title": "প্রাসের তাৎক্ষণিক বেগ ও কোণ (Instantaneous Velocity & Angle of Projectile)",
+    "latex": "v = \\sqrt{v_x^2 + v_y^2} = \\sqrt{(v_0\\cos\\theta_0)^2 + (v_0\\sin\\theta_0 - gt)^2}, \\quad \\tan\\theta = \\frac{v_0\\sin\\theta_0 - gt}{v_0\\cos\\theta_0}",
+    "description": "t সময় পর প্রাসের বেগ v এবং অনুভূমিকের সাথে উৎপন্ন কোণ θ।"
+  },
+  {
+    "title": "প্রাসের সর্বোচ্চ উচ্চতা ও আরোহণকাল (Max Height & Ascent Time of Projectile)",
+    "latex": "H = \\frac{v_0^2\\sin^2\\theta_0}{2g}, \\quad t_{\\text{max}} = \\frac{v_0\\sin\\theta_0}{g}",
+    "description": "অনুভূমিকের সাথে θ₀ কোণে v₀ আদিবেগে নিক্ষিপ্ত প্রাসের সর্বোচ্চ উল্লম্ব উচ্চতা।"
+  },
+  {
+    "title": "প্রাসের উড্ডয়নকাল বা বিচরণকাল (Total Time of Flight of Projectile)",
+    "latex": "T = \\frac{2v_0\\sin\\theta_0}{g} = \\frac{2v_y}{g}",
+    "description": "প্রাসের নিক্ষেপ বিন্দু থেকে পুনরায় ভূমিতে ফিরে আসার মোট সময় T।"
+  },
+  {
+    "title": "প্রাসের অনুভূমিক পাল্লা (Horizontal Range of Projectile)",
+    "latex": "R = \\frac{v_0^2\\sin 2\\theta_0}{g} = \\frac{2(v_0\\cos\\theta_0)(v_0\\sin\\theta_0)}{g} = \\frac{2v_x v_y}{g}",
+    "description": "প্রাসটি অনুভূমিক রেখা বরাবর ভূমিতে যে দূরত্ব অতিক্রম করে।"
+  },
+  {
+    "title": "সর্বোচ্চ অনুভূমিক পাল্লা (Maximum Horizontal Range)",
+    "latex": "R_{\\text{max}} = \\frac{v_0^2}{g} \\quad (\\theta_0 = 45^\\circ), \\quad H = \\frac{R_{\\text{max}}}{4}",
+    "description": "৪৫° কোণে নিক্ষেপ করলে সর্বাধিক দূরত্ব অতিক্রম করে। এই ক্ষেত্রে সর্বোচ্চ উচ্চতা পাল্লার এক-চতুর্থাংশ হয়।"
+  },
+  {
+    "title": "পাল্লা ও সর্বোচ্চ উচ্চতার সম্পর্ক (Relation between Range and Max Height)",
+    "latex": "R\\tan\\theta_0 = 4H \\implies \\tan\\theta_0 = \\frac{4H}{R}",
+    "description": "যেকোনো নিক্ষেপ কোণ θ₀ এর জন্য অনুভূমিক পাল্লা R এবং সর্বোচ্চ উচ্চতা H এর মধ্যে সম্পর্ক।"
+  },
+  {
+    "title": "সমান পাল্লার জন্য দুটি নিক্ষেপ কোণ (Complementary Angles for Equal Range)",
+    "latex": "\\theta_1 + \\theta_2 = 90^\\circ \\implies R = \\frac{g}{2}T_1 T_2 = 4\\sqrt{H_1 H_2}",
+    "description": "একই আদিবেগে θ ও (90° - θ) কোণে নিক্ষেপ করলে উভয়ের পাল্লা সমান হয়।"
+  },
+  {
+    "title": "প্রাসের গতিপথের সমীকরণ / ট্র্যাজেক্টরি (Trajectory Equation of Projectile)",
+    "latex": "y = x\\tan\\theta_0 - \\frac{g x^2}{2v_0^2\\cos^2\\theta_0} = x\\tan\\theta_0\\left(1 - \\frac{x}{R}\\right)",
+    "description": "প্রাসের গতিপথ একটি প্যারাবোলা বা অধিবৃত্ত।"
+  },
+  {
+    "title": "প্রাসের শীর্ষবিন্দুতে বক্রতার ব্যাসার্ধ (Radius of Curvature at Projectile Peak)",
+    "latex": "\\rho_{\\text{peak}} = \\frac{v_0^2\\cos^2\\theta_0}{g}, \\quad \\rho_{\\text{any}} = \\frac{v^3}{g\\cos\\theta}",
+    "description": "প্রাসের গতিপথের শীর্ষবিন্দুতে এবং যেকোনো বিন্দুতে গতিপথের বক্রতার ব্যাসার্ধ।"
+  },
+  {
+    "title": "উঁচু স্থান থেকে অনুভূমিকভাবে নিক্ষিপ্ত প্রাস (Horizontal Projection from Height h)",
+    "latex": "t = \\sqrt{\\frac{2h}{g}}, \\quad R = v_0 t = v_0\\sqrt{\\frac{2h}{g}}, \\quad y = \\frac{g}{2v_0^2}x^2",
+    "description": "h উচ্চতা থেকে অনুভূমিক দিকে v₀ বেগে বস্তু ছুড়লে ভূমিতে পড়ার সময় t এবং অনুভূমিক দূরত্ব R।"
+  },
+  {
+    "title": "আনত তলে প্রাসের পাল্লা ও উড্ডয়নকাল (Projectile on an Inclined Plane)",
+    "latex": "R_{\\text{up}} = \\frac{v_0^2}{g\\cos^2\\beta}\\left[\\sin(2\\alpha - \\beta) - \\sin\\beta\\right], \\quad T = \\frac{2v_0\\sin(\\alpha - \\beta)}{g\\cos\\beta}",
+    "description": "β কোণে আনত তলের উপর অনুভূমিকের সাথে α কোণে নিক্ষিপ্ত প্রাসের পাল্লা ও উড্ডয়নকাল।"
+  },
+  {
+    "title": "গুলির তক্তা ভেদ করার শর্টকাট (Bullet Piercing Planks Shortcut)",
+    "latex": "N = n^2 \\quad (v' = nv \\implies N \\text{ টি তক্তা}), \\quad x' = \\frac{x}{n^2 - 1} \\; (v = u/n)",
+    "description": "গুলির বেগ n গুণ বাড়ালে n² টি তক্তা ভেদ করবে। x দূরত্বে বেগ 1/n অংশ কমে গেলে আর x/(n²-1) দূরত্ব যাবে।"
+  },
+  {
+    "title": "গাড়ি থামানোর ব্রেকিং দূরত্ব ও সময় (Stopping Distance & Time)",
+    "latex": "s = \\frac{u^2}{2a} = \\frac{u^2}{2\\mu g} \\implies s \\propto u^2, \\quad t = \\frac{u}{a} \\implies t \\propto u",
+    "description": "গাড়ির আদিবেগ দ্বিগুণ করলে থামার দূরত্ব ৪ গুণ হয়, কিন্তু থামার সময় ২ গুণ হয়।"
+  },
+  {
+    "title": "ক্যালকুলাস ভিত্তিক তাৎক্ষণিক গতিবিদ্যা (Calculus based Kinematics)",
+    "latex": "v = \\frac{dx}{dt}, \\quad a = \\frac{dv}{dt} = v\\frac{dv}{dx} = \\frac{d^2x}{dt^2}, \\quad x = \\int v\\,dt, \\quad v = \\int a\\,dt",
+    "description": "পরিবর্তনশীল বল ও ত্বরণের ক্ষেত্রে ব্যবকলন ও সমাকলন ভিত্তিক গতির সমীকরণ।"
   }
 ]

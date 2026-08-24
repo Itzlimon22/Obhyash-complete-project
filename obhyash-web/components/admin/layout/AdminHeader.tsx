@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,14 +10,10 @@ import {
   LogOut,
   ChevronDown,
   Shield,
-  Radio,
-  Sparkles,
   ExternalLink,
-  User,
 } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
-
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -51,12 +47,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
+  const { signOut } = useAdminAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const supabase = createClient();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/login';
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Logout error in AdminHeader:', err);
+      window.location.href = '/login';
+    }
   };
 
   const currentTitle = ROUTE_TITLES[pathname] || 'অ্যাডমিন প্যানেল';
@@ -66,8 +71,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       {/* LEFT: Mobile Menu Button & Dynamic Route Title */}
       <div className="flex items-center gap-3.5 min-w-0">
         <button
+          type="button"
           onClick={toggleSidebar}
-          className="p-2 text-neutral-600 dark:text-zinc-300 hover:text-neutral-900 dark:hover:text-white rounded-xl hover:bg-neutral-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+          className="p-2 text-neutral-600 dark:text-zinc-300 hover:text-neutral-900 dark:hover:text-white rounded-xl hover:bg-neutral-100 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
           title="Toggle Navigation"
         >
           <Menu size={20} />
@@ -98,8 +104,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
         {/* Dark/Light Mode Toggle */}
         <button
+          type="button"
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-neutral-600 dark:text-zinc-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-neutral-200/70 dark:border-zinc-800 transition-all"
+          className="p-2 rounded-xl text-neutral-600 dark:text-zinc-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-neutral-200/70 dark:border-zinc-800 transition-all cursor-pointer"
           title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {isDark ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
@@ -110,8 +117,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         {/* Admin Profile Dropdown */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-transparent hover:border-neutral-200 dark:hover:border-zinc-800 transition-all"
+            className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-transparent hover:border-neutral-200 dark:hover:border-zinc-800 transition-all cursor-pointer"
           >
             <div className="w-8 h-8 rounded-lg bg-[#004633] text-white flex items-center justify-center font-bold text-xs shadow-sm border border-emerald-500/30">
               {adminName.charAt(0).toUpperCase()}
@@ -137,11 +145,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {isDropdownOpen && (
             <>
               <div
-                className="fixed inset-0 z-20"
+                className="fixed inset-0 z-40"
                 onClick={() => setIsDropdownOpen(false)}
               />
 
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#121215] rounded-2xl shadow-xl border border-neutral-200/80 dark:border-zinc-800 p-2 z-30 space-y-1 animate-in fade-in-50 zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#121215] rounded-2xl shadow-2xl border border-neutral-200/80 dark:border-zinc-800 p-2 z-50 space-y-1 animate-in fade-in-50 zoom-in-95 duration-150">
                 <div className="px-3 py-2 border-b border-neutral-100 dark:border-zinc-800/80 mb-1">
                   <p className="text-xs font-bold text-neutral-900 dark:text-zinc-100 truncate">
                     {adminName}
@@ -161,11 +169,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 </Link>
 
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors text-left"
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors text-left cursor-pointer disabled:opacity-50"
                 >
-                  <LogOut size={14} />
-                  <span>লগ আউট (Sign Out)</span>
+                  <LogOut size={14} className={isLoggingOut ? 'animate-spin' : ''} />
+                  <span>{isLoggingOut ? 'লগ আউট হচ্ছে...' : 'লগ আউট (Sign Out)'}</span>
                 </button>
               </div>
             </>
