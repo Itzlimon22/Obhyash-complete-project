@@ -251,10 +251,10 @@ const Dashboard: React.FC<DashboardProps> = ({
       animate="show"
       className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1"
     >
-      {/* Daily Spaced Repetition Memory Revision Card */}
-      <motion.div variants={fadeInUp} className="lg:col-span-3">
+      {/* Daily Spaced Repetition Memory Revision Card (Temporarily hidden) */}
+      {/* <motion.div variants={fadeInUp} className="lg:col-span-3">
         <DailyRevisionCard userId={user?.id} />
-      </motion.div>
+      </motion.div> */}
 
       {/* Cards Section */}
       <motion.div variants={fadeInUp} className="lg:col-span-2 grid grid-cols-3 gap-2 sm:gap-3 h-fit">

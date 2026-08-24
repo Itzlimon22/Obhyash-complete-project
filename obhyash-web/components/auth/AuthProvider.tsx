@@ -515,6 +515,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       if (typeof window !== "undefined") {
+        try {
+          Object.keys(localStorage).forEach((key) => {
+            if (
+              key.startsWith("sb-") ||
+              key.startsWith("obhyash_") ||
+              key.includes("supabase") ||
+              key.includes("auth") ||
+              key.includes("profile")
+            ) {
+              localStorage.removeItem(key);
+            }
+          });
+          sessionStorage.clear();
+        } catch (e) {}
+
         document.cookie = "obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       }
 
@@ -533,7 +548,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("Signout error in AuthProvider:", err);
     } finally {
-      window.location.replace("/login");
+      window.location.replace("/login?logout=true");
     }
   }, [supabase, user]);
 

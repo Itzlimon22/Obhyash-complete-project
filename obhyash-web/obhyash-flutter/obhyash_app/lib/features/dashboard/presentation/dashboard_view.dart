@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'widgets/dashboard_action_card.dart';
-import 'widgets/daily_spaced_repetition_card.dart';
+// import 'widgets/daily_spaced_repetition_card.dart';
 import 'widgets/daily_streak_card.dart';
 import 'widgets/daily_quests_card.dart';
 import 'widgets/subject_stat_card.dart';
@@ -146,18 +146,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
-
-                const DailySpacedRepetitionCard()
-                    .animate(delay: 120.ms)
-                    .fadeIn(duration: 400.ms)
-                    .slideY(
-                      begin: 0.05,
-                      duration: 400.ms,
-                      curve: Curves.easeOut,
-                    ),
-
-                const SizedBox(height: 18),
+                // Revision Card temporarily hidden as per requirement
+                // const DailySpacedRepetitionCard(),
+                // const SizedBox(height: 18),
 
                 DailyStreakCard(userStreak: userProfile?.streakCount ?? 0)
                     .animate(delay: 150.ms)

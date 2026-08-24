@@ -174,7 +174,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       await signOut();
     } catch (err) {
       console.error('Logout error in AdminSidebar:', err);
-      window.location.href = '/login';
+      window.location.replace('/login?logout=true');
     }
   };
 

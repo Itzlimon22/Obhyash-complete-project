@@ -60,7 +60,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       await signOut();
     } catch (err) {
       console.error('Logout error in AdminHeader:', err);
-      window.location.href = '/login';
+      window.location.replace('/login?logout=true');
     }
   };
 

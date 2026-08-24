@@ -49,6 +49,7 @@ export default function LoginPage() {
       setTimeout(() => {
         setError('গুগল লগইন বাতিল বা ব্যর্থ হয়েছে। দয়া করে পুনরায় চেষ্টা করুন।');
       }, 0);
+    } else if (params.get('logout') === 'true') {
       window.history.replaceState({}, '', '/login');
     }
   }, []);

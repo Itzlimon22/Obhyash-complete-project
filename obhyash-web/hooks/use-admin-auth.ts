@@ -52,25 +52,49 @@ export function useAdminAuth() {
   const signOut = useCallback(async () => {
     try {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('obhyash_admin_cached_profile');
-        localStorage.removeItem('obhyash_user_profile');
-        document.cookie = 'obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        // Clear all admin & user profiles and session caches
+        try {
+          Object.keys(localStorage).forEach((key) => {
+            if (
+              key.startsWith('sb-') ||
+              key.startsWith('obhyash_') ||
+              key.includes('supabase') ||
+              key.includes('auth') ||
+              key.includes('profile')
+            ) {
+              localStorage.removeItem(key);
+            }
+          });
+          sessionStorage.clear();
+        } catch (e) {}
+
+        // Expire all cookies from client
+        try {
+          document.cookie.split(';').forEach((cookie) => {
+            const eqPos = cookie.indexOf('=');
+            const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+            if (name) {
+              document.cookie = `${name}=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+              document.cookie = `${name}=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+            }
+          });
+        } catch (e) {}
       }
-      
-      // Server-side signout to strip server cookies
+
+      // Server-side signout to clear HTTP-only cookies
       await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
 
       // Client-side Supabase signout
       const supabase = createClient();
       await supabase.auth.signOut().catch(() => {});
-      
+
       if (authSignOut) {
         await authSignOut().catch(() => {});
       }
     } catch (err) {
-      console.error('Sign out failed:', err);
+      console.error('Admin sign out error:', err);
     } finally {
-      window.location.replace('/login');
+      window.location.replace('/login?logout=true');
     }
   }, [authSignOut]);
 

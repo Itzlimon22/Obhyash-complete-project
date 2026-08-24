@@ -50,6 +50,28 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
+  // If explicitly logging out via query parameter, bypass session check and clear cookies immediately
+  if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.has('logout')) {
+    const logoutResponse = NextResponse.next({ request });
+    request.cookies.getAll().forEach((cookie) => {
+      if (
+        cookie.name.startsWith('sb-') ||
+        cookie.name.startsWith('sb:') ||
+        cookie.name.includes('supabase') ||
+        cookie.name.includes('auth') ||
+        cookie.name.startsWith('obhyash')
+      ) {
+        logoutResponse.cookies.delete(cookie.name);
+        logoutResponse.cookies.set(cookie.name, '', {
+          path: '/',
+          maxAge: 0,
+          expires: new Date(0),
+        });
+      }
+    });
+    return logoutResponse;
+  }
+
   // We use getSession() instead of getUser() because Next.js prefetches can trigger
   // this middleware 20+ times concurrently on the Admin dashboard.
   // getUser() makes an API call every time, leading to rate limits and 429 errors.
@@ -159,7 +181,7 @@ export async function updateSession(request: NextRequest) {
     // Logged-in users visiting auth pages or the root get redirected to their dashboard
     // Exception: If an error parameter is present on /login (e.g. unregistered_google), do NOT redirect
     if (isAuthRoute || isRootRoute) {
-      if (isAuthRoute && request.nextUrl.searchParams.has('error')) {
+      if (isAuthRoute && (request.nextUrl.searchParams.has('error') || request.nextUrl.searchParams.has('logout'))) {
         return supabaseResponse;
       }
 
