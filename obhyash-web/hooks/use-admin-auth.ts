@@ -87,16 +87,14 @@ export function useAdminAuth() {
       // Client-side Supabase signout
       const supabase = createClient();
       await supabase.auth.signOut().catch(() => {});
-
-      if (authSignOut) {
-        await authSignOut().catch(() => {});
-      }
     } catch (err) {
       console.error('Admin sign out error:', err);
     } finally {
-      window.location.replace('/login?logout=true');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login?logout=true';
+      }
     }
-  }, [authSignOut]);
+  }, []);
 
   useEffect(() => {
     if (authUser) {

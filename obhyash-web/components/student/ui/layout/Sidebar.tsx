@@ -1,172 +1,120 @@
-import React from 'react';
-import { UserProfile } from '@/lib/types';
-import UserAvatar from '../common/UserAvatar';
+"use client";
 
-interface SidebarProps {
+import React from "react";
+import {
+  LayoutDashboard,
+  FileEdit,
+  Radio,
+  History,
+  PenTool,
+  Trophy,
+  BarChart2,
+  Sigma,
+  Newspaper,
+  BookOpen,
+  ChevronRight,
+  Sun,
+  Moon,
+  LogOut,
+  ChevronLeft,
+} from "lucide-react";
+import { UserProfile } from "@/lib/types";
+import UserAvatar from "../common/UserAvatar";
+
+export interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   isOpen: boolean; // Mobile state
   onClose: () => void; // Mobile close
   onLogout: () => void;
-  isCollapsed: boolean; // Desktop collapsed state
-  toggleCollapse: () => void;
+  isCollapsed?: boolean; // Desktop collapsed state
+  toggleCollapse?: () => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
-  user?: UserProfile;
+  user?: UserProfile | null;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
+export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   isOpen,
   onClose,
   onLogout,
-  isCollapsed,
-  toggleCollapse,
+  isCollapsed = false,
+  toggleCollapse = () => {},
   isDarkMode,
   toggleTheme,
   user,
 }) => {
+  // ── Exact 9 Menu Items from Flutter MainSidebar.dart ───────────────────────
   const menuItems = [
-    {
-      id: 'dashboard',
-      label: 'ড্যাশবোর্ড',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-        />
-      ),
-    },
-    {
-      id: 'setup',
-      label: 'মক পরীক্ষা',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-        />
-      ),
-    },
-    {
-      id: 'live_exam',
-      label: 'লাইভ পরীক্ষা',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM6.166 17.834a.75.75 0 0 0 1.06 1.06l1.591-1.59a.75.75 0 1 0-1.06-1.061l-1.591 1.59ZM2.25 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75ZM6.166 6.166a.75.75 0 0 0 1.06 1.06L8.817 5.635a.75.75 0 0 0-1.061-1.06L6.166 6.166Z"
-        />
-      ),
-    },
-    {
-      id: 'history',
-      label: 'ইতিহাস',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-        />
-      ),
-    },
-    {
-      id: 'practice',
-      label: 'অনুশীলন',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-        />
-      ),
-    },
-    {
-      id: 'leaderboard',
-      label: 'লিডারবোর্ড',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.302 5.002"
-        />
-      ),
-    },
-    {
-      id: 'analysis',
-      label: 'এনালাইসিস',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
-        />
-      ),
-    },
-    {
-      id: 'blog',
-      label: 'ব্লগ',
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v2.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-        />
-      ),
-    },
+    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+    { id: "setup", label: "পরীক্ষা", icon: FileEdit },
+    { id: "live_exam", label: "লাইভ পরীক্ষা", icon: Radio },
+    { id: "history", label: "ইতিহাস", icon: History },
+    { id: "practice", label: "অনুশীলন", icon: PenTool },
+    { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy },
+    { id: "analysis", label: "এনালাইসিস", icon: BarChart2 },
+    { id: "formulas", label: "ফর্মুলা", icon: Sigma },
+    { id: "blog", label: "ব্লগ", icon: Newspaper },
   ];
+
+  const handleItemClick = (id: string) => {
+    if (id === "blog") {
+      window.location.href = "/blog";
+      return;
+    }
+    onTabChange(id);
+    if (window.innerWidth < 1024) onClose();
+  };
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* ── Mobile Backdrop Overlay ── */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
+      {/* ── Sidebar / Drawer (Width: 250px, Background: #0C0A09 / white) ── */}
       <aside
         className={`
-        fixed lg:static top-0 left-0 h-full bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 z-[60] transition-all duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform shadow-xl lg:shadow-none flex flex-col justify-between
-        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'}
-        ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
-      `}
+          fixed lg:static top-0 left-0 h-full bg-white dark:bg-[#0C0A09] border-r border-[#F5F5F5] dark:border-[#1C1C1E] z-[60] 
+          transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] transform shadow-2xl lg:shadow-none flex flex-col justify-between
+          select-none font-['HindSiliguri',sans-serif]
+          ${isOpen ? "translate-x-0 w-[250px]" : "-translate-x-full lg:translate-x-0"}
+          ${isCollapsed ? "lg:w-[72px]" : "lg:w-[250px]"}
+        `}
       >
-        <div className="flex flex-col h-full">
-          {/* Brand */}
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* ── 1. Brand Logo & Title (Matching Flutter MainSidebar Header: h-16, px-5) ── */}
           <div
-            className={`h-16 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between px-5'} border-b border-neutral-100 dark:border-neutral-800 shrink-0`}
+            className={`h-16 flex items-center ${
+              isCollapsed ? "justify-center px-2" : "justify-start px-5"
+            } border-b border-[#F5F5F5] dark:border-[#1C1C1E] shrink-0`}
           >
             <div
               className="flex items-center gap-3 cursor-pointer group"
-              onClick={() => onTabChange('dashboard')}
+              onClick={() => {
+                onTabChange("dashboard");
+                if (window.innerWidth < 1024) onClose();
+              }}
             >
-              <div className="w-9 h-9 bg-emerald-700 rounded-lg flex items-center justify-center text-white shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform duration-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-                  />
-                </svg>
+              {/* Emerald Green Logo Box (36x36, rounded-lg, #059669) */}
+              <div className="w-9 h-9 bg-[#059669] rounded-[8px] flex items-center justify-center text-white shadow-[0_2px_4px_rgba(4,120,87,0.2)] group-hover:scale-105 transition-transform shrink-0">
+                <BookOpen size={20} className="stroke-[2.2]" />
               </div>
 
+              {/* Brand Text Column */}
               {!isCollapsed && (
-                <div className="flex flex-col -space-y-0.5">
-                  <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest leading-tight font-sans">
+                <div className="flex flex-col justify-center text-left leading-none">
+                  <span className="text-[13px] font-bold text-[#A3A3A3] dark:text-[#737373] uppercase tracking-[2px] font-sans">
                     OBHYASH
                   </span>
-                  <span className="text-xl font-bold text-neutral-900 dark:text-white font-serif-exam leading-tight">
+                  <span className="text-[22px] font-bold text-[#000000] dark:text-white font-['Anek_Bangla',sans-serif] leading-[1.1] mt-0.5">
                     অভ্যাস
                   </span>
                 </div>
@@ -174,50 +122,51 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* ── 2. Navigation Items (Matching Flutter: px-3, py-6, 9 items) ── */}
           <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar">
             {menuItems.map((item) => {
-              const isActive = activeTab === item.id;
+              const Icon = item.icon;
+              const isActive =
+                activeTab === item.id ||
+                (item.id === "practice" && activeTab === "bookmarks") ||
+                (item.id === "formulas" && activeTab === "formulas");
+
               return (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    if (item.id === 'blog') {
-                      window.location.href = '/blog';
-                      return;
-                    }
-                    onTabChange(item.id);
-                    if (window.innerWidth < 1024) onClose();
-                  }}
+                  onClick={() => handleItemClick(item.id)}
                   className={`
-                    relative w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3.5'} py-2.5 rounded-xl transition-all duration-300 group
+                    w-full flex items-center ${
+                      isCollapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3.5 py-2.5"
+                    } rounded-[12px] transition-all duration-200 group text-left cursor-pointer
                     ${
                       isActive
-                        ? 'bg-emerald-700 text-white shadow-md shadow-emerald-600/25'
-                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-200'
+                        ? "bg-[#059669] text-white shadow-[0_2px_6px_rgba(5,150,105,0.25)] font-semibold"
+                        : "text-[#525252] dark:text-[#E5E5E5] hover:bg-[#F5F5F5] dark:hover:bg-[#1C1C1E] font-semibold"
                     }
                   `}
                   title={isCollapsed ? item.label : undefined}
                 >
                   <span
-                    className={`
-                    transition-transform duration-300 ${isActive ? '' : 'group-hover:scale-110'}
-                  `}
+                    className={`shrink-0 transition-transform duration-200 ${
+                      isActive ? "" : "group-hover:scale-110"
+                    }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className="w-5 h-5"
-                    >
-                      {item.icon}
-                    </svg>
+                    <Icon
+                      size={20}
+                      className={
+                        isActive
+                          ? "text-white stroke-[2.2]"
+                          : "text-[#525252] dark:text-[#A3A3A3] group-hover:text-neutral-900 dark:group-hover:text-white stroke-[2]"
+                      }
+                    />
                   </span>
+
                   {!isCollapsed && (
                     <span
-                      className={`text-sm font-semibold tracking-wide ${isActive ? 'text-white' : ''}`}
+                      className={`text-[16px] font-['Anek_Bangla',sans-serif] font-semibold tracking-[0.2px] truncate ${
+                        isActive ? "text-white font-semibold" : "text-[#525252] dark:text-[#E5E5E5]"
+                      }`}
                     >
                       {item.label}
                     </span>
@@ -227,137 +176,97 @@ const Sidebar: React.FC<SidebarProps> = ({
             })}
           </nav>
 
-          {/* Bottom Section */}
-          <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 space-y-3 bg-neutral-50/50 dark:bg-neutral-900/50">
-            {/* User Card */}
+          {/* ── 3. Bottom Section (Matching Flutter: p-4, bg #FAFAFA/50 / #171717/50, border-t) ── */}
+          <div className="p-4 border-t border-[#F5F5F5] dark:border-[#1C1C1E] bg-[#FAFAFA]/50 dark:bg-[#171717]/50 space-y-3 shrink-0">
+            {/* User Profile Card */}
             {user && (
               <button
-                onClick={() => onTabChange('settings')}
+                onClick={() => {
+                  onTabChange("settings");
+                  if (window.innerWidth < 1024) onClose();
+                }}
                 className={`
-                        w-full flex items-center ${isCollapsed ? 'justify-center p-1' : 'gap-3 p-2.5'} rounded-xl 
-                        bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700
-                        hover:border-red-300 dark:hover:border-red-700 transition-all duration-300 shadow-sm group
-                    `}
-                title={isCollapsed ? 'Profile' : undefined}
+                  w-full flex items-center ${
+                    isCollapsed ? "justify-center p-1.5" : "gap-3 p-2.5"
+                  } rounded-[12px] 
+                  bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A]
+                  shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:border-[#059669]/60 dark:hover:border-[#059669]/60 
+                  transition-all duration-200 text-left group cursor-pointer
+                `}
+                title={isCollapsed ? `${user.name} - Settings & Profile` : undefined}
               >
                 <UserAvatar
                   user={user}
                   size="sm"
-                  className="group-hover:scale-105 transition-transform"
+                  className="w-9 h-9 rounded-full ring-[1.5px] ring-white dark:ring-[#1C1C1E] group-hover:scale-105 transition-transform shrink-0"
                 />
 
                 {!isCollapsed && (
-                  <div className="flex-1 text-left min-w-0">
-                    <p className="text-sm font-bold text-neutral-800 dark:text-white truncate">
-                      {user.name}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[16px] font-bold text-[#000000] dark:text-white truncate leading-tight font-['Anek_Bangla',sans-serif]">
+                      {user.name || "শিক্ষার্থী"}
                     </p>
-                    <p className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 truncate">
+                    <p className="text-[13px] font-medium text-[#737373] dark:text-[#A3A3A3] truncate leading-tight mt-0.5">
                       Settings & Profile
                     </p>
                   </div>
                 )}
 
                 {!isCollapsed && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="w-4 h-4 text-neutral-400 group-hover:text-red-500 transition-colors"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <ChevronRight
+                    size={16}
+                    className="text-[#A3A3A3] group-hover:text-[#059669] transition-colors shrink-0"
+                  />
                 )}
               </button>
             )}
 
+            {/* Actions Row (Theme Toggle, Logout, Collapse) */}
             <div
-              className={`flex ${isCollapsed ? 'flex-col gap-3' : 'justify-between items-center'} px-1`}
+              className={`flex ${
+                isCollapsed ? "flex-col gap-2" : "justify-between items-center"
+              }`}
             >
-              {/* Theme Toggle */}
+              {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300 transition-all"
-                title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#737373] hover:text-[#000000] dark:hover:text-white transition-all shadow-xs cursor-pointer"
+                title={isDarkMode ? "লাইট মোড চালু করো" : "ডার্ক মোড চালু করো"}
+                aria-label="Theme toggle"
               >
                 {isDarkMode ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                    />
-                  </svg>
+                  <Sun size={20} className="text-amber-400" />
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
-                    />
-                  </svg>
+                  <Moon size={20} />
                 )}
               </button>
 
               {/* Logout Button */}
               <button
-                onClick={onLogout}
-                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-red-600 transition-all"
-                title="Logout"
+                onClick={() => {
+                  if (window.innerWidth < 1024) onClose();
+                  onLogout();
+                }}
+                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#737373] hover:text-[#B91C1C] hover:bg-[#E11D48]/10 transition-all shadow-xs cursor-pointer"
+                title="লগআউট করো"
+                aria-label="Logout"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M18 12H9m9 0-3-3m3 3-3 3"
-                  />
-                </svg>
+                <LogOut size={20} />
               </button>
 
-              {/* Collapse Toggle (Desktop Only) */}
+              {/* Desktop Collapse Toggle */}
               <button
                 onClick={toggleCollapse}
-                className="hidden lg:flex p-2 rounded-lg text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-red-600 transition-all"
-                title={isCollapsed ? 'Expand' : 'Collapse'}
+                className="hidden lg:flex p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#A3A3A3] hover:text-[#000000] dark:hover:text-white transition-all shadow-xs cursor-pointer"
+                title={isCollapsed ? "Expand" : "Collapse"}
+                aria-label="Collapse"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                  />
-                </svg>
+                <ChevronLeft
+                  size={20}
+                  className={`transition-transform duration-300 ${
+                    isCollapsed ? "rotate-180" : ""
+                  }`}
+                />
               </button>
             </div>
           </div>

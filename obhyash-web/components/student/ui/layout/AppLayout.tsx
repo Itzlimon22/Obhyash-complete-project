@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowLeft, Flame } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import StreakDialog from '../common/StreakDialog';
@@ -16,10 +15,6 @@ import {
 import NotificationBell from '../notifications/NotificationBell';
 import NotificationDropdown from '../notifications/NotificationDropdown';
 import UserAvatar from '../common/UserAvatar';
-import {
-  EXAM_DATES,
-  EXAM_LABELS,
-} from '@/components/student/features/dashboard/CountdownBanner';
 import { supabase } from '@/services/database';
 import { toast } from 'sonner';
 
@@ -59,8 +54,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Dropdown States
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  // Dropdown & Modal States
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isStreakDialogOpen, setIsStreakDialogOpen] = useState(false);
 
@@ -69,24 +63,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-  const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
-      ) {
-        setIsProfileOpen(false);
-      }
-      if (
         notifRef.current &&
         !notifRef.current.contains(event.target as Node)
       ) {
-        // On mobile, the dropdown uses a portal and its own backdrop.
-        // We only trigger outside-click close on desktop where it's a relative dropdown.
         if (window.innerWidth >= 768) {
           setIsNotifOpen(false);
         }
@@ -95,6 +80,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
   // Fetch notifications on mount & Subscribe to Realtime
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -116,7 +102,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
     fetchNotifications();
 
-    // Real-time Subscription
     if (user?.id) {
       const channel = supabase
         .channel('realtime-notifications')
@@ -129,18 +114,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             filter: `user_id=eq.${user.id}`,
           },
           (payload: { new: Notification }) => {
-            console.log('🔔 New Notification:', payload.new);
-
-            // Add new notification to state
             const newNotif = payload.new as Notification;
             setNotifications((prev) => [newNotif, ...prev]);
             setUnreadCount((prev) => prev + 1);
 
-            // Play Sound (Optional - can be added later)
-            // const audio = new Audio('/notification.mp3');
-            // audio.play().catch(e => console.log('Audio play failed', e));
-
-            // Show Toast
             toast.info(newNotif.title, {
               description: newNotif.message,
               duration: 5000,
@@ -160,12 +137,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const handleNotificationClick = async (notification: Notification) => {
     if (!user?.id) return;
 
-    // Mark as read if unread
     if (!notification.is_read) {
       try {
         await markNotificationAsRead(notification.id);
-
-        // Update local state
         setNotifications((prev) =>
           prev.map((n) =>
             n.id === notification.id ? { ...n, is_read: true } : n,
@@ -177,12 +151,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       }
     }
 
-    // Navigate if there's an action URL
     if (notification.action_url) {
       window.location.href = notification.action_url;
     }
 
-    // Close dropdown
     setIsNotifOpen(false);
   };
 
@@ -191,8 +163,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
     try {
       await markAllNotificationsAsRead();
-
-      // Update local state
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -202,11 +172,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
   const handleViewAllNotifications = () => {
     setIsNotifOpen(false);
-    onTabChange('notifications'); // Navigate to notifications page if you have one
+    onTabChange('notifications');
   };
 
   return (
-    <div className="h-screen w-full bg-[#fafaf9] dark:bg-[#0c0a09] flex transition-colors overflow-hidden font-sans">
+    <div className="h-screen w-full bg-[#FAFAF9] dark:bg-[#0C0A09] flex transition-colors overflow-hidden font-['HindSiliguri',sans-serif]">
+      {/* ── Sidebar Component ── */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={onTabChange}
@@ -221,65 +192,54 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Header - Custom or Default */}
+        {/* ── Header Section (Matching Flutter MainLayout Header) ── */}
         {customHeader ? (
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
           <header
-            className={`${simpleHeader ? 'h-14' : 'h-14 md:h-16'} bg-white/80 dark:bg-[#0c0a09]/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between px-3 md:px-8 z-30 shrink-0 sticky top-0 transition-all duration-300`}
+            className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] flex items-center justify-between px-3.5 sm:px-5 md:px-6 z-30 shrink-0 sticky top-0 transition-all duration-300 select-none"
           >
-            {/* Left: Mobile Toggle & Title */}
-            <div className="flex items-center gap-3">
-              <h1
-                className={`font-extrabold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-sm' : 'text-lg md:text-xl'}`}
-              >
+            {/* ── Left: Back Button (Sub-routes) + Title ── */}
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              {activeTab !== 'dashboard' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.history.length > 1) {
+                      window.history.back();
+                    } else {
+                      onTabChange('dashboard');
+                    }
+                  }}
+                  className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] border border-neutral-200/90 dark:border-[#27272A] hover:bg-neutral-200/80 dark:hover:bg-[#2C2C2E] text-neutral-800 dark:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs"
+                  aria-label="Back"
+                  title="ফিরে যাও"
+                >
+                  <ArrowLeft size={18} className="stroke-[2.2]" />
+                </button>
+              )}
+
+              <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl md:text-[21px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
                 {title}
               </h1>
             </div>
 
-            {/* Right: Actions */}
-            <div className="flex items-center gap-3 md:gap-5">
-              {/* Streak Icon */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 rounded-full border border-emerald-100 dark:border-emerald-900/20 group cursor-pointer transition-all hover:border-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/20 shadow-sm"
-                title="ডেইলি স্ট্রিক"
+            {/* ── Right: Streak + Notification + Divider + User Avatar ── */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Streak Badge */}
+              <button
+                type="button"
                 onClick={() => setIsStreakDialogOpen(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
+                title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
               >
-                <div className="relative">
-                  <motion.svg
-                    initial={{ scale: 1 }}
-                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      filter: [
-                        'drop-shadow(0 0 0px #f97316)',
-                        'drop-shadow(0 0 4px #f97316)',
-                        'drop-shadow(0 0 0px #f97316)',
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className="w-5 h-5 md:w-5 md:h-5 text-emerald-500 transition-transform"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                      clipRule="evenodd"
-                    />
-                  </motion.svg>
-                </div>
-                <span className="text-xs md:text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                <Flame size={20} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
+                <span className="text-base sm:text-lg font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
                   {user?.streakCount || 0}
                 </span>
-              </motion.button>
+              </button>
 
-              {/* Notification System */}
+              {/* Notification Bell */}
               <div className="relative" ref={notifRef}>
                 <NotificationBell
                   unreadCount={unreadCount}
@@ -299,31 +259,36 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 )}
               </div>
 
-              {/* Profile Dropdown */}
-              <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
-                <button
-                  onClick={() => onTabChange('settings')}
-                  className="flex items-center gap-2 focus:outline-none group"
-                  title="সেটিংস"
-                >
-                  <UserAvatar
-                    user={user}
-                    size="md"
-                    className="ring-2 ring-transparent group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900"
-                  />
-                </button>
-              </div>
+              {/* Divider */}
+              <div className="w-[1px] h-6 bg-neutral-200 dark:bg-[#27272A] mx-0.5" />
+
+              {/* Profile Avatar */}
+              <button
+                type="button"
+                onClick={() => onTabChange('settings')}
+                className="flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-[#059669]/40 transition-all cursor-pointer group shrink-0"
+                title="প্রোফাইল ও সেটিংস"
+              >
+                <UserAvatar
+                  user={user}
+                  size="md"
+                  className="w-9 h-9 ring-1 ring-neutral-200 dark:ring-[#27272A] shadow-xs"
+                />
+              </button>
             </div>
           </header>
         )}
 
-        {/* Content */}
+        {/* ── Content Body ── */}
         <main
-          className={`flex-1 overflow-y-auto ${noPadding ? 'pb-24 lg:pb-0' : 'px-2 py-3 md:p-5 pb-24 lg:pb-5'} relative scroll-smooth`}
+          className={`flex-1 overflow-y-auto ${
+            noPadding ? 'pb-24 lg:pb-0' : 'px-2 py-3 md:p-5 pb-24 lg:pb-5'
+          } relative scroll-smooth`}
         >
           {children}
         </main>
 
+        {/* ── Mobile Bottom Navigation ── */}
         {!simpleHeader && (
           <MobileBottomNav
             activeTab={activeTab}
@@ -335,8 +300,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           />
         )}
       </div>
-      
-      {/* Streak Dialog */}
+
+      {/* ── Streak Info Dialog ── */}
       {user && (
         <StreakDialog
           isOpen={isStreakDialogOpen}

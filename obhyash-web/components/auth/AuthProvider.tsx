@@ -469,11 +469,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             initDoneRef.current = true;
           }
         } else if (event === "SIGNED_OUT") {
-          // Supabase fires SIGNED_OUT on the *current* client whenever ANY session
-          // for this user is revoked — including when a new device logs in with a
-          // fresh token (the old token is invalidated server-side).
-          // We must NOT blindly redirect here; instead, verify the local session
-          // is genuinely gone before treating this as a logout.
           const { data: currentSessionData } =
             await supabase.auth.getSession();
           if (!currentSessionData?.session) {
@@ -483,7 +478,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               setProfile(null);
             }
             clearCachedProfile();
-            router.push("/");
+            if (typeof window !== "undefined") {
+              const currentPath = window.location.pathname;
+              if (
+                currentPath.startsWith("/admin") ||
+                currentPath.startsWith("/teacher") ||
+                currentPath.startsWith("/dashboard") ||
+                currentPath.startsWith("/setup") ||
+                currentPath.startsWith("/history") ||
+                currentPath.startsWith("/practice") ||
+                currentPath.startsWith("/leaderboard") ||
+                currentPath.startsWith("/analysis") ||
+                currentPath.startsWith("/profile") ||
+                currentPath.startsWith("/settings")
+              ) {
+                window.location.href = "/login?logout=true";
+              }
+            }
           }
           // else: session still valid (e.g. another device logged out) — stay logged in.
         }

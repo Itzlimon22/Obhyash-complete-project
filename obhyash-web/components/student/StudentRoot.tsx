@@ -212,6 +212,8 @@ export default function StudentRoot({
     "exam",
     "legends-league",
     "legends_league",
+    "formulas",
+    "bookmarks",
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -703,7 +705,7 @@ export default function StudentRoot({
         return (
           <AppLayout activeTab={activeTab} {...commonLayoutProps}>
             <Dashboard
-              user={currentUser}
+              user={currentUser!}
               onMockExamClick={() => handleTabChange("setup")}
               onHistoryClick={() => handleTabChange("history")}
               onSubjectClick={(subject) => {
@@ -712,10 +714,12 @@ export default function StudentRoot({
               }}
               onLeaderboardClick={() => handleTabChange("leaderboard")}
               onAnalysisClick={() => handleTabChange("analysis")}
+              onLiveExamClick={() => handleTabChange("live_exam")}
+              onFormulasClick={() => handleTabChange("practice")}
               onPracticeClick={() => handleTabChange("practice")}
               onBookmarksClick={() => handleTabChange("bookmarks")}
               history={examHistory}
-              examTarget={currentUser.exam_target}
+              examTarget={currentUser?.exam_target}
               onChangeTarget={() => setShowTargetModal(true)}
             />
           </AppLayout>
@@ -887,12 +891,12 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === "practice" || activeTab === "bookmarks") {
+      if (activeTab === "practice" || activeTab === "bookmarks" || activeTab === "formulas") {
         return (
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title={activeTab === "bookmarks" ? "আমার বুকমার্কস" : "অনুশীলন"}
+            title={activeTab === "bookmarks" ? "আমার বুকমার্কস" : activeTab === "formulas" ? "ফর্মুলা ও অনুশীলন" : "অনুশীলন"}
           >
             <PracticeDashboard
               history={examHistory}
