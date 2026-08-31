@@ -247,30 +247,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           const fresh = await fetchProfile(currentUser.id);
           if (fresh && isMounted) {
             setProfile(fresh);
-            mutate(() => true, undefined, { revalidate: true });
           }
           // setLoading(false) will be called in the finally block below.
         } else {
           // getSession() returned null with NO error.
-          // WHY don't we clear state here?
-          // The Supabase JS client cache is empty, but this does NOT mean there is no session
-          // proxy.ts validates the session server-side via cookies, and Supabase fires
-          // onAuthStateChange('INITIAL_SESSION') shortly after mount to sync the client cache.
-          // If we clear user/profile here, ClientLayout redirects to /login.
-          // proxy.ts bounces the admin back to /admin/dashboard → infinite reload loop.
-          // Solution: set a flag, leave state alone, and let INITIAL_SESSION handle everything.
-          // setLoading(false) will be called by the INITIAL_SESSION handler instead.
           if (isMounted) {
-            // Signal to INITIAL_SESSION handler that initializeAuth did NOT find a user,
-            // so INITIAL_SESSION must resolve loading state regardless.
             userSetByInit = false;
           }
-          // Deliberately do NOT call setLoading(false) here.
-          // If INITIAL_SESSION never fires (truly no session), the handler below clears state.
-          // CRITICAL: mark this flag so the finally block below does NOT call setLoading(false).
-          // Without this, finally runs (return inside try still triggers finally in JS),
-          // setLoading(false) fires with user=null, ClientLayout redirects to /login,
-          // middleware bounces the admin back to /admin/dashboard → infinite reload loop.
           waitingForInitialSession = true;
           return; // Exit early — INITIAL_SESSION takes over from here.
         }
@@ -279,8 +262,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           console.error("Auth initialization sequence failed:", error);
         }
       } finally {
-        // Skip if we are waiting for INITIAL_SESSION to provide the real session.
-        // In that case INITIAL_SESSION handler is solely responsible for setLoading(false).
         if (isMounted && !initDoneRef.current && !waitingForInitialSession) {
           setLoading(false);
           initDoneRef.current = true;
@@ -290,61 +271,36 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth();
 
-    // Safety net: if waitingForInitialSession=true but INITIAL_SESSION never fires
-    // (e.g. Supabase Realtime is blocked), unblock loading after 5 seconds so the
-    // admin sees cached profile while we retry. The redirect logic will then handle
-    // the unauthenticated state correctly.
     const initialSessionTimeout = setTimeout(() => {
       if (isMounted && !initDoneRef.current) {
         console.warn(
-          "[Auth] INITIAL_SESSION taking too long — using cached profile + retrying",
+          "[Auth] INITIAL_SESSION taking too long — using cached profile",
         );
         setLoading(false);
         initDoneRef.current = true;
-
-        // Retry INITIAL_SESSION after a short delay
-        setTimeout(() => {
-          if (isMounted && user?.id) {
-            fetchProfile(user.id);
-          }
-        }, 2000);
       }
     }, 5000);
 
     // ── Resiliency Listeners (Network & Focus) ───────────────────────────────
+    let lastProfileFetchTime = Date.now();
+
     const handleHealthCheck = async () => {
       if (!isMounted || !initDoneRef.current) return;
-
-      // If we are offline, don't ping (it will just fail and trigger errors)
       if (typeof navigator !== "undefined" && !navigator.onLine) return;
-
-      // Guard: skip if a check is already in-flight
       if (isHealthCheckingRef.current) return;
 
-      // Guard: skip if we checked less than 30 seconds ago
       const now = Date.now();
-      if (now - lastHealthCheckRef.current < 30_000) return;
+      if (now - lastHealthCheckRef.current < 60_000) return;
 
       isHealthCheckingRef.current = true;
       lastHealthCheckRef.current = now;
 
       try {
-        // IMPORTANT: Use getSession() here, NOT getUser().
-        // getUser() acquires the Supabase JS client's internal auth lock and makes
-        // a server round-trip. While the lock is held (1-3 seconds), ALL .from().select()
-        // queries queue up and appear to hang — this was causing the admin panel to stop
-        // fetching data after a focus/tab-switch event.
-        // getSession() reads from the local JS cache (lock-free, synchronous).
-        // The middleware (proxy.ts) already validates the JWT server-side on every request,
-        // so we can trust the local session here for client-side health checks.
         const { data, error } = await supabase.auth.getSession();
         if (error && isHardAuthError(error)) {
           console.warn("[Auth] Health check failed - session may be corrupted");
           setShowCorruptionModal(true);
         } else if (data.session?.user) {
-          if (process.env.NODE_ENV === "development") {
-            console.log("[Auth] Health check: OK");
-          }
           setUser(data.session.user);
         }
       } catch {
@@ -354,10 +310,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Debounced wrapper — prevents multiple rapid focus/visibility events from
-    // firing concurrent health checks (the old code had a comment about debounce
-    // but never actually implemented one).
-    const scheduleHealthCheck = (delayMs = 500) => {
+    const scheduleHealthCheck = (delayMs = 1000) => {
       if (healthCheckDebounceRef.current) {
         clearTimeout(healthCheckDebounceRef.current);
       }
@@ -365,33 +318,26 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const onOnline = () => {
-      if (process.env.NODE_ENV === "development")
-        console.log("[Auth] Back online - checking session and profile");
       scheduleHealthCheck(1000);
-      // Immediately refresh profile when reconnecting
-      if (user?.id) {
-        fetchProfile(user.id, 0).catch(() => {
-          console.warn(
-            "[Auth] Profile refresh on reconnect failed, using cached",
-          );
-        });
-      }
-    };
-
-    const onFocus = () => {
-      scheduleHealthCheck(500);
-      // Also refresh profile on tab focus for freshness
-      if (user?.id) {
+      if (user?.id && Date.now() - lastProfileFetchTime > 60_000) {
+        lastProfileFetchTime = Date.now();
         fetchProfile(user.id, 0).catch(() => {});
       }
     };
 
-    // Store as a named function so it can be properly removed on cleanup
+    const onFocus = () => {
+      scheduleHealthCheck(1000);
+      if (user?.id && Date.now() - lastProfileFetchTime > 120_000) {
+        lastProfileFetchTime = Date.now();
+        fetchProfile(user.id, 0).catch(() => {});
+      }
+    };
+
     const onVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        scheduleHealthCheck(500);
-        // Refresh profile when tab becomes visible
-        if (user?.id) {
+        scheduleHealthCheck(1000);
+        if (user?.id && Date.now() - lastProfileFetchTime > 120_000) {
+          lastProfileFetchTime = Date.now();
           fetchProfile(user.id, 0).catch(() => {});
         }
       }
@@ -408,50 +354,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
-        if (process.env.NODE_ENV === "development") {
-          console.log(
-            "[Auth] event:",
-            event,
-            "| user:",
-            session?.user?.id ?? "none",
-          );
-        }
-
         if (session?.user) {
           if (isMounted) setUser(session.user);
 
           if (event === "SIGNED_IN") {
-            // Fresh login — invalidate all SWR caches and load profile.
-            mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === "TOKEN_REFRESHED") {
-            // Token silently refreshed — revalidate ALL SWR caches so dashboard
-            // data re-fetches with the fresh token. Without this, queries made
-            // just before the refresh window may return stale/empty results.
-            mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === "INITIAL_SESSION") {
-            // This fires when the Supabase JS client syncs the session from the server cookie.
-            // It recovers the session when initializeAuth's getSession() found nothing in cache.
             if (!initDoneRef.current || !userSetByInit) {
               if (isMounted) setUser(session.user);
 
-              // CRITICAL FIX: Unblock loading IMMEDIATELY — do NOT wait for fetchProfile().
-              // Previously setLoading(false) was called after the DB round-trip finished,
-              // keeping authLoading=true for 300-800ms extra. During this window, SWR
-              // keys were null and data fetches were blocked entirely, causing the
-              // dashboard to appear frozen / show no subjects after a browser refresh.
               if (isMounted && !initDoneRef.current) {
                 setLoading(false);
                 initDoneRef.current = true;
               }
 
-              // Revalidate all SWR caches now that session is live.
-              mutate(() => true, undefined, { revalidate: true });
-
-              // Fetch fresh profile in background — does NOT block the data loading.
               fetchProfile(session.user.id).then((fresh) => {
                 if (fresh && isMounted) setProfile(fresh);
               });

@@ -13,6 +13,7 @@ import {
   GraduationCap
 } from "lucide-react";
 import { toast } from "sonner";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
 interface RoutineItem {
   id: string;
@@ -361,7 +362,7 @@ export const LiveExamRoutineModal: React.FC<LiveExamRoutineModalProps> = ({
                   <span style="color: #64748b; font-size: 11px;">(${item.dayName}) ${item.time}</span>
                 </td>
                 <td class="subject-col">
-                  ${item.subject}<br>
+                  ${BanglaNameHelper.formatSubject(item.subject)}<br>
                   <span style="font-weight: 500; font-size: 11px; color: #64748b;">${item.paper}</span>
                 </td>
                 <td>
@@ -457,7 +458,7 @@ export const LiveExamRoutineModal: React.FC<LiveExamRoutineModalProps> = ({
                     </span>
                     <div>
                       <h4 className="font-extrabold text-neutral-900 dark:text-white text-base">
-                        {item.subject}
+                        {BanglaNameHelper.formatSubject(item.subject)}
                       </h4>
                       <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
                         <span>{item.date} ({item.dayName})</span>

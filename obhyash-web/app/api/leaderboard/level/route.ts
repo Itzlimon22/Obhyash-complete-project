@@ -44,10 +44,11 @@ export async function GET(req: NextRequest) {
   const isMonthly = timeframe === 'monthly';
   const batch = searchParams.get('batch');
 
-  // Query users belonging to this level tier based on lifetime XP
+  // Query users belonging to this level tier based on lifetime XP (Only Students)
   let query = supabase
     .from('users')
-    .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, avatar_color, streak, batch')
+    .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, avatar_color, streak, batch, role')
+    .or('role.ilike.student,role.is.null')
     .gte('xp', threshold.min);
 
   if (threshold.max < 999999999) {
@@ -76,7 +77,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
   }
 
-  const users = rows.map((user: any, index: number) => {
+  const studentRows = rows.filter((u: any) => {
+    const r = (u.role || 'student').toLowerCase();
+    return r === 'student';
+  });
+
+  const users = studentRows.map((user: any, index: number) => {
     const effectiveXp = isMonthly
       ? (user.monthly_xp ?? 0)
       : (user.xp ?? 0);

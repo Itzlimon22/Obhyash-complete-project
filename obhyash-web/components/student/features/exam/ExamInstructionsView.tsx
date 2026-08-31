@@ -15,6 +15,7 @@ import {
   Hourglass,
 } from 'lucide-react';
 import { ExamConfig } from '@/lib/types';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { cn } from '@/lib/utils';
 
 interface ExamInstructionsViewProps {
@@ -41,6 +42,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
     }
   };
 
+  const formattedSubject = BanglaNameHelper.formatSubject(config.subject, config.subjectLabel);
   const hasNegative = config.negativeMarking > 0;
 
   const chapterCount = config.chapters && config.chapters !== 'All' ? config.chapters.split(',').length.toString() : 'সব';
@@ -56,7 +58,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto pb-4 md:pb-8 px-2 md:px-6">
+    <div className="relative w-full max-w-3xl mx-auto pb-4 md:pb-8 px-2 md:px-6 font-['HindSiliguri']">
       
       {/* 3. Ambient Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 flex justify-center">
@@ -66,7 +68,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       {/* 6. Contextual Header */}
       <div className="flex justify-center mb-3 pt-2 md:mb-8 md:pt-4 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
         <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 dark:bg-neutral-900/60 backdrop-blur-md border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
-          <span className="text-neutral-800 dark:text-neutral-200">{config.subjectLabel?.split(' ')[0]}</span>
+          <span className="text-neutral-800 dark:text-neutral-200">{formattedSubject}</span>
           <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
           <span>{config.examType}</span>
           <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
@@ -87,7 +89,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             icon={<BookOpen size={18} strokeWidth={2.5} />}
             iconColor="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
             label="বিষয়"
-            value={config.subjectLabel?.split(' ')[0] ?? '—'}
+            value={formattedSubject}
           />
           <StatCell
             icon={<Layers size={18} strokeWidth={2.5} />}

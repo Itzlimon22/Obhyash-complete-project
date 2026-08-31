@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flame, Info, Check, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { supabase } from "@/services/core";
 import { cn } from "@/lib/utils";
@@ -110,69 +110,66 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
     return `${day} ${month}`;
   };
 
-  const isStreakActive = streakCount > 0;
-
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
-      {/* ── Top Header Row ── */}
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-[#2C1810] border border-orange-200 dark:border-orange-900/50 flex items-center justify-center text-orange-500 shrink-0">
-            <Flame size={22} className="fill-orange-500 animate-pulse" />
-          </div>
-
-          <div>
-            <h3 className="text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-tight">
-              {BanglaNameHelper.toBanglaNumeral(streakCount)} দিনের স্ট্রিক! 🔥
-            </h3>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              প্রতিদিন অন্তত ১টি পরীক্ষা দিয়ে স্ট্রিক ধরে রাখো
-            </p>
-          </div>
+    <div className="p-4 sm:p-4.5 rounded-[20px] bg-white dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#2C2C2E] shadow-sm font-['HindSiliguri']">
+      {/* ── 1. Header Row (Matching Flutter DailyStreakCard) ── */}
+      <div className="flex items-center justify-between gap-3 mb-3.5">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-[#059669]" />
+          <h3 className="text-base font-extrabold text-neutral-900 dark:text-white leading-tight">
+            গত ৩০ দিনের অ্যাক্টিভিটি
+          </h3>
         </div>
 
-        <div className="px-2.5 py-1 rounded-full bg-orange-50 dark:bg-[#2C1810] border border-orange-200 dark:border-orange-900/50 text-orange-600 dark:text-orange-400 text-xs font-black shrink-0">
-          {isStreakActive ? "সক্রিয় স্ট্রিক" : "নতুন শুরু"}
+        {/* Streak Badge */}
+        <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#EF4444]/12 border border-[#EF4444]/20 text-[#EF4444] text-xs font-black shrink-0">
+          <span>🔥</span>
+          <span>{BanglaNameHelper.toBanglaNumeral(streakCount)} দিন</span>
         </div>
       </div>
 
-      {/* ── 30-Day Activity Heatmap Grid (Matching Flutter) ── */}
-      <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/80">
-        <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 font-bold mb-2">
-          <span>বিগত ৩০ দিনের অ্যাক্টিভিটি</span>
-          <span>{last30DaysActivity[29] > 0 ? "আজ পরীক্ষা সম্পন্ন ✓" : "আজ এখনও বাকি"}</span>
-        </div>
+      {/* ── 2. Compact Heatmap Grid (10 Columns x 3 Rows) ── */}
+      <div className="grid grid-cols-10 gap-1.5">
+        {last30DaysActivity.map((count, idx) => {
+          const isToday = idx === 29;
 
-        <div className="grid grid-cols-10 sm:grid-cols-15 gap-1.5 sm:gap-2">
-          {last30DaysActivity.map((count, idx) => {
-            const hasActivity = count > 0;
-            const isToday = idx === 29;
+          let boxColorClass = "bg-[#F1F5F9] dark:bg-[#2C2C2E]";
+          if (count === 1) {
+            boxColorClass = "bg-[#EF4444]/35 dark:bg-[#EF4444]/40";
+          } else if (count === 2) {
+            boxColorClass = "bg-[#EF4444]/70 dark:bg-[#EF4444]/75";
+          } else if (count >= 3) {
+            boxColorClass = "bg-[#EF4444]";
+          }
 
-            return (
+          const tooltipText =
+            count > 0
+              ? `${formatBoxDate(idx)}: ${BanglaNameHelper.toBanglaNumeral(count)}টি পরীক্ষা দেওয়া হয়েছে`
+              : `${formatBoxDate(idx)}: কোনো পরীক্ষা দেওয়া হয়নি`;
+
+          return (
+            <div
+              key={idx}
+              className="relative group flex items-center justify-center"
+            >
               <div
-                key={idx}
-                title={`${formatBoxDate(idx)}: ${BanglaNameHelper.toBanglaNumeral(count)}টি পরীক্ষা`}
                 className={cn(
-                  "aspect-square rounded-md transition-all relative group flex items-center justify-center text-[9px] font-bold cursor-pointer",
-                  hasActivity
-                    ? "bg-orange-500 text-white shadow-sm shadow-orange-500/20"
-                    : "bg-neutral-100 dark:bg-[#27272A] border border-neutral-200 dark:border-[#38383D] text-neutral-400",
-                  isToday && "ring-2 ring-orange-500 ring-offset-1 dark:ring-offset-[#18181B]"
+                  "w-full aspect-square rounded-[6px] transition-all cursor-pointer",
+                  boxColorClass,
+                  isToday && "ring-1.5 ring-[#EF4444] ring-offset-1 dark:ring-offset-[#1C1C1E]"
                 )}
-              >
-                {hasActivity ? "✓" : ""}
+              />
 
-                {/* Floating Tooltip on Hover */}
-                <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-20 pointer-events-none">
-                  <div className="px-2 py-1 bg-neutral-900 text-white text-[10px] rounded shadow-md whitespace-nowrap font-bold">
-                    {formatBoxDate(idx)}: {BanglaNameHelper.toBanglaNumeral(count)}টি পরীক্ষা
-                  </div>
-                  <div className="w-1.5 h-1.5 bg-neutral-900 rotate-45 -mt-0.5" />
+              {/* Floating Tooltip on Hover */}
+              <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col items-center z-30 pointer-events-none">
+                <div className="px-2.5 py-1 bg-[#18181B] text-white text-[11px] rounded-lg shadow-lg whitespace-nowrap font-bold border border-neutral-700">
+                  {tooltipText}
                 </div>
+                <div className="w-1.5 h-1.5 bg-[#18181B] rotate-45 -mt-1 border-r border-b border-neutral-700" />
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

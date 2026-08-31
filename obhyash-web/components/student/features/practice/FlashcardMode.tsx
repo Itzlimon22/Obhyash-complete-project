@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Question } from '@/lib/types';
 import LatexText from '@/components/student/ui/common/LatexText';
 import { toBengaliNumeral } from '@/lib/utils';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
 export type FlashcardGrade = 'got_it' | 'struggling';
 
@@ -285,7 +286,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                     )}
                     {(current.subjectLabel || current.subject) && (
                       <span className="px-1.5 py-0.5 md:px-2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[9px] md:text-[10px] font-bold">
-                        {current.subjectLabel || current.subject}
+                        {BanglaNameHelper.formatSubject(current.subject, current.subjectLabel)}
                       </span>
                     )}
                   </div>

@@ -29,14 +29,14 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
-  // Query 1: Get the top user (#1 in this level) — only 1 row
+  // Query 1: Get the top user (#1 in this level) — only 1 row (Student role only)
   const { data: topRows, error: topError } = await supabase
     .from('public_profiles')
-    .select('id, name, avatar_url, avatar_color, xp')
+    .select('id, name, avatar_url, avatar_color, xp, role')
     .eq('level', level)
-    .ilike('role', 'student')
+    .or('role.ilike.student,role.is.null')
     .order('xp', { ascending: false })
-    .limit(1);
+    .limit(5);
 
   if (topError) {
     return NextResponse.json(
@@ -45,7 +45,11 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const topUser = topRows?.[0] ?? null;
+  const studentTopRows = (topRows || []).filter((u: any) => {
+    const r = (u.role || 'student').toLowerCase();
+    return r === 'student';
+  });
+  const topUser = studentTopRows[0] ?? null;
 
   // Query 2: Count how many users have MORE xp than this user in this level.
   // rank = count of users with higher xp + 1.
@@ -65,7 +69,7 @@ export async function GET(req: NextRequest) {
       .from('public_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('level', level)
-      .ilike('role', 'student')
+      .or('role.ilike.student,role.is.null')
       .gt('xp', userXp);
 
     userRank = (count ?? 0) + 1;

@@ -1,23 +1,21 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
 import StudentRoot from '@/components/student/StudentRoot';
 import { UserProfile } from '@/lib/types';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface DashboardClientProps {
   user: UserProfile;
-  subjects?: any[]; // Using any[] for now or define Subject type if available
+  subjects?: any[];
 }
 
 export default function DashboardClient({
   user,
   subjects = [],
 }: DashboardClientProps) {
-  const router = useRouter();
-  const supabase = createClient();
+  const { signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Sync user profile locally for instant loading on next visit
@@ -33,12 +31,7 @@ export default function DashboardClient({
   }, [user]);
 
   const handleLogout = async () => {
-    // Clear cached data on logout
-    sessionStorage.removeItem('obhyash_active_tab');
-    localStorage.removeItem('obhyash_user_profile');
-    await supabase.auth.signOut();
-    router.refresh();
-    router.replace('/');
+    await signOut();
   };
 
   return (

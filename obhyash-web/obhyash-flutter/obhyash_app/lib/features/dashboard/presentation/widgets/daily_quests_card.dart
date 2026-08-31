@@ -551,32 +551,15 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'আজকের মিশন',
-                    style: TextStyle(
-                      fontFamily: 'HindSiliguri',
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  InkWell(
-                    onTap: () => XpGuideBottomSheet.show(context),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: Icon(
-                        LucideIcons.helpCircle,
-                        size: 15,
-                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                      ),
-                    ),
-                  ),
-                ],
+              Text(
+                'আজকের মিশন',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  letterSpacing: -0.2,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),

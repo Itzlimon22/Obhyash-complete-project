@@ -412,7 +412,8 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
         name,
         avatarUrl:avatar_url,
         avatarColor:avatar_color,
-        institute
+        institute,
+        role
       )
     `)
     .eq("live_exam_id", examId)
@@ -420,12 +421,19 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
     .order("score", { ascending: false })
     .order("wrong_count", { ascending: true })
     .order("submit_time", { ascending: true })
-    .limit(limit);
+    .limit(limit * 2);
 
   if (error) {
     console.error("Error fetching public leaderboard:", error);
     throw error;
   }
 
-  return data;
+  const studentData = (data || [])
+    .filter((item: any) => {
+      const role = (item.users?.role || "student").toLowerCase();
+      return role === "student";
+    })
+    .slice(0, limit);
+
+  return studentData;
 }

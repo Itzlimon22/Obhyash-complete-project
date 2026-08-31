@@ -211,15 +211,21 @@ final liveExamLeaderboardProvider = FutureProvider.autoDispose
   final supabase = Supabase.instance.client;
   final data = await supabase
       .from('live_exam_attempts')
-      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, users(id, name, institute, avatar_color, avatar_url)')
+      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, users(id, name, institute, avatar_color, avatar_url, role)')
       .eq('live_exam_id', examId)
       .eq('status', 'submitted')
       .order('score', ascending: false)
       .order('wrong_count', ascending: true)
       .order('submit_time', ascending: true)
-      .limit(100);
+      .limit(200);
 
   return (data as List)
+      .where((e) {
+        final u = e['users'] as Map<String, dynamic>?;
+        final role = (u?['role'] ?? 'student').toString().toLowerCase();
+        return role == 'student';
+      })
+      .take(100)
       .map((e) => LiveExamLeaderboardEntry.fromJson(e as Map<String, dynamic>))
       .toList();
 });

@@ -215,7 +215,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
         {/* Subject & Chapters Scope Header */}
         {examDetails && (
           <ExamScopeHeader
-            subjectName={examDetails.subjectLabel || examDetails.subject}
+            subjectName={BanglaNameHelper.formatSubject(examDetails.subject, examDetails.subjectLabel)}
             chapters={examDetails.chapters ? examDetails.chapters.split(", ") : []}
             topics={examDetails.topics ? examDetails.topics.split(", ") : []}
             initiallyExpanded={false}

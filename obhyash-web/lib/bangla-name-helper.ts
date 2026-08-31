@@ -29,36 +29,36 @@ export class BanglaNameHelper {
 
     const lower = raw.toLowerCase().replace(/-/g, '_');
 
-    if (lower.includes('physics')) {
-      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first')) return 'পদার্থবিজ্ঞান ১ম পত্র';
-      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second')) return 'পদার্থবিজ্ঞান ২য় পত্র';
+    if (lower.includes('physics') || lower.includes('phy') || lower.startsWith('hsc_phy')) {
+      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first') || lower.endsWith('1')) return 'পদার্থবিজ্ঞান ১ম পত্র';
+      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second') || lower.endsWith('2')) return 'পদার্থবিজ্ঞান ২য় পত্র';
       return 'পদার্থবিজ্ঞান';
     }
 
-    if (lower.includes('chemistry')) {
-      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first')) return 'রসায়ন ১ম পত্র';
-      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second')) return 'রসায়ন ২য় পত্র';
+    if (lower.includes('chemistry') || lower.includes('chem') || lower.startsWith('hsc_chem')) {
+      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first') || lower.endsWith('1')) return 'রসায়ন ১ম পত্র';
+      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second') || lower.endsWith('2')) return 'রসায়ন ২য় পত্র';
       return 'রসায়ন';
     }
 
-    if (lower.includes('higher_math') || lower.includes('highermath') || lower.includes('h_math')) {
-      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first')) return 'উচ্চতর গণিত ১ম পত্র';
-      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second')) return 'উচ্চতর গণিত ২য় পত্র';
+    if (lower.includes('higher_math') || lower.includes('highermath') || lower.includes('h_math') || lower.includes('hmath') || lower.startsWith('hsc_hm')) {
+      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first') || lower.endsWith('1')) return 'উচ্চতর গণিত ১ম পত্র';
+      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second') || lower.endsWith('2')) return 'উচ্চতর গণিত ২য় পত্র';
       return 'উচ্চতর গণিত';
     }
 
     if (lower.includes('math') || lower.includes('mathematics')) {
-      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first')) return 'উচ্চতর গণিত ১ম পত্র';
-      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second')) return 'উচ্চতর গণিত ২য় পত্র';
+      if (lower.includes('1st') || lower.includes('_1') || lower.includes('first') || lower.endsWith('1')) return 'উচ্চতর গণিত ১ম পত্র';
+      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('second') || lower.endsWith('2')) return 'উচ্চতর গণিত ২য় পত্র';
       if (lower.includes('general')) return 'সাধারণ গণিত';
       return 'উচ্চতর গণিত';
     }
 
-    if (lower.includes('biology') || lower.includes('botany') || lower.includes('zoology')) {
-      if (lower.includes('1st') || lower.includes('_1') || lower.includes('botany') || lower.includes('first')) {
+    if (lower.includes('biology') || lower.includes('botany') || lower.includes('zoology') || lower.includes('bio') || lower.startsWith('hsc_bio')) {
+      if (lower.includes('1st') || lower.includes('_1') || lower.includes('botany') || lower.includes('first') || lower.endsWith('1')) {
         return 'জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)';
       }
-      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('zoology') || lower.includes('second')) {
+      if (lower.includes('2nd') || lower.includes('_2') || lower.includes('zoology') || lower.includes('second') || lower.endsWith('2')) {
         return 'জীববিজ্ঞান ২য় পত্র (প্রাণিবিজ্ঞান)';
       }
       return 'জীববিজ্ঞান';

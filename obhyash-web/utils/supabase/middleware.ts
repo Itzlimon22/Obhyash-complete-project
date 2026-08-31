@@ -100,10 +100,14 @@ export async function updateSession(request: NextRequest) {
   // All student tab paths that map into the SPA (including deep-link sub-paths)
   const STUDENT_TAB_PATHS = [
     '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
-    '/analysis', '/notifications', '/subscription', '/profile', '/settings',
-    '/referral',
+    '/analysis', '/notifications', '/subscription', '/upgrade', '/profile', '/settings',
+    '/referral', '/complaint', '/feature-requests', '/bookmarks', '/about',
+    '/account-info', '/account-linking', '/delete-account', '/info',
+    '/legends-league', '/legends_league', '/live_exam',
     // Deep links — dynamic sub-paths
     '/leaderboard/user', // /leaderboard/user/[userId]
+    '/history/',
+    '/exam/',
   ];
   const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
   const isProtectedRoute = isStudentRoute || isTeacherRoute || isAdminRoute;

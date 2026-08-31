@@ -7,6 +7,7 @@ import { getLiveExamSolutions } from "@/services/live-exam-student-service";
 import { toggleBookmark, getUserBookmarks } from "@/services/bookmark-service";
 import LatexText from "@/components/student/ui/common/LatexText";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -282,7 +283,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
                       
                       {q.subject && (
                         <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
-                          {q.subject}
+                          {BanglaNameHelper.formatSubject(q.subject, (q as any).subjectLabel)}
                         </span>
                       )}
 
@@ -341,6 +342,8 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
                   {/* Options List */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                     {q.options.map((opt, optIndex) => {
+                      const banglaOptions = ["ক", "খ", "গ", "ঘ", "ঙ"];
+                      const banglaLetter = banglaOptions[optIndex] || `${optIndex + 1}`;
                       const isOptionCorrect = optIndex === q.correctAnswerIndex || (q.correctAnswerIndices && q.correctAnswerIndices.includes(optIndex));
                       const isUserSelected = userPick === optIndex;
 
@@ -361,7 +364,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
                           className={`p-3.5 rounded-xl border-2 flex items-start gap-3 transition-all ${optionBorder}`}
                         >
                           <span className={`w-6 h-6 rounded-md font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 ${optionBadge}`}>
-                            {String.fromCharCode(65 + optIndex)}
+                            {banglaLetter}
                           </span>
                           <div className="flex-1 font-medium text-sm">
                             <LatexText text={opt} />

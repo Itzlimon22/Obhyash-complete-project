@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExamDetails } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 // Icon imports removed for simplified layout
 
 interface ExamDetailsCardProps {
@@ -14,8 +15,10 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
   totalQuestions,
   negativeMarking = 0.25,
 }) => {
-  const subjectName =
-    details.subjectLabel || getSubjectDisplayName(details.subject);
+  const subjectName = BanglaNameHelper.formatSubject(
+    details.subject,
+    details.subjectLabel || getSubjectDisplayName(details.subject)
+  );
 
   // Calculate Full Marks if not explicitly provided
   const fullMarks = details.totalMarks || totalQuestions;

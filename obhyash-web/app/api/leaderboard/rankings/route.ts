@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('users')
-    .select('institute, xp, monthly_xp')
+    .select('institute, xp, monthly_xp, role')
+    .or('role.ilike.student,role.is.null')
     .not('institute', 'is', null)
     .neq('institute', '')
     .order(xpCol, { ascending: false, nullsFirst: false })

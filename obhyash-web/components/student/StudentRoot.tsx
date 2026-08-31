@@ -284,7 +284,7 @@ export default function StudentRoot({
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[] | undefined>(undefined);
   
   useEffect(() => {
-    if (!currentUser?.id || authLoading || isBookmarksLoading) return;
+    if (!currentUser?.id || authLoading || isBookmarksLoading || activeTab !== "bookmarks") return;
     
     // Optimistically remove any questions that are no longer in bookmarkedIds
     setBookmarkedQuestions((prev) => {
@@ -298,15 +298,13 @@ export default function StudentRoot({
     // Fetch latest from DB to capture any additions
     getBookmarkedQuestions(currentUser.id).then((fetchedQs) => {
       if (ignore) return;
-      // Filter the DB result against current bookmarkedIds to prevent stale reads
-      // (e.g. DB hasn't processed the deletion yet)
       setBookmarkedQuestions(fetchedQs.filter((q) => bookmarkedIds.has(String(q.id))));
     });
 
     return () => {
       ignore = true;
     };
-  }, [currentUser?.id, authLoading, isBookmarksLoading, bookmarkedIds]);
+  }, [currentUser?.id, authLoading, isBookmarksLoading, bookmarkedIds.size, activeTab]);
 
   // Streak Celebration State
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
@@ -684,7 +682,11 @@ export default function StudentRoot({
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
       setNavWarning({ isOpen: true, targetTab: null, action: "logout" });
     } else {
-      onLogout();
+      if (onLogout) {
+        onLogout();
+      } else {
+        await authSignOut();
+      }
     }
   };
 
@@ -693,7 +695,11 @@ export default function StudentRoot({
     if (navWarning.action === "tab" && navWarning.targetTab) {
       setActiveTab(navWarning.targetTab);
     } else if (navWarning.action === "logout") {
-      onLogout();
+      if (onLogout) {
+        onLogout();
+      } else {
+        await authSignOut();
+      }
     }
     setNavWarning({ isOpen: false, targetTab: null, action: "tab" });
   };
@@ -952,6 +958,7 @@ export default function StudentRoot({
                 setSelectedSubjectReport(subject);
                 setActiveTab("subject_report"); // internal-only, no route
               }}
+              onStartExam={() => handleTabChange("setup")}
             />
           </AppLayout>
         );

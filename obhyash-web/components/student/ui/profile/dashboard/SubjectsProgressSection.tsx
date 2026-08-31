@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
 interface SubjectStat {
   subject: string;
@@ -59,39 +60,32 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
       return {
         badge: 'চমৎকার দক্ষতা (Master)',
         color: 'text-emerald-600 dark:text-emerald-400',
-        advice:
-          'তোমার এই বিষয়ে চমৎকার দক্ষতা রয়েছে! পরীক্ষার হলে নিখুঁত টাইমিং বজায় রাখতে নিয়মিত মডেল টেস্ট দাও।',
-      };
-    } else if (accuracy >= 60) {
-      return {
-        badge: 'ভালো অগ্রগতি (Proficient)',
-        color: 'text-blue-600 dark:text-blue-400',
-        advice:
-          'বেসিক কনসেপ্ট ভালো আছে। যেসব চ্যাপ্টারে ভুল বেশি হচ্ছে সেগুলো চিহ্নিত করে রিভিশন দাও।',
-      };
-    } else if (accuracy >= 40) {
-      return {
-        badge: 'অনুশীলনের সুযোগ (Developing)',
-        color: 'text-amber-600 dark:text-amber-400',
-        advice:
-          'আন্দাজে উত্তর না দিয়ে নিশ্চিত প্রশ্নগুলো আগে সমাধান করো। অধ্যায়ভিত্তিক প্র্যাকটিসে মনোযোগ দাও।',
-      };
-    } else {
-      return {
-        badge: 'বিশেষ মনোযোগ প্রয়োজন (Needs Focus)',
-        color: 'text-red-600 dark:text-red-400',
-        advice:
-          'এই বিষয়ে নির্ভুলতা বাড়াতে প্রতিদিন অন্তত ১৫ মিনিট করে মূল বই ও সূত্রের নোট রিভিশন করো।',
+        advice: 'এই বিষয়ে তোমার প্রস্তুতি খুব ভালো। নিয়মিত রিভিশন দাও।',
       };
     }
+    if (accuracy >= 60) {
+      return {
+        badge: 'উন্নতি প্রয়োজন (Proficient)',
+        color: 'text-blue-600 dark:text-blue-400',
+        advice: 'ধারাবাহিক অনুশীলনে তুমি সহজেই আরও ভালো করতে পারবে।',
+      };
+    }
+    return {
+      badge: 'দুর্বল বিষয় (Needs Work)',
+      color: 'text-red-600 dark:text-red-400',
+      advice: 'এই বিষয়ের মূল কনসেপ্টগুলো আবার রিভিশন দেওয়ার পরামর্শ রইল।',
+    };
   };
 
   return (
-    <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#27272a] shadow-sm p-5 sm:p-7">
-      <div className="mb-4 sm:mb-5">
-        <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+    <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#27272a] shadow-sm p-4 sm:p-6 font-['HindSiliguri',sans-serif]">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
           বিষয়ভিত্তিক দক্ষতা
         </h3>
+        <span className="text-xs text-neutral-500 dark:text-neutral-400">
+          {subjectStats.length}টি বিষয়
+        </span>
       </div>
 
       <div className="space-y-3">
@@ -104,7 +98,7 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
             <div className="flex justify-between items-center mb-2.5">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-neutral-900 dark:text-white text-sm sm:text-base">
-                  {stat.subject}
+                  {BanglaNameHelper.formatSubject(stat.subject)}
                 </span>
                 <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 px-2 py-0.5 bg-neutral-200 dark:bg-[#3f3f46] rounded-md">
                   {stat.examCount} পরীক্ষা
@@ -135,7 +129,7 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
             {/* Pinned Header */}
             <div className="p-4 sm:p-5 border-b border-neutral-200 dark:border-[#27272a] flex items-center justify-between shrink-0">
               <h4 className="text-lg font-black text-neutral-900 dark:text-white">
-                {selectedSubject.subject}
+                {BanglaNameHelper.formatSubject(selectedSubject.subject)}
               </h4>
               <button
                 onClick={() => setSelectedSubject(null)}

@@ -41,7 +41,8 @@ export async function GET(req: NextRequest) {
   if (rpcError || !rows) {
     const { data, error } = await supabase
       .from('public_profiles')
-      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak')
+      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, role')
+      .or('role.ilike.student,role.is.null')
       .eq('institute', institute)
       .order('xp', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -52,7 +53,12 @@ export async function GET(req: NextRequest) {
     rows = data;
   }
 
-  const users = rows.map((user, index) => ({
+  const studentRows = (rows || []).filter((u: any) => {
+    const r = (u.role || 'student').toLowerCase();
+    return r === 'student';
+  });
+
+  const users = studentRows.map((user, index) => ({
     id: user.id,
     name: user.name || 'Unknown User',
     institute: user.institute || institute,

@@ -1,4 +1,5 @@
 import { hscSubjects } from '@/lib/data/hsc';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
 /**
  * Dynamically generated map of subject IDs → Bengali display names from hsc.ts
@@ -13,8 +14,9 @@ export const SUBJECT_NAME_MAP: Record<string, string> = hscSubjects.reduce(
 );
 
 /**
- * Returns the Bengali display name for a subject ID, or falls back to the raw ID.
+ * Returns the Bengali display name for a subject ID, guaranteed in Bengali.
  */
 export function getSubjectDisplayName(subjectId: string): string {
-  return SUBJECT_NAME_MAP[subjectId] || subjectId;
+  if (!subjectId) return 'পরীক্ষা';
+  return SUBJECT_NAME_MAP[subjectId] || BanglaNameHelper.formatSubject(subjectId);
 }

@@ -80,7 +80,7 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 sm:gap-3 font-['HindSiliguri']">
+    <div className="grid grid-cols-3 gap-2 sm:gap-2.5 font-['HindSiliguri']">
       {actions.map((action, idx) => {
         const Icon = action.icon;
         return (
@@ -88,20 +88,20 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
             key={idx}
             type="button"
             onClick={action.onClick}
-            className="aspect-[1.05/1] rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700 p-2.5 sm:p-3 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all active:scale-95 group select-none"
+            className="rounded-xl sm:rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700 py-2 sm:py-2.5 px-1.5 sm:px-2 flex flex-col items-center justify-center gap-1 sm:gap-1.5 shadow-sm hover:shadow-md transition-all active:scale-95 group select-none"
           >
             <div
               className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-105",
+                "w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-105",
                 action.bgLight,
                 action.borderColor,
                 action.primaryColor
               )}
             >
-              <Icon size={20} strokeWidth={2.2} />
+              <Icon size={17} strokeWidth={2.2} />
             </div>
 
-            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate w-full text-center">
+            <span className="text-xs sm:text-[13px] font-bold text-neutral-800 dark:text-neutral-200 truncate w-full text-center">
               {action.title}
             </span>
           </button>

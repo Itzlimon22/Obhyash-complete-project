@@ -233,12 +233,19 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
       await Promise.all(
         LEADERBOARD_LEVELS.map(async (lvl) => {
-          let query = supabase.from("users").select("id", { count: "exact", head: true }).gte(sortColumn, lvl.minXP);
-          if (lvl.maxXP < 999999999) {
-            query = query.lte(sortColumn, lvl.maxXP);
+          try {
+            let query = supabase.from("users").select("id", { count: "exact", head: true });
+            if (lvl.minXP > 0) {
+              query = query.gte(sortColumn, lvl.minXP);
+            }
+            if (lvl.maxXP < 999999999) {
+              query = query.lte(sortColumn, lvl.maxXP);
+            }
+            const { count } = await query;
+            counts[lvl.id] = count || 0;
+          } catch {
+            counts[lvl.id] = 0;
           }
-          const { count } = await query;
-          counts[lvl.id] = count || 0;
         })
       );
 
@@ -268,50 +275,88 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         const currentLevelInfo = getLevelById(selectedLevel);
         const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
 
-        let query = supabase
-          .from("users")
-          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, plan, is_pro")
-          .gte(sortColumn, currentLevelInfo.minXP);
+        let mapped: LeaderboardUser[] = [];
 
-        if (currentLevelInfo.maxXP < 999999999) {
-          query = query.lte(sortColumn, currentLevelInfo.maxXP);
+        try {
+          let query = supabase
+            .from("users")
+            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status");
+
+          if (currentLevelInfo.minXP > 0) {
+            query = query.gte(sortColumn, currentLevelInfo.minXP);
+          }
+
+          if (currentLevelInfo.maxXP < 999999999) {
+            query = query.lte(sortColumn, currentLevelInfo.maxXP);
+          }
+
+          if (batchFilter === "my_batch" && currentUser?.batch) {
+            query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
+          }
+
+          if (timeframe === "monthly") {
+            query = query
+              .order("monthly_xp", { ascending: false, nullsFirst: false })
+              .order("xp", { ascending: false, nullsFirst: false });
+          } else {
+            query = query.order("xp", { ascending: false, nullsFirst: false });
+          }
+
+          query = query.range(currentOffset, currentOffset + PAGE_SIZE - 1);
+
+          const { data, error } = await query;
+
+          if (error) throw error;
+
+          if (data && data.length > 0) {
+            mapped = data.map((u: any, idx: number) => {
+              const isPro = Boolean(u.is_subscribed || u.subscription_status === "active" || u.is_pro);
+              const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+
+              return {
+                id: u.id,
+                name: u.name || "শিক্ষার্থী",
+                institute: u.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই",
+                xp: effXp,
+                monthly_xp: u.monthly_xp || 0,
+                level: calculateLevelFromXp(effXp),
+                exams_taken: u.exams_taken || 0,
+                avatar_url: u.avatar_url || undefined,
+                batch: u.batch || undefined,
+                rank: currentOffset + idx + 1,
+                is_pro: isPro,
+              };
+            });
+          }
+        } catch (dbErr) {
+          console.warn("[LeaderboardView] Direct Supabase query failed, falling back to API:", dbErr);
+          const params = new URLSearchParams({
+            level: selectedLevel,
+            timeframe,
+            offset: String(currentOffset),
+            limit: String(PAGE_SIZE),
+          });
+          if (batchFilter === "my_batch" && currentUser?.batch) {
+            params.set("batch", currentUser.batch.trim());
+          }
+          const res = await fetch(`/api/leaderboard/level?${params.toString()}`);
+          if (res.ok) {
+            const json = await res.json();
+            mapped = (json.users || []).map((u: any, idx: number) => ({
+              id: u.id,
+              name: u.name || "শিক্ষার্থী",
+              institute: u.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই",
+              xp: u.xp || 0,
+              monthly_xp: u.monthlyXp || 0,
+              level: u.level || calculateLevelFromXp(u.xp || 0),
+              exams_taken: u.examsTaken || 0,
+              avatar_url: u.avatarUrl || undefined,
+              batch: u.batch || undefined,
+              rank: currentOffset + idx + 1,
+              is_pro: Boolean(u.isPro || u.is_pro),
+            }));
+          }
         }
-
-        if (batchFilter === "my_batch" && currentUser?.batch) {
-          query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
-        }
-
-        if (timeframe === "monthly") {
-          query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
-        } else {
-          query = query.order("xp", { ascending: false, nullsFirst: false });
-        }
-
-        query = query.range(currentOffset, currentOffset + PAGE_SIZE - 1);
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        const mapped: LeaderboardUser[] = (data || []).map((u: any, idx: number) => {
-          const rawPlan = u.plan?.toString().toLowerCase();
-          const isPro = u.is_pro === true || (rawPlan && rawPlan !== "free");
-          const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
-
-          return {
-            id: u.id,
-            name: u.name || "শিক্ষার্থী",
-            institute: u.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই",
-            xp: effXp,
-            monthly_xp: u.monthly_xp || 0,
-            level: calculateLevelFromXp(effXp),
-            exams_taken: u.exams_taken || 0,
-            avatar_url: u.avatar_url || undefined,
-            batch: u.batch || undefined,
-            rank: currentOffset + idx + 1,
-            is_pro: isPro,
-          };
-        });
 
         if (isLoadMore) {
           setUsers((prev) => [...prev, ...mapped]);
@@ -343,42 +388,63 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     if (!currentUser?.institute) return;
     setIsLoadingCollege(true);
     try {
-      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
-      let query = supabase
-        .from("users")
-        .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, plan, is_pro")
-        .eq("institute", currentUser.institute);
+      let mapped: LeaderboardUser[] = [];
+      try {
+        const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+        let query = supabase
+          .from("users")
+          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status")
+          .eq("institute", currentUser.institute);
 
-      if (timeframe === "monthly") {
-        query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
-      } else {
-        query = query.order("xp", { ascending: false, nullsFirst: false });
+        if (timeframe === "monthly") {
+          query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
+        } else {
+          query = query.order("xp", { ascending: false, nullsFirst: false });
+        }
+
+        query = query.limit(100);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        mapped = (data || []).map((u: any, idx: number) => {
+          const isPro = Boolean(u.is_subscribed || u.subscription_status === "active" || u.is_pro);
+          const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+
+          return {
+            id: u.id,
+            name: u.name || "শিক্ষার্থী",
+            institute: u.institute,
+            xp: effXp,
+            monthly_xp: u.monthly_xp || 0,
+            level: calculateLevelFromXp(effXp),
+            exams_taken: u.exams_taken || 0,
+            avatar_url: u.avatar_url || undefined,
+            batch: u.batch || undefined,
+            rank: idx + 1,
+            is_pro: isPro,
+          };
+        });
+      } catch (collegeErr) {
+        console.warn("[LeaderboardView] Direct college query failed, falling back to API:", collegeErr);
+        const res = await fetch(`/api/leaderboard/college?institute=${encodeURIComponent(currentUser.institute)}&limit=100`);
+        if (res.ok) {
+          const json = await res.json();
+          mapped = (json.users || []).map((u: any, idx: number) => ({
+            id: u.id,
+            name: u.name || "শিক্ষার্থী",
+            institute: u.institute || currentUser.institute,
+            xp: u.xp || 0,
+            monthly_xp: u.monthlyXp || 0,
+            level: u.level || calculateLevelFromXp(u.xp || 0),
+            exams_taken: u.examsTaken || 0,
+            avatar_url: u.avatarUrl || undefined,
+            batch: u.batch || undefined,
+            rank: idx + 1,
+            is_pro: Boolean(u.isPro || u.is_pro),
+          }));
+        }
       }
-
-      query = query.limit(100);
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      const mapped: LeaderboardUser[] = (data || []).map((u: any, idx: number) => {
-        const rawPlan = u.plan?.toString().toLowerCase();
-        const isPro = u.is_pro === true || (rawPlan && rawPlan !== "free");
-        const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
-
-        return {
-          id: u.id,
-          name: u.name || "শিক্ষার্থী",
-          institute: u.institute,
-          xp: effXp,
-          monthly_xp: u.monthly_xp || 0,
-          level: calculateLevelFromXp(effXp),
-          exams_taken: u.exams_taken || 0,
-          avatar_url: u.avatar_url || undefined,
-          batch: u.batch || undefined,
-          rank: idx + 1,
-          is_pro: isPro,
-        };
-      });
 
       setCollegeUsers(mapped);
     } catch (err) {
@@ -398,48 +464,66 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const fetchInstituteRankings = useCallback(async () => {
     setIsLoadingRankings(true);
     try {
-      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
-      const { data, error } = await supabase
-        .from("users")
-        .select("institute, xp, monthly_xp")
-        .not("institute", "is", null)
-        .neq("institute", "")
-        .order(sortColumn, { ascending: false })
-        .limit(3000);
+      let rankings: InstituteRank[] = [];
 
-      if (error) throw error;
+      try {
+        const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+        const { data, error } = await supabase
+          .from("users")
+          .select("institute, xp, monthly_xp")
+          .not("institute", "is", null)
+          .neq("institute", "")
+          .order(sortColumn, { ascending: false, nullsFirst: false })
+          .limit(3000);
 
-      const pointsMap: Record<string, number> = {};
-      const countsMap: Record<string, number> = {};
-      const bestRankMap: Record<string, number> = {};
+        if (error) throw error;
 
-      (data || []).forEach((row: any, i: number) => {
-        const inst = (row.institute || "").trim();
-        if (!inst) return;
-        const rank = i + 1;
-        const pts = calculateRankPoints(rank);
+        const pointsMap: Record<string, number> = {};
+        const countsMap: Record<string, number> = {};
+        const bestRankMap: Record<string, number> = {};
 
-        pointsMap[inst] = (pointsMap[inst] || 0) + pts;
-        countsMap[inst] = (countsMap[inst] || 0) + 1;
-        if (!bestRankMap[inst] || rank < bestRankMap[inst]) {
-          bestRankMap[inst] = rank;
+        (data || []).forEach((row: any, i: number) => {
+          const inst = (row.institute || "").trim();
+          if (!inst) return;
+          const rank = i + 1;
+          const pts = calculateRankPoints(rank);
+
+          pointsMap[inst] = (pointsMap[inst] || 0) + pts;
+          countsMap[inst] = (countsMap[inst] || 0) + 1;
+          if (!bestRankMap[inst] || rank < bestRankMap[inst]) {
+            bestRankMap[inst] = rank;
+          }
+        });
+
+        const myInst = (currentUser?.institute || "").trim().toLowerCase();
+
+        rankings = Object.keys(pointsMap).map((inst) => ({
+          institute: inst,
+          points: pointsMap[inst],
+          studentCount: countsMap[inst],
+          bestRank: bestRankMap[inst],
+          isMyCollege: myInst.length > 0 && inst.toLowerCase() === myInst,
+        }));
+
+        rankings.sort((a, b) => {
+          if (b.points !== a.points) return b.points - a.points;
+          return a.bestRank - b.bestRank;
+        });
+      } catch (rankingsErr) {
+        console.warn("[LeaderboardView] Direct rankings query failed, falling back to API:", rankingsErr);
+        const res = await fetch(`/api/leaderboard/rankings?timeframe=${timeframe}`);
+        if (res.ok) {
+          const json = await res.json();
+          const myInst = (currentUser?.institute || "").trim().toLowerCase();
+          rankings = (json || []).map((r: any) => ({
+            institute: r.institute,
+            points: r.points || 0,
+            studentCount: r.studentCount || 0,
+            bestRank: r.bestRank || 9999,
+            isMyCollege: myInst.length > 0 && (r.institute || "").toLowerCase() === myInst,
+          }));
         }
-      });
-
-      const myInst = (currentUser?.institute || "").trim().toLowerCase();
-
-      const rankings: InstituteRank[] = Object.keys(pointsMap).map((inst) => ({
-        institute: inst,
-        points: pointsMap[inst],
-        studentCount: countsMap[inst],
-        bestRank: bestRankMap[inst],
-        isMyCollege: myInst.length > 0 && inst.toLowerCase() === myInst,
-      }));
-
-      rankings.sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        return a.bestRank - b.bestRank;
-      });
+      }
 
       setInstituteRankings(rankings);
     } catch (err) {

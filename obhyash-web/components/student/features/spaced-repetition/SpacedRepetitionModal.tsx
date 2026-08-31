@@ -403,7 +403,7 @@ export default function SpacedRepetitionModal({
                           : 'bg-slate-800 text-slate-400'
                       }`}
                     >
-                      {String.fromCharCode(65 + optIdx)}
+                      {['ক', 'খ', 'গ', 'ঘ', 'ঙ'][optIdx] || optIdx + 1}
                     </span>
                     <div className="flex-1">
                       <MathRenderer text={opt} />

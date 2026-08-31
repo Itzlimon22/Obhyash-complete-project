@@ -253,7 +253,11 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       // Count students in each league tier by their active timeframe XP
       final futures = _levels.map((lvl) async {
         final (minXp, maxXp) = _getLevelThreshold(lvl.id);
-        var query = supabase.from('users').select('id').gte(sortColumn, minXp);
+        var query = supabase
+            .from('users')
+            .select('id')
+            .or('role.ilike.student,role.is.null')
+            .gte(sortColumn, minXp);
         if (maxXp < 999999999) {
           query = query.lte(sortColumn, maxXp);
         }
@@ -287,10 +291,11 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final isMonthly = _timeframe == 'monthly';
       final sortColumn = isMonthly ? 'monthly_xp' : 'xp';
 
-      // 1. Query users who belong to this Tier (Level) in active timeframe
+      // 1. Query users who belong to this Tier (Level) in active timeframe (Students Only)
       PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
-          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
+          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, role')
+          .or('role.ilike.student,role.is.null')
           .gte(sortColumn, minXp);
 
       if (maxXp < 999999999) {
@@ -330,6 +335,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           var countQuery = supabase
               .from('users')
               .select('id')
+              .or('role.ilike.student,role.is.null')
               .gte(sortColumn, myMinXp);
           if (myMaxXp < 999999999) {
             countQuery = countQuery.lte(sortColumn, myMaxXp);
@@ -348,6 +354,10 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       if (mounted) {
         setState(() {
           final fetchedUsers = (data as List)
+              .where((u) {
+                final role = (u['role'] ?? 'student').toString().toLowerCase();
+                return role == 'student';
+              })
               .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
               .toList();
 
@@ -389,7 +399,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 
       PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
-          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
+          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, role')
+          .or('role.ilike.student,role.is.null')
           .eq('institute', institute);
 
       final PostgrestTransformBuilder<List<Map<String, dynamic>>> orderedQuery;
@@ -407,6 +418,10 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       if (mounted) {
         setState(() {
           _collegeUsers = (data as List)
+              .where((u) {
+                final role = (u['role'] ?? 'student').toString().toLowerCase();
+                return role == 'student';
+              })
               .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
               .toList();
           _isLoadingCollege = false;
@@ -436,7 +451,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 
       final data = await supabase
           .from('users')
-          .select('institute, xp, monthly_xp')
+          .select('institute, xp, monthly_xp, role')
+          .or('role.ilike.student,role.is.null')
           .not('institute', 'is', null)
           .neq('institute', '')
           .order(xpColumn, ascending: false)

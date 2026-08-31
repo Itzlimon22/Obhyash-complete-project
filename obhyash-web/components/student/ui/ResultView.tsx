@@ -220,7 +220,10 @@ export const ResultView: React.FC<ResultViewProps> = ({
   }, [questions, userAnswers, reviewFilter, localBookmarks]);
 
   // Subject and chapters
-  const subjectTitle = examDetails?.subjectLabel || examDetails?.subject || "বিষয়";
+  const subjectTitle = BanglaNameHelper.formatSubject(
+    examDetails?.subject,
+    examDetails?.subjectLabel || (examDetails as any)?.title
+  );
   const chapterList = examDetails?.chapters ? examDetails.chapters.split(", ") : [];
   const topicList = examDetails?.topics ? examDetails.topics.split(", ") : [];
 

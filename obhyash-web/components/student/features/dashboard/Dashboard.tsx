@@ -8,6 +8,7 @@ import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp } from "@/lib/animations";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
 // Dashboard Components
 import LiveExamSlider from "@/components/student/ui/dashboard/LiveExamSlider";
@@ -134,7 +135,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       history.forEach((exam) => {
         const subId = exam.subject || "general";
-        const subLabel = exam.subjectLabel || getSubjectDisplayName(subId);
+        const subLabel = BanglaNameHelper.formatSubject(subId, exam.subjectLabel || getSubjectDisplayName(subId));
         if (!subjectsMap[subId]) {
           subjectsMap[subId] = {
             id: subId,
@@ -211,60 +212,67 @@ export const Dashboard: React.FC<DashboardProps> = ({
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="max-w-5xl mx-auto flex flex-col gap-4 sm:gap-6 px-1 font-['HindSiliguri']"
+      className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-2 font-['HindSiliguri']"
     >
-      {/* ── 1. Target Exam Countdown Banner (Optional / Configured) ── */}
-      {effectiveExamTarget && (
-        <motion.div variants={fadeInUp}>
-          <CountdownBanner
-            examTarget={effectiveExamTarget}
-            onChangeTarget={onChangeTarget}
-          />
-        </motion.div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+        {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7/8) ── */}
+        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-4 sm:gap-6">
+          {/* 1. Target Exam Countdown Banner */}
+          {effectiveExamTarget && (
+            <motion.div variants={fadeInUp}>
+              <CountdownBanner
+                examTarget={effectiveExamTarget}
+                onChangeTarget={onChangeTarget}
+              />
+            </motion.div>
+          )}
 
-      {/* ── 2. Live Exam Announcement / Status Carousel Slider ── */}
-      <motion.div variants={fadeInUp}>
-        <LiveExamSlider
-          onExamClick={() => {
-            if (onLiveExamClick) onLiveExamClick();
-          }}
-        />
-      </motion.div>
+          {/* 2. Live Exam Announcement / Status Carousel Slider */}
+          <motion.div variants={fadeInUp}>
+            <LiveExamSlider
+              onExamClick={() => {
+                if (onLiveExamClick) onLiveExamClick();
+              }}
+            />
+          </motion.div>
 
-      {/* ── 3. 6 Primary Action Shortcut Cards Grid (Flutter Parity) ── */}
-      <motion.div variants={fadeInUp}>
-        <DashboardActionGrid
-          onExamClick={onMockExamClick}
-          onFormulasClick={onFormulasClick || onPracticeClick}
-          onHistoryClick={onHistoryClick}
-          onLeaderboardClick={onLeaderboardClick}
-          onAnalysisClick={onAnalysisClick}
-          onLiveExamClick={onLiveExamClick}
-        />
-      </motion.div>
+          {/* 3. Primary Action Shortcut Cards Grid */}
+          <motion.div variants={fadeInUp}>
+            <DashboardActionGrid
+              onExamClick={onMockExamClick}
+              onFormulasClick={onFormulasClick || onPracticeClick}
+              onHistoryClick={onHistoryClick}
+              onLeaderboardClick={onLeaderboardClick}
+              onAnalysisClick={onAnalysisClick}
+              onLiveExamClick={onLiveExamClick}
+            />
+          </motion.div>
 
-      {/* ── 4. Daily Streak Card (Flame + 30-Day Activity Heatmap Grid) ── */}
-      <motion.div variants={fadeInUp}>
-        <DailyStreakCard
-          userStreak={user?.streakCount || 0}
-          userId={user?.id}
-        />
-      </motion.div>
+          {/* 4. Daily Streak Card (Flame + 30-Day Activity Heatmap Grid) */}
+          <motion.div variants={fadeInUp}>
+            <DailyStreakCard
+              userStreak={user?.streakCount || 0}
+              userId={user?.id}
+            />
+          </motion.div>
 
-      {/* ── 5. Daily Quests Card (Master Missions + Claim XP Rewards) ── */}
-      <motion.div variants={fadeInUp}>
-        <DailyQuestsCard userId={user?.id} />
-      </motion.div>
+          {/* 5. Daily Quests Card (Master Missions + Claim XP Rewards) */}
+          <motion.div variants={fadeInUp}>
+            <DailyQuestsCard userId={user?.id} />
+          </motion.div>
+        </div>
 
-      {/* ── 6. Subject Performance Breakdown ── */}
-      <motion.div variants={fadeInUp}>
-        <SubjectStat
-          data={subjectStats}
-          onSubjectClick={onSubjectClick}
-          isLoading={isLoadingStats}
-        />
-      </motion.div>
+        {/* ── Right Column: Subject-wise Performance Section (Col Span 5/4) ── */}
+        <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 sm:gap-6 lg:sticky lg:top-4">
+          <motion.div variants={fadeInUp}>
+            <SubjectStat
+              data={subjectStats}
+              onSubjectClick={onSubjectClick}
+              isLoading={isLoadingStats}
+            />
+          </motion.div>
+        </div>
+      </div>
     </motion.div>
   );
 };
