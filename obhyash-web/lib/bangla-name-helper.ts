@@ -406,26 +406,21 @@ export class BanglaNameHelper {
    * Filters allowed exam types based on the user's exam target/profile.
    */
   static getAllowedExamTypesForProfile(profile?: UserProfileTarget | null): string[] {
-    const rawTarget = (
-      profile?.exam_target ??
-      profile?.examTarget ??
-      profile?.target ??
-      (profile as any)?.dream_target ??
-      (profile as any)?.target_institution ??
-      (profile as any)?.stream ??
-      profile?.level ??
-      ''
-    ).toLowerCase().trim();
+    const rawTarget = [
+      profile?.target,
+      profile?.exam_target,
+      profile?.examTarget,
+      (profile as any)?.dream_target,
+      (profile as any)?.target_institution,
+      (profile as any)?.stream,
+      profile?.level,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .trim();
 
     if (
-      rawTarget.includes('mbbs') ||
-      rawTarget.includes('medical') ||
-      rawTarget.includes('মেডিকেল') ||
-      rawTarget.includes('mat') ||
-      rawTarget.includes('dermatology')
-    ) {
-      return ['Medical', 'Varsity', 'Board', 'Academic'];
-    } else if (
       rawTarget.includes('eng') ||
       rawTarget.includes('buet') ||
       rawTarget.includes('engineering') ||
@@ -439,7 +434,16 @@ export class BanglaNameHelper {
     ) {
       return ['Engineering', 'Varsity', 'Board', 'Academic'];
     } else if (
+      rawTarget.includes('mbbs') ||
+      rawTarget.includes('medical') ||
+      rawTarget.includes('মেডিকেল') ||
+      rawTarget.includes('mat') ||
+      rawTarget.includes('dermatology')
+    ) {
+      return ['Medical', 'Varsity', 'Board', 'Academic'];
+    } else if (
       rawTarget.includes('varsity') ||
+      rawTarget.includes('university') ||
       rawTarget.includes('ভার্সিটি') ||
       rawTarget.includes('gst') ||
       rawTarget.includes('du') ||

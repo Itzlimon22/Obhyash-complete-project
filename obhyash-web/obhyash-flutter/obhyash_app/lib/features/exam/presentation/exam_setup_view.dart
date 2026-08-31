@@ -89,12 +89,37 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   }
 
   List<String> _getAllowedExamTypesForProfile(UserProfile? profile) {
-    final rawTarget = (profile?.examTarget ?? profile?.target ?? profile?.level ?? '').toLowerCase().trim();
-    if (rawTarget.contains('mbbs') || rawTarget.contains('medical') || rawTarget.contains('মেডিকেল') || rawTarget.contains('mat')) {
-      return const ['Medical', 'Varsity', 'Board', 'Academic'];
-    } else if (rawTarget.contains('eng') || rawTarget.contains('buet') || rawTarget.contains('engineering') || rawTarget.contains('ckruet') || rawTarget.contains('kuet') || rawTarget.contains('ruet') || rawTarget.contains('cuet') || rawTarget.contains('butex') || rawTarget.contains('mist') || rawTarget.contains('ইঞ্জিনিয়ারিং')) {
+    final rawTarget = [
+      profile?.target,
+      profile?.examTarget,
+      profile?.level,
+    ].where((s) => s != null && s.isNotEmpty).join(' ').toLowerCase().trim();
+
+    if (rawTarget.contains('eng') ||
+        rawTarget.contains('buet') ||
+        rawTarget.contains('engineering') ||
+        rawTarget.contains('ckruet') ||
+        rawTarget.contains('kuet') ||
+        rawTarget.contains('ruet') ||
+        rawTarget.contains('cuet') ||
+        rawTarget.contains('butex') ||
+        rawTarget.contains('mist') ||
+        rawTarget.contains('ইঞ্জিনিয়ারিং')) {
       return const ['Engineering', 'Varsity', 'Board', 'Academic'];
-    } else if (rawTarget.contains('varsity') || rawTarget.contains('ভার্সিটি') || rawTarget.contains('gst') || rawTarget.contains('du') || rawTarget.contains('ju') || rawTarget.contains('ru') || rawTarget.contains('cu') || rawTarget.contains('bup')) {
+    } else if (rawTarget.contains('mbbs') ||
+        rawTarget.contains('medical') ||
+        rawTarget.contains('মেডিকেল') ||
+        rawTarget.contains('mat')) {
+      return const ['Medical', 'Varsity', 'Board', 'Academic'];
+    } else if (rawTarget.contains('varsity') ||
+        rawTarget.contains('university') ||
+        rawTarget.contains('ভার্সিটি') ||
+        rawTarget.contains('gst') ||
+        rawTarget.contains('du') ||
+        rawTarget.contains('ju') ||
+        rawTarget.contains('ru') ||
+        rawTarget.contains('cu') ||
+        rawTarget.contains('bup')) {
       return const ['Varsity', 'Board', 'Academic'];
     } else {
       return const ['Academic', 'Board'];

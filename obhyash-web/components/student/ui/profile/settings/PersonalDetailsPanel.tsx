@@ -100,6 +100,12 @@ export default function PersonalDetailsPanel({
     if (!validateForm()) return;
     setIsSaving(true);
 
+    const rawT = formData.target.trim();
+    let computedExamTarget = 'hsc_2026';
+    if (rawT.toLowerCase().includes('med')) computedExamTarget = 'mbbs_2026';
+    else if (rawT.toLowerCase().includes('eng')) computedExamTarget = 'eng_2026';
+    else if (rawT.toLowerCase().includes('univ') || rawT.toLowerCase().includes('varsity')) computedExamTarget = 'varsity_2026';
+
     const updates: Record<string, any> = {
       name: formData.name.trim(),
       dob: formData.dob.trim() ? formData.dob.trim() : null,
@@ -109,7 +115,8 @@ export default function PersonalDetailsPanel({
       stream: formData.stream.trim() ? formData.stream.trim() : null,
       division: formData.group.trim() ? formData.group.trim() : null,
       batch: formData.batch.trim() ? formData.batch.trim() : null,
-      target: formData.target.trim() ? formData.target.trim() : null,
+      target: rawT || null,
+      exam_target: computedExamTarget,
       optional_subject: formData.optionalSubject.trim()
         ? formData.optionalSubject.trim()
         : null,
