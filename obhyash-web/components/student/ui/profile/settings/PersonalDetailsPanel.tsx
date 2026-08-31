@@ -44,18 +44,18 @@ type SettingsUpdatePayload = {
 };
 
 const cardClass =
-  'bg-white dark:bg-neutral-950 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden';
+  'bg-white dark:bg-[#18181B] rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A] overflow-hidden font-[\'HindSiliguri\']';
 const headerClass =
-  'px-6 py-4 border-b border-green-900 bg-green-800 flex items-center justify-between';
-const headerTitleClass = 'text-lg font-bold text-white';
-const bodyClass = 'p-6 space-y-6';
-const inputGroupClass = 'space-y-2';
+  'px-6 py-4 border-b border-[#003627] bg-[#004633] flex items-center justify-between';
+const headerTitleClass = 'text-base sm:text-lg font-black text-white';
+const bodyClass = 'p-5 sm:p-6 space-y-6';
+const inputGroupClass = 'space-y-1.5';
 const labelClass =
-  'block text-sm font-medium text-neutral-600 dark:text-neutral-400';
+  'block text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300';
 const inputClass =
-  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-green-700/20 focus:border-green-700 transition-all text-neutral-800 dark:text-neutral-200';
+  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-[#27272A] bg-neutral-50/70 dark:bg-[#141417] focus:outline-none focus:ring-2 focus:ring-[#004633]/20 focus:border-[#004633] transition-all text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200';
 const selectClass =
-  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-green-700/20 focus:border-green-700 transition-all text-neutral-800 dark:text-neutral-200 appearance-none';
+  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-[#27272A] bg-neutral-50/70 dark:bg-[#141417] focus:outline-none focus:ring-2 focus:ring-[#004633]/20 focus:border-[#004633] transition-all text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 appearance-none';
 
 const ChevronDownIcon = () => (
   <svg

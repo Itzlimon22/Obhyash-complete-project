@@ -1,13 +1,28 @@
-'use client';
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { getUserBookmarks, getBookmarkedQuestions, toggleBookmark } from '@/services/bookmark-service';
-import { toast } from 'sonner';
+"use client";
 
-import { ExamResult, Question } from '@/lib/types';
-import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-import LatexText from '@/components/student/ui/common/LatexText';
-import QuestionCard from '@/components/student/ui/exam/QuestionCard';
+import React, { useState, useMemo } from "react";
+import { ExamResult, Question } from "@/lib/types";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import LatexText from "@/components/student/ui/common/LatexText";
+import {
+  Clock,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Eye,
+  Calendar,
+  Filter,
+  ArrowUpDown,
+  BookOpen,
+  Trophy,
+  Search,
+  Check,
+  ChevronDown,
+  Bookmark,
+  Layers,
+  HelpCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ExamHistoryViewProps {
   history: ExamResult[];
@@ -17,985 +32,572 @@ interface ExamHistoryViewProps {
   onRecheckRequest: (id: string) => void;
   bookmarkedIds?: Set<string>;
   onToggleBookmark?: (questionId: string | number) => void;
-  /** Pre-fetched bookmark question objects — when provided, the bookmarks tab
-   *  uses these directly instead of filtering from exam history. */
   bookmarkedQuestions?: Question[];
 }
 
-const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ'];
+type SortOption = "date_desc" | "score_desc" | "score_asc";
+type TabMode = "exams" | "questions";
 
-/* ── Score Ring SVG ── */
-const ScoreRing: React.FC<{ percent: number; size?: number }> = ({
-  percent,
-  size = 44,
-}) => {
-  const r = (size - 6) / 2;
-  const circ = 2 * Math.PI * r;
-  const filled = (percent / 100) * circ;
-  const color =
-    percent >= 80 ? '#16a34a' : percent >= 50 ? '#ca8a04' : '#dc2626';
-  return (
-    <svg width={size} height={size} className="shrink-0 -rotate-90">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        strokeWidth={5}
-        stroke="currentColor"
-        className="text-neutral-200 dark:text-neutral-700"
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        strokeWidth={5}
-        stroke={color}
-        strokeDasharray={`${filled} ${circ - filled}`}
-        strokeLinecap="round"
-      />
-      <text
-        x={size / 2}
-        y={size / 2}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        className="rotate-90"
-        transform={`rotate(90 ${size / 2} ${size / 2})`}
-        fontSize={size * 0.26}
-        fontWeight="700"
-        fill={color}
-      >
-        {percent}%
-      </text>
-    </svg>
-  );
-};
+const BANGLA_OPTIONS = ["ক", "খ", "গ", "ঘ", "ঙ"];
 
-/* ── PracticeRow ── */
-const PracticeRow: React.FC<{
-  item: {
-    examDate: string;
-    subject: string;
-    subjectLabel?: string;
-    userAns: number | undefined;
-    question: Question;
-    flagged: boolean;
-  };
-  isMistakeTab?: boolean;
-  index: number;
-  onToggleBookmark?: (id: string | number) => void;
-}> = ({ item, isMistakeTab, index, onToggleBookmark }) => {
-  const [selectedOpt, setSelectedOpt] = useState<number | undefined>(undefined);
-  const [revealed, setRevealed] = useState(false);
-
-  const handleSelect = (idx: number) => {
-    setSelectedOpt(idx);
-    setRevealed(true);
-  };
-  const handleRetry = () => {
-    setSelectedOpt(undefined);
-    setRevealed(false);
-  };
-
-  return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center px-1 mb-2">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
-            {item.examDate && !isNaN(new Date(item.examDate).getTime())
-              ? new Date(item.examDate).toLocaleDateString('bn-BD', {
-                  day: 'numeric',
-                  month: 'short',
-                }) + ' • '
-              : ''}
-            {item.subjectLabel || getSubjectDisplayName(item.subject)}
-          </span>
-          {revealed && item.userAns !== undefined && isMistakeTab && (
-            <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-semibold">
-              আগের উত্তর:{' '}
-              <span
-                className={
-                  item.userAns === item.question.correctAnswerIndex
-                    ? 'text-emerald-500'
-                    : 'text-red-500'
-                }
-              >
-                <LatexText text={item.question.options[item.userAns] || '—'} />
-              </span>
-            </span>
-          )}
-        </div>
-        {revealed && (
-          <button
-            onClick={handleRetry}
-            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-2.5 py-1.5 rounded-lg transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-3.5 h-3.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-              />
-            </svg>
-            আবার চেষ্টা
-          </button>
-        )}
-      </div>
-      <QuestionCard
-        question={item.question}
-        serialNumber={index}
-        selectedOptionIndex={selectedOpt}
-        isFlagged={item.flagged}
-        onSelectOption={handleSelect}
-        onToggleFlag={() => onToggleBookmark?.(item.question.id)}
-        onReport={() => {}}
-        showFeedback={revealed}
-        readOnly={revealed}
-      />
-    </div>
-  );
-};
-
-/* ═══════════════════════════════════════════════
-   MAIN COMPONENT
-═══════════════════════════════════════════════ */
-const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
+export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   history,
   onBack,
-  onClearHistory,
   onViewResult,
-  onRecheckRequest,
-  bookmarkedIds: externalBookmarkedIds,
-  onToggleBookmark: externalOnToggleBookmark,
-  bookmarkedQuestions: externalBookmarkedQuestions,
+  bookmarkedIds = new Set(),
+  onToggleBookmark,
 }) => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'exams' | 'mistakes' | 'marked'>(
-    'exams',
-  );
+  const [activeTab, setActiveTab] = useState<TabMode>("exams");
+  const [selectedSubject, setSelectedSubject] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("date_desc");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedExplanation, setExpandedExplanation] = useState<Record<string, boolean>>({});
 
-  const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Set<string>>(new Set());
-  const [localBookmarkedQuestions, setLocalBookmarkedQuestions] = useState<Question[]>([]);
-  const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
-
-  const bookmarkedIds = externalBookmarkedIds || localBookmarkedIds;
-  const bookmarkedQuestions = externalBookmarkedQuestions || (localBookmarkedQuestions.length > 0 ? localBookmarkedQuestions : undefined);
-
-  useEffect(() => {
-    if (externalBookmarkedQuestions || !user?.id) return;
-    const fetchMarks = async () => {
-      setIsLoadingBookmarks(true);
-      try {
-        const idsSet = await getUserBookmarks(user.id);
-        const ids = Array.from(idsSet).map(String);
-        setLocalBookmarkedIds(new Set(ids));
-        if (ids.length > 0) {
-          const qs = await getBookmarkedQuestions(user.id);
-          setLocalBookmarkedQuestions(qs);
-        } else {
-          setLocalBookmarkedQuestions([]);
-        }
-      } catch (err) {
-        console.error("Error fetching bookmarks in history view:", err);
-      } finally {
-        setIsLoadingBookmarks(false);
-      }
-    };
-    fetchMarks();
-  }, [user?.id, externalBookmarkedQuestions]);
-
-  const handleToggleBookmark = useCallback(async (qId: string | number) => {
-    if (externalOnToggleBookmark) {
-      externalOnToggleBookmark(qId);
-      return;
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return "—";
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m > 0) {
+      return `${BanglaNameHelper.toBanglaNumeral(m)}মি ${BanglaNameHelper.toBanglaNumeral(s)}সে`;
     }
-    if (!user?.id) return;
-    const questionIdStr = String(qId);
-    const isBookmarked = localBookmarkedIds.has(questionIdStr);
-    
-    const nextIds = new Set(localBookmarkedIds);
-    if (isBookmarked) {
-      nextIds.delete(questionIdStr);
-      setLocalBookmarkedQuestions(prev => prev.filter(q => q.id !== questionIdStr));
-    } else {
-      nextIds.add(questionIdStr);
+    return `${BanglaNameHelper.toBanglaNumeral(s)} সেকেন্ড`;
+  };
+
+  // Top Summary Statistics
+  const { totalExams, avgAccuracy, totalStudyTime } = useMemo(() => {
+    if (history.length === 0) {
+      return { totalExams: 0, avgAccuracy: 0, totalStudyTime: 0 };
     }
-    setLocalBookmarkedIds(nextIds);
-    
-    try {
-      await toggleBookmark(user.id, questionIdStr, isBookmarked);
-      toast.success(isBookmarked ? "বুকমার্ক সরানো হয়েছে" : "বুকমার্ক সেভ করা হয়েছে");
-    } catch {
-      toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে।");
-      setLocalBookmarkedIds(localBookmarkedIds);
-    }
-  }, [user?.id, localBookmarkedIds, externalOnToggleBookmark]);
+    let totalQuestions = 0;
+    let totalCorrect = 0;
+    let totalTime = 0;
 
-  const [filterSubject, setFilterSubject] = useState('');
-  const [filterDate, setFilterDate] = useState('');
-  const [visibleCount, setVisibleCount] = useState(9);
-
-  const [sortBy, setSortBy] = useState<'date' | 'score-high' | 'score-low'>(
-    'date',
-  );
-  const [searchText, setSearchText] = useState('');
-
-  const uniqueSubjects = useMemo(() => {
-    const map = new Map<string, string>();
-    history.forEach((item) => {
-      if (!map.has(item.subject)) {
-        map.set(
-          item.subject,
-          getSubjectDisplayName(item.subject)
-        );
-      }
+    history.forEach((h) => {
+      const qCount = h.totalQuestions || h.totalMarks || 1;
+      const cCount = h.correctCount ?? (h as any).correct_count ?? 0;
+      const time = h.timeTaken ?? (h as any).time_taken ?? 0;
+      totalQuestions += qCount;
+      totalCorrect += cCount;
+      totalTime += time;
     });
-    return Array.from(map.entries()).sort((a, b) => a[1].localeCompare(b[1]));
-  }, [history]);
 
-  const filteredHistory = useMemo(() => {
-    const filtered = history.filter((item) => {
-      const matchSubject = filterSubject
-        ? item.subject === filterSubject
-        : true;
-      const matchDate = filterDate ? item.date.startsWith(filterDate) : true;
-      const matchSearch = searchText
-        ? (item.subjectLabel || item.subject || '')
-            .toLowerCase()
-            .includes(searchText.toLowerCase()) ||
-          (item.examType || '').toLowerCase().includes(searchText.toLowerCase())
-        : true;
-      return matchSubject && matchDate && matchSearch;
-    });
-    if (sortBy === 'score-high')
-      filtered.sort((a, b) => b.score / b.totalMarks - a.score / a.totalMarks);
-    else if (sortBy === 'score-low')
-      filtered.sort((a, b) => a.score / a.totalMarks - b.score / b.totalMarks);
-    else {
-      // Sort by date newest first
-      filtered.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      );
-    }
-    return filtered;
-  }, [history, filterSubject, filterDate, searchText, sortBy]);
-
-  const displayedHistory = filteredHistory.slice(0, visibleCount);
-  const hasMoreHistory = visibleCount < filteredHistory.length;
-
-  const stats = useMemo(() => {
-    const ev = history.filter(
-      (h) => (!h.status || h.status === 'evaluated') && h.totalMarks > 0,
-    );
-    const totalExams = ev.length;
-
-    // Use pre-calculated fields from DB if available, otherwise sum from questions
-    const totalQuestions = ev.reduce((acc, e) => acc + (e.totalQuestions || 0), 0);
-    const totalCorrect = ev.reduce((acc, e) => acc + (e.correctCount || 0), 0);
-    const totalWrong = ev.reduce((acc, e) => acc + (e.wrongCount || 0), 0);
-    const totalSkipped = ev.reduce(
-      (acc, e) =>
-        acc +
-        Math.max(0, (e.totalQuestions || 0) - ((e.correctCount || 0) + (e.wrongCount || 0))),
-      0,
-    );
-
-    const avgScore =
-      totalExams > 0
-        ? Math.round(
-            ev.reduce((acc, c) => acc + (c.score / c.totalMarks) * 100, 0) /
-              totalExams,
-          )
-        : 0;
-
-    const examsWithTime = ev.filter(e => (e.timeTaken || 0) > 0);
-    const totalTime = ev.reduce((acc, e) => acc + (e.timeTaken || 0), 0);
-    const questionsWithTime = examsWithTime.reduce((acc, e) => acc + (e.totalQuestions || 0), 0);
-    const avgTimePerQuestion = questionsWithTime > 0 ? Math.round(totalTime / questionsWithTime) : 0;
-
+    const acc = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
     return {
-      totalQuestions,
-      totalCorrect,
-      totalWrong,
-      totalSkipped,
-      avgScore,
-      totalTime,
-      avgTimePerQuestion,
+      totalExams: history.length,
+      avgAccuracy: acc,
+      totalStudyTime: totalTime,
     };
   }, [history]);
 
-  const mistakes = useMemo(() => {
-    const all: {
-      question: Question;
-      examDate: string;
-      subject: string;
-      subjectLabel?: string;
-      userAns: number;
-      flagged: boolean;
-    }[] = [];
-    const seen = new Set<string | number>();
-    history.forEach((exam) => {
-      if (filterSubject && exam.subject !== filterSubject) return;
-      if (filterDate && !exam.date.startsWith(filterDate)) return;
-      if (!exam.questions || !exam.userAnswers) return;
-      const flags = new Set(exam.flaggedQuestions || []);
-      exam.questions.forEach((q) => {
-        const ua = exam.userAnswers?.[q.id];
-        if (ua !== undefined && ua !== null && ua !== -1 && !seen.has(q.id)) {
-          const isCorrect =
-            ua === q.correctAnswerIndex ||
-            (q.correctAnswerIndices != null &&
-              q.correctAnswerIndices.includes(ua));
+  const allSubjects = useMemo(() => {
+    const map = new Map<string, string>();
+    history.forEach((h) => {
+      const label = h.subjectLabel || (h as any).subject_label || h.subject;
+      if (label && !map.has(label)) {
+        map.set(label, h.subject);
+      }
+    });
+    return Array.from(map.entries()).map(([label, id]) => ({ id, label }));
+  }, [history]);
 
-          if (!isCorrect) {
-            seen.add(q.id);
-            all.push({
+  // Filtered Exams
+  const filteredHistory = useMemo(() => {
+    let list = [...history];
+
+    if (selectedSubject !== "all") {
+      list = list.filter((h) => {
+        const lbl = h.subjectLabel || (h as any).subject_label;
+        return (
+          h.subject === selectedSubject ||
+          (lbl &&
+            allSubjects.find((s) => s.id === selectedSubject)?.label === lbl)
+        );
+      });
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((h) => {
+        const lbl = (h.subjectLabel || (h as any).subject_label || "").toLowerCase();
+        const sub = (h.subject || "").toLowerCase();
+        const typ = (h.examType || (h as any).exam_type || "").toLowerCase();
+        return lbl.includes(q) || sub.includes(q) || typ.includes(q);
+      });
+    }
+
+    if (sortBy === "date_desc") {
+      list.sort(
+        (a, b) =>
+          new Date((b as any).created_at || b.date).getTime() -
+          new Date((a as any).created_at || a.date).getTime()
+      );
+    } else if (sortBy === "score_desc") {
+      list.sort((a, b) => {
+        const maxA = a.totalMarks || a.totalQuestions || 1;
+        const maxB = b.totalMarks || b.totalQuestions || 1;
+        const scoreA = (a.score / maxA) * 100;
+        const scoreB = (b.score / maxB) * 100;
+        return scoreB - scoreA;
+      });
+    } else if (sortBy === "score_asc") {
+      list.sort((a, b) => {
+        const maxA = a.totalMarks || a.totalQuestions || 1;
+        const maxB = b.totalMarks || b.totalQuestions || 1;
+        const scoreA = (a.score / maxA) * 100;
+        const scoreB = (b.score / maxB) * 100;
+        return scoreA - scoreB;
+      });
+    }
+
+    return list;
+  }, [history, selectedSubject, searchQuery, sortBy, allSubjects]);
+
+  // Flattened Questions List across all exams for Question Review Tab
+  const allAttemptedQuestions = useMemo(() => {
+    const list: {
+      question: Question;
+      userAns: number;
+      examTitle: string;
+      examDate: string;
+    }[] = [];
+
+    history.forEach((h) => {
+      if (h.questions && h.userAnswers) {
+        h.questions.forEach((q) => {
+          const ans = h.userAnswers?.[q.id];
+          if (ans !== undefined && ans !== null && ans !== -1) {
+            list.push({
               question: q,
-              examDate: exam.date,
-              subject: exam.subject,
-              subjectLabel: exam.subjectLabel,
-              userAns: ua,
-              flagged: flags.has(q.id),
+              userAns: ans,
+              examTitle: h.subjectLabel || BanglaNameHelper.formatSubject(h.subject, h.subject),
+              examDate: h.date,
             });
           }
-        }
-      });
+        });
+      }
     });
-    return all.reverse();
-  }, [history, filterSubject, filterDate, bookmarkedIds]);
 
-  const bookmarks = useMemo(() => {
-    // If we have pre-fetched bookmarked questions from DB, use them directly
-    if (bookmarkedQuestions !== undefined) {
-      return bookmarkedQuestions
-        .filter((q) => !filterSubject || q.subject === filterSubject)
-        .map((q) => ({
-          question: q,
-          examDate: '',
-          subject: q.subject ?? '',
-          subjectLabel: q.subjectLabel,
-          userAns: undefined as number | undefined,
-          flagged: true,
-        }));
+    if (selectedSubject !== "all") {
+      return list.filter((item) => {
+        const sub = item.question.subject;
+        const subLabel = item.question.subjectLabel;
+        return (
+          sub === selectedSubject ||
+          (subLabel &&
+            allSubjects.find((s) => s.id === selectedSubject)?.label === subLabel)
+        );
+      });
     }
-    // Fallback: filter from exam history (only shows bookmarks present in history)
-    const all: {
-      question: Question;
-      examDate: string;
-      subject: string;
-      subjectLabel?: string;
-      userAns: number | undefined;
-      flagged: boolean;
-    }[] = [];
-    const seen = new Set<string | number>();
-    history.forEach((exam) => {
-      if (filterSubject && exam.subject !== filterSubject) return;
-      if (filterDate && !exam.date.startsWith(filterDate)) return;
-      if (!exam.questions) return;
-      exam.questions.forEach((q) => {
-        if (seen.has(q.id)) return;
-        const isMarked = bookmarkedIds
-          ? bookmarkedIds.has(String(q.id))
-          : !!(exam.flaggedQuestions && exam.flaggedQuestions.includes(q.id));
-        if (isMarked) {
-          seen.add(q.id);
-          all.push({
-            question: q,
-            examDate: exam.date,
-            subject: exam.subject,
-            subjectLabel: exam.subjectLabel,
-            userAns: exam.userAnswers?.[q.id],
-            flagged: true,
-          });
-        }
-      });
-    });
-    return all.reverse();
-  }, [history, filterSubject, filterDate, bookmarkedIds, bookmarkedQuestions]);
 
-  const displayedMistakes = mistakes.slice(0, visibleCount);
-  const hasMoreMistakes = visibleCount < mistakes.length;
-  const displayedBookmarks = bookmarks.slice(0, visibleCount);
-  const hasMoreBookmarks = visibleCount < bookmarks.length;
+    return list;
+  }, [history, selectedSubject, allSubjects]);
 
-  const formatDate = (iso: string) =>
-    new Intl.DateTimeFormat('bn-BD', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(new Date(iso));
-  // Helper to format time seconds into hh:mm:ss format
-const formatDuration = (seconds: number) => {
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  if (hrs > 0) return `${hrs}ঘণ্টা ${mins}মি`;
-  if (mins > 0) return `${mins}মি ${secs}সে`;
-  return `${secs}সেকেন্ড`;
-};
-
-  const TABS = [
-    {
-      id: 'exams',
-      label: 'পরীক্ষা',
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'mistakes',
-      label: 'ভুলসমূহ',
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-          />
-        </svg>
-      ),
-    },
-  ] as const;
+  const toggleExplanation = (id: string) => {
+    setExpandedExplanation((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] dark:bg-[#0e0e0e] transition-colors pb-28 md:pb-10">
-      {/* ── Android-style top app bar (mobile) / Desktop header ── */}
-      <header className="overflow-x-auto hide-scrollbar pt-4 md:pt-6">
-        <div className="max-w-6xl mx-auto px-2 md:px-4 flex items-center justify-start md:justify-end gap-3 min-w-max w-fit md:w-full">
-          {/* Tab strip */}
-          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setVisibleCount(9);
-                }}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-sm'
-                    : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </div>
+    <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
+            পরীক্ষার ইতিহাস ও পর্যালোচনা 📜
+          </h2>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            তোমার দেওয়া সকল পরীক্ষা ও প্রশ্নোত্তরের পূর্ণাঙ্গ সংগ্রহশালা
+          </p>
         </div>
-      </header>
 
-      <div className="max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 space-y-4">
-        {/* ── Filters row ── */}
-        {activeTab === 'exams' && (
-          <div className="grid grid-cols-2 md:flex md:flex-row gap-2">
-            {/* Search */}
-            <div className="relative col-span-2 md:flex-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setVisibleCount(9);
-                }}
-                placeholder="খুঁজুন..."
-                className="w-full bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 rounded-xl pl-9 pr-3 py-2 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all h-[42px]"
-              />
-            </div>
-            {/* Subject */}
-            <div className="relative col-span-1 border-r border-neutral-200 dark:border-neutral-700 md:border-r-0">
-              <select
-                value={filterSubject}
-                onChange={(e) => {
-                  setFilterSubject(e.target.value);
-                  setVisibleCount(9);
-                }}
-                className="appearance-none bg-white dark:bg-[#1c1c1c] border md:border-neutral-200 dark:md:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-l-xl md:rounded-xl px-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full h-[42px] cursor-pointer"
-              >
-                <option value="">সকল বিষয়</option>
-                {uniqueSubjects.map(([code, label]) => (
-                  <option key={code} value={code}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-            {/* Date */}
-            <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => {
-                setFilterDate(e.target.value);
-                setVisibleCount(9);
-              }}
-              className="col-span-1 bg-white dark:bg-[#1c1c1c] border-t border-r border-neutral-200 dark:border-neutral-700 md:border md:border-neutral-200 dark:md:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-r-xl md:rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full h-[42px]"
-            />
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => {
-                setSortBy(
-                  e.target.value as 'date' | 'score-high' | 'score-low',
-                );
-                setVisibleCount(9);
-              }}
-              className="col-span-2 md:col-span-1 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full md:w-auto h-[42px] cursor-pointer mt-1 md:mt-0"
+        {/* Tab Switcher (Exams vs Questions Review) */}
+        <div className="flex bg-neutral-100 dark:bg-[#18181B] p-1 rounded-2xl border border-neutral-200 dark:border-[#27272A] w-fit shadow-sm">
+          <button
+            onClick={() => setActiveTab("exams")}
+            className={cn(
+              "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all",
+              activeTab === "exams"
+                ? "bg-[#004633] text-white shadow-sm"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+            )}
+          >
+            পরীক্ষাসমূহ ({BanglaNameHelper.toBanglaNumeral(history.length)})
+          </button>
+          <button
+            onClick={() => setActiveTab("questions")}
+            className={cn(
+              "px-3.5 py-1.5 rounded-xl text-xs font-black transition-all",
+              activeTab === "questions"
+                ? "bg-[#004633] text-white shadow-sm"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+            )}
+          >
+            প্রশ্নোত্তর রিভিউ ({BanglaNameHelper.toBanglaNumeral(allAttemptedQuestions.length)})
+          </button>
+        </div>
+      </div>
+
+      {/* ── Summary Statistics Cards ── */}
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-4 mb-5">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm flex flex-col items-center sm:items-start">
+          <span className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
+            মোট পরীক্ষা
+          </span>
+          <span className="text-lg sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums mt-0.5">
+            {BanglaNameHelper.toBanglaNumeral(totalExams)}টি
+          </span>
+        </div>
+
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm flex flex-col items-center sm:items-start">
+          <span className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
+            গড় নির্ভুলতা
+          </span>
+          <span className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5">
+            {BanglaNameHelper.toBanglaNumeral(avgAccuracy)}%
+          </span>
+        </div>
+
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm flex flex-col items-center sm:items-start">
+          <span className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
+            মোট পড়ার সময়
+          </span>
+          <span className="text-lg sm:text-2xl font-black text-purple-600 dark:text-purple-400 tabular-nums mt-0.5">
+            {formatDuration(totalStudyTime)}
+          </span>
+        </div>
+      </div>
+
+      {/* Controls Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        {/* Subject Filter Pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-1">
+          <button
+            onClick={() => setSelectedSubject("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-bold border transition-all shrink-0",
+              selectedSubject === "all"
+                ? "bg-[#004633] text-white border-[#004633] shadow-sm"
+                : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
+            )}
+          >
+            সব বিষয়
+          </button>
+          {allSubjects.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSelectedSubject(s.id)}
+              className={cn(
+                "px-3 py-1.5 rounded-full text-xs font-bold border transition-all shrink-0",
+                selectedSubject === s.id
+                  ? "bg-[#004633] text-white border-[#004633] shadow-sm"
+                  : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
+              )}
             >
-              <option value="date">তারিখ অনুযায়ী</option>
-              <option value="score-high">স্কোর: বেশি আগে</option>
-              <option value="score-low">স্কোর: কম আগে</option>
-            </select>
-          </div>
-        )}
+              {BanglaNameHelper.formatSubject(s.label, s.id)}
+            </button>
+          ))}
+        </div>
 
-        {/* ══════════════ EXAMS TAB ══════════════ */}
-        {activeTab === 'exams' && (
-          <div className="space-y-4 animate-fade-in">
-            {/* Stats bar — Android Material-style chips on mobile */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-              {/* Total Questions */}
-              <div className="bg-emerald-700 dark:bg-emerald-800 rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start text-white shadow-md shadow-emerald-700/20">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-80 mb-0.5">
-                  মোট প্রশ্ন
-                </p>
-                <p className="text-2xl md:text-4xl font-extrabold leading-tight">
-                  {stats.totalQuestions}
-                </p>
-                <p className="hidden md:block text-xs opacity-60 mt-0.5">
-                  সমাধান করেছ
-                </p>
-              </div>
-              {/* Correct */}
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-0.5">
-                  সঠিক
-                </p>
-                <p className="text-2xl md:text-4xl font-extrabold text-emerald-600 dark:text-emerald-500 leading-tight">
-                  {stats.totalCorrect}
-                </p>
-                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
-                  প্রশ্নের উত্তর
-                </p>
-              </div>
-              {/* Wrong */}
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-0.5">
-                  ভুল
-                </p>
-                <p className="text-2xl md:text-4xl font-extrabold text-red-600 dark:text-red-500 leading-tight">
-                  {stats.totalWrong}
-                </p>
-                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
-                  প্রশ্নের উত্তর
-                </p>
-              </div>
-              {/* Avg Score */}
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  গড় নম্বর
-                </p>
-                <p className="text-2xl md:text-4xl font-extrabold text-neutral-800 dark:text-white leading-tight">
-                  {stats.avgScore}%
-                </p>
-                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
-                  সাফল্যের হার
-                </p>
-              </div>
+        {/* Search & Sort for Exams tab */}
+        {activeTab === "exams" && (
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-[#27272A] bg-white dark:bg-[#18181B] text-xs font-bold text-neutral-800 dark:text-neutral-200 outline-none cursor-pointer shadow-sm"
+              >
+                <option value="date_desc">📅 সর্বশেষ</option>
+                <option value="score_desc">🏆 সর্বোচ্চ স্কোর</option>
+                <option value="score_asc">📉 সর্বনিম্ন স্কোর</option>
+              </select>
             </div>
-
-            {/* Extra stats — Time metrics */}
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  মোট সময় (মিনিট)
-                </p>
-                <p className="text-xl md:text-2xl font-extrabold text-neutral-800 dark:text-white leading-tight">
-                  {stats.totalTime > 0 ? Math.max(1, Math.round(stats.totalTime / 60)) : 0}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm relative">
-                <div className="flex items-center gap-1 mb-0.5 group">
-                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-                    গড় সময় (সেকেন্ড)
-                  </p>
-                  <div className="text-neutral-400 hover:text-emerald-500 transition-colors cursor-help">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-[calc(100%-8px)] left-1/2 md:left-4 -translate-x-1/2 md:-translate-x-0 w-max max-w-[200px] p-2 bg-neutral-900 dark:bg-neutral-800 text-white text-[10px] font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 text-center shadow-xl pointer-events-none">
-                    প্রতিটি প্রশ্নের জন্য তোমার গড়ে কত সেকেন্ড সময় লাগে
-                    <div className="absolute top-full left-1/2 md:left-6 -translate-x-1/2 border-4 border-transparent border-t-neutral-900 dark:border-t-neutral-800"></div>
-                  </div>
-                </div>
-                <p className="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-500 leading-tight">
-                  {stats.avgTimePerQuestion}
-                </p>
-              </div>
-            </div>
-
-
-            {/* Empty state */}
-            {displayedHistory.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1c1c1c] rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-700">
-                <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-4 text-neutral-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-8 h-8"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                    />
-                  </svg>
-                </div>
-                <p className="text-neutral-500 dark:text-neutral-400 font-semibold text-sm">
-                  কোনো ফলাফল পাওয়া যায়নি
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* ── Mobile: Android-style list rows ── */}
-                <div className="flex flex-col gap-2 md:hidden">
-                  {displayedHistory.map((item) => {
-                    const isPending =
-                      item.submissionType === 'script' &&
-                      item.status === 'pending';
-                    const isRejected =
-                      item.submissionType === 'script' &&
-                      item.status === 'rejected';
-                    const scorePercent =
-                      item.totalMarks > 0
-                        ? Math.round((item.score / item.totalMarks) * 100)
-                        : 0;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden active:scale-[0.99] transition-transform"
-                      >
-                        <div className="flex items-center gap-3 px-4 py-2">
-                          {/* Score Ring */}
-                          {!isPending && !isRejected ? (
-                            <ScoreRing percent={scorePercent} size={36} />
-                          ) : (
-                            <div
-                              className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black uppercase ${isPending ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300' : 'bg-red-100 dark:bg-red-900/30 text-red-600'}`}
-                            >
-                              {isPending ? 'Wait' : 'Rej.'}
-                            </div>
-                          )}
-
-                          {/* Details */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[15px] font-bold text-neutral-900 dark:text-white truncate">
-                              {item.subjectLabel || item.subject}
-                            </p>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium truncate">
-                              {formatDate(item.date)}
-                            </p>
-                            {!isPending && !isRejected && (
-                              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
-                                {item.score.toFixed(1)} / {item.totalMarks}{' '}
-                                &nbsp;·&nbsp; {formatDuration(item.timeTaken)}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Chevron / action */}
-                          <button
-                            onClick={
-                              isRejected
-                                ? () => onRecheckRequest(item.id)
-                                : () => onViewResult(item)
-                            }
-                            disabled={isPending}
-                            className={`shrink-0 flex items-center justify-center w-9 h-9 rounded-full transition-colors ${isPending ? 'opacity-30 cursor-default' : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-90'}`}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2.5}
-                              stroke="currentColor"
-                              className="w-4 h-4 text-neutral-500 dark:text-neutral-400"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* ── Desktop: Card Grid ── */}
-                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {displayedHistory.map((item) => {
-                    const isPending =
-                      item.submissionType === 'script' &&
-                      item.status === 'pending';
-                    const isRejected =
-                      item.submissionType === 'script' &&
-                      item.status === 'rejected';
-                    const scorePercent =
-                      item.totalMarks > 0
-                        ? Math.round((item.score / item.totalMarks) * 100)
-                        : 0;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className="group bg-white dark:bg-[#1c1c1c] rounded-2xl p-5 border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/40 hover:shadow-lg dark:hover:shadow-black/30 transition-all duration-200 flex flex-col gap-4"
-                      >
-                        {/* Top row */}
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-1">
-                              {formatDate(item.date)}
-                            </p>
-                            <h3 className="text-[17px] font-black text-neutral-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight line-clamp-2">
-                              {item.subjectLabel || item.subject}
-                            </h3>
-                          </div>
-                          {!isPending && !isRejected && (
-                            <ScoreRing percent={scorePercent} size={36} />
-                          )}
-                          {isPending && (
-                            <span className="text-[10px] font-black uppercase tracking-widest bg-neutral-800 dark:bg-white text-white dark:text-black px-2.5 py-1 rounded-lg">
-                              Pending
-                            </span>
-                          )}
-                          {isRejected && (
-                            <span className="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-2.5 py-1 rounded-lg">
-                              Rejected
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Score detail row */}
-                        {!isPending && !isRejected && (
-                          <div className="grid grid-cols-2 gap-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-3 border border-neutral-100 dark:border-neutral-800">
-                            <div>
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-0.5">
-                                স্কোর
-                              </p>
-                              <p className="text-sm font-black text-neutral-800 dark:text-white">
-                                {item.score.toFixed(1)}{' '}
-                                <span className="text-neutral-400 font-bold">
-                                  / {item.totalMarks}
-                                </span>
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-0.5">
-                                সময়
-                              </p>
-                              <p className="text-sm font-black text-neutral-800 dark:text-white">
-                                {formatDuration(item.timeTaken)}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* CTA */}
-                        <button
-                          onClick={
-                            isRejected
-                              ? () => onRecheckRequest(item.id)
-                              : () => onViewResult(item)
-                          }
-                          disabled={isPending}
-                          className="mt-auto w-full py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-500 dark:hover:text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          {isRejected ? 'রিচেক করো' : 'ফলাফল দেখো →'}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-
-            {hasMoreHistory && (
-              <div className="flex justify-center pt-2">
-                <button
-                  onClick={() => setVisibleCount((p) => p + 9)}
-                  className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                >
-                  আরও দেখো
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ══════════════ MISTAKES TAB ══════════════ */}
-        {activeTab === 'mistakes' && (
-          <div className="animate-fade-in space-y-4">
-            {displayedMistakes.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1c1c1c] rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-700">
-                <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mb-4 text-emerald-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-8 h-8"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                  কোনো ভুল নেই!
-                </h3>
-                <p className="text-neutral-400 dark:text-neutral-500 mt-1 text-sm">
-                  তুমি সব প্রশ্নের সঠিক উত্তর দিয়েছো।
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center gap-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40 p-3 rounded-xl">
-                  <div className="p-1.5 bg-red-100 dark:bg-red-900/40 rounded-full text-red-600 dark:text-red-400">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-xs text-red-800 dark:text-red-300 font-semibold">
-                    ভুল করা প্রশ্নগুলো আবার প্র্যাকটিস করো।
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {displayedMistakes.map((item, idx) => (
-                    <PracticeRow
-                      key={`${item.examDate}-${item.question.id}-${idx}`}
-                      item={item}
-                      isMistakeTab
-                      index={idx + 1}
-                      onToggleBookmark={handleToggleBookmark}
-                    />
-                  ))}
-                </div>
-                {hasMoreMistakes && (
-                  <div className="flex justify-center pt-2">
-                    <button
-                      onClick={() => setVisibleCount((p) => p + 9)}
-                      className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                    >
-                      আরও দেখো
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
           </div>
         )}
       </div>
 
-      {/* ── Android bottom nav bar (mobile only) ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#161616] border-t border-neutral-200 dark:border-neutral-800 flex">
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setVisibleCount(9);
-              }}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}`}
-            >
-              {tab.icon}
-              <span
-                className={`text-[10px] font-bold tracking-wide ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}`}
-              >
-                {tab.label}
-              </span>
-              {isActive && (
-                <span className="absolute bottom-0 w-8 h-0.5 bg-emerald-600 dark:bg-emerald-500 rounded-t-full" />
-              )}
-            </button>
-          );
-        })}
-      </nav>
+      {/* ── TAB 1: EXAMS LIST ── */}
+      {activeTab === "exams" && (
+        <>
+          {filteredHistory.length === 0 ? (
+            <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6">
+              <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-3">
+                <BookOpen size={24} />
+              </div>
+              <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200">
+                কোনো পরীক্ষার রেকর্ড পাওয়া যায়নি
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                মডেল টেস্ট দিয়ে তোমার ইতিহাস তৈরি করো
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredHistory.map((exam) => {
+                const total = exam.totalQuestions || exam.totalMarks || 1;
+                const correct = exam.correctCount ?? (exam as any).correct_count ?? 0;
+                const wrong = exam.wrongCount ?? (exam as any).wrong_count ?? 0;
+                const totalMarks = exam.totalMarks || total;
+                const netScore = exam.score ?? 0;
+                const pct = Math.max(
+                  0,
+                  Math.min(100, Math.round((netScore / totalMarks) * 100))
+                );
+
+                let scoreBadgeClass =
+                  "bg-emerald-50 dark:bg-[#0C2419] text-[#004633] dark:text-[#4ADE80] border-emerald-300 dark:border-emerald-900/50";
+                if (pct < 40) {
+                  scoreBadgeClass =
+                    "bg-red-50 dark:bg-[#260C0E] text-red-600 dark:text-[#F87171] border-red-200 dark:border-red-900/50";
+                } else if (pct < 70) {
+                  scoreBadgeClass =
+                    "bg-blue-50 dark:bg-[#0E1A2E] text-blue-700 dark:text-[#60A5FA] border-blue-200 dark:border-blue-900/50";
+                }
+
+                const examDate = new Date((exam as any).created_at || exam.date);
+                const dateStr = !isNaN(examDate.getTime())
+                  ? examDate.toLocaleDateString("bn-BD", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "—";
+                const timeStr = !isNaN(examDate.getTime())
+                  ? examDate.toLocaleTimeString("bn-BD", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "";
+
+                return (
+                  <div
+                    key={exam.id}
+                    className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    {/* Left: Exam Info */}
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#27272A] text-[10px] font-black text-neutral-600 dark:text-neutral-300 uppercase">
+                          {BanglaNameHelper.formatSubject(
+                            exam.subjectLabel || (exam as any).subject_label || exam.subject,
+                            exam.subject
+                          )}
+                        </span>
+                        <span className="text-xs font-bold text-neutral-400">
+                          {dateStr} {timeStr && `• ${timeStr}`}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base sm:text-lg font-black text-neutral-900 dark:text-white truncate">
+                        {exam.subjectLabel || (exam as any).subject_label || BanglaNameHelper.formatSubject(exam.subject, exam.subject)}
+                      </h3>
+
+                      {/* Stats Row */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold text-neutral-500 dark:text-neutral-400">
+                        <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                          <CheckCircle2 size={12} />
+                          <span>{BanglaNameHelper.toBanglaNumeral(correct)}টি সঠিক</span>
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 text-red-500">
+                          <XCircle size={12} />
+                          <span>{BanglaNameHelper.toBanglaNumeral(wrong)}টি ভুল</span>
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 text-neutral-500">
+                          <Clock size={12} />
+                          <span>{formatDuration(exam.timeTaken || (exam as any).time_taken)}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Score Badge & Actions */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-neutral-100 dark:border-neutral-800">
+                      {/* Score Pill */}
+                      <div
+                        className={cn(
+                          "px-3.5 py-1.5 rounded-2xl border text-center font-black",
+                          scoreBadgeClass
+                        )}
+                      >
+                        <div className="text-base sm:text-lg tabular-nums leading-tight">
+                          {BanglaNameHelper.toBanglaNumeral(pct)}%
+                        </div>
+                        <div className="text-[10px] font-bold uppercase opacity-80">
+                          স্কোর: {BanglaNameHelper.toBanglaNumeral(netScore)}/{BanglaNameHelper.toBanglaNumeral(totalMarks)}
+                        </div>
+                      </div>
+
+                      {/* View Details / Review Button */}
+                      <button
+                        onClick={() => onViewResult(exam)}
+                        className="px-4 py-2 rounded-xl bg-[#004633] hover:bg-[#003627] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                      >
+                        <Eye size={14} />
+                        <span>উত্তরপত্র ও রিভিউ</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── TAB 2: QUESTIONS REVIEW (QUESTION BANK) ── */}
+      {activeTab === "questions" && (
+        <>
+          {allAttemptedQuestions.length === 0 ? (
+            <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6">
+              <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-3">
+                <HelpCircle size={24} />
+              </div>
+              <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200">
+                কোনো প্রশ্ন পাওয়া যায়নি
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                পরীক্ষা দেওয়ার পর প্রশ্নগুলো এখানে রিভিউ করতে পারবে
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {allAttemptedQuestions.map((item, idx) => {
+                const q = item.question;
+                const isCorrect =
+                  item.userAns === q.correctAnswerIndex ||
+                  (q.correctAnswerIndices != null &&
+                    q.correctAnswerIndices.includes(item.userAns));
+                const isExp = !!expandedExplanation[q.id];
+
+                return (
+                  <div
+                    key={`${q.id}-${idx}`}
+                    className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] shadow-sm space-y-3"
+                  >
+                    {/* Top Row: Meta Tags */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-md bg-neutral-100 dark:bg-[#27272A] text-[10px] font-black text-neutral-600 dark:text-neutral-300 uppercase">
+                          {item.examTitle}
+                        </span>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded-md text-[10px] font-black border",
+                            isCorrect
+                              ? "bg-emerald-50 dark:bg-[#0C2419] text-emerald-600 border-emerald-200"
+                              : "bg-red-50 dark:bg-[#260C0E] text-red-600 border-red-200"
+                          )}
+                        >
+                          {isCorrect ? "✓ সঠিক উত্তর" : "✗ ভুল উত্তর"}
+                        </span>
+                      </div>
+
+                      {onToggleBookmark && (
+                        <button
+                          onClick={() => onToggleBookmark(q.id)}
+                          className="p-1 text-neutral-400 hover:text-emerald-500 transition-colors"
+                        >
+                          <Bookmark
+                            size={16}
+                            className={cn(
+                              bookmarkedIds.has(String(q.id)) &&
+                                "fill-emerald-500 text-emerald-500"
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Question Text */}
+                    <div className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white leading-relaxed flex items-start gap-1.5">
+                      <span className="font-mono text-neutral-400">
+                        {BanglaNameHelper.toBanglaNumeral(idx + 1)}.
+                      </span>
+                      <div className="flex-1">
+                        <LatexText text={q.question} />
+                      </div>
+                    </div>
+
+                    {/* Options Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {q.options.map((opt, optIdx) => {
+                        const isThisCorrect =
+                          optIdx === q.correctAnswerIndex ||
+                          (q.correctAnswerIndices != null &&
+                            q.correctAnswerIndices.includes(optIdx));
+                        const isUserChoice = optIdx === item.userAns;
+
+                        let optClass =
+                          "bg-neutral-50/70 dark:bg-[#141417] border-neutral-200 dark:border-[#27272A] text-neutral-700 dark:text-neutral-300";
+
+                        if (isThisCorrect) {
+                          optClass =
+                            "bg-emerald-50 dark:bg-[#004633]/30 border-emerald-400 dark:border-[#004633] text-emerald-900 dark:text-emerald-300 font-bold";
+                        } else if (isUserChoice && !isThisCorrect) {
+                          optClass =
+                            "bg-red-50 dark:bg-[#260C0E] border-red-300 dark:border-red-900/50 text-red-700 dark:text-red-300";
+                        }
+
+                        return (
+                          <div
+                            key={optIdx}
+                            className={cn(
+                              "p-2.5 rounded-xl border text-xs flex items-center gap-2",
+                              optClass
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0",
+                                isThisCorrect
+                                  ? "bg-[#004633] text-white"
+                                  : isUserChoice
+                                  ? "bg-red-600 text-white"
+                                  : "bg-neutral-200 dark:bg-[#27272A] text-neutral-600"
+                              )}
+                            >
+                              {BANGLA_OPTIONS[optIdx] || optIdx + 1}
+                            </span>
+                            <div className="flex-1 truncate">
+                              <LatexText text={opt} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Explanation Drawer */}
+                    {q.explanation && (
+                      <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                        <button
+                          type="button"
+                          onClick={() => toggleExplanation(String(q.id))}
+                          className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline"
+                        >
+                          <span>{isExp ? "ব্যাখ্যা লুকান" : "ব্যাখ্যা ও সমাধান দেখুন"}</span>
+                          <ChevronDown
+                            size={14}
+                            className={cn("transition-transform", isExp && "rotate-180")}
+                          />
+                        </button>
+
+                        {isExp && (
+                          <div className="mt-2 p-3 rounded-xl bg-neutral-50 dark:bg-[#141417] border border-neutral-200 dark:border-[#27272A] text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                            <LatexText text={q.explanation} />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

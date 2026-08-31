@@ -1,7 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { staggerContainer, fadeInUp, hoverScale, tapScale } from '@/lib/animations';
-import { ArrowLeft, Download, FileQuestion, CheckCircle2, Clock, BarChart2, AlertTriangle, Award } from 'lucide-react';
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Download,
+  FileQuestion,
+  CheckCircle2,
+  Clock,
+  BarChart2,
+  AlertTriangle,
+  Award,
+  BookOpen,
+} from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -13,15 +24,14 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-} from 'recharts';
-import { ExamResult } from '@/lib/types';
-import { getSubjectAnalysis, SubjectAnalysis } from '@/services/database';
-import { printSubjectReport } from '@/services/print-service';
-import { supabase } from '@/services/core';
-import LatexText from '@/components/student/ui/common/LatexText';
-import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-
-import { useAuth } from '@/components/auth/AuthProvider';
+} from "recharts";
+import { ExamResult } from "@/lib/types";
+import { getSubjectAnalysis, SubjectAnalysis } from "@/services/database";
+import { printSubjectReport } from "@/services/print-service";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import LatexText from "@/components/student/ui/common/LatexText";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { cn } from "@/lib/utils";
 
 interface SubjectReportViewProps {
   subject: string;
@@ -29,21 +39,19 @@ interface SubjectReportViewProps {
   onBack: () => void;
 }
 
-const SubjectReportView: React.FC<SubjectReportViewProps> = ({
+export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   subject,
   history,
   onBack,
 }) => {
   const { user, loading: authLoading } = useAuth();
-  const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
+  const [timeFilter, setTimeFilter] = useState<"all" | "month" | "week">("all");
 
-  // Async Data State (Simulating Supabase Fetch)
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<SubjectAnalysis | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-
     if (authLoading || !user?.id) return;
 
     const fetchStats = async () => {
@@ -65,21 +73,19 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
     };
   }, [subject, timeFilter, user?.id, authLoading]);
 
-  // Chart Data Preparation
   const pieData = stats
     ? [
-        { name: 'সঠিক', value: stats.correct, color: '#10b981' }, // Emerald
-        { name: 'ভুল', value: stats.wrong, color: '#f43f5e' }, // Rose (Theme consistent)
-        { name: 'স্কিপড', value: stats.skipped, color: '#f59e0b' }, // Amber
+        { name: "সঠিক", value: stats.correct, color: "#10b981" },
+        { name: "ভুল", value: stats.wrong, color: "#f43f5e" },
+        { name: "স্কিপড", value: stats.skipped, color: "#f59e0b" },
       ]
     : [];
 
   const chartData =
     (stats?.totalQuestions || 0) === 0
-      ? [{ name: 'Empty', value: 1, color: '#f1f5f9' }]
+      ? [{ name: "Empty", value: 1, color: "#f1f5f9" }]
       : pieData;
 
-  // Derive Weak Chapters / Topics for Tendency Analysis
   const weakChapters = useMemo(() => {
     if (!stats) return [];
     return stats.chapterPerformance
@@ -95,137 +101,132 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
 
   if (loading || !stats) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8 flex items-center justify-center font-['HindSiliguri']">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
           <p className="text-neutral-500 font-bold text-sm">
-            রিপোর্ট তৈরি হচ্ছে...
+            বিষয়ভিত্তিক রিপোর্ট তৈরি হচ্ছে...
           </p>
         </div>
       </div>
     );
   }
 
+  const subjectTitle = BanglaNameHelper.formatSubject(subject, subject);
+
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-8 animate-fade-in transition-colors font-sans pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-8 animate-fade-in transition-colors font-['HindSiliguri'] pb-24">
       {/* HEADER SECTION */}
-      <div className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <motion.button
-            whileHover={hoverScale}
-            whileTap={tapScale}
+      <div className="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <button
             onClick={onBack}
-            className="p-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 transition-all shadow-sm group"
+            className="p-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#27272A] transition-all shadow-sm active:scale-95"
           >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-          </motion.button>
+            <ArrowLeft size={18} />
+          </button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
-              {getSubjectDisplayName(subject)}
+            <h1 className="text-2xl md:text-3xl font-black text-neutral-900 dark:text-white leading-tight">
+              {subjectTitle} 📚
             </h1>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
-              বিস্তারিত পারফরম্যাও্স রিপোর্ট
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-bold">
+              অধ্যায়ভিত্তিক বিস্তারিত পারফরম্যান্স রিপোর্ট
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Time Filter */}
+        <div className="flex items-center gap-2.5">
           <select
             value={timeFilter}
             onChange={(e) =>
-              setTimeFilter(e.target.value as 'all' | 'month' | 'week')
+              setTimeFilter(e.target.value as "all" | "month" | "week")
             }
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-red-500/20 shadow-sm cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors"
+            className="bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-700 dark:text-neutral-300 text-xs font-bold rounded-xl px-3.5 py-2 outline-none shadow-sm cursor-pointer"
           >
-            <option value="all">সব সময় (All Time)</option>
-            <option value="month">এই মাস (This Month)</option>
-            <option value="week">এই সপ্তাহ (This Week)</option>
+            <option value="all">সব সময়</option>
+            <option value="month">এই মাস</option>
+            <option value="week">এই সপ্তাহ</option>
           </select>
 
-          <motion.button
-            whileHover={hoverScale}
-            whileTap={tapScale}
+          <button
             onClick={handleDownload}
             disabled={stats.totalQuestions === 0}
-            className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#004633] hover:bg-[#003627] text-white text-xs font-black rounded-xl shadow-md shadow-emerald-950/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">ডাউনলোড</span>
-          </motion.button>
+            <Download size={14} />
+            <span>ডাউনলোড রিপোর্ট</span>
+          </button>
         </div>
       </div>
 
-      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-4">
         {/* KPI CARDS ROW */}
-        <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-6">
-          <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
-            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-110 transition-transform shrink-0">
-              <FileQuestion className="w-5 h-5 md:w-7 md:h-7" />
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+          <div className="bg-white dark:bg-[#18181B] p-4 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A] flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <FileQuestion size={20} />
             </div>
-            <div className="text-center md:text-left min-w-0 w-full">
-              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
+            <div className="text-center sm:text-left">
+              <p className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
                 মোট প্রশ্ন
               </p>
-              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
-                {stats.totalQuestions}
+              <h3 className="text-lg sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums">
+                {BanglaNameHelper.toBanglaNumeral(stats.totalQuestions)}টি
               </h3>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-emerald-200 dark:hover:border-emerald-900 group">
-            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-110 transition-transform shrink-0">
-              <CheckCircle2 className="w-5 h-5 md:w-7 md:h-7" />
+          <div className="bg-white dark:bg-[#18181B] p-4 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A] flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <CheckCircle2 size={20} />
             </div>
-            <div className="text-center md:text-left min-w-0 w-full">
-              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
+            <div className="text-center sm:text-left">
+              <p className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
                 সঠিকতার হার
               </p>
-              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
-                {stats.accuracy}%
+              <h3 className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+                {BanglaNameHelper.toBanglaNumeral(Math.round(stats.accuracy))}%
               </h3>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
-            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-110 transition-transform shrink-0">
-              <Clock className="w-5 h-5 md:w-7 md:h-7" />
+          <div className="bg-white dark:bg-[#18181B] p-4 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A] flex flex-col sm:flex-row items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Clock size={20} />
             </div>
-            <div className="text-center md:text-left min-w-0 w-full">
-              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
-                গড় সময় (প্রতি প্রশ্ন)
+            <div className="text-center sm:text-left">
+              <p className="text-[10px] sm:text-xs font-bold text-neutral-500 uppercase">
+                গড় সময়
               </p>
-              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
-                {stats.averageTime}s
+              <h3 className="text-lg sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums">
+                {BanglaNameHelper.toBanglaNumeral(Math.round(stats.averageTime))} সে.
               </h3>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* CHARTS ROW */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Accuracy Pie Chart */}
-          <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col justify-center items-center relative overflow-hidden">
-            <div className="w-full flex justify-between items-center mb-2 z-10">
-              <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
-                ফলাফল বিশ্লেষণ
-              </h3>
-            </div>
+          <div className="bg-white dark:bg-[#18181B] p-5 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A]">
+            <h3 className="font-black text-sm text-neutral-900 dark:text-white mb-3">
+              ফলাফল বিশ্লেষণ
+            </h3>
 
             {stats.totalQuestions === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-neutral-400">
-                <BarChart2 className="w-10 h-10 mb-2 opacity-50" />
-                <p className="text-sm font-medium">পর্যাপ্ত ডাটা নেই</p>
+              <div className="h-48 flex flex-col items-center justify-center text-neutral-400 text-xs">
+                <BarChart2 size={24} className="mb-2 opacity-50" />
+                <p>পর্যাপ্ত ডাটা নেই</p>
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-8 h-64 w-full z-10">
-                <div className="relative w-48 h-48">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 h-52 w-full">
+                <div className="relative w-40 h-40">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={chartData}
-                        innerRadius={60}
-                        outerRadius={80}
+                        innerRadius={50}
+                        outerRadius={68}
                         paddingAngle={5}
                         dataKey="value"
                         stroke="none"
@@ -237,237 +238,122 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-                      {stats.accuracy}%
+                    <span className="text-2xl font-black text-neutral-900 dark:text-white">
+                      {BanglaNameHelper.toBanglaNumeral(Math.round(stats.accuracy))}%
                     </span>
-                    <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase">
                       Accuracy
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-4 w-full sm:w-auto min-w-[140px]">
+                <div className="space-y-2 text-xs">
                   {pieData.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between gap-4 w-full"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full shadow-sm"
-                          style={{ backgroundColor: item.color }}
-                        ></div>
-                        <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
-                          {item.name}
-                        </span>
-                      </div>
-                      <span className="font-mono font-bold text-neutral-900 dark:text-white">
-                        {item.value}
+                    <div key={idx} className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="font-bold text-neutral-600 dark:text-neutral-300">
+                        {item.name}: {BanglaNameHelper.toBanglaNumeral(item.value)}টি
                       </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </motion.div>
-
-          {/* Chapter Performance Bar Chart */}
-          <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800">
-            <h3 className="font-bold text-lg text-neutral-800 dark:text-white mb-6">
-              অধ্যায়ভিত্তিক দক্ষতা
-            </h3>
-
-            {stats.chapterPerformance.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-neutral-400">
-                <BarChart2 className="w-10 h-10 mb-2 opacity-50" />
-                <p className="text-sm font-medium">অধ্যায় ডাটা পাওয়া যায়নি</p>
-              </div>
-            ) : (
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={stats.chapterPerformance}
-                    layout="vertical"
-                    margin={{ left: 0, right: 20 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      horizontal={false}
-                      stroke="#e2e8f0"
-                      opacity={0.5}
-                    />
-                    <XAxis type="number" domain={[0, 100]} hide />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      width={100}
-                      tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      cursor={{ fill: 'transparent' }}
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          return (
-                            <div className="bg-white dark:bg-neutral-800 p-3 rounded-lg shadow-xl border border-neutral-100 dark:border-neutral-700">
-                              <p className="font-bold text-neutral-800 dark:text-white text-sm mb-1">
-                                {data.name}
-                              </p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                Accuracy:{' '}
-                                <span className="font-bold text-emerald-500">
-                                  {data.accuracy}%
-                                </span>
-                              </p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                Questions: {data.total}
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Bar
-                      dataKey="accuracy"
-                      radius={4}
-                      barSize={20}
-                      background={{ fill: '#f1f5f9', radius: 4 }}
-                    >
-                      {stats.chapterPerformance.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            entry.accuracy >= 80
-                              ? '#10b981'
-                              : entry.accuracy >= 50
-                                ? '#f59e0b'
-                                : '#f43f5e'
-                          }
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* WEAKNESS & TENDENCY SECTION */}
-        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 rounded-3xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden">
-          <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4 bg-neutral-50/50 dark:bg-neutral-800/30">
-            <h3 className="font-bold text-lg text-neutral-800 dark:text-white flex items-center gap-3">
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
-                <AlertTriangle className="w-5 h-5" />
-              </span>
-              দুর্বলতা ও ভুলের ধরণ (Weakness Analysis)
-            </h3>
           </div>
 
-          <div className="p-6 max-h-[600px] overflow-y-auto custom-scrollbar">
-            {weakChapters.length > 0 ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20">
-                    <h4 className="font-bold text-red-800 dark:text-red-200 text-sm mb-1 uppercase tracking-wide">
-                      সর্বাধিক ভুল (Top Mistake Area)
-                    </h4>
-                    <p className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white mt-1">
-                      {weakChapters[0]?.name &&
-                      weakChapters[0]?.name !== 'General'
-                        ? weakChapters[0]?.name
-                        : 'অজানা টপিক / All'}
-                    </p>
-                    <p className="text-xs text-red-600 dark:text-red-300 mt-1 font-medium">
-                      {weakChapters[0]?.wrong}টি ভুল উত্তর
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20">
-                    <h4 className="font-bold text-emerald-800 dark:text-emerald-200 text-sm mb-1 uppercase tracking-wide">
-                      পরামর্শ (Recommendation)
-                    </h4>
-                    <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                      আপনার{' '}
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                        {weakChapters[0]?.name &&
-                        weakChapters[0]?.name !== 'General'
-                          ? weakChapters[0]?.name
-                          : 'এই'}
-                      </span>{' '}
-                      অধ্যায়ে দুর্বলতা রয়েছে। মূল বইয়ের কনসেপ্টগুলো আবার ঝালিয়ে
-                      নাও এবং বেশি করে প্র্যাকটিস করো।
-                    </p>
-                  </div>
-                </div>
+          {/* Weak Chapters Spotlight */}
+          <div className="bg-white dark:bg-[#18181B] p-5 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A]">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle size={16} className="text-red-500" />
+              <h3 className="font-black text-sm text-neutral-900 dark:text-white">
+                মনোযোগের অধ্যায়সমূহ
+              </h3>
+            </div>
 
-                <div className="pt-2">
-                  <h4 className="font-bold text-neutral-600 dark:text-neutral-400 text-xs uppercase tracking-wider mb-3">
-                    বিষয়ভিত্তিক ভুলের তালিকা (Mistake Tendency by Topic)
-                  </h4>
-
-                  <div className="grid grid-cols-1 gap-3">
-                    {weakChapters.map((chapter, idx) => (
-                      <div
-                        key={idx}
-                        className="group bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-800 transition-colors shadow-sm flex items-center justify-between"
-                      >
-                        <div className="flex-1 min-w-0 pr-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h5 className="font-bold text-neutral-900 dark:text-white text-sm md:text-base truncate">
-                              {chapter.name && chapter.name !== 'General'
-                                ? chapter.name
-                                : 'অজানা টপিক / All'}
-                            </h5>
-                            <span className="text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-md shrink-0">
-                              {chapter.wrong} Mistakes
-                            </span>
-                          </div>
-
-                          <div className="w-full h-2 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-red-500 to-red-500 rounded-full"
-                              style={{
-                                width: `${Math.min(100, (chapter.wrong / Math.max(chapter.total, 1)) * 100)}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <div className="flex justify-between items-center mt-1.5">
-                            <p className="text-[10px] text-neutral-400 font-medium uppercase tracking-wide">
-                              Error Rate
-                            </p>
-                            <p className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400">
-                              {Math.round(
-                                (chapter.wrong / chapter.total) * 100,
-                              )}
-                              %
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center bg-neutral-50/50 dark:bg-neutral-800/20 rounded-3xl border border-dashed border-neutral-200 dark:border-neutral-700">
-                <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mb-4 ring-8 ring-emerald-50/50 dark:ring-emerald-900/10">
-                  <Award className="w-8 h-8 text-emerald-500" />
-                </div>
-                <h4 className="font-bold text-neutral-900 dark:text-white text-lg mb-1">
-                  চমৎকার পারফরম্যাও্স!
-                </h4>
-                <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-xs mx-auto">
-                  নির্বাচিত ফিল্টারে তোমার কোনো ভুল উত্তর পাওয়া যায়নি। অনুশীলন
-                  চালিয়ে যাও।
+            {weakChapters.length === 0 ? (
+              <div className="h-48 flex flex-col items-center justify-center text-center p-4">
+                <CheckCircle2 size={32} className="text-emerald-500 mb-2" />
+                <p className="text-xs font-black text-neutral-800 dark:text-neutral-200">
+                  কোনো বড় ধরনের দুর্বলতা পাওয়া যায়নি!
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  এই বিষয়ের প্রস্তুতি চমৎকার চলছে।
                 </p>
               </div>
+            ) : (
+              <div className="space-y-2.5 max-h-52 overflow-y-auto">
+                {weakChapters.slice(0, 4).map((ch, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-red-50/50 dark:bg-red-950/30 border border-red-200/80 dark:border-red-900/40 flex items-center justify-between text-xs"
+                  >
+                    <span className="font-bold text-neutral-800 dark:text-neutral-200 truncate">
+                      {BanglaNameHelper.formatChapter((ch as any).chapter || ch.name)}
+                    </span>
+                    <span className="font-black text-red-600 dark:text-red-400 shrink-0">
+                      {BanglaNameHelper.toBanglaNumeral(ch.wrong)}টি ভুল
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+
+        {/* ALL CHAPTERS BREAKDOWN */}
+        <div className="bg-white dark:bg-[#18181B] p-5 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A]">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen size={16} className="text-[#004633] dark:text-emerald-400" />
+            <h3 className="font-black text-sm sm:text-base text-neutral-900 dark:text-white">
+              সকল অধ্যায়ের ফলাফল
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            {stats.chapterPerformance.map((ch, idx) => {
+              const total = ch.total || ch.correct + ch.wrong + (ch.skipped || 0);
+              const acc = total > 0 ? Math.round((ch.correct / total) * 100) : 0;
+              const barColor =
+                acc >= 75
+                  ? "bg-[#004633]"
+                  : acc >= 50
+                  ? "bg-amber-500"
+                  : "bg-red-500";
+
+              return (
+                <div
+                  key={idx}
+                  className="p-3 rounded-xl border border-neutral-100 dark:border-[#27272A] bg-neutral-50/40 dark:bg-[#141417]"
+                >
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-neutral-800 dark:text-neutral-200 truncate">
+                      {BanglaNameHelper.formatChapter((ch as any).chapter || ch.name)}
+                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[11px] text-neutral-400">
+                        {BanglaNameHelper.toBanglaNumeral(total)} প্রশ্ন
+                      </span>
+                      <span className="font-black text-neutral-900 dark:text-white">
+                        {BanglaNameHelper.toBanglaNumeral(acc)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500", barColor)}
+                      style={{ width: `${acc}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

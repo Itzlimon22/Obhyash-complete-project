@@ -100,16 +100,18 @@ export const getInstituteLeaderboardUsers = async (
 
 export interface InstituteRankEntry {
   institute: string;
-  avgXp: number;
+  points: number;
+  avgXp?: number;
   studentCount: number;
+  bestRank: number;
 }
 
-export const getInstituteRankings = async (): Promise<InstituteRankEntry[]> => {
+export const getInstituteRankings = async (
+  timeframe: 'monthly' | 'all_time' = 'monthly',
+): Promise<InstituteRankEntry[]> => {
   try {
-    // Reads from mv_institute_rankings materialized view — refreshed every 15 min by pg_cron.
-    // Response is CDN-cached for 15 min so this is effectively free at scale.
-    const res = await fetch('/api/leaderboard/rankings', {
-      next: { revalidate: 900 },
+    const res = await fetch(`/api/leaderboard/rankings?timeframe=${timeframe}`, {
+      next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();

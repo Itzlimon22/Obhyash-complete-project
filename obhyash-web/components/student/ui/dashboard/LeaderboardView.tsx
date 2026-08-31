@@ -12,9 +12,13 @@ import {
 
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile) => void;
+  onLegendsLeagueClick?: () => void;
 }
 
-const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
+const LeaderboardView: React.FC<LeaderboardViewProps> = ({
+  onUserClick,
+  onLegendsLeagueClick,
+}) => {
   const [currentUser, setCurrentUser] = useState<
     UserProfile | null | undefined
   >(undefined);
@@ -70,8 +74,29 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   }, [currentUser, leaderboardUsers, selectedLevel]);
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-2 md:p-6 animate-fade-in transition-colors pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-2 md:p-6 animate-fade-in transition-colors pb-24 font-['HindSiliguri']">
       <div className="max-w-7xl mx-auto">
+        {/* Top Header Row with Legends League Glow Button */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
+              মেধা লিডারবোর্ড 🏆
+            </h2>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              দৈনিক পরীক্ষা দিয়ে XP বাড়াও ও লিডারবোর্ডে এগিয়ে যাও
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onLegendsLeagueClick || (() => (window.location.href = "/legends-league"))}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-black shadow-md shadow-rose-600/30 active:scale-95 transition-all flex items-center gap-1.5 shrink-0 animate-pulse border border-rose-400/40"
+          >
+            <span>👑</span>
+            <span>লেজেন্ডস লীগ</span>
+          </button>
+        </div>
+
         <LevelSelector
           selectedLevel={selectedLevel}
           setSelectedLevel={setSelectedLevel}

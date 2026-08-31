@@ -1,106 +1,193 @@
-import React, { useState, useEffect } from 'react';
-import { Question, UserAnswers, UserProfile } from '@/lib/types';
+"use client";
 
-import { useCountUp } from '@/hooks/use-count-up';
-import { celebration } from '@/lib/confetti';
-import QuestionCard from '@/components/student/ui/exam/QuestionCard';
-import ReportModal from '@/components/student/ui/common/ReportModal';
+import React, { useState, useEffect, useMemo } from "react";
+import { Question, UserAnswers, UserProfile } from "@/lib/types";
+import { celebration } from "@/lib/confetti";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import QuestionCard from "@/components/student/ui/exam/QuestionCard";
+import ExamScopeHeader from "@/components/student/ui/exam/ExamScopeHeader";
+import ResultStats from "@/components/student/ui/exam/ResultStats";
+import ReportModal from "@/components/student/ui/common/ReportModal";
+import ProUpgradeModal from "@/components/common/ProUpgradeModal";
+import { supabase } from "@/services/core";
+import {
+  Trophy,
+  RotateCcw,
+  Download,
+  Bookmark,
+  TrendingUp,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-interface ResultViewProps {
+export interface ResultViewProps {
   questions: Question[];
   userAnswers: UserAnswers;
   timeTaken: number; // in seconds
-  onRestart: () => void; // Used as "Back" in history mode
-  isDarkMode: boolean;
-  onToggleTheme: () => void;
+  onRestart: () => void;
+  isDarkMode?: boolean;
+  onToggleTheme?: () => void;
   isHistoryMode?: boolean;
   negativeMarking?: number;
   onDownloadQuestionPaper?: () => void;
   onDownloadResultWithExplanations?: () => void;
-  submissionType?: 'digital' | 'script';
+  submissionType?: "digital" | "script";
   onChallengeEvaluation?: () => void;
-  /** @deprecated use bookmarkedIds instead */
   initialBookmarks?: Set<number | string>;
   currentUser?: UserProfile | null;
-  /** DB-synced bookmark set from useBookmarks hook */
   bookmarkedIds?: Set<string>;
-  /** Toggle a bookmark via useBookmarks hook */
   onToggleBookmark?: (questionId: string | number) => void;
   examDetails?: {
+    subject?: string;
     subjectLabel?: string;
-    // Add other expected properties here if needed
+    chapters?: string;
+    topics?: string;
   };
-  /** Called with wrong questions to start a retry session */
   onRetryWrongAnswers?: (wrongQuestions: Question[]) => void;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({
+export const ResultView: React.FC<ResultViewProps> = ({
   questions,
   userAnswers,
   timeTaken,
   onRestart,
-  isDarkMode,
-  onToggleTheme,
   isHistoryMode = false,
   negativeMarking = 0.25,
   onDownloadQuestionPaper,
   onDownloadResultWithExplanations,
-  submissionType,
-  onChallengeEvaluation,
+  initialBookmarks,
   currentUser,
-  bookmarkedIds,
-  onToggleBookmark,
+  bookmarkedIds: propBookmarks,
+  onToggleBookmark: propToggleBookmark,
   examDetails,
   onRetryWrongAnswers,
 }) => {
-  // State for Report Modal
-  const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [reportingQuestionId, setReportingQuestionId] = useState<
-    number | string | null
-  >(null);
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'correct' | 'wrong' | 'skipped'>('all');
+  const [reviewFilter, setReviewFilter] = useState<
+    "all" | "correct" | "wrong" | "skipped" | "bookmarked"
+  >("all");
+  const [localBookmarks, setLocalBookmarks] = useState<Set<string>>(
+    propBookmarks ? new Set(propBookmarks) : new Set()
+  );
+  const [reportingQuestionId, setReportingQuestionId] = useState<string | number | null>(null);
+  const [showProBookmarkModal, setShowProBookmarkModal] = useState<boolean>(false);
 
-  const openReportModal = (id: number | string) => {
-    setReportingQuestionId(id);
-    setReportModalOpen(true);
+  // Confetti on mount (if direct exam finish)
+  useEffect(() => {
+    if (!isHistoryMode) {
+      celebration.levelUp();
+    }
+  }, [isHistoryMode]);
+
+  // Sync prop bookmarks
+  useEffect(() => {
+    if (propBookmarks) {
+      setLocalBookmarks(new Set(propBookmarks));
+    }
+  }, [propBookmarks]);
+
+  // Fetch bookmarks from DB if not provided
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user && questions.length > 0) {
+          const qIds = questions.map((q) => q.id.toString());
+          const { data } = await supabase
+            .from("bookmarks")
+            .select("question_id")
+            .eq("user_id", userData.user.id)
+            .in("question_id", qIds);
+
+          if (data) {
+            setLocalBookmarks(new Set(data.map((r: any) => r.question_id.toString())));
+          }
+        }
+      } catch (e) {
+        console.warn("[ResultView] Error fetching bookmarks:", e);
+      }
+    };
+
+    if (!propBookmarks) {
+      fetchBookmarks();
+    }
+  }, [questions, propBookmarks]);
+
+  // Toggle Bookmark Handler
+  const handleToggleBookmark = async (qId: string | number) => {
+    const idStr = qId.toString();
+    const isBookmarked = localBookmarks.has(idStr);
+
+    if (!isBookmarked && localBookmarks.size >= 25 && !currentUser?.subscription?.plan) {
+      setShowProBookmarkModal(true);
+      return;
+    }
+
+    setLocalBookmarks((prev) => {
+      const next = new Set(prev);
+      if (isBookmarked) next.delete(idStr);
+      else next.add(idStr);
+      return next;
+    });
+
+    if (propToggleBookmark) {
+      propToggleBookmark(qId);
+    } else {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          if (isBookmarked) {
+            await supabase
+              .from("bookmarks")
+              .delete()
+              .eq("user_id", userData.user.id)
+              .eq("question_id", idStr);
+          } else {
+            await supabase
+              .from("bookmarks")
+              .insert({ user_id: userData.user.id, question_id: idStr });
+          }
+        }
+      } catch (e) {
+        console.error("[ResultView] Bookmark toggle failed:", e);
+      }
+    }
   };
 
-  const closeReportModal = () => {
-    setReportModalOpen(false);
-    setReportingQuestionId(null);
-  };
-
-  // Logic to calculate final score including Negative Marking
-  const calculateStats = () => {
+  // Calculate stats
+  const stats = useMemo(() => {
     let rawScore = 0;
     let correctCount = 0;
     let wrongCount = 0;
     let skippedCount = 0;
-    let negativeMarksDeduction = 0;
+    const wrongQuestions: Question[] = [];
 
     questions.forEach((q) => {
       const ua = userAnswers[q.id];
       const points = q.points ?? 1;
+
       if (ua === undefined) {
         skippedCount++;
       } else {
-        // Check both singular index and multi-answer indices array (matches engine logic)
         const isCorrect =
           ua === q.correctAnswerIndex ||
-          (q.correctAnswerIndices != null &&
-            q.correctAnswerIndices.includes(ua));
+          (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua));
+
         if (isCorrect) {
           rawScore += points;
           correctCount++;
         } else {
           wrongCount++;
-          // Negative marking calculation based on prop
-          negativeMarksDeduction += points * negativeMarking;
+          wrongQuestions.push(q);
         }
       }
     });
 
+    const negativeMarksDeduction = wrongCount * negativeMarking;
     const finalScore = Math.max(0, rawScore - negativeMarksDeduction);
+    const totalPoints = questions.reduce((acc, q) => acc + (q.points ?? 1), 0);
+    const percentage = totalPoints > 0 ? (finalScore / totalPoints) * 100 : 0;
+    const xpEarned = correctCount * 2;
+
     return {
       rawScore,
       finalScore,
@@ -108,535 +195,176 @@ const ResultView: React.FC<ResultViewProps> = ({
       wrongCount,
       skippedCount,
       negativeMarksDeduction,
+      totalPoints,
+      percentage,
+      xpEarned,
+      wrongQuestions,
     };
-  };
+  }, [questions, userAnswers, negativeMarking]);
 
-  const {
-    finalScore,
-    correctCount,
-    wrongCount,
-    skippedCount,
-    negativeMarksDeduction,
-  } = calculateStats();
-  const totalPoints = questions.reduce((acc, q) => acc + (q.points ?? 1), 0);
-  const percentage =
-    totalPoints > 0 ? Math.round((finalScore / totalPoints) * 100) : 0;
+  // Filtered questions for review
+  const filteredQuestions = useMemo(() => {
+    return questions.filter((q) => {
+      const ua = userAnswers[q.id];
+      const isCorrect =
+        ua !== undefined &&
+        (ua === q.correctAnswerIndex ||
+          (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua)));
 
-  // Helper to format time seconds into mm:ss format
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins} মি ${secs} সেকেন্ড`;
-  };
+      if (reviewFilter === "correct") return isCorrect;
+      if (reviewFilter === "wrong") return ua !== undefined && !isCorrect;
+      if (reviewFilter === "skipped") return ua === undefined;
+      if (reviewFilter === "bookmarked") return localBookmarks.has(q.id.toString());
+      return true;
+    });
+  }, [questions, userAnswers, reviewFilter, localBookmarks]);
 
-  const getFeedbackMessage = () => {
-    if (isHistoryMode)
-      return {
-        title: 'ফলাফল পর্যালোচনা',
-        text: 'আপনার পূর্ববর্তী পরীক্ষার বিস্তারিত ফলাফল',
-      };
-    if (percentage >= 90)
-      return {
-        title: 'অসাধারণ!',
-        text: 'আপনি এই বিষয়টি খুব ভালো আয়ত্ত করেছেন।',
-      };
-    if (percentage >= 70)
-      return { title: 'খুব ভালো!', text: 'ভালো ধারণা আছে, চালিয়ে যাও।' };
-    if (percentage >= 50)
-      return { title: 'ভালো প্রচেষ্টা', text: 'আপনি সঠিক পথে আছেন।' };
-    return {
-      title: 'আরও ভালো করতে হবে',
-      text: 'বিষয়টি পুনরায় পড়ে আবার চেষ্টা করো।',
-    };
-  };
-
-  const feedback = getFeedbackMessage();
-
-  // Count animations
-  const animatedScore = useCountUp(finalScore, 1500, 0, 2);
-
-  // Trigger Perfect Score Celebration
-  useEffect(() => {
-    if (
-      !isHistoryMode &&
-      correctCount === questions.length &&
-      questions.length > 0
-    ) {
-      celebration.perfectScore();
-    }
-  }, [correctCount, questions.length, isHistoryMode]);
+  // Subject and chapters
+  const subjectTitle = examDetails?.subjectLabel || examDetails?.subject || "বিষয়";
+  const chapterList = examDetails?.chapters ? examDetails.chapters.split(", ") : [];
+  const topicList = examDetails?.topics ? examDetails.topics.split(", ") : [];
 
   return (
-    <div className="max-w-5xl mx-auto px-2 md:px-4 pt-4 pb-20 animate-fade-in relative">
-      {/* Header Section */}
-      <div className="text-center mb-6 mt-2">
-        <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-          {feedback.title}
-        </h2>
-        <p className="text-neutral-600 dark:text-neutral-300 text-sm md:text-base">
-          {feedback.text}
-        </p>
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri'] pb-24 pt-4 sm:pt-6">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 flex flex-col gap-4 sm:gap-5">
+        {/* ── 1. Exam Scope Accordion Header (Matching Flutter ExamScopeHeader) ── */}
+        <ExamScopeHeader
+          subjectName={subjectTitle}
+          chapters={chapterList}
+          topics={topicList}
+          initiallyExpanded={false}
+        />
 
-        <div className="grid grid-cols-2 gap-2 mt-5 max-w-sm mx-auto">
+        {/* ── 2. Result Stats & Detailed Performance Table (Matching Flutter ResultStats) ── */}
+        <ResultStats
+          percentage={stats.percentage}
+          finalScore={stats.finalScore}
+          totalPoints={stats.totalPoints}
+          timeTaken={timeTaken}
+          totalQuestions={questions.length}
+          correctCount={stats.correctCount}
+          wrongCount={stats.wrongCount}
+          skippedCount={stats.skippedCount}
+          negativeMarking={negativeMarking}
+          negativeMarksDeduction={stats.negativeMarksDeduction}
+        />
+
+        {/* ── 3. Primary Action Buttons (Matching Flutter Result View) ── */}
+        <div className="w-full flex items-center justify-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={onRestart}
+            className="flex-1 min-w-[140px] py-3.5 px-4 rounded-xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-sm shadow-md shadow-[#004633]/25 transition flex items-center justify-center gap-1.5 active:scale-95"
+          >
+            <RotateCcw size={16} />
+            <span>পুনরায় পরীক্ষা দাও</span>
+          </button>
+
+          {stats.wrongQuestions.length > 0 && onRetryWrongAnswers && (
+            <button
+              type="button"
+              onClick={() => onRetryWrongAnswers(stats.wrongQuestions)}
+              className="flex-1 min-w-[140px] py-3.5 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm shadow-md shadow-orange-600/25 transition flex items-center justify-center gap-1.5 active:scale-95"
+            >
+              <TrendingUp size={16} />
+              <span>ভুলগুলো রিভিশন ({BanglaNameHelper.toBanglaNumeral(stats.wrongQuestions.length)})</span>
+            </button>
+          )}
+
           {onDownloadResultWithExplanations && (
             <button
+              type="button"
               onClick={onDownloadResultWithExplanations}
-              className="flex justify-center items-center gap-1.5 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs sm:text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors border border-emerald-200 dark:border-emerald-800"
+              className="py-3.5 px-4 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold text-sm transition flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4 shrink-0"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                />
-              </svg>
-              <span className="text-center leading-tight">রেজাল্ট ও ব্যাখ্যা</span>
-            </button>
-          )}
-
-          {onDownloadQuestionPaper && (
-            <button
-              onClick={onDownloadQuestionPaper}
-              className="flex justify-center items-center gap-1.5 px-3 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs sm:text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4 shrink-0"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-              <span className="text-center leading-tight">প্রশ্নপত্র ডাউনলোড</span>
+              <Download size={16} />
+              <span>PDF সমাধান</span>
             </button>
           )}
         </div>
 
-      </div>
-      {/* Exam Details Section */}
-      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-2 mb-6 -mx-2 sm:mx-0 px-2 sm:px-4 sm:rounded-xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
-        <div className="flex items-center gap-1.5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25"
-            />
-          </svg>
-          {examDetails?.subjectLabel || 'বিষয়'}
+        {/* ── 4. Review Filter Tabs (Matching Flutter Review Filters) ── */}
+        <div className="flex items-center justify-between gap-2 overflow-x-auto select-none mt-2">
+          <div className="flex items-center gap-1 p-1 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm w-full">
+            {[
+              { id: "all", label: `সবগুলো (${BanglaNameHelper.toBanglaNumeral(questions.length)})` },
+              { id: "correct", label: `সঠিক (${BanglaNameHelper.toBanglaNumeral(stats.correctCount)})` },
+              { id: "wrong", label: `ভুল (${BanglaNameHelper.toBanglaNumeral(stats.wrongCount)})` },
+              { id: "skipped", label: `বাকি (${BanglaNameHelper.toBanglaNumeral(stats.skippedCount)})` },
+              { id: "bookmarked", label: `বুকমার্ক (${BanglaNameHelper.toBanglaNumeral(localBookmarks.size)})` },
+            ].map((tab) => {
+              const isSelected = reviewFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setReviewFilter(tab.id as any)}
+                  className={cn(
+                    "flex-1 py-2 px-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-center whitespace-nowrap",
+                    isSelected
+                      ? "bg-[#004633] dark:bg-[#003D2C] text-white border border-[#004633] dark:border-[#059669] shadow-sm"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-            />
-          </svg>
-          {isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা'}
-        </div>
-        <div className="flex items-center gap-1.5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-            />
-          </svg>
-          মোট প্রশ্ন: {questions.length}
-        </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-5 mb-8">
-        {/* Accuracy */}
-        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="relative w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center mb-2 sm:mb-4">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="50%"
-                cy="50%"
-                r="44%"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="transparent"
-                className="text-neutral-100 dark:text-neutral-800"
-              />
-              <circle
-                cx="50%"
-                cy="50%"
-                r="44%"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="transparent"
-                strokeDasharray={283}
-                strokeDashoffset={283 - (283 * percentage) / 100}
-                className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-red-500' : 'text-red-500'}`}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-sm sm:text-3xl font-bold text-neutral-800 dark:text-white">
-                {percentage}%
-              </span>
+        {/* ── 5. Question By Question Review List ── */}
+        <div className="flex flex-col mt-1">
+          {filteredQuestions.length === 0 ? (
+            <div className="p-8 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 font-bold">
+              এই ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি।
             </div>
-          </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
-            সঠিকতা
-          </div>
-        </div>
-
-        {/* Points */}
-        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2 sm:mb-4 text-red-600 dark:text-red-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 sm:w-8 sm:h-8"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.302 5.002"
-              />
-            </svg>
-          </div>
-          <div className="text-sm sm:text-3xl font-bold text-neutral-800 dark:text-white mb-0.5">
-            {animatedScore.toFixed(2)}{' '}
-            <span className="text-[10px] sm:text-lg text-neutral-500 dark:text-neutral-400 font-normal">
-              / {totalPoints}
-            </span>
-          </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
-            প্রাপ্ত নম্বর
-          </div>
-        </div>
-
-        {/* Time taken replaced XP gained */}
-        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2 sm:mb-4 text-emerald-600 dark:text-emerald-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 sm:w-8 sm:h-8"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
-          </div>
-          <div className="text-[10px] sm:text-xl font-bold text-neutral-800 dark:text-white mb-0.5 text-center">
-            {formatDuration(timeTaken)}
-          </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
-            সময় লেগেছে
-          </div>
-        </div>
-      </div>
-
-
-
-      {/* SUMMARY TABLE */}
-      <div className="mb-8 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-        <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40">
-          <h3 className="text-lg font-bold text-neutral-800 dark:text-white">
-            ফলাফল বিস্তারিত
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-100 dark:divide-neutral-800 text-xs sm:text-sm">
-          {/* Left Column */}
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-              <span className="font-medium text-neutral-600 dark:text-neutral-300">
-                মোট প্রশ্ন
-              </span>
-              <span className="font-bold text-neutral-900 dark:text-white">
-                {questions.length}
-              </span>
-            </div>
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-              <span className="font-medium text-neutral-600 dark:text-neutral-300">
-                উত্তর দেওয়া হয়েছে
-              </span>
-              <span className="font-bold text-neutral-900 dark:text-white">
-                {correctCount + wrongCount}
-              </span>
-            </div>
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-              <span className="font-medium text-neutral-600 dark:text-neutral-300">
-                উত্তর দেওয়া হয়নি
-              </span>
-              <span className="font-bold text-neutral-900 dark:text-white">
-                {skippedCount}
-              </span>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-              <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                সঠিক উত্তর
-              </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                {correctCount}
-              </span>
-            </div>
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
-              <span className="font-medium text-red-600 dark:text-red-400">
-                ভুল উত্তর
-              </span>
-              <span className="font-bold text-red-600 dark:text-red-400">
-                {wrongCount}
-              </span>
-            </div>
-            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 bg-red-50/50 dark:bg-red-900/10">
-              <span className="font-medium text-red-700 dark:text-red-300">
-                নেগেটিভ মার্কিং ({negativeMarking}x)
-              </span>
-              <span className="font-bold text-red-700 dark:text-red-300">
-                -{negativeMarksDeduction.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Score Footer */}
-        <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40 px-4 py-3.5 flex justify-between items-center">
-          <span className="font-bold text-base md:text-lg text-neutral-900 dark:text-white">
-            মোট প্রাপ্ত নম্বর
-          </span>
-          <span className="font-bold text-base md:text-lg text-emerald-600 dark:text-emerald-400">
-            {finalScore.toFixed(2)} / {totalPoints}
-          </span>
-        </div>
-      </div>
-
-      {/* Review Section */}
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 className="text-xl md:text-2xl font-bold text-neutral-800 dark:text-white">
-            উত্তরপত্র পর্যালোচনা
-          </h3>
-          <div className="flex flex-wrap gap-4 sm:gap-6">
-            <button
-              onClick={() => setReviewFilter('all')}
-              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-                reviewFilter === 'all'
-                  ? 'text-neutral-900 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
-              }`}
-            >
-              সব ({questions.length})
-            </button>
-            <button
-              onClick={() => setReviewFilter(reviewFilter === 'correct' ? 'all' : 'correct')}
-              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-                reviewFilter === 'correct'
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-neutral-500 hover:text-emerald-600 dark:text-neutral-400 dark:hover:text-emerald-400'
-              }`}
-            >
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-              সঠিক ({correctCount})
-            </button>
-            <button
-              onClick={() => setReviewFilter(reviewFilter === 'wrong' ? 'all' : 'wrong')}
-              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-                reviewFilter === 'wrong'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-neutral-500 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400'
-              }`}
-            >
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-              ভুল ({wrongCount})
-            </button>
-            <button
-              onClick={() => setReviewFilter(reviewFilter === 'skipped' ? 'all' : 'skipped')}
-              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-                reviewFilter === 'skipped'
-                  ? 'text-neutral-800 dark:text-neutral-200'
-                  : 'text-neutral-400 hover:text-neutral-800 dark:text-neutral-500 dark:hover:text-neutral-300'
-              }`}
-            >
-              <div className="w-2.5 h-2.5 rounded-full bg-neutral-400"></div>
-              স্কিপ ({skippedCount})
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {questions.map((q, idx) => {
-            const questionId = q.id;
-            const ua = userAnswers[q.id];
-            const isSkipped = ua === undefined;
-            const isCorrect =
-              !isSkipped &&
-              (ua === q.correctAnswerIndex ||
-                (q.correctAnswerIndices != null &&
-                  q.correctAnswerIndices.includes(ua)));
-            const isWrong = !isSkipped && !isCorrect;
-
-            if (reviewFilter === 'correct' && !isCorrect) return null;
-            if (reviewFilter === 'wrong' && !isWrong) return null;
-            if (reviewFilter === 'skipped' && !isSkipped) return null;
-
-            return (
-              <QuestionCard
-                key={q.id}
-                question={q}
-                serialNumber={idx + 1}
-                selectedOptionIndex={userAnswers[q.id]}
-                isFlagged={false}
-                onSelectOption={() => {}} // Read-only
-                onToggleFlag={() => {}}
-                onReport={() => openReportModal(questionId)}
-                readOnly={true}
-                showFeedback={true}
-                isBookmarked={
-                  bookmarkedIds ? bookmarkedIds.has(String(questionId)) : false
-                }
-                onToggleBookmark={
-                  onToggleBookmark
-                    ? () => onToggleBookmark(questionId)
-                    : undefined
-                }
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Restart/Back Button */}
-      <div className="mt-12 flex flex-col sm:flex-row justify-center gap-3">
-        {!isHistoryMode && wrongCount > 0 && onRetryWrongAnswers && (
-          <button
-            onClick={() => {
-              const wrongQuestions = questions.filter((q) => {
-                const ua = userAnswers[q.id];
-                if (ua === undefined) return false;
-                const isCorrect =
-                  ua === q.correctAnswerIndex ||
-                  (q.correctAnswerIndices != null &&
-                    q.correctAnswerIndices.includes(ua));
-                return !isCorrect;
-              });
-              onRetryWrongAnswers(wrongQuestions);
-            }}
-            className="w-full sm:w-auto px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-red-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-              />
-            </svg>
-            ভুলগুলো আবার দেখো ({wrongCount}টি)
-          </button>
-        )}
-        <button
-          onClick={onRestart}
-          className="w-full sm:w-auto px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"
-        >
-          {isHistoryMode ? (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
-                />
-              </svg>
-              ইতিহাসে ফিরে যাও
-            </>
           ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+            filteredQuestions.map((question) => {
+              const originalIndex = questions.findIndex((q) => q.id === question.id);
+              const isBookmarked = localBookmarks.has(question.id.toString());
+
+              return (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  serialNumber={originalIndex + 1}
+                  selectedOptionIndex={userAnswers[question.id]}
+                  showFeedback={true}
+                  showAnswer={true}
+                  readOnly={true}
+                  isBookmarked={isBookmarked}
+                  onToggleBookmark={() => handleToggleBookmark(question.id)}
+                  onReport={() => setReportingQuestionId(question.id)}
+                  initiallyExpanded={true}
                 />
-              </svg>
-              নতুন পরীক্ষা শুরু করো
-            </>
+              );
+            })
           )}
-        </button>
+        </div>
       </div>
 
-      {/* Report Modal */}
-      <ReportModal
-        isOpen={reportModalOpen}
-        onClose={closeReportModal}
-        onSubmit={() => {}} // Internal submission used
-        questionId={reportingQuestionId}
-        reporterId={currentUser?.id}
-        reporterName={currentUser?.name}
+      {/* Question Report Modal */}
+      {reportingQuestionId && (
+        <ReportModal
+          isOpen={true}
+          onClose={() => setReportingQuestionId(null)}
+          onSubmit={() => {
+            setReportingQuestionId(null);
+            toast.success("রিপোর্ট গ্রহণ করা হয়েছে। ধন্যবাদ!");
+          }}
+          questionId={reportingQuestionId}
+        />
+      )}
+
+      {/* Pro Bookmark Limit Upgrade Modal */}
+      <ProUpgradeModal
+        isOpen={showProBookmarkModal}
+        onClose={() => setShowProBookmarkModal(false)}
+        title="বুকমার্ক লিমিট শেষ 📌"
+        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        featurePill="বুকমার্ক লিমিট: ২৫/২৫"
+        icon={Bookmark}
       />
     </div>
   );

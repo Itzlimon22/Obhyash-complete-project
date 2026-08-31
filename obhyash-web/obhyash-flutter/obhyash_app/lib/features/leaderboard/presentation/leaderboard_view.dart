@@ -10,6 +10,7 @@ import '../../../core/data/college_list.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -133,7 +134,8 @@ class _LBUser {
     final fullXp = (j['xp'] as num?)?.toInt() ?? 0;
     final mXp = (j['monthly_xp'] as num?)?.toInt() ?? 0;
     final effectiveXp = timeframe == 'monthly' ? mXp : fullXp;
-    final calculatedLevel = _calculateLevelFromXp(effectiveXp);
+    // Level is strictly determined by lifetime XP
+    final calculatedLevel = _calculateLevelFromXp(fullXp);
 
     return _LBUser(
       id: j['id'] ?? '',
@@ -154,16 +156,32 @@ class _LBUser {
 // ─── Institute Rank Model ────────────────────────────────────────────────────
 class _InstituteRank {
   final String institute;
-  final int avgXp;
+  final int points;
   final int studentCount;
+  final int bestRank;
   final bool isMyCollege;
 
   const _InstituteRank({
     required this.institute,
-    required this.avgXp,
+    required this.points,
     required this.studentCount,
+    required this.bestRank,
     required this.isMyCollege,
   });
+}
+
+int _calculateRankPoints(int rank) {
+  if (rank == 1) return 500;
+  if (rank == 2) return 400;
+  if (rank == 3) return 350;
+  if (rank <= 5) return 300;
+  if (rank <= 10) return 250;
+  if (rank <= 25) return 180;
+  if (rank <= 50) return 120;
+  if (rank <= 100) return 80;
+  if (rank <= 250) return 40;
+  if (rank <= 500) return 20;
+  return 10;
 }
 
 final _numFmt = NumberFormat('#,##0');
@@ -201,6 +219,7 @@ class LeaderboardView extends ConsumerStatefulWidget {
 
 class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   String _selectedLevel = 'Explorer';
+  bool _hasSetDefaultLevel = false;
   String _timeframe = 'monthly'; // 'monthly', 'all_time'
   String _batchFilter = 'all'; // 'all', 'my_batch'
   List<_LBUser> _users = [];
@@ -229,13 +248,14 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   Future<void> _fetchCounts() async {
     try {
       final supabase = Supabase.instance.client;
+      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
 
-      // Count students in each league tier by their lifetime XP
+      // Count students in each league tier by their active timeframe XP
       final futures = _levels.map((lvl) async {
         final (minXp, maxXp) = _getLevelThreshold(lvl.id);
-        var query = supabase.from('users').select('id').gte('xp', minXp);
+        var query = supabase.from('users').select('id').gte(sortColumn, minXp);
         if (maxXp < 999999999) {
-          query = query.lte('xp', maxXp);
+          query = query.lte(sortColumn, maxXp);
         }
         final data = await query.limit(9999);
         return MapEntry(lvl.id, (data as List).length);
@@ -267,14 +287,14 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final isMonthly = _timeframe == 'monthly';
       final sortColumn = isMonthly ? 'monthly_xp' : 'xp';
 
-      // 1. Query users who belong to this Tier (Level) by lifetime XP
+      // 1. Query users who belong to this Tier (Level) in active timeframe
       PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
           .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
-          .gte('xp', minXp);
+          .gte(sortColumn, minXp);
 
       if (maxXp < 999999999) {
-        query = query.lte('xp', maxXp);
+        query = query.lte(sortColumn, maxXp);
       }
 
       // Optional Batch filtering
@@ -304,19 +324,20 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final myProfile = ref.read(userProfileProvider).whenOrNull(data: (u) => u);
       if (myProfile != null && !isLoadMore) {
         try {
-          final (myMinXp, myMaxXp) = _getLevelThreshold(myProfile.level ?? _selectedLevel);
-          final myXp = isMonthly ? myProfile.monthlyXp : myProfile.xp;
+          final myEffectiveXp = isMonthly ? myProfile.monthlyXp : myProfile.xp;
+          final userCalculatedLevel = _calculateLevelFromXp(myEffectiveXp);
+          final (myMinXp, myMaxXp) = _getLevelThreshold(userCalculatedLevel);
           var countQuery = supabase
               .from('users')
               .select('id')
-              .gte('xp', myMinXp);
+              .gte(sortColumn, myMinXp);
           if (myMaxXp < 999999999) {
-            countQuery = countQuery.lte('xp', myMaxXp);
+            countQuery = countQuery.lte(sortColumn, myMaxXp);
           }
           if (_batchFilter == 'my_batch' && myProfile.batch != null && myProfile.batch!.isNotEmpty) {
             countQuery = countQuery.ilike('batch', '%${myProfile.batch!.trim()}%');
           }
-          countQuery = countQuery.gt(sortColumn, myXp);
+          countQuery = countQuery.gt(sortColumn, myEffectiveXp);
           final countRes = await countQuery.count(CountOption.exact);
           calculatedRank = countRes.count + 1;
         } catch (e) {
@@ -397,8 +418,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     }
   }
 
-  Future<void> _fetchInstituteRankings() async {
-    if (_instituteRankings.isNotEmpty) return; // already loaded
+  Future<void> _fetchInstituteRankings({bool forceRefresh = false}) async {
+    if (_instituteRankings.isNotEmpty && !forceRefresh) return;
     setState(() => _isLoadingRankings = true);
     try {
       final supabase = Supabase.instance.client;
@@ -410,41 +431,59 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           ? normalizeCollegeName(rawMyInstitute)
           : null;
 
+      final isMonthly = _timeframe == 'monthly';
+      final xpColumn = isMonthly ? 'monthly_xp' : 'xp';
+
       final data = await supabase
-          .from('public_profiles')
-          .select('institute, xp')
+          .from('users')
+          .select('institute, xp, monthly_xp')
           .not('institute', 'is', null)
           .neq('institute', '')
-          .order('xp', ascending: false)
+          .order(xpColumn, ascending: false)
           .limit(5000);
 
-      // Group by institute
-      final groups = <String, List<int>>{};
-      for (final row in (data as List).cast<Map<String, dynamic>>()) {
+      // Group student national ranks by normalized institute
+      final institutePoints = <String, int>{};
+      final instituteCounts = <String, int>{};
+      final instituteBestRank = <String, int>{};
+
+      final rows = (data as List).cast<Map<String, dynamic>>();
+      for (int i = 0; i < rows.length; i++) {
+        final row = rows[i];
         final rawInst = row['institute'] as String?;
         if (rawInst == null || rawInst.isEmpty) continue;
         final inst = normalizeCollegeName(rawInst);
-        groups
-            .putIfAbsent(inst, () => [])
-            .add((row['xp'] as num?)?.toInt() ?? 0);
+        final nationalRank = i + 1;
+        final rankPoints = _calculateRankPoints(nationalRank);
+
+        institutePoints[inst] = (institutePoints[inst] ?? 0) + rankPoints;
+        instituteCounts[inst] = (instituteCounts[inst] ?? 0) + 1;
+        if (!instituteBestRank.containsKey(inst) || nationalRank < instituteBestRank[inst]!) {
+          instituteBestRank[inst] = nationalRank;
+        }
       }
 
-      // Top-5 average; require at least 5 students
+      // Build rankings list
       final rankings = <_InstituteRank>[];
-      for (final entry in groups.entries) {
-        if (entry.value.length < 5) continue;
-        final top5 = entry.value.take(5).toList(); // already sorted desc
-        final avgXp = (top5.reduce((a, b) => a + b) / 5).round();
+      for (final inst in institutePoints.keys) {
         rankings.add(
           _InstituteRank(
-            institute: entry.key,
-            avgXp: avgXp,
-            studentCount: entry.value.length,
-            isMyCollege: entry.key == myInstitute,
+            institute: inst,
+            points: institutePoints[inst] ?? 0,
+            studentCount: instituteCounts[inst] ?? 0,
+            bestRank: instituteBestRank[inst] ?? 999999,
+            isMyCollege: inst == myInstitute,
           ),
         );
       }
-      rankings.sort((a, b) => b.avgXp.compareTo(a.avgXp));
+
+      // Sort by points DESC; if equal, bestRank ASC
+      rankings.sort((a, b) {
+        if (b.points != a.points) {
+          return b.points.compareTo(a.points);
+        }
+        return a.bestRank.compareTo(b.bestRank);
+      });
 
       if (mounted) {
         setState(() {
@@ -463,7 +502,22 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentUserAsync = ref.watch(userProfileProvider);
     final myProfile = currentUserAsync.whenOrNull(data: (u) => u);
+    final effectiveUserXp = _timeframe == 'monthly' ? (myProfile?.monthlyXp ?? 0) : (myProfile?.xp ?? 0);
+    final myCalculatedLevelId = _calculateLevelFromXp(effectiveUserXp);
+    final myLvl = _levelById(myCalculatedLevelId);
     final lvl = _levelById(_selectedLevel);
+
+    if (!_hasSetDefaultLevel && myProfile != null) {
+      _hasSetDefaultLevel = true;
+      if (_selectedLevel != myCalculatedLevelId) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() => _selectedLevel = myCalculatedLevelId);
+            _fetch();
+          }
+        });
+      }
+    }
 
     final rawUserBatch = myProfile?.batch?.trim();
     final userBatchLabel = (rawUserBatch != null && rawUserBatch.isNotEmpty)
@@ -489,7 +543,6 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
         ? displayedUsers.indexWhere((u) => u.id == myProfile.id)
         : -1;
     final myRank = myRankIdx >= 0 ? myRankIdx + 1 : (_myExactRank > 0 ? _myExactRank : 0);
-    final myLvl = _levelById(myProfile?.level ?? 'Explorer');
     final isOnOwnLevel = myLvl.id == lvl.id;
 
     final isSsc = (myProfile?.stream?.toLowerCase().contains('ssc') ?? false) ||
@@ -543,7 +596,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                   isDark: isDark,
                   onTap: () {
                     setState(() => _viewMode = 'rankings');
-                    _fetchInstituteRankings();
+                    _fetchInstituteRankings(forceRefresh: true);
                   },
                 ),
               ],
@@ -558,7 +611,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                   rankings: _instituteRankings,
                   isLoading: _isLoadingRankings,
                   isDark: isDark,
-                  onRefresh: _fetchInstituteRankings,
+                  onRefresh: () => _fetchInstituteRankings(forceRefresh: true),
                 )
               : _viewMode == 'level'
               ? (_isLoading && _users.isEmpty
@@ -577,7 +630,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                           _LevelSelector(
                             levels: _levels,
                             selectedLevel: _selectedLevel,
-                            myLevel: myProfile?.level,
+                            myLevel: myCalculatedLevelId,
                             levelCounts: _levelCounts,
                             onSelect: (id) {
                               setState(() => _selectedLevel = id);
@@ -600,7 +653,10 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             },
                             onTimeframeChanged: (t) {
                               if (_timeframe != t) {
-                                setState(() => _timeframe = t);
+                                setState(() {
+                                  _timeframe = t;
+                                  _hasSetDefaultLevel = false;
+                                });
                                 _fetchCounts();
                                 _fetch();
                               }
@@ -614,8 +670,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                               children: [
                                 if (myProfile != null && isOnOwnLevel)
                                   _UserProgressCard(
-                                    level: myProfile.level ?? 'Explorer',
-                                    xp: _timeframe == 'monthly' ? myProfile.monthlyXp : myProfile.xp,
+                                    level: myCalculatedLevelId,
+                                    xp: effectiveUserXp,
                                     rank: myRank,
                                     isDark: isDark,
                                   ),
@@ -1221,163 +1277,173 @@ class _InstituteRankingsBody extends StatelessWidget {
       return emptyContent;
     }
 
+    final myCollegeIdx = rankings.indexWhere((e) => e.isMyCollege);
+    final myCollegeEntry = myCollegeIdx != -1 ? rankings[myCollegeIdx] : null;
+    final myCollegeRank = myCollegeIdx != -1 ? myCollegeIdx + 1 : 0;
+
+    Widget buildCollegeRow({
+      required int rank,
+      required _InstituteRank entry,
+      required bool isMe,
+      bool isPinned = false,
+    }) {
+      final medal = rank == 1
+          ? '🥇'
+          : rank == 2
+          ? '🥈'
+          : rank == 3
+          ? '🥉'
+          : null;
+
+      return Container(
+        margin: EdgeInsets.only(bottom: isPinned ? 12 : 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: isMe
+              ? (isDark ? const Color(0xFF242426) : const Color(0xFFF3F4F6))
+              : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isMe
+                ? (isDark
+                      ? const Color(0xFF3A3A3C)
+                      : const Color(0xFFE5E7EB))
+                : (isDark
+                      ? const Color(0xFF1C1C1E)
+                      : const Color(0xFFF0F0F0)),
+            width: isPinned ? 1.5 : 1,
+          ),
+          boxShadow: isPinned
+              ? [
+                  BoxShadow(
+                    color: (isDark ? Colors.black : const Color(0xFF000000)).withValues(alpha: isDark ? 0.35 : 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            // Rank / medal
+            SizedBox(
+              width: 32,
+              child: Center(
+                child: medal != null
+                    ? Text(medal, style: const TextStyle(fontSize: 22))
+                    : Text(
+                        BanglaNameHelper.toBanglaNumeral(rank),
+                        style: TextStyle(
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: isMe
+                              ? (isDark ? Colors.white : const Color(0xFF111827))
+                              : (isDark
+                                  ? const Color(0xFF4A4A4A)
+                                  : const Color(0xFFBBBBBB)),
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Institute name + "তোমার" badge if pinned or own
+            Expanded(
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      entry.institute,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: isDark
+                            ? Colors.white
+                            : const Color(0xFF1C1C1E),
+                      ),
+                    ),
+                  ),
+                  if (isMe) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EB),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'তোমার',
+                        style: TextStyle(
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? const Color(0xFFE5E7EB) : const Color(0xFF374151),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Points
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 7,
+              ),
+              decoration: BoxDecoration(
+                color: isMe
+                    ? (isDark
+                          ? const Color(0xFF1C1C1E)
+                          : const Color(0xFFE5E7EB))
+                    : (isDark
+                          ? const Color(0xFF1A1A1A)
+                          : const Color(0xFFF5F5F5)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${_numFmt.format(entry.points)} pts',
+                style: TextStyle(
+                  fontFamily: 'Anek Bangla',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  color: isDark
+                      ? Colors.white
+                      : const Color(0xFF1C1C1E),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     Widget list = ListView(
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12, left: 2),
-          child: Text(
-            'র‍্যাংকিং: প্রতিটি কলেজের শীর্ষ ৫ শিক্ষার্থীর গড় XP অনুযায়ী',
-            style: TextStyle(
-              fontFamily: 'Anek Bangla',
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isDark ? const Color(0xFF525252) : const Color(0xFF9CA3AF),
-            ),
+        if (myCollegeEntry != null)
+          buildCollegeRow(
+            rank: myCollegeRank,
+            entry: myCollegeEntry,
+            isMe: true,
+            isPinned: true,
           ),
-        ),
         ...rankings.asMap().entries.map((e) {
           final idx = e.key;
           final entry = e.value;
           final rank = idx + 1;
           final isMe = entry.isMyCollege;
-          final medal = rank == 1
-              ? '🥇'
-              : rank == 2
-              ? '🥈'
-              : rank == 3
-              ? '🥉'
-              : null;
 
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: isMe
-                  ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5))
-                  : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isMe
-                    ? (isDark
-                          ? const Color(0xFF059669)
-                          : const Color(0xFFBBF7D0))
-                    : (isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFF0F0F0)),
-              ),
-            ),
-            child: Row(
-              children: [
-                // Rank / medal
-                SizedBox(
-                  width: 32,
-                  child: Center(
-                    child: medal != null
-                        ? Text(medal, style: const TextStyle(fontSize: 22))
-                        : Text(
-                            '$rank',
-                            style: TextStyle(
-                              fontFamily: 'Anek Bangla',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: isDark
-                                  ? const Color(0xFF4A4A4A)
-                                  : const Color(0xFFBBBBBB),
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                // Institute name + student count
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.institute,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: 'Anek Bangla',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: isMe
-                              ? (isDark
-                                    ? const Color(0xFF059669)
-                                    : const Color(0xFF059669))
-                              : (isDark
-                                    ? Colors.white
-                                    : const Color(0xFF1C1C1E)),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        isMe
-                            ? 'তোমার কলেজ • ${entry.studentCount} শিক্ষার্থী'
-                            : '${entry.studentCount} জন শিক্ষার্থী',
-                        style: TextStyle(
-                          fontFamily: 'Anek Bangla',
-                          fontSize: 14,
-                          color: isDark
-                              ? const Color(0xFF525252)
-                              : const Color(0xFF9CA3AF),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Avg XP
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isMe
-                        ? (isDark
-                              ? const Color(0xFF059669)
-                              : const Color(0xFFECFDF5))
-                        : (isDark
-                              ? const Color(0xFF1A1A1A)
-                              : const Color(0xFFF5F5F5)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${_numFmt.format(entry.avgXp)} XP',
-                        style: TextStyle(
-                          fontFamily: 'Anek Bangla',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: isMe
-                              ? (isDark
-                                    ? const Color(0xFF059669)
-                                    : const Color(0xFF059669))
-                              : (isDark
-                                    ? Colors.white
-                                    : const Color(0xFF1C1C1E)),
-                        ),
-                      ),
-                      Text(
-                        'গড় স্কোর',
-                        style: TextStyle(
-                          fontFamily: 'Anek Bangla',
-                          fontSize: 12,
-                          color: isDark
-                              ? const Color(0xFF525252)
-                              : const Color(0xFF9CA3AF),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          return buildCollegeRow(
+            rank: rank,
+            entry: entry,
+            isMe: isMe,
           );
         }),
       ],
@@ -1628,11 +1694,13 @@ class _UserProgressCard extends StatelessWidget {
     final nextLvl = _nextLevel(level);
 
     double progress = 1.0;
+    int neededXp = 0;
     if (nextLvl != null) {
       final denom = (nextLvl.minXP - lvl.minXP).toDouble();
       if (denom > 0) {
         progress = ((xp - lvl.minXP) / denom).clamp(0.0, 1.0);
       }
+      neededXp = (nextLvl.minXP - xp).clamp(0, nextLvl.minXP);
     }
 
     return Container(
@@ -1742,7 +1810,7 @@ class _UserProgressCard extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        '#$rank',
+                        BanglaNameHelper.toBanglaNumeral(rank),
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 22,
@@ -1783,7 +1851,7 @@ class _UserProgressCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${_numFmt.format(nextLvl.minXP - xp)} XP প্রয়োজন',
+                  '${_numFmt.format(neededXp)} XP প্রয়োজন',
                   style: TextStyle(
                     fontFamily: 'Anek Bangla',
                     fontSize: 13.5,
@@ -1799,7 +1867,7 @@ class _UserProgressCard extends StatelessWidget {
             Stack(
               children: [
                 Container(
-                  height: 12,
+                  height: 10,
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF374151)
@@ -1807,20 +1875,21 @@ class _UserProgressCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutCubic,
-                  height: 12,
-                  width: MediaQuery.of(context).size.width * progress,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [lvl.start, lvl.end]),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: lvl.start.withValues(alpha: 0.5),
-                        blurRadius: 8,
-                      ),
-                    ],
+                FractionallySizedBox(
+                  widthFactor: progress.clamp(0.02, 1.0),
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: 10,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [lvl.start, lvl.end]),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: lvl.start.withValues(alpha: 0.5),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

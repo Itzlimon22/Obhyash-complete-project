@@ -2,19 +2,39 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Bookmark,
+  Shuffle,
+  Play,
+  Layers,
+  ChevronDown,
+  ChevronRight,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  Sparkles,
+  BookOpen,
+  Calendar,
+} from "lucide-react";
 import { Question, ExamResult, ExamDetails, UserProfile } from "@/lib/types";
-import { getUserBookmarks, toggleBookmark, getBookmarkedQuestions } from "@/services/bookmark-service";
-import { getQuestionsByIds } from "@/services/question-service";
+import {
+  getUserBookmarks,
+  toggleBookmark,
+  getBookmarkedQuestions,
+} from "@/services/bookmark-service";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { toast } from "sonner";
 import FlashcardMode, { FlashcardResult } from "./FlashcardMode";
 import PracticeSummary from "./PracticeSummary";
 import LatexText from "@/components/student/ui/common/LatexText";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PracticeDashboardProps {
   history: ExamResult[];
-  onStartPractice: (questions: Question[], details: ExamDetails) => void; // kept for compatibility
+  onStartPractice: (questions: Question[], details: ExamDetails) => void;
   onNavigateToMock: () => void;
   subjects?: string[];
   currentUser?: UserProfile | null;
@@ -24,8 +44,8 @@ interface PracticeDashboardProps {
 type Tab = "mistakes" | "bookmarks";
 type ViewState = "list" | "flashcard" | "summary";
 
-// ─── Pagination Config ────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE = 15;
+const BANGLA_OPTIONS = ["ক", "খ", "গ", "ঘ", "ঙ"];
 
 // ─── Spaced Repetition Helpers ─────────────────────────────────────────────
 
@@ -49,12 +69,10 @@ function markReviewed(ids: string[]) {
 
 function isDue(id: string, map: Record<string, number>): boolean {
   const last = map[id];
-  if (!last) return false; // never reviewed → not "due" yet, it's just new
+  if (!last) return false;
   const daysSince = (Date.now() - last) / (1000 * 60 * 60 * 24);
   return daysSince >= REVIEW_INTERVAL_DAYS;
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   history,
@@ -65,7 +83,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("");
@@ -73,8 +91,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   const [viewState, setViewState] = useState<ViewState>("list");
   const [flashcardQuestions, setFlashcardQuestions] = useState<Question[]>([]);
   const [flashcardResults, setFlashcardResults] = useState<FlashcardResult[]>(
-    [],
+    []
   );
+  const [expandedExplanation, setExpandedExplanation] = useState<
+    Record<string, boolean>
+  >({});
 
   // Bookmarks state
   const [globalBookmarks, setGlobalBookmarks] = useState<Question[]>([]);
@@ -114,9 +135,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       }
     });
 
-    // Sort by frequency descending
     const sorted = Array.from(mistakeMap.values()).sort(
-      (a, b) => (freq.get(b.id) ?? 0) - (freq.get(a.id) ?? 0),
+      (a, b) => (freq.get(b.id) ?? 0) - (freq.get(a.id) ?? 0)
     );
 
     return { mistakes: sorted, mistakeFrequency: freq };
@@ -133,10 +153,12 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         setBookmarkedIds(new Set(ids));
         if (ids.length > 0) {
           const questions = await getBookmarkedQuestions(currentUser.id);
-          // Sort by bookmarkedAt descending
           questions.sort((a, b) => {
             if (!a.bookmarkedAt || !b.bookmarkedAt) return 0;
-            return new Date(b.bookmarkedAt).getTime() - new Date(a.bookmarkedAt).getTime();
+            return (
+              new Date(b.bookmarkedAt).getTime() -
+              new Date(a.bookmarkedAt).getTime()
+            );
           });
           setGlobalBookmarks(questions);
         } else {
@@ -173,22 +195,20 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         toast.success(
           isCurrentlyBookmarked
             ? "বুকমার্ক সরানো হয়েছে"
-            : "বুকমার্ক সেভ করা হয়েছে",
+            : "বুকমার্ক সেভ করা হয়েছে"
         );
       } catch {
         toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে।");
         setBookmarkedIds(bookmarkedIds);
       }
     },
-    [currentUser?.id, bookmarkedIds, activeTab, mistakes],
+    [currentUser?.id, bookmarkedIds, activeTab, mistakes]
   );
 
   // ── All subjects from current list ─────────────────────────────────────────
   const baseList = activeTab === "mistakes" ? mistakes : globalBookmarks;
 
   const allSubjects = useMemo(() => {
-    // Group subjects by their display label to avoid duplicates like "Chemistry Ch 1" appearing twice
-    // even if they have different internal IDs.
     const labelMap = new Map<string, string>();
     baseList.forEach((q) => {
       const label = q.subjectLabel || q.subject;
@@ -197,14 +217,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       }
     });
 
-    // Return entries as [id, label] for the pills
-    // We use the first ID we found as the representative ID for the pill key
     return Array.from(labelMap.entries()).map(
-      ([label, id]) => [id, label] as [string, string],
+      ([label, id]) => [id, label] as [string, string]
     );
   }, [baseList]);
 
-  // Reset filter when tab changes
   useEffect(() => {
     setSubjectFilter("all");
     setDateFilter("");
@@ -212,7 +229,6 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     setCurrentPage(1);
   }, [activeTab]);
 
-  // ── Filtered list ───────────────────────────────────────────────────────────
   const currentList = useMemo(() => {
     let list = baseList;
 
@@ -224,7 +240,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     if (activeTab === "bookmarks" && dateFilter) {
       list = list.filter((q) => {
         if (!q.bookmarkedAt) return false;
-        const bDate = new Date(q.bookmarkedAt).toISOString().split('T')[0];
+        const bDate = new Date(q.bookmarkedAt).toISOString().split("T")[0];
         return bDate === dateFilter;
       });
     }
@@ -235,12 +251,6 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     return list;
   }, [baseList, subjectFilter, allSubjects, dateFilter, activeTab, shuffle]);
 
-  // Reset pagination when list changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [currentList, activeTab]);
-
-  // Pagination calculations
   const totalPages = Math.ceil(currentList.length / ITEMS_PER_PAGE);
   const paginatedList = useMemo(() => {
     const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -248,23 +258,21 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     return currentList.slice(startIdx, endIdx);
   }, [currentList, currentPage]);
 
-  // Due-today derived
   const dueCount = useMemo(
     () =>
       [...mistakes, ...globalBookmarks].filter((q) => isDue(q.id, reviewedMap))
         .length,
-    [mistakes, globalBookmarks, reviewedMap],
+    [mistakes, globalBookmarks, reviewedMap]
   );
 
-  // ── Selection helpers ───────────────────────────────────────────────────────
   const currentSelection = useMemo(
     () =>
       new Set(
         [...selectedQuestions].filter((id) =>
-          currentList.some((q) => q.id === id),
-        ),
+          currentList.some((q) => q.id === id)
+        )
       ),
-    [selectedQuestions, currentList],
+    [selectedQuestions, currentList]
   );
 
   const toggleSelection = (id: string) => {
@@ -291,46 +299,47 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     }
   };
 
-  const handlePreviousPage = () => {
-    setCurrentPage((p) => Math.max(1, p - 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((p) => Math.min(totalPages, p + 1));
-  };
-
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+  const toggleExplanation = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedExplanation((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   // ── Launch helpers ──────────────────────────────────────────────────────────
-  const buildDetails = (questions: Question[], mode: string): ExamDetails => ({
-    subject: "অনুশীলন",
-    subjectLabel: "অনুশীলন",
-    examType: mode,
-    chapters: "Mixed",
-    topics: "Mixed",
-    totalQuestions: questions.length,
-    durationMinutes: questions.length * 2,
-    totalMarks: questions.reduce((acc, q) => acc + (q.points || 1), 0),
-    negativeMarking: 0,
-  });
-
   const getSelectedQuestions = (): Question[] => {
     let qs = currentList.filter((q) => currentSelection.has(q.id));
     if (shuffle) qs = [...qs].sort(() => Math.random() - 0.5);
     return qs;
   };
 
-  const handleLaunch = () => {
+  const handleLaunchFlashcards = () => {
     const qs = getSelectedQuestions();
     if (qs.length === 0) return;
     markReviewed(qs.map((q) => q.id));
     setReviewedMap(getLastReviewedMap());
     setFlashcardQuestions(qs);
     setViewState("flashcard");
+  };
+
+  const handleLaunchPracticeExam = () => {
+    const qs = getSelectedQuestions();
+    if (qs.length === 0) return;
+
+    const details: ExamDetails = {
+      subject: "অনুশীলন পরীক্ষা",
+      subjectLabel: "অনুশীলন ও ভুল উত্তর রিভিশন",
+      examType: "Practice Exam",
+      chapters: "Custom Selection",
+      topics: "Mixed",
+      totalQuestions: qs.length,
+      durationMinutes: Math.max(5, Math.ceil(qs.length * 1.5)),
+      totalMarks: qs.reduce((acc, q) => acc + (q.points || 1), 0),
+      negativeMarking: 0.25,
+    };
+
+    onStartPractice(qs, details);
   };
 
   const handleFlashcardComplete = (results: FlashcardResult[]) => {
@@ -366,83 +375,78 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     );
   }
 
-  // ── Badge helper ────────────────────────────────────────────────────────────
-  const FrequencyBadge = ({ count }: { count: number }) => {
-    const cfg =
-      count >= 3
-        ? {
-            bg: "bg-emerald-900/50 text-emerald-400 border-emerald-800/50",
-            label: `${count}× ভুল`,
-          }
-        : count === 2
-          ? {
-              bg: "bg-red-900/50 text-red-400 border-red-800/50",
-              label: `${count}× ভুল`,
-            }
-          : {
-              bg: "bg-neutral-800 text-neutral-400 border-neutral-700",
-              label: `${count}× ভুল`,
-            };
-    return (
-      <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${cfg.bg}`}
-      >
-        {cfg.label}
-      </span>
-    );
-  };
-
-  // ── Main list UI ────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-5xl mx-auto px-2 py-4 md:p-6 space-y-4 animate-fade-in">
-      {/* ── Stats bar ── */}
+    <div className="max-w-5xl mx-auto px-2 py-4 md:p-6 space-y-4 animate-fade-in font-['HindSiliguri'] pb-24">
+      {/* ── Top Stats Bar ── */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
-          { label: "মোট ভুল", value: mistakes.length, color: "text-red-500" },
           {
-            label: "বুকমার্ক",
-            value: globalBookmarks.length,
-            color: "text-emerald-500",
+            label: "মোট ভুল উত্তর",
+            value: BanglaNameHelper.toBanglaNumeral(mistakes.length),
+            color: "text-red-500",
+            bg: "bg-red-50 dark:bg-red-950/30",
+            border: "border-red-200 dark:border-red-900/40",
           },
-          { label: "রিভিউ বাকি", value: dueCount, color: "text-emerald-400" },
-        ].map(({ label, value, color }) => (
+          {
+            label: "সংরক্ষিত বুকমার্ক",
+            value: BanglaNameHelper.toBanglaNumeral(globalBookmarks.length),
+            color: "text-emerald-500",
+            bg: "bg-emerald-50 dark:bg-emerald-950/30",
+            border: "border-emerald-200 dark:border-emerald-900/40",
+          },
+          {
+            label: "আজকের রিভিশন বাকি",
+            value: BanglaNameHelper.toBanglaNumeral(dueCount),
+            color: "text-sky-500",
+            bg: "bg-sky-50 dark:bg-sky-950/30",
+            border: "border-sky-200 dark:border-sky-900/40",
+          },
+        ].map(({ label, value, color, bg, border }) => (
           <div
             key={label}
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-center shadow-sm"
+            className={cn(
+              "rounded-2xl p-3 sm:p-4 text-center shadow-sm border",
+              bg,
+              border
+            )}
           >
-            <div className={`text-2xl font-bold ${color}`}>{value}</div>
-            <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            <div className={cn("text-2xl sm:text-3xl font-black", color)}>
+              {value}
+            </div>
+            <div className="text-xs font-bold text-neutral-600 dark:text-neutral-400 mt-1">
               {label}
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── Tabs ── */}
-      <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl w-fit border border-neutral-200 dark:border-neutral-800">
+      {/* ── Tabs (Mistakes vs Bookmarks) ── */}
+      <div className="flex bg-neutral-100 dark:bg-[#18181B] p-1 rounded-2xl w-fit border border-neutral-200 dark:border-[#27272A] shadow-sm">
         <button
           onClick={() => setActiveTab("mistakes")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+          className={cn(
+            "px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all",
             activeTab === "mistakes"
-              ? "bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
-              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-          }`}
+              ? "bg-[#004633] text-white shadow-sm"
+              : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+          )}
         >
-          ভুল সমূহ ({mistakes.length})
+          ভুল উত্তর ব্যাংক ({BanglaNameHelper.toBanglaNumeral(mistakes.length)})
         </button>
         <button
           onClick={() => setActiveTab("bookmarks")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+          className={cn(
+            "px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all",
             activeTab === "bookmarks"
-              ? "bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
-              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-          }`}
+              ? "bg-[#004633] text-white shadow-sm"
+              : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+          )}
         >
-          বুকমার্ক ({globalBookmarks.length})
+          বুকমার্কস ({BanglaNameHelper.toBanglaNumeral(globalBookmarks.length)})
         </button>
       </div>
 
-      {/* ── Filters ── */}
+      {/* ── Subject Filter Pills ── */}
       {(allSubjects.length > 0 || activeTab === "bookmarks") && (
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -452,13 +456,14 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 <button
                   key={code}
                   onClick={() => setSubjectFilter(code)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                  className={cn(
+                    "flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all",
                     subjectFilter === code
-                      ? "bg-red-600 text-white border-red-600 shadow"
-                      : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400"
-                  }`}
+                      ? "bg-[#004633] text-white border-[#004633] shadow"
+                      : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A] hover:border-neutral-400"
+                  )}
                 >
-                  {label}
+                  {BanglaNameHelper.formatSubject(label, label)}
                 </button>
               ))}
           </div>
@@ -469,68 +474,43 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                  dateFilter
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow"
-                    : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-400"
-                }`}
-                style={{ colorScheme: 'dark' }}
+                className="px-3.5 py-1.5 rounded-full text-xs font-bold border border-neutral-200 dark:border-[#27272A] bg-white dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200"
               />
-              {!dateFilter && (
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-bold text-neutral-400">
-                  তারিখ
-                </div>
-              )}
             </div>
           )}
         </div>
       )}
 
-      {/* ── Main content box ── */}
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm min-h-[400px] flex flex-col">
+      {/* ── Main List Container ── */}
+      <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm flex flex-col">
         {isLoadingBookmarks && activeTab === "bookmarks" ? (
           <div className="flex-1 flex items-center justify-center p-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
           </div>
         ) : currentList.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-            <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-8 h-8 text-neutral-400"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-                />
-              </svg>
+            <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mb-3 text-neutral-400">
+              <BookOpen size={28} />
             </div>
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
+            <h3 className="text-base font-black text-neutral-900 dark:text-white mb-1">
               কোনো তথ্য পাওয়া যায়নি
             </h3>
-            <p className="text-neutral-500 text-sm max-w-md mb-6">
+            <p className="text-neutral-500 text-xs max-w-md mb-5">
               {activeTab === "mistakes"
-                ? subjectFilter !== "all"
-                  ? `"${subjectFilter}" বিষয়ে কোনো ভুল পাওয়া যায়নি।`
-                  : "তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।"
-                : "তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।"}
+                ? "তুমি এখনো কোনো পরীক্ষায় ভুল উত্তর দাওনি অথবা ফিল্টারে কোনো তথ্য নেই।"
+                : "তুমি এখনো কোনো প্রশ্ন বুকমার্ক করে রাখোনি।"}
             </p>
             <button
               onClick={onNavigateToMock}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow hover:bg-red-700 transition-colors"
+              className="px-5 py-2 bg-[#004633] text-white rounded-xl text-xs font-bold shadow hover:bg-[#003627] transition-all"
             >
-              নতুন পরীক্ষা দাও
+              নতুন পরীক্ষা দিন
             </button>
           </div>
         ) : (
           <div className="flex flex-col h-full">
             {/* Toolbar */}
-            <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900/50 gap-3 flex-wrap">
+            <div className="p-3.5 sm:p-4 border-b border-neutral-100 dark:border-neutral-800/80 flex justify-between items-center bg-neutral-50/50 dark:bg-[#141417] gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -539,78 +519,99 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                     currentList.length > 0
                   }
                   onChange={toggleSelectAll}
-                  className="w-5 h-5 rounded border-neutral-300 text-red-600 focus:ring-red-500"
+                  className="w-4 h-4 rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                  {currentSelection.size} নির্বাচিত
+                <span className="text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300">
+                  {BanglaNameHelper.toBanglaNumeral(currentSelection.size)}টি নির্বাচিত
                 </span>
 
                 {/* Shuffle toggle */}
                 <button
                   onClick={() => setShuffle((s) => !s)}
-                  title="এলোমেলো করো"
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                  className={cn(
+                    "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all",
                     shuffle
-                      ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700"
-                      : "bg-white dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400"
-                  }`}
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border-emerald-300"
+                      : "bg-white dark:bg-[#18181B] text-neutral-500 border-neutral-200 dark:border-[#27272A]"
+                  )}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="w-3.5 h-3.5"
-                  >
-                    <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
-                  </svg>
-                  {shuffle ? "Random On" : "Random"}
+                  <Shuffle size={12} />
+                  <span>{shuffle ? "Random On" : "Random"}</span>
                 </button>
               </div>
 
-              {/* Start practice button — flashcard only */}
-              <button
-                onClick={handleLaunch}
-                disabled={currentSelection.size === 0}
-                className={`px-5 py-2 rounded-lg text-sm font-bold transition-all transform active:scale-95 ${
-                  currentSelection.size > 0
-                    ? "bg-emerald-700 text-white shadow-md shadow-emerald-700/20 hover:bg-emerald-800"
-                    : "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
-                }`}
-              >
-                📇 ফ্ল্যাশকার্ড শুরু করো
-              </button>
+              {/* Dual Launch Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleLaunchFlashcards}
+                  disabled={currentSelection.size === 0}
+                  className={cn(
+                    "px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-sm",
+                    currentSelection.size > 0
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white active:scale-95 shadow-indigo-600/20"
+                      : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                  )}
+                >
+                  <Layers size={14} />
+                  <span>ফ্ল্যাশকার্ড</span>
+                </button>
+
+                <button
+                  onClick={handleLaunchPracticeExam}
+                  disabled={currentSelection.size === 0}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-sm",
+                    currentSelection.size > 0
+                      ? "bg-[#004633] hover:bg-[#003627] text-white active:scale-95 shadow-emerald-900/30"
+                      : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                  )}
+                >
+                  <Play size={14} className="fill-white" />
+                  <span>অনুশীলন পরীক্ষা</span>
+                </button>
+              </div>
             </div>
 
-            {/* Question list */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-neutral-50/30 dark:bg-black/20">
+            {/* Questions List */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-neutral-50/40 dark:bg-[#121214]">
               {paginatedList.map((question, idx) => {
                 const globalIdx = (currentPage - 1) * ITEMS_PER_PAGE + idx;
                 const freq = mistakeFrequency.get(question.id);
-                const due = isDue(question.id, reviewedMap);
                 const isSelected = selectedQuestions.has(question.id);
+                const isExp = !!expandedExplanation[question.id];
+
+                const sourceTag = BanglaNameHelper.formatQuestionSource({
+                  institutes: (question as any).institutes,
+                  years: (question as any).years,
+                  examHistory:
+                    (question as any).examHistory ||
+                    (question as any).exam_history,
+                });
 
                 return (
                   <motion.div
                     key={question.id}
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.03 }}
+                    transition={{ delay: idx * 0.02 }}
                     onClick={() => toggleSelection(question.id)}
-                    className={`group relative bg-white dark:bg-neutral-900 border rounded-xl p-4 transition-all cursor-pointer ${
+                    className={cn(
+                      "group rounded-2xl p-4 transition-all cursor-pointer border bg-white dark:bg-[#18181B] shadow-sm",
                       isSelected
-                        ? "border-red-500 dark:border-red-500 ring-1 ring-red-500"
-                        : "border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700"
-                    }`}
+                        ? "border-[#004633] dark:border-[#004633] ring-1 ring-[#004633]"
+                        : "border-neutral-200/90 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700"
+                    )}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3">
                       {/* Checkbox */}
-                      <div className="pt-1 flex-shrink-0">
+                      <div className="pt-0.5 shrink-0">
                         <div
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          className={cn(
+                            "w-4 h-4 rounded border flex items-center justify-center transition-all",
                             isSelected
-                              ? "bg-red-600 border-red-600"
+                              ? "bg-[#004633] border-[#004633]"
                               : "border-neutral-300 dark:border-neutral-600"
-                          }`}
+                          )}
                         >
                           {isSelected && (
                             <svg
@@ -629,70 +630,120 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         </div>
                       </div>
 
-                      {/* Content */}
+                      {/* Question Content */}
                       <div className="flex-1 min-w-0">
-                        {/* Meta row */}
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          {question.subject && (
-                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
-                              {question.subject}
+                        {/* Meta Tags Row */}
+                        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                          <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300 text-[10px] font-bold">
+                            {BanglaNameHelper.formatSubject(
+                              question.subjectLabel || question.subject,
+                              question.subject
+                            )}
+                          </span>
+
+                          {sourceTag && (
+                            <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-[10px] font-black border border-blue-200 dark:border-blue-800">
+                              {sourceTag}
                             </span>
                           )}
+
                           {freq !== undefined && activeTab === "mistakes" && (
-                            <FrequencyBadge count={freq} />
+                            <span className="px-2 py-0.5 rounded-md bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-[10px] font-black border border-red-200 dark:border-red-900/40">
+                              {BanglaNameHelper.toBanglaNumeral(freq)}× ভুল
+                            </span>
                           )}
                         </div>
 
-                        {/* Question text */}
-                        <div className="text-sm font-medium text-neutral-900 dark:text-white leading-snug line-clamp-2">
-                          <div className="flex gap-2">
-                            <span className="shrink-0">{globalIdx + 1}.</span>
-                            <div className="flex-1">
-                              <LatexText text={question.question} />
-                            </div>
+                        {/* Question Text */}
+                        <div className="text-sm font-bold text-neutral-900 dark:text-white leading-snug mb-2 flex items-start gap-1.5">
+                          <span className="font-mono text-neutral-500">
+                            {BanglaNameHelper.toBanglaNumeral(globalIdx + 1)}.
+                          </span>
+                          <div className="flex-1">
+                            <LatexText text={question.question} />
                           </div>
                         </div>
 
-                        {/* Correct answer hint */}
-                        {question.options &&
-                          question.correctAnswerIndex !== undefined && (
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 line-clamp-1">
-                              ✓ {question.options[question.correctAnswerIndex]}
-                            </p>
-                          )}
+                        {/* Options */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 my-2">
+                          {question.options.map((opt, optIdx) => {
+                            const isCorrect =
+                              optIdx === question.correctAnswerIndex ||
+                              (question.correctAnswerIndices != null &&
+                                question.correctAnswerIndices.includes(optIdx));
+
+                            return (
+                              <div
+                                key={optIdx}
+                                className={cn(
+                                  "px-2.5 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2",
+                                  isCorrect
+                                    ? "bg-emerald-50 dark:bg-[#004633]/30 border-emerald-300 dark:border-[#004633] text-emerald-800 dark:text-emerald-300"
+                                    : "bg-neutral-50/60 dark:bg-[#141417] border-neutral-200 dark:border-[#27272A] text-neutral-700 dark:text-neutral-300"
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0",
+                                    isCorrect
+                                      ? "bg-[#004633] text-white"
+                                      : "bg-neutral-200 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-400"
+                                  )}
+                                >
+                                  {BANGLA_OPTIONS[optIdx] || optIdx + 1}
+                                </span>
+                                <div className="flex-1 truncate">
+                                  <LatexText text={opt} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Explanation Toggle & Drawer */}
+                        {question.explanation && (
+                          <div className="mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/60">
+                            <button
+                              type="button"
+                              onClick={(e) => toggleExplanation(question.id, e)}
+                              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline"
+                            >
+                              <span>{isExp ? "ব্যাখ্যা লুকান" : "ব্যাখ্যা ও সমাধান দেখুন"}</span>
+                              <ChevronDown
+                                size={14}
+                                className={cn("transition-transform", isExp && "rotate-180")}
+                              />
+                            </button>
+
+                            {isExp && (
+                              <div className="mt-2 p-3 rounded-xl bg-neutral-50 dark:bg-[#141417] border border-neutral-200 dark:border-[#27272A] text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                                <LatexText text={question.explanation} />
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Bookmark toggle icon */}
+                      {/* Bookmark Icon */}
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleToggleBookmark(question.id);
                         }}
-                        className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${
+                        className={cn(
+                          "p-2 rounded-xl transition-all shrink-0",
                           bookmarkedIds.has(question.id)
-                            ? "text-emerald-500"
-                            : "text-neutral-400 hover:text-emerald-500"
-                        }`}
-                        title="বুকমার্ক"
+                            ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/40"
+                            : "text-neutral-400 hover:text-emerald-500 hover:bg-neutral-100 dark:hover:bg-[#27272A]"
+                        )}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill={
-                            bookmarkedIds.has(question.id)
-                              ? "currentColor"
-                              : "none"
-                          }
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-                          />
-                        </svg>
+                        <Bookmark
+                          size={16}
+                          className={cn(
+                            bookmarkedIds.has(question.id) && "fill-emerald-500"
+                          )}
+                        />
                       </button>
                     </div>
                   </motion.div>
@@ -700,86 +751,29 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               })}
             </div>
 
-            {/* Pagination controls */}
+            {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
-                {/* Left: Info */}
-                <div className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
-                  পৃষ্ঠা {currentPage} / {totalPages} ({currentList.length}{" "}
-                  প্রশ্ন)
-                </div>
+              <div className="p-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-2 flex-wrap text-xs">
+                <span className="text-neutral-500 font-bold">
+                  পৃষ্ঠা {BanglaNameHelper.toBanglaNumeral(currentPage)} /{" "}
+                  {BanglaNameHelper.toBanglaNumeral(totalPages)} (
+                  {BanglaNameHelper.toBanglaNumeral(currentList.length)}টি প্রশ্ন)
+                </span>
 
-                {/* Right: Controls */}
-                <div className="flex items-center gap-1.5">
-                  {/* Previous button */}
+                <div className="flex items-center gap-1">
                   <button
-                    onClick={handlePreviousPage}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                    title="পূর্ববর্তী"
+                    className="px-3 py-1 rounded-lg border border-neutral-200 dark:border-[#27272A] disabled:opacity-40 font-bold"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    পূর্ববর্তী
                   </button>
-
-                  {/* Page numbers */}
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-                      return pageNum;
-                    }).map((pageNum) => (
-                      <button
-                        key={pageNum}
-                        onClick={() => goToPage(pageNum)}
-                        className={`w-8 h-8 rounded-lg font-bold text-sm transition-all ${
-                          currentPage === pageNum
-                            ? "bg-red-600 text-white shadow-md"
-                            : "border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Next button */}
                   <button
-                    onClick={handleNextPage}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                    title="পরবর্তী"
+                    className="px-3 py-1 rounded-lg border border-neutral-200 dark:border-[#27272A] disabled:opacity-40 font-bold"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    পরবর্তী
                   </button>
                 </div>
               </div>

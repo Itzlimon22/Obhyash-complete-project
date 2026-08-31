@@ -19,14 +19,19 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
 import { searchColleges } from '@/lib/college-mapping';
 import { calculateLevel } from '@/lib/utils';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile, rank: number) => void;
+  onLegendsLeagueClick?: () => void;
 }
 
 const INSTITUTE_PAGE_SIZE = 15;
 
-const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
+const LeaderboardView: React.FC<LeaderboardViewProps> = ({
+  onUserClick,
+  onLegendsLeagueClick,
+}) => {
   const { loading: authLoading, user: authUser } = useAuth();
 
   const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
@@ -131,9 +136,11 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
   // ── SWR: all colleges list (for dropdown filter + rankings tab) ──────────────
   const { data: allCollegesRaw = [], isLoading: isLoadingCollegesList } = useSWR(
-    viewMode === 'college' || viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
-    getInstituteRankings,
-    { revalidateOnFocus: false, dedupingInterval: 300_000 },
+    viewMode === 'college' || viewMode === 'rankings'
+      ? `leaderboard:instituteRankings:${timeframe}`
+      : null,
+    () => getInstituteRankings(timeframe === 'all_time' ? 'all_time' : 'monthly'),
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
   );
   const allColleges = [...allCollegesRaw].sort((a, b) => {
     if (a.institute === currentUser?.institute) return -1;
@@ -178,8 +185,29 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const allInstTabLabel = `সব ${instLabel}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-6 animate-fade-in transition-colors pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-6 animate-fade-in transition-colors pb-24 font-['HindSiliguri']">
       <div className="max-w-7xl mx-auto">
+        {/* Top Header Row with Legends League Glow Button */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
+              মেধা লিডারবোর্ড 🏆
+            </h2>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              দৈনিক পরীক্ষা দিয়ে XP বাড়াও ও লিডারবোর্ডে এগিয়ে যাও
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onLegendsLeagueClick || (() => (window.location.href = "/legends-league"))}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-black shadow-md shadow-rose-600/30 active:scale-95 transition-all flex items-center gap-1.5 shrink-0 animate-pulse border border-rose-400/40"
+          >
+            <span>👑</span>
+            <span>লেজেন্ডস লীগ</span>
+          </button>
+        </div>
+
         {/* View mode tabs */}
         <div className="flex gap-1 mb-4 bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-1">
           <button onClick={() => setViewMode('level')} className={tabClass(viewMode === 'level')}>
@@ -356,7 +384,7 @@ function CollegeFilter({ colleges, value, onChange, isLoading }: CollegeFilterPr
         if (existingRank) {
           combined.push(existingRank);
         } else {
-          combined.push({ institute: name, studentCount: 0, avgXp: 0 });
+          combined.push({ institute: name, studentCount: 0, points: 0, bestRank: 999999 });
         }
       }
     }
@@ -541,25 +569,50 @@ function InstituteRankingsView({ rankings, isLoading, myInstitute }: InstituteRa
       <div className="text-center py-20 text-neutral-400 dark:text-neutral-600">
         <p className="text-4xl mb-3">🏆</p>
         <p className="font-bold text-sm">এখনো যথেষ্ট ডেটা নেই</p>
-        <p className="text-xs mt-1">প্রতিটি কলেজ থেকে কমপক্ষে ৫ জন শিক্ষার্থী লাগবে</p>
+        <p className="text-xs mt-1">শিক্ষার্থীরা পরীক্ষায় অংশ নিলে র‍্যাংকিং প্রদর্শিত হবে</p>
       </div>
     );
   }
+
+  const myInstituteIdx = myInstitute ? rankings.findIndex((r) => r.institute === myInstitute) : -1;
+  const myInstituteEntry = myInstituteIdx !== -1 ? rankings[myInstituteIdx] : null;
+  const myInstituteRank = myInstituteIdx !== -1 ? myInstituteIdx + 1 : 0;
 
   return (
     <div className="mt-2 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
       {/* Header */}
       <div className="px-4 md:px-5 py-3.5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/50 flex justify-between items-center flex-wrap gap-2">
-        <div>
-          <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200">কলেজ প্রতিযোগিতা</h3>
-          <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mt-0.5">
-            শীর্ষ ৫ শিক্ষার্থীর গড় XP অনুযায়ী র‍্যাংকিং
-          </p>
-        </div>
+        <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200">কলেজ প্রতিযোগিতা</h3>
         <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded-full">
-          {rankings.length} টি কলেজ
+          {BanglaNameHelper.toBanglaNumeral(rankings.length)} টি কলেজ
         </span>
       </div>
+
+      {/* Pinned Own College */}
+      {myInstituteEntry && (
+        <div className="p-3 bg-neutral-100/70 dark:bg-neutral-800/40 border-b border-neutral-200 dark:border-neutral-700/60">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-sm">
+            <div className="w-8 text-center flex-shrink-0">
+              <span className="text-sm font-black text-neutral-800 dark:text-neutral-200">
+                {BanglaNameHelper.toBanglaNumeral(myInstituteRank)}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold truncate text-neutral-900 dark:text-neutral-100">
+                {myInstituteEntry.institute}
+                <span className="ml-1.5 text-[10px] font-black text-neutral-600 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded-full">
+                  তোমার কলেজ
+                </span>
+              </p>
+            </div>
+            <div className="text-right flex-shrink-0 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800">
+              <p className="text-xs font-black text-neutral-800 dark:text-neutral-200">
+                {(myInstituteEntry.points ?? 0).toLocaleString()} pts
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* List */}
       <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -571,35 +624,35 @@ function InstituteRankingsView({ rankings, isLoading, myInstitute }: InstituteRa
           return (
             <div
               key={entry.institute}
-              className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                isMe ? 'bg-emerald-50 dark:bg-emerald-950/40' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'
+              className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${
+                isMe ? 'bg-neutral-50 dark:bg-neutral-800/50' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'
               }`}
             >
               <div className="w-8 text-center flex-shrink-0">
                 {medal ? (
                   <span className="text-xl">{medal}</span>
                 ) : (
-                  <span className="text-sm font-black text-neutral-400 dark:text-neutral-600">{rank}</span>
+                  <span className="text-sm font-black text-neutral-400 dark:text-neutral-600">
+                    {BanglaNameHelper.toBanglaNumeral(rank)}
+                  </span>
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-bold truncate ${isMe ? 'text-emerald-800 dark:text-emerald-300' : 'text-neutral-800 dark:text-neutral-200'}`}>
+                <p className="text-sm font-bold truncate text-neutral-800 dark:text-neutral-200">
                   {entry.institute}
                   {isMe && (
-                    <span className="ml-1.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full">
+                    <span className="ml-1.5 text-[10px] font-black text-neutral-600 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded-full">
                       তোমার কলেজ
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-neutral-400 dark:text-neutral-600 mt-0.5">{entry.studentCount} জন শিক্ষার্থী</p>
               </div>
 
-              <div className={`text-right flex-shrink-0 px-2.5 py-1.5 rounded-xl ${isMe ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-neutral-50 dark:bg-neutral-800'}`}>
-                <p className={`text-xs font-black ${isMe ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-600 dark:text-neutral-300'}`}>
-                  {entry.avgXp.toLocaleString()} XP
+              <div className="text-right flex-shrink-0 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800">
+                <p className="text-xs font-black text-neutral-700 dark:text-neutral-300">
+                  {(entry.points ?? 0).toLocaleString()} pts
                 </p>
-                <p className="text-[10px] text-neutral-400 dark:text-neutral-600">গড় স্কোর</p>
               </div>
             </div>
           );

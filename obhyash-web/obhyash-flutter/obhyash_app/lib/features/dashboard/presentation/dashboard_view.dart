@@ -89,16 +89,16 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         // 2. Main Content inside SliverToBoxAdapter
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Actions Grid
                 GridView.count(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.06,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1.05,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
@@ -146,9 +146,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     ),
                   ],
                 ),
-                // Revision Card temporarily hidden as per requirement
-                // const DailySpacedRepetitionCard(),
-                // const SizedBox(height: 18),
+                
+                const SizedBox(height: 18),
 
                 DailyStreakCard(userStreak: userProfile?.streakCount ?? 0)
                     .animate(delay: 150.ms)
@@ -159,7 +158,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                       curve: Curves.easeOut,
                     ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 const DailyQuestsCard()
                     .animate(delay: 180.ms)

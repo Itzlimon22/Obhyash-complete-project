@@ -245,40 +245,40 @@ class _StreakCalendarState extends State<StreakCalendar> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
-                ), // sm:px-4 sm:py-2
+                ),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0x337c2d12)
-                      : const Color(0xFFFFF7ED), // orange-900/20 : orange-50
-                  borderRadius: BorderRadius.circular(40), // rounded-full
+                      ? const Color(0xFFEF4444).withValues(alpha: 0.15)
+                      : const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(40),
                   border: Border.all(
                     color: isDark
-                        ? const Color(0x4D7c2d12)
-                        : const Color(0xFFFFEDD5),
-                  ), // orange-900/30 : orange-100
-                  boxShadow: const [
+                        ? const Color(0xFFEF4444).withValues(alpha: 0.3)
+                        : const Color(0xFFFECACA),
+                  ),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x0Df97316),
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.08),
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
-                  ], // shadow-orange-500/5
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
                       Icons.local_fire_department_rounded,
-                      color: Color(0xFFF97316),
+                      color: Color(0xFFEF4444),
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       '${widget.streakCount} দিন স্ট্রিক',
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFFEA580C),
+                        color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
                         fontFamily: 'Anek Bangla',
                       ),
                     ),

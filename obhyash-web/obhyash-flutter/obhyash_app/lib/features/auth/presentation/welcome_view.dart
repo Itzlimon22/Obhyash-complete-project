@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 class OnboardingSlide {
   final String tag;
@@ -498,7 +499,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '#১৪ তুমি (সাদিকুর)',
+                  '১৪ তুমি (সাদিকুর)',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -776,7 +777,7 @@ class _WelcomeViewState extends State<WelcomeView> {
       child: Row(
         children: [
           Text(
-            '#$rank',
+            BanglaNameHelper.toBanglaNumeral(rank),
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w800,

@@ -254,9 +254,9 @@ function ProfileCard({
   toggleTheme?: () => void;
 }) {
   return (
-    <div className="max-w-5xl mx-auto mb-6 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-md">
-      {/* Green gradient header */}
-      <div className="bg-gradient-to-br from-green-700 to-green-900 px-6 py-8 flex flex-col items-center gap-3">
+    <div className="max-w-5xl mx-auto mb-6 rounded-2xl overflow-hidden border border-neutral-200/90 dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
+      {/* Brand deep green header */}
+      <div className="bg-[#004633] px-6 py-8 flex flex-col items-center gap-3">
         <UserAvatar user={user} size="2xl" showBorder />
         <div className="text-center">
           <h2 className="text-xl font-black text-white tracking-tight">
@@ -271,33 +271,33 @@ function ProfileCard({
       </div>
 
       {/* Info chips + theme toggle */}
-      <div className="bg-white dark:bg-neutral-950 px-5 pt-4 pb-5 space-y-4">
+      <div className="bg-white dark:bg-[#18181B] px-5 pt-4 pb-5 space-y-4">
         <div className="flex flex-wrap gap-2 justify-center">
           {user.phone && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
               📞 {user.phone}
             </span>
           )}
           {user.institute && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
               🏫 {user.institute}
             </span>
           )}
           {user.batch && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
               📅 ব্যাচ {user.batch}
             </span>
           )}
         </div>
 
         {toggleTheme && (
-          <div className="flex rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
+          <div className="flex rounded-xl overflow-hidden border border-neutral-200 dark:border-[#27272A]">
             <button
               onClick={() => isDarkMode && toggleTheme()}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
                 !isDarkMode
-                  ? 'bg-green-800 text-white'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900'
+                  ? 'bg-[#004633] text-white'
+                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#141417]'
               }`}
             >
               <Sun className="w-3.5 h-3.5" />
@@ -307,8 +307,8 @@ function ProfileCard({
               onClick={() => !isDarkMode && toggleTheme()}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
                 isDarkMode
-                  ? 'bg-green-800 text-white'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900'
+                  ? 'bg-[#004633] text-white'
+                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#141417]'
               }`}
             >
               <Moon className="w-3.5 h-3.5" />
@@ -485,14 +485,14 @@ export default function SettingsView({
           onClick={() => handleItem(item)}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
             active
-              ? 'bg-green-800 text-white font-bold shadow-sm'
+              ? 'bg-[#004633] text-white font-bold shadow-sm'
               : isDanger
-                ? 'text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 font-medium'
-                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 font-medium'
+                ? 'text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 font-bold'
+                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#27272A] font-bold'
           }`}
         >
           <item.Icon className="w-4 h-4 shrink-0" />
-          <span className="text-sm flex-1">{item.label}</span>
+          <span className="text-xs sm:text-sm flex-1">{item.label}</span>
           {(isExternal || isInternal) && !active && (
             <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
           )}
@@ -513,12 +513,12 @@ export default function SettingsView({
       )}
 
       {/* ── DESKTOP (md+): sidebar + content ─────────────── */}
-      <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start">
+      <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start font-['HindSiliguri']">
         {/* Sidebar */}
         <aside className="w-56 shrink-0 sticky top-4">
-          <nav className="bg-white dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
-            <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-green-800">
-              <p className="text-[11px] font-bold text-green-100 uppercase tracking-widest">
+          <nav className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm">
+            <div className="px-4 py-3 border-b border-[#003627] bg-[#004633]">
+              <p className="text-[11px] font-black text-white uppercase tracking-widest">
                 সেটিংস
               </p>
             </div>
@@ -528,12 +528,12 @@ export default function SettingsView({
                   key={gi}
                   className={
                     gi > 0
-                      ? 'mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800'
+                      ? 'mt-3 pt-3 border-t border-neutral-100 dark:border-[#27272A]'
                       : ''
                   }
                 >
                   {group.title && (
-                    <p className="px-3 mb-1 text-[10px] font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest">
+                    <p className="px-3 mb-1 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
                       {group.title}
                     </p>
                   )}
@@ -553,13 +553,13 @@ export default function SettingsView({
       </div>
 
       {/* ── MOBILE: menu list → sub-panel with back button ── */}
-      <div className="md:hidden pb-24">
+      <div className="md:hidden pb-24 font-['HindSiliguri']">
         {activeSection === null ? (
           <div className="space-y-4">
             {GROUPS.map((group, gi) => (
               <div key={gi}>
                 {group.title && (
-                  <p className="px-1 mb-2 text-[10px] font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest">
+                  <p className="px-1 mb-2 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
                     {group.title}
                   </p>
                 )}
@@ -574,24 +574,24 @@ export default function SettingsView({
                         onClick={() => handleItem(item)}
                         className={`w-full flex items-center gap-4 p-4 rounded-2xl border text-left active:scale-[0.99] transition-transform shadow-sm ${
                           isDanger
-                            ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900 hover:border-red-400'
-                            : 'bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 hover:border-green-700 dark:hover:border-green-700'
+                            ? 'bg-red-50 dark:bg-[#260C0E] border-red-200 dark:border-red-900/50 hover:border-red-400'
+                            : 'bg-white dark:bg-[#18181B] border-neutral-200/90 dark:border-[#27272A] hover:border-[#004633] dark:hover:border-[#004633]'
                         }`}
                       >
                         <div
                           className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                            isDanger ? 'bg-red-600' : 'bg-green-800'
+                            isDanger ? 'bg-red-600' : 'bg-[#004633]'
                           }`}
                         >
                           <item.Icon className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p
-                            className={`text-sm font-bold ${isDanger ? 'text-red-600 dark:text-red-500' : 'text-neutral-800 dark:text-neutral-100'}`}
+                            className={`text-sm font-black ${isDanger ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white'}`}
                           >
                             {item.label}
                           </p>
-                          <p className="text-xs text-neutral-400 dark:text-neutral-500 truncate mt-0.5">
+                          <p className="text-xs text-neutral-400 dark:text-neutral-500 truncate mt-0.5 font-bold">
                             {item.description}
                           </p>
                         </div>
@@ -613,7 +613,7 @@ export default function SettingsView({
           <div>
             <button
               onClick={() => setActiveSection(null)}
-              className="flex items-center gap-2 mb-5 text-sm font-bold text-green-800 dark:text-green-400 hover:text-green-900"
+              className="flex items-center gap-2 mb-5 text-sm font-black text-[#004633] dark:text-[#4ADE80] hover:underline"
             >
               <ArrowLeft className="w-4 h-4" />
               সেটিংস

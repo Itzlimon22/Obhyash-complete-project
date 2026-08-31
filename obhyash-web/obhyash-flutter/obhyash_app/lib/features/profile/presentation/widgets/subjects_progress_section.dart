@@ -7,11 +7,15 @@ import '../../../dashboard/domain/models.dart';
 class SubjectsProgressSection extends StatelessWidget {
   final List<SubjectStats> subjectStats;
   final Function(String)? onSubjectClick;
+  final bool isViewingSelf;
+  final String? studentName;
 
   const SubjectsProgressSection({
     super.key,
     required this.subjectStats,
     this.onSubjectClick,
+    this.isViewingSelf = true,
+    this.studentName,
   });
 
   String _formatSubjectName(String name) {
@@ -478,12 +482,15 @@ class SubjectsProgressSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে তোমার বিষয়ভিত্তিক দক্ষতা দেখা যাবে।',
+              isViewingSelf
+                  ? 'এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে তোমার বিষয়ভিত্তিক দক্ষতা দেখা যাবে।'
+                  : '${studentName != null ? '$studentName এখনও' : 'এই শিক্ষার্থী এখনও'} কোনো পরীক্ষায় অংশ নেয়নি।',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: isDark
                     ? const Color(0xFFA1A1AA)
                     : const Color(0xFF64748B),
+                fontFamily: 'Anek Bangla',
               ),
             ),
           ],

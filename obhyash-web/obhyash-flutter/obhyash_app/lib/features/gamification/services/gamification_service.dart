@@ -217,6 +217,33 @@ class GamificationService {
         unlockedMap[bId] = unAt;
       }
 
+      // If user has no explicit user_badges rows, check public_profiles stats as fallback
+      if (unlockedMap.isEmpty) {
+        try {
+          final prof = await _supabase
+              .from('public_profiles')
+              .select('xp, exams_taken, streak')
+              .eq('id', userId)
+              .maybeSingle();
+          if (prof != null) {
+            final xp = (prof['xp'] as num?)?.toInt() ?? 0;
+            final exams = (prof['exams_taken'] as num?)?.toInt() ?? 0;
+            final streak = (prof['streak'] as num?)?.toInt() ?? 0;
+
+            final now = DateTime.now();
+            if (exams >= 1) unlockedMap['first_step'] = now;
+            if (streak >= 3) unlockedMap['streak_3'] = now;
+            if (streak >= 7) unlockedMap['streak_7'] = now;
+            if (exams >= 5) unlockedMap['precision_master'] = now;
+            if (exams >= 10 || xp >= 1000) unlockedMap['knowledge_sage'] = now;
+            if (exams >= 15) unlockedMap['speed_demon'] = now;
+            if (exams >= 20) unlockedMap['night_owl'] = now;
+            if (xp >= 5000) unlockedMap['apex_legend'] = now;
+            if (xp >= 10000) unlockedMap['live_champion'] = now;
+          }
+        } catch (_) {}
+      }
+
       return ObhyashBadges.allBadges.map((badge) {
         final isUnlocked = unlockedMap.containsKey(badge.id);
         return badge.copyWith(

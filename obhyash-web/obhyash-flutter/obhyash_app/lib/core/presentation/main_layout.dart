@@ -26,6 +26,7 @@ import '../../features/notifications/providers/notification_providers.dart';
 import '../../features/notifications/presentation/widgets/in_app_notification_banner.dart';
 import '../../features/notifications/services/notification_service.dart';
 import '../../features/notifications/services/notification_permission_manager.dart';
+import '../../features/history/presentation/exam_history_view.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -48,19 +49,22 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       if (user != null) {
         StreakService.syncStreak(user.id).then((data) {
           if (mounted) {
-            ref.read(userProfileProvider.notifier).updateStreak(data.streakCount);
+            ref
+                .read(userProfileProvider.notifier)
+                .updateStreak(data.streakCount);
           }
         });
       }
     });
   }
-  
+
   void _showStreakDialog(int currentStreak, String userId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => StreakDialog(currentStreak: currentStreak, userId: userId),
+      builder: (ctx) =>
+          StreakDialog(currentStreak: currentStreak, userId: userId),
     );
   }
 
@@ -80,7 +84,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/leaderboard')) return 'leaderboard';
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
-    if (location.startsWith('/profile/my-subscription')) return 'my-subscription';
+    if (location.startsWith('/profile/my-subscription'))
+      return 'my-subscription';
     if (location.startsWith('/profile/subscription')) return 'subscription';
     if (location.startsWith('/profile/complaint')) return 'complaint';
     if (location.startsWith('/profile/about')) return 'about';
@@ -90,9 +95,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/profile/blog')) return 'blog';
     if (location.startsWith('/profile/referral')) return 'referral';
     if (location.startsWith('/profile/stats')) return 'stats';
-    if (location.startsWith('/profile/bookmarks') || location.startsWith('/bookmarks')) return 'bookmarks';
-    if (location.startsWith('/profile/feature-requests')) return 'feature-requests';
-    if (location.startsWith('/profile/account-linking')) return 'account-linking';
+    if (location.startsWith('/profile/bookmarks') ||
+        location.startsWith('/bookmarks'))
+      return 'bookmarks';
+    if (location.startsWith('/profile/feature-requests'))
+      return 'feature-requests';
+    if (location.startsWith('/profile/account-linking'))
+      return 'account-linking';
     if (location.startsWith('/profile')) return 'settings';
     if (location.startsWith('/subject') || location.contains('/subject')) {
       try {
@@ -111,8 +120,10 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     }
     if (location.startsWith('/notifications')) return 'notifications';
     if (location.startsWith('/bookmarks')) return 'bookmarks';
-    if (location.contains('/formulas/') && location.split('/').length >= 5) return 'formula_detail';
-    if (location.contains('/formulas/') && location.split('/').length >= 4) return 'formula_chapters';
+    if (location.contains('/formulas/') && location.split('/').length >= 5)
+      return 'formula_detail';
+    if (location.contains('/formulas/') && location.split('/').length >= 4)
+      return 'formula_chapters';
     if (location.startsWith('/live_exam/')) {
       final segs = location.split('/');
       if (segs.length >= 3 && segs[2].isNotEmpty) {
@@ -141,7 +152,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
 
       // 2. Live Exam: Keep bottom nav on main hub (/live_exam), hide on category/details/session
-      if (segs.contains('live_exam') || segs.contains('live-exams') || segs.contains('live-exam')) {
+      if (segs.contains('live_exam') ||
+          segs.contains('live-exams') ||
+          segs.contains('live-exam')) {
         final idx = segs.indexWhere((s) => s.startsWith('live'));
         if (idx != -1 && segs.length - idx >= 2) {
           return false;
@@ -150,15 +163,23 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
 
       // 3. Detail sub-routes and setup form that hide bottom nav
-      if (location.startsWith('/setup') || location.contains('/setup')) return false;
+      if (location.startsWith('/setup') || location.contains('/setup'))
+        return false;
       if (location.startsWith('/notifications')) return false;
-      if (location.startsWith('/bookmarks') || location.contains('/bookmarks')) return false;
-      if (location.startsWith('/subject') || location.contains('/subject/')) return false;
-      if (location.startsWith('/my-reports') || location.startsWith('/analysis')) return false;
-      if (location.startsWith('/profile/') && location != '/profile') return false;
-      if (location.startsWith('/history/') && location != '/history') return false;
+      if (location.startsWith('/bookmarks') || location.contains('/bookmarks'))
+        return false;
+      if (location.startsWith('/subject') || location.contains('/subject/'))
+        return false;
+      if (location.startsWith('/my-reports') ||
+          location.startsWith('/analysis'))
+        return false;
+      if (location.startsWith('/profile/') && location != '/profile')
+        return false;
+      if (location.startsWith('/history/') && location != '/history')
+        return false;
       if (location.contains('legends-league')) return false;
-      if (location.startsWith('/leaderboard/') && location != '/leaderboard') return false;
+      if (location.startsWith('/leaderboard/') && location != '/leaderboard')
+        return false;
       if (location.startsWith('/exam')) return false;
       if (location.contains('/user-profile')) return false;
 
@@ -444,8 +465,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     final isLoading = userProfileAsync.isLoading;
 
     // Auto-refresh & sync whenever internet returns from offline to online
-    ref.listen<AsyncValue<NetworkStatus>>(connectivityStreamProvider, (prev, next) {
-      if (next.value == NetworkStatus.online && prev?.value == NetworkStatus.offline) {
+    ref.listen<AsyncValue<NetworkStatus>>(connectivityStreamProvider, (
+      prev,
+      next,
+    ) {
+      if (next.value == NetworkStatus.online &&
+          prev?.value == NetworkStatus.offline) {
         globalRefresh(ref);
       }
     });
@@ -481,7 +506,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     });
 
     final isDrawerOpen = _scaffoldKey.currentState?.isDrawerOpen ?? false;
-    final isAtDashboardRoot = widget.navigationShell.currentIndex == 0 &&
+    final isAtDashboardRoot =
+        widget.navigationShell.currentIndex == 0 &&
         (location == '/' || location.isEmpty) &&
         !context.canPop();
 
@@ -495,7 +521,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         }
         if (context.canPop()) {
           context.pop();
-        } else if (widget.navigationShell.currentIndex != 0 || location != '/') {
+        } else if (widget.navigationShell.currentIndex != 0 ||
+            location != '/') {
           widget.navigationShell.goBranch(0);
           context.go('/');
         }
@@ -505,397 +532,526 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         backgroundColor: isDark
             ? const Color(0xFF0C0A09)
             : const Color(0xFFFAFAF9),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(68),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF0C0A09).withValues(alpha: 0.85)
-                    : Colors.white.withValues(alpha: 0.9),
-                border: Border(
-                  bottom: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF1C1C1E).withValues(alpha: 0.8)
-                        : const Color(0xFFF3F4F6),
-                    width: 1,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(68),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF0C0A09).withValues(alpha: 0.85)
+                      : Colors.white.withValues(alpha: 0.9),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF1C1C1E).withValues(alpha: 0.8)
+                          : const Color(0xFFF3F4F6),
+                      width: 1,
+                    ),
                   ),
                 ),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: SizedBox(
-                  height: 68,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Left: Clean Title & Back Button
-                        Expanded(
-                          child: Consumer(
-                            builder: (context, ref, child) {
-                              final currentLoc = GoRouterState.of(context).uri.toString();
-                              final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
-                              final titleText = dynamicTitle ?? _getTitle(activeTab);
-                              final isSubRoute = dynamicTitle != null;
+                child: SafeArea(
+                  bottom: false,
+                  child: SizedBox(
+                    height: 68,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Left: Clean Title & Back Button
+                          Expanded(
+                            child: Consumer(
+                              builder: (context, ref, child) {
+                                final currentLoc = GoRouterState.of(
+                                  context,
+                                ).uri.toString();
+                                final dynamicTitle = ref.watch(
+                                  locationTitleProvider,
+                                )[currentLoc];
+                                final titleText =
+                                    dynamicTitle ?? _getTitle(activeTab);
+                                final isSubRoute = dynamicTitle != null;
 
-                              const settingsSubTabs = {
-                                'stats',
-                                'subscription',
-                                'my-subscription',
-                                'complaint',
-                                'feature-requests',
-                                'about',
-                                'privacy',
-                                'terms',
-                                'faq',
-                                'account-linking',
-                                'referral',
-                                'blog',
-                                'bookmarks',
-                                'my-reports',
-                                'notifications',
-                              };
+                                const settingsSubTabs = {
+                                  'stats',
+                                  'subscription',
+                                  'my-subscription',
+                                  'complaint',
+                                  'feature-requests',
+                                  'about',
+                                  'privacy',
+                                  'terms',
+                                  'faq',
+                                  'account-linking',
+                                  'referral',
+                                  'blog',
+                                  'bookmarks',
+                                  'my-reports',
+                                  'notifications',
+                                };
 
-                              final isSettingsSubPage = settingsSubTabs.contains(activeTab) ||
-                                  (currentLoc.startsWith('/profile/') && currentLoc != '/profile') ||
-                                  currentLoc.startsWith('/bookmarks') ||
-                                  currentLoc.startsWith('/my-reports') ||
-                                  currentLoc.startsWith('/notifications');
+                                final isSettingsSubPage =
+                                    settingsSubTabs.contains(activeTab) ||
+                                    (currentLoc.startsWith('/profile/') &&
+                                        currentLoc != '/profile') ||
+                                    currentLoc.startsWith('/bookmarks') ||
+                                    currentLoc.startsWith('/my-reports') ||
+                                    currentLoc.startsWith('/notifications');
 
-                              final showBackButton = isSettingsSubPage ||
-                                  activeTab == 'legends-league' ||
-                                  activeTab == 'setup' ||
-                                  activeTab == 'practice' ||
-                                  activeTab == 'analysis' ||
-                                  activeTab == 'live_exam' ||
-                                  activeTab.startsWith('subject_') ||
-                                  isSubRoute ||
-                                  context.canPop();
+                                final showBackButton =
+                                    isSettingsSubPage ||
+                                    activeTab == 'legends-league' ||
+                                    activeTab == 'setup' ||
+                                    activeTab == 'practice' ||
+                                    activeTab == 'analysis' ||
+                                    activeTab == 'live_exam' ||
+                                    activeTab.startsWith('subject_') ||
+                                    isSubRoute ||
+                                    context.canPop();
 
-                              return Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (showBackButton) ...[
-                                    GestureDetector(
-                                      onTap: () {
-                                        HapticFeedback.lightImpact();
-                                        if (context.canPop()) {
-                                          context.pop();
-                                        } else if (activeTab == 'legends-league') {
-                                          widget.navigationShell.goBranch(3);
-                                          context.go('/leaderboard');
-                                        } else if (isSettingsSubPage) {
-                                          widget.navigationShell.goBranch(4);
-                                          context.go('/profile');
-                                        } else {
-                                          widget.navigationShell.goBranch(0);
-                                          context.go('/');
-                                        }
-                                      },
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(7),
-                                        margin: const EdgeInsets.only(right: 10),
-                                        decoration: BoxDecoration(
-                                          color: isDark
-                                              ? const Color(0xFF1C1C1E)
-                                              : const Color(0xFFF1F5F9),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (showBackButton) ...[
+                                      GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          if (context.canPop()) {
+                                            context.pop();
+                                          } else if (activeTab ==
+                                              'legends-league') {
+                                            widget.navigationShell.goBranch(3);
+                                            context.go('/leaderboard');
+                                          } else if (isSettingsSubPage) {
+                                            widget.navigationShell.goBranch(4);
+                                            context.go('/profile');
+                                          } else {
+                                            widget.navigationShell.goBranch(0);
+                                            context.go('/');
+                                          }
+                                        },
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(7),
+                                          margin: const EdgeInsets.only(
+                                            right: 10,
+                                          ),
+                                          decoration: BoxDecoration(
                                             color: isDark
-                                                ? const Color(0xFF27272A)
-                                                : const Color(0xFFE2E8F0),
+                                                ? const Color(0xFF1C1C1E)
+                                                : const Color(0xFFF1F5F9),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            border: Border.all(
+                                              color: isDark
+                                                  ? const Color(0xFF27272A)
+                                                  : const Color(0xFFE2E8F0),
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            LucideIcons.arrowLeft,
+                                            size: 18,
+                                            color: isDark
+                                                ? Colors.white
+                                                : const Color(0xFF0F172A),
                                           ),
                                         ),
-                                        child: Icon(
-                                          LucideIcons.arrowLeft,
-                                          size: 18,
-                                          color: isDark
-                                              ? Colors.white
-                                              : const Color(0xFF0F172A),
+                                      ),
+                                    ],
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          titleText,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: isSubRoute ? 18 : 21,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'Anek Bangla',
+                                            letterSpacing: -0.2,
+                                            color: isDark
+                                                ? Colors.white
+                                                : const Color(0xFF111827),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ],
-                                  Flexible(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        titleText,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: isSubRoute ? 18 : 21,
-                                          fontWeight: FontWeight.w700,
-                                          fontFamily: 'Anek Bangla',
-                                          letterSpacing: -0.2,
-                                          color: isDark
-                                              ? Colors.white
-                                              : const Color(0xFF111827),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ),
 
-                        // Right: Streak + Notification + Divider + Avatar (Dashboard Only for Clean Look)
-                        if (activeTab == 'dashboard')
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Streak Badge with Tooltip
-                              ObhyashTooltip(
-                                message: 'দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো',
-                                preferredPosition: TooltipPosition.bottom,
-                                child: GestureDetector(
-                                  onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Animate(
-                                        key: ValueKey(_streakAnimKey),
-                                        effects: _streakAnimKey > 0
-                                            ? [
-                                                ScaleEffect(
+                          // Right: Streak + Notification + Divider + Avatar (Dashboard Only for Clean Look)
+                          if (activeTab == 'dashboard')
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Streak Badge with Tooltip
+                                ObhyashTooltip(
+                                  message:
+                                      'দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো',
+                                  preferredPosition: TooltipPosition.bottom,
+                                  child: GestureDetector(
+                                    onTap: user != null
+                                        ? () => _triggerStreakAnimation(
+                                            streak,
+                                            user.id,
+                                          )
+                                        : null,
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Animate(
+                                          key: ValueKey(_streakAnimKey),
+                                          effects: _streakAnimKey > 0
+                                              ? [
+                                                  ScaleEffect(
                                                     begin: const Offset(1, 1),
                                                     end: const Offset(1.4, 1.4),
                                                     duration: 250.ms,
-                                                    curve: Curves.easeOutBack),
-                                                ShakeEffect(
-                                                  hz: 4,
-                                                  duration: 400.ms,
-                                                  delay: 200.ms,
-                                                ),
-                                                ScaleEffect(
-                                                    begin: const Offset(1.4, 1.4),
+                                                    curve: Curves.easeOutBack,
+                                                  ),
+                                                  ShakeEffect(
+                                                    hz: 4,
+                                                    duration: 400.ms,
+                                                    delay: 200.ms,
+                                                  ),
+                                                  ScaleEffect(
+                                                    begin: const Offset(
+                                                      1.4,
+                                                      1.4,
+                                                    ),
                                                     end: const Offset(1, 1),
                                                     duration: 250.ms,
                                                     delay: 600.ms,
-                                                    curve: Curves.easeIn),
-                                              ]
-                                            : [],
-                                        child: const Icon(
-                                          Icons.local_fire_department_rounded,
-                                          color: Color(0xFFF97316),
-                                          size: 24,
+                                                    curve: Curves.easeIn,
+                                                  ),
+                                                ]
+                                              : [],
+                                          child: const Icon(
+                                            Icons.local_fire_department_rounded,
+                                            color: Color(0xFFEF4444),
+                                            size: 24,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      isLoading
-                                          ? Container(
-                                              width: 16,
-                                              height: 12,
-                                              decoration: BoxDecoration(
-                                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
-                                            )
-                                          : Animate(
-                                              key: ValueKey('text_$_streakAnimKey'),
-                                              effects: _streakAnimKey > 0
-                                                  ? [
-                                                      ShimmerEffect(
-                                                        color: const Color(0xFFFDE047),
-                                                        duration: 600.ms,
-                                                      ),
-                                                    ]
-                                                  : [],
-                                              child: Text(
-                                                streak.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFFEA580C),
+                                        const SizedBox(width: 4),
+                                        isLoading
+                                            ? Container(
+                                                width: 16,
+                                                height: 12,
+                                                decoration: BoxDecoration(
+                                                  color: isDark
+                                                      ? const Color(0xFF3F3F46)
+                                                      : const Color(0xFFE5E7EB),
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                              )
+                                            : Animate(
+                                                key: ValueKey(
+                                                  'text_$_streakAnimKey',
+                                                ),
+                                                effects: _streakAnimKey > 0
+                                                    ? [
+                                                        ShimmerEffect(
+                                                          color: const Color(
+                                                            0xFFFDE047,
+                                                          ),
+                                                          duration: 600.ms,
+                                                        ),
+                                                      ]
+                                                    : [],
+                                                child: Text(
+                                                  streak.toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFFDC2626),
+                                                  ),
                                                 ),
                                               ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Notification Bell with Tooltip
+                                Builder(
+                                  builder: (context) {
+                                    final unread = ref.watch(
+                                      unreadNotificationCountProvider,
+                                    );
+                                    return ObhyashTooltip(
+                                      message: 'নতুন নোটিফিকেশন ও আপডেট',
+                                      preferredPosition: TooltipPosition.bottom,
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            context.push('/notifications'),
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 4.0,
+                                                  ),
+                                              child: Icon(
+                                                LucideIcons.bell,
+                                                size: 24,
+                                                color: isDark
+                                                    ? const Color(0xFFD4D4D4)
+                                                    : const Color(0xFF4B5563),
+                                              ),
                                             ),
+                                            if (unread > 0)
+                                              Positioned(
+                                                top: -4,
+                                                right: -2,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFFEF4444,
+                                                    ),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: isDark
+                                                          ? const Color(
+                                                              0xFF0C0A09,
+                                                            )
+                                                          : Colors.white,
+                                                      width: 1.5,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    unread > 99
+                                                        ? '99+'
+                                                        : unread.toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                // Divider
+                                Container(
+                                  width: 1,
+                                  height: 24,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  color: isDark
+                                      ? const Color(0xFF27272A)
+                                      : const Color(0xFFE5E5E5),
+                                ),
+
+                                // Profile Avatar with Tooltip
+                                ObhyashTooltip(
+                                  message: 'প্রোফাইল ও সেটিংস',
+                                  preferredPosition: TooltipPosition.bottom,
+                                  child: GestureDetector(
+                                    onTap: () => context.go('/profile'),
+                                    child: UserAvatar(
+                                      name: userName,
+                                      avatarUrl: user?.avatarUrl,
+                                      gender: user?.gender,
+                                      id: user?.id,
+                                      size: 40,
+                                      showBorder: true,
+                                      borderColor: isDark
+                                          ? const Color(0xFF1C1C1E)
+                                          : Colors.white,
+                                      borderWidth: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          else if (activeTab == 'practice')
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final currentPracticeTab = ref.watch(
+                                  practiceTabProvider,
+                                );
+                                return Container(
+                                  height: 36,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF1E1E1E)
+                                        : const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? const Color(0xFF2E2E2E)
+                                          : const Color(0xFFE5E7EB),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _HeaderTabBtn(
+                                        label: 'ভুলসমূহ',
+                                        active:
+                                            currentPracticeTab == 'mistakes',
+                                        isDark: isDark,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                practiceTabProvider.notifier,
+                                              )
+                                              .setTab('mistakes');
+                                        },
+                                      ),
+                                      _HeaderTabBtn(
+                                        label: 'বুকমার্ক',
+                                        active:
+                                            currentPracticeTab == 'bookmarks',
+                                        isDark: isDark,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                practiceTabProvider.notifier,
+                                              )
+                                              .setTab('bookmarks');
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )
+                          else if (activeTab == 'history')
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final currentHistoryTab = ref.watch(
+                                  examHistoryActiveTabProvider,
+                                );
+                                return Container(
+                                  height: 36,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF1E1E1E)
+                                        : const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? const Color(0xFF2E2E2E)
+                                          : const Color(0xFFE5E7EB),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _HeaderTabBtn(
+                                        label: 'পরীক্ষা',
+                                        active: currentHistoryTab == 0,
+                                        isDark: isDark,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                                  .read(
+                                                    examHistoryActiveTabProvider
+                                                        .notifier,
+                                                  )
+                                                  .state =
+                                              0;
+                                        },
+                                      ),
+                                      _HeaderTabBtn(
+                                        label: 'প্রশ্ন',
+                                        active: currentHistoryTab == 1,
+                                        isDark: isDark,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                                  .read(
+                                                    examHistoryActiveTabProvider
+                                                        .notifier,
+                                                  )
+                                                  .state =
+                                              1;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )
+                          else if (activeTab == 'leaderboard')
+                            Animate(
+                              onPlay: (controller) =>
+                                  controller.repeat(reverse: true),
+                              effects: [
+                                ScaleEffect(
+                                  begin: const Offset(0.94, 0.94),
+                                  end: const Offset(1.08, 1.08),
+                                  duration: 900.ms,
+                                  curve: Curves.easeInOut,
+                                ),
+                              ],
+                              child: GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  context.push('/legends-league');
+                                },
+                                behavior: HitTestBehavior.opaque,
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 4,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.crown,
+                                        size: 16,
+                                        color: Color(0xFFEF4444),
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        'লেজেন্ডস লিগ',
+                                        style: TextStyle(
+                                          fontFamily: 'Anek Bangla',
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFFEF4444),
+                                          letterSpacing: -0.2,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-
-                              // Notification Bell with Tooltip
-                              Builder(
-                                builder: (context) {
-                                  final unread = ref.watch(unreadNotificationCountProvider);
-                                  return ObhyashTooltip(
-                                    message: 'নতুন নোটিফিকেশন ও আপডেট',
-                                    preferredPosition: TooltipPosition.bottom,
-                                    child: GestureDetector(
-                                      onTap: () => context.push('/notifications'),
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                            child: Icon(
-                                              LucideIcons.bell,
-                                              size: 24,
-                                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF4B5563),
-                                            ),
-                                          ),
-                                          if (unread > 0)
-                                            Positioned(
-                                              top: -4,
-                                              right: -2,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFEF4444),
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: isDark ? const Color(0xFF0C0A09) : Colors.white,
-                                                    width: 1.5,
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  unread > 99 ? '99+' : unread.toString(),
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w900,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-
-                              // Divider
-                              Container(
-                                width: 1,
-                                height: 24,
-                                margin: const EdgeInsets.symmetric(horizontal: 10),
-                                color: isDark
-                                    ? const Color(0xFF27272A)
-                                    : const Color(0xFFE5E5E5),
-                              ),
-
-                              // Profile Avatar with Tooltip
-                              ObhyashTooltip(
-                                message: 'প্রোফাইল ও সেটিংস',
-                                preferredPosition: TooltipPosition.bottom,
-                                child: GestureDetector(
-                                  onTap: () => context.go('/profile'),
-                                  child: UserAvatar(
-                                    name: userName,
-                                    avatarUrl: user?.avatarUrl,
-                                    gender: user?.gender,
-                                    id: user?.id,
-                                    size: 40,
-                                    showBorder: true,
-                                    borderColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                                    borderWidth: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        else if (activeTab == 'practice')
-                          Consumer(
-                            builder: (context, ref, _) {
-                              final currentPracticeTab = ref.watch(practiceTabProvider);
-                              return Container(
-                                height: 36,
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? const Color(0xFF1E1E1E)
-                                      : const Color(0xFFF3F4F6),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isDark
-                                        ? const Color(0xFF2E2E2E)
-                                        : const Color(0xFFE5E7EB),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _HeaderTabBtn(
-                                      label: 'ভুলসমূহ',
-                                      active: currentPracticeTab == 'mistakes',
-                                      isDark: isDark,
-                                      onTap: () {
-                                        HapticFeedback.lightImpact();
-                                        ref.read(practiceTabProvider.notifier).setTab('mistakes');
-                                      },
-                                    ),
-                                    _HeaderTabBtn(
-                                      label: 'বুকমার্ক',
-                                      active: currentPracticeTab == 'bookmarks',
-                                      isDark: isDark,
-                                      onTap: () {
-                                        HapticFeedback.lightImpact();
-                                        ref.read(practiceTabProvider.notifier).setTab('bookmarks');
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          )
-                        else if (activeTab == 'leaderboard')
-                          Animate(
-                            onPlay: (controller) => controller.repeat(reverse: true),
-                            effects: [
-                              ScaleEffect(
-                                begin: const Offset(0.94, 0.94),
-                                end: const Offset(1.08, 1.08),
-                                duration: 900.ms,
-                                curve: Curves.easeInOut,
-                              ),
-                            ],
-                            child: GestureDetector(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                context.push('/legends-league');
-                              },
-                              behavior: HitTestBehavior.opaque,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      LucideIcons.crown,
-                                      size: 16,
-                                      color: Color(0xFFEF4444),
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      'লেজেন্ডস লিগ',
-                                      style: TextStyle(
-                                        fontFamily: 'Anek Bangla',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xFFEF4444),
-                                        letterSpacing: -0.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -903,40 +1059,40 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             ),
           ),
         ),
+
+        drawer: MainSidebar(
+          activeTab: activeTab,
+          onTabChange: _onTabChange,
+          onLogout: () {
+            ref.read(authControllerProvider.notifier).logout();
+          },
+          toggleTheme: () {
+            ref.read(themeModeProvider.notifier).toggle();
+          },
+          userName: userName,
+          userInstitute: userInst,
+          avatarUrl: user?.avatarUrl,
+        ),
+
+        body: widget.navigationShell,
+
+        bottomNavigationBar: _shouldShowBottomNav(location)
+            ? MainBottomNav(
+                activeTab:
+                    (activeTab == 'history' ||
+                        activeTab == 'setup' ||
+                        activeTab == 'leaderboard' ||
+                        activeTab == 'settings')
+                    ? activeTab
+                    : 'dashboard',
+                onTabChange: _onTabChange,
+                onMenuClick: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+              )
+            : null,
       ),
-
-      drawer: MainSidebar(
-        activeTab: activeTab,
-        onTabChange: _onTabChange,
-        onLogout: () {
-          ref.read(authControllerProvider.notifier).logout();
-        },
-        toggleTheme: () {
-          ref.read(themeModeProvider.notifier).toggle();
-        },
-        userName: userName,
-        userInstitute: userInst,
-        avatarUrl: user?.avatarUrl,
-      ),
-
-      body: widget.navigationShell,
-
-      bottomNavigationBar: _shouldShowBottomNav(location)
-          ? MainBottomNav(
-              activeTab: (activeTab == 'history' ||
-                      activeTab == 'setup' ||
-                      activeTab == 'leaderboard' ||
-                      activeTab == 'settings')
-                  ? activeTab
-                  : 'dashboard',
-              onTabChange: _onTabChange,
-              onMenuClick: () {
-                _scaffoldKey.currentState?.openDrawer();
-              },
-            )
-          : null,
-    ),
-  );
+    );
   }
 }
 
@@ -1218,7 +1374,9 @@ class _ProfileSheet extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
-                     maxLines: 1, overflow: TextOverflow.ellipsis),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   GestureDetector(
                     onTap: onToggleTheme,

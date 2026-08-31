@@ -1,31 +1,87 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCheck, Trash2, BellRing, X } from 'lucide-react';
-import { Notification } from '@/lib/types';
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CheckCheck,
+  Trash2,
+  BellRing,
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  AlertCircle,
+  Settings,
+  Info,
+  Sparkles,
+  Inbox,
+} from "lucide-react";
+import { Notification } from "@/lib/types";
 import {
   getNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification,
-} from '@/services/database';
-import { formatDistanceToNow } from 'date-fns';
-import { bn } from 'date-fns/locale';
-import { toast } from 'sonner';
-import {
-  getNotificationStyle,
-  groupNotificationsByDate,
-  getRandomEmptyState,
-} from './notification-utils';
+} from "@/services/database";
+import { toast } from "sonner";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import { cn } from "@/lib/utils";
 
-const NotificationsView: React.FC = () => {
+type FilterType = "all" | "unread";
+
+const NOTIFICATION_STYLES: Record<
+  string,
+  {
+    icon: React.ComponentType<{ className?: string; size?: number }>;
+    bgLight: string;
+    bgDark: string;
+    textColor: string;
+    iconColor: string;
+  }
+> = {
+  success: {
+    icon: CheckCircle2,
+    bgLight: "bg-emerald-50 border-emerald-200",
+    bgDark: "dark:bg-emerald-950/20 dark:border-emerald-900/40",
+    textColor: "text-emerald-700 dark:text-emerald-400",
+    iconColor: "text-emerald-500",
+  },
+  warning: {
+    icon: AlertTriangle,
+    bgLight: "bg-amber-50 border-amber-200",
+    bgDark: "dark:bg-amber-950/20 dark:border-amber-900/40",
+    textColor: "text-amber-700 dark:text-amber-400",
+    iconColor: "text-amber-500",
+  },
+  error: {
+    icon: AlertCircle,
+    bgLight: "bg-rose-50 border-rose-200",
+    bgDark: "dark:bg-rose-950/20 dark:border-rose-900/40",
+    textColor: "text-rose-700 dark:text-rose-400",
+    iconColor: "text-rose-500",
+  },
+  system: {
+    icon: Settings,
+    bgLight: "bg-purple-50 border-purple-200",
+    bgDark: "dark:bg-purple-950/20 dark:border-purple-900/40",
+    textColor: "text-purple-700 dark:text-purple-400",
+    iconColor: "text-purple-500",
+  },
+  info: {
+    icon: Info,
+    bgLight: "bg-blue-50 border-blue-200",
+    bgDark: "dark:bg-blue-950/20 dark:border-blue-900/40",
+    textColor: "text-blue-700 dark:text-blue-400",
+    iconColor: "text-blue-500",
+  },
+};
+
+export const NotificationsView: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [filter, setFilter] = useState<FilterType>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
-  const [emptyState, setEmptyState] = useState(getRandomEmptyState());
   const limit = 20;
 
   const fetchNotifs = async (pageNumber: number = 1, isLoadMore = false) => {
@@ -38,8 +94,8 @@ const NotificationsView: React.FC = () => {
 
       if (isLoadMore) {
         setNotifications((prev) => {
-          const existingIds = new Set(prev.map(n => n.id));
-          const newItems = data.filter(n => !existingIds.has(n.id));
+          const existingIds = new Set(prev.map((n) => n.id));
+          const newItems = data.filter((n) => !existingIds.has(n.id));
           return [...prev, ...newItems];
         });
       } else {
@@ -48,7 +104,7 @@ const NotificationsView: React.FC = () => {
       setHasMore(more);
       setPage(pageNumber);
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      console.error("Failed to fetch notifications:", error);
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -59,17 +115,10 @@ const NotificationsView: React.FC = () => {
     fetchNotifs(1);
   }, []);
 
-  const handleLoadMore = () => {
-    if (!isLoadingMore && hasMore) {
-      fetchNotifs(page + 1, true);
-    }
-  };
-
   const handleMarkRead = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Optimistic update
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
     await markNotificationAsRead(id);
   };
@@ -78,201 +127,198 @@ const NotificationsView: React.FC = () => {
     const success = await markAllNotificationsAsRead();
     if (success) {
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      toast.success('সব বার্তা Read হিসেবে চিহ্নিত করা হয়েছে!');
+      toast.success("সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে!");
     }
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Optimistic update
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     await deleteNotification(id);
-    toast.success('Delete করা হয়েছে 🗑️');
+    toast.success("বার্তা মুছে ফেলা হয়েছে 🗑️");
   };
 
-  const groupedNotifications = groupNotificationsByDate(notifications);
+  const filteredNotifications = notifications.filter((n) => {
+    if (filter === "unread") return !n.is_read;
+    return true;
+  });
+
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
+  const formatRelativeTime = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "এখনই";
+    if (mins < 60) return `${BanglaNameHelper.toBanglaNumeral(mins)} মিনিট আগে`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${BanglaNameHelper.toBanglaNumeral(hrs)} ঘণ্টা আগে`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `${BanglaNameHelper.toBanglaNumeral(days)} দিন আগে`;
+    return new Date(iso).toLocaleDateString("bn-BD", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 px-2 py-4 md:p-8">
-      <div className="max-w-2xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="flex items-end justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800">
-          <div>
-            <h1 className="text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-3 tracking-tight">
-              নোটিফিকেশন <span className="text-2xl animate-bounce">🔔</span>
-            </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-medium">
-              সব আপডেট এবং অ্যাক্টিভিটি।
-            </p>
-          </div>
-
-          {unreadCount > 0 && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleMarkAllAsRead}
-              className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full text-sm font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-2"
-            >
-              <CheckCheck className="w-4 h-4 text-emerald-500" />
-              সব পড়ো
-            </motion.button>
-          )}
+    <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
+            <span>নোটিফিকেশন সেন্টার</span>
+            <span className="text-xl">🔔</span>
+          </h1>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            পরীক্ষা, ফলাফল ও অ্যাকাউন্টের সকল বার্তা
+          </p>
         </div>
 
-        {/* Content Section */}
-        <div className="space-y-8">
-          {isLoading ? (
-            // Loading Skeletons
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="h-28 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 animate-pulse"
-                />
-              ))}
-            </div>
-          ) : notifications.length > 0 ? (
-            // Notification List
-            <>
-              <AnimatePresence mode="popLayout">
-                {groupedNotifications.map((group) => (
-                  <motion.div
-                    key={group.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-4"
-                  >
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 pl-2">
-                      {group.label}
-                    </h3>
-
-                    {group.items.map((notif) => {
-                      const style = getNotificationStyle(notif.type);
-                      const Icon = style.icon;
-
-                      return (
-                        <motion.div
-                          layout
-                          key={notif.id}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, x: -100 }}
-                          onClick={() =>
-                            !notif.is_read &&
-                            handleMarkRead(
-                              notif.id,
-                              // Create a synthetic MouseEvent for type safety
-                              {
-                                stopPropagation: () => {},
-                              } as unknown as React.MouseEvent<HTMLDivElement>
-                            )
-                          }
-                          className={`relative group p-4 sm:p-5 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden
-                            ${
-                              notif.is_read
-                                ? 'bg-neutral-50/50 dark:bg-neutral-900/20 border-transparent hover:border-neutral-200 dark:hover:border-neutral-800'
-                                : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-none translate-x-1'
-                            }
-                          `}
-                        >
-                          {/* Unread Indicator Dot */}
-                          {!notif.is_read && (
-                            <div className="absolute top-5 right-5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                          )}
-
-                          <div className="flex gap-5">
-                            {/* Icon Box */}
-                            <div
-                              className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center ${style.bg} ${style.color}`}
-                            >
-                              <Icon className="w-6 h-6" />
-                            </div>
-
-                            <div className="flex-1 min-w-0 pt-1">
-                              <div className="flex justify-between items-start gap-4 mb-1">
-                                <h4
-                                  className={`text-base font-bold truncate pr-6 ${notif.is_read ? 'text-neutral-600 dark:text-neutral-400' : 'text-neutral-900 dark:text-white'}`}
-                                >
-                                  {notif.title}
-                                </h4>
-                              </div>
-
-                              <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-3 line-clamp-2">
-                                {notif.message}
-                              </p>
-
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
-                                  {formatDistanceToNow(
-                                    new Date(notif.created_at),
-                                    { addSuffix: true, locale: bn },
-                                  )}
-                                </span>
-
-                                {/* Action Buttons (Visible on Hover/Focus) */}
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
-                                  <button
-                                    onClick={(e) => handleDelete(notif.id, e)}
-                                    className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-neutral-400 hover:text-red-500 rounded-xl transition-colors"
-                                    title="মুছে ফেল"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-
-              {/* Load More Button */}
-              {hasMore && (
-                <div className="flex justify-center pt-6 pb-2">
-                  <button
-                    onClick={handleLoadMore}
-                    disabled={isLoadingMore}
-                    className="px-6 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
-                  >
-                    {isLoadingMore ? (
-                      <span className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin" />
-                        লোড হচ্ছে...
-                      </span>
-                    ) : (
-                      'আরও দেখো'
-                    )}
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            // Empty State
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-24 text-center px-4"
-            >
-              <div className="w-32 h-32 bg-gradient-to-tr from-emerald-100 to-red-50 dark:from-neutral-800 dark:to-neutral-900 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-red-100 dark:shadow-none animate-float">
-                <span className="text-6xl filter drop-shadow-lg">
-                  {emptyState.icon}
-                </span>
-              </div>
-              <h3 className="text-2xl font-black text-neutral-800 dark:text-white mb-2">
-                {emptyState.message}
-              </h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-lg font-medium max-w-sm mx-auto">
-                {emptyState.subtext}
-              </p>
-            </motion.div>
-          )}
-        </div>
+        {/* Action button */}
+        {unreadCount > 0 && (
+          <button
+            onClick={handleMarkAllAsRead}
+            className="px-3.5 py-1.5 rounded-xl bg-[#004633] text-white text-xs font-black hover:bg-[#003627] active:scale-95 transition-all flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
+          >
+            <CheckCheck size={14} />
+            <span>সবগুলো পঠিত করো</span>
+          </button>
+        )}
       </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2 mb-5">
+        <button
+          onClick={() => setFilter("all")}
+          className={cn(
+            "px-4 py-1.5 rounded-full text-xs font-black border transition-all",
+            filter === "all"
+              ? "bg-[#004633] text-white border-[#004633] shadow-sm"
+              : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
+          )}
+        >
+          সব বার্তা ({BanglaNameHelper.toBanglaNumeral(notifications.length)})
+        </button>
+        <button
+          onClick={() => setFilter("unread")}
+          className={cn(
+            "px-4 py-1.5 rounded-full text-xs font-black border transition-all",
+            filter === "unread"
+              ? "bg-[#004633] text-white border-[#004633] shadow-sm"
+              : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
+          )}
+        >
+          অপঠিত ({BanglaNameHelper.toBanglaNumeral(unreadCount)})
+        </button>
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-20 bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/80 dark:border-[#27272A] animate-pulse"
+            />
+          ))}
+        </div>
+      ) : filteredNotifications.length === 0 ? (
+        <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] p-6">
+          <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-3">
+            <Inbox size={24} />
+          </div>
+          <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200">
+            কোনো নোটিফিকেশন নেই
+          </h3>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+            {filter === "unread"
+              ? "তোমার সব বার্তা পড়া হয়ে গেছে!"
+              : "নতুন কোনো আপডেট আসলে এখানে দেখতে পাবে"}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          <AnimatePresence mode="popLayout">
+            {filteredNotifications.map((notif) => {
+              const style =
+                NOTIFICATION_STYLES[notif.type?.toLowerCase()] ??
+                NOTIFICATION_STYLES.info;
+              const Icon = style.icon;
+
+              return (
+                <motion.div
+                  key={notif.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  onClick={(e) => !notif.is_read && handleMarkRead(notif.id, e)}
+                  className={cn(
+                    "p-4 rounded-2xl border transition-all flex items-start gap-3.5 group cursor-pointer",
+                    notif.is_read
+                      ? "bg-white dark:bg-[#18181B] border-neutral-200/80 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700"
+                      : "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300/80 dark:border-emerald-800/60 shadow-sm"
+                  )}
+                >
+                  {/* Icon */}
+                  <div
+                    className={cn(
+                      "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
+                      style.bgLight,
+                      style.bgDark
+                    )}
+                  >
+                    <Icon className={style.iconColor} size={18} />
+                  </div>
+
+                  {/* Body */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4
+                        className={cn(
+                          "text-xs sm:text-sm font-black truncate",
+                          notif.is_read
+                            ? "text-neutral-800 dark:text-neutral-200"
+                            : "text-neutral-950 dark:text-white"
+                        )}
+                      >
+                        {notif.title}
+                      </h4>
+                      <time className="text-[10px] text-neutral-400 font-bold shrink-0">
+                        {formatRelativeTime(notif.created_at)}
+                      </time>
+                    </div>
+
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 leading-relaxed font-medium">
+                      {notif.message}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                    {!notif.is_read && (
+                      <button
+                        onClick={(e) => handleMarkRead(notif.id, e)}
+                        className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+                        title="পঠিত হিসেবে চিহ্নিত করো"
+                      >
+                        <CheckCheck size={14} />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => handleDelete(notif.id, e)}
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      title="মুছে ফেলো"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 };

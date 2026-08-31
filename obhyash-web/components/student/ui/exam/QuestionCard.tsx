@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
-import { Question } from '@/lib/types';
-import LatexText from '../common/LatexText';
-import { toBengaliNumeral } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+"use client";
 
-interface QuestionCardProps {
+import React, { useState } from "react";
+import { Question } from "@/lib/types";
+import { MathRenderer } from "@/components/common/MathRenderer";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import {
+  Bookmark,
+  Flag,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  X,
+  HelpCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export interface QuestionCardProps {
   question: Question;
   serialNumber?: number;
-  selectedOptionIndex: number | undefined;
-  isFlagged: boolean;
-  onSelectOption: (optionIndex: number) => void;
-  onToggleFlag: () => void;
-  onReport: () => void;
+  selectedOptionIndex?: number;
+  isFlagged?: boolean;
+  onSelectOption?: (optionIndex: number) => void;
+  onToggleFlag?: () => void;
+  onReport?: () => void;
   showFeedback?: boolean;
   readOnly?: boolean;
   showAnswer?: boolean;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
   hideMetadata?: boolean;
+  initiallyExpanded?: boolean;
 }
 
-const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
+const BANGLA_INDICES = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ"];
 
-export default function QuestionCard({
+export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   serialNumber,
   selectedOptionIndex,
-  isFlagged,
+  isFlagged = false,
   onSelectOption,
+  onToggleFlag,
   onReport,
   showFeedback = false,
   readOnly = false,
@@ -36,305 +49,264 @@ export default function QuestionCard({
   isBookmarked = false,
   onToggleBookmark,
   hideMetadata = false,
-}: QuestionCardProps) {
-  const isAnswered = selectedOptionIndex !== undefined;
-  const [isExplanationOpen, setIsExplanationOpen] = useState(showFeedback);
-
-  // Build institute/year tags
-  const tags: string[] = [];
-  const len = Math.max(
-    question.institutes?.length || 0,
-    question.years?.length || 0,
+  initiallyExpanded = false,
+}) => {
+  const [isExplanationOpen, setIsExplanationOpen] = useState(
+    showFeedback && initiallyExpanded
   );
-  for (let i = 0; i < len; i++) {
-    const inst = question.institutes?.[i] || '';
-    const yr = question.years?.[i] || '';
-    const combined = `${inst} ${yr}`.trim();
-    if (combined) tags.push(combined);
-  }
-  if (tags.length === 0 && (question.institute || question.year)) {
-    tags.push(`${question.institute || ''} ${question.year || ''}`.trim());
-  }
+
+  // Parse institute/year/author tags
+  const sourceTags = React.useMemo(() => {
+    return BanglaNameHelper.formatQuestionSource({
+      institutes: question.institutes || (question.institute ? [question.institute] : []),
+      years: question.years || (question.year ? [question.year] : []),
+      examHistory: question.exam_history || question.examHistory || [],
+    });
+  }, [question]);
+
+  const correctIndex = question.correctAnswerIndex;
+  const isCorrectAnswer = (idx: number) => {
+    if (question.correctAnswerIndices && question.correctAnswerIndices.length > 0) {
+      return question.correctAnswerIndices.includes(idx);
+    }
+    return idx === correctIndex;
+  };
+
+  const isUserSelected = (idx: number) => selectedOptionIndex === idx;
 
   return (
     <div
       id={`question-${question.id}`}
-      className={`
-        relative mb-6 scroll-mt-24
-        bg-white dark:bg-neutral-900
-        border border-neutral-200/80 dark:border-neutral-800
-        rounded-xl
-        transition-all duration-200
-        ${isFlagged ? 'ring-2 ring-orange-400' : ''}
-      `}
+      className={cn(
+        "relative mb-5 scroll-mt-24 rounded-2xl bg-white dark:bg-[#000000] border transition-all duration-200 shadow-sm font-['HindSiliguri']",
+        isFlagged
+          ? "border-orange-500 ring-2 ring-orange-500/30"
+          : "border-neutral-200/90 dark:border-neutral-800"
+      )}
     >
-      {/* ── Top section ── */}
-      <div className="px-2 pt-3 pb-2 md:px-5 md:pt-5">
-        {/* Question text row */}
-        <div className="flex items-baseline gap-2 mb-2">
-          {/* Serial number */}
+      {/* ── Top Header Section: Serial + Question text + Tags ── */}
+      <div className="p-4 sm:p-5">
+        {/* Stimulus / Passage (উদ্দীপক) if present */}
+        {question.passage && (
+          <div className="mb-3.5 p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
+            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block mb-1 uppercase tracking-wider">
+              উদ্দীপক
+            </span>
+            <MathRenderer text={question.passage} />
+          </div>
+        )}
+
+        {/* Question Text with Bengali Serial Number */}
+        <div className="flex items-start gap-2.5 mb-3">
           {serialNumber !== undefined && (
-            <span className="shrink-0 font-bold text-[14px] md:text-[15px] text-neutral-800 dark:text-neutral-200">
-              {toBengaliNumeral(serialNumber)}.
+            <span className="shrink-0 text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-snug">
+              {BanglaNameHelper.toBanglaNumeral(serialNumber)}.
             </span>
           )}
-
-          {/* Question text */}
-          <div className="min-w-0 text-[14px] md:text-[15px] text-neutral-900 dark:text-neutral-100 leading-[1.4] font-serif-exam font-medium">
-            <LatexText text={question.question} />
+          <div className="flex-1 min-w-0 text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-snug">
+            <MathRenderer text={question.question} />
           </div>
         </div>
 
-        {/* Tags + action buttons row */}
-        <div className="flex items-center justify-end gap-2 flex-wrap">
-          {/* Institute/year tags */}
-          {!hideMetadata &&
-            tags.map((tag, i) => (
-              <span
-                key={i}
-                className="
-                inline-flex items-center text-[11px] font-semibold
-                px-2.5 py-0.5 rounded-sm
-                bg-[#e8f4f0] text-[#1a7a5a]
-                dark:bg-[#0d3326] dark:text-[#4ecca3]
-                tracking-wide
-              "
+        {/* Question Image (if any) */}
+        {question.imageUrl && (
+          <div className="my-3 max-w-md mx-auto rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 p-2">
+            <img
+              src={question.imageUrl}
+              alt="Question illustration"
+              className="max-h-64 mx-auto object-contain rounded-lg"
+            />
+          </div>
+        )}
+
+        {/* Source Tags & Actions Toolbar */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pt-1">
+          {/* Source Tag Badge */}
+          {!hideMetadata && sourceTags ? (
+            <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#e8f4f0] dark:bg-[#0d3326] text-[#1a7a5a] dark:text-[#4ecca3] text-xs font-bold tracking-wide">
+              {sourceTags}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {/* Action Toolbar */}
+          <div className="flex items-center gap-1.5 ml-auto">
+            {/* Flag for Review */}
+            {onToggleFlag && !showFeedback && (
+              <button
+                type="button"
+                onClick={onToggleFlag}
+                title={isFlagged ? "ফ্ল্যাগ বাতিল করো" : "রিভিউর জন্য ফ্ল্যাগ করো"}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition",
+                  isFlagged
+                    ? "bg-orange-100 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-300 dark:border-orange-700"
+                    : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                )}
               >
-                {tag}
-              </span>
-            ))}
+                <Flag size={13} className={isFlagged ? "fill-orange-500" : ""} />
+                <span>{isFlagged ? "ফ্ল্যাগকৃত" : "ফ্ল্যাগ"}</span>
+              </button>
+            )}
 
-          {/* Bookmark button */}
-          <motion.button
-            whileTap={{ scale: 0.86 }}
-            whileHover={{ scale: 1.08 }}
-            onClick={onToggleBookmark}
-            disabled={!onToggleBookmark}
-            title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-            className={`
-              rounded p-1 transition-colors
-              ${!onToggleBookmark ? 'opacity-30 cursor-default' : 'cursor-pointer'}
-              ${
-                isBookmarked
-                  ? 'text-amber-500 dark:text-amber-400'
-                  : 'text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300'
-              }
-            `}
-            style={{ border: 'none', background: 'none' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isBookmarked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-[17px] h-[17px]"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
-              />
-            </svg>
-          </motion.button>
+            {/* Bookmark Button */}
+            {onToggleBookmark && (
+              <button
+                type="button"
+                onClick={onToggleBookmark}
+                title={isBookmarked ? "বুকমার্ক সরানো হয়েছে" : "বুকমার্কে যোগ করো"}
+                className={cn(
+                  "p-1.5 rounded-lg transition",
+                  isBookmarked
+                    ? "text-amber-500 bg-amber-50 dark:bg-amber-950/40"
+                    : "text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                )}
+              >
+                <Bookmark size={16} className={isBookmarked ? "fill-amber-500" : ""} />
+              </button>
+            )}
 
-          {/* Report button */}
-          <button
-            onClick={onReport}
-            title="রিপোর্ট করো"
-            className="
-              rounded p-1 transition-colors
-              text-neutral-400 hover:text-red-500
-              dark:text-neutral-500 dark:hover:text-red-400
-            "
-            style={{ border: 'none', background: 'none' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-[17px] h-[17px]"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </button>
+            {/* Report Question Button */}
+            {onReport && (
+              <button
+                type="button"
+                onClick={onReport}
+                title="ভুল প্রশ্ন রিপোর্ট করো"
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition"
+              >
+                <AlertTriangle size={15} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── Options grid ── */}
-      <div
-        className={`
-    px-4 pb-4 md:px-6 md:pb-5
-    grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3 items-stretch
-    ${readOnly ? 'pointer-events-none' : ''}
-  `}
-      >
+      {/* ── Options List Section ── */}
+      <div className="px-4 pb-4 sm:px-5 sm:pb-5 flex flex-col gap-2.5">
         {question.options.map((option, idx) => {
-          const isSelected = selectedOptionIndex === idx;
-          const isCorrect = idx === question.correctAnswerIndex;
-          const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
+          const banglaIndex = BANGLA_INDICES[idx] || `${idx + 1}`;
+          const isSelected = isUserSelected(idx);
+          const isCorrect = isCorrectAnswer(idx);
 
-          const iconText = banglaIndex;
-          let iconBg =
-            'bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none';
-          let iconFg = 'text-neutral-600 dark:text-neutral-300';
-          let boxClass =
-            'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] hover:bg-[#f1f3f5] dark:hover:bg-[#2a2a2a]';
-          let textClass = 'text-neutral-800 dark:text-neutral-200';
+          // Determine option styling based on mode (Active Exam vs Feedback/Review)
+          let optionStyle =
+            "bg-[#F8FAFC] dark:bg-[#121214] border-[#E2E8F0] dark:border-[#27272A] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700";
+          let badgeStyle =
+            "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-300 dark:border-neutral-700";
+          let rightIcon: React.ReactNode = null;
 
-          if (showFeedback) {
+          if (showFeedback || showAnswer) {
+            // In Review / Result Mode:
             if (isCorrect) {
-              boxClass =
-                'bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800';
-              iconBg = 'bg-emerald-500 border-emerald-500';
-              iconFg = 'text-white';
-              textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
-            } else if (isSelected) {
-              boxClass =
-                'bg-red-50/40 dark:bg-red-900/10 border-red-200 dark:border-red-800';
-              iconBg = 'bg-red-500 border-red-500';
-              iconFg = 'text-white';
-              textClass = 'text-red-700 dark:text-red-300 font-bold';
+              optionStyle =
+                "bg-emerald-50/90 dark:bg-emerald-950/30 border-emerald-500 text-emerald-900 dark:text-emerald-200 shadow-sm";
+              badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+              rightIcon = <Check size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />;
+            } else if (isSelected && !isCorrect) {
+              optionStyle =
+                "bg-red-50/90 dark:bg-red-950/30 border-red-500 text-red-900 dark:text-red-200 shadow-sm";
+              badgeStyle = "bg-red-600 text-white border-red-600";
+              rightIcon = <X size={16} className="text-red-600 dark:text-red-400 shrink-0" />;
             } else {
-              boxClass =
-                'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] opacity-95';
+              optionStyle =
+                "bg-[#F8FAFC]/50 dark:bg-[#121214]/50 border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 opacity-60";
             }
-          } else if (showAnswer && isCorrect) {
-            boxClass =
-              'bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800';
-            iconBg = 'bg-emerald-500 border-emerald-500';
-            iconFg = 'text-white';
-            textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
-          } else if (isSelected) {
-            boxClass =
-              'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-500';
-            iconBg =
-              'bg-neutral-800 border-neutral-800 dark:bg-neutral-200 dark:border-neutral-200';
-            iconFg = 'text-white dark:text-neutral-900';
-            textClass = 'text-neutral-900 dark:text-white font-bold';
+          } else {
+            // In Active Exam Mode:
+            if (isSelected) {
+              optionStyle =
+                "bg-[#004633] dark:bg-[#003D2C] border-[#004633] dark:border-[#059669] text-white dark:text-[#E6FFFA] shadow-md shadow-[#004633]/20";
+              badgeStyle = "bg-white dark:bg-[#10B981] text-[#004633] dark:text-black border-white dark:border-[#10B981]";
+              rightIcon = (
+                <div className="w-5 h-5 rounded-full bg-white dark:bg-[#10B981] flex items-center justify-center shrink-0">
+                  <Check size={12} className="text-[#004633] dark:text-black stroke-[3]" />
+                </div>
+              );
+            }
           }
 
+          const optionImageUrl = question.optionImages?.[idx];
+
           return (
-            <label
+            <button
               key={idx}
-              className={`
-                group relative flex items-center gap-2.5 w-full h-full
-                px-3 py-1.5 rounded-md border
-                transition-all duration-200
-                ${readOnly ? 'cursor-default' : 'cursor-pointer'}
-                ${boxClass}
-              `}
+              type="button"
+              disabled={readOnly || showFeedback}
+              onClick={() => onSelectOption && onSelectOption(idx)}
+              className={cn(
+                "w-full flex items-start gap-3 p-3 sm:p-3.5 rounded-2xl border transition-all text-left group",
+                optionStyle,
+                !readOnly && !showFeedback && "cursor-pointer active:scale-[0.99]"
+              )}
             >
-              <input
-                type="radio"
-                name={`question-${question.id}`}
-                checked={isSelected}
-                onChange={() =>
-                  !isAnswered && !readOnly && onSelectOption(idx)
-                }
-                disabled={isAnswered || readOnly}
-                className="sr-only"
-              />
-
-              {/* Circle badge */}
-              <div
-                className={`
-                  w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
-                  ${iconBg}
-                `}
+              {/* Option Alphabet Badge (ক, খ, গ, ঘ) */}
+              <span
+                className={cn(
+                  "w-7 h-7 rounded-xl border flex items-center justify-center text-xs font-black shrink-0 transition-colors mt-0.5",
+                  badgeStyle
+                )}
               >
-                <span
-                  className={`text-[14px] font-bold leading-none ${iconFg}`}
-                >
-                  {iconText}
-                </span>
+                {banglaIndex}
+              </span>
+
+              {/* Option Text & Image */}
+              <div className="flex-1 min-w-0 flex flex-col gap-1.5 pt-0.5">
+                <div className="text-base font-semibold leading-relaxed">
+                  <MathRenderer text={option} />
+                </div>
+                {optionImageUrl && (
+                  <img
+                    src={optionImageUrl}
+                    alt={`Option ${banglaIndex}`}
+                    className="max-h-32 object-contain rounded-lg border border-neutral-200 dark:border-neutral-800 mt-1 bg-white p-1"
+                  />
+                )}
               </div>
 
-              {/* Option text */}
-              <div
-                className={`flex-1 text-[13px] md:text-[14px] leading-[1.4] select-none font-serif-exam ${textClass}`}
-              >
-                <LatexText text={option} />
-              </div>
-            </label>
+              {/* Right Selection / Check Icon */}
+              {rightIcon}
+            </button>
           );
         })}
       </div>
 
-      {/* ── Explanation ── */}
-      {showFeedback && question.explanation && (
-        <div className="mx-2 mb-3 md:mx-5 md:mb-5">
-          <div
-            className={`
-              rounded-xl overflow-hidden transition-all duration-300
-              ${isExplanationOpen ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/60' : 'bg-neutral-50/80 dark:bg-[#1c1c1c] border-neutral-200/80 dark:border-[#333]'}
-              border
-            `}
+      {/* ── Explanation Accordion Section (in Feedback/Review mode) ── */}
+      {showFeedback && (question.explanation || question.explanationImageUrl) && (
+        <div className="border-t border-neutral-100 dark:border-neutral-800">
+          <button
+            type="button"
+            onClick={() => setIsExplanationOpen(!isExplanationOpen)}
+            className="w-full flex items-center justify-between px-5 py-3 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition rounded-b-2xl"
           >
-            {/* Header / Toggle Row */}
-            <button
-              onClick={() => setIsExplanationOpen(!isExplanationOpen)}
-              className="w-full flex items-center justify-between p-3 md:px-4 md:py-3.5 transition-colors hover:bg-emerald-100/20 dark:hover:bg-emerald-900/20"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[14px] md:text-[15px] font-extrabold text-emerald-700 dark:text-emerald-400">
-                  সঠিক উত্তর :{' '}
-                  {BANGLA_INDICES[question.correctAnswerIndex ?? 0] || ''}
-                </span>
-              </div>
-              <div
-                className="text-emerald-600 dark:text-emerald-400 p-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white dark:bg-neutral-800 transition-transform duration-300"
-                style={{
-                  transform: isExplanationOpen
-                    ? 'rotate(180deg)'
-                    : 'rotate(0deg)',
-                }}
-              >
-                <ChevronDown className="w-4 h-4" />
-              </div>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <HelpCircle size={15} />
+              <span>{isExplanationOpen ? "ব্যাখ্যা লুকান" : "বিস্তারিত ব্যাখ্যা দেখুন"}</span>
+            </div>
+            {isExplanationOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
 
-            {/* Collapsible Content */}
-            <AnimatePresence initial={false}>
-              {isExplanationOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                >
-                  <div className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-emerald-200/50 dark:border-emerald-800/30">
-                    <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam mt-3">
-                      <LatexText
-                        text={question.explanation || ''}
-                        className="text-[14px] md:text-[15px]"
-                      />
-                    </div>
-                    {question.explanationImageUrl && (
-                      <div className="mt-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={question.explanationImageUrl}
-                          alt="ব্যাখ্যার চিত্র"
-                          className="max-w-full h-auto rounded-lg border border-emerald-200/60 dark:border-emerald-800/40 object-contain max-h-[400px]"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          {isExplanationOpen && (
+            <div className="px-5 pb-5 pt-1 text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed animate-in fade-in duration-200">
+              <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
+                <span className="text-[11px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block mb-1.5">
+                  ব্যাখ্যা:
+                </span>
+                {question.explanation && <MathRenderer text={question.explanation} />}
+                {question.explanationImageUrl && (
+                  <img
+                    src={question.explanationImageUrl}
+                    alt="Explanation diagram"
+                    className="max-h-48 object-contain rounded-lg border border-emerald-200 dark:border-emerald-800 mt-2 bg-white p-1"
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
-}
+};
+
+export default QuestionCard;

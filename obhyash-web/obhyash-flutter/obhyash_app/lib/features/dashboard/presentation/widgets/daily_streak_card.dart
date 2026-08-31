@@ -147,10 +147,10 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     const Color primaryAccent = Color(0xFFEF4444); // Red
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor),
         boxShadow: [
           if (!isDark)

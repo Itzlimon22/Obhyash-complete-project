@@ -92,7 +92,6 @@ class _ExamRecord {
   }
 }
 
-
 String _formatDur(int secs) {
   final m = secs ~/ 60;
   final s = secs % 60;
@@ -106,6 +105,15 @@ Color _scoreColor(double s) {
 }
 
 enum _SortMode { date, scoreDesc, scoreAsc }
+
+class _ActiveTabNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+}
+
+final examHistoryActiveTabProvider = NotifierProvider<_ActiveTabNotifier, int>(
+  _ActiveTabNotifier.new,
+);
 
 // ─── Main View ─────────────────────────────────────────────────────────────────
 class ExamHistoryView extends ConsumerStatefulWidget {
@@ -151,8 +159,13 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 2, vsync: this);
+    final initialTab = ref.read(examHistoryActiveTabProvider);
+    _tab = TabController(length: 2, vsync: this, initialIndex: initialTab);
     _tab.addListener(() {
+      if (!_tab.indexIsChanging &&
+          _tab.index != ref.read(examHistoryActiveTabProvider)) {
+        ref.read(examHistoryActiveTabProvider.notifier).state = _tab.index;
+      }
       if (!_tab.indexIsChanging) {
         setState(() {});
       }
@@ -205,8 +218,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
       final List rawList = data is List ? data : [];
       var filteredData = rawList.where((e) {
-        final subName =
-            (e['name'] ?? e['name_en'] ?? '').toString().toLowerCase();
+        final subName = (e['name'] ?? e['name_en'] ?? '')
+            .toString()
+            .toLowerCase();
         final subId = e['id'].toString().toLowerCase();
         final subLevel = (e['level'] ?? '').toString().toUpperCase();
 
@@ -226,10 +240,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         }
 
         // Optional Subject filtering
-        final isBiology = subName.contains('biology') ||
+        final isBiology =
+            subName.contains('biology') ||
             subId.contains('biology') ||
             subName.contains('জীববিজ্ঞান');
-        final isStatistics = subName.contains('statistics') ||
+        final isStatistics =
+            subName.contains('statistics') ||
             subId.contains('statistics') ||
             subName.contains('পরিসংখ্যান');
 
@@ -304,8 +320,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
       if (uid == null) return;
-      final data =
-          await sb.from('bookmarks').select('question_id').eq('user_id', uid);
+      final data = await sb
+          .from('bookmarks')
+          .select('question_id')
+          .eq('user_id', uid);
       if (mounted) {
         final ids = (data as List)
             .map((e) => e['question_id'].toString())
@@ -429,8 +447,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     if (refresh && _history.isEmpty) {
       final cached = await LocalExamCacheService.getCachedHistoryList();
       if (cached != null && cached.isNotEmpty && mounted) {
-        final cachedRecords =
-            cached.map((r) => _ExamRecord.fromJson(r)).toList();
+        final cachedRecords = cached
+            .map((r) => _ExamRecord.fromJson(r))
+            .toList();
         setState(() {
           _history = cachedRecords;
           _isLoadingExams = false;
@@ -544,8 +563,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           }
           final entries = seen.entries.toList()
             ..sort((a, b) {
-              final pA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
-              final pB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
+              final pA = BanglaNameHelper.getSubjectSortPriority(
+                a.value,
+                a.key,
+              );
+              final pB = BanglaNameHelper.getSubjectSortPriority(
+                b.value,
+                b.key,
+              );
               if (pA != pB) return pA.compareTo(pB);
               return a.value.compareTo(b.value);
             });
@@ -586,8 +611,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           }
           final entries = seen.entries.toList()
             ..sort((a, b) {
-              final pA = BanglaNameHelper.getSubjectSortPriority(a.value, a.key);
-              final pB = BanglaNameHelper.getSubjectSortPriority(b.value, b.key);
+              final pA = BanglaNameHelper.getSubjectSortPriority(
+                a.value,
+                a.key,
+              );
+              final pB = BanglaNameHelper.getSubjectSortPriority(
+                b.value,
+                b.key,
+              );
               if (pA != pB) return pA.compareTo(pB);
               return a.value.compareTo(b.value);
             });
@@ -620,8 +651,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     if (refresh && _questions.isEmpty) {
       final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
       if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
-        final cachedQuestions =
-            cachedQ.map((q) => Question.fromJson(q)).toList();
+        final cachedQuestions = cachedQ
+            .map((q) => Question.fromJson(q))
+            .toList();
         setState(() {
           _questions = cachedQuestions;
           _isLoadingQuestions = false;
@@ -666,7 +698,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
 
       if (_filterChapter.isNotEmpty) {
-        final chapterVariants = BanglaNameHelper.getChapterSearchVariants(_filterChapter);
+        final chapterVariants = BanglaNameHelper.getChapterSearchVariants(
+          _filterChapter,
+        );
         query = query.inFilter('chapter', chapterVariants);
       }
 
@@ -696,8 +730,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           .range(currentOffset, currentOffset + _qPageSize - 1);
 
       final rawList = data as List;
-      final fetched =
-          rawList.map((q) => Question.fromJson(q as Map<String, dynamic>)).toList();
+      final fetched = rawList
+          .map((q) => Question.fromJson(q as Map<String, dynamic>))
+          .toList();
 
       if (refresh && _filterSubject.isEmpty && _filterChapter.isEmpty) {
         await LocalExamCacheService.cacheQuestionsList(
@@ -719,11 +754,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         });
       }
     } catch (e) {
-      debugPrint('[ExamHistoryView] _fetchQuestions error (offline fallback): $e');
+      debugPrint(
+        '[ExamHistoryView] _fetchQuestions error (offline fallback): $e',
+      );
       final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
       if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
-        var cachedQuestions =
-            cachedQ.map((q) => Question.fromJson(q)).toList();
+        var cachedQuestions = cachedQ.map((q) => Question.fromJson(q)).toList();
 
         // Apply subject filter to cached fallback if set
         if (_filterSubject.isNotEmpty) {
@@ -731,7 +767,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             _filterSubject,
             filterBanglaSubject,
           );
-          final lowerSub = subVariants.map((v) => v.toLowerCase().trim()).toSet();
+          final lowerSub = subVariants
+              .map((v) => v.toLowerCase().trim())
+              .toSet();
           cachedQuestions = cachedQuestions.where((q) {
             final s = q.subject.toLowerCase().trim();
             final sl = (q.subjectLabel ?? '').toLowerCase().trim();
@@ -741,11 +779,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
         // Apply chapter filter to cached fallback if set
         if (_filterChapter.isNotEmpty) {
-          final chVariants = BanglaNameHelper.getChapterSearchVariants(_filterChapter);
+          final chVariants = BanglaNameHelper.getChapterSearchVariants(
+            _filterChapter,
+          );
           final lowerCh = chVariants.map((v) => v.toLowerCase().trim()).toSet();
           cachedQuestions = cachedQuestions.where((q) {
             final c = q.chapter.toLowerCase().trim();
-            return lowerCh.contains(c) || lowerCh.any((v) => c.contains(v) || v.contains(c));
+            return lowerCh.contains(c) ||
+                lowerCh.any((v) => c.contains(v) || v.contains(c));
           }).toList();
         }
 
@@ -776,7 +817,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     setState(() {});
   }
 
-  bool _matchesSubject(String recordSubject, String recordSubjectLabel, String filterKey) {
+  bool _matchesSubject(
+    String recordSubject,
+    String recordSubjectLabel,
+    String filterKey,
+  ) {
     if (filterKey.isEmpty) return true;
 
     String filterDisplayName = '';
@@ -787,20 +832,31 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
     }
 
-    final variants = BanglaNameHelper.getSubjectSearchVariants(filterKey, filterDisplayName);
+    final variants = BanglaNameHelper.getSubjectSearchVariants(
+      filterKey,
+      filterDisplayName,
+    );
     final lowerVariants = variants.map((v) => v.toLowerCase().trim()).toSet();
 
     final rSub = recordSubject.toLowerCase().trim();
     final rLabel = recordSubjectLabel.toLowerCase().trim();
 
-    if (lowerVariants.contains(rSub) || lowerVariants.contains(rLabel)) return true;
+    if (lowerVariants.contains(rSub) || lowerVariants.contains(rLabel))
+      return true;
     for (final v in lowerVariants) {
-      if (v.isNotEmpty && (rSub.contains(v) || v.contains(rSub) || rLabel.contains(v) || v.contains(rLabel))) {
+      if (v.isNotEmpty &&
+          (rSub.contains(v) ||
+              v.contains(rSub) ||
+              rLabel.contains(v) ||
+              v.contains(rLabel))) {
         return true;
       }
     }
 
-    final norm = BanglaNameHelper.formatSubject(recordSubject, recordSubjectLabel).toLowerCase();
+    final norm = BanglaNameHelper.formatSubject(
+      recordSubject,
+      recordSubjectLabel,
+    ).toLowerCase();
     if (lowerVariants.contains(norm)) return true;
     for (final v in lowerVariants) {
       if (v.isNotEmpty && (norm.contains(v) || v.contains(norm))) {
@@ -845,8 +901,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     return list;
   }
 
-
-
   Future<void> _handleDeleteExam(_ExamRecord record) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final confirmed = await showDialog<bool>(
@@ -862,7 +916,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(LucideIcons.trash2, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(
+                LucideIcons.trash2,
+                color: Color(0xFFEF4444),
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -895,7 +953,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontFamily: 'HindSiliguri',
-                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+                color: isDark
+                    ? const Color(0xFFA1A1AA)
+                    : const Color(0xFF6B7280),
               ),
             ),
           ),
@@ -905,7 +965,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: const Text(
               'মুছে ফেলো',
@@ -942,7 +1004,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         setState(() {
           _history.removeWhere((r) => r.id == record.id);
         });
-        AppPopups.success(context, message: 'পরীক্ষার ফলাফল সফলভাবে মুছে ফেলা হয়েছে');
+        AppPopups.success(
+          context,
+          message: 'পরীক্ষার ফলাফল সফলভাবে মুছে ফেলা হয়েছে',
+        );
       }
     } catch (e) {
       debugPrint('[ExamHistory] delete exam error: $e');
@@ -978,7 +1043,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(LucideIcons.trash2, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(
+                LucideIcons.trash2,
+                color: Color(0xFFEF4444),
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -1003,7 +1072,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             height: 1.4,
           ),
         ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -1012,7 +1084,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               style: TextStyle(
                 fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w600,
-                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                color: isDark
+                    ? const Color(0xFF9CA3AF)
+                    : const Color(0xFF6B7280),
               ),
             ),
           ),
@@ -1022,7 +1096,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             child: const Text(
@@ -1053,10 +1129,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
 
       if (mounted) {
-        AppPopups.success(
-          context,
-          message: 'প্রশ্নটি তালিকা থেকে সরানো হয়েছে',
-        );
+        AppPopups.success(context, message: 'প্রশ্নটি তালিকা থেকে সরানো হয়েছে');
       }
     }
   }
@@ -1095,82 +1168,21 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
     });
 
+    ref.listen<int>(examHistoryActiveTabProvider, (prev, next) {
+      if (next != _tab.index) {
+        _tab.animateTo(next);
+      }
+    });
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Top Bar: Right Aligned Smaller Tabs ─────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                height: 36,
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF1E1E1E)
-                      : const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF2E2E2E)
-                        : const Color(0xFFE5E7EB),
-                  ),
-                ),
-                child: TabBar(
-                  controller: _tab,
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.start,
-                  indicator: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF004633), Color(0xFF00664B)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(9),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: isDark
-                      ? const Color(0xFFA3A3A3)
-                      : const Color(0xFF6B7280),
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    fontFamily: 'HindSiliguri',
-                  ),
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 14),
-                  dividerColor: Colors.transparent,
-                  tabs: const [
-                    Tab(
-                      height: 30,
-                      child: Text('পরীক্ষা'),
-                    ),
-                    Tab(
-                      height: 30,
-                      child: Text('প্রশ্ন'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
         // ── Single Row Filter: Subject | Chapter | Date ─────────────────────
         // Guaranteed to stay in a single row for all mobile screen sizes
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
           child: Row(
             children: [
               // 1. Subject Dropdown
@@ -1228,23 +1240,24 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                             ),
                           ),
                         ),
-                        ..._subjectList.map(
-                          (s) {
-                            final emoji = BanglaNameHelper.getSubjectEmoji(s.key, s.value);
-                            return DropdownMenuItem<String>(
-                              value: s.key,
-                              child: Text(
-                                '$emoji ${s.value}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontFamily: 'HindSiliguri',
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                        ..._subjectList.map((s) {
+                          final emoji = BanglaNameHelper.getSubjectEmoji(
+                            s.key,
+                            s.value,
+                          );
+                          return DropdownMenuItem<String>(
+                            value: s.key,
+                            child: Text(
+                              '$emoji ${s.value}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'HindSiliguri',
                               ),
-                            );
-                          },
-                        ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }),
                       ],
                       onChanged: (v) {
                         setState(() {
@@ -1577,11 +1590,9 @@ class _ExamsTab extends StatelessWidget {
           const SizedBox(height: 10),
 
           // Compact Exam Cards
-          ...records.map((r) => _ExamCard(
-                record: r,
-                isDark: isDark,
-                onDelete: onDeleteExam,
-              )),
+          ...records.map(
+            (r) => _ExamCard(record: r, isDark: isDark, onDelete: onDeleteExam),
+          ),
           if (hasMore) ...[
             const SizedBox(height: 12),
             Center(
@@ -1591,10 +1602,12 @@ class _ExamsTab extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: isLoadingMore ? null : onLoadMore,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDark ? const Color(0xFF18181B) : Colors.white,
-                    foregroundColor:
-                        isDark ? Colors.white : const Color(0xFF0F172A),
+                    backgroundColor: isDark
+                        ? const Color(0xFF18181B)
+                        : Colors.white,
+                    foregroundColor: isDark
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
                     elevation: 0,
                     side: BorderSide(
                       color: isDark
@@ -1679,9 +1692,7 @@ class _ExamsTab extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? const Color(0xFFA1A1AA)
-                  : const Color(0xFF64748B),
+              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               fontFamily: 'HindSiliguri',
               height: 1.1,
             ),
@@ -1720,7 +1731,9 @@ class _ExamCardState extends State<_ExamCard> {
 
     try {
       // 1. Try loading from local cache first (instant offline response)
-      final cached = await LocalExamCacheService.getExamResult(widget.record.id);
+      final cached = await LocalExamCacheService.getExamResult(
+        widget.record.id,
+      );
       if (cached != null && cached.questions.isNotEmpty) {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -1765,7 +1778,9 @@ class _ExamCardState extends State<_ExamCard> {
         return;
       }
     } catch (e) {
-      debugPrint('[ExamCard] Error fetching exam details (offline fallback): $e');
+      debugPrint(
+        '[ExamCard] Error fetching exam details (offline fallback): $e',
+      );
       // Offline fallback: synthesize an ExamResult so user is never blocked from viewing their score
       final fallbackResult = ExamResult(
         id: widget.record.id,
@@ -1813,7 +1828,10 @@ class _ExamCardState extends State<_ExamCard> {
     final isDark = widget.isDark;
     final color = _scoreColor(record.score);
     final dateStr = DateFormat('d MMM yyyy, h:mm a').format(record.createdAt);
-    final label = BanglaNameHelper.formatSubject(record.subject, record.subjectLabel);
+    final label = BanglaNameHelper.formatSubject(
+      record.subject,
+      record.subjectLabel,
+    );
     final timeStr = record.timeTaken != null
         ? _formatDur(record.timeTaken!)
         : '--';
@@ -1855,7 +1873,9 @@ class _ExamCardState extends State<_ExamCard> {
                         value: 1.0,
                         strokeWidth: 3.5,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
+                          isDark
+                              ? const Color(0xFF27272A)
+                              : const Color(0xFFF3F4F6),
                         ),
                       ),
                       CircularProgressIndicator(
@@ -1872,7 +1892,9 @@ class _ExamCardState extends State<_ExamCard> {
                             fontSize: 13,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'HindSiliguri',
-                            color: isDark ? Colors.white : const Color(0xFF111827),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -1893,7 +1915,9 @@ class _ExamCardState extends State<_ExamCard> {
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                           fontFamily: 'HindSiliguri',
-                          color: isDark ? Colors.white : const Color(0xFF111827),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF111827),
                           height: 1.25,
                         ),
                         maxLines: 1,
@@ -2016,7 +2040,9 @@ class _ExamCardState extends State<_ExamCard> {
                     Icon(
                       LucideIcons.chevronRight,
                       size: 18,
-                      color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                      color: isDark
+                          ? const Color(0xFF52525B)
+                          : const Color(0xFFA1A1AA),
                     ),
                   ],
                 ),
@@ -2100,10 +2126,12 @@ class _QuestionsTab extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: isLoadingMore ? null : onLoadMore,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isDark ? const Color(0xFF18181B) : Colors.white,
-                      foregroundColor:
-                          isDark ? Colors.white : const Color(0xFF0F172A),
+                      backgroundColor: isDark
+                          ? const Color(0xFF18181B)
+                          : Colors.white,
+                      foregroundColor: isDark
+                          ? Colors.white
+                          : const Color(0xFF0F172A),
                       elevation: 0,
                       side: BorderSide(
                         color: isDark
@@ -2129,7 +2157,9 @@ class _QuestionsTab extends StatelessWidget {
                             color: Color(0xFF059669),
                           ),
                     label: Text(
-                      isLoadingMore ? 'লোড হচ্ছে...' : 'আরও ২০টি প্রশ্ন লোড করো',
+                      isLoadingMore
+                          ? 'লোড হচ্ছে...'
+                          : 'আরও ২০টি প্রশ্ন লোড করো',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -2343,7 +2373,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
     'সেপ্টেম্বর',
     'অক্টোবর',
     'নভেম্বর',
-    'ডিসেম্বর'
+    'ডিসেম্বর',
   ];
 
   static const List<String> _banglaWeekdays = [
@@ -2353,7 +2383,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
     'বুধ',
     'বৃহঃ',
     'শুক্র',
-    'শনি'
+    'শনি',
   ];
 
   @override
@@ -2412,7 +2442,8 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    final isNextDisabled = _displayedMonth.year > now.year ||
+    final isNextDisabled =
+        _displayedMonth.year > now.year ||
         (_displayedMonth.year == now.year &&
             _displayedMonth.month >= now.month);
 
@@ -2531,21 +2562,22 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                   children: [
                     _buildPresetChip(
                       label: 'আজ',
-                      isSelected: _tempSelected != null &&
+                      isSelected:
+                          _tempSelected != null &&
                           _isSameDay(_tempSelected!, today),
                       isDark: isDark,
                       onTap: () {
                         setState(() {
                           _tempSelected = today;
-                          _displayedMonth =
-                              DateTime(today.year, today.month);
+                          _displayedMonth = DateTime(today.year, today.month);
                         });
                       },
                     ),
                     const SizedBox(width: 8),
                     _buildPresetChip(
                       label: 'গতকাল',
-                      isSelected: _tempSelected != null &&
+                      isSelected:
+                          _tempSelected != null &&
                           _isSameDay(
                             _tempSelected!,
                             today.subtract(const Duration(days: 1)),
@@ -2555,8 +2587,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         final yest = today.subtract(const Duration(days: 1));
                         setState(() {
                           _tempSelected = yest;
-                          _displayedMonth =
-                              DateTime(yest.year, yest.month);
+                          _displayedMonth = DateTime(yest.year, yest.month);
                         });
                       },
                     ),
@@ -2569,8 +2600,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         final past7 = today.subtract(const Duration(days: 7));
                         setState(() {
                           _tempSelected = past7;
-                          _displayedMonth =
-                              DateTime(past7.year, past7.month);
+                          _displayedMonth = DateTime(past7.year, past7.month);
                         });
                       },
                     ),
@@ -2613,10 +2643,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                       children: [
                         IconButton(
                           onPressed: _previousMonth,
-                          icon: const Icon(
-                            LucideIcons.chevronLeft,
-                            size: 18,
-                          ),
+                          icon: const Icon(LucideIcons.chevronLeft, size: 18),
                           color: isDark
                               ? Colors.white70
                               : const Color(0xFF374151),
@@ -2639,10 +2666,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         ),
                         IconButton(
                           onPressed: isNextDisabled ? null : _nextMonth,
-                          icon: const Icon(
-                            LucideIcons.chevronRight,
-                            size: 18,
-                          ),
+                          icon: const Icon(LucideIcons.chevronRight, size: 18),
                           color: isNextDisabled
                               ? (isDark
                                     ? const Color(0xFF3F3F46)
@@ -2692,11 +2716,11 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                       itemCount: startOffset + daysInMonth,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        mainAxisSpacing: 6,
-                        crossAxisSpacing: 4,
-                        childAspectRatio: 1.05,
-                      ),
+                            crossAxisCount: 7,
+                            mainAxisSpacing: 6,
+                            crossAxisSpacing: 4,
+                            childAspectRatio: 1.05,
+                          ),
                       itemBuilder: (context, index) {
                         if (index < startOffset) {
                           return const SizedBox.shrink();
@@ -2708,7 +2732,8 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           dayNum,
                         );
                         final isFuture = currentDay.isAfter(today);
-                        final isSelected = _tempSelected != null &&
+                        final isSelected =
+                            _tempSelected != null &&
                             _isSameDay(_tempSelected!, currentDay);
                         final isCurrentToday = _isSameDay(currentDay, today);
 
@@ -2889,9 +2914,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           ? const Color(0xFF27272A)
                           : const Color(0xFFF3F4F6))
                     : const Color(0xFF004633))
-              : (isDark
-                    ? const Color(0xFF1E1E1E)
-                    : const Color(0xFFF9FAFB)),
+              : (isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9FAFB)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
@@ -2900,9 +2923,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                             ? const Color(0xFF3F3F46)
                             : const Color(0xFFD1D5DB))
                       : const Color(0xFF10B981))
-                : (isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFE5E7EB)),
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB)),
           ),
         ),
         child: Text(
@@ -2915,9 +2936,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                 ? (isClear
                       ? (isDark ? Colors.white : Colors.black87)
                       : Colors.white)
-                : (isDark
-                      ? const Color(0xFFA1A1AA)
-                      : const Color(0xFF6B7280)),
+                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280)),
           ),
         ),
       ),

@@ -7,6 +7,7 @@ import '../domain/models.dart';
 import '../providers/live_exam_providers.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../../core/presentation/widgets/user_avatar.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 
 class LiveExamLeaderboardView extends ConsumerStatefulWidget {
   final String examId;
@@ -132,7 +133,7 @@ class _LiveExamLeaderboardViewState
       );
     }
     return Text(
-      '#$rank',
+      BanglaNameHelper.toBanglaNumeral(rank),
       style: TextStyle(
         fontSize: 12.5,
         fontWeight: FontWeight.w800,
@@ -292,7 +293,7 @@ class _LiveExamLeaderboardViewState
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            '#$myRank',
+                            BanglaNameHelper.toBanglaNumeral(myRank),
                             style: TextStyle(
                               color: isDark
                                   ? const Color(0xFFF8FAFC)

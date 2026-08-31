@@ -1,16 +1,35 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getCanonicalCollegeName } from '@/lib/college-mapping';
 
-export async function GET() {
+function calculateRankPoints(rank: number): number {
+  if (rank === 1) return 500;
+  if (rank === 2) return 400;
+  if (rank === 3) return 350;
+  if (rank <= 5) return 300;
+  if (rank <= 10) return 250;
+  if (rank <= 25) return 180;
+  if (rank <= 50) return 120;
+  if (rank <= 100) return 80;
+  if (rank <= 250) return 40;
+  if (rank <= 500) return 20;
+  return 10;
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const timeframe = searchParams.get('timeframe') || 'monthly';
+  const xpCol = timeframe === 'all_time' ? 'xp' : 'monthly_xp';
+
   const supabase = await createClient();
 
-  // Read from the materialized view — pre-computed every 15 min by pg_cron.
-  // This is a trivial SELECT with no aggregation and no joins.
   const { data, error } = await supabase
-    .from('mv_institute_rankings')
-    .select('institute, avg_top5_xp, student_count')
-    .order('avg_top5_xp', { ascending: false })
-    .limit(100);
+    .from('users')
+    .select('institute, xp, monthly_xp')
+    .not('institute', 'is', null)
+    .neq('institute', '')
+    .order(xpCol, { ascending: false, nullsFirst: false })
+    .limit(5000);
 
   if (error || !data) {
     return NextResponse.json(
@@ -19,22 +38,41 @@ export async function GET() {
     );
   }
 
-  const rankings = data.map(
-    (row: {
-      institute: string;
-      avg_top5_xp: number;
-      student_count: number;
-    }) => ({
-      institute: row.institute,
-      avgXp: row.avg_top5_xp,
-      studentCount: row.student_count,
-    }),
-  );
+  const institutePoints: Record<string, number> = {};
+  const instituteCounts: Record<string, number> = {};
+  const instituteBestRank: Record<string, number> = {};
+
+  data.forEach((row, idx) => {
+    const rawInst = row.institute;
+    if (!rawInst || !rawInst.trim()) return;
+    const inst = getCanonicalCollegeName(rawInst);
+    const nationalRank = idx + 1;
+    const pts = calculateRankPoints(nationalRank);
+
+    institutePoints[inst] = (institutePoints[inst] || 0) + pts;
+    instituteCounts[inst] = (instituteCounts[inst] || 0) + 1;
+    if (!instituteBestRank[inst] || nationalRank < instituteBestRank[inst]) {
+      instituteBestRank[inst] = nationalRank;
+    }
+  });
+
+  const rankings = Object.keys(institutePoints).map((inst) => ({
+    institute: inst,
+    points: institutePoints[inst],
+    studentCount: instituteCounts[inst],
+    bestRank: instituteBestRank[inst] || 999999,
+  }));
+
+  rankings.sort((a, b) => {
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+    return a.bestRank - b.bestRank;
+  });
 
   return NextResponse.json(rankings, {
     headers: {
-      // Rankings change at most every 15 min (pg_cron refresh interval)
-      'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
     },
   });
 }

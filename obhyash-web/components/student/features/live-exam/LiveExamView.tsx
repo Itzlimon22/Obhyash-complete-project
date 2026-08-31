@@ -1,84 +1,146 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import {
+  Cpu,
+  HeartPulse,
+  GraduationCap,
+  BookOpen,
+  Calendar,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
+import { supabase } from "@/services/core";
 import LiveExamCategoryView from "./LiveExamCategoryView";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
+import { cn } from "@/lib/utils";
 
 export interface LiveExamViewProps {
   commonLayoutProps: any;
 }
 
-const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps }) => {
-  const [selectedCategory, setSelectedCategory] = useState<{ id: string; title: string } | null>(null);
+interface CategoryInfo {
+  key: string;
+  tag: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: React.ElementType;
+  gradientDark: string;
+  gradientLight: string;
+  accentColor: string;
+  shadowColor: string;
+  hasLive: boolean;
+}
 
-  const cards = [
+export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [liveExamsMap, setLiveExamsMap] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch ongoing live exams from Supabase to activate "LIVE" indicator
+  useEffect(() => {
+    const fetchLiveStatus = async () => {
+      try {
+        const now = new Date().toISOString();
+        const { data } = await supabase
+          .from("live_exams")
+          .select("category, start_time, end_time")
+          .lte("start_time", now)
+          .gte("end_time", now);
+
+        const map: Record<string, boolean> = {
+          engineering: false,
+          medical: false,
+          varsity: false,
+          hsc: false,
+        };
+
+        if (data) {
+          data.forEach((e: any) => {
+            const cat = (e.category || "").toLowerCase();
+            if (map[cat] !== undefined) map[cat] = true;
+            if (cat === "varsity_a" || cat === "all") map.varsity = true;
+            if (cat === "all") {
+              map.engineering = true;
+              map.medical = true;
+              map.hsc = true;
+            }
+          });
+        }
+
+        setLiveExamsMap(map);
+      } catch (err) {
+        console.warn("[LiveExamView] Error fetching live status:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLiveStatus();
+  }, []);
+
+  const categories: CategoryInfo[] = [
     {
-      id: "engineering",
+      key: "engineering",
+      tag: "ইঞ্জিনিয়ারিং",
       title: "ইঞ্জিনিয়ারিং",
-      subtitle: "বুয়েট, কুয়েট, রুয়েট, চুয়েট\nসাপ্তাহিক মডেল টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-        </svg>
-      ),
-      footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-blue-600 to-indigo-900",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "Engineering Weekly",
+      subtitle: "উইকলি মডেল টেস্ট",
+      description: "বুয়েট • কুয়েট • রুয়েট • চুয়েট • আইইউটি",
+      icon: Cpu,
+      gradientDark: "from-[#1E3A8A] via-[#172554] to-[#0F172A]",
+      gradientLight: "from-[#2563EB] via-[#1D4ED8] to-[#1E40AF]",
+      accentColor: "#60A5FA",
+      shadowColor: "rgba(37, 99, 235, 0.25)",
+      hasLive: !!liveExamsMap.engineering,
     },
     {
-      id: "medical",
+      key: "medical",
+      tag: "মেডিকেল",
       title: "মেডিকেল",
-      subtitle: "মেডিকেল ও ডেন্টাল ভর্তি\nপূর্ণাঙ্গ মডেল টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-        </svg>
-      ),
-      footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-rose-600 to-red-900",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "Medical Weekly",
+      subtitle: "উইকলি মডেল টেস্ট",
+      description: "মেডিকেল ও ডেন্টাল সরকারি ভর্তি পরীক্ষা",
+      icon: HeartPulse,
+      gradientDark: "from-[#881337] via-[#4C0519] to-[#2E020D]",
+      gradientLight: "from-[#E11D48] via-[#BE123C] to-[#9F1239]",
+      accentColor: "#FB7185",
+      shadowColor: "rgba(225, 29, 72, 0.25)",
+      hasLive: !!liveExamsMap.medical,
     },
     {
-      id: "varsity",
+      key: "varsity",
+      tag: "ভার্সিটি",
       title: "ভার্সিটি ক-ইউনিট",
-      subtitle: "ঢাকা বিশ্ববিদ্যালয় ও সমন্বিত গুচ্ছ\nভর্তি পরীক্ষা প্রস্তুতি",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
-        </svg>
-      ),
-      footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-purple-600 to-indigo-950",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "Varsity Weekly",
+      subtitle: "উইকলি মডেল টেস্ট",
+      description: "ঢাকা বিশ্ববিদ্যালয় • সমন্বিত গুচ্ছ • জাহাঙ্গীরনগর",
+      icon: GraduationCap,
+      gradientDark: "from-[#581C87] via-[#3B0764] to-[#240342]",
+      gradientLight: "from-[#7C3AED] via-[#6D28D9] to-[#5B21B6]",
+      accentColor: "#A78BFA",
+      shadowColor: "rgba(124, 58, 237, 0.25)",
+      hasLive: !!liveExamsMap.varsity,
     },
     {
-      id: "hsc",
+      key: "hsc",
+      tag: "এইচএসসি",
       title: "এইচএসসি স্পেশাল",
-      subtitle: "বিজ্ঞান বিভাগ\nঅধ্যায়ভিত্তিক বোর্ড টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-        </svg>
-      ),
-      footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-emerald-600 to-teal-900",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "HSC Weekly",
+      subtitle: "অধ্যায়ভিত্তিক পরীক্ষা",
+      description: "বিজ্ঞান বিভাগ বোর্ড প্রশ্ন ও পূর্ণাঙ্গ প্রস্তুতি",
+      icon: BookOpen,
+      gradientDark: "from-[#064E3B] via-[#022C22] to-[#011812]",
+      gradientLight: "from-[#059669] via-[#047857] to-[#065F46]",
+      accentColor: "#34D399",
+      shadowColor: "rgba(5, 150, 105, 0.25)",
+      hasLive: !!liveExamsMap.hsc,
     },
   ];
-
 
   if (selectedCategory) {
     return (
       <LiveExamCategoryView
-        categoryTitle={selectedCategory.title}
+        category={selectedCategory}
         commonLayoutProps={commonLayoutProps}
         onBack={() => setSelectedCategory(null)}
-        onExamClick={(examId, status) => {
-          // This will be handled in the next step when the user provides images
-          console.log(`Clicked exam ${examId} with status ${status}`);
-        }}
       />
     );
   }
@@ -87,72 +149,88 @@ const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps }) => {
     <AppLayout
       activeTab="live_exam"
       {...commonLayoutProps}
-      title="লাইভ পরীক্ষা"
+      title="লাইভ মডেল টেস্ট"
     >
-    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in duration-300 min-h-[80vh]">
-        
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-[#2F61E1] dark:text-blue-400">
-            মডেল টেস্ট
-          </h2>
+      <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+        {/* Top Header */}
+        <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
+              লাইভ মডেল টেস্ট সেন্টার 🔴
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              জাতীয় পর্যায়ের পরীক্ষার্থীদের সাথে লাইভ প্রতিযোগিতায় অংশ নাও
+            </p>
+          </div>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {cards.map((card) => (
-            <div
-              key={card.id}
-              onClick={() => setSelectedCategory({ id: card.id, title: card.categoryTitle })}
-              className={`relative overflow-hidden rounded-3xl cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 aspect-square flex flex-col justify-between ${card.gradient}`}
-            >
-              
-              {/* Glassy Overlay Highlight (Top Half) */}
-              <div className="absolute top-0 left-0 w-full h-[45%] bg-white/20 backdrop-blur-[2px] rounded-b-[40px] pointer-events-none border-b border-white/30 z-10"></div>
-              
-              {/* Faint Background Image */}
-              {card.bgImage && (
-                <div 
-                  className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] opacity-10 bg-no-repeat bg-contain bg-bottom pointer-events-none"
-                  style={{ backgroundImage: `url(${card.bgImage})` }}
-                ></div>
-              )}
-
-              {/* Live Badge */}
-              <div className="absolute top-4 right-4 z-20">
-                <div className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 border border-red-500/50">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                  Live
-                </div>
-              </div>
-
-              {/* Content Box */}
-              <div className="relative z-20 p-6 flex flex-col h-full justify-between">
-                <div>
-                  <h3 className="font-black text-white text-3xl md:text-4xl tracking-tight">
-                    {card.title}
-                  </h3>
-                  
-                  {card.subtitle && (
-                    <div className="mt-2 text-white/90 font-bold text-sm md:text-base leading-tight whitespace-pre-line">
-                      {card.subtitle}
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer Section */}
-                {card.footerText && (
-                  <div className="flex items-center justify-end text-white font-bold text-xl md:text-2xl gap-2 mt-auto self-end">
-                    {card.footerIcon}
-                    <span>{card.footerText}</span>
-                  </div>
+        {/* 4 Premium Category Cards */}
+        <div className="flex flex-col gap-3.5 sm:gap-4">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <div
+                key={cat.key}
+                onClick={() => setSelectedCategory(cat.key)}
+                style={{
+                  boxShadow: `0 8px 24px -6px ${cat.shadowColor}`,
+                }}
+                className={cn(
+                  "relative overflow-hidden rounded-[24px] p-5 sm:p-6 cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 group select-none text-white border border-white/10",
+                  "bg-gradient-to-br",
+                  cat.gradientLight,
+                  `dark:${cat.gradientDark}`
                 )}
-              </div>
+              >
+                {/* Background Glow Ring */}
+                <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
-            </div>
-          ))}
+                {/* Top Row: Tag, Live Badge, and Icon */}
+                <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black tracking-wide uppercase border border-white/25 text-white shadow-sm">
+                      {cat.tag}
+                    </span>
+
+                    {cat.hasLive && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-red-600/90 text-white text-[10px] font-black flex items-center gap-1 shadow-md animate-pulse border border-red-400/50">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                        <span>LIVE NOW</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform">
+                    <Icon size={22} />
+                  </div>
+                </div>
+
+                {/* Main Titles */}
+                <div className="relative z-10 mb-3">
+                  <h3 className="text-xl sm:text-2xl font-black text-white leading-tight tracking-tight">
+                    {cat.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm font-bold text-white/90 mt-0.5">
+                    {cat.subtitle}
+                  </p>
+                </div>
+
+                {/* Bottom Row: Description & Arrow */}
+                <div className="flex items-center justify-between gap-2 pt-3 border-t border-white/15 relative z-10">
+                  <p className="text-[11px] sm:text-xs font-medium text-white/80 truncate">
+                    {cat.description}
+                  </p>
+
+                  <div className="flex items-center gap-1 text-xs font-bold text-white group-hover:translate-x-1 transition-transform shrink-0">
+                    <span>পরীক্ষা দেখুন</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
     </AppLayout>
   );
 };

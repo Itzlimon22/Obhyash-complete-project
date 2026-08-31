@@ -41,20 +41,20 @@ const REASON_LABELS: Record<string, string> = {
 function StatusBadge({ status }: { status: ReportStatus }) {
   if (status === "Resolved") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-800 text-white">
+      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-[#004633] text-white">
         গৃহীত
       </span>
     );
   }
   if (status === "Ignored") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-600 text-white">
+      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-neutral-600 text-white">
         বাতিল
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-600 text-white">
+    <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-amber-600 text-white">
       অপেক্ষমান
     </span>
   );
@@ -74,37 +74,37 @@ function QuestionViewerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg font-['HindSiliguri']">
         <DialogHeader>
-          <DialogTitle className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+          <DialogTitle className="text-sm font-black text-neutral-800 dark:text-neutral-200">
             প্রশ্ন দেখো
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 text-sm">
-          <p className="font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
-            {q.question}
-          </p>
+        <div className="space-y-3 text-xs sm:text-sm">
+          <div className="font-bold text-neutral-800 dark:text-neutral-200 leading-relaxed">
+            <LatexText text={q.question} />
+          </div>
           {q.options && q.options.length > 0 && (
             <ul className="space-y-1.5">
               {q.options.map((opt, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2 px-3 py-1.5 rounded-lg bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                  className="flex items-start gap-2 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-[#18181B] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-[#27272A]"
                 >
-                  <span className="font-bold shrink-0 text-green-800 dark:text-green-400">
+                  <span className="font-black shrink-0 text-[#004633] dark:text-[#4ADE80]">
                     {String.fromCharCode(65 + i)}.
                   </span>
-                  {opt}
+                  <LatexText text={opt} />
                 </li>
               ))}
             </ul>
           )}
           {q.explanation && (
-            <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border-l-4 border-green-800">
-              <p className="text-xs font-semibold text-green-800 dark:text-green-400 mb-1">
+            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-[#004633]">
+              <p className="text-xs font-black text-[#004633] dark:text-emerald-400 mb-1">
                 ব্যাখ্যা
               </p>
-              <div className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+              <div className="text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
                 <LatexText text={q.explanation} />
               </div>
             </div>
@@ -120,24 +120,24 @@ function ReportCard({ report }: { report: Report }) {
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const accentColor =
-    report.status === "Resolved" ? "bg-green-800" : "bg-red-600";
+    report.status === "Resolved" ? "bg-[#004633]" : "bg-amber-600";
 
   return (
     <>
-      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden font-['HindSiliguri'] shadow-sm">
         {/* Left accent strip + main content */}
         <div className="flex">
-          <div className={`w-1 shrink-0 ${accentColor}`} />
+          <div className={`w-1.5 shrink-0 ${accentColor}`} />
           <div className="flex-1 p-4">
             {/* Top row: reason + status + date */}
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-0.5 rounded-md">
+                <span className="text-xs font-bold bg-neutral-100 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-400 px-2.5 py-0.5 rounded-md">
                   {REASON_LABELS[report.reason] ?? report.reason}
                 </span>
                 <StatusBadge status={report.status} />
               </div>
-              <time className="text-xs text-neutral-400 shrink-0">
+              <time className="text-xs text-neutral-400 shrink-0 font-bold">
                 {new Date(report.created_at).toLocaleDateString("bn-BD")}
               </time>
             </div>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../domain/models.dart';
 import '../../../../core/presentation/widgets/user_avatar.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 
 class DashboardLeaderboardCard extends StatelessWidget {
   final LeaderboardUser currentUser;
@@ -23,130 +24,68 @@ class DashboardLeaderboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: onLeaderboardClick,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF000000)
-              : const Color(0xFF000000), // Deep rich color instead of white
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFF1C1C1E),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF141416) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+          width: 1,
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // Top Right Decor
-            Positioned(
-              top: -20,
-              right: -20,
-              child: Container(
-                width: 128,
-                height: 128,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isDark
-                        ? [
-                            const Color(0xFF059669).withOpacity(0.15),
-                            Colors.transparent,
-                          ]
-                        : [
-                            const Color(0xFFECFDF5).withOpacity(0.7),
-                            Colors.transparent,
-                          ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(100),
-                  ),
-                ),
-              ),
-            ),
-
-            Column(
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onLeaderboardClick,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // Top Row: Title + Arrow
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF059669).withOpacity(0.3)
-                                : const Color(0xFFECFDF5),
-                            borderRadius: BorderRadius.circular(8),
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
                             LucideIcons.trophy,
                             size: 16,
                             color: isDark
-                                ? const Color(0xFF059669)
-                                : const Color(0xFF059669),
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF71717A),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Text(
                           'লিডারবোর্ড',
                           style: TextStyle(
                             fontFamily: 'Anek Bangla',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                             color: isDark
-                                ? Colors.white
-                                : const Color(0xFF1C1C1E),
+                                ? const Color(0xFFF4F4F5)
+                                : const Color(0xFF18181B),
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF059669).withOpacity(0.2)
-                            : const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'সব দেখো',
-                            style: TextStyle(
-                              fontFamily: 'Anek Bangla',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: isDark
-                                  ? const Color(0xFF059669)
-                                  : const Color(0xFF059669),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            LucideIcons.chevronRight,
-                            size: 12,
-                            color: isDark
-                                ? const Color(0xFF059669)
-                                : const Color(0xFF059669),
-                          ),
-                        ],
-                      ),
+                    Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: isDark
+                          ? const Color(0xFF71717A)
+                          : const Color(0xFFA1A1AA),
                     ),
                   ],
                 ),
@@ -155,7 +94,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                 // Table Header
                 Row(
                   children: [
-                    SizedBox(width: 36, child: Text('#', style: _headerStyle)),
+                    SizedBox(width: 36, child: Text('র‍্যাঙ্ক', style: _headerStyle)),
                     const SizedBox(width: 8),
                     const SizedBox(width: 28),
                     const Expanded(child: Text('নাম', style: _headerStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
@@ -249,7 +188,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       SizedBox(
                         width: 36,
                         child: Text(
-                          '#$userRank',
+                          BanglaNameHelper.toBanglaNumeral(userRank),
                           style: const TextStyle(
                             fontFamily: 'Anek Bangla',
                             fontWeight: FontWeight.w900,
@@ -362,31 +301,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                 ],
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMiniAvatar(String name, bool isDark) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF059669) : const Color(0xFFECFDF5),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isDark ? const Color(0xFF059669) : const Color(0xFF6EE7B7),
-          width: 2,
-        ),
-      ),
-      child: Center(
-        child: Text(
-          name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            color: isDark ? const Color(0xFF059669) : const Color(0xFF059669),
           ),
         ),
       ),

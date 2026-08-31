@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ExamConfig } from '@/lib/types';
+import { ExamConfig, UserProfile } from '@/lib/types';
 import ExamSetupForm from '@/components/student/ui/exam/ExamSetupForm';
 
 /**
@@ -12,6 +12,8 @@ interface ExamSetupContainerProps {
   onStartExam: (config: ExamConfig) => void;
   /** Loading state indicating if the exam initialization is in progress. */
   isLoading: boolean;
+  /** Current user profile */
+  currentUser?: UserProfile | null;
   /** User's academic group/division — passed down to avoid a redundant DB fetch in ExamSetupForm */
   userDivision?: string;
   userStream?: string;
@@ -28,6 +30,7 @@ interface ExamSetupContainerProps {
 export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   onStartExam,
   isLoading,
+  currentUser,
   userDivision,
   userStream,
   userOptionalSubject,
@@ -36,9 +39,11 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
     <ExamSetupForm
       onStartExam={onStartExam}
       isLoading={isLoading}
+      currentUser={currentUser}
       userDivision={userDivision}
       userStream={userStream}
       userOptionalSubject={userOptionalSubject}
     />
   );
 };
+

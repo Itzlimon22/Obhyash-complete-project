@@ -46,6 +46,7 @@ import { FeatureRequestsView } from "@/components/student/features/feature_reque
 import AnalysisView from "@/components/student/features/dashboard/AnalysisView";
 import { PracticeDashboard } from "@/components/student/features/practice/PracticeDashboard";
 import NotificationsView from "@/components/student/features/notifications/NotificationsView";
+import LegendsLeagueView from "@/components/student/ui/legends_league/LegendsLeagueView";
 // Profile Features
 import MyProfileView from "@/components/student/ui/profile/MyProfileView";
 import SubscriptionView from "@/components/student/ui/profile/SubscriptionView";
@@ -209,6 +210,8 @@ export default function StudentRoot({
     "profile",
     "settings",
     "exam",
+    "legends-league",
+    "legends_league",
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -729,6 +732,7 @@ export default function StudentRoot({
             <ExamSetupContainer
               onStartExam={handleStartExam}
               isLoading={false}
+              currentUser={currentUser}
               userDivision={currentUser?.division}
               userStream={currentUser?.stream}
               userOptionalSubject={currentUser?.optional_subject}
@@ -823,6 +827,7 @@ export default function StudentRoot({
             title="লিডারবোর্ড"
           >
             <LeaderboardView
+              onLegendsLeagueClick={() => handleTabChange("legends-league")}
               onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
                 setSelectedUserRank(rank || 0);
@@ -830,6 +835,21 @@ export default function StudentRoot({
                 // Give this view a shareable URL
                 window.history.pushState({ tab: "user_profile", userId: user.id }, "", `/leaderboard/user/${user.id}`);
               }}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "legends-league" || activeTab === "legends_league") {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="লেজেন্ডস লীগ"
+          >
+            <LegendsLeagueView
+              currentUser={currentUser}
+              onBack={() => handleTabChange("leaderboard")}
             />
           </AppLayout>
         );

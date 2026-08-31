@@ -640,6 +640,7 @@ export interface OverallAnalytics {
   totalSkipped: number;
   avgTimePerExam: number;
   avgTimePerQuestion: number;
+  totalNegativeDeduction?: number;
 }
 
 // ==========================================

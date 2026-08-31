@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 import { useTheme } from '@/components/providers/ThemeProvider';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
 interface ReferralInfo {
   referral?: { id: string; code: string; created_at: string } | null;
@@ -150,11 +151,11 @@ export default function ReferralPage() {
       title="রেফারেল"
       noPadding
     >
-      <div className="min-h-full bg-neutral-50 dark:bg-black pb-24 animate-fade-in relative font-sans">
-        {/* ── Top Header Bar (Mobile App Style) ── */}
-        <div className="bg-emerald-900 text-white px-4 pt-6 pb-4 md:pt-8 md:pb-6 rounded-b-[2.5rem] shadow-xl relative overflow-hidden z-10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-800 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
-          <div className="absolute top-0 left-0 w-48 h-48 bg-emerald-950 rounded-full blur-3xl opacity-50 -translate-y-1/2 -translate-x-1/2"></div>
+      <div className="min-h-full bg-neutral-50 dark:bg-[#141417] pb-24 animate-fade-in relative font-['HindSiliguri']">
+        {/* ── Top Header Bar ── */}
+        <div className="bg-[#004633] text-white px-4 pt-6 pb-4 md:pt-8 md:pb-6 rounded-b-[2.5rem] shadow-xl relative overflow-hidden z-10">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#003627] rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 bg-[#00261b] rounded-full blur-3xl opacity-50 -translate-y-1/2 -translate-x-1/2"></div>
 
           <div className="relative z-10 flex items-center justify-between mb-6">
             <button
@@ -166,19 +167,19 @@ export default function ReferralPage() {
             <h1 className="text-lg font-black tracking-wide">
               রেফারেল প্রোগ্রাম
             </h1>
-            <div className="w-10"></div> {/* Spacer for centering */}
+            <div className="w-10"></div>
           </div>
 
           <div className="relative z-10 text-center px-2">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-inner mb-4">
-              <Gift className="w-8 h-8 text-emerald-300 drop-shadow-md" />
+              <Gift className="w-8 h-8 text-yellow-300 drop-shadow-md" />
             </div>
             <h2 className="text-2xl md:text-3xl font-black mb-2 leading-tight">
               বন্ধুদের আমন্ত্রণ জানাও
             </h2>
-            <p className="text-emerald-100/90 text-[13px] md:text-sm max-w-[280px] mx-auto leading-relaxed font-medium">
-              তোমার কোড শেয়ার করো। বন্ধু প্রিমিয়াম পেলে তুমিও পাবে{' '}
-              <span className="font-bold text-white">১ মাস ফ্রি!</span>
+            <p className="text-emerald-100/90 text-xs sm:text-sm max-w-[300px] mx-auto leading-relaxed font-bold">
+              তোমার কোড শেয়ার করো। বন্ধু প্রিমিয়াম নিলে তুমিও পাবে{' '}
+              <span className="font-black text-yellow-300">১ মাস ফ্রি!</span>
             </p>
           </div>
         </div>
@@ -191,34 +192,32 @@ export default function ReferralPage() {
               {
                 icon: Users,
                 label: 'মোট রেফারেল',
-                value: loading ? '-' : data.history.length,
+                value: loading ? '-' : BanglaNameHelper.toBanglaNumeral(data.history.length),
               },
               {
                 icon: Crown,
                 label: 'অর্জিত মাস',
                 value: loading
                   ? '-'
-                  : data.history.filter((h) => h.admin_status === 'Approved')
-                      .length,
+                  : BanglaNameHelper.toBanglaNumeral(data.history.filter((h) => h.admin_status === 'Approved').length),
               },
               {
                 icon: TrendingUp,
                 label: 'পেন্ডিং',
                 value: loading
                   ? '-'
-                  : data.history.filter((h) => h.admin_status === 'Pending')
-                      .length,
+                  : BanglaNameHelper.toBanglaNumeral(data.history.filter((h) => h.admin_status === 'Pending').length),
               },
             ].map(({ icon: Icon, label, value }, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-neutral-900 p-3 sm:p-5 rounded-3xl shadow-sm border border-neutral-100 dark:border-neutral-800 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+                className="bg-white dark:bg-[#18181B] p-3 sm:p-5 rounded-3xl shadow-sm border border-neutral-200/90 dark:border-[#27272A] flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
               >
-                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 dark:text-emerald-400 mb-1.5" />
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#004633] dark:text-[#4ADE80] mb-1.5" />
                 <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums">
                   {value}
                 </span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">
+                <span className="text-[10px] sm:text-xs font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">
                   {label}
                 </span>
               </div>
@@ -226,7 +225,7 @@ export default function ReferralPage() {
           </div>
 
           {/* ── Referral Code Card ── */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2rem] p-5 sm:p-7 shadow-sm relative overflow-hidden">
+          <div className="bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] rounded-3xl p-5 sm:p-7 shadow-sm relative overflow-hidden">
             {/* subtle background decor */}
             <div className="absolute -right-6 -top-6 w-32 h-32 bg-red-500/5 dark:bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
 

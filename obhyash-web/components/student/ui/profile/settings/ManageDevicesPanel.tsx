@@ -87,17 +87,17 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4 animate-fade-in font-['HindSiliguri']">
       {/* Header card */}
-      <div className="bg-white dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
-        <div className="px-6 py-4 border-b border-green-900 bg-green-800 flex items-center justify-between">
+      <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-[#003627] bg-[#004633] flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-white">লগইন ডিভাইস</h3>
+            <h3 className="text-base sm:text-lg font-black text-white">লগইন ডিভাইস</h3>
           </div>
           <button
             onClick={fetchDevices}
             disabled={loading}
-            className="p-2 rounded-xl text-green-200 hover:text-white hover:bg-green-700 transition-all disabled:opacity-50"
+            className="p-2 rounded-xl text-emerald-200 hover:text-white hover:bg-[#003627] transition-all disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -111,8 +111,8 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
             </div>
           ) : devices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <ShieldCheck className="w-10 h-10 text-green-800/30 dark:text-green-700/30 mb-3" />
-              <p className="text-sm text-neutral-500">
+              <ShieldCheck className="w-10 h-10 text-emerald-600/30 mb-3" />
+              <p className="text-xs font-bold text-neutral-500">
                 কোনো ডিভাইস পাওয়া যায়নি
               </p>
             </div>
@@ -122,15 +122,15 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
               return (
                 <div
                   key={device.id}
-                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                  className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
                     isCurrent
-                      ? "border-green-700 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
-                      : "border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30"
+                      ? "border-[#004633] dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20"
+                      : "border-neutral-200 dark:border-[#27272A] bg-neutral-50/70 dark:bg-[#141417]"
                   }`}
                 >
                   {/* Icon */}
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-green-800 text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"}`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-[#004633] text-white" : "bg-neutral-200 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300"}`}
                   >
                     <DeviceIcon type={device.device_type} />
                   </div>
