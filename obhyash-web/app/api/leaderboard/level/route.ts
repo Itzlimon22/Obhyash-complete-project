@@ -42,21 +42,32 @@ export async function GET(req: NextRequest) {
   const levelKey = level.toLowerCase();
   const threshold = LEVEL_THRESHOLDS[levelKey] || LEVEL_THRESHOLDS.explorer;
   const isMonthly = timeframe === 'monthly';
-  const xpColumn = isMonthly ? 'monthly_xp' : 'xp';
+  const batch = searchParams.get('batch');
 
-  // Direct query based on monthly_xp (for monthly reset) or all-time xp
+  // Query users belonging to this level tier based on lifetime XP
   let query = supabase
     .from('users')
     .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, avatar_color, streak, batch')
-    .gte(xpColumn, threshold.min);
+    .gte('xp', threshold.min);
 
   if (threshold.max < 999999999) {
-    query = query.lte(xpColumn, threshold.max);
+    query = query.lte('xp', threshold.max);
   }
 
-  query = query
-    .order(xpColumn, { ascending: false, nullsFirst: false })
-    .range(offset, offset + limit - 1);
+  if (batch && batch.trim().length > 0 && batch !== 'all') {
+    query = query.ilike('batch', `%${batch.trim()}%`);
+  }
+
+  if (isMonthly) {
+    query = query
+      .order('monthly_xp', { ascending: false, nullsFirst: false })
+      .order('xp', { ascending: false, nullsFirst: false });
+  } else {
+    query = query
+      .order('xp', { ascending: false, nullsFirst: false });
+  }
+
+  query = query.range(offset, offset + limit - 1);
 
   const { data: rows, error } = await query;
 
@@ -70,7 +81,7 @@ export async function GET(req: NextRequest) {
       ? (user.monthly_xp ?? 0)
       : (user.xp ?? 0);
 
-    const calculatedLevel = calculateLevelFromXp(effectiveXp);
+    const userLevel = user.level || calculateLevelFromXp(user.xp || 0);
 
     return {
       id: user.id,
@@ -79,8 +90,8 @@ export async function GET(req: NextRequest) {
       xp: effectiveXp,
       allTimeXp: user.xp || 0,
       monthlyXp: user.monthly_xp || 0,
-      level: calculatedLevel,
-      allTimeLevel: user.level || calculateLevelFromXp(user.xp || 0),
+      level: userLevel,
+      allTimeLevel: userLevel,
       examsTaken: user.exams_taken || 0,
       avatarUrl: user.avatar_url || undefined,
       avatarColor: user.avatar_color || undefined,

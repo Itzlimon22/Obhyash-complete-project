@@ -136,7 +136,15 @@ BEGIN
           AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
           AND (p_topics IS NULL OR q.topic = ANY(p_topics))
           AND (p_difficulties IS NULL OR q.difficulty = ANY(p_difficulties))
-          AND (p_exam_types IS NULL OR q.exam_type = ANY(p_exam_types))
+          AND (
+            p_exam_types IS NULL
+            OR 'Mixed' = ANY(p_exam_types)
+            OR 'All' = ANY(p_exam_types)
+            OR EXISTS (
+              SELECT 1 FROM unnest(p_exam_types) AS pet 
+              WHERE q.exam_type ILIKE '%' || pet || '%'
+            )
+          )
         ORDER BY r.box_level ASC, r.next_review_due ASC
         LIMIT v_weakness_quota
         ON CONFLICT (q_id) DO NOTHING;
@@ -157,7 +165,15 @@ BEGIN
           AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
           AND (p_topics IS NULL OR q.topic = ANY(p_topics))
           AND (p_difficulties IS NULL OR q.difficulty = ANY(p_difficulties))
-          AND (p_exam_types IS NULL OR q.exam_type = ANY(p_exam_types))
+          AND (
+            p_exam_types IS NULL
+            OR 'Mixed' = ANY(p_exam_types)
+            OR 'All' = ANY(p_exam_types)
+            OR EXISTS (
+              SELECT 1 FROM unnest(p_exam_types) AS pet 
+              WHERE q.exam_type ILIKE '%' || pet || '%'
+            )
+          )
           AND q.id NOT IN (SELECT q_id FROM _adaptive_mock_picked)
           -- Exclude questions user has already Mastered 🏆
           AND (p_user_id IS NULL OR q.id NOT IN (

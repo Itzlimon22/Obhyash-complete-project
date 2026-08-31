@@ -18,12 +18,30 @@ DECLARE
   v_errors INTEGER := 0;
   v_error_details TEXT[] := '{}';
   v_fingerprint TEXT;
+  v_exam_history JSONB;
+  v_institutes TEXT[];
+  v_years INT[];
 BEGIN
   FOR i IN 1..v_total LOOP
     v_question := p_questions[i];
     v_fingerprint := v_question->>'fingerprint';
 
     BEGIN
+      -- Extract exam_history or fallback to empty array
+      v_exam_history := COALESCE(v_question->'exam_history', '[]'::jsonb);
+
+      -- Maintain backward compatibility for institutes and years arrays
+      IF jsonb_array_length(v_exam_history) > 0 THEN
+        SELECT 
+          COALESCE(array_agg(elem->>'institute'), '{}'::TEXT[]),
+          COALESCE(array_agg((elem->>'year')::integer), '{}'::INT[])
+        INTO v_institutes, v_years
+        FROM jsonb_array_elements(v_exam_history) AS elem;
+      ELSE
+        v_institutes := ARRAY(SELECT jsonb_array_elements_text(COALESCE(v_question->'institutes', '[]'::jsonb)));
+        v_years := ARRAY(SELECT (jsonb_array_elements(COALESCE(v_question->'years', '[]'::jsonb)))::integer);
+      END IF;
+
       -- Attempt insert
       INSERT INTO questions (
         question, 
@@ -39,6 +57,7 @@ BEGIN
         division, 
         section, 
         exam_type, 
+        exam_history,
         institutes, 
         years, 
         status, 
@@ -63,8 +82,9 @@ BEGIN
         COALESCE(v_question->>'division', v_question->>'section'),
         v_question->>'section',
         COALESCE(v_question->>'exam_type', 'Academic'),
-        ARRAY(SELECT jsonb_array_elements_text(v_question->'institutes')),
-        ARRAY(SELECT (jsonb_array_elements(v_question->'years'))::integer),
+        v_exam_history,
+        v_institutes,
+        v_years,
         COALESCE(v_question->>'status', 'Pending'),
         COALESCE(v_question->>'author', 'Admin'),
         ARRAY(SELECT jsonb_array_elements_text(v_question->'tags')),

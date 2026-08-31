@@ -145,6 +145,7 @@ class UserProfile {
   final String name;
   final String? email;
   final int xp;
+  final int monthlyXp;
   final String? level;
   final String? division;
   final String? stream;
@@ -180,6 +181,7 @@ class UserProfile {
     required this.name,
     this.email,
     required this.xp,
+    this.monthlyXp = 0,
     this.level,
     this.division,
     this.stream,
@@ -253,6 +255,7 @@ class UserProfile {
     String? name,
     String? email,
     int? xp,
+    int? monthlyXp,
     String? level,
     String? division,
     String? stream,
@@ -285,6 +288,7 @@ class UserProfile {
       name: name ?? this.name,
       email: email ?? this.email,
       xp: xp ?? this.xp,
+      monthlyXp: monthlyXp ?? this.monthlyXp,
       level: level ?? this.level,
       division: division ?? this.division,
       stream: stream ?? this.stream,
@@ -333,6 +337,7 @@ class UserProfile {
       name: json['name'] as String? ?? 'Unknown User',
       email: json['email'] as String?,
       xp: (json['xp'] as num?)?.toInt() ?? 0,
+      monthlyXp: (json['monthly_xp'] as num?)?.toInt() ?? 0,
       level: json['level'] as String?,
       division: json['division'] as String?,
       stream: json['stream'] as String?,

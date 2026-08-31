@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 import '../providers/exam_provider.dart';
+import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
@@ -69,7 +70,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   String? _selectedSubject;
   final Set<String> _selectedChapters = {};
   final Set<String> _selectedTopics = {};
-  final Set<String> _examTypes = {'Academic'};
+  final Set<String> _examTypes = {'Academic', 'Board'};
   final Set<String> _difficulties = {'Medium'};
   int _questionCount = 25;
   int _durationMinutes = 25;
@@ -80,13 +81,35 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   @override
   void initState() {
     super.initState();
+    final profile = ref.read(userProfileProvider).value;
+    _initTargetExamTypes(profile);
     _fetchSubjects();
+  }
+
+  List<String> _getAllowedExamTypesForProfile(UserProfile? profile) {
+    final rawTarget = (profile?.examTarget ?? profile?.target ?? '').toLowerCase().trim();
+    if (rawTarget.contains('mbbs') || rawTarget.contains('medical') || rawTarget.contains('মেডিকেল')) {
+      return const ['Medical', 'Varsity', 'Board', 'Academic'];
+    } else if (rawTarget.contains('eng') || rawTarget.contains('buet') || rawTarget.contains('engineering') || rawTarget.contains('ইঞ্জিনিয়ারিং')) {
+      return const ['Engineering', 'Varsity', 'Board', 'Academic'];
+    } else if (rawTarget.contains('varsity') || rawTarget.contains('ভার্সিটি')) {
+      return const ['Varsity', 'Board', 'Academic'];
+    } else {
+      return const ['Academic', 'Board'];
+    }
+  }
+
+  void _initTargetExamTypes(UserProfile? profile) {
+    final allowed = _getAllowedExamTypesForProfile(profile);
+    _examTypes.clear();
+    _examTypes.addAll(allowed);
   }
 
   Future<void> _fetchSubjects() async {
     setState(() => _isLoadingData = true);
     try {
       final profile = ref.read(userProfileProvider).value;
+      _initTargetExamTypes(profile);
       final level = profile?.level?.trim();
       final division = profile?.division?.trim();
       final optionalSubject = profile?.optionalSubject?.trim();
@@ -1002,9 +1025,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               title: 'পরীক্ষার ধরন',
               icon: LucideIcons.settings,
               tooltip:
-                  'Academic: ক্লাসের সিলেবাস অনুযায়ী\nAdmission: বিশ্ববিদ্যালয় ও ইঞ্জিনিয়ারিং প্রশ্ন\nBoard: বিগত বোর্ড পরীক্ষার প্রশ্ন',
+                  'তোমার প্রোফাইলের লক্ষ্য অনুযায়ী পরীক্ষার ধরন ফিল্টার করা হয়েছে। এটি প্রোফাইল থেকে যেকোনো সময় পরিবর্তন করা যাবে।',
               child: _buildSegmentedGroup(
-                items: const ['Academic', 'Admission', 'Board'],
+                items: _getAllowedExamTypesForProfile(ref.watch(userProfileProvider).value),
                 selectedItems: _examTypes,
                 isDark: isDark,
                 onToggle: (t) {

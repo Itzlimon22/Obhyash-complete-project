@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -30,8 +30,7 @@ import {
   Trash2,
   Plus,
   Minus,
-  Columns,
-  Rows,
+  Loader2,
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -46,15 +45,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
   placeholder,
-  showToolbar = false,
+  showToolbar = true,
   editorClassName,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit,
       Underline,
-      ImageExtension,
+      ImageExtension.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       Table.configure({
         resizable: true,
       }),
@@ -65,7 +70,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         types: ['heading', 'paragraph'],
       }),
       Placeholder.configure({
-        placeholder: placeholder || 'Write something...',
+        placeholder: placeholder || 'এখানে লিখুন (Markdown & LaTeX supported)...',
       }),
       Markdown.configure({
         html: false,
@@ -124,7 +129,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const insertMath = (block: boolean) => {
     if (block) {
-      editor.chain().focus().insertContent('$$\n\n$$').run();
+      editor.chain().focus().insertContent('\n\n$$\n\n$$\n\n').run();
     } else {
       editor.chain().focus().insertContent('$ $').run();
     }
@@ -138,104 +143,183 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       .run();
   };
 
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingImage(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'questions');
+
+      const res = await fetch('/api/r2-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Image upload failed');
+      }
+
+      const resData = await res.json();
+      const uploadedUrl = resData.publicUrl || resData.url;
+
+      if (uploadedUrl && editor) {
+        // Insert image at cursor
+        editor.chain().focus().setImage({ src: uploadedUrl, alt: file.name }).run();
+      }
+    } catch (err) {
+      console.error('R2 Image Upload Error:', err);
+      alert('ইমেজ আপলোড ব্যর্থ হয়েছে! অনুগ্রহ করে আবার চেষ্টা করুন।');
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
-    <div className="border border-paper-200 dark:border-obsidian-800 rounded-xl overflow-hidden bg-white dark:bg-obsidian-950 focus-within:ring-2 focus-within:ring-brand-500/20 focus-within:border-brand-500 transition-all relative">
-      {/* Static Toolbar - always visible when showToolbar is true */}
+    <div className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden bg-white dark:bg-neutral-950 focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all relative">
+      {/* Hidden File Input for Image Upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageFileChange}
+      />
+
+      {/* Sticky Top Floating Toolbar - always visible on top */}
       {showToolbar && editor && (
-        <div className="flex flex-wrap gap-0.5 p-1.5 bg-neutral-50 dark:bg-obsidian-900 border-b border-paper-200 dark:border-obsidian-700">
+        <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 p-2 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800">
           {/* Text Formatting */}
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            isActive={editor.isActive('bold')}
-            icon={<Bold size={13} />}
-            label="Bold"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            isActive={editor.isActive('italic')}
-            icon={<Italic size={13} />}
-            label="Italic"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            isActive={editor.isActive('underline')}
-            icon={<UnderlineIcon size={13} />}
-            label="Underline"
-          />
-          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
-          <MenuButton
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-            isActive={editor.isActive('heading', { level: 1 })}
-            icon={<Heading1 size={13} />}
-            label="H1"
-          />
-          <MenuButton
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            isActive={editor.isActive('heading', { level: 2 })}
-            icon={<Heading2 size={13} />}
-            label="H2"
-          />
-          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            isActive={editor.isActive('bulletList')}
-            icon={<List size={13} />}
-            label="Bullet List"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            isActive={editor.isActive('orderedList')}
-            icon={<ListOrdered size={13} />}
-            label="Ordered List"
-          />
-          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
-          <MenuButton
-            onClick={() => editor.chain().focus().setTextAlign('left').run()}
-            isActive={editor.isActive({ textAlign: 'left' })}
-            icon={<AlignLeft size={13} />}
-            label="Align Left"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().setTextAlign('center').run()}
-            isActive={editor.isActive({ textAlign: 'center' })}
-            icon={<AlignCenter size={13} />}
-            label="Align Center"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().setTextAlign('right').run()}
-            isActive={editor.isActive({ textAlign: 'right' })}
-            icon={<AlignRight size={13} />}
-            label="Align Right"
-          />
-          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
-          <MenuButton
-            onClick={() => insertMath(false)}
-            isActive={false}
-            icon={<Calculator size={13} />}
-            label="Inline Math ($...$)"
-          />
-          <MenuButton
-            onClick={() => insertMath(true)}
-            isActive={false}
-            icon={<SquareSigma size={13} />}
-            label="Math Block ($$...$$)"
-          />
-          <MenuButton
-            onClick={insertTable}
-            isActive={false}
-            icon={<TableIcon size={13} />}
-            label="Insert Table"
-          />
-          <MenuButton
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            isActive={editor.isActive('code')}
-            icon={<Code2 size={13} />}
-            label="Code"
-          />
+          <div className="flex items-center gap-0.5 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              isActive={editor.isActive('bold')}
+              icon={<Bold size={14} />}
+              label="Bold (Ctrl+B)"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              isActive={editor.isActive('italic')}
+              icon={<Italic size={14} />}
+              label="Italic (Ctrl+I)"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              isActive={editor.isActive('underline')}
+              icon={<UnderlineIcon size={14} />}
+              label="Underline (Ctrl+U)"
+            />
+          </div>
+
+          {/* Headings */}
+          <div className="flex items-center gap-0.5 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <MenuButton
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run()
+              }
+              isActive={editor.isActive('heading', { level: 1 })}
+              icon={<Heading1 size={14} />}
+              label="Heading 1"
+            />
+            <MenuButton
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              isActive={editor.isActive('heading', { level: 2 })}
+              icon={<Heading2 size={14} />}
+              label="Heading 2"
+            />
+          </div>
+
+          {/* Lists */}
+          <div className="flex items-center gap-0.5 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              isActive={editor.isActive('bulletList')}
+              icon={<List size={14} />}
+              label="Bullet List"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              isActive={editor.isActive('orderedList')}
+              icon={<ListOrdered size={14} />}
+              label="Numbered List"
+            />
+          </div>
+
+          {/* Alignment */}
+          <div className="flex items-center gap-0.5 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <MenuButton
+              onClick={() => editor.chain().focus().setTextAlign('left').run()}
+              isActive={editor.isActive({ textAlign: 'left' })}
+              icon={<AlignLeft size={14} />}
+              label="Align Left"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().setTextAlign('center').run()}
+              isActive={editor.isActive({ textAlign: 'center' })}
+              icon={<AlignCenter size={14} />}
+              label="Align Center"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().setTextAlign('right').run()}
+              isActive={editor.isActive({ textAlign: 'right' })}
+              icon={<AlignRight size={14} />}
+              label="Align Right"
+            />
+          </div>
+
+          {/* Math & Media & Table Tools */}
+          <div className="flex items-center gap-1 bg-white dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
+            <MenuButton
+              onClick={() => insertMath(false)}
+              isActive={false}
+              icon={<Calculator size={14} className="text-blue-500" />}
+              label="Inline Math ($...$)"
+            />
+            <MenuButton
+              onClick={() => insertMath(true)}
+              isActive={false}
+              icon={<SquareSigma size={14} className="text-indigo-500" />}
+              label="Math Block ($$...$$)"
+            />
+            <MenuButton
+              onClick={insertTable}
+              isActive={editor.isActive('table')}
+              icon={<TableIcon size={14} className="text-emerald-500" />}
+              label="Insert Table"
+            />
+            <MenuButton
+              onClick={() => fileInputRef.current?.click()}
+              isActive={false}
+              icon={
+                isUploadingImage ? (
+                  <Loader2 size={14} className="animate-spin text-amber-500" />
+                ) : (
+                  <ImageIcon size={14} className="text-amber-500" />
+                )
+              }
+              label="Upload & Insert Inline Image (R2)"
+            />
+            <MenuButton
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              isActive={editor.isActive('code')}
+              icon={<Code2 size={14} />}
+              label="Code Block"
+            />
+          </div>
+
+          {isUploadingImage && (
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1 animate-pulse ml-1">
+              <Loader2 size={12} className="animate-spin" />
+              ছবি আপলোড হচ্ছে...
+            </span>
+          )}
         </div>
       )}
       {/* Bubble Menu - Formatting & Table Controls */}
@@ -413,14 +497,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <MenuButton
             onClick={() => insertMath(true)}
             isActive={false}
-            icon={<SquareSigma size={14} />}
+            icon={<SquareSigma size={14} className="text-indigo-500" />}
             label="Math Block"
           />
           <MenuButton
             onClick={insertTable}
             isActive={false}
-            icon={<TableIcon size={14} />}
+            icon={<TableIcon size={14} className="text-emerald-500" />}
             label="Insert Table"
+          />
+          <MenuButton
+            onClick={() => fileInputRef.current?.click()}
+            isActive={false}
+            icon={<ImageIcon size={14} className="text-amber-500" />}
+            label="Upload & Insert Inline Image (R2)"
           />
         </FloatingMenu>
       )}

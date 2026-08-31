@@ -24,6 +24,34 @@ class ExamDetails {
   });
 }
 
+class ExamHistory {
+  final String institute;
+  final String code;
+  final int year;
+
+  const ExamHistory({
+    required this.institute,
+    this.code = '',
+    required this.year,
+  });
+
+  factory ExamHistory.fromJson(Map<String, dynamic> j) {
+    return ExamHistory(
+      institute: j['institute']?.toString().trim() ?? '',
+      code: j['code']?.toString().trim() ?? '',
+      year: (j['year'] is num)
+          ? (j['year'] as num).toInt()
+          : (int.tryParse(j['year']?.toString().replaceAll(RegExp(r'[^0-9]'), '') ?? '') ?? 0),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'institute': institute,
+    'code': code,
+    'year': year,
+  };
+}
+
 class Question {
   final String id;
   final String subject;
@@ -34,8 +62,10 @@ class Question {
   final List<String> options;
   final int correctAnswerIndex;
   final int points;
+  final List<ExamHistory> examHistory;
   final List<String> institutes;
   final List<int> years;
+  final String? examType;
 
   const Question({
     required this.id,
@@ -47,8 +77,10 @@ class Question {
     required this.options,
     required this.correctAnswerIndex,
     required this.points,
+    this.examHistory = const [],
     this.institutes = const [],
     this.years = const [],
+    this.examType,
   });
 
   factory Question.fromJson(Map<String, dynamic> j) {
@@ -58,20 +90,40 @@ class Question {
           .map((e) => QuestionFormatter.format(e.toString()))
           .toList();
     }
+
+    // 1. Parse structured exam_history if present
+    List<ExamHistory> validExamHistory = [];
+    final rawHistory = j['exam_history'] ?? j['examHistory'];
+    if (rawHistory is List) {
+      for (final item in rawHistory) {
+        if (item is Map<String, dynamic>) {
+          validExamHistory.add(ExamHistory.fromJson(item));
+        } else if (item is Map) {
+          validExamHistory.add(ExamHistory.fromJson(Map<String, dynamic>.from(item)));
+        }
+      }
+    }
+
+    // 2. Parse legacy institutes
     List<String> validInstitutes = [];
     if (j['institutes'] is List) {
       validInstitutes = (j['institutes'] as List)
           .map((e) => e.toString().trim())
           .where((s) => s.isNotEmpty)
           .toList();
-    } else if (j['institute'] != null && j['institute'].toString().trim().isNotEmpty) {
-      validInstitutes = [j['institute'].toString().trim()];
-    } else if (j['institution'] != null && j['institution'].toString().trim().isNotEmpty) {
-      validInstitutes = [j['institution'].toString().trim()];
-    } else if (j['board'] != null && j['board'].toString().trim().isNotEmpty) {
-      validInstitutes = [j['board'].toString().trim()];
+    } else {
+      final raw = j['institute'] ?? j['institution'] ?? j['board'];
+      if (raw != null && raw.toString().trim().isNotEmpty) {
+        validInstitutes = raw
+            .toString()
+            .split(',')
+            .map((e) => e.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
     }
     
+    // 3. Parse legacy years
     List<int> validYears = [];
     if (j['years'] is List) {
       for (final e in j['years'] as List) {
@@ -84,10 +136,42 @@ class Question {
         }
       }
     } else if (j['year'] != null && j['year'].toString().trim().isNotEmpty) {
-      final digits = j['year'].toString().replaceAll(RegExp(r'[^0-9]'), '');
-      final y = int.tryParse(digits);
-      if (y != null) validYears = [y];
+      final parts = j['year'].toString().split(',');
+      for (final p in parts) {
+        final digits = p.replaceAll(RegExp(r'[^0-9]'), '');
+        final y = int.tryParse(digits);
+        if (y != null) validYears.add(y);
+      }
     }
+
+    // Two-way synchronization for backward compatibility
+    if (validExamHistory.isNotEmpty) {
+      if (validInstitutes.isEmpty) {
+        validInstitutes = validExamHistory
+            .map((h) => h.institute.isNotEmpty ? h.institute : h.code)
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
+      if (validYears.isEmpty) {
+        validYears = validExamHistory
+            .map((h) => h.year)
+            .where((y) => y > 0)
+            .toList();
+      }
+    } else if (validInstitutes.isNotEmpty || validYears.isNotEmpty) {
+      final maxLen = validInstitutes.length > validYears.length
+          ? validInstitutes.length
+          : validYears.length;
+      for (int i = 0; i < maxLen; i++) {
+        final inst = i < validInstitutes.length ? validInstitutes[i] : (validInstitutes.isNotEmpty ? validInstitutes[0] : '');
+        final yr = i < validYears.length ? validYears[i] : (validYears.isNotEmpty ? validYears[0] : 0);
+        validExamHistory.add(ExamHistory(
+          institute: inst,
+          year: yr,
+        ));
+      }
+    }
+
     return Question(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
@@ -100,8 +184,10 @@ class Question {
       options: validOptions,
       correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
       points: (j['points'] as num?)?.toInt() ?? 1,
+      examHistory: validExamHistory,
       institutes: validInstitutes,
       years: validYears,
+      examType: j['exam_type']?.toString() ?? j['examType']?.toString(),
     );
   }
 
@@ -115,8 +201,10 @@ class Question {
     'options': options,
     'correct_answer_index': correctAnswerIndex,
     'points': points,
+    'exam_history': examHistory.map((e) => e.toJson()).toList(),
     'institutes': institutes,
     'years': years,
+    'exam_type': examType,
   };
 
   Question copyWith({
@@ -129,8 +217,10 @@ class Question {
     List<String>? options,
     int? correctAnswerIndex,
     int? points,
+    List<ExamHistory>? examHistory,
     List<String>? institutes,
     List<int>? years,
+    String? examType,
   }) {
     return Question(
       id: id ?? this.id,
@@ -142,8 +232,10 @@ class Question {
       options: options ?? this.options,
       correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
       points: points ?? this.points,
+      examHistory: examHistory ?? this.examHistory,
       institutes: institutes ?? this.institutes,
       years: years ?? this.years,
+      examType: examType ?? this.examType,
     );
   }
 }

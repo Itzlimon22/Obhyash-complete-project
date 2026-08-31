@@ -50,7 +50,15 @@ BEGIN
           AND (p_chapters IS NULL OR q2.chapter = ANY(p_chapters))
           AND (p_topics IS NULL OR q2.topic = ANY(p_topics))
           AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q2.difficulty = p_difficulty)
-          AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q2.exam_type = ANY(p_exam_types))
+          AND (
+            p_exam_types IS NULL
+            OR 'Mixed' = ANY(p_exam_types)
+            OR 'All' = ANY(p_exam_types)
+            OR EXISTS (
+              SELECT 1 FROM unnest(p_exam_types) AS pet 
+              WHERE q2.exam_type ILIKE '%' || pet || '%'
+            )
+          )
         LIMIT v_oversample          -- Fast index scan, no sort
       ) cand
       ORDER BY random()             -- Shuffle only the small candidate set
@@ -79,7 +87,15 @@ BEGIN
         AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
         AND (p_topics IS NULL OR q.topic = ANY(p_topics))
         AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
-        AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
+        AND (
+          p_exam_types IS NULL
+          OR 'Mixed' = ANY(p_exam_types)
+          OR 'All' = ANY(p_exam_types)
+          OR EXISTS (
+            SELECT 1 FROM unnest(p_exam_types) AS pet 
+            WHERE q.exam_type ILIKE '%' || pet || '%'
+          )
+        )
       ORDER BY uqa.last_attempted_at ASC
       LIMIT v_needed
     LOOP
@@ -108,7 +124,15 @@ BEGIN
             AND (p_chapters IS NULL OR q2.chapter = ANY(p_chapters))
             AND (p_topics IS NULL OR q2.topic = ANY(p_topics))
             AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q2.difficulty = p_difficulty)
-            AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q2.exam_type = ANY(p_exam_types))
+            AND (
+              p_exam_types IS NULL
+              OR 'Mixed' = ANY(p_exam_types)
+              OR 'All' = ANY(p_exam_types)
+              OR EXISTS (
+                SELECT 1 FROM unnest(p_exam_types) AS pet 
+                WHERE q2.exam_type ILIKE '%' || pet || '%'
+              )
+            )
           LIMIT v_oversample          -- Fast index scan, no sort
         ) cand
         ORDER BY random()             -- Shuffle only the small candidate set

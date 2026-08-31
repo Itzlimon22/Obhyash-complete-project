@@ -358,9 +358,45 @@ class BanglaNameHelper {
   /// ["DINAJPUR BOARD"], ["2017"] -> "DINAJPUR BOARD 17"
   /// ["BUET", "কেতাব স্যার"], ["2022-2023"] -> "BUET 22-23, কেতাব স্যার"
   static String formatQuestionSource({
-    required List<dynamic> institutes,
-    required List<dynamic> years,
+    List<dynamic> institutes = const [],
+    List<dynamic> years = const [],
+    List<dynamic> examHistory = const [],
   }) {
+    // 1. If structured examHistory is provided, format with priority
+    if (examHistory.isNotEmpty) {
+      final tags = <String>[];
+      for (final item in examHistory) {
+        String code = '';
+        String inst = '';
+        String rawYear = '';
+
+        if (item is Map) {
+          code = (item['code']?.toString() ?? '').trim();
+          inst = (item['institute']?.toString() ?? '').trim();
+          rawYear = item['year']?.toString() ?? '';
+        } else if (item != null) {
+          try {
+            final dynamic obj = item;
+            code = (obj.code?.toString() ?? '').trim();
+            inst = (obj.institute?.toString() ?? '').trim();
+            rawYear = obj.year?.toString() ?? '';
+          } catch (_) {}
+        }
+
+        final yr = _formatYearShort(rawYear);
+        final label = code.isNotEmpty ? code : _normalizeInstituteOrAuthor(inst);
+
+        if (label.isNotEmpty && yr.isNotEmpty) {
+          tags.add('$label-$yr');
+        } else if (label.isNotEmpty) {
+          tags.add(label);
+        } else if (yr.isNotEmpty) {
+          tags.add(yr);
+        }
+      }
+      if (tags.isNotEmpty) return tags.join(', ');
+    }
+
     if (institutes.isEmpty && years.isEmpty) return '';
 
     final rawInsts = institutes

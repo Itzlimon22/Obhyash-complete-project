@@ -47,6 +47,12 @@ export interface QuestionOption {
   isCorrect: boolean;
 }
 
+export interface ExamHistoryItem {
+  institute: string;
+  code?: string;
+  year: number;
+}
+
 /**
  * The Unified Question Interface
  * Handles both Database (Admin) and Exam Engine (Student) needs.
@@ -101,8 +107,10 @@ export interface Question {
   divisionId?: string;
   section?: string; // Optional subdivision
   examType?: string; // Medical, Engineering, Academic (defaults to 'Academic')
-  institutes?: string[]; // Array of institute names (NEW)
-  years?: number[]; // Array of years [2023, 2024] (NEW)
+  exam_history?: ExamHistoryItem[]; // Structured exam occurrences (NEW)
+  examHistory?: ExamHistoryItem[]; // CamelCase alias for frontend
+  institutes?: string[]; // Array of institute names (legacy/cached)
+  years?: number[]; // Array of years [2023, 2024] (legacy/cached)
 
   // Passage & Stimulus (উদ্দীপক)
   passage?: string; // Stimulus text/context for composite questions

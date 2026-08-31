@@ -62,6 +62,17 @@ class PdfDownloadService {
   }
 
   static String _renderQuestionMeta(Question q) {
+    if (q.examHistory.isNotEmpty) {
+      final parts = q.examHistory
+          .map((h) {
+            final label = h.code.isNotEmpty ? h.code : h.institute;
+            final yr = h.year > 0 ? ' ${_toBanglaDigits(h.year)}' : '';
+            return '$label$yr'.trim();
+          })
+          .where((s) => s.isNotEmpty)
+          .toList();
+      if (parts.isNotEmpty) return '[${parts.join(', ')}]';
+    }
     final List<String> parts = [];
     if (q.institutes.isNotEmpty) {
       parts.add(q.institutes.join(', '));

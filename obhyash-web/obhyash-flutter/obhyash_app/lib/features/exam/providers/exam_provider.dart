@@ -243,13 +243,32 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             query = query.inFilter('difficulty', difficultiesList);
           }
           if (examTypesList != null && examTypesList.isNotEmpty) {
-            query = query.inFilter('exam_type', examTypesList);
+            final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+            query = query.or(orConditions);
           }
 
           final fallbackData = await query.limit(config.questionCount * 3);
-          final allQuestions = List<dynamic>.from(fallbackData as List)
+          var allQuestions = List<dynamic>.from(fallbackData as List)
               .map((e) => Question.fromJson(e as Map<String, dynamic>))
               .toList();
+
+          // Target specific exclusion filter (e.g. Medical students should not get pure Engineering questions)
+          if (examTypesList != null && examTypesList.isNotEmpty) {
+            final isMedicalTarget = examTypesList.any((e) => e.toLowerCase() == 'medical');
+            final isEngineeringRequested = examTypesList.any((e) => e.toLowerCase() == 'engineering');
+
+            if (isMedicalTarget && !isEngineeringRequested) {
+              allQuestions = allQuestions.where((q) {
+                final qType = (q.examType ?? '').toLowerCase();
+                // If it contains engineering and NOT medical, exclude it
+                if (qType.contains('engineering') && !qType.contains('medical')) {
+                  return false;
+                }
+                return true;
+              }).toList();
+            }
+          }
+
           generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
             allQuestions,
             config.questionCount,

@@ -175,10 +175,12 @@ class _QuestionCardState extends State<QuestionCard>
                     // Unified Source Tag (Board / University & Year - Short Form e.g. DB-24)
                     // Hidden during active exam runner, visible in Result, History, Practice review & Bookmarks
                     if ((widget.readOnly || widget.showFeedback || widget.showAnswer) &&
-                        (widget.question.institutes.isNotEmpty ||
+                        (widget.question.examHistory.isNotEmpty ||
+                            widget.question.institutes.isNotEmpty ||
                             widget.question.years.isNotEmpty)) ...[
                       () {
                         final sourceText = BanglaNameHelper.formatQuestionSource(
+                          examHistory: widget.question.examHistory,
                           institutes: widget.question.institutes,
                           years: widget.question.years,
                         );

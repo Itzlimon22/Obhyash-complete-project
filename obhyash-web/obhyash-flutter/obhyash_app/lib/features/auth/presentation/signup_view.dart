@@ -135,6 +135,9 @@ class _SignupViewState extends ConsumerState<SignupView>
       if (_gender.isEmpty) {
         return 'লিঙ্গ (Gender) নির্বাচন করা আবশ্যক';
       }
+      if (_examTarget.trim().isEmpty) {
+        return 'তোমার মূল লক্ষ্য / টার্গেট নির্বাচন করা আবশ্যক';
+      }
     } else if (currentStep == 3) {
       if (_emailController.text.trim().isEmpty ||
           _passwordController.text.isEmpty ||
@@ -852,6 +855,58 @@ class _SignupViewState extends ConsumerState<SignupView>
             );
           }).toList(),
         ),
+        const SizedBox(height: 20),
+
+        _buildLabel(
+          'মূল লক্ষ্য / টার্গেট (Target Exam)',
+          isDark,
+          tooltip: 'এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF059669).withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFF059669).withValues(alpha: 0.25),
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.info, size: 16, color: Color(0xFF10B981)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
+                  style: TextStyle(
+                    fontFamily: 'Anek Bangla',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 2.3,
+          children: [
+            _examTargetOption('mbbs_2026', '🩺', 'মেডিকেল ভর্তি', isDark),
+            _examTargetOption('eng_2026', '⚙️', 'ইঞ্জিনিয়ারিং ভর্তি', isDark),
+            _examTargetOption('varsity_2026', '🏛️', 'ভার্সিটি ভর্তি', isDark),
+            _examTargetOption('hsc_2026', '📚', 'এইচএসসি ২০২৬', isDark),
+            _examTargetOption('ssc_2026', '🎓', 'এসএসসি ২০২৬', isDark),
+            _examTargetOption('other', '🎯', 'অন্যান্য / সাধারণ', isDark),
+          ],
+        ),
       ],
     );
   }
@@ -864,7 +919,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF059669).withValues(alpha: 0.1)
+              ? const Color(0xFF059669).withValues(alpha: 0.12)
               : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -872,59 +927,27 @@ class _SignupViewState extends ConsumerState<SignupView>
             width: isSelected ? 2 : 1,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Anek Bangla',
-            color: isSelected
-                ? const Color(0xFF059669)
-                : (isDark ? Colors.white70 : Colors.black87),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _examTargetOptionWide(
-    String id,
-    String emoji,
-    String label,
-    bool isDark,
-  ) {
-    final isSelected = _examTarget == id;
-    return GestureDetector(
-      onTap: () => setState(() => _examTarget = id),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF059669).withValues(alpha: 0.1)
-              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF059669) : Colors.transparent,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Anek Bangla',
-                color: isSelected
-                    ? const Color(0xFF059669)
-                    : (isDark ? Colors.white70 : Colors.black87),
+            Text(emoji, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Anek Bangla',
+                  color: isSelected
+                      ? const Color(0xFF059669)
+                      : (isDark ? Colors.white70 : Colors.black87),
+                ),
               ),
             ),
           ],
@@ -937,41 +960,6 @@ class _SignupViewState extends ConsumerState<SignupView>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_stream == 'Admission') ...[
-          _buildLabel('ভর্তি পরীক্ষার টার্গেট', isDark),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 2.2,
-            children: [
-              _examTargetOption('engineering', '🛠️', 'ইঞ্জিনিয়ারিং', isDark),
-              _examTargetOption('medical', '⚕️', 'মেডিকেল', isDark),
-              _examTargetOption('university', '🏛️', 'ভার্সিটি-ক', isDark),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _examTargetOptionWide(
-                  'agricultural',
-                  '🌾',
-                  'কৃষি গুচ্ছ',
-                  isDark,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _examTargetOptionWide('gst', '🎯', 'GST গুচ্ছ', isDark),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
 
         _buildInputField(
           label: 'ইমেইল এড্রেস',

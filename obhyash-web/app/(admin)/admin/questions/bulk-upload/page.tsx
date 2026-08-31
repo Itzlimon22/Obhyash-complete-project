@@ -866,16 +866,30 @@ export default function BulkUploadPage() {
                             <div className="font-medium text-slate-900 dark:text-slate-100 line-clamp-3">
                               <MathRenderer text={q.question || ''} />
                             </div>
-                            {q.institutes && q.institutes.length > 0 && (
+                            {/* Exam History / Institutes Badges */}
+                            {((q.exam_history && q.exam_history.length > 0) || (q.institutes && q.institutes.length > 0)) && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
-                                {q.institutes.map((inst, i) => (
-                                  <span
-                                    key={i}
-                                    className="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-100 text-cyan-900 dark:bg-cyan-950/80 dark:text-cyan-300"
-                                  >
-                                    {inst}
-                                  </span>
-                                ))}
+                                {q.exam_history && q.exam_history.length > 0 ? (
+                                  q.exam_history.map((hist, i) => (
+                                    <span
+                                      key={i}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-100 text-cyan-900 dark:bg-cyan-950/80 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/50"
+                                      title={`${hist.institute}${hist.year ? ` (${hist.year})` : ''}`}
+                                    >
+                                      <span>{hist.code || hist.institute}</span>
+                                      {hist.year > 0 && <span className="opacity-80">'{String(hist.year).slice(-2)}</span>}
+                                    </span>
+                                  ))
+                                ) : (
+                                  q.institutes?.map((inst, i) => (
+                                    <span
+                                      key={i}
+                                      className="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-100 text-cyan-900 dark:bg-cyan-950/80 dark:text-cyan-300"
+                                    >
+                                      {inst}
+                                    </span>
+                                  ))
+                                )}
                               </div>
                             )}
                           </td>

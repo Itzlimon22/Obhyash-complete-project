@@ -202,6 +202,7 @@ class LeaderboardView extends ConsumerStatefulWidget {
 class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   String _selectedLevel = 'Explorer';
   String _timeframe = 'monthly'; // 'monthly', 'all_time'
+  String _batchFilter = 'all'; // 'all', 'my_batch'
   List<_LBUser> _users = [];
   bool _isLoading = false;
   Map<String, int> _levelCounts = {};
@@ -210,6 +211,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   bool _isLoadingCollege = false;
   List<_InstituteRank> _instituteRankings = [];
   bool _isLoadingRankings = false;
+  int _myExactRank = 0;
 
   // Pagination state for level rankings
   int _offset = 0;
@@ -227,13 +229,13 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   Future<void> _fetchCounts() async {
     try {
       final supabase = Supabase.instance.client;
-      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
 
+      // Count students in each league tier by their lifetime XP
       final futures = _levels.map((lvl) async {
         final (minXp, maxXp) = _getLevelThreshold(lvl.id);
-        var query = supabase.from('users').select('id').gte(sortColumn, minXp);
+        var query = supabase.from('users').select('id').gte('xp', minXp);
         if (maxXp < 999999999) {
-          query = query.lte(sortColumn, maxXp);
+          query = query.lte('xp', maxXp);
         }
         final data = await query.limit(9999);
         return MapEntry(lvl.id, (data as List).length);
@@ -262,20 +264,65 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
       final (minXp, maxXp) = _getLevelThreshold(_selectedLevel);
-      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
+      final isMonthly = _timeframe == 'monthly';
+      final sortColumn = isMonthly ? 'monthly_xp' : 'xp';
 
-      var query = supabase
+      // 1. Query users who belong to this Tier (Level) by lifetime XP
+      PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
           .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
-          .gte(sortColumn, minXp);
+          .gte('xp', minXp);
 
       if (maxXp < 999999999) {
-        query = query.lte(sortColumn, maxXp);
+        query = query.lte('xp', maxXp);
       }
 
-      final data = await query
-          .order(sortColumn, ascending: false, nullsFirst: false)
-          .range(_offset, _offset + _limit - 1);
+      // Optional Batch filtering
+      if (_batchFilter == 'my_batch') {
+        final myProfile = ref.read(userProfileProvider).whenOrNull(data: (u) => u);
+        final rawUserBatch = myProfile?.batch?.trim();
+        if (rawUserBatch != null && rawUserBatch.isNotEmpty) {
+          query = query.ilike('batch', '%$rawUserBatch%');
+        }
+      }
+
+      // 2. Order by timeframe XP: for monthly, sort by monthly_xp DESC then xp DESC; for lifetime, xp DESC
+      final PostgrestTransformBuilder<List<Map<String, dynamic>>> orderedQuery;
+      if (isMonthly) {
+        orderedQuery = query
+            .order('monthly_xp', ascending: false, nullsFirst: false)
+            .order('xp', ascending: false, nullsFirst: false);
+      } else {
+        orderedQuery = query
+            .order('xp', ascending: false, nullsFirst: false);
+      }
+
+      final data = await orderedQuery.range(_offset, _offset + _limit - 1);
+
+      // 3. Compute accurate current user rank in their tier if initial fetch
+      int calculatedRank = 0;
+      final myProfile = ref.read(userProfileProvider).whenOrNull(data: (u) => u);
+      if (myProfile != null && !isLoadMore) {
+        try {
+          final (myMinXp, myMaxXp) = _getLevelThreshold(myProfile.level ?? _selectedLevel);
+          final myXp = isMonthly ? myProfile.monthlyXp : myProfile.xp;
+          var countQuery = supabase
+              .from('users')
+              .select('id')
+              .gte('xp', myMinXp);
+          if (myMaxXp < 999999999) {
+            countQuery = countQuery.lte('xp', myMaxXp);
+          }
+          if (_batchFilter == 'my_batch' && myProfile.batch != null && myProfile.batch!.isNotEmpty) {
+            countQuery = countQuery.ilike('batch', '%${myProfile.batch!.trim()}%');
+          }
+          countQuery = countQuery.gt(sortColumn, myXp);
+          final countRes = await countQuery.count(CountOption.exact);
+          calculatedRank = countRes.count + 1;
+        } catch (e) {
+          debugPrint('[LeaderboardView] Rank count error: $e');
+        }
+      }
 
       if (mounted) {
         setState(() {
@@ -293,6 +340,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           } else {
             _users = fetchedUsers;
             _isLoading = false;
+            if (calculatedRank > 0) {
+              _myExactRank = calculatedRank;
+            }
           }
           _offset += fetchedUsers.length;
         });
@@ -314,14 +364,24 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     try {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
-      final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
+      final isMonthly = _timeframe == 'monthly';
 
-      final data = await supabase
+      PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
           .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch')
-          .eq('institute', institute)
-          .order(sortColumn, ascending: false, nullsFirst: false)
-          .limit(100);
+          .eq('institute', institute);
+
+      final PostgrestTransformBuilder<List<Map<String, dynamic>>> orderedQuery;
+      if (isMonthly) {
+        orderedQuery = query
+            .order('monthly_xp', ascending: false, nullsFirst: false)
+            .order('xp', ascending: false, nullsFirst: false);
+      } else {
+        orderedQuery = query
+            .order('xp', ascending: false, nullsFirst: false);
+      }
+
+      final data = await orderedQuery.limit(100);
 
       if (mounted) {
         setState(() {
@@ -410,20 +470,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
         ? rawUserBatch
         : 'HSC 2026';
 
-    // Strictly filter by user's own batch if available
-    final cleanTarget = userBatchLabel.toLowerCase().replaceAll(' ', '').replaceAll('-', '');
-    final batchFiltered = _users.where((u) {
-      if (u.batch == null || u.batch!.isEmpty) return true;
-      final cleanU = u.batch!.toLowerCase().replaceAll(' ', '').replaceAll('-', '');
-      return cleanU.contains(cleanTarget) || cleanTarget.contains(cleanU);
-    }).toList();
-
-    // Fallback: If no other students are specifically tagged with this batch yet in this level,
-    // display all students in this level so the leaderboard is never blank!
-    List<_LBUser> displayedUsers = batchFiltered.isNotEmpty ? batchFiltered : _users;
-
-    // Adjust displayed XP based on timeframe
-    displayedUsers = displayedUsers.map((u) => _LBUser(
+    // Map displayed XP and users cleanly
+    final displayedUsers = _users.map((u) => _LBUser(
       id: u.id,
       name: u.name,
       institute: u.institute,
@@ -440,7 +488,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     final myRankIdx = myProfile != null
         ? displayedUsers.indexWhere((u) => u.id == myProfile.id)
         : -1;
-    final myRank = myRankIdx >= 0 ? myRankIdx + 1 : 0;
+    final myRank = myRankIdx >= 0 ? myRankIdx + 1 : (_myExactRank > 0 ? _myExactRank : 0);
     final myLvl = _levelById(myProfile?.level ?? 'Explorer');
     final isOnOwnLevel = myLvl.id == lvl.id;
 
@@ -541,8 +589,15 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                           // ── My Batch Badge & Timeframe Filter (Below Level Selector) ──
                           _BatchAndTimelineHeader(
                             userBatchLabel: userBatchLabel,
+                            selectedBatchFilter: _batchFilter,
                             timeframe: _timeframe,
                             isDark: isDark,
+                            onBatchFilterChanged: (b) {
+                              if (_batchFilter != b) {
+                                setState(() => _batchFilter = b);
+                                _fetch();
+                              }
+                            },
                             onTimeframeChanged: (t) {
                               if (_timeframe != t) {
                                 setState(() => _timeframe = t);
@@ -559,8 +614,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                               children: [
                                 if (myProfile != null && isOnOwnLevel)
                                   _UserProgressCard(
-                                    level: myProfile.level ?? 'Rookie',
-                                    xp: myRankIdx >= 0 ? displayedUsers[myRankIdx].xp : myProfile.xp,
+                                    level: myProfile.level ?? 'Explorer',
+                                    xp: _timeframe == 'monthly' ? myProfile.monthlyXp : myProfile.xp,
                                     rank: myRank,
                                     isDark: isDark,
                                   ),
@@ -651,22 +706,28 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 // ─── Batch and Timeline Header ───────────────────────────────────────────────
 class _BatchAndTimelineHeader extends StatelessWidget {
   final String userBatchLabel;
+  final String selectedBatchFilter;
   final String timeframe;
   final bool isDark;
+  final ValueChanged<String> onBatchFilterChanged;
   final ValueChanged<String> onTimeframeChanged;
 
   const _BatchAndTimelineHeader({
     required this.userBatchLabel,
+    required this.selectedBatchFilter,
     required this.timeframe,
     required this.isDark,
+    required this.onBatchFilterChanged,
     required this.onTimeframeChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isMyBatchSelected = selectedBatchFilter == 'my_batch';
+
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 6, 10, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF141416) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -677,16 +738,99 @@ class _BatchAndTimelineHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Normal text (no box, no emoji/icon)
-          Text(
-            'আমার ব্যাচ ($userBatchLabel)',
-            style: TextStyle(
-              fontFamily: 'Anek Bangla',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF1F2937),
+          // Left: Batch Selector Popup
+          PopupMenuButton<String>(
+            initialValue: selectedBatchFilter,
+            onSelected: onBatchFilterChanged,
+            offset: const Offset(0, 36),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              ),
+            ),
+            color: isDark ? const Color(0xFF1E1E22) : Colors.white,
+            elevation: 8,
+            itemBuilder: (ctx) => [
+              PopupMenuItem(
+                value: 'all',
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.users, size: 15, color: Color(0xFF10B981)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'সকল ব্যাচ (All Batches)',
+                      style: TextStyle(
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 13,
+                        fontWeight: !isMyBatchSelected ? FontWeight.w800 : FontWeight.w500,
+                        color: !isMyBatchSelected
+                            ? const Color(0xFF10B981)
+                            : (isDark ? Colors.white : const Color(0xFF1F2937)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'my_batch',
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.graduationCap, size: 15, color: Color(0xFF6366F1)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'আমার ব্যাচ ($userBatchLabel)',
+                      style: TextStyle(
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 13,
+                        fontWeight: isMyBatchSelected ? FontWeight.w800 : FontWeight.w500,
+                        color: isMyBatchSelected
+                            ? const Color(0xFF6366F1)
+                            : (isDark ? Colors.white : const Color(0xFF1F2937)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1F1F23) : const Color(0xFFF3F4F6),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE5E7EB),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isMyBatchSelected ? LucideIcons.graduationCap : LucideIcons.users,
+                    size: 13,
+                    color: isMyBatchSelected ? const Color(0xFF6366F1) : const Color(0xFF10B981),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    isMyBatchSelected ? userBatchLabel : 'সকল ব্যাচ',
+                    style: TextStyle(
+                      fontFamily: 'Anek Bangla',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    LucideIcons.chevronDown,
+                    size: 14,
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                  ),
+                ],
+              ),
             ),
           ),
+
           // Right: Timeframe Filter Dropdown
           PopupMenuButton<String>(
             initialValue: timeframe,

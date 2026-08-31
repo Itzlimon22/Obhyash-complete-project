@@ -31,8 +31,9 @@ CREATE TABLE questions (
     
     -- Exam Context
     exam_type VARCHAR(100) DEFAULT 'Academic',
-    institutes TEXT[] DEFAULT '{}',   -- Array of institute names
-    years INTEGER[] DEFAULT '{}',     -- Array of years [2023, 2024]
+    exam_history JSONB DEFAULT '[]'::jsonb, -- Array of objects: [{"institute": "ঢাকা বোর্ড", "code": "DB", "year": 2022}]
+    institutes TEXT[] DEFAULT '{}',   -- Array of institute names (legacy/cached)
+    years INTEGER[] DEFAULT '{}',     -- Array of years [2023, 2024] (legacy/cached)
     
     -- Metadata
     status VARCHAR(50) DEFAULT 'Pending',
@@ -78,7 +79,8 @@ CREATE INDEX idx_questions_status_created ON questions(status, created_at DESC);
 -- Full-text search index
 CREATE INDEX idx_questions_search ON questions USING GIN(to_tsvector('english', question));
 
--- GIN indexes for array searches
+-- GIN indexes for array & JSONB searches
+CREATE INDEX idx_questions_exam_history_gin ON questions USING GIN(exam_history jsonb_path_ops);
 CREATE INDEX idx_questions_institutes_gin ON questions USING GIN(institutes);
 CREATE INDEX idx_questions_years_gin ON questions USING GIN(years);
 CREATE INDEX idx_questions_tags_gin ON questions USING GIN(tags);

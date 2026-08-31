@@ -40,6 +40,8 @@ function normalizeRowKeys(rawRow: Record<string, unknown>): Record<string, unkno
       normalized.option5 = value;
     } else if (cleanKey === 'opt6' || cleanKey === 'option6' || cleanKey === 'optionf') {
       normalized.option6 = value;
+    } else if (cleanKey === 'examhistory' || cleanKey === 'exam_history' || cleanKey === 'boardhistory' || cleanKey === 'বোর্ড/সাল') {
+      normalized.exam_history = value;
     } else {
       normalized[key.trim()] = value;
     }
@@ -211,17 +213,27 @@ export function generateJSONTemplate(): string {
       {
         stream: 'HSC',
         division: 'Science',
-        subject: 'রসায়ন',
-        chapter: 'অধ্যায় ১',
+        subject: 'পদার্থবিজ্ঞান ১ম পত্র',
+        chapter: 'অধ্যায় ১: ভৌতজগত ও পরিমাপ',
         topic: '১',
-        question: 'প্রশ্ন টেক্সট',
-        options: ['অপশন ১', 'অপশন ২', 'অপশন ৩', 'অপশন ৪'],
+        question: 'একটি স্ক্রু গজের বৃত্তাকার স্কেলের ভাগ সংখ্যা ১০০ এবং পিচ 1 mm হলে এর লঘিষ্ঠ গণন কত?',
+        options: ['0.01 mm', '0.1 mm', '0.001 mm', '0.0001 mm'],
         correctAnswers: [0],
-        explanation: 'ব্যাখ্যা',
+        explanation: 'লঘিষ্ঠ গণন (LC) = পিচ / বৃত্তাকার স্কেলের ভাগ সংখ্যা = 1 mm / 100 = 0.01 mm',
         difficulty: 'Easy',
         examType: 'Academic',
-        institutes: ['ঢাকা মেডিকেল'],
-        years: [2024],
+        exam_history: [
+          {
+            institute: 'ঢাকা বোর্ড',
+            code: 'DB',
+            year: 2022
+          },
+          {
+            institute: 'রাজশাহী বোর্ড',
+            code: 'RB',
+            year: 2023
+          }
+        ]
       },
     ],
     null,

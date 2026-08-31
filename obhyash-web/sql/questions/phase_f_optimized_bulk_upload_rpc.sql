@@ -68,6 +68,21 @@ BEGIN
       INTO v_ans_indices
       FROM jsonb_array_elements(COALESCE(v_question->'correct_answer_indices', '[0]'::jsonb)) AS x;
 
+      -- Extract exam_history or fallback
+      v_exam_history := COALESCE(v_question->'exam_history', '[]'::jsonb);
+
+      -- Maintain institutes & years backward compatibility
+      IF jsonb_array_length(v_exam_history) > 0 THEN
+        SELECT 
+          COALESCE(array_agg(elem->>'institute'), '{}'::TEXT[]),
+          COALESCE(array_agg((elem->>'year')::integer), '{}'::INT[])
+        INTO v_institutes, v_years
+        FROM jsonb_array_elements(v_exam_history) AS elem;
+      ELSE
+        v_institutes := COALESCE(ARRAY(SELECT jsonb_array_elements_text(COALESCE(v_question->'institutes', '[]'::jsonb))), '{}'::TEXT[]);
+        v_years := COALESCE(ARRAY(SELECT (jsonb_array_elements(COALESCE(v_question->'years', '[]'::jsonb)))::integer), '{}'::INT[]);
+      END IF;
+
       -- Check duplicate fingerprint before inserting
       IF v_fingerprint IS NOT NULL AND EXISTS (SELECT 1 FROM public.questions WHERE fingerprint = v_fingerprint) THEN
         v_duplicates := v_duplicates + 1;
@@ -93,6 +108,7 @@ BEGIN
           division_id,
           section, 
           exam_type, 
+          exam_history,
           institutes, 
           years, 
           status, 
@@ -125,8 +141,9 @@ BEGIN
           COALESCE(v_question->>'division_id', 'science'),
           v_question->>'section',
           COALESCE(v_question->>'exam_type', 'Academic'),
-          COALESCE(ARRAY(SELECT jsonb_array_elements_text(COALESCE(v_question->'institutes', '[]'::jsonb))), '{}'::TEXT[]),
-          COALESCE(ARRAY(SELECT (jsonb_array_elements(COALESCE(v_question->'years', '[]'::jsonb)))::integer), '{}'::INT[]),
+          v_exam_history,
+          v_institutes,
+          v_years,
           COALESCE(v_question->>'status', 'Approved'),
           COALESCE(v_question->>'author', 'Bulk Upload'),
           COALESCE(v_question->>'author_name', 'Bulk Upload'),

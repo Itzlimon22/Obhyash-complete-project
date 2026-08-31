@@ -1800,6 +1800,17 @@ export const hscSubjects: Subject[] = [
         ],
       },
       {
+        id: 'math1_ch08',
+        name: 'ফাংশন ও ফাংশনের লেখচিত্র',
+        topics: [
+          { id: 'math1_ch08_t1', name: 'ফাংশন, ডোমেন ও রেঞ্জ নির্ণয়', serial: 1 },
+          { id: 'math1_ch08_t2', name: 'এক-এক ও সার্বিক (Onto) ফাংশন', serial: 2 },
+          { id: 'math1_ch08_t3', name: 'সংযোজিত ও বিপরীত ফাংশন', serial: 3 },
+          { id: 'math1_ch08_t4', name: 'বিশেষ ফাংশন (পরমমান, চিহ্ন, গুরু ও লঘু পূর্ণসংখ্যা ফাংশন)', serial: 4 },
+          { id: 'math1_ch08_t5', name: 'ফাংশনের লেখচিত্র ও রূপান্তর', serial: 5 },
+        ],
+      },
+      {
         id: 'math1_ch09',
         name: 'অন্তরীকরণ',
         topics: [

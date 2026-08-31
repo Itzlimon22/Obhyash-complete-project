@@ -30,6 +30,7 @@ class PracticeQuestion {
   final int correctAnswerIndex;
   final String? explanation;
   final int points;
+  final List<ExamHistory> examHistory;
   final List<String> institutes;
   final List<int> years;
 
@@ -42,6 +43,7 @@ class PracticeQuestion {
     required this.correctAnswerIndex,
     this.explanation,
     this.points = 1,
+    this.examHistory = const [],
     this.institutes = const [],
     this.years = const [],
   });
@@ -51,15 +53,33 @@ class PracticeQuestion {
     if (j['options'] is List) {
       opts = (j['options'] as List).map((e) => e.toString()).toList();
     }
+
+    // 1. Parse exam_history
+    List<ExamHistory> validExamHistory = [];
+    final rawHistory = j['exam_history'] ?? j['examHistory'];
+    if (rawHistory is List) {
+      for (final item in rawHistory) {
+        if (item is Map<String, dynamic>) {
+          validExamHistory.add(ExamHistory.fromJson(item));
+        } else if (item is Map) {
+          validExamHistory.add(ExamHistory.fromJson(Map<String, dynamic>.from(item)));
+        }
+      }
+    }
+
     List<String> inst = [];
     if (j['institutes'] is List) {
       inst = (j['institutes'] as List).map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
-    } else if (j['institute'] != null && j['institute'].toString().trim().isNotEmpty) {
-      inst = [j['institute'].toString().trim()];
-    } else if (j['institution'] != null && j['institution'].toString().trim().isNotEmpty) {
-      inst = [j['institution'].toString().trim()];
-    } else if (j['board'] != null && j['board'].toString().trim().isNotEmpty) {
-      inst = [j['board'].toString().trim()];
+    } else {
+      final raw = j['institute'] ?? j['institution'] ?? j['board'];
+      if (raw != null && raw.toString().trim().isNotEmpty) {
+        inst = raw
+            .toString()
+            .split(',')
+            .map((e) => e.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
     }
 
     List<int> yrs = [];
@@ -74,9 +94,22 @@ class PracticeQuestion {
         }
       }
     } else if (j['year'] != null && j['year'].toString().trim().isNotEmpty) {
-      final digits = j['year'].toString().replaceAll(RegExp(r'[^0-9]'), '');
-      final parsed = int.tryParse(digits);
-      if (parsed != null) yrs.add(parsed);
+      final parts = j['year'].toString().split(',');
+      for (final p in parts) {
+        final digits = p.replaceAll(RegExp(r'[^0-9]'), '');
+        final parsed = int.tryParse(digits);
+        if (parsed != null) yrs.add(parsed);
+      }
+    }
+
+    // Backward compatibility sync
+    if (validExamHistory.isNotEmpty) {
+      if (inst.isEmpty) {
+        inst = validExamHistory.map((h) => h.institute.isNotEmpty ? h.institute : h.code).where((s) => s.isNotEmpty).toList();
+      }
+      if (yrs.isEmpty) {
+        yrs = validExamHistory.map((h) => h.year).where((y) => y > 0).toList();
+      }
     }
 
     int correctIdx = 0;
@@ -103,6 +136,7 @@ class PracticeQuestion {
       correctAnswerIndex: correctIdx,
       explanation: j['explanation']?.toString(),
       points: (j['points'] as num?)?.toInt() ?? 1,
+      examHistory: validExamHistory,
       institutes: inst,
       years: yrs,
     );
@@ -119,6 +153,7 @@ class PracticeQuestion {
       options: options,
       correctAnswerIndex: correctAnswerIndex,
       points: points,
+      examHistory: examHistory,
       institutes: institutes,
       years: years,
     );
