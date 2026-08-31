@@ -77,22 +77,24 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   double _negativeMarking = 0.25;
 
   bool _isStarting = false;
+  String? _lastExamTarget;
 
   @override
   void initState() {
     super.initState();
     final profile = ref.read(userProfileProvider).value;
+    _lastExamTarget = profile?.examTarget ?? profile?.target;
     _initTargetExamTypes(profile);
     _fetchSubjects();
   }
 
   List<String> _getAllowedExamTypesForProfile(UserProfile? profile) {
-    final rawTarget = (profile?.examTarget ?? profile?.target ?? '').toLowerCase().trim();
-    if (rawTarget.contains('mbbs') || rawTarget.contains('medical') || rawTarget.contains('মেডিকেল')) {
+    final rawTarget = (profile?.examTarget ?? profile?.target ?? profile?.level ?? '').toLowerCase().trim();
+    if (rawTarget.contains('mbbs') || rawTarget.contains('medical') || rawTarget.contains('মেডিকেল') || rawTarget.contains('mat')) {
       return const ['Medical', 'Varsity', 'Board', 'Academic'];
-    } else if (rawTarget.contains('eng') || rawTarget.contains('buet') || rawTarget.contains('engineering') || rawTarget.contains('ইঞ্জিনিয়ারিং')) {
+    } else if (rawTarget.contains('eng') || rawTarget.contains('buet') || rawTarget.contains('engineering') || rawTarget.contains('ckruet') || rawTarget.contains('kuet') || rawTarget.contains('ruet') || rawTarget.contains('cuet') || rawTarget.contains('butex') || rawTarget.contains('mist') || rawTarget.contains('ইঞ্জিনিয়ারিং')) {
       return const ['Engineering', 'Varsity', 'Board', 'Academic'];
-    } else if (rawTarget.contains('varsity') || rawTarget.contains('ভার্সিটি')) {
+    } else if (rawTarget.contains('varsity') || rawTarget.contains('ভার্সিটি') || rawTarget.contains('gst') || rawTarget.contains('du') || rawTarget.contains('ju') || rawTarget.contains('ru') || rawTarget.contains('cu') || rawTarget.contains('bup')) {
       return const ['Varsity', 'Board', 'Academic'];
     } else {
       return const ['Academic', 'Board'];
@@ -873,8 +875,18 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final profile = ref.watch(userProfileProvider).value;
+    final currentTarget = profile?.examTarget ?? profile?.target;
+    if (_lastExamTarget != currentTarget && profile != null) {
+      _lastExamTarget = currentTarget;
+      final allowed = _getAllowedExamTypesForProfile(profile);
+      _examTypes.clear();
+      _examTypes.addAll(allowed);
+    }
+
     ref.listen(userProfileProvider, (previous, next) {
       if (next.value != null && previous?.value != next.value) {
+        _initTargetExamTypes(next.value);
         _fetchSubjects();
       }
     });

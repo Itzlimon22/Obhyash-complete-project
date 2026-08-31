@@ -52,6 +52,14 @@ import MyProfileView from "@/components/student/ui/profile/MyProfileView";
 import SubscriptionView from "@/components/student/ui/profile/SubscriptionView";
 import SettingsView from "@/components/student/ui/profile/SettingsView";
 import AboutUsView from "@/components/student/ui/profile/AboutUsView";
+import PrivacyPolicyView from "@/components/student/ui/profile/PrivacyPolicyView";
+import TermsConditionsView from "@/components/student/ui/profile/TermsConditionsView";
+import FaqPanel from "@/components/student/ui/profile/settings/FaqPanel";
+import BookmarksView from "@/components/student/features/bookmarks/BookmarksView";
+import AccountInfoView from "@/components/student/ui/profile/settings/AccountInfoView";
+import AccountLinkingPanel from "@/components/student/ui/profile/settings/AccountLinkingPanel";
+import DeleteAccountPanel from "@/components/student/ui/profile/settings/DeleteAccountPanel";
+import ReferralView from "@/components/student/features/referral/ReferralView";
 
 // Exam Features
 import { ExamSetupContainer } from "@/components/student/features/exam/setup/ExamSetupContainer";
@@ -214,6 +222,16 @@ export default function StudentRoot({
     "legends_league",
     "formulas",
     "bookmarks",
+    "referral",
+    "upgrade",
+    "info",
+    "account-info",
+    "account-linking",
+    "delete-account",
+    "privacy",
+    "terms",
+    "faq",
+    "help",
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -643,7 +661,6 @@ export default function StudentRoot({
     }
   }, []);  // only on mount
 
-  // Navigation Logic
   const handleTabChange = (tab: string) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
       setNavWarning({ isOpen: true, targetTab: tab, action: "tab" });
@@ -891,12 +908,24 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === "practice" || activeTab === "bookmarks" || activeTab === "formulas") {
+      if (activeTab === "bookmarks") {
         return (
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title={activeTab === "bookmarks" ? "আমার বুকমার্কস" : activeTab === "formulas" ? "ফর্মুলা ও অনুশীলন" : "অনুশীলন"}
+            title="আমার বুকমার্কস"
+          >
+            <BookmarksView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "practice" || activeTab === "formulas") {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title={activeTab === "formulas" ? "ফর্মুলা ও অনুশীলন" : "অনুশীলন"}
           >
             <PracticeDashboard
               history={examHistory}
@@ -904,7 +933,7 @@ export default function StudentRoot({
               onNavigateToMock={() => handleTabChange("setup")}
               subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
-              initialTab={activeTab === "bookmarks" ? "bookmarks" : "mistakes"}
+              initialTab="mistakes"
             />
           </AppLayout>
         );
@@ -955,7 +984,34 @@ export default function StudentRoot({
       if (activeTab === "notifications") {
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="নোটিফিকেশন">
-            <NotificationsView />
+            <NotificationsView onNavigate={(tab) => handleTabChange(tab)} />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "info" || activeTab === "account-info") {
+        return (
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="অ্যাকাউন্ট ইনফো"
+          >
+            <AccountInfoView
+              user={currentUser}
+              onBack={() => handleTabChange("settings")}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "referral") {
+        return (
+          <AppLayout
+            activeTab="referral"
+            {...commonLayoutProps}
+            title="রেফারেল ও রিওয়ার্ড"
+          >
+            <ReferralView />
           </AppLayout>
         );
       }
@@ -972,9 +1028,72 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === "subscription")
+      if (activeTab === "privacy") {
         return (
-          <AppLayout activeTab="" {...commonLayoutProps} title="আপগ্রেড">
+          <AppLayout
+            activeTab=""
+            {...commonLayoutProps}
+            title="প্রাইভেসি পলিসি"
+          >
+            <PrivacyPolicyView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "terms") {
+        return (
+          <AppLayout
+            activeTab=""
+            {...commonLayoutProps}
+            title="ব্যবহারের শর্তাবলী"
+          >
+            <TermsConditionsView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "faq" || activeTab === "help") {
+        return (
+          <AppLayout
+            activeTab=""
+            {...commonLayoutProps}
+            title="সাহায্য ও জিজ্ঞাসা"
+          >
+            <FaqPanel onNavigateComplaint={() => handleTabChange("complaint")} />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "account-linking" && currentUser) {
+        return (
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="অ্যাকাউন্ট লিংকিং"
+          >
+            <AccountLinkingPanel user={currentUser} />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "delete-account" && currentUser) {
+        return (
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="অ্যাকাউন্ট মুছুন"
+          >
+            <DeleteAccountPanel
+              user={currentUser}
+              onBack={() => handleTabChange("settings")}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "subscription" || activeTab === "upgrade")
+        return (
+          <AppLayout activeTab="subscription" {...commonLayoutProps} title="আপগ্রেড">
             <SubscriptionView />
           </AppLayout>
         );

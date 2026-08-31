@@ -1,675 +1,1059 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
-import { usePersistedState } from '@/hooks/use-persisted-state';
-import { UserProfile } from 'lib/types';
-import { LEVELS, LevelType } from './leaderboard/leaderboardData';
-import LevelSelector from './leaderboard/LevelSelector';
-import LeaderboardTable from './leaderboard/LeaderboardTable';
-import {
-  getLeaderboardUsers,
-  getLevelUserCounts,
-  getUserProfile,
-  getInstituteLeaderboardUsers,
-  getInstituteRankings,
-  InstituteRankEntry,
-} from 'services/database';
+"use client";
 
-import { useAuth } from '@/components/auth/AuthProvider';
-import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
-import { searchColleges } from '@/lib/college-mapping';
-import { calculateLevel } from '@/lib/utils';
-import { BanglaNameHelper } from '@/lib/bangla-name-helper';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  Crown,
+  Sparkles,
+  Shield,
+  Zap,
+  Sprout,
+  Users,
+  GraduationCap,
+  ChevronDown,
+  Calendar,
+  Clock,
+  Building2,
+  Trophy,
+  Medal,
+  Award,
+  ChevronRight,
+  TrendingUp,
+  RefreshCw,
+  Search,
+  CheckCircle2,
+} from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { UserProfile } from "@/lib/types";
+import UserAvatar from "../../ui/common/UserAvatar";
+import { LeaderboardSkeleton } from "../../ui/common/Skeletons";
+
+// ─── Level Definitions matching Flutter ──────────────────────────────────────
+export interface LevelInfo {
+  id: string;
+  label: string;
+  minXP: number;
+  maxXP: number;
+  xpRange: string;
+  startColor: string;
+  endColor: string;
+  textColor: string;
+  badgeBg: string;
+  icon: React.ElementType;
+}
+
+export const LEADERBOARD_LEVELS: LevelInfo[] = [
+  {
+    id: "Legend",
+    label: "লিজেন্ড",
+    minXP: 15000,
+    maxXP: 999999999,
+    xpRange: "15K+ XP",
+    startColor: "from-red-500",
+    endColor: "to-red-700",
+    textColor: "text-red-500",
+    badgeBg: "bg-red-500/10 text-red-500 border-red-500/30",
+    icon: Crown,
+  },
+  {
+    id: "Scholar",
+    label: "স্কলার",
+    minXP: 7000,
+    maxXP: 14999,
+    xpRange: "7K–15K XP",
+    startColor: "from-amber-500",
+    endColor: "to-amber-700",
+    textColor: "text-amber-500",
+    badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+    icon: Sparkles,
+  },
+  {
+    id: "Warrior",
+    label: "ওয়ারিয়র",
+    minXP: 3000,
+    maxXP: 6999,
+    xpRange: "3K–7K XP",
+    startColor: "from-purple-500",
+    endColor: "to-purple-700",
+    textColor: "text-purple-500",
+    badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+    icon: Shield,
+  },
+  {
+    id: "Challenger",
+    label: "চ্যালেঞ্জার",
+    minXP: 1000,
+    maxXP: 2999,
+    xpRange: "1K–3K XP",
+    startColor: "from-sky-500",
+    endColor: "to-sky-700",
+    textColor: "text-sky-500",
+    badgeBg: "bg-sky-500/10 text-sky-500 border-sky-500/30",
+    icon: Zap,
+  },
+  {
+    id: "Explorer",
+    label: "এক্সপ্লোরার",
+    minXP: 0,
+    maxXP: 999,
+    xpRange: "0–1K XP",
+    startColor: "from-emerald-500",
+    endColor: "to-emerald-700",
+    textColor: "text-emerald-500",
+    badgeBg: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
+    icon: Sprout,
+  },
+];
+
+export function getLevelById(id: string): LevelInfo {
+  const clean = (id || "").toLowerCase();
+  if (clean.includes("legend") || clean.includes("apex")) return LEADERBOARD_LEVELS[0];
+  if (clean.includes("scholar") || clean.includes("titan")) return LEADERBOARD_LEVELS[1];
+  if (clean.includes("warrior") || clean.includes("conqueror")) return LEADERBOARD_LEVELS[2];
+  if (clean.includes("challenger") || clean.includes("scout")) return LEADERBOARD_LEVELS[3];
+  return LEADERBOARD_LEVELS[4];
+}
+
+export function calculateLevelFromXp(xp: number): string {
+  if (xp >= 15000) return "Legend";
+  if (xp >= 7000) return "Scholar";
+  if (xp >= 3000) return "Warrior";
+  if (xp >= 1000) return "Challenger";
+  return "Explorer";
+}
+
+// Convert numbers to Bengali digits
+function toBengaliNum(num: number | string): string {
+  const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return String(num).replace(/\d/g, (d) => bnDigits[parseInt(d, 10)]);
+}
+
+function calculateRankPoints(rank: number): number {
+  if (rank === 1) return 500;
+  if (rank === 2) return 400;
+  if (rank === 3) return 350;
+  if (rank <= 5) return 300;
+  if (rank <= 10) return 250;
+  if (rank <= 25) return 180;
+  if (rank <= 50) return 120;
+  if (rank <= 100) return 80;
+  if (rank <= 250) return 40;
+  if (rank <= 500) return 20;
+  return 10;
+}
+
+export interface LeaderboardUser {
+  id: string;
+  name: string;
+  institute?: string;
+  xp: number;
+  monthly_xp?: number;
+  level?: string;
+  exams_taken?: number;
+  avatar_url?: string;
+  batch?: string;
+  rank: number;
+  is_pro?: boolean;
+}
+
+export interface InstituteRank {
+  institute: string;
+  points: number;
+  studentCount: number;
+  bestRank: number;
+  isMyCollege: boolean;
+}
 
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile, rank: number) => void;
   onLegendsLeagueClick?: () => void;
 }
 
-const INSTITUTE_PAGE_SIZE = 15;
+const PAGE_SIZE = 20;
 
-const LeaderboardView: React.FC<LeaderboardViewProps> = ({
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   onUserClick,
   onLegendsLeagueClick,
 }) => {
-  const { loading: authLoading, user: authUser } = useAuth();
+  const supabase = useMemo(() => createClient(), []);
 
-  const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
-  const [viewMode, setViewMode] = usePersistedState<'level' | 'college' | 'rankings'>('lb_view_mode', 'level');
-  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'all_time'>('monthly');
-  // Track which college is being viewed in college mode (defaults to own college)
-  const [selectedCollege, setSelectedCollege] = useState<string | null>(null);
+  // ── States ─────────────────────────────────────────────────────────────────
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("level");
+  const [selectedLevel, setSelectedLevel] = useState<string>("Explorer");
+  const [timeframe, setTimeframe] = useState<"monthly" | "all_time">("monthly");
+  const [batchFilter, setBatchFilter] = useState<"all" | "my_batch">("all");
 
-  // ── SWR: current user profile (cached in localStorage) ──────────────────────
-  const { data: currentUser } = useSWR(
-    authLoading || !authUser ? null : `profile:${authUser.id}`,
-    () => getUserProfile('me'),
-    { revalidateOnFocus: false, dedupingInterval: 60_000 },
-  );
+  const [levelCounts, setLevelCounts] = useState<Record<string, number>>({});
+  const [users, setUsers] = useState<LeaderboardUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
 
-  // Effective college: user's selection or fall back to own college
-  const effectiveCollege = selectedCollege ?? currentUser?.institute ?? null;
+  const [collegeUsers, setCollegeUsers] = useState<LeaderboardUser[]>([]);
+  const [isLoadingCollege, setIsLoadingCollege] = useState(false);
 
-  // Set selectedCollege to own college when user data first loads (only if not already set)
+  const [instituteRankings, setInstituteRankings] = useState<InstituteRank[]>([]);
+  const [isLoadingRankings, setIsLoadingRankings] = useState(false);
+  const [searchCollegeQuery, setSearchCollegeQuery] = useState("");
+
+  const [myExactRank, setMyExactRank] = useState(0);
+
+  // ── 1. Fetch Current User Profile ──────────────────────────────────────────
   useEffect(() => {
-    if (currentUser?.institute && !selectedCollege) {
-      // Defer to avoid synchronous setState inside an effect (cascading renders)
-      queueMicrotask(() => setSelectedCollege(currentUser.institute!));
+    async function loadCurrentUser() {
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user) {
+          const { data: prof } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", authData.user.id)
+            .single();
+
+          if (prof) {
+            setCurrentUser(prof);
+            const userEffXp = timeframe === "monthly" ? prof.monthly_xp || 0 : prof.xp || 0;
+            const lvl = calculateLevelFromXp(userEffXp);
+            setSelectedLevel(lvl);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading user profile:", err);
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?.institute]);
+    loadCurrentUser();
+  }, [supabase, timeframe]);
 
-  // Set selectedLevel once we know the user's level (monthly vs all_time)
-  const resolvedLevel: LevelType = useMemo(() => {
-    if (selectedLevel) return selectedLevel;
-    const userXp = timeframe === 'all_time' ? (currentUser?.xp ?? 0) : (currentUser?.monthly_xp ?? 0);
-    const lvl = (calculateLevel(userXp) as LevelType) || 'Explorer';
-    return LEVELS.some((l) => l.id === lvl) ? lvl : 'Explorer';
-  }, [currentUser, selectedLevel, timeframe]);
+  // ── 2. Fetch Level Student Counts ──────────────────────────────────────────
+  const fetchCounts = useCallback(async () => {
+    try {
+      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+      const counts: Record<string, number> = {};
 
-  // ── SWR: level user counts (cached) ─────────────────────────────────────────
-  const { data: levelCounts = {} } = useSWR(
-    authLoading ? null : `leaderboard:levelCounts:${timeframe}`,
-    () => getLevelUserCounts(timeframe === 'all_time' ? 'all_time' : 'monthly'),
-    { revalidateOnFocus: false, dedupingInterval: 120_000 },
-  );
+      await Promise.all(
+        LEADERBOARD_LEVELS.map(async (lvl) => {
+          let query = supabase.from("users").select("id", { count: "exact", head: true }).gte(sortColumn, lvl.minXP);
+          if (lvl.maxXP < 999999999) {
+            query = query.lte(sortColumn, lvl.maxXP);
+          }
+          const { count } = await query;
+          counts[lvl.id] = count || 0;
+        })
+      );
 
-  // ── SWRInfinite: level leaderboard (loads 20 at a time as user scrolls) ───────
-  const getLevelKey = (pageIdx: number, prev: { hasMore: boolean; nextOffset: number } | null) => {
-    if (authLoading) return null;
-    if (prev && !prev.hasMore) return null; // stop when no more pages
-    const offset = prev ? prev.nextOffset : 0;
-    return `leaderboard:level:${resolvedLevel}:timeframe:${timeframe}:offset:${offset}`;
-  };
-  const {
-    data: levelPages,
-    isLoading: isLevelLoading,
-    isValidating: isLevelValidating,
-    size: levelSize,
-    setSize: setLevelSize,
-  } = useSWRInfinite(
-    getLevelKey,
-    (key) => {
-      const offset = parseInt(key.split(':offset:')[1], 10);
-      const tf = timeframe === 'all_time' ? 'all_time' : 'monthly';
-      return getLeaderboardUsers(resolvedLevel, offset, 20, tf);
+      setLevelCounts(counts);
+    } catch (err) {
+      console.error("Error fetching level counts:", err);
+    }
+  }, [supabase, timeframe]);
+
+  useEffect(() => {
+    fetchCounts();
+  }, [fetchCounts]);
+
+  // ── 3. Fetch Level Leaderboard Users ───────────────────────────────────────
+  const fetchLevelUsers = useCallback(
+    async (isLoadMore = false) => {
+      if (isLoadMore) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+        setOffset(0);
+        setHasMore(true);
+      }
+
+      try {
+        const currentOffset = isLoadMore ? offset : 0;
+        const currentLevelInfo = getLevelById(selectedLevel);
+        const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+
+        let query = supabase
+          .from("users")
+          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, plan, is_pro")
+          .gte(sortColumn, currentLevelInfo.minXP);
+
+        if (currentLevelInfo.maxXP < 999999999) {
+          query = query.lte(sortColumn, currentLevelInfo.maxXP);
+        }
+
+        if (batchFilter === "my_batch" && currentUser?.batch) {
+          query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
+        }
+
+        if (timeframe === "monthly") {
+          query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
+        } else {
+          query = query.order("xp", { ascending: false, nullsFirst: false });
+        }
+
+        query = query.range(currentOffset, currentOffset + PAGE_SIZE - 1);
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        const mapped: LeaderboardUser[] = (data || []).map((u: any, idx: number) => {
+          const rawPlan = u.plan?.toString().toLowerCase();
+          const isPro = u.is_pro === true || (rawPlan && rawPlan !== "free");
+          const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+
+          return {
+            id: u.id,
+            name: u.name || "শিক্ষার্থী",
+            institute: u.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই",
+            xp: effXp,
+            monthly_xp: u.monthly_xp || 0,
+            level: calculateLevelFromXp(effXp),
+            exams_taken: u.exams_taken || 0,
+            avatar_url: u.avatar_url || undefined,
+            batch: u.batch || undefined,
+            rank: currentOffset + idx + 1,
+            is_pro: isPro,
+          };
+        });
+
+        if (isLoadMore) {
+          setUsers((prev) => [...prev, ...mapped]);
+          setOffset((prev) => prev + mapped.length);
+        } else {
+          setUsers(mapped);
+          setOffset(mapped.length);
+        }
+
+        setHasMore(mapped.length === PAGE_SIZE);
+      } catch (err) {
+        console.error("Error fetching level users:", err);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     },
-    { revalidateOnFocus: false, revalidateFirstPage: false, dedupingInterval: 60_000 },
+    [supabase, selectedLevel, timeframe, batchFilter, currentUser, offset]
   );
-  const leaderboardUsers: UserProfile[] = levelPages ? levelPages.flatMap((p) => p.users) : [];
-  const isLoading = isLevelLoading;
-  const isLoadingMoreLevel = isLevelValidating && levelSize > 1;
-  const hasMoreLevel = levelPages ? levelPages[levelPages.length - 1]?.hasMore ?? false : false;
 
-  // ── SWRInfinite: college leaderboard (loads 20 at a time as user scrolls) ─────
-  const getCollegeKey = (pageIdx: number, prev: { hasMore: boolean; nextOffset: number } | null) => {
-    if (!effectiveCollege || viewMode !== 'college') return null;
-    if (prev && !prev.hasMore) return null;
-    const offset = prev ? prev.nextOffset : 0;
-    return `leaderboard:college:${effectiveCollege}:offset:${offset}`;
-  };
-  const {
-    data: collegePages,
-    isLoading: isCollegeLoading,
-    isValidating: isCollegeValidating,
-    size: collegeSize,
-    setSize: setCollegeSize,
-  } = useSWRInfinite(
-    getCollegeKey,
-    (key) => {
-      const offset = parseInt(key.split(':offset:')[1], 10);
-      return getInstituteLeaderboardUsers(effectiveCollege!, offset);
-    },
-    { revalidateOnFocus: false, revalidateFirstPage: false, dedupingInterval: 120_000 },
-  );
-  const collegeUsers: UserProfile[] = collegePages ? collegePages.flatMap((p) => p.users) : [];
-  const isLoadingCollege = isCollegeLoading;
-  const isLoadingMoreCollege = isCollegeValidating && collegeSize > 1;
-  const hasMoreCollege = collegePages ? collegePages[collegePages.length - 1]?.hasMore ?? false : false;
+  useEffect(() => {
+    if (viewMode === "level") {
+      fetchLevelUsers(false);
+    }
+  }, [selectedLevel, timeframe, batchFilter, viewMode]);
 
-  const userRankInOwnLevel = useMemo(() => {
+  // ── 4. Fetch College Leaderboard ───────────────────────────────────────────
+  const fetchCollegeLeaderboard = useCallback(async () => {
+    if (!currentUser?.institute) return;
+    setIsLoadingCollege(true);
+    try {
+      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+      let query = supabase
+        .from("users")
+        .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, plan, is_pro")
+        .eq("institute", currentUser.institute);
+
+      if (timeframe === "monthly") {
+        query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
+      } else {
+        query = query.order("xp", { ascending: false, nullsFirst: false });
+      }
+
+      query = query.limit(100);
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const mapped: LeaderboardUser[] = (data || []).map((u: any, idx: number) => {
+        const rawPlan = u.plan?.toString().toLowerCase();
+        const isPro = u.is_pro === true || (rawPlan && rawPlan !== "free");
+        const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+
+        return {
+          id: u.id,
+          name: u.name || "শিক্ষার্থী",
+          institute: u.institute,
+          xp: effXp,
+          monthly_xp: u.monthly_xp || 0,
+          level: calculateLevelFromXp(effXp),
+          exams_taken: u.exams_taken || 0,
+          avatar_url: u.avatar_url || undefined,
+          batch: u.batch || undefined,
+          rank: idx + 1,
+          is_pro: isPro,
+        };
+      });
+
+      setCollegeUsers(mapped);
+    } catch (err) {
+      console.error("Error fetching college leaderboard:", err);
+    } finally {
+      setIsLoadingCollege(false);
+    }
+  }, [supabase, currentUser, timeframe]);
+
+  useEffect(() => {
+    if (viewMode === "college") {
+      fetchCollegeLeaderboard();
+    }
+  }, [viewMode, fetchCollegeLeaderboard]);
+
+  // ── 5. Fetch Institute Rankings ────────────────────────────────────────────
+  const fetchInstituteRankings = useCallback(async () => {
+    setIsLoadingRankings(true);
+    try {
+      const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
+      const { data, error } = await supabase
+        .from("users")
+        .select("institute, xp, monthly_xp")
+        .not("institute", "is", null)
+        .neq("institute", "")
+        .order(sortColumn, { ascending: false })
+        .limit(3000);
+
+      if (error) throw error;
+
+      const pointsMap: Record<string, number> = {};
+      const countsMap: Record<string, number> = {};
+      const bestRankMap: Record<string, number> = {};
+
+      (data || []).forEach((row: any, i: number) => {
+        const inst = (row.institute || "").trim();
+        if (!inst) return;
+        const rank = i + 1;
+        const pts = calculateRankPoints(rank);
+
+        pointsMap[inst] = (pointsMap[inst] || 0) + pts;
+        countsMap[inst] = (countsMap[inst] || 0) + 1;
+        if (!bestRankMap[inst] || rank < bestRankMap[inst]) {
+          bestRankMap[inst] = rank;
+        }
+      });
+
+      const myInst = (currentUser?.institute || "").trim().toLowerCase();
+
+      const rankings: InstituteRank[] = Object.keys(pointsMap).map((inst) => ({
+        institute: inst,
+        points: pointsMap[inst],
+        studentCount: countsMap[inst],
+        bestRank: bestRankMap[inst],
+        isMyCollege: myInst.length > 0 && inst.toLowerCase() === myInst,
+      }));
+
+      rankings.sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        return a.bestRank - b.bestRank;
+      });
+
+      setInstituteRankings(rankings);
+    } catch (err) {
+      console.error("Error fetching institute rankings:", err);
+    } finally {
+      setIsLoadingRankings(false);
+    }
+  }, [supabase, currentUser, timeframe]);
+
+  useEffect(() => {
+    if (viewMode === "rankings") {
+      fetchInstituteRankings();
+    }
+  }, [viewMode, fetchInstituteRankings]);
+
+  // ── Derived Data ───────────────────────────────────────────────────────────
+  const myEffectiveXp = timeframe === "monthly" ? currentUser?.monthly_xp || 0 : currentUser?.xp || 0;
+  const myCalculatedLevel = calculateLevelFromXp(myEffectiveXp);
+  const myLevelInfo = getLevelById(myCalculatedLevel);
+  const currentSelectedLevelInfo = getLevelById(selectedLevel);
+  const isOnOwnLevel = myCalculatedLevel === selectedLevel;
+
+  const myRank = useMemo(() => {
     if (!currentUser) return 0;
-    const idx = leaderboardUsers.findIndex((u) => u.id === currentUser.id);
-    if (idx !== -1) return idx + 1;
-    return 0;
-  }, [currentUser, leaderboardUsers]);
+    const idx = users.findIndex((u) => u.id === currentUser.id);
+    return idx >= 0 ? idx + 1 : myExactRank;
+  }, [currentUser, users, myExactRank]);
 
-  // ── SWR: all colleges list (for dropdown filter + rankings tab) ──────────────
-  const { data: allCollegesRaw = [], isLoading: isLoadingCollegesList } = useSWR(
-    viewMode === 'college' || viewMode === 'rankings'
-      ? `leaderboard:instituteRankings:${timeframe}`
-      : null,
-    () => getInstituteRankings(timeframe === 'all_time' ? 'all_time' : 'monthly'),
-    { revalidateOnFocus: false, dedupingInterval: 60_000 },
-  );
-  const allColleges = [...allCollegesRaw].sort((a, b) => {
-    if (a.institute === currentUser?.institute) return -1;
-    if (b.institute === currentUser?.institute) return 1;
-    return a.institute.localeCompare(b.institute);
-  });
-  const instituteRankings = viewMode === 'rankings' ? allCollegesRaw : [];
-  const isLoadingRankings = viewMode === 'rankings' && isLoadingCollegesList;
+  // Next level progress calculation
+  const nextLevelInfo = useMemo(() => {
+    const currentIdx = LEADERBOARD_LEVELS.findIndex((l) => l.id === myCalculatedLevel);
+    return currentIdx > 0 ? LEADERBOARD_LEVELS[currentIdx - 1] : null;
+  }, [myCalculatedLevel]);
 
-  const userBatchLabel = currentUser?.batch?.trim() || 'HSC 2027';
+  const levelProgressPercent = useMemo(() => {
+    if (!nextLevelInfo) return 100;
+    const currentBase = myLevelInfo.minXP;
+    const nextTarget = nextLevelInfo.minXP;
+    const range = nextTarget - currentBase;
+    if (range <= 0) return 100;
+    const earned = myEffectiveXp - currentBase;
+    return Math.min(100, Math.max(0, Math.round((earned / range) * 100)));
+  }, [myEffectiveXp, myLevelInfo, nextLevelInfo]);
 
-  const displayedLeaderboardUsers = useMemo(() => {
-    const cleanTarget = userBatchLabel.toLowerCase().replace(/[\s-]/g, '');
-    const batchFiltered = leaderboardUsers.filter((u) => {
-      if (!u.batch) return true;
-      const cleanU = u.batch.toLowerCase().replace(/[\s-]/g, '');
-      return cleanU.includes(cleanTarget) || cleanTarget.includes(cleanU);
-    });
-
-    return batchFiltered.length > 0 ? batchFiltered : leaderboardUsers;
-  }, [leaderboardUsers, userBatchLabel]);
-
-  if (isLoading && !leaderboardUsers.length && viewMode === 'level') {
-    return <LeaderboardSkeleton />;
-  }
-
-  const tabClass = (active: boolean) =>
-    `flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
-      active
-        ? 'bg-white dark:bg-neutral-800 shadow-sm text-emerald-700 dark:text-emerald-400'
-        : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
-    }`;
+  const top3Users = useMemo(() => users.slice(0, 3), [users]);
 
   const isSsc =
-    currentUser?.stream?.toLowerCase().includes('ssc') ||
-    currentUser?.batch?.toLowerCase().includes('ssc') ||
-    currentUser?.target?.toLowerCase().includes('ssc') ||
-    false;
+    (currentUser?.batch || "").toLowerCase().includes("ssc") ||
+    (currentUser?.target || "").toLowerCase().includes("ssc");
+  const instLabel = isSsc ? "স্কুল" : "কলেজ";
 
-  const instLabel = isSsc ? 'স্কুল' : 'কলেজ';
-  const myInstTabLabel = `আমার ${instLabel}`;
-  const allInstTabLabel = `সব ${instLabel}`;
+  const filteredInstituteRankings = useMemo(() => {
+    if (!searchCollegeQuery.trim()) return instituteRankings;
+    const q = searchCollegeQuery.toLowerCase();
+    return instituteRankings.filter((r) => r.institute.toLowerCase().includes(q));
+  }, [instituteRankings, searchCollegeQuery]);
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-6 animate-fade-in transition-colors pb-24 font-['HindSiliguri']">
-      <div className="max-w-7xl mx-auto">
-        {/* Top Header Row with Legends League Glow Button */}
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
-              মেধা লিডারবোর্ড 🏆
-            </h2>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              দৈনিক পরীক্ষা দিয়ে XP বাড়াও ও লিডারবোর্ডে এগিয়ে যাও
-            </p>
-          </div>
+    <div className="max-w-4xl mx-auto flex flex-col gap-5 px-2 sm:px-4 py-4 font-['HindSiliguri',sans-serif]">
+      {/* ── 1. Top View Mode Tabs (র‍্যাংকিং, আমার প্রতিষ্ঠান, সব প্রতিষ্ঠান) ── */}
+      <div className="bg-white dark:bg-[#0C0A09] p-1.5 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] shadow-sm">
+        <div className="grid grid-cols-3 gap-1 bg-neutral-100 dark:bg-[#141416] p-1 rounded-xl">
+          <button
+            onClick={() => setViewMode("level")}
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+              viewMode === "level"
+                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
+                : "text-neutral-500 hover:text-black dark:hover:text-white"
+            }`}
+          >
+            <Trophy size={18} className={viewMode === "level" ? "text-amber-500" : ""} />
+            <span>র‍্যাংকিং</span>
+          </button>
 
           <button
-            type="button"
-            onClick={onLegendsLeagueClick || (() => (window.location.href = "/legends-league"))}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-black shadow-md shadow-rose-600/30 active:scale-95 transition-all flex items-center gap-1.5 shrink-0 animate-pulse border border-rose-400/40"
+            onClick={() => setViewMode("college")}
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+              viewMode === "college"
+                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
+                : "text-neutral-500 hover:text-black dark:hover:text-white"
+            }`}
           >
-            <span>👑</span>
-            <span>লেজেন্ডস লীগ</span>
+            <Building2 size={18} className={viewMode === "college" ? "text-emerald-500" : ""} />
+            <span>আমার {instLabel}</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode("rankings")}
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+              viewMode === "rankings"
+                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
+                : "text-neutral-500 hover:text-black dark:hover:text-white"
+            }`}
+          >
+            <Medal size={18} className={viewMode === "rankings" ? "text-indigo-500" : ""} />
+            <span>সব {instLabel}</span>
           </button>
         </div>
+      </div>
 
-        {/* View mode tabs */}
-        <div className="flex gap-1 mb-4 bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-1">
-          <button onClick={() => setViewMode('level')} className={tabClass(viewMode === 'level')}>
-            র‍্যাংকিং
-          </button>
-          <button onClick={() => setViewMode('college')} className={tabClass(viewMode === 'college')}>
-            {myInstTabLabel}
-          </button>
-          <button onClick={() => setViewMode('rankings')} className={tabClass(viewMode === 'rankings')}>
-            {allInstTabLabel}
-          </button>
-        </div>
+      {/* ── 2. LEVEL RANKINGS VIEW ────────────────────────────────────────── */}
+      {viewMode === "level" && (
+        <>
+          {/* Level Selector Carousel Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
+            {LEADERBOARD_LEVELS.map((lvl) => {
+              const Icon = lvl.icon;
+              const isSelected = selectedLevel === lvl.id;
+              const isUserLevel = myCalculatedLevel === lvl.id;
+              const count = levelCounts[lvl.id] || 0;
 
-        {viewMode === 'rankings' ? (
-          <InstituteRankingsView
-            key={instituteRankings.length}
-            rankings={instituteRankings}
-            isLoading={isLoadingRankings}
-            myInstitute={currentUser?.institute}
-          />
-        ) : viewMode === 'level' ? (
-          <>
-            <LevelSelector
-              selectedLevel={resolvedLevel}
-              setSelectedLevel={setSelectedLevel}
-              currentUser={currentUser ?? undefined}
-              levelCounts={levelCounts}
-            />
-
-            {/* ── My Batch & Timeframe Selector (Below Level Selector) ── */}
-            <div className="my-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-3 shadow-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                  আমার ব্যাচ ({userBatchLabel})
-                </span>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium hidden md:inline">
-                  • তোমার ব্যাচের সহপাঠীদের মেধা তালিকা
-                </span>
-              </div>
-
-              {/* Timeframe Dropdown Filter */}
-              <div className="relative">
-                <select
-                  value={timeframe}
-                  onChange={(e) => setTimeframe(e.target.value as 'weekly' | 'monthly' | 'all_time')}
-                  aria-label="টাইমফ্রেম ফিল্টার"
-                  className="appearance-none text-xs font-bold bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 rounded-xl pl-8 pr-7 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 cursor-pointer shadow-sm"
+              return (
+                <button
+                  key={lvl.id}
+                  onClick={() => setSelectedLevel(lvl.id)}
+                  className={`
+                    relative p-3.5 rounded-2xl border transition-all duration-200 text-left flex flex-col justify-between cursor-pointer
+                    ${
+                      isSelected
+                        ? "bg-white dark:bg-[#161412] border-emerald-500 ring-2 ring-emerald-500/30 shadow-md"
+                        : "bg-white dark:bg-[#12100E] border-neutral-200 dark:border-[#1C1C1E] hover:border-neutral-300 dark:hover:border-neutral-700"
+                    }
+                  `}
                 >
-                  <option value="weekly">⚡ সাপ্তাহিক (Weekly)</option>
-                  <option value="monthly">🗓️ মাসিক (Monthly)</option>
-                  <option value="all_time">👑 সর্বকালীন (All-Time)</option>
-                </select>
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-xs">
-                  {timeframe === 'weekly' ? '⚡' : timeframe === 'monthly' ? '🗓️' : '👑'}
-                </span>
-                <svg
-                  className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  {/* Top: Icon + Count Badge */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${lvl.startColor} ${lvl.endColor} flex items-center justify-center text-white shadow-xs`}>
+                      <Icon size={18} className="stroke-[2.2]" />
+                    </div>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-300">
+                      {toBengaliNum(count)} জন
+                    </span>
+                  </div>
+
+                  {/* Level Name & Threshold */}
+                  <div>
+                    <h4 className="text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
+                      {lvl.label}
+                    </h4>
+                    <p className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 mt-0.5">
+                      {lvl.xpRange}
+                    </p>
+                  </div>
+
+                  {/* Your Level Badge */}
+                  {isUserLevel && (
+                    <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-center border border-emerald-200 dark:border-emerald-800/40">
+                      আপনার স্তর
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Filters Bar: Batch Filter & Timeframe Selector */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E]">
+            {/* Batch Filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-neutral-500 font-['Anek_Bangla',sans-serif]">ব্যাচ:</span>
+              <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
+                <button
+                  onClick={() => setBatchFilter("all")}
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                    batchFilter === "all"
+                      ? "bg-white dark:bg-[#27272A] text-black dark:text-white shadow-xs"
+                      : "text-neutral-500"
+                  }`}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                  সকল ব্যাচ
+                </button>
+                {currentUser?.batch && (
+                  <button
+                    onClick={() => setBatchFilter("my_batch")}
+                    className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                      batchFilter === "my_batch"
+                        ? "bg-white dark:bg-[#27272A] text-emerald-600 dark:text-emerald-400 shadow-xs"
+                        : "text-neutral-500"
+                    }`}
+                  >
+                    আমার ব্যাচ ({currentUser.batch})
+                  </button>
+                )}
               </div>
             </div>
 
-            <LeaderboardTable
-              key={`level-${resolvedLevel}-${timeframe}`}
-              users={displayedLeaderboardUsers}
-              selectedLevel={resolvedLevel}
-              onUserClick={(user) => {
-                const rank = displayedLeaderboardUsers.findIndex((u) => u.id === user.id) + 1;
-                onUserClick?.(user, rank);
-              }}
-              isLoading={isLoading}
-              isLoadingMore={isLoadingMoreLevel}
-              hasMore={hasMoreLevel}
-              onLoadMore={() => setLevelSize((s) => s + 1)}
-            />
-          </>
-        ) : (
-          /* College mode */
-          <>
-            {currentUser?.institute || effectiveCollege ? (
-              <>
-                {/* ── Header row: own college (left) + filter dropdown (right) ── */}
-                <div className="mb-4 flex items-center gap-3">
-                  {/* Left: own college badge */}
-                  <div className="flex-1 min-w-0 flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
-                    <span className="text-lg flex-shrink-0">🏫</span>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-wide leading-none mb-0.5">
-                        {effectiveCollege === currentUser?.institute ? 'তোমার কলেজ' : 'নির্বাচিত কলেজ'}
-                      </p>
-                      <p className="text-sm font-extrabold text-emerald-800 dark:text-emerald-300 truncate">
-                        {effectiveCollege || currentUser?.institute || '—'}
-                      </p>
-                    </div>
-                  </div>
+            {/* Timeframe Filter (Monthly vs All-time) */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-neutral-500 font-['Anek_Bangla',sans-serif]">সময়কাল:</span>
+              <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
+                <button
+                  onClick={() => setTimeframe("monthly")}
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                    timeframe === "monthly"
+                      ? "bg-[#059669] text-white shadow-xs"
+                      : "text-neutral-500 hover:text-black dark:hover:text-white"
+                  }`}
+                >
+                  মাসিক র‍্যাংকিং
+                </button>
+                <button
+                  onClick={() => setTimeframe("all_time")}
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                    timeframe === "all_time"
+                      ? "bg-[#059669] text-white shadow-xs"
+                      : "text-neutral-500 hover:text-black dark:hover:text-white"
+                  }`}
+                >
+                  সর্বকালীন (All Time)
+                </button>
+              </div>
+            </div>
+          </div>
 
-                  {/* Right: searchable college combobox */}
-                  <CollegeFilter
-                    colleges={allColleges}
-                    value={effectiveCollege ?? ''}
-                    onChange={setSelectedCollege}
-                    isLoading={isLoadingCollegesList}
-                  />
+          {/* User Progress Banner (When viewing own level) */}
+          {currentUser && isOnOwnLevel && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-neutral-50 to-white dark:from-emerald-950/20 dark:via-[#12100E] dark:to-[#12100E] border border-emerald-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="relative">
+                  <UserAvatar user={currentUser} size="md" className="w-12 h-12 ring-2 ring-emerald-500" />
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-extrabold shadow-xs">
+                    {toBengaliNum(myRank || 1)}
+                  </div>
                 </div>
-
-                <LeaderboardTable
-                  key={`college-${effectiveCollege}`}
-                  users={collegeUsers}
-                  selectedLevel={resolvedLevel}
-                  title={`${effectiveCollege ?? 'কলেজ'} র‍্যাংকিং`}
-                  onUserClick={(user) => {
-                    const rank = collegeUsers.findIndex((u) => u.id === user.id) + 1;
-                    onUserClick?.(user, rank);
-                  }}
-                  isLoading={isLoadingCollege}
-                  isLoadingMore={isLoadingMoreCollege}
-                  hasMore={hasMoreCollege}
-                  onLoadMore={() => setCollegeSize((s) => s + 1)}
-                />
-                {!isLoadingCollege && collegeUsers.length === 0 && (
-                  <div className="text-center py-16 text-neutral-400 dark:text-neutral-600">
-                    <p className="text-3xl mb-3">🏫</p>
-                    <p className="font-bold text-sm">এই কলেজ থেকে এখনো কেউ যোগ দেয়নি</p>
-                    <p className="text-xs mt-1">অন্য কলেজ বেছে নাও</p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                      {currentUser.name || "শিক্ষার্থী"}
+                    </h3>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500 text-white font-bold">
+                      {myLevelInfo.label}
+                    </span>
                   </div>
-                )}
-              </>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                    বর্তমান অবস্থান: <strong className="text-emerald-600 dark:text-emerald-400 font-bold font-['Anek_Bangla',sans-serif]">{myRank > 0 ? `${toBengaliNum(myRank)}ম স্থান` : "তালিকায় অন্তর্ভুক্ত"}</strong> • {toBengaliNum(myEffectiveXp)} XP
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress to next level */}
+              {nextLevelInfo && (
+                <div className="w-full sm:w-64 flex flex-col gap-1.5">
+                  <div className="flex justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                    <span>পরবর্তী স্তর: <strong className="text-neutral-900 dark:text-white">{nextLevelInfo.label}</strong></span>
+                    <span>{toBengaliNum(nextLevelInfo.minXP - myEffectiveXp)} XP বাকি</span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                      style={{ width: `${levelProgressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Top 3 Podium Section */}
+          {!isLoading && top3Users.length >= 3 && (
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-6 pb-2">
+              {/* 2nd Place (Silver) */}
+              <div
+                onClick={() => onUserClick?.(top3Users[1] as any, 2)}
+                className="bg-white dark:bg-[#12100E] p-3 sm:p-4 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] flex flex-col items-center text-center relative group cursor-pointer hover:border-neutral-400 transition-all"
+              >
+                <div className="w-6 h-6 rounded-full bg-slate-300 text-slate-800 text-xs font-extrabold flex items-center justify-center absolute -top-3 shadow-md">
+                  ২
+                </div>
+                <UserAvatar user={top3Users[1] as any} size="md" className="w-11 h-11 sm:w-14 sm:h-14 ring-2 ring-slate-300 mb-2" />
+                <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
+                  {top3Users[1].name}
+                </h4>
+                <p className="text-[11px] text-neutral-400 truncate w-full">{top3Users[1].institute}</p>
+                <div className="mt-2 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs font-extrabold">
+                  {toBengaliNum(top3Users[1].xp)} XP
+                </div>
+              </div>
+
+              {/* 1st Place (Gold - Taller & Highlighted) */}
+              <div
+                onClick={() => onUserClick?.(top3Users[0] as any, 1)}
+                className="bg-gradient-to-b from-amber-500/10 to-white dark:to-[#141210] p-4 sm:p-5 rounded-2xl border-2 border-amber-400 dark:border-amber-500/50 flex flex-col items-center text-center relative group cursor-pointer shadow-lg shadow-amber-500/10 -mt-4 transition-all"
+              >
+                <div className="w-8 h-8 rounded-full bg-amber-400 text-amber-950 text-sm font-black flex items-center justify-center absolute -top-4 shadow-md">
+                  <Crown size={16} className="stroke-[2.5]" />
+                </div>
+                <UserAvatar user={top3Users[0] as any} size="lg" className="w-14 h-14 sm:w-16 sm:h-16 ring-4 ring-amber-400 mb-2 mt-1" />
+                <h4 className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
+                  {top3Users[0].name}
+                </h4>
+                <p className="text-xs text-neutral-400 truncate w-full">{top3Users[0].institute}</p>
+                <div className="mt-2.5 px-3 py-1 rounded-full bg-amber-400 text-amber-950 text-xs sm:text-sm font-black shadow-xs">
+                  {toBengaliNum(top3Users[0].xp)} XP
+                </div>
+              </div>
+
+              {/* 3rd Place (Bronze) */}
+              <div
+                onClick={() => onUserClick?.(top3Users[2] as any, 3)}
+                className="bg-white dark:bg-[#12100E] p-3 sm:p-4 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] flex flex-col items-center text-center relative group cursor-pointer hover:border-neutral-400 transition-all"
+              >
+                <div className="w-6 h-6 rounded-full bg-amber-700 text-amber-100 text-xs font-extrabold flex items-center justify-center absolute -top-3 shadow-md">
+                  ৩
+                </div>
+                <UserAvatar user={top3Users[2] as any} size="md" className="w-11 h-11 sm:w-14 sm:h-14 ring-2 ring-amber-700 mb-2" />
+                <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
+                  {top3Users[2].name}
+                </h4>
+                <p className="text-[11px] text-neutral-400 truncate w-full">{top3Users[2].institute}</p>
+                <div className="mt-2 px-2.5 py-0.5 rounded-full bg-amber-900/10 text-amber-800 dark:text-amber-300 text-xs font-extrabold">
+                  {toBengaliNum(top3Users[2].xp)} XP
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Leaderboard Table List */}
+          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
+            {isLoading ? (
+              <div className="p-6">
+                <LeaderboardSkeleton />
+              </div>
+            ) : users.length === 0 ? (
+              <div className="p-12 text-center text-neutral-400 flex flex-col items-center gap-2">
+                <Trophy size={36} className="text-neutral-300 dark:text-neutral-700" />
+                <p className="text-base font-bold font-['Anek_Bangla',sans-serif]">এই স্তরে এখনও কোন শিক্ষার্থী যুক্ত হয়নি</p>
+                <p className="text-xs">পরীক্ষায় অংশগ্রহণ করে প্রথম স্থান অর্জন করুন!</p>
+              </div>
             ) : (
-              <div className="text-center py-16 text-neutral-400 dark:text-neutral-600">
-                <p className="text-3xl mb-3">🏫</p>
-                <p className="font-bold text-sm">তোমার প্রোফাইলে কলেজের নাম যোগ করো</p>
-                <p className="text-xs mt-1">সেটিংস থেকে শিক্ষা প্রতিষ্ঠান আপডেট করো</p>
+              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+                {users.map((user) => {
+                  const isMe = user.id === currentUser?.id;
+
+                  return (
+                    <div
+                      key={user.id}
+                      onClick={() => onUserClick?.(user as any, user.rank)}
+                      className={`
+                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors cursor-pointer group
+                        ${
+                          isMe
+                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
+                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                        }
+                      `}
+                    >
+                      {/* Rank + Avatar + Name & Institute */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Rank Badge */}
+                        <div
+                          className={`
+                            w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center text-xs sm:text-sm font-black shrink-0
+                            ${
+                              user.rank === 1
+                                ? "bg-amber-400 text-amber-950"
+                                : user.rank === 2
+                                ? "bg-slate-300 text-slate-800"
+                                : user.rank === 3
+                                ? "bg-amber-700 text-amber-100"
+                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
+                            }
+                          `}
+                        >
+                          {toBengaliNum(user.rank)}
+                        </div>
+
+                        {/* Avatar */}
+                        <UserAvatar user={user as any} size="sm" className="w-10 h-10 shrink-0" />
+
+                        {/* Name & Institute */}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-[15px] sm:text-[16px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                              {user.name}
+                            </h4>
+                            {isMe && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
+                                আপনি
+                              </span>
+                            )}
+                            {user.is_pro && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500 text-black font-extrabold flex items-center gap-0.5">
+                                <Crown size={10} /> PRO
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-neutral-400 truncate max-w-[200px] sm:max-w-[320px]">
+                            {user.institute} {user.batch ? `• ${user.batch}` : ""}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right: XP Badge & Chevron */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="text-right">
+                          <div className="text-sm sm:text-base font-extrabold text-[#059669] dark:text-[#10B981] font-['Anek_Bangla',sans-serif]">
+                            {toBengaliNum(user.xp)} XP
+                          </div>
+                          <div className="text-[11px] text-neutral-400 font-medium">
+                            {toBengaliNum(user.exams_taken || 0)} পরীক্ষা
+                          </div>
+                        </div>
+                        <ChevronRight size={16} className="text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
-          </>
-        )}
-      </div>
+
+            {/* Load More Button */}
+            {hasMore && !isLoading && (
+              <div className="p-4 border-t border-neutral-100 dark:border-[#1C1C1E] bg-neutral-50 dark:bg-[#12100E] text-center">
+                <button
+                  onClick={() => fetchLevelUsers(true)}
+                  disabled={isLoadingMore}
+                  className="px-6 py-2.5 rounded-xl bg-white dark:bg-[#1C1C1E] border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-white font-['Anek_Bangla',sans-serif] font-bold text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {isLoadingMore ? "লোড হচ্ছে..." : "আরও লোড করুন"}
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* ── 3. MY COLLEGE LEADERBOARD VIEW ───────────────────────────────── */}
+      {viewMode === "college" && (
+        <div className="flex flex-col gap-4">
+          {/* Header Card */}
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                <Building2 size={15} />
+                <span>আমার শিক্ষা প্রতিষ্ঠান</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] mt-1">
+                {currentUser?.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই"}
+              </h2>
+            </div>
+            <div className="px-3.5 py-1.5 rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] text-sm font-bold text-neutral-700 dark:text-neutral-300">
+              মোট শিক্ষার্থী: {toBengaliNum(collegeUsers.length)} জন
+            </div>
+          </div>
+
+          {/* College Student List */}
+          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden">
+            {isLoadingCollege ? (
+              <div className="p-6">
+                <LeaderboardSkeleton />
+              </div>
+            ) : collegeUsers.length === 0 ? (
+              <div className="p-12 text-center text-neutral-400">
+                <Building2 size={36} className="mx-auto mb-2 text-neutral-400" />
+                <p className="font-bold font-['Anek_Bangla',sans-serif]">আপনার প্রতিষ্ঠানের আর কোন শিক্ষার্থী পাওয়া যায়নি</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+                {collegeUsers.map((user) => {
+                  const isMe = user.id === currentUser?.id;
+
+                  return (
+                    <div
+                      key={user.id}
+                      onClick={() => onUserClick?.(user as any, user.rank)}
+                      className={`
+                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors cursor-pointer group
+                        ${
+                          isMe
+                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
+                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`
+                            w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0
+                            ${
+                              user.rank === 1
+                                ? "bg-amber-400 text-amber-950"
+                                : user.rank === 2
+                                ? "bg-slate-300 text-slate-800"
+                                : user.rank === 3
+                                ? "bg-amber-700 text-amber-100"
+                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
+                            }
+                          `}
+                        >
+                          {toBengaliNum(user.rank)}
+                        </div>
+                        <UserAvatar user={user as any} size="sm" className="w-10 h-10 shrink-0" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-[15px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                              {user.name}
+                            </h4>
+                            {isMe && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
+                                আপনি
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-neutral-400">{user.batch || "ব্যাচ নির্ধারিত নেই"}</p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-base font-extrabold text-[#059669] dark:text-[#10B981] font-['Anek_Bangla',sans-serif]">
+                          {toBengaliNum(user.xp)} XP
+                        </div>
+                        <div className="text-xs text-neutral-400">{user.level}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 4. ALL INSTITUTES NATIONAL RANKINGS ──────────────────────────── */}
+      {viewMode === "rankings" && (
+        <div className="flex flex-col gap-4">
+          {/* Search Box */}
+          <div className="relative">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              type="text"
+              value={searchCollegeQuery}
+              onChange={(e) => setSearchCollegeQuery(e.target.value)}
+              placeholder="শিক্ষা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন..."
+              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-['Anek_Bangla',sans-serif]"
+            />
+          </div>
+
+          {/* Rankings List */}
+          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden">
+            {isLoadingRankings ? (
+              <div className="p-6">
+                <LeaderboardSkeleton />
+              </div>
+            ) : filteredInstituteRankings.length === 0 ? (
+              <div className="p-12 text-center text-neutral-400">
+                <p className="font-bold font-['Anek_Bangla',sans-serif]">কোন শিক্ষা প্রতিষ্ঠান পাওয়া যায়নি</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+                {filteredInstituteRankings.map((inst, index) => {
+                  const rank = index + 1;
+
+                  return (
+                    <div
+                      key={inst.institute}
+                      className={`
+                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors
+                        ${
+                          inst.isMyCollege
+                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
+                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`
+                            w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0
+                            ${
+                              rank === 1
+                                ? "bg-amber-400 text-amber-950"
+                                : rank === 2
+                                ? "bg-slate-300 text-slate-800"
+                                : rank === 3
+                                ? "bg-amber-700 text-amber-100"
+                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
+                            }
+                          `}
+                        >
+                          {toBengaliNum(rank)}
+                        </div>
+
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-[15px] sm:text-[16px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                              {inst.institute}
+                            </h4>
+                            {inst.isMyCollege && (
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
+                                আপনার প্রতিষ্ঠান
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-neutral-400">
+                            শিক্ষার্থী: {toBengaliNum(inst.studentCount)} জন • সেরা র‍্যাংক: {toBengaliNum(inst.bestRank)}ম
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-base font-extrabold text-indigo-600 dark:text-indigo-400 font-['Anek_Bangla',sans-serif]">
+                          {toBengaliNum(inst.points)} পয়েন্ট
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
-// ─── College Filter (searchable combobox) ────────────────────────────────────
-interface CollegeFilterProps {
-  colleges: InstituteRankEntry[];
-  value: string;
-  onChange: (college: string) => void;
-  isLoading: boolean;
-}
-
-function CollegeFilter({ colleges, value, onChange, isLoading }: CollegeFilterProps) {
-  const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  const filtered = useMemo(() => {
-    if (query.length === 0) return colleges;
-
-    const rankingMatches = colleges.filter((c) =>
-      c.institute.toLowerCase().includes(query.toLowerCase())
-    );
-    const canonicalMatches = searchColleges(query);
-
-    const combined = [...rankingMatches];
-    const existingNames = new Set(rankingMatches.map((c) => c.institute));
-
-    for (const name of canonicalMatches) {
-      if (!existingNames.has(name)) {
-        existingNames.add(name);
-        const existingRank = colleges.find((c) => c.institute === name);
-        if (existingRank) {
-          combined.push(existingRank);
-        } else {
-          combined.push({ institute: name, studentCount: 0, points: 0, bestRank: 999999 });
-        }
-      }
-    }
-
-    return combined;
-  }, [query, colleges]);
-
-  // Close on outside click
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setQuery('');
-      }
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const selected = colleges.find((c) => c.institute === value);
-
-  return (
-    <div ref={containerRef} className="relative flex-shrink-0">
-      <button
-        onClick={() => { setOpen((o) => !o); setQuery(''); }}
-        className="flex items-center gap-1.5 text-sm font-semibold bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl px-3 py-2.5 hover:border-emerald-400 dark:hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all max-w-[148px]"
-      >
-        {isLoading ? (
-          <span className="text-neutral-400">লোড হচ্ছে…</span>
-        ) : (
-          <span className="truncate">{selected?.institute ?? 'কলেজ বেছে নাও'}</span>
-        )}
-        <svg className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-full mt-1 w-72 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl shadow-xl z-50 overflow-hidden">
-          {/* Search input */}
-          <div className="p-2 border-b border-neutral-100 dark:border-neutral-800">
-            <input
-              autoFocus
-              type="text"
-              placeholder="কলেজ খুঁজুন…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full text-sm px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/30 text-neutral-800 dark:text-neutral-200 placeholder-neutral-400"
-            />
-          </div>
-
-          {/* College list */}
-          <div className="max-h-60 overflow-y-auto divide-y divide-neutral-50 dark:divide-neutral-800">
-            {filtered.length === 0 ? (
-              <p className="text-xs text-neutral-400 text-center py-6">কোনো কলেজ পাওয়া যায়নি</p>
-            ) : (
-              filtered.map((c) => {
-                const isSelected = c.institute === value;
-                return (
-                  <button
-                    key={c.institute}
-                    onClick={() => { onChange(c.institute); setOpen(false); setQuery(''); }}
-                    className={`w-full text-left px-4 py-2.5 flex items-center justify-between gap-2 transition-colors ${
-                      isSelected
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
-                        : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
-                    }`}
-                  >
-                    <span className="text-sm font-semibold truncate">{c.institute}</span>
-                    <span className="text-xs text-neutral-400 flex-shrink-0">{c.studentCount} জন</span>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Pagination Controls (shared) ────────────────────────────────────────────
-interface PaginationProps {
-  page: number;
-  totalPages: number;
-  onPageChange: (p: number) => void;
-  showingFrom: number;
-  showingTo: number;
-  total: number;
-  unit?: string;
-}
-
-function Pagination({ page, totalPages, onPageChange, showingFrom, showingTo, total, unit = 'জন' }: PaginationProps) {
-  if (totalPages <= 1) return null;
-
-  const btnBase =
-    'flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-700 dark:hover:text-emerald-400 disabled:opacity-35 disabled:cursor-not-allowed transition-all';
-
-  return (
-    <div className="px-4 md:px-5 py-3.5 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 flex items-center justify-between gap-3 flex-wrap">
-      <p className="text-xs text-neutral-400 dark:text-neutral-500 font-medium">
-        দেখাচ্ছে{' '}
-        <span className="text-neutral-700 dark:text-neutral-300 font-bold">
-          {showingFrom}–{showingTo}
-        </span>{' '}
-        / {total} {unit}
-      </p>
-
-      <div className="flex items-center gap-1.5">
-        <button onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page === 1} className={btnBase}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-            <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
-          </svg>
-          আগে
-        </button>
-
-        <div className="flex items-center gap-1">
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const p = i + 1;
-            const isVisible = p === 1 || p === totalPages || Math.abs(p - page) <= 1;
-            const isEllipsisBefore = p === 2 && page > 3;
-            const isEllipsisAfter = p === totalPages - 1 && page < totalPages - 2;
-            if (!isVisible) return null;
-            if (isEllipsisBefore || isEllipsisAfter) {
-              return <span key={p} className="text-xs text-neutral-400 dark:text-neutral-600 px-1 select-none">···</span>;
-            }
-            return (
-              <button
-                key={p}
-                onClick={() => onPageChange(p)}
-                className={`min-w-[2rem] h-8 px-2 rounded-xl text-xs font-bold transition-all ${
-                  p === page
-                    ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-200 dark:shadow-emerald-900/40'
-                    : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-emerald-300 dark:hover:border-emerald-700 hover:text-emerald-700 dark:hover:text-emerald-400'
-                }`}
-              >
-                {p}
-              </button>
-            );
-          })}
-        </div>
-
-        <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page === totalPages} className={btnBase}>
-          পরে
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-            <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Institute Rankings View ─────────────────────────────────────────────────
-interface InstituteRankingsViewProps {
-  rankings: InstituteRankEntry[];
-  isLoading: boolean;
-  myInstitute?: string;
-}
-
-function InstituteRankingsView({ rankings, isLoading, myInstitute }: InstituteRankingsViewProps) {
-  const [page, setPage] = useState(1);
-
-  // page resets automatically via the `key` prop on the parent — no useEffect needed
-
-  const totalPages = Math.ceil(rankings.length / INSTITUTE_PAGE_SIZE);
-  const globalOffset = (page - 1) * INSTITUTE_PAGE_SIZE;
-  const pageRankings = rankings.slice(globalOffset, globalOffset + INSTITUTE_PAGE_SIZE);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3 mt-2">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (rankings.length === 0) {
-    return (
-      <div className="text-center py-20 text-neutral-400 dark:text-neutral-600">
-        <p className="text-4xl mb-3">🏆</p>
-        <p className="font-bold text-sm">এখনো যথেষ্ট ডেটা নেই</p>
-        <p className="text-xs mt-1">শিক্ষার্থীরা পরীক্ষায় অংশ নিলে র‍্যাংকিং প্রদর্শিত হবে</p>
-      </div>
-    );
-  }
-
-  const myInstituteIdx = myInstitute ? rankings.findIndex((r) => r.institute === myInstitute) : -1;
-  const myInstituteEntry = myInstituteIdx !== -1 ? rankings[myInstituteIdx] : null;
-  const myInstituteRank = myInstituteIdx !== -1 ? myInstituteIdx + 1 : 0;
-
-  return (
-    <div className="mt-2 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
-      {/* Header */}
-      <div className="px-4 md:px-5 py-3.5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/50 flex justify-between items-center flex-wrap gap-2">
-        <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200">কলেজ প্রতিযোগিতা</h3>
-        <span className="text-xs text-neutral-400 dark:text-neutral-500 font-medium bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded-full">
-          {BanglaNameHelper.toBanglaNumeral(rankings.length)} টি কলেজ
-        </span>
-      </div>
-
-      {/* Pinned Own College */}
-      {myInstituteEntry && (
-        <div className="p-3 bg-neutral-100/70 dark:bg-neutral-800/40 border-b border-neutral-200 dark:border-neutral-700/60">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-sm">
-            <div className="w-8 text-center flex-shrink-0">
-              <span className="text-sm font-black text-neutral-800 dark:text-neutral-200">
-                {BanglaNameHelper.toBanglaNumeral(myInstituteRank)}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-neutral-900 dark:text-neutral-100">
-                {myInstituteEntry.institute}
-                <span className="ml-1.5 text-[10px] font-black text-neutral-600 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded-full">
-                  তোমার কলেজ
-                </span>
-              </p>
-            </div>
-            <div className="text-right flex-shrink-0 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800">
-              <p className="text-xs font-black text-neutral-800 dark:text-neutral-200">
-                {(myInstituteEntry.points ?? 0).toLocaleString()} pts
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* List */}
-      <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-        {pageRankings.map((entry, localIdx) => {
-          const rank = globalOffset + localIdx + 1;
-          const isMe = myInstitute && entry.institute === myInstitute;
-          const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
-
-          return (
-            <div
-              key={entry.institute}
-              className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${
-                isMe ? 'bg-neutral-50 dark:bg-neutral-800/50' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'
-              }`}
-            >
-              <div className="w-8 text-center flex-shrink-0">
-                {medal ? (
-                  <span className="text-xl">{medal}</span>
-                ) : (
-                  <span className="text-sm font-black text-neutral-400 dark:text-neutral-600">
-                    {BanglaNameHelper.toBanglaNumeral(rank)}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold truncate text-neutral-800 dark:text-neutral-200">
-                  {entry.institute}
-                  {isMe && (
-                    <span className="ml-1.5 text-[10px] font-black text-neutral-600 dark:text-neutral-300 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded-full">
-                      তোমার কলেজ
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <div className="text-right flex-shrink-0 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800">
-                <p className="text-xs font-black text-neutral-700 dark:text-neutral-300">
-                  {(entry.points ?? 0).toLocaleString()} pts
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        showingFrom={globalOffset + 1}
-        showingTo={Math.min(globalOffset + INSTITUTE_PAGE_SIZE, rankings.length)}
-        total={rankings.length}
-        unit="টি কলেজ"
-      />
-    </div>
-  );
-}
 
 export default LeaderboardView;

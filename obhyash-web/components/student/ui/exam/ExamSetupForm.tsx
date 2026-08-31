@@ -115,7 +115,14 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   useEffect(() => {
     const allowed = BanglaNameHelper.getAllowedExamTypesForProfile(currentUser);
     setExamTypes(new Set(allowed));
-  }, [currentUser]);
+  }, [
+    currentUser?.exam_target,
+    currentUser?.target,
+    (currentUser as any)?.examTarget,
+    (currentUser as any)?.dream_target,
+    currentUser?.stream,
+    currentUser?.level,
+  ]);
 
   // Fetch Subjects
   const fetchSubjects = useCallback(async () => {

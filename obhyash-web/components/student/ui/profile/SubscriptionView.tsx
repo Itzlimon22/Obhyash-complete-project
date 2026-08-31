@@ -7,7 +7,6 @@ import {
   UserProfile,
   PaymentSubmission,
 } from '@/lib/types';
-import PricingCard from './subscription/PricingCard';
 import ManualPaymentModal from './subscription/ManualPaymentModal';
 import { CouponModal } from './subscription/CouponModal';
 import { toast } from 'sonner';
@@ -22,178 +21,145 @@ import { calculateCouponDiscount, AppliedCoupon } from '@/lib/utils/coupon-syste
 import { cn } from '@/lib/utils';
 import {
   Zap,
+  BookOpen,
+  Trophy,
+  LineChart,
+  Bookmark,
+  Binary,
+  ShieldCheck,
   Headphones,
   Clock,
   Shield,
-  RefreshCcw,
-  CheckCircle2,
-  XCircle,
+  RefreshCw,
+  Crown,
   Check,
-  Tag,
-  Sparkles,
   X,
+  XCircle,
+  ArrowRight,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
-
-// ── Comparison table feature matrix ──────────────────────────────────────────
-const COMPARISON_FEATURES = [
-  {
-    label: 'অনুশীলন প্রশ্ন',
-    free: '৫০টি/দিন',
-    paid: 'সীমাহীন',
-  },
-  {
-    label: 'মডেল টেস্ট ও কাস্টম পরীক্ষা',
-    free: '৩টি/দিন',
-    paid: 'সীমাহীন',
-  },
-  {
-    label: 'লাইভ এক্সাম ও প্রতিযোগিতা',
-    free: 'সীমিত',
-    paid: 'সকল এক্সাম',
-  },
-  {
-    label: 'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক',
-    free: true,
-    paid: true,
-  },
-  {
-    label: 'প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান',
-    free: false,
-    paid: true,
-  },
-  {
-    label: 'বিষয়ভিত্তিক ও পারফরম্যান্স এনালাইসিস',
-    free: false,
-    paid: true,
-  },
-  { label: 'মেধা তালিকা ও লাইভ লিডারবোর্ড', free: true, paid: true },
-  { label: 'ডেইলি স্ট্রিক ও রিওয়ার্ড কোয়েস্ট', free: true, paid: true },
-  {
-    label: 'ভুল উত্তর ও বুকমার্ক কালেকশন',
-    free: false,
-    paid: true,
-  },
-  { label: 'প্রাইওরিটি হেল্প ও সাপোর্ট', free: false, paid: true },
-];
 
 const TRUST_BADGES = [
   {
-    Icon: Headphones,
+    icon: Headphones,
     label: '২৪/৭ সাপোর্ট',
-    color: 'text-red-500',
-    bg: 'bg-red-50 dark:bg-red-950/20',
+    iconColor: '#B91C1C',
+    bgColor: 'bg-red-50 dark:bg-[#1A0505]',
+    borderColor: 'border-red-200 dark:border-red-900/40',
   },
   {
-    Icon: Clock,
+    icon: Clock,
     label: 'তাৎক্ষণিক অ্যাক্সেস',
-    color: 'text-green-700',
-    bg: 'bg-green-50 dark:bg-green-950/20',
+    iconColor: '#16A34A',
+    bgColor: 'bg-emerald-50 dark:bg-[#051A0A]',
+    borderColor: 'border-emerald-200 dark:border-emerald-900/40',
   },
   {
-    Icon: Shield,
+    icon: ShieldCheck,
     label: 'নিরাপদ পেমেন্ট',
-    color: 'text-blue-600',
-    bg: 'bg-blue-50 dark:bg-blue-950/20',
+    iconColor: '#0F172A',
+    bgColor: 'bg-blue-50 dark:bg-[#050B1A]',
+    borderColor: 'border-blue-200 dark:border-blue-900/40',
   },
   {
-    Icon: RefreshCcw,
+    icon: RefreshCw,
     label: 'রিনিউ সহজ',
-    color: 'text-purple-600',
-    bg: 'bg-purple-50 dark:bg-purple-950/20',
+    iconColor: '#9333EA',
+    bgColor: 'bg-purple-50 dark:bg-[#10051A]',
+    borderColor: 'border-purple-200 dark:border-purple-900/40',
   },
 ];
 
-function ComparisonCell({
-  value,
-  isPaid,
-}: {
-  value: boolean | string;
-  isPaid?: boolean;
-}) {
-  if (typeof value === 'boolean') {
-    return value ? (
-      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto" />
-    ) : (
-      <XCircle className="w-4 h-4 text-neutral-300 dark:text-neutral-600 mx-auto" />
-    );
-  }
-  return (
-    <span
-      className={cn(
-        'text-xs font-bold',
-        isPaid
-          ? 'text-emerald-700 dark:text-emerald-400'
-          : 'text-neutral-700 dark:text-neutral-300',
-      )}
-    >
-      {value}
-    </span>
-  );
-}
+const COMPARISON_FEATURES = [
+  { label: 'দৈনিক পরীক্ষা কোটা', free: '২টি / দিন', pro: 'সীমাহীন' },
+  { label: 'দৈনিক প্র্যাকটিস সেশন', free: '১টি / দিন', pro: 'সীমাহীন' },
+  { label: 'প্রতি পরীক্ষায় প্রশ্ন সংখ্যা', free: 'সর্বোচ্চ ৫০', pro: '১০০+ পূর্ণাঙ্গ' },
+  { label: 'বুকমার্ক প্রশ্ন সংরক্ষণ', free: 'সর্বোচ্চ ২৫টি', pro: 'সীমাহীন' },
+  { label: 'প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান', free: false, pro: true },
+  { label: 'পারফরম্যান্স ও ফলাফল অ্যানালিটিক্স', free: false, pro: true },
+  { label: 'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড', free: false, pro: true },
+  { label: 'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক', free: false, pro: true },
+  { label: 'ডেইলি স্ট্রিক ও মিশন রিওয়ার্ড', free: false, pro: true },
+  { label: '১০০% বিজ্ঞাপনমুক্ত পরিবেশ', free: false, pro: true },
+];
 
-const SubscriptionView: React.FC = () => {
+export const SubscriptionView: React.FC = () => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<string>('free');
+  const [activeSubscription, setActiveSubscription] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
-    null,
-  );
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [fetchedPlans, fetchedMethods, user, activeSub] =
-          await Promise.all([
-            getSubscriptionPlans(),
-            getUserPaymentMethods(),
-            getUserProfile('me'),
-            getUserActiveSubscription(),
-          ]);
-        setPlans(fetchedPlans);
-        setPaymentMethods(fetchedMethods);
-        setCurrentUser(user);
-        if (activeSub) setCurrentPlanId(activeSub.id);
-      } catch (error) {
-        console.error('Failed to load upgrade data', error);
-      } finally {
-        setLoading(false);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [fetchedPlans, fetchedMethods, user, activeSub] = await Promise.all([
+        getSubscriptionPlans(),
+        getUserPaymentMethods(),
+        getUserProfile('me'),
+        getUserActiveSubscription(),
+      ]);
+
+      const premium = fetchedPlans.filter((p) => p.price > 0).sort((a, b) => a.price - b.price);
+      setPlans(premium);
+      setPaymentMethods(fetchedMethods);
+      setCurrentUser(user);
+      setActiveSubscription(activeSub);
+      if (activeSub) setCurrentPlanId(activeSub.id);
+
+      if (premium.length >= 2) {
+        setSelectedPlanIndex(1); // Default to middle/popular plan
+      } else {
+        setSelectedPlanIndex(0);
       }
-    };
-    fetchData();
+    } catch (error) {
+      console.error('Failed to load subscription data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   const handleApplyCoupon = (code: string): boolean => {
-    // Validate with reference 149 plan
-    const result = calculateCouponDiscount(code, 149);
+    const activePlan = plans[selectedPlanIndex] || plans[0];
+    const refPrice = activePlan?.price || 149;
+    const result = calculateCouponDiscount(code, refPrice);
     if (result.isValid && result.appliedCoupon) {
       setAppliedCoupon(result.appliedCoupon);
+      toast.success(`🎉 '${result.appliedCoupon.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!`);
       return true;
     }
+    toast.error(result.errorMessage || 'অকার্যকর কুপন কোড!');
     return false;
   };
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
+    toast.info('কুপন মুছে ফেলা হয়েছে');
   };
 
-  const handlePlanSelect = (plan: SubscriptionPlan) => {
-    if (plan.id === 'free' || plan.id === currentPlanId) return;
+  const selectedPlan = plans[selectedPlanIndex] || null;
 
-    // Apply coupon discount to selected plan if active
-    let effectivePlan = { ...plan };
-    if (appliedCoupon && plan.price > 0) {
-      const discount = calculateCouponDiscount(appliedCoupon.code, plan.price);
+  const handlePaymentInitiate = () => {
+    if (!selectedPlan) return;
+
+    let effectivePlan = { ...selectedPlan };
+    if (appliedCoupon && selectedPlan.price > 0) {
+      const discount = calculateCouponDiscount(appliedCoupon.code, selectedPlan.price);
       if (discount.appliedCoupon) {
         effectivePlan.price = discount.appliedCoupon.finalPrice;
       }
     }
 
-    setSelectedPlan(effectivePlan);
     setIsPaymentModalOpen(true);
   };
 
@@ -203,216 +169,350 @@ const SubscriptionView: React.FC = () => {
     trxId: string;
   }) => {
     if (!currentUser || !selectedPlan) {
-      toast.error('User or Plan details missing.');
+      toast.error('ব্যবহারকারী বা প্ল্যানের তথ্য পাওয়া যায়নি।');
       return;
     }
+
+    const effectivePrice = appliedCoupon
+      ? calculateCouponDiscount(appliedCoupon.code, selectedPlan.price).appliedCoupon?.finalPrice || selectedPlan.price
+      : selectedPlan.price;
+
     const submission: PaymentSubmission = {
       id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       userId: currentUser.id,
       userName: currentUser.name,
       planId: selectedPlan.id,
       planName: selectedPlan.name,
-      amount: selectedPlan.price,
+      amount: effectivePrice,
       paymentMethod: data.method,
       senderNumber: data.number,
       transactionId: data.trxId,
       status: 'pending',
       submittedAt: new Date().toISOString(),
     };
+
     try {
       const success = await submitManualPayment(submission);
       if (success) {
-        toast.success(
-          `পেমেন্ট জমা হয়েছে। যাচাই হলে ${selectedPlan.name} চালু হবে।`,
-        );
+        toast.success(`পেমেন্ট জমা হয়েছে। যাচাই হলে ${selectedPlan.name} চালু হবে।`);
         setIsPaymentModalOpen(false);
-        setSelectedPlan(null);
-      } else throw new Error('Submission failed');
+        loadData();
+      } else {
+        throw new Error('Submission failed');
+      }
     } catch {
-      toast.error(
-        'ত্রুটি হয়েছে। আবার চেষ্টা করো।',
-      );
+      toast.error('পেমেন্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।');
     }
   };
 
-  const premiumPlans = plans
-    .filter((p) => p.price > 0)
-    .sort((a, b) => a.price - b.price);
-
-  if (isPaymentModalOpen && selectedPlan) {
-    return (
-      <ManualPaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => {
-          setIsPaymentModalOpen(false);
-          setSelectedPlan(null);
-        }}
-        plan={selectedPlan}
-        savedMethods={paymentMethods}
-        onConfirm={handlePaymentConfirm}
-      />
-    );
-  }
+  const daysRemaining = activeSubscription?.expiresAt
+    ? Math.max(
+        0,
+        Math.ceil(
+          (new Date(activeSubscription.expiresAt).getTime() - Date.now()) /
+            (1000 * 60 * 60 * 24)
+        )
+      )
+    : 0;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 sm:space-y-10 pb-24 sm:pb-20 px-1 animate-fade-in pt-2">
-      {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
-      <section>
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-1">
+    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+      {/* ── 1. Active Subscription Banner (1:1 with Flutter) ── */}
+      {activeSubscription && (
+        <div className="mb-6 p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-neutral-800 shadow-xs flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+            <Crown className="w-6 h-6" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-extrabold text-neutral-900 dark:text-white truncate leading-tight">
+              {activeSubscription.name}
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+              মেয়াদ: {daysRemaining} দিন বাকি
+              {activeSubscription.expiresAt && ` (${activeSubscription.expiresAt})`}
+            </p>
+          </div>
+
+          <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-[#004633] dark:text-[#34D399] text-xs font-bold border border-emerald-200 dark:border-emerald-900/50 shrink-0">
+            সক্রিয়
+          </span>
+        </div>
+      )}
+
+      {/* ── 2. Master Pricing & Plan Card (1:1 with Flutter) ── */}
+      <div className="bg-white dark:bg-[#141417] rounded-[28px] p-5 sm:p-7 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-6">
+        {/* Header */}
+        <div className="text-center mb-5">
+          <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white">
             তোমার প্ল্যান বেছে নাও
           </h2>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            যেকোনো সময় বাতিল করা যাবে
+          <p className="text-xs sm:text-sm text-[#64748B] dark:text-[#A1A1AA] mt-1">
+            সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে
           </p>
         </div>
 
+        {/* Plan Selectors */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="space-y-3">
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="h-96 bg-white dark:bg-neutral-900 rounded-3xl animate-pulse border border-neutral-100 dark:border-neutral-800"
+                className="h-20 rounded-2xl bg-neutral-100 dark:bg-neutral-800 animate-pulse"
               />
             ))}
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
-              {premiumPlans.map((plan) => (
-                <PricingCard
-                  key={plan.id}
-                  plan={plan}
-                  isCurrent={currentPlanId === plan.id}
-                  onSelect={() => handlePlanSelect(plan)}
-                  appliedCoupon={appliedCoupon}
-                  onOpenCouponModal={() => setIsCouponModalOpen(true)}
-                  onRemoveCoupon={handleRemoveCoupon}
-                />
-              ))}
-            </div>
+          <div className="space-y-3.5 mb-4">
+            {plans.map((plan, index) => {
+              const isSelected = selectedPlanIndex === index;
+              const durationDays = plan.duration_days ?? (plan as any).durationDays ?? 30;
+              const isMasterPro = durationDays >= 180;
+              const effectivePrice = appliedCoupon
+                ? calculateCouponDiscount(appliedCoupon.code, plan.price).appliedCoupon?.finalPrice || plan.price
+                : plan.price;
+              const hasDiscount = effectivePrice !== plan.price;
 
-            {/* Global Coupon Bar Below Packages */}
-            <div className="max-w-4xl mx-auto flex items-center justify-center">
-              {appliedCoupon ? (
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl shadow-sm text-xs text-emerald-800 dark:text-emerald-300">
-                  <Sparkles size={14} className="text-amber-500 shrink-0" />
-                  <span>
-                    কুপন <strong>{appliedCoupon.code}</strong> কার্যকর রয়েছে (৳{appliedCoupon.discountAmount} ছাড়)
-                  </span>
-                  <button
-                    onClick={handleRemoveCoupon}
-                    className="ml-2 text-xs font-bold text-red-600 hover:text-red-700 underline"
-                  >
-                    মুছে ফেলুন
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsCouponModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-neutral-600 dark:text-neutral-400 hover:text-emerald-700 dark:hover:text-emerald-400 font-semibold transition-all group underline underline-offset-4"
+              const activeBorder = isSelected
+                ? isMasterPro
+                  ? 'border-[#D97706] dark:border-[#F59E0B] bg-[#FFFBEB] dark:bg-[#271A0A]'
+                  : 'border-[#059669] dark:border-[#10B981] bg-[#F0FDF4] dark:bg-[#062319]'
+                : 'border-[#E2E8F0] dark:border-[#27272A] bg-[#F8FAFC] dark:bg-[#1C1C20]';
+
+              const accentColor = isMasterPro ? '#D97706' : '#059669';
+
+              return (
+                <div
+                  key={plan.id}
+                  onClick={() => setSelectedPlanIndex(index)}
+                  className={`p-4 sm:p-5 rounded-[20px] border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-xs ${activeBorder}`}
                 >
-                  <Tag size={13} className="text-emerald-500" />
-                  <span>কুপন আছে?</span>
-                </button>
-              )}
-            </div>
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    {/* Radio circle */}
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected
+                          ? `border-[${accentColor}] bg-[${accentColor}] text-white`
+                          : 'border-neutral-400 dark:border-neutral-600 bg-transparent'
+                      }`}
+                      style={{
+                        borderColor: isSelected ? accentColor : undefined,
+                        backgroundColor: isSelected ? accentColor : undefined,
+                      }}
+                    >
+                      {isSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                    </div>
+
+                    <div className="min-w-0">
+                      <h4 className="text-base font-black text-[#0F172A] dark:text-white truncate">
+                        {plan.name}
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* Price info */}
+                  <div className="text-right shrink-0">
+                    {hasDiscount && (
+                      <span className="text-xs text-neutral-400 dark:text-neutral-500 line-through mr-1 font-mono">
+                        ৳{plan.price}
+                      </span>
+                    )}
+                    <span className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white font-mono">
+                      ৳{effectivePrice}
+                    </span>
+                    <span className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400">
+                      /{durationDays} দিন
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
-      </section>
 
-      {/* ── COMPARISON TABLE ─────────────────────────────────────────────── */}
-      <section>
-        <div className="text-center mb-6">
-          <h2 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
-            ফ্রি বনাম প্রিমিয়াম
-          </h2>
+        {/* ── Coupon prompt text link (1:1 with Flutter) ── */}
+        <div className="text-center mb-5">
+          <button
+            type="button"
+            onClick={() => {
+              if (appliedCoupon) {
+                handleRemoveCoupon();
+              } else {
+                setIsCouponModalOpen(true);
+              }
+            }}
+            className={`text-xs sm:text-sm font-semibold underline underline-offset-4 cursor-pointer transition-colors ${
+              appliedCoupon
+                ? 'text-red-500 hover:text-red-600'
+                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+            }`}
+          >
+            {appliedCoupon ? 'কুপন রিমুভ করুন' : 'কুপন আছে?'}
+          </button>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
-          {/* Table header */}
-          <div className="grid grid-cols-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700">
-            <div className="p-4 text-sm font-bold text-neutral-500 dark:text-neutral-400">
-              ফিচার
-            </div>
-            <div className="p-4 text-center">
-              <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400">
-                ফ্রি
+        {/* ── Primary CTA Button (1:1 with Flutter) ── */}
+        {selectedPlan && (
+          <div>
+            <button
+              type="button"
+              onClick={handlePaymentInitiate}
+              className="w-full py-4 px-6 rounded-[18px] bg-[#004633] hover:bg-[#003828] text-white font-extrabold text-base flex items-center justify-center gap-3 transition-all shadow-md shadow-[#004633]/25 active:scale-[0.99] cursor-pointer"
+            >
+              <span>পেমেন্ট করতে এগিয়ে যান</span>
+              <div className="px-2.5 py-0.5 rounded-lg bg-white/20 text-white font-mono text-sm font-bold flex items-center gap-1.5">
+                {appliedCoupon && (
+                  <span className="line-through text-white/60 text-xs">
+                    ৳{selectedPlan.price}
+                  </span>
+                )}
+                <span>
+                  ৳
+                  {appliedCoupon
+                    ? calculateCouponDiscount(appliedCoupon.code, selectedPlan.price).appliedCoupon?.finalPrice || selectedPlan.price
+                    : selectedPlan.price}
+                </span>
+              </div>
+              <ArrowRight className="w-4.5 h-4.5" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── 3. Unified What's Included Features Showcase (1:1 with Flutter) ── */}
+      <div className="bg-white dark:bg-[#18181B] rounded-[22px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-6">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="p-1.5 rounded-lg bg-[#004633]/10 dark:bg-[#004633]/25 text-[#004633] dark:text-[#34D399]">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
+            প্রিমিয়াম প্ল্যানে যা যা থাকছে
+          </h3>
+        </div>
+
+        <div className="space-y-3.5">
+          {[
+            { icon: Zap, title: 'সীমাহীন কাস্টম ও পূর্ণাঙ্গ মডেল টেস্ট' },
+            { icon: BookOpen, title: 'প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান' },
+            { icon: Trophy, title: 'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড র‍্যাংকিং' },
+            { icon: LineChart, title: 'স্মার্ট পারফরম্যান্স অ্যানালিটিক্স ও রিপোর্ট' },
+            { icon: Bookmark, title: 'বুকমার্ক প্রশ্ন ও ফ্ল্যাশকার্ড রিভিশন মোড' },
+            { icon: Binary, title: 'সকল বিষয়ের ফর্মুলা ব্যাংক ও চিটশিট' },
+            { icon: ShieldCheck, title: '১০০% বিজ্ঞাপনমুক্ত নিরবচ্ছিন্ন প্র্যাকটিস' },
+          ].map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-[#004633]/10 dark:bg-[#004633]/20 border border-[#004633]/20 dark:border-[#004633]/40 flex items-center justify-center text-[#004633] dark:text-[#34D399] shrink-0">
+                  <Icon className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-sm font-bold text-[#0F172A] dark:text-white">
+                  {item.title}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 4. Trust Badges Grid (1:1 with Flutter) ── */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-6">
+        {TRUST_BADGES.map((b, i) => {
+          const Icon = b.icon;
+          return (
+            <div
+              key={i}
+              className={`p-3.5 rounded-[16px] border flex items-center gap-2.5 ${b.bgColor} ${b.borderColor}`}
+            >
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${b.iconColor}15`, color: b.iconColor }}
+              >
+                <Icon className="w-4 h-4" />
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
+                {b.label}
               </span>
             </div>
-            <div className="p-4 text-center bg-green-800/5 dark:bg-green-900/20">
-              <span className="text-sm font-bold text-green-800 dark:text-green-400">
-                প্রিমিয়াম
-              </span>
+          );
+        })}
+      </div>
+
+      {/* ── 5. Comparison Table (1:1 with Flutter) ── */}
+      <div className="mb-6">
+        <h3 className="text-center text-lg sm:text-xl font-black text-[#0F172A] dark:text-white mb-4">
+          ফ্রি বনাম প্রিমিয়াম
+        </h3>
+
+        <div className="bg-white dark:bg-[#141416] rounded-[20px] border border-[#E2E8F0] dark:border-[#27272A] overflow-hidden shadow-xs">
+          {/* Table Header */}
+          <div className="grid grid-cols-12 p-4 bg-[#F8FAFC] dark:bg-[#1E1E22] border-b border-[#E2E8F0] dark:border-[#27272A] text-xs font-bold text-neutral-600 dark:text-neutral-300">
+            <div className="col-span-6">ফিচারসমূহ</div>
+            <div className="col-span-3 text-center">ফ্রি</div>
+            <div className="col-span-3 text-center text-[#004633] dark:text-[#34D399]">
+              প্রিমিয়াম
             </div>
           </div>
 
           {/* Rows */}
-          {COMPARISON_FEATURES.map((row, i) => (
-            <div
-              key={i}
-              className={cn(
-                'grid grid-cols-3 border-b border-neutral-100 dark:border-neutral-800 last:border-0',
-                i % 2 === 0 ? '' : 'bg-neutral-50/50 dark:bg-neutral-800/20',
-              )}
-            >
-              <div className="p-3 sm:p-4 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium flex items-center">
-                {row.label}
-              </div>
-              <div className="p-3 sm:p-4 flex items-center justify-center text-neutral-500 dark:text-neutral-500">
-                <ComparisonCell value={row.free} />
-              </div>
-              <div className="p-3 sm:p-4 flex items-center justify-center bg-green-800/5 dark:bg-green-900/10 text-green-800 dark:text-green-400">
-                <ComparisonCell value={row.paid} isPaid={true} />
-              </div>
-            </div>
-          ))}
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            {COMPARISON_FEATURES.map((row, i) => (
+              <div key={i} className="grid grid-cols-12 p-3.5 items-center text-xs">
+                <div className="col-span-6 font-semibold text-neutral-800 dark:text-neutral-200">
+                  {row.label}
+                </div>
 
-          {/* CTA footer */}
-          <div className="p-4 sm:p-6 grid grid-cols-3">
-            <div />
-            <div />
-            <div className="flex justify-center">
-              <button
-                onClick={() =>
-                  premiumPlans[0] && handlePlanSelect(premiumPlans[0])
-                }
-                disabled={loading || premiumPlans.length === 0}
-                className="px-5 py-2.5 rounded-xl bg-green-800 text-white text-xs sm:text-sm font-bold hover:bg-green-900 transition-colors disabled:opacity-50 flex items-center gap-1.5"
-              >
-                <CheckCircle2 size={14} />
-                এখনই শুরু করো
-              </button>
-            </div>
+                <div className="col-span-3 text-center font-bold text-neutral-500 dark:text-neutral-400">
+                  {typeof row.free === 'boolean' ? (
+                    row.free ? (
+                      <Check className="w-4 h-4 text-emerald-600 mx-auto" />
+                    ) : (
+                      <X className="w-4 h-4 text-neutral-400 mx-auto" />
+                    )
+                  ) : (
+                    <span>{row.free}</span>
+                  )}
+                </div>
+
+                <div className="col-span-3 text-center font-bold text-[#004633] dark:text-[#34D399]">
+                  {typeof row.pro === 'boolean' ? (
+                    <Check className="w-4 h-4 text-emerald-600 mx-auto" />
+                  ) : (
+                    <span>{row.pro}</span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
-
-      {/* ── TRUST BADGES ─────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {TRUST_BADGES.map(({ Icon, label, color, bg }, idx) => (
-          <div
-            key={idx}
-            className={cn(
-              'flex flex-col items-center text-center gap-2 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800',
-              bg,
-            )}
-          >
-            <Icon className={cn('w-5 h-5', color)} strokeWidth={1.5} />
-            <span className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
-              {label}
-            </span>
-          </div>
-        ))}
       </div>
 
-      {/* ── COUPON MODAL POPUP ────────────────────────────────────────────── */}
+      {/* Manual Payment / Checkout Modal */}
+      {isPaymentModalOpen && selectedPlan && (
+        <ManualPaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          plan={
+            appliedCoupon
+              ? {
+                  ...selectedPlan,
+                  price:
+                    calculateCouponDiscount(appliedCoupon.code, selectedPlan.price)
+                      .appliedCoupon?.finalPrice || selectedPlan.price,
+                }
+              : selectedPlan
+          }
+          savedMethods={paymentMethods}
+          onConfirm={handlePaymentConfirm}
+        />
+      )}
+
+      {/* Coupon Modal */}
       <CouponModal
         isOpen={isCouponModalOpen}
         onClose={() => setIsCouponModalOpen(false)}
-        appliedCoupon={appliedCoupon}
         onApplyCoupon={handleApplyCoupon}
+        appliedCoupon={appliedCoupon}
         onRemoveCoupon={handleRemoveCoupon}
       />
     </div>

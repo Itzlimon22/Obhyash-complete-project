@@ -2,6 +2,7 @@ export type SubjectCategoryType = 'compulsory' | 'core' | 'elective';
 
 export interface UserProfileTarget {
   examTarget?: string;
+  exam_target?: string;
   target?: string;
   level?: string;
   division?: string;
@@ -405,17 +406,48 @@ export class BanglaNameHelper {
    * Filters allowed exam types based on the user's exam target/profile.
    */
   static getAllowedExamTypesForProfile(profile?: UserProfileTarget | null): string[] {
-    const rawTarget = (profile?.examTarget ?? profile?.target ?? '').toLowerCase().trim();
-    if (rawTarget.includes('mbbs') || rawTarget.includes('medical') || rawTarget.includes('মেডিকেল')) {
+    const rawTarget = (
+      profile?.exam_target ??
+      profile?.examTarget ??
+      profile?.target ??
+      (profile as any)?.dream_target ??
+      (profile as any)?.target_institution ??
+      (profile as any)?.stream ??
+      profile?.level ??
+      ''
+    ).toLowerCase().trim();
+
+    if (
+      rawTarget.includes('mbbs') ||
+      rawTarget.includes('medical') ||
+      rawTarget.includes('মেডিকেল') ||
+      rawTarget.includes('mat') ||
+      rawTarget.includes('dermatology')
+    ) {
       return ['Medical', 'Varsity', 'Board', 'Academic'];
     } else if (
       rawTarget.includes('eng') ||
       rawTarget.includes('buet') ||
       rawTarget.includes('engineering') ||
+      rawTarget.includes('ckruet') ||
+      rawTarget.includes('kuet') ||
+      rawTarget.includes('ruet') ||
+      rawTarget.includes('cuet') ||
+      rawTarget.includes('butex') ||
+      rawTarget.includes('mist') ||
       rawTarget.includes('ইঞ্জিনিয়ারিং')
     ) {
       return ['Engineering', 'Varsity', 'Board', 'Academic'];
-    } else if (rawTarget.includes('varsity') || rawTarget.includes('ভার্সিটি')) {
+    } else if (
+      rawTarget.includes('varsity') ||
+      rawTarget.includes('ভার্সিটি') ||
+      rawTarget.includes('gst') ||
+      rawTarget.includes('du') ||
+      rawTarget.includes('ju') ||
+      rawTarget.includes('ru') ||
+      rawTarget.includes('cu') ||
+      rawTarget.includes('bup')
+    ) {
       return ['Varsity', 'Board', 'Academic'];
     } else {
       return ['Academic', 'Board'];

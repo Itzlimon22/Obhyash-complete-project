@@ -1,183 +1,288 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Loader2,
-  CheckCircle2,
+  Send,
+  ClipboardList,
   Zap,
   Smile,
   Bug,
   AlertCircle,
-  ShieldCheck,
-  Send,
-  LifeBuoy,
   Clock,
-  RefreshCw,
+  RefreshCcw,
+  CheckCheck,
   XCircle,
   AlertTriangle,
-  History,
+  ShieldAlert,
   Inbox,
-} from "lucide-react";
-import { toast } from "sonner";
-import { submitComplaint, getUserComplaints } from "@/services/complaint-service";
-import { ComplaintType, AppComplaint, ComplaintStatus } from "@/lib/types";
-import { BanglaNameHelper } from "@/lib/bangla-name-helper";
-import { cn } from "@/lib/utils";
+  CheckCircle2,
+  Check,
+  Lock,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  submitComplaint,
+  getUserComplaints,
+} from '@/services/complaint-service';
+import { ComplaintType, AppComplaint, ComplaintStatus } from '@/lib/types';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 
-interface IssueCategory {
+interface ComplaintTypeConfig {
   id: ComplaintType;
-  title: string;
-  subtitle: string;
+  label: string;
+  subLabel: string;
   icon: React.ElementType;
-  colorClass: string;
-  iconColor: string;
+  bgLight: string;
+  bgDark: string;
+  iconColorLight: string;
+  iconColorDark: string;
+  description: string;
 }
 
-const ISSUE_CATEGORIES: IssueCategory[] = [
+const COMPLAINT_TYPES: ComplaintTypeConfig[] = [
   {
-    id: "Technical",
-    title: "কারিগরি সমস্যা",
-    subtitle: "অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর",
+    id: 'Technical',
+    label: 'কারিগরি সমস্যা',
+    subLabel: 'Technical Issue',
     icon: Zap,
-    colorClass: "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40",
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    bgLight: 'bg-[#ECFDF5]',
+    bgDark: 'dark:bg-[#059669]/20',
+    iconColorLight: 'text-[#059669]',
+    iconColorDark: 'dark:text-[#34D399]',
+    description: 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
   },
   {
-    id: "UX",
-    title: "ডিজাইন ও অভিজ্ঞতা",
-    subtitle: "ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ",
+    id: 'UX',
+    label: 'ডিজাইন ও অভিজ্ঞতা',
+    subLabel: 'UX / Design',
     icon: Smile,
-    colorClass: "bg-blue-50/60 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/40",
-    iconColor: "text-blue-600 dark:text-blue-400",
+    bgLight: 'bg-[#EFF6FF]',
+    bgDark: 'dark:bg-[#2563EB]/20',
+    iconColorLight: 'text-[#2563EB]',
+    iconColorDark: 'dark:text-[#60A5FA]',
+    description: 'ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ',
   },
   {
-    id: "Bug",
-    title: "বাগ রিপোর্ট",
-    subtitle: "কোনো ফিচার ঠিকমতো কাজ করছে না",
+    id: 'Bug',
+    label: 'বাগ রিপোর্ট',
+    subLabel: 'Bug Report',
     icon: Bug,
-    colorClass: "bg-rose-50/60 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40",
-    iconColor: "text-rose-600 dark:text-rose-400",
+    bgLight: 'bg-[#FEF2F2]',
+    bgDark: 'dark:bg-[#DC2626]/20',
+    iconColorLight: 'text-[#DC2626]',
+    iconColorDark: 'dark:text-[#F87171]',
+    description: 'কোনো ফিচার ঠিকমতো কাজ করছে না',
   },
   {
-    id: "Other",
-    title: "নতুন ফিচার প্রস্তাব",
-    subtitle: "নতুন কোনো সুবিধা বা ফিচার যোগ করার আইডিয়া",
+    id: 'Other',
+    label: 'নতুন ফিচার প্রস্তাব',
+    subLabel: 'Feature Request',
     icon: AlertCircle,
-    colorClass: "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40",
-    iconColor: "text-amber-600 dark:text-amber-400",
+    bgLight: 'bg-[#FFFBEB]',
+    bgDark: 'dark:bg-[#D97706]/20',
+    iconColorLight: 'text-[#D97706]',
+    iconColorDark: 'dark:text-[#FBBF24]',
+    description: 'নতুন কোনো সুবিধা বা ফিচার যোগ করার আইডিয়া',
   },
 ];
 
 const STATUS_CONFIG: Record<
   ComplaintStatus,
-  { label: string; color: string; icon: React.ElementType }
+  {
+    label: string;
+    icon: React.ElementType;
+    bgLight: string;
+    bgDark: string;
+    textColor: string;
+  }
 > = {
   Pending: {
-    label: "অপেক্ষমাণ",
-    color: "text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50",
+    label: 'অপেক্ষমাণ',
     icon: Clock,
+    bgLight: 'bg-[#FEF3C7]',
+    bgDark: 'dark:bg-[#78350F]/30',
+    textColor: 'text-[#D97706]',
   },
-  "In Progress": {
-    label: "প্রক্রিয়াধীন",
-    color: "text-blue-700 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50",
-    icon: RefreshCw,
+  'In Progress': {
+    label: 'প্রক্রিয়াধীন',
+    icon: RefreshCcw,
+    bgLight: 'bg-[#DBEAFE]',
+    bgDark: 'dark:bg-[#1E3A8A]/30',
+    textColor: 'text-[#2563EB]',
   },
   Resolved: {
-    label: "সমাধান হয়েছে",
-    color: "text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50",
-    icon: CheckCircle2,
+    label: 'সমাধান হয়েছে',
+    icon: CheckCheck,
+    bgLight: 'bg-[#ECFDF5]',
+    bgDark: 'dark:bg-[#064E3B]/30',
+    textColor: 'text-[#059669]',
   },
   Dismissed: {
-    label: "বাতিল",
-    color: "text-neutral-600 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700",
+    label: 'বাতিল',
     icon: XCircle,
+    bgLight: 'bg-[#F4F4F5]',
+    bgDark: 'dark:bg-[#27272A]',
+    textColor: 'text-[#71717A]',
   },
 };
 
 export const ComplaintView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"new" | "my_tickets">("new");
-  const [selectedType, setSelectedType] = useState<ComplaintType>("Technical");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [description, setDescription] = useState("");
+  const [activeTab, setActiveTab] = useState<'new' | 'my'>('new');
+  const [selectedType, setSelectedType] = useState<ComplaintType | null>(null);
+  const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // My Complaints State
   const [myComplaints, setMyComplaints] = useState<AppComplaint[]>([]);
   const [isLoadingComplaints, setIsLoadingComplaints] = useState(false);
 
-  const pendingCount = myComplaints.filter(
-    (c) => c.status === "Pending" || c.status === "In Progress"
-  ).length;
-  const isPendingLimitReached = pendingCount >= 3;
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize Cooldown
+  const initCooldown = useCallback(() => {
+    try {
+      const lastSubmit = parseInt(
+        localStorage.getItem('last_complaint_submit_time') || '0',
+        10
+      );
+      const elapsedMs = Date.now() - lastSubmit;
+      if (elapsedMs < 180000) {
+        startCooldownTimer(Math.floor((180000 - elapsedMs) / 1000));
+      }
+    } catch (_) {}
+  }, []);
+
+  const startCooldownTimer = (seconds: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setCooldownSeconds(seconds);
+    timerRef.current = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   useEffect(() => {
-    if (activeTab !== "my_tickets") return;
-
-    let isMounted = true;
-    const fetchMyComplaints = async () => {
-      if (isMounted) setIsLoadingComplaints(true);
-      const data = await getUserComplaints();
-      if (isMounted) {
-        setMyComplaints(data);
-        setIsLoadingComplaints(false);
-      }
-    };
-
-    void fetchMyComplaints();
+    initCooldown();
     return () => {
-      isMounted = false;
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [activeTab]);
+  }, [initCooldown]);
+
+  const fetchMyComplaints = useCallback(async () => {
+    setIsLoadingComplaints(true);
+    try {
+      const data = await getUserComplaints();
+      setMyComplaints(data);
+    } catch (err) {
+      console.error('[ComplaintView] Error fetching complaints:', err);
+    } finally {
+      setIsLoadingComplaints(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMyComplaints();
+  }, [fetchMyComplaints]);
+
+  // Limits
+  const pendingCount = myComplaints.filter(
+    (c) => c.status === 'Pending' || c.status === 'In Progress'
+  ).length;
+  const dailyCount = myComplaints.filter(
+    (c) =>
+      Date.now() - new Date(c.created_at).getTime() < 24 * 60 * 60 * 1000
+  ).length;
+
+  const isPendingLimitReached = pendingCount >= 3;
+  const isDailyLimitReached = dailyCount >= 5;
+  const isBlocked =
+    isPendingLimitReached || isDailyLimitReached || cooldownSeconds > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isPendingLimitReached) {
-      toast.error(
-        "আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।"
+      toast.warning(
+        'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।'
       );
       return;
     }
 
-    const trimmed = description.trim();
-    if (trimmed.length < 15) {
-      toast.error("সমস্যাটি একটু বিস্তারিত লিখে জানাও (কমপক্ষে ১৫ অক্ষর আবশ্যক)");
-      return;
-    }
-    if (trimmed.length > 1000) {
-      toast.error("মতামতের বিবরণ সর্বোচ্চ ১০০০ অক্ষরের মধ্যে লিখুন");
+    if (isDailyLimitReached) {
+      toast.warning(
+        'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।'
+      );
       return;
     }
 
-    // Duplicate check in last 7 days
+    if (cooldownSeconds > 0) {
+      const min = Math.floor(cooldownSeconds / 60);
+      const sec = cooldownSeconds % 60;
+      toast.warning(
+        `পরবর্তী বার্তা পাঠানোর জন্য আর ${min} মিনিট ${sec} সেকেন্ড অপেক্ষা করুন।`
+      );
+      return;
+    }
+
+    if (!selectedType) {
+      toast.warning('অনুগ্রহ করে মতামতের ধরণ নির্বাচন করো');
+      return;
+    }
+
+    const desc = description.trim();
+    if (desc.length < 15) {
+      toast.warning(
+        'অনুগ্রহ করে বিস্তারিত মতামত লেখো (কমপক্ষে ১৫ অক্ষর আবশ্যক)'
+      );
+      return;
+    }
+    if (desc.length > 1000) {
+      toast.warning('মতামতের বিবরণ সর্বোচ্চ ১০০০ অক্ষরের মধ্যে লেখো');
+      return;
+    }
+
+    // Duplicate text check in last 7 days
     const isDuplicate = myComplaints.some(
       (c) =>
-        c.description.trim().toLowerCase() === trimmed.toLowerCase() &&
-        new Date().getTime() - new Date(c.created_at).getTime() <
-          7 * 24 * 60 * 60 * 1000
+        c.description.trim().toLowerCase() === desc.toLowerCase() &&
+        Date.now() - new Date(c.created_at).getTime() < 7 * 24 * 60 * 60 * 1000
     );
     if (isDuplicate) {
-      toast.error(
-        "আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন তথ্য থাকলে তা উল্লেখ করুন।"
+      toast.warning(
+        'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।'
       );
       return;
     }
 
     setIsLoading(true);
     try {
-      const result = await submitComplaint(selectedType, trimmed);
+      const result = await submitComplaint(selectedType, desc);
       if (result.success) {
+        try {
+          localStorage.setItem(
+            'last_complaint_submit_time',
+            Date.now().toString()
+          );
+          startCooldownTimer(180);
+        } catch (_) {}
+
         setIsSuccess(true);
-        toast.success("সাপোর্ট টিকেট সফলভাবে জমা নেওয়া হয়েছে!");
-        setDescription("");
-        setSelectedType("Technical");
+        fetchMyComplaints();
+        toast.success(
+          'তোমার বার্তা আমরা পেয়েছি! দ্রুতই ব্যবস্থা নেওয়া হবে। 🚀'
+        );
       } else {
-        toast.error(result.error || "টিকেট পাঠাতে সমস্যা হয়েছে");
+        toast.error(result.error || 'মতামত পাঠাতে সমস্যা হয়েছে');
       }
-    } catch (error: unknown) {
-      console.error("Error submitting complaint:", error);
-      toast.error("টিকেট পাঠাতে সমস্যা হয়েছে");
+    } catch (err: any) {
+      console.error('Error submitting complaint:', err);
+      toast.error('মতামত পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।');
     } finally {
       setIsLoading(false);
     }
@@ -185,349 +290,398 @@ export const ComplaintView: React.FC = () => {
 
   const handleReset = () => {
     setIsSuccess(false);
-    setSelectedType("Technical");
-    setDescription("");
+    setSelectedType(null);
+    setDescription('');
   };
 
-  const filteredComplaints =
-    filterStatus === "all"
-      ? myComplaints
-      : myComplaints.filter((c) => c.status === filterStatus);
+  const charCount = description.trim().length;
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 py-6 space-y-6 font-['HindSiliguri'] pb-24">
-      {/* ── Sticky Support Navigation ── */}
-      <div className="sticky top-0 z-20 bg-white/80 dark:bg-[#141417]/80 backdrop-blur-md py-2 -mx-4 px-4 flex justify-center">
-        <div className="bg-neutral-100 dark:bg-[#18181B] p-1 rounded-2xl flex items-center gap-1 border border-neutral-200 dark:border-[#27272A] shadow-sm">
-          <button
-            onClick={() => setActiveTab("new")}
-            className={cn(
-              "px-5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2",
-              activeTab === "new"
-                ? "bg-[#004633] text-white shadow-sm"
-                : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-            )}
-          >
-            <LifeBuoy className="w-4 h-4" />
-            <span>অভিযোগ বা সমস্যা</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("my_tickets")}
-            className={cn(
-              "px-5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2",
-              activeTab === "my_tickets"
-                ? "bg-[#004633] text-white shadow-sm"
-                : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-            )}
-          >
-            <History className="w-4 h-4" />
-            <span>আমার টিকেট</span>
-            {myComplaints.length > 0 && (
-              <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">
-                {BanglaNameHelper.toBanglaNumeral(myComplaints.length)}
-              </span>
-            )}
-          </button>
-        </div>
+    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif] pb-24">
+      {/* ── 1. Segmented Tab Switcher (1:1 with Flutter _buildTabButton) ── */}
+      <div className="p-1 rounded-[14px] bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] flex items-center mb-4">
+        {/* New Complaint Tab */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('new')}
+          className={`
+            flex-1 py-2.5 px-3 rounded-[10px] text-xs sm:text-[13.5px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer
+            ${
+              activeTab === 'new'
+                ? 'bg-white dark:bg-[#27272A] text-[#059669] dark:text-white shadow-xs font-black'
+                : 'text-[#A3A3A3] hover:text-neutral-700 dark:hover:text-neutral-200'
+            }
+          `}
+        >
+          <Send className="w-4 h-4 text-[#059669]" />
+          <span>নতুন অভিযোগ</span>
+        </button>
+
+        {/* My List Tab */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('my');
+            fetchMyComplaints();
+          }}
+          className={`
+            flex-1 py-2.5 px-3 rounded-[10px] text-xs sm:text-[13.5px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer
+            ${
+              activeTab === 'my'
+                ? 'bg-white dark:bg-[#27272A] text-[#059669] dark:text-white shadow-xs font-black'
+                : 'text-[#A3A3A3] hover:text-neutral-700 dark:hover:text-neutral-200'
+            }
+          `}
+        >
+          <ClipboardList className="w-4 h-4 text-[#059669]" />
+          <span>
+            {myComplaints.length === 0
+              ? 'আমার তালিকা'
+              : `আমার তালিকা (${BanglaNameHelper.toBanglaNumeral(myComplaints.length)})`}
+          </span>
+        </button>
       </div>
 
-      {activeTab === "new" ? (
-        isSuccess ? (
-          /* Success Screen */
-          <div className="bg-white dark:bg-[#18181B] rounded-3xl p-8 border border-neutral-200/90 dark:border-[#27272A] text-center space-y-6 shadow-sm">
-            <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/50 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-xl font-black text-neutral-900 dark:text-white">
-                টিকেট জমা নেওয়া হয়েছে!
-              </h2>
-              <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm max-w-md mx-auto font-medium">
-                তোমার বার্তাটি আমাদের সাপোর্ট টিমের কাছে পৌঁছেছে। দ্রুতই ব্যবস্থা গ্রহণ করা হবে এবং আপডেট জানানো হবে।
+      {/* ── 2. Success Screen (1:1 with Flutter _buildSuccessState) ── */}
+      {isSuccess ? (
+        <div className="bg-white dark:bg-[#18181B] rounded-[24px] p-7 sm:p-8 border border-[#E2E8F0] dark:border-[#27272A] text-center space-y-5 shadow-sm">
+          <div className="w-20 h-20 bg-[#ECFDF5] dark:bg-[#059669]/20 rounded-full flex items-center justify-center mx-auto text-[#059669]">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white">
+              বার্তা গৃহীত হয়েছে!
+            </h2>
+            <p className="text-xs sm:text-sm text-[#A3A3A3] max-w-md mx-auto leading-relaxed">
+              আমাদের টিম বিষয়টি গুরুত্ব সহকারে দেখছে। তোমার মতামতের জন্য ধন্যবাদ।
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex-1 py-3 px-5 rounded-[12px] border border-[#CBD5E1] dark:border-[#3F3F46] text-[#0F172A] dark:text-white font-bold text-sm hover:bg-neutral-50 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+            >
+              আরেকটি পাঠাও
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleReset();
+                setActiveTab('my');
+                fetchMyComplaints();
+              }}
+              className="flex-1 py-3 px-5 rounded-[12px] bg-[#059669] text-white font-bold text-sm hover:bg-[#047857] transition-all shadow-xs cursor-pointer"
+            >
+              তালিকা দেখো
+            </button>
+          </div>
+        </div>
+      ) : activeTab === 'new' ? (
+        /* ── 3. New Complaint Form Screen (1:1 with Flutter _buildNewComplaintForm) ── */
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Anti-Spam / Rate Limit Status Alerts */}
+          {isPendingLimitReached ? (
+            <div className="p-3.5 rounded-[12px] bg-[#FFFBEB] dark:bg-[#451A03]/40 border border-[#FDE68A] dark:border-[#D97706]/40 flex items-center gap-2.5">
+              <AlertTriangle className="w-4.5 h-4.5 text-[#D97706] shrink-0" />
+              <p className="text-xs font-semibold text-[#92400E] dark:text-[#FDE68A] leading-snug">
+                আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।
               </p>
             </div>
-            <div className="pt-2 flex justify-center gap-3">
-              <button
-                onClick={handleReset}
-                className="px-5 py-2.5 rounded-xl border border-neutral-200 dark:border-[#27272A] text-neutral-700 dark:text-neutral-300 font-black text-xs hover:bg-neutral-50 dark:hover:bg-[#27272A] transition-colors"
-              >
-                আরেকটি সমস্যা জানাও
-              </button>
-              <button
-                onClick={() => setActiveTab("my_tickets")}
-                className="px-5 py-2.5 rounded-xl bg-[#004633] text-white font-black text-xs hover:bg-[#003627] transition-all shadow-sm"
-              >
-                আমার টিকেটগুলো দেখো
-              </button>
+          ) : isDailyLimitReached ? (
+            <div className="p-3.5 rounded-[12px] bg-[#FFFBEB] dark:bg-[#451A03]/40 border border-[#FDE68A] dark:border-[#D97706]/40 flex items-center gap-2.5">
+              <ShieldAlert className="w-4.5 h-4.5 text-[#D97706] shrink-0" />
+              <p className="text-xs font-semibold text-[#92400E] dark:text-[#FDE68A] leading-snug">
+                আজকের জন্য আপনার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।
+              </p>
             </div>
-          </div>
-        ) : (
-          /* Form Screen */
-          <div className="space-y-6">
-            {/* Limit Banner */}
-            {isPendingLimitReached && (
-              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-xs font-bold text-amber-800 dark:text-amber-300">
-                  আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।
-                </p>
-              </div>
-            )}
+          ) : cooldownSeconds > 0 ? (
+            <div className="p-3.5 rounded-[12px] bg-[#EEF2FF] dark:bg-[#1E1B4B]/40 border border-[#C7D2FE] dark:border-[#6366F1]/40 flex items-center gap-2.5">
+              <Clock className="w-4.5 h-4.5 text-[#6366F1] shrink-0" />
+              <p className="text-xs font-semibold text-[#3730A3] dark:text-[#C7D2FE] leading-snug">
+                স্প্যামিং প্রতিরোধে পরবর্তী বার্তা পাঠাতে আর{' '}
+                {Math.floor(cooldownSeconds / 60)}:
+                {(cooldownSeconds % 60).toString().padStart(2, '0')} মিনিট অপেক্ষা
+                করুন।
+              </p>
+            </div>
+          ) : null}
 
-            {/* Support Desk Banner */}
-            <div className="bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-2xl p-4 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-[#004633] flex items-center justify-center text-white shrink-0 shadow-sm">
-                <ShieldCheck className="w-5 h-5 text-yellow-300" />
+          {/* Step 1: Category Selection */}
+          <div>
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-black text-xs flex items-center justify-center shrink-0">
+                ১
               </div>
-              <div>
-                <h3 className="font-black text-emerald-900 dark:text-emerald-300 text-sm">
-                  অভ্যাস সাপোর্ট টিম সর্বদা পাশে আছে
-                </h3>
-                <p className="text-emerald-700 dark:text-emerald-400/90 text-xs mt-0.5 font-medium">
-                  যেকোনো সমস্যা জানালে দ্রুত সমাধান প্রদান করা হবে।
-                </p>
-              </div>
+              <h3 className="text-base font-bold text-[#111827] dark:text-white">
+                সমস্যার ধরন বেছে নাও
+              </h3>
             </div>
 
-            {/* Issue Category Tiles */}
-            <div className="space-y-3">
-              <h2 className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white uppercase tracking-wider">
-                সমস্যার ধরন নির্বাচন করো
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                {ISSUE_CATEGORIES.map((cat) => {
-                  const isSelected = selectedType === cat.id;
-                  const Icon = cat.icon;
-                  return (
-                    <button
-                      type="button"
-                      disabled={isPendingLimitReached}
-                      key={cat.id}
-                      onClick={() => setSelectedType(cat.id)}
-                      className={cn(
-                        "flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all",
+            <div className="space-y-2">
+              {COMPLAINT_TYPES.map((cat) => {
+                const isSelected = selectedType === cat.id;
+                const Icon = cat.icon;
+
+                return (
+                  <div
+                    key={cat.id}
+                    onClick={() => !isBlocked && setSelectedType(cat.id)}
+                    className={`
+                      relative rounded-[14px] border transition-all cursor-pointer overflow-hidden flex items-center
+                      ${
                         isSelected
-                          ? "bg-emerald-50/70 dark:bg-emerald-950/30 border-[#004633] dark:border-emerald-500 shadow-sm ring-1 ring-[#004633]/20"
-                          : "bg-white dark:bg-[#18181B] border-neutral-200/90 dark:border-[#27272A] hover:border-neutral-300",
-                        isPendingLimitReached && "opacity-60 cursor-not-allowed"
-                      )}
-                    >
+                          ? 'border-[#059669] bg-[#F0FDF4] dark:bg-[#064E3B]/30 shadow-xs'
+                          : 'border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#18181B] hover:border-neutral-300'
+                      }
+                      ${isBlocked ? 'opacity-60 cursor-not-allowed' : ''}
+                    `}
+                  >
+                    {/* Left Accent Bar */}
+                    <div
+                      className={`w-1 self-stretch transition-colors ${
+                        isSelected ? 'bg-[#059669]' : 'bg-transparent'
+                      }`}
+                    />
+
+                    <div className="flex-1 p-3 sm:p-3.5 flex items-center gap-3">
+                      {/* Icon */}
                       <div
-                        className={cn(
-                          "p-2.5 rounded-xl shrink-0 transition-colors",
-                          isSelected
-                            ? "bg-[#004633] text-white"
-                            : "bg-neutral-100 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-400"
-                        )}
+                        className={`
+                          p-2 rounded-[10px] shrink-0 transition-colors
+                          ${
+                            isSelected
+                              ? 'bg-[#059669] text-white'
+                              : `${cat.bgLight} ${cat.bgDark} ${cat.iconColorLight} ${cat.iconColorDark}`
+                          }
+                        `}
                       >
                         <Icon className="w-4 h-4" />
                       </div>
+
+                      {/* Label + Description */}
                       <div className="flex-1 min-w-0">
-                        <div className="font-black text-neutral-900 dark:text-white text-xs md:text-sm">
-                          {cat.title}
-                        </div>
-                        <div className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate font-medium mt-0.5">
-                          {cat.subtitle}
-                        </div>
+                        <h4
+                          className={`text-sm font-bold truncate ${
+                            isSelected
+                              ? 'text-[#065F46] dark:text-white'
+                              : 'text-[#111827] dark:text-white'
+                          }`}
+                        >
+                          {cat.label}
+                        </h4>
+                        <p
+                          className={`text-[11px] mt-0.5 truncate ${
+                            isSelected
+                              ? 'text-[#047857] dark:text-[#6EE7B7]'
+                              : 'text-[#9CA3AF] dark:text-[#71717A]'
+                          }`}
+                        >
+                          {cat.description}
+                        </p>
                       </div>
-                    </button>
-                  );
-                })}
+
+                      {/* Checkbox circle */}
+                      <div
+                        className={`
+                          w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all
+                          ${
+                            isSelected
+                              ? 'bg-[#059669] border-[#059669] text-white'
+                              : 'border-[#D1D5DB] dark:border-[#3F3F46]'
+                          }
+                        `}
+                      >
+                        {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Step 2: Description */}
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-[7px] bg-[#059669] text-white font-black text-xs flex items-center justify-center shrink-0">
+                  ২
+                </div>
+                <h3 className="text-base font-bold text-[#111827] dark:text-white">
+                  বিস্তারিত বিবরণ লেখো
+                </h3>
               </div>
+              <span
+                className={`text-[11.5px] font-semibold ${
+                  charCount === 0
+                    ? 'text-[#9CA3AF] dark:text-[#71717A]'
+                    : charCount < 15
+                    ? 'text-[#D97706]'
+                    : charCount <= 1000
+                    ? 'text-[#059669]'
+                    : 'text-[#EF4444]'
+                }`}
+              >
+                {BanglaNameHelper.toBanglaNumeral(charCount)} / ১০০০ অক্ষর
+              </span>
             </div>
 
-            {/* Description Card */}
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white dark:bg-[#18181B] rounded-2xl p-5 sm:p-6 border border-neutral-200/90 dark:border-[#27272A] shadow-sm space-y-4"
-            >
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white">
-                    সমস্যার বিস্তারিত বিবরণ
-                  </label>
-                  <span
-                    className={cn(
-                      "text-xs font-black",
-                      description.trim().length === 0
-                        ? "text-neutral-400"
-                        : description.trim().length < 15
-                        ? "text-amber-600 dark:text-amber-400"
-                        : description.trim().length <= 1000
-                        ? "text-emerald-600"
-                        : "text-rose-600"
-                    )}
-                  >
-                    {BanglaNameHelper.toBanglaNumeral(description.trim().length)} / ১০০০ অক্ষর
-                  </span>
-                </div>
-                <textarea
-                  rows={4}
-                  maxLength={1000}
-                  disabled={isPendingLimitReached}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="সমস্যাটি কীভাবে ঘটেছে বা কোথায় হয়েছে তা বিস্তারিত লেখো (কমপক্ষে ১৫ অক্ষর আবশ্যক)..."
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-[#27272A] bg-neutral-50 dark:bg-[#141417] text-neutral-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#004633]/20 focus:border-[#004633] transition-all placeholder:text-neutral-400 resize-none disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading || isPendingLimitReached}
-                className="w-full py-3 rounded-xl bg-[#004633] hover:bg-[#003627] font-black text-white text-xs sm:text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm active:scale-95"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>টিকেট পাঠানো হচ্ছে...</span>
-                  </>
-                ) : isPendingLimitReached ? (
-                  <span>আগের ৩টি আবেদনের সমাধানের অপেক্ষা করুন</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>সাপোর্ট টিকেট জমা দাও</span>
-                  </>
-                )}
-              </button>
-            </form>
+            <div className="rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] p-3 shadow-xs">
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={1000}
+                disabled={isBlocked}
+                rows={5}
+                placeholder="সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো (কমপক্ষে ১৫ অক্ষর)…"
+                className="w-full bg-transparent border-none outline-none resize-none text-sm text-neutral-800 dark:text-white placeholder:text-[#BBBBBB] dark:placeholder:text-[#52525B] leading-relaxed disabled:opacity-50"
+              />
+            </div>
           </div>
-        )
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading || isBlocked}
+            className={`
+              w-full h-13 rounded-[14px] text-sm sm:text-base font-bold flex items-center justify-center gap-2.5 transition-all shadow-xs cursor-pointer
+              ${
+                isBlocked
+                  ? 'bg-[#E2E8F0] dark:bg-[#27272A] text-[#94A3B8] dark:text-[#71717A] cursor-not-allowed'
+                  : 'bg-[#059669] hover:bg-[#047857] text-white'
+              }
+            `}
+          >
+            {isLoading ? (
+              <span>জমা হচ্ছে...</span>
+            ) : isBlocked ? (
+              <>
+                <Lock className="w-4 h-4" />
+                <span>
+                  {isPendingLimitReached
+                    ? 'আগের ৩টি আবেদনের সমাধানের অপেক্ষা করো'
+                    : isDailyLimitReached
+                    ? 'আজকের সাবমিশন সীমা পূর্ণ (৫/৫)'
+                    : `অপেক্ষা করুন (${Math.floor(cooldownSeconds / 60)}:${(cooldownSeconds % 60).toString().padStart(2, '0')})`}
+                </span>
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                <span>সাপোর্ট টিকেট জমা দাও</span>
+              </>
+            )}
+          </button>
+        </form>
       ) : (
-        /* My Tickets View */
-        <div className="space-y-4">
+        /* ── 4. My Complaints List (1:1 with Flutter _buildMyComplaintsList) ── */
+        <div>
           {isLoadingComplaints ? (
-            <div className="py-16 text-center">
-              <Loader2 className="w-7 h-7 animate-spin text-[#004633] mx-auto" />
+            <div className="space-y-3 pt-2">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="p-5 rounded-[16px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] animate-pulse space-y-2.5"
+                >
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
+                </div>
+              ))}
             </div>
           ) : myComplaints.length === 0 ? (
-            <div className="bg-white dark:bg-[#18181B] rounded-2xl p-10 text-center border border-neutral-200/90 dark:border-[#27272A] space-y-3">
-              <div className="w-12 h-12 bg-neutral-100 dark:bg-[#27272A] rounded-2xl flex items-center justify-center mx-auto text-neutral-500">
-                <Inbox className="w-6 h-6" />
+            <div className="p-10 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-center space-y-4">
+              <div className="w-14 h-14 rounded-full bg-[#F1F5F9] dark:bg-[#27272A] flex items-center justify-center mx-auto text-[#A3A3A3]">
+                <Inbox className="w-7 h-7" />
               </div>
-              <h3 className="text-sm sm:text-base font-black text-neutral-900 dark:text-white">
-                কোনো সাপোর্ট টিকেট নেই
-              </h3>
-              <p className="text-neutral-500 text-xs max-w-sm mx-auto font-medium">
-                অ্যাপে কোনো সমস্যার সম্মুখীন হলে নতুন টিকেট জমা দিতে পারো।
-              </p>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white">
+                  কোনো অভিযোগ জমা নেই
+                </h3>
+                <p className="text-xs text-[#A3A3A3]">
+                  তুমি এখনো কোনো অভিযোগ বা ফিডব্যাক জমা দাওনি।
+                </p>
+              </div>
               <button
-                onClick={() => setActiveTab("new")}
-                className="mt-2 px-4 py-2 rounded-xl bg-[#004633] text-white font-black text-xs hover:bg-[#003627] transition-all shadow-sm"
+                type="button"
+                onClick={() => setActiveTab('new')}
+                className="px-5 py-2.5 rounded-[12px] bg-[#059669] text-white text-xs font-bold flex items-center gap-1.5 mx-auto hover:bg-[#047857] transition-all cursor-pointer"
               >
-                নতুন টিকেট তৈরি করো
+                <Send className="w-3.5 h-3.5" />
+                <span>নতুন অভিযোগ করো</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* Filter Chips */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setFilterStatus("all")}
-                  className={cn(
-                    "px-3.5 py-1.5 rounded-full text-xs font-black transition-all border",
-                    filterStatus === "all"
-                      ? "bg-[#004633] text-white border-[#004633] shadow-sm"
-                      : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
-                  )}
-                >
-                  সব ({BanglaNameHelper.toBanglaNumeral(myComplaints.length)})
-                </button>
-                <button
-                  onClick={() => setFilterStatus("Pending")}
-                  className={cn(
-                    "px-3.5 py-1.5 rounded-full text-xs font-black transition-all border",
-                    filterStatus === "Pending"
-                      ? "bg-[#004633] text-white border-[#004633] shadow-sm"
-                      : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
-                  )}
-                >
-                  অপেক্ষমাণ ({BanglaNameHelper.toBanglaNumeral(myComplaints.filter((c) => c.status === "Pending").length)})
-                </button>
-                <button
-                  onClick={() => setFilterStatus("Resolved")}
-                  className={cn(
-                    "px-3.5 py-1.5 rounded-full text-xs font-black transition-all border",
-                    filterStatus === "Resolved"
-                      ? "bg-[#004633] text-white border-[#004633] shadow-sm"
-                      : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
-                  )}
-                >
-                  সমাধান ({BanglaNameHelper.toBanglaNumeral(myComplaints.filter((c) => c.status === "Resolved").length)})
-                </button>
-              </div>
+            <div className="space-y-3">
+              {myComplaints.map((complaint) => {
+                const typeInfo =
+                  COMPLAINT_TYPES.find((t) => t.id === complaint.type) ||
+                  COMPLAINT_TYPES[0];
+                const statusInfo =
+                  STATUS_CONFIG[complaint.status] || STATUS_CONFIG.Pending;
+                const StatusIcon = statusInfo.icon;
+                const TypeIcon = typeInfo.icon;
 
-              {/* Tickets Cards */}
-              <div className="space-y-3">
-                {filteredComplaints.map((comp) => {
-                  const status = STATUS_CONFIG[comp.status] || {
-                    label: "অপেক্ষমাণ",
-                    color: "text-amber-700 bg-amber-50 dark:bg-amber-950/40 border-amber-200",
-                    icon: Clock,
-                  };
-                  const StatusIcon = status.icon;
-                  const ticketCode = comp.id.slice(0, 6).toUpperCase();
-
-                  return (
-                    <div
-                      key={comp.id}
-                      className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm"
-                    >
-                      {/* Ticket Top Header */}
-                      <div className="bg-neutral-50 dark:bg-[#141417] px-4 py-2.5 border-b border-neutral-100 dark:border-[#27272A] flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-neutral-500 dark:text-neutral-400">
-                            #TKT-{ticketCode}
-                          </span>
-                          <span className="bg-neutral-200 dark:bg-[#27272A] text-neutral-700 dark:text-neutral-300 text-[11px] px-2 py-0.5 rounded font-bold">
-                            {comp.type}
+                return (
+                  <div
+                    key={complaint.id}
+                    className="p-4 sm:p-5 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs space-y-3"
+                  >
+                    {/* Top Row: Type and Status */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`p-2 rounded-[10px] shrink-0 ${typeInfo.bgLight} ${typeInfo.bgDark} ${typeInfo.iconColorLight} ${typeInfo.iconColorDark}`}
+                        >
+                          <TypeIcon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-sm sm:text-[15px] font-bold text-[#0F172A] dark:text-white truncate">
+                            {typeInfo.label}
+                          </h4>
+                          <span className="text-[11px] text-[#A3A3A3] block">
+                            {new Date(complaint.created_at).toLocaleDateString(
+                              'bn-BD',
+                              {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              }
+                            )}
                           </span>
                         </div>
-                        <span
-                          className={cn(
-                            "px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 flex items-center gap-1",
-                            status.color
-                          )}
-                        >
-                          <StatusIcon className="w-3 h-3" />
-                          <span>{status.label}</span>
-                        </span>
                       </div>
 
-                      {/* Ticket Content */}
-                      <div className="p-4 space-y-3">
-                        <p className="text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm leading-relaxed font-medium">
-                          {comp.description}
-                        </p>
-
-                        {comp.admin_feedback && (
-                          <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 p-3 rounded-xl text-xs space-y-1">
-                            <strong className="text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 font-black">
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              <span>সাপোর্ট টিমের প্রতিক্রিয়া:</span>
-                            </strong>
-                            <p className="text-emerald-700 dark:text-emerald-400 font-medium">
-                              {comp.admin_feedback}
-                            </p>
-                          </div>
-                        )}
-
-                        <div className="text-[11px] text-neutral-400 pt-1 font-bold">
-                          {new Date(comp.created_at).toLocaleDateString("bn-BD", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "numeric",
-                          })}
-                        </div>
+                      {/* Status Pill */}
+                      <div
+                        className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shrink-0 ${statusInfo.bgLight} ${statusInfo.bgDark} ${statusInfo.textColor}`}
+                      >
+                        <StatusIcon className="w-3 h-3" />
+                        <span>{statusInfo.label}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-[14px] text-[#334155] dark:text-[#D4D4D8] leading-relaxed">
+                      {complaint.description}
+                    </p>
+
+                    {/* Admin Feedback (if present) */}
+                    {complaint.admin_feedback &&
+                      complaint.admin_feedback.trim() && (
+                        <div className="p-3 rounded-[12px] bg-[#ECFDF5] dark:bg-[#064E3B]/30 border border-[#A7F3D0] dark:border-[#059669]/35 space-y-1">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#065F46] dark:text-[#34D399]">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                            <span>অ্যাডমিন উত্তর:</span>
+                          </div>
+                          <p className="text-xs sm:text-sm text-[#0F172A] dark:text-[#E2E8F0] leading-relaxed">
+                            {complaint.admin_feedback}
+                          </p>
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

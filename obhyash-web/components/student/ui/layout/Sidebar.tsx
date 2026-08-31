@@ -9,7 +9,6 @@ import {
   PenTool,
   Trophy,
   BarChart2,
-  Sigma,
   Newspaper,
   BookOpen,
   ChevronRight,
@@ -55,7 +54,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "practice", label: "অনুশীলন", icon: PenTool },
     { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy },
     { id: "analysis", label: "এনালাইসিস", icon: BarChart2 },
-    { id: "formulas", label: "ফর্মুলা", icon: Sigma },
     { id: "blog", label: "ব্লগ", icon: Newspaper },
   ];
 

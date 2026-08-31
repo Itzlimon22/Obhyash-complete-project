@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import { UserProfile, ExamResult } from "@/lib/types";
-import dynamic from "next/dynamic";
-import useProfileData from "@/hooks/use-profile-data";
-import { BanglaNameHelper } from "@/lib/bangla-name-helper";
-import Link from "next/link";
+import React, { useState } from 'react';
+import { UserProfile, ExamResult } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import useProfileData from '@/hooks/use-profile-data';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
+import Link from 'next/link';
 import {
   Gift,
   Trophy,
@@ -17,16 +17,20 @@ import {
   ArrowRight,
   ShieldCheck,
   Zap,
-} from "lucide-react";
-import UserAvatar from "@/components/student/ui/common/UserAvatar";
+} from 'lucide-react';
+import UserAvatar from '@/components/student/ui/common/UserAvatar';
+import AvatarPickerModal from './dashboard/AvatarPickerModal';
 
-const StatsGrid = dynamic(() => import("./dashboard/StatsGrid"));
+const StatsGrid = dynamic(() => import('./dashboard/StatsGrid'));
 const SubjectsProgressSection = dynamic(
-  () => import("./dashboard/SubjectsProgressSection")
+  () => import('./dashboard/SubjectsProgressSection')
 );
-const StreakCalendar = dynamic(() => import("./dashboard/StreakCalendar"));
+const StreakCalendar = dynamic(() => import('./dashboard/StreakCalendar'));
 const BadgesShowcaseSection = dynamic(
-  () => import("./dashboard/BadgesShowcaseSection")
+  () => import('./dashboard/BadgesShowcaseSection')
+);
+const RecentActivitySection = dynamic(
+  () => import('./dashboard/RecentActivitySection')
 );
 
 interface MyProfileViewProps {
@@ -44,6 +48,7 @@ export default function MyProfileView({
   onSubjectClick,
 }: MyProfileViewProps) {
   const hookData = useProfileData();
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const user = propUser || hookData.user;
   const history = propHistory ?? hookData.examHistory;
@@ -51,48 +56,48 @@ export default function MyProfileView({
   const calendarData = hookData.calendarData;
   const isLoading = !propHistory && hookData.isLoading;
 
-  // 5-Tier Level Calculation matching Flutter
+  // 5-Tier Level Calculation matching Flutter my_profile_view.dart
   const getLevelInfo = (xp: number) => {
-    if (xp < 1000) {
-      const p = Math.min(1.0, Math.max(0.0, xp / 1000.0));
+    if (xp < 500) {
+      const p = Math.min(1.0, Math.max(0.0, xp / 500.0));
       return {
-        currentRank: "এক্সপ্লোরার 🌱",
-        nextRank: "চ্যালেঞ্জার ⚡",
+        currentRank: 'রুকি',
+        nextRank: 'স্কাউট',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৫০০ XP`,
       };
-    } else if (xp < 3000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 1000) / 2000.0));
+    } else if (xp < 2000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 500) / 1500.0));
       return {
-        currentRank: "চ্যালেঞ্জার ⚡",
-        nextRank: "ওয়ারিয়র 🛡️",
+        currentRank: 'স্কাউট',
+        nextRank: 'ওয়ারিয়র',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৩,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ২,০০০ XP`,
       };
-    } else if (xp < 7000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 3000) / 4000.0));
+    } else if (xp < 5000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 2000) / 3000.0));
       return {
-        currentRank: "ওয়ারিয়র 🛡️",
-        nextRank: "স্কলার ✨",
+        currentRank: 'ওয়ারিয়র',
+        nextRank: 'টাইটান',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৭,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৫,০০০ XP`,
       };
-    } else if (xp < 15000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 7000) / 8000.0));
+    } else if (xp < 10000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 5000) / 5000.0));
       return {
-        currentRank: "স্কলার ✨",
-        nextRank: "লিজেন্ড 👑",
+        currentRank: 'টাইটান',
+        nextRank: 'লিজেন্ড',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১৫,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১০,০০০ XP`,
       };
     } else {
       return {
-        currentRank: "লিজেন্ড 👑",
-        nextRank: "সর্বোচ্চ স্তর",
+        currentRank: 'লিজেন্ড',
+        nextRank: 'সর্বোচ্চ স্তর',
         progress: 1.0,
         percent: 100,
         xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} XP (সর্বোচ্চ স্তর)`,
@@ -101,17 +106,16 @@ export default function MyProfileView({
   };
 
   const evaluatedExams = history.filter(
-    (h) => !h.status || h.status === "evaluated"
+    (h) => !h.status || h.status === 'evaluated'
   );
   const avgScore =
     evaluatedExams.length > 0
       ? Math.round(
-          evaluatedExams.reduce(
-            (acc, curr) =>
-              acc +
-              (curr.totalMarks > 0 ? (curr.score / curr.totalMarks) * 100 : 0),
-            0
-          ) / evaluatedExams.length
+          evaluatedExams.reduce((acc, curr) => {
+            const maxMarks = curr.totalMarks || curr.totalQuestions || 1;
+            const scoreVal = curr.score ?? (curr as any).correctCount ?? 0;
+            return acc + (maxMarks > 0 ? (scoreVal / maxMarks) * 100 : 0);
+          }, 0) / evaluatedExams.length
         )
       : 0;
 
@@ -135,22 +139,32 @@ export default function MyProfileView({
   if (!user) return null;
 
   const levelInfo = getLevelInfo(user.xp || 0);
-  const isPro = (user as any).is_pro || (user as any).is_subscribed || (user as any).plan === "pro";
+  const isPro =
+    (user as any).is_pro ||
+    (user as any).is_subscribed ||
+    (user as any).plan === 'pro';
 
   return (
     <div className="max-w-5xl mx-auto space-y-5 animate-fade-in pb-24 pt-2 font-['HindSiliguri']">
-      {/* 1. User Profile Header Card */}
-      <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200/90 dark:border-[#27272a] p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* ── 1. User Profile Header Card (1:1 with Flutter _UserProfileCard) ── */}
+      <div className="bg-white dark:bg-[#18181B] rounded-[22px] border border-[#E4E4E7] dark:border-[#27272A] p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          {/* Avatar with Camera Badge */}
-          <div className="relative group cursor-pointer" onClick={onEditProfile}>
-            <div className="rounded-full p-0.5 border-2 border-neutral-200 dark:border-[#3f3f46]">
-              <UserAvatar user={user} size="lg" />
+          {/* Avatar with Camera Edit Badge */}
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => setShowAvatarPicker(true)}
+          >
+            <div className="rounded-full p-0.5 border-2 border-neutral-200 dark:border-[#3F3F46] shadow-sm transition-transform group-hover:scale-105">
+              <UserAvatar user={user} size="lg" className="w-16 h-16" />
             </div>
             <button
-              onClick={onEditProfile}
-              className="absolute -bottom-1 -right-1 p-1.5 bg-[#004633] text-white rounded-full border-2 border-white dark:border-[#18181b] shadow-md hover:bg-[#003627] transition-transform active:scale-95"
-              title="এডিট করো"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAvatarPicker(true);
+              }}
+              className="absolute -bottom-1 -right-1 p-1.5 bg-[#059669] hover:bg-[#047857] text-white rounded-full border-2 border-white dark:border-[#18181B] shadow-md transition-transform active:scale-95"
+              title="অ্যাভাটার পরিবর্তন করো"
             >
               <Camera className="w-3.5 h-3.5" />
             </button>
@@ -159,7 +173,7 @@ export default function MyProfileView({
           {/* User Info */}
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white leading-tight">
                 {user.name}
               </h2>
               {isPro && (
@@ -170,20 +184,25 @@ export default function MyProfileView({
             </div>
 
             {user.email && (
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-2">
+              <p className="text-xs sm:text-sm text-[#64748B] dark:text-[#A1A1AA] mt-0.5 mb-2">
                 {user.email}
               </p>
             )}
 
-            {/* Chips */}
+            {/* Info Chips (Matching Flutter _InfoChip) */}
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {user.institute && (
-                <span className="text-xs font-bold px-2.5 py-1 bg-neutral-100 dark:bg-[#27272a] text-neutral-700 dark:text-[#e4e4e7] rounded-xl border border-neutral-200/60 dark:border-[#3f3f46]">
+                <span className="text-xs font-semibold px-2.5 py-1 bg-[#F4F4F5] dark:bg-[#27272A] text-[#3F3F46] dark:text-[#E4E4E7] rounded-[8px] border border-[#E4E4E7] dark:border-[#3F3F46]">
                   {user.institute}
                 </span>
               )}
+              {user.stream && (
+                <span className="text-xs font-semibold px-2.5 py-1 bg-[#F4F4F5] dark:bg-[#27272A] text-[#3F3F46] dark:text-[#E4E4E7] rounded-[8px] border border-[#E4E4E7] dark:border-[#3F3F46]">
+                  {user.stream}
+                </span>
+              )}
               {user.batch && (
-                <span className="text-xs font-bold px-2.5 py-1 bg-neutral-100 dark:bg-[#27272a] text-neutral-700 dark:text-[#e4e4e7] rounded-xl border border-neutral-200/60 dark:border-[#3f3f46]">
+                <span className="text-xs font-semibold px-2.5 py-1 bg-[#F4F4F5] dark:bg-[#27272A] text-[#3F3F46] dark:text-[#E4E4E7] rounded-[8px] border border-[#E4E4E7] dark:border-[#3F3F46]">
                   ব্যাচ: {user.batch}
                 </span>
               )}
@@ -195,13 +214,13 @@ export default function MyProfileView({
         <div className="flex items-center gap-2.5 w-full sm:w-auto pt-2 sm:pt-0">
           <button
             onClick={onEditProfile}
-            className="flex-1 sm:flex-none px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] text-neutral-800 dark:text-white text-xs font-black rounded-xl transition-all active:scale-95 border border-neutral-200/60 dark:border-[#3f3f46]"
+            className="flex-1 sm:flex-none px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272A] dark:hover:bg-[#3F3F46] text-neutral-800 dark:text-white text-xs font-bold rounded-xl transition-all active:scale-95 border border-neutral-200/60 dark:border-[#3F3F46] cursor-pointer"
           >
             প্রোফাইল এডিট
           </button>
           <Link
             href="/referral"
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-xl text-xs font-black hover:bg-emerald-500/20 transition-all active:scale-95"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-xl text-xs font-bold hover:bg-emerald-500/20 transition-all active:scale-95"
           >
             <Gift className="w-4 h-4" />
             <span>রেফার করো</span>
@@ -209,35 +228,35 @@ export default function MyProfileView({
         </div>
       </div>
 
-      {/* 2. Level Progress Bar (Matching Flutter) */}
-      <div className="bg-gradient-to-br from-[#1E1B4B] to-[#312E81] text-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      {/* ── 2. Level Progress Bar (Premium Design matching Flutter) ── */}
+      <div className="bg-gradient-to-br from-[#312E81] to-[#4338CA] dark:from-[#1E1B4B] dark:to-[#312E81] text-white rounded-[24px] p-6 sm:p-7 shadow-xl relative overflow-hidden">
         <Sparkles className="absolute -top-6 -right-6 w-36 h-36 text-white/5 pointer-events-none" />
 
         <div className="flex items-center justify-between mb-4 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-500/40 rounded-xl text-amber-400 text-xs font-black mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#F59E0B]/20 border border-[#F59E0B]/50 rounded-[12px] text-[#FBBF24] text-sm font-black mb-2">
               <Trophy className="w-4 h-4" />
               <span>{levelInfo.currentRank}</span>
             </div>
-            <h3 className="text-base sm:text-lg font-black text-white/90">
+            <h3 className="text-base sm:text-lg font-bold text-white/80 leading-snug">
               পরবর্তী লেভেল রিওয়ার্ড
             </h3>
           </div>
 
           <div className="text-right">
-            <span className="text-3xl sm:text-4xl font-black text-white block tabular-nums">
+            <span className="text-3xl sm:text-4xl font-black text-white block tabular-nums leading-none">
               {BanglaNameHelper.toBanglaNumeral(levelInfo.percent)}%
             </span>
-            <span className="text-xs font-bold text-yellow-300 bg-black/30 px-2.5 py-0.5 rounded-md border border-white/10 mt-1 inline-block">
+            <span className="text-xs font-bold text-[#FDE047] bg-black/25 px-2.5 py-0.5 rounded-[6px] border border-white/10 mt-1 inline-block">
               {levelInfo.xpText}
             </span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="h-2.5 sm:h-3 bg-black/30 rounded-full overflow-hidden border border-white/10 relative">
+        <div className="h-2.5 bg-black/25 rounded-full overflow-hidden border border-white/10 relative my-1">
           <div
-            className="h-full bg-gradient-to-r from-blue-400 to-yellow-300 transition-all duration-700 rounded-full shadow-lg shadow-amber-500/20"
+            className="h-full bg-gradient-to-r from-[#60A5FA] to-[#FDE047] transition-all duration-700 rounded-full shadow-[0_2px_8px_rgba(245,158,11,0.4)]"
             style={{ width: `${levelInfo.progress * 100}%` }}
           />
         </div>
@@ -248,7 +267,7 @@ export default function MyProfileView({
         </div>
       </div>
 
-      {/* 3. Key Stats Grid */}
+      {/* ── 3. Key Stats Grid ── */}
       <StatsGrid
         examsTaken={evaluatedExams.length}
         avgScore={avgScore}
@@ -256,84 +275,21 @@ export default function MyProfileView({
         streak={user.streakCount || 0}
       />
 
-      {/* 4. Badges Showcase Section */}
+      {/* ── 4. Badges Showcase Section ── */}
       <BadgesShowcaseSection userId={user.id} />
 
-      {/* 5. Main Content Grid (Two Columns) */}
+      {/* ── 5. Main Content Layout (Left Column & Right Column mimic from Flutter) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Left Column */}
+        {/* Left Column: Subjects Progress + Recent Activity */}
         <div className="space-y-5">
           <SubjectsProgressSection
             subjectStats={subjectStats}
             onSubjectClick={onSubjectClick}
           />
-
-          {/* Recent Activity Card */}
-          <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200/90 dark:border-[#27272a] shadow-sm p-5 sm:p-7">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base sm:text-lg font-black text-neutral-900 dark:text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-emerald-500" />
-                <span>সর্বশেষ কার্যক্রম</span>
-              </h3>
-            </div>
-
-            {history.length === 0 ? (
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 py-4 text-center">
-                কোনো সাম্প্রতিক পরীক্ষা পাওয়া যায়নি।
-              </p>
-            ) : (
-              <div className="space-y-2.5">
-                {history.slice(0, 5).map((exam, idx) => {
-                  const maxMarks = exam.totalMarks || exam.totalQuestions || 1;
-                  const scorePct = Math.round((exam.score / maxMarks) * 100);
-
-                  return (
-                    <div
-                      key={exam.id || idx}
-                      className="p-3 sm:p-3.5 bg-neutral-50 dark:bg-[#27272a] rounded-xl border border-neutral-200/60 dark:border-[#3f3f46]/60 flex items-center justify-between gap-3"
-                    >
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white">
-                          {BanglaNameHelper.formatSubject(
-                            exam.subjectLabel || exam.subject,
-                            exam.subject
-                          )}
-                        </h4>
-                        <div className="flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-bold">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {new Date(exam.date).toLocaleDateString("bn-BD", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <HelpCircle className="w-3.5 h-3.5" />
-                            {BanglaNameHelper.toBanglaNumeral(exam.totalQuestions)} প্রশ্ন
-                          </span>
-                        </div>
-                      </div>
-
-                      <div
-                        className={`text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg border tabular-nums ${
-                          scorePct >= 80
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                            : scorePct >= 50
-                            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                            : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-                        }`}
-                      >
-                        {BanglaNameHelper.toBanglaNumeral(scorePct)}%
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <RecentActivitySection history={history} />
         </div>
 
-        {/* Right Column */}
+        {/* Right Column: Streak Calendar */}
         <div>
           <StreakCalendar
             calendarData={calendarData}
@@ -341,6 +297,19 @@ export default function MyProfileView({
           />
         </div>
       </div>
+
+      {/* ── Avatar Picker Modal ── */}
+      {showAvatarPicker && (
+        <AvatarPickerModal
+          user={user}
+          onClose={() => setShowAvatarPicker(false)}
+          onAvatarUpdated={(newUrl) => {
+            if (user) {
+              user.avatarUrl = newUrl;
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

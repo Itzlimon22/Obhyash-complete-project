@@ -1,122 +1,154 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCheck,
+  Check,
   Trash2,
-  BellRing,
-  X,
+  BellOff,
+  Clock,
   CheckCircle2,
   AlertTriangle,
   AlertCircle,
   Settings,
   Info,
-  Sparkles,
-  Inbox,
-} from "lucide-react";
-import { Notification } from "@/lib/types";
+} from 'lucide-react';
+import { Notification } from '@/lib/types';
 import {
   getNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification,
-} from "@/services/database";
-import { toast } from "sonner";
-import { BanglaNameHelper } from "@/lib/bangla-name-helper";
-import { cn } from "@/lib/utils";
+} from '@/services/database';
+import { createClient } from '@/utils/supabase/client';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-type FilterType = "all" | "unread";
+interface NotificationsViewProps {
+  onNavigate?: (tab: string) => void;
+}
+
+type FilterType = 'all' | 'unread';
 
 const NOTIFICATION_STYLES: Record<
   string,
   {
-    icon: React.ComponentType<{ className?: string; size?: number }>;
+    icon: React.ElementType;
     bgLight: string;
     bgDark: string;
-    textColor: string;
     iconColor: string;
   }
 > = {
   success: {
     icon: CheckCircle2,
-    bgLight: "bg-emerald-50 border-emerald-200",
-    bgDark: "dark:bg-emerald-950/20 dark:border-emerald-900/40",
-    textColor: "text-emerald-700 dark:text-emerald-400",
-    iconColor: "text-emerald-500",
+    bgLight: 'bg-[#ECFDF5]',
+    bgDark: 'dark:bg-[#064E3B]/20',
+    iconColor: 'text-[#059669]',
   },
   warning: {
     icon: AlertTriangle,
-    bgLight: "bg-amber-50 border-amber-200",
-    bgDark: "dark:bg-amber-950/20 dark:border-amber-900/40",
-    textColor: "text-amber-700 dark:text-amber-400",
-    iconColor: "text-amber-500",
+    bgLight: 'bg-[#FEF3C7]',
+    bgDark: 'dark:bg-[#78350F]/20',
+    iconColor: 'text-[#D97706]',
   },
   error: {
     icon: AlertCircle,
-    bgLight: "bg-rose-50 border-rose-200",
-    bgDark: "dark:bg-rose-950/20 dark:border-rose-900/40",
-    textColor: "text-rose-700 dark:text-rose-400",
-    iconColor: "text-rose-500",
+    bgLight: 'bg-[#FEF2F2]',
+    bgDark: 'dark:bg-[#881337]/20',
+    iconColor: 'text-[#DC2626]',
   },
   system: {
     icon: Settings,
-    bgLight: "bg-purple-50 border-purple-200",
-    bgDark: "dark:bg-purple-950/20 dark:border-purple-900/40",
-    textColor: "text-purple-700 dark:text-purple-400",
-    iconColor: "text-purple-500",
+    bgLight: 'bg-[#EDE9FE]',
+    bgDark: 'dark:bg-[#4C1D95]/20',
+    iconColor: 'text-[#8B5CF6]',
   },
   info: {
     icon: Info,
-    bgLight: "bg-blue-50 border-blue-200",
-    bgDark: "dark:bg-blue-950/20 dark:border-blue-900/40",
-    textColor: "text-blue-700 dark:text-blue-400",
-    iconColor: "text-blue-500",
+    bgLight: 'bg-[#DBEAFE]',
+    bgDark: 'dark:bg-[#1E3A8A]/20',
+    iconColor: 'text-[#2563EB]',
   },
 };
 
-export const NotificationsView: React.FC = () => {
+export const NotificationsView: React.FC<NotificationsViewProps> = ({
+  onNavigate,
+}) => {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filter, setFilter] = useState<FilterType>("all");
+  const [filter, setFilter] = useState<FilterType>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
-  const limit = 20;
+  const limit = 10;
 
-  const fetchNotifs = async (pageNumber: number = 1, isLoadMore = false) => {
-    if (isLoadMore) setIsLoadingMore(true);
-    else setIsLoading(true);
+  const fetchNotifs = useCallback(
+    async (pageNumber: number = 1, isLoadMore = false) => {
+      if (isLoadMore) setIsLoadingMore(true);
+      else setIsLoading(true);
 
-    try {
-      const offset = (pageNumber - 1) * limit;
-      const { data, hasMore: more } = await getNotifications(limit, offset);
+      try {
+        const offset = (pageNumber - 1) * limit;
+        const { data, hasMore: more } = await getNotifications(limit, offset);
 
-      if (isLoadMore) {
-        setNotifications((prev) => {
-          const existingIds = new Set(prev.map((n) => n.id));
-          const newItems = data.filter((n) => !existingIds.has(n.id));
-          return [...prev, ...newItems];
-        });
-      } else {
-        setNotifications(data);
+        if (isLoadMore) {
+          setNotifications((prev) => {
+            const existingIds = new Set(prev.map((n) => n.id));
+            const newItems = data.filter((n) => !existingIds.has(n.id));
+            return [...prev, ...newItems];
+          });
+        } else {
+          setNotifications(data);
+        }
+        setHasMore(more);
+        setPage(pageNumber);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
       }
-      setHasMore(more);
-      setPage(pageNumber);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  };
+    },
+    [limit]
+  );
 
   useEffect(() => {
     fetchNotifs(1);
+  }, [fetchNotifs]);
+
+  // Realtime live subscription (1:1 with Flutter latestNotificationEventProvider)
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel('realtime_user_notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+        },
+        (payload) => {
+          const newNotif = payload.new as Notification;
+          if (newNotif) {
+            setNotifications((prev) => [
+              newNotif,
+              ...prev.filter((n) => n.id !== newNotif.id),
+            ]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const handleMarkRead = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleMarkRead = async (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
@@ -126,8 +158,10 @@ export const NotificationsView: React.FC = () => {
   const handleMarkAllAsRead = async () => {
     const success = await markAllNotificationsAsRead();
     if (success) {
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      toast.success("সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে!");
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, is_read: true }))
+      );
+      toast.success('সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে');
     }
   };
 
@@ -135,109 +169,163 @@ export const NotificationsView: React.FC = () => {
     e.stopPropagation();
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     await deleteNotification(id);
-    toast.success("বার্তা মুছে ফেলা হয়েছে 🗑️");
+    toast.success('মুছে ফেলা হয়েছে');
+  };
+
+  // Smart notification router (1:1 with Flutter NotificationRouter.handleTap)
+  const handleNotificationTap = async (notif: Notification) => {
+    if (!notif.is_read) {
+      await handleMarkRead(notif.id);
+    }
+
+    const text = `${notif.title} ${notif.message}`.toLowerCase();
+
+    if (text.includes('live') || text.includes('লাইভ')) {
+      if (onNavigate) onNavigate('live_exam');
+      else router.push('/live_exam');
+    } else if (
+      text.includes('report') ||
+      text.includes('রিপোর্ট') ||
+      text.includes('সমাধান')
+    ) {
+      if (onNavigate) onNavigate('reports');
+      else router.push('/dashboard');
+    } else if (
+      text.includes('streak') ||
+      text.includes('স্ট্রিক') ||
+      text.includes('অনুশীলন') ||
+      text.includes('practice')
+    ) {
+      if (onNavigate) onNavigate('practice');
+      else router.push('/practice');
+    } else if (
+      text.includes('pro') ||
+      text.includes('প্রিমিয়াম') ||
+      text.includes('subscription') ||
+      text.includes('সাবস্ক্রিপশন')
+    ) {
+      if (onNavigate) onNavigate('subscription');
+      else router.push('/subscription');
+    } else if (
+      text.includes('leaderboard') ||
+      text.includes('লিডারবোর্ড') ||
+      text.includes('র‍্যাংক')
+    ) {
+      if (onNavigate) onNavigate('leaderboard');
+      else router.push('/leaderboard');
+    } else if (
+      text.includes('bookmark') ||
+      text.includes('বুকমার্ক')
+    ) {
+      if (onNavigate) onNavigate('bookmarks');
+      else router.push('/bookmarks');
+    }
+  };
+
+  const formatDateDistance = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'এখনই';
+    if (mins < 60) return `${mins} মিনিট আগে`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} ঘন্টা আগে`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `${days} দিন আগে`;
+    return new Date(iso).toLocaleDateString('bn-BD', {
+      day: 'numeric',
+      month: 'short',
+    });
   };
 
   const filteredNotifications = notifications.filter((n) => {
-    if (filter === "unread") return !n.is_read;
+    if (filter === 'unread') return !n.is_read;
     return true;
   });
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const formatRelativeTime = (iso: string) => {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "এখনই";
-    if (mins < 60) return `${BanglaNameHelper.toBanglaNumeral(mins)} মিনিট আগে`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${BanglaNameHelper.toBanglaNumeral(hrs)} ঘণ্টা আগে`;
-    const days = Math.floor(hrs / 24);
-    if (days < 7) return `${BanglaNameHelper.toBanglaNumeral(days)} দিন আগে`;
-    return new Date(iso).toLocaleDateString("bn-BD", {
-      day: "numeric",
-      month: "short",
-    });
-  };
-
   return (
-    <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
-            <span>নোটিফিকেশন সেন্টার</span>
-            <span className="text-xl">🔔</span>
-          </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            পরীক্ষা, ফলাফল ও অ্যাকাউন্টের সকল বার্তা
-          </p>
+    <div className="w-full max-w-3xl mx-auto px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif] pb-24">
+      {/* ── Top Filter Tabs & Mark All Read Action (1:1 with Flutter) ── */}
+      <div className="py-2.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {/* All Filter Tab */}
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`
+              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer
+              ${
+                filter === 'all'
+                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-xs'
+                  : 'bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-[#27272A]'
+              }
+            `}
+          >
+            সব বার্তা
+          </button>
+
+          {/* Unread Filter Tab */}
+          <button
+            type="button"
+            onClick={() => setFilter('unread')}
+            className={`
+              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer
+              ${
+                filter === 'unread'
+                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-xs'
+                  : 'bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-[#27272A]'
+              }
+            `}
+          >
+            অপঠিত
+          </button>
         </div>
 
-        {/* Action button */}
+        {/* Mark All Read Button */}
         {unreadCount > 0 && (
           <button
+            type="button"
             onClick={handleMarkAllAsRead}
-            className="px-3.5 py-1.5 rounded-xl bg-[#004633] text-white text-xs font-black hover:bg-[#003627] active:scale-95 transition-all flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
+            className="px-3 py-1.5 rounded-xl bg-[#E6F4EA] dark:bg-[#004633]/30 border border-[#004633]/30 text-[#004633] dark:text-[#4ADE80] text-xs font-bold flex items-center gap-1.5 hover:bg-[#d8edd9] dark:hover:bg-[#004633]/50 transition-colors cursor-pointer"
           >
-            <CheckCheck size={14} />
-            <span>সবগুলো পঠিত করো</span>
+            <CheckCheck className="w-3.5 h-3.5" />
+            <span>সব পড়ুন</span>
           </button>
         )}
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-5">
-        <button
-          onClick={() => setFilter("all")}
-          className={cn(
-            "px-4 py-1.5 rounded-full text-xs font-black border transition-all",
-            filter === "all"
-              ? "bg-[#004633] text-white border-[#004633] shadow-sm"
-              : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
-          )}
-        >
-          সব বার্তা ({BanglaNameHelper.toBanglaNumeral(notifications.length)})
-        </button>
-        <button
-          onClick={() => setFilter("unread")}
-          className={cn(
-            "px-4 py-1.5 rounded-full text-xs font-black border transition-all",
-            filter === "unread"
-              ? "bg-[#004633] text-white border-[#004633] shadow-sm"
-              : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-[#27272A]"
-          )}
-        >
-          অপঠিত ({BanglaNameHelper.toBanglaNumeral(unreadCount)})
-        </button>
-      </div>
-
-      {/* Content */}
+      {/* ── Content List ── */}
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5 pt-2">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-20 bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/80 dark:border-[#27272A] animate-pulse"
-            />
+              className="p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-[#27272A] animate-pulse space-y-2.5"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
+                  <div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] p-6">
-          <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-3">
-            <Inbox size={24} />
+        <div className="py-20 text-center flex flex-col items-center justify-center">
+          <div className="w-18 h-18 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] flex items-center justify-center text-neutral-400 dark:text-neutral-500 mb-3.5">
+            <BellOff className="w-8 h-8" />
           </div>
-          <h3 className="text-base font-bold text-neutral-800 dark:text-neutral-200">
-            কোনো নোটিফিকেশন নেই
+          <h3 className="text-base font-bold text-neutral-600 dark:text-neutral-300">
+            {filter === 'unread'
+              ? 'কোনো অপঠিত নোটিফিকেশন নেই'
+              : 'কোনো নোটিফিকেশন নেই'}
           </h3>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-            {filter === "unread"
-              ? "তোমার সব বার্তা পড়া হয়ে গেছে!"
-              : "নতুন কোনো আপডেট আসলে এখানে দেখতে পাবে"}
-          </p>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2.5 pt-1">
           <AnimatePresence mode="popLayout">
             {filteredNotifications.map((notif) => {
               const style =
@@ -249,74 +337,104 @@ export const NotificationsView: React.FC = () => {
                 <motion.div
                   key={notif.id}
                   layout
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  onClick={(e) => !notif.is_read && handleMarkRead(notif.id, e)}
-                  className={cn(
-                    "p-4 rounded-2xl border transition-all flex items-start gap-3.5 group cursor-pointer",
-                    notif.is_read
-                      ? "bg-white dark:bg-[#18181B] border-neutral-200/80 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700"
-                      : "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300/80 dark:border-emerald-800/60 shadow-sm"
-                  )}
+                  onClick={() => handleNotificationTap(notif)}
+                  className={`
+                    p-4 rounded-[20px] border transition-all flex items-start gap-3.5 cursor-pointer
+                    ${
+                      notif.is_read
+                        ? 'bg-white dark:bg-[#171717]/20 border-neutral-200/70 dark:border-[#1C1C1E] text-neutral-500 hover:border-neutral-300'
+                        : 'bg-[#FAFAFA] dark:bg-[#18181B] border-neutral-300 dark:border-[#3F3F46] shadow-xs hover:border-neutral-400'
+                    }
+                  `}
                 >
-                  {/* Icon */}
+                  {/* Icon Box (42x42, rounded-[13px]) */}
                   <div
-                    className={cn(
-                      "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
-                      style.bgLight,
-                      style.bgDark
-                    )}
+                    className={`
+                      w-10.5 h-10.5 rounded-[13px] flex items-center justify-center shrink-0
+                      ${style.bgLight} ${style.bgDark}
+                    `}
                   >
-                    <Icon className={style.iconColor} size={18} />
+                    <Icon className={`w-5 h-5 ${style.iconColor}`} />
                   </div>
 
                   {/* Body */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2 mb-1">
                       <h4
-                        className={cn(
-                          "text-xs sm:text-sm font-black truncate",
-                          notif.is_read
-                            ? "text-neutral-800 dark:text-neutral-200"
-                            : "text-neutral-950 dark:text-white"
-                        )}
+                        className={`
+                          text-[15px] leading-snug truncate
+                          ${
+                            notif.is_read
+                              ? 'font-semibold text-neutral-700 dark:text-neutral-300'
+                              : 'font-bold text-neutral-950 dark:text-white'
+                          }
+                        `}
                       >
                         {notif.title}
                       </h4>
-                      <time className="text-[10px] text-neutral-400 font-bold shrink-0">
-                        {formatRelativeTime(notif.created_at)}
-                      </time>
+                      {/* Red unread dot */}
+                      {!notif.is_read && (
+                        <div className="w-2 h-2 rounded-full bg-[#DC2626] shrink-0 mt-1" />
+                      )}
                     </div>
 
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 leading-relaxed font-medium">
+                    <p className="text-[13.5px] text-neutral-600 dark:text-[#A1A1AA] leading-relaxed mb-2.5">
                       {notif.message}
                     </p>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                    {!notif.is_read && (
-                      <button
-                        onClick={(e) => handleMarkRead(notif.id, e)}
-                        className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
-                        title="পঠিত হিসেবে চিহ্নিত করো"
-                      >
-                        <CheckCheck size={14} />
-                      </button>
-                    )}
-                    <button
-                      onClick={(e) => handleDelete(notif.id, e)}
-                      className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-                      title="মুছে ফেলো"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {/* Bottom Status & Quick Action Row */}
+                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-[#71717A]">
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{formatDateDistance(notif.created_at)}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Single Mark Read Icon Button */}
+                        {!notif.is_read && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleMarkRead(notif.id, e)}
+                            className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-[#27272A] flex items-center justify-center text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 transition-colors cursor-pointer"
+                            title="পঠিত হিসেবে চিহ্নিত করো"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+
+                        {/* Delete Icon Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleDelete(notif.id, e)}
+                          className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-[#27272A] flex items-center justify-center text-[#DC2626] hover:bg-rose-100 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                          title="মুছে ফেলো"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               );
             })}
           </AnimatePresence>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="py-4 text-center">
+              <button
+                type="button"
+                onClick={() => fetchNotifs(page + 1, true)}
+                disabled={isLoadingMore}
+                className="px-6 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-900 dark:text-white font-bold text-xs sm:text-sm shadow-xs hover:bg-neutral-50 dark:hover:bg-[#202024] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isLoadingMore ? 'লোড হচ্ছে...' : 'আরও দেখুন'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

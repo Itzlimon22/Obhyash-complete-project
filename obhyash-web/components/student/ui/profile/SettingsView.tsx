@@ -1,47 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   User,
-  ChevronRight,
-  ArrowLeft,
+  Pencil,
+  Info,
+  Gift,
+  Bookmark,
   AlertTriangle,
   Bell,
-  BookOpen,
+  MessageSquare,
+  Sparkles,
   Crown,
-  ArrowUpRight,
-  Info,
+  TrendingUp,
   Shield,
   FileText,
   HelpCircle,
-  LogOut,
-  ExternalLink,
+  Fingerprint,
+  Link2,
   Sun,
   Moon,
-  Bookmark,
-  MessageSquare,
-  Sparkles,
-  Fingerprint,
-  Copy,
-  Check,
-  Hash,
-  Mail,
-  Phone,
-  X,
+  LogOut,
   Trash2,
-  Link2,
+  ChevronRight,
+  ArrowLeft,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
 import AccountLinkingPanel from './settings/AccountLinkingPanel';
-import { createClient } from '@/utils/supabase/client';
-import { toast } from 'sonner';
-
 import ReportsPanel from './settings/ReportsPanel';
 import MySubscriptionPanel from './settings/MySubscriptionPanel';
 import SubscriptionView from './SubscriptionView';
+import AboutUsView from './AboutUsView';
+import PrivacyPolicyView from './PrivacyPolicyView';
+import TermsConditionsView from './TermsConditionsView';
+import FaqPanel from './settings/FaqPanel';
+import AccountInfoModal from './settings/AccountInfoModal';
+import AccountInfoView from './settings/AccountInfoView';
+import DeleteAccountModal from './settings/DeleteAccountModal';
 import NotificationsView from '@/components/student/features/notifications/NotificationsView';
+
+import DeleteAccountPanel from './settings/DeleteAccountPanel';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -52,815 +52,549 @@ interface SettingsViewProps {
   isDarkMode?: boolean;
 }
 
-type PanelSection =
+type ActivePanel =
+  | null
   | 'personal'
   | 'account-linking'
+  | 'account-info'
   | 'reports'
   | 'my-subscription'
+  | 'upgrade'
   | 'notifications'
-  | 'upgrade';
+  | 'about'
+  | 'privacy'
+  | 'terms'
+  | 'faq'
+  | 'delete-account';
 
-interface BaseItem {
+type ItemType = 'navigate' | 'external' | 'action';
+
+interface SettingsItem {
   label: string;
   description: string;
-  Icon: React.ComponentType<{ className?: string }>;
-}
-interface PanelItem extends BaseItem {
-  type: 'panel';
-  id: PanelSection;
-}
-interface InternalItem extends BaseItem {
-  type: 'internal';
-  tab: string;
-}
-interface ExternalItem extends BaseItem {
-  type: 'external';
-  href: string;
-}
-interface ActionItem extends BaseItem {
-  type: 'action';
-  id: string;
+  icon: React.ElementType;
+  type: ItemType;
+  route?: string;
+  url?: string;
+  actionId?: string;
   danger?: boolean;
 }
-
-type SettingsItem = PanelItem | InternalItem | ExternalItem | ActionItem;
 
 interface SettingsGroup {
   title: string;
   items: SettingsItem[];
 }
 
-const GROUPS: SettingsGroup[] = [
-  {
-    title: 'অ্যাকাউন্ট',
-    items: [
-      {
-        type: 'panel',
-        id: 'personal',
-        label: 'ব্যক্তিগত তথ্য',
-        description: 'নাম, ছবি, একাডেমিক তথ্য',
-        Icon: User,
-      },
-      {
-        type: 'panel',
-        id: 'account-linking',
-        label: 'অ্যাকাউন্ট লিংকিং',
-        description: 'Google ও অন্যান্য অ্যাকাউন্ট সংযুক্ত ও ম্যানেজ করো',
-        Icon: Link2,
-      },
-      {
-        type: 'action',
-        id: 'accountInfo',
-        label: 'অ্যাকাউন্ট ইনফো',
-        description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার তথ্য',
-        Icon: Fingerprint,
-      },
-    ],
-  },
-  {
-    title: 'কার্যকলাপ',
-    items: [
-      {
-        type: 'internal',
-        tab: 'bookmarks',
-        label: 'আমার বুকমার্কস',
-        description: 'সংরক্ষণ করা প্রশ্নগুলো',
-        Icon: Bookmark,
-      },
-      {
-        type: 'panel',
-        id: 'reports',
-        label: 'আমার রিপোর্ট',
-        description: 'রিপোর্ট করা প্রশ্ন ও অ্যাডমিন ফিডব্যাক',
-        Icon: AlertTriangle,
-      },
-      {
-        type: 'panel',
-        id: 'notifications',
-        label: 'নোটিফিকেশন',
-        description: 'নতুন আপডেট ও বার্তা',
-        Icon: Bell,
-      },
-      {
-        type: 'internal',
-        tab: 'complaint',
-        label: 'অভিযোগ ও মতামত',
-        description: 'অ্যাপের সমস্যা, বাগ বা ফিচারের পরামর্শ জানাও',
-        Icon: MessageSquare,
-      },
-      {
-        type: 'internal',
-        tab: 'feature-requests',
-        label: 'নতুন ফিচার প্রস্তাব',
-        description: 'অ্যাপের জন্য নতুন ফিচারের আইডিয়া পাঠাও',
-        Icon: Sparkles,
-      },
-    ],
-  },
-  {
-    title: 'সাবস্ক্রিপশন',
-    items: [
-      {
-        type: 'panel',
-        id: 'my-subscription',
-        label: 'আমার সাবস্ক্রিপশন',
-        description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
-        Icon: Crown,
-      },
-      {
-        type: 'panel',
-        id: 'upgrade',
-        label: 'আপগ্রেড করো',
-        description: 'প্ল্যান দেখো ও আপগ্রেড করো',
-        Icon: ArrowUpRight,
-      },
-    ],
-  },
-  {
-    title: 'কন্টেন্ট',
-    items: [
-      {
-        type: 'internal',
-        tab: 'blog',
-        label: 'ব্লগ',
-        description: 'আর্টিকেল ও গাইড পড়ো',
-        Icon: BookOpen,
-      },
-    ],
-  },
-  {
-    title: 'অ্যাপ ও আইনি',
-    items: [
-      {
-        type: 'internal',
-        tab: 'about',
-        label: 'আমাদের সম্পর্কে',
-        description: 'Obhyash সম্পর্কে জানো',
-        Icon: Info,
-      },
-      {
-        type: 'external',
-        href: '/privacy',
-        label: 'প্রাইভেসি পলিসি',
-        description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
-        Icon: Shield,
-      },
-      {
-        type: 'external',
-        href: '/terms',
-        label: 'ব্যবহারের নিয়মাবলী',
-        description: 'শর্ত ও বিধিমালা',
-        Icon: FileText,
-      },
-      {
-        type: 'external',
-        href: '/faq',
-        label: 'সাহায্য ও FAQ',
-        description: 'সাধারণ প্রশ্নের উত্তর',
-        Icon: HelpCircle,
-      },
-    ],
-  },
-  {
-    title: '',
-    items: [
-      {
-        type: 'action',
-        id: 'logout',
-        label: 'লগ আউট',
-        description: 'অ্যাকাউন্ট থেকে বের হও',
-        Icon: LogOut,
-        danger: true,
-      },
-      {
-        type: 'action',
-        id: 'deleteAccount',
-        label: 'অ্যাকাউন্ট মুছুন',
-        description: 'স্থায়ীভাবে তোমার অ্যাকাউন্ট ও ডেটা ডিলিট করো',
-        Icon: Trash2,
-        danger: true,
-      },
-    ],
-  },
-];
-
-function ProfileCard({
-  user,
-  isDarkMode,
-  toggleTheme,
-}: {
-  user: UserProfile;
-  isDarkMode?: boolean;
-  toggleTheme?: () => void;
-}) {
-  return (
-    <div className="max-w-5xl mx-auto mb-6 rounded-2xl overflow-hidden border border-neutral-200/90 dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
-      {/* Brand deep green header */}
-      <div className="bg-[#004633] px-6 py-8 flex flex-col items-center gap-3">
-        <UserAvatar user={user} size="2xl" showBorder />
-        <div className="text-center">
-          <h2 className="text-xl font-black text-white tracking-tight">
-            {user.name}
-          </h2>
-          {user.email && (
-            <p className="text-sm text-white/70 mt-1 truncate max-w-xs">
-              {user.email}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Info chips + theme toggle */}
-      <div className="bg-white dark:bg-[#18181B] px-5 pt-4 pb-5 space-y-4">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {user.phone && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
-              📞 {user.phone}
-            </span>
-          )}
-          {user.institute && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
-              🏫 {user.institute}
-            </span>
-          )}
-          {user.batch && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-[#27272A] rounded-full text-xs font-bold text-neutral-700 dark:text-neutral-300">
-              📅 ব্যাচ {user.batch}
-            </span>
-          )}
-        </div>
-
-        {toggleTheme && (
-          <div className="flex rounded-xl overflow-hidden border border-neutral-200 dark:border-[#27272A]">
-            <button
-              onClick={() => isDarkMode && toggleTheme()}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
-                !isDarkMode
-                  ? 'bg-[#004633] text-white'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#141417]'
-              }`}
-            >
-              <Sun className="w-3.5 h-3.5" />
-              লাইট
-            </button>
-            <button
-              onClick={() => !isDarkMode && toggleTheme()}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
-                isDarkMode
-                  ? 'bg-[#004633] text-white'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#141417]'
-              }`}
-            >
-              <Moon className="w-3.5 h-3.5" />
-              ডার্ক
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default function SettingsView({
+export const SettingsView: React.FC<SettingsViewProps> = ({
   user,
   onSave,
   onNavigate,
   onLogout,
   toggleTheme,
-  isDarkMode,
-}: SettingsViewProps) {
-  const [activeSection, setActiveSection] = useState<PanelSection | null>(null);
-  const [showAccountInfo, setShowAccountInfo] = useState(false);
+  isDarkMode = false,
+}) => {
+  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  const [showAccountInfoModal, setShowAccountInfoModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-  const desktopSection: PanelSection = activeSection ?? 'personal';
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const displayStudentId =
-    user.student_id ||
-    (user.id
-      ? `OBH-${user.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`
-      : `OBH-${Math.floor(10000 + Math.random() * 90000)}`);
+  const groups: SettingsGroup[] = [
+    {
+      title: 'কার্যকলাপ',
+      items: [
+        {
+          label: 'প্রোফাইল',
+          description: 'এক্সাম ইতিহাস, বিষয়ভিত্তিক স্কোর',
+          icon: User,
+          type: 'navigate',
+          route: 'analysis',
+        },
+        {
+          label: 'বুকমার্ক',
+          description: 'সংরক্ষণ করা প্রশ্নগুলো',
+          icon: Bookmark,
+          type: 'navigate',
+          route: 'bookmarks',
+        },
+        {
+          label: 'রিপোর্ট',
+          description: 'রিপোর্ট করা প্রশ্ন ও অ্যাডমিন ফিডব্যাক',
+          icon: AlertTriangle,
+          type: 'navigate',
+          actionId: 'reports',
+        },
+        {
+          label: 'নোটিফিকেশন',
+          description: 'নতুন আপডেট ও বার্তা',
+          icon: Bell,
+          type: 'navigate',
+          actionId: 'notifications',
+        },
+        {
+          label: 'অভিযোগ ও মতামত',
+          description: 'অ্যাপের সমস্যা, বাগ বা ফিচারের পরামর্শ জানাও',
+          icon: MessageSquare,
+          type: 'navigate',
+          route: 'complaint',
+        },
+        {
+          label: 'ফিচার রিকোয়েস্ট',
+          description: 'অ্যাপের জন্য নতুন ফিচারের প্রস্তাব ও আইডিয়া পাঠাও',
+          icon: Sparkles,
+          type: 'navigate',
+          route: 'feature-requests',
+        },
+      ],
+    },
+    {
+      title: 'সাবস্ক্রিপশন',
+      items: [
+        {
+          label: 'সাবস্ক্রিপশন',
+          description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
+          icon: Crown,
+          type: 'navigate',
+          actionId: 'my-subscription',
+        },
+        {
+          label: 'আপগ্রেড',
+          description: 'নতুন প্ল্যান কিনুন',
+          icon: TrendingUp,
+          type: 'navigate',
+          actionId: 'upgrade',
+        },
+      ],
+    },
+    {
+      title: 'অ্যাপ ও আইনি',
+      items: [
+        {
+          label: 'পরিচিতি',
+          description: 'Obhyash সম্পর্কে জানো',
+          icon: Info,
+          type: 'navigate',
+          actionId: 'about',
+        },
+        {
+          label: 'প্রাইভেসি',
+          description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
+          icon: Shield,
+          type: 'navigate',
+          actionId: 'privacy',
+        },
+        {
+          label: 'শর্তাবলী',
+          description: 'শর্ত ও বিধিমালা',
+          icon: FileText,
+          type: 'navigate',
+          actionId: 'terms',
+        },
+        {
+          label: 'সাহায্য',
+          description: 'সাধারণ প্রশ্নের উত্তর',
+          icon: HelpCircle,
+          type: 'navigate',
+          actionId: 'faq',
+        },
+      ],
+    },
+    {
+      title: 'অ্যাকাউন্ট ও সেটিংস',
+      items: [
+        {
+          label: 'অ্যাকাউন্ট ইনফো',
+          description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার জরুরি তথ্য',
+          icon: Fingerprint,
+          type: 'action',
+          actionId: 'accountInfo',
+        },
+        {
+          label: 'অ্যাকাউন্ট লিংকিং',
+          description: 'গুগল ও অন্যান্য অ্যাকাউন্ট সংযুক্ত ও ম্যানেজ করো',
+          icon: Link2,
+          type: 'navigate',
+          actionId: 'account-linking',
+        },
+        {
+          label: isDarkMode ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
+          description: 'অ্যাপের কালার থিম পরিবর্তন করো',
+          icon: isDarkMode ? Sun : Moon,
+          type: 'action',
+          actionId: 'toggleTheme',
+        },
+        {
+          label: 'লগ আউট',
+          description: 'অ্যাকাউন্ট থেকে বের হও',
+          icon: LogOut,
+          type: 'action',
+          actionId: 'logout',
+          danger: true,
+        },
+        {
+          label: 'অ্যাকাউন্ট মুছুন',
+          description: 'স্থায়ীভাবে তোমার অ্যাকাউন্ট ও ডেটা ডিলিট করো',
+          icon: Trash2,
+          type: 'action',
+          actionId: 'deleteAccount',
+          danger: true,
+        },
+      ],
+    },
+  ];
 
-  const handleCopy = (label: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(label);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleCopyAll = () => {
-    const lines = [
-      '📋 Obhyash Account Info:',
-      `• Student ID: ${displayStudentId}`,
-      `• User Name: ${user.name || 'N/A'}`,
-      user.email ? `• Email: ${user.email}` : null,
-      user.phone ? `• Phone: ${user.phone}` : null,
-      user.stream ? `• Stream: ${user.stream}${user.batch ? ` (${user.batch})` : ''}` : null,
-      user.institute ? `• Institute: ${user.institute}` : null,
-      `• System UUID: ${user.id || 'N/A'}`,
-    ].filter(Boolean);
-
-    navigator.clipboard.writeText(lines.join('\n'));
-    setCopiedField('all');
-    setTimeout(() => setCopiedField(null), 2500);
-  };
-
-  const handleDeleteAccount = async () => {
-    if (deleteConfirmation.trim() !== 'DELETE') {
-      toast.error('অ্যাকাউন্ট মুছতে নিশ্চিতকরণ বক্সে "DELETE" লিখো।');
+  const handleItemClick = (item: SettingsItem) => {
+    if (item.actionId === 'accountInfo') {
+      setActivePanel('account-info');
+      return;
+    }
+    if (item.actionId === 'deleteAccount') {
+      setActivePanel('delete-account');
+      return;
+    }
+    if (item.actionId === 'logout') {
+      setShowLogoutModal(true);
+      return;
+    }
+    if (item.actionId === 'toggleTheme') {
+      toggleTheme?.();
+      return;
+    }
+    if (item.actionId === 'reports') {
+      setActivePanel('reports');
+      return;
+    }
+    if (item.actionId === 'notifications') {
+      setActivePanel('notifications');
+      return;
+    }
+    if (item.actionId === 'my-subscription') {
+      setActivePanel('my-subscription');
+      return;
+    }
+    if (item.actionId === 'upgrade') {
+      setActivePanel('upgrade');
+      return;
+    }
+    if (item.actionId === 'about') {
+      setActivePanel('about');
+      return;
+    }
+    if (item.actionId === 'privacy') {
+      setActivePanel('privacy');
+      return;
+    }
+    if (item.actionId === 'terms') {
+      setActivePanel('terms');
+      return;
+    }
+    if (item.actionId === 'faq') {
+      setActivePanel('faq');
+      return;
+    }
+    if (item.actionId === 'account-linking') {
+      setActivePanel('account-linking');
       return;
     }
 
-    setIsDeleting(true);
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.rpc('delete_user_account', {
-        p_reason: 'User requested deletion',
-      });
-
-      if (error) throw error;
-
-      await supabase.auth.signOut();
-      toast.success('তোমার অ্যাকাউন্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে।');
-      window.location.href = '/login';
-    } catch (err: unknown) {
-      setIsDeleting(false);
-      const msg = err instanceof Error ? err.message : 'অ্যাকাউন্ট মুছতে সমস্যা হয়েছে।';
-      toast.error(msg.replace('Exception:', '').trim());
+    if (item.type === 'navigate' && item.route) {
+      onNavigate?.(item.route);
     }
   };
 
-  const handleItem = (item: SettingsItem) => {
-    if (item.type === 'panel') {
-      setActiveSection(item.id);
-      return;
-    }
-    if (item.type === 'internal') {
-      onNavigate?.(item.tab);
-      return;
-    }
-    if (item.type === 'external') {
-      window.open(item.href, '_blank', 'noopener');
-      return;
-    }
-    if (item.type === 'action') {
-      if (item.id === 'accountInfo') {
-        setShowAccountInfo(true);
-        return;
-      }
-      if (item.id === 'deleteAccount') {
-        setShowDeleteModal(true);
-        return;
-      }
-      if (item.id === 'logout') {
-        onLogout?.();
-        return;
-      }
-    }
-  };
-
-  const renderPanel = (section: PanelSection) => {
-    const panelTitles: Record<PanelSection, string> = {
-      personal: 'ব্যক্তিগত তথ্য',
-      'account-linking': 'অ্যাকাউন্ট লিংকিং',
-      reports: 'আমার রিপোর্ট',
-      'my-subscription': 'আমার সাবসক্রিপশন',
-      notifications: 'নোটিফিকেশন',
-      upgrade: 'আপগ্রেড করো',
-    };
-    const content = (() => {
-      switch (section) {
-        case 'personal':
-          return <PersonalDetailsPanel user={user} onSave={onSave} />;
-        case 'account-linking':
-          return <AccountLinkingPanel user={user} />;
-        case 'reports':
-          return <ReportsPanel user={user} />;
-        case 'my-subscription':
-          return (
-            <MySubscriptionPanel
-              onUpgrade={() => setActiveSection('upgrade')}
-            />
-          );
-        case 'notifications':
-          return <NotificationsView />;
-        case 'upgrade':
-          return <SubscriptionView />;
-      }
-    })();
-
+  // ── Render Sub-Panels if Active ────────────────────────────────────────────
+  if (activePanel) {
     return (
-      <div>
-        {/* Panel header with back button — shown on desktop */}
-        <div className="hidden md:flex items-center gap-3 mb-5 pb-4 border-b border-neutral-200 dark:border-neutral-800">
-          <button
-            onClick={() => setActiveSection('personal')}
-            className="flex items-center gap-1.5 text-xs font-bold text-neutral-400 dark:text-neutral-500 hover:text-green-700 dark:hover:text-green-400 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            সেটিংস
-          </button>
-          <span className="text-neutral-300 dark:text-neutral-700">/</span>
-          <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-100">
-            {panelTitles[section]}
-          </h2>
-        </div>
-        {content}
-      </div>
-    );
-  };
-
-  // Sidebar nav item renderer
-  const NavItem = ({ item }: { item: SettingsItem }) => {
-    const isPanel = item.type === 'panel';
-    const active = isPanel && desktopSection === (item as PanelItem).id;
-    const isDanger = item.type === 'action' && (item as ActionItem).danger;
-    const isExternal = item.type === 'external';
-    const isInternal = item.type === 'internal';
-
-    return (
-      <li>
+      <div className="max-w-4xl mx-auto p-2 sm:p-4 font-['HindSiliguri',sans-serif]">
         <button
-          onClick={() => handleItem(item)}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-            active
-              ? 'bg-[#004633] text-white font-bold shadow-sm'
-              : isDanger
-                ? 'text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 font-bold'
-                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#27272A] font-bold'
-          }`}
+          onClick={() => setActivePanel(null)}
+          className="mb-4 flex items-center gap-2 text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
         >
-          <item.Icon className="w-4 h-4 shrink-0" />
-          <span className="text-xs sm:text-sm flex-1">{item.label}</span>
-          {(isExternal || isInternal) && !active && (
-            <ExternalLink className="w-3 h-3 shrink-0 opacity-50" />
-          )}
+          <ArrowLeft size={18} />
+          <span>সেটিংস এ ফিরে যান</span>
         </button>
-      </li>
-    );
-  };
 
-  return (
-    <>
-      {/* ── Profile Card — only on main settings page ─────── */}
-      {activeSection === null && (
-        <ProfileCard
-          user={user}
-          isDarkMode={isDarkMode}
-          toggleTheme={toggleTheme}
-        />
-      )}
+        {activePanel === 'personal' && (
+          <PersonalDetailsPanel
+            user={user}
+            onSave={async (data) => {
+              if (onSave) await onSave(data);
+              setActivePanel(null);
+            }}
+          />
+        )}
 
-      {/* ── DESKTOP (md+): sidebar + content ─────────────── */}
-      <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start font-['HindSiliguri']">
-        {/* Sidebar */}
-        <aside className="w-56 shrink-0 sticky top-4">
-          <nav className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm">
-            <div className="px-4 py-3 border-b border-[#003627] bg-[#004633]">
-              <p className="text-[11px] font-black text-white uppercase tracking-widest">
-                সেটিংস
-              </p>
-            </div>
-            <div className="p-2">
-              {GROUPS.map((group, gi) => (
-                <div
-                  key={gi}
-                  className={
-                    gi > 0
-                      ? 'mt-3 pt-3 border-t border-neutral-100 dark:border-[#27272A]'
-                      : ''
-                  }
-                >
-                  {group.title && (
-                    <p className="px-3 mb-1 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                      {group.title}
-                    </p>
-                  )}
-                  <ul className="space-y-0.5">
-                    {group.items.map((item) => (
-                      <NavItem key={item.label} item={item} />
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </nav>
-        </aside>
+        {activePanel === 'account-linking' && <AccountLinkingPanel user={user} />}
 
-        {/* Content panel */}
-        <div className="flex-1 min-w-0">{renderPanel(desktopSection)}</div>
-      </div>
+        {activePanel === 'account-info' && (
+          <AccountInfoView user={user} onBack={() => setActivePanel(null)} />
+        )}
 
-      {/* ── MOBILE: menu list → sub-panel with back button ── */}
-      <div className="md:hidden pb-24 font-['HindSiliguri']">
-        {activeSection === null ? (
-          <div className="space-y-4">
-            {GROUPS.map((group, gi) => (
-              <div key={gi}>
-                {group.title && (
-                  <p className="px-1 mb-2 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                    {group.title}
-                  </p>
-                )}
-                <div className="space-y-1.5">
-                  {group.items.map((item) => {
-                    const isDanger =
-                      item.type === 'action' && (item as ActionItem).danger;
-                    const isExternal = item.type === 'external';
-                    return (
-                      <button
-                        key={item.label}
-                        onClick={() => handleItem(item)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border text-left active:scale-[0.99] transition-transform shadow-sm ${
-                          isDanger
-                            ? 'bg-red-50 dark:bg-[#260C0E] border-red-200 dark:border-red-900/50 hover:border-red-400'
-                            : 'bg-white dark:bg-[#18181B] border-neutral-200/90 dark:border-[#27272A] hover:border-[#004633] dark:hover:border-[#004633]'
-                        }`}
-                      >
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                            isDanger ? 'bg-red-600' : 'bg-[#004633]'
-                          }`}
-                        >
-                          <item.Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className={`text-sm font-black ${isDanger ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-white'}`}
-                          >
-                            {item.label}
-                          </p>
-                          <p className="text-xs text-neutral-400 dark:text-neutral-500 truncate mt-0.5 font-bold">
-                            {item.description}
-                          </p>
-                        </div>
-                        {isExternal ? (
-                          <ExternalLink className="w-4 h-4 text-neutral-400 shrink-0" />
-                        ) : (
-                          <ChevronRight
-                            className={`w-4 h-4 shrink-0 ${isDanger ? 'text-red-400' : 'text-neutral-400'}`}
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div>
-            <button
-              onClick={() => setActiveSection(null)}
-              className="flex items-center gap-2 mb-5 text-sm font-black text-[#004633] dark:text-[#4ADE80] hover:underline"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              সেটিংস
-            </button>
-            {renderPanel(activeSection)}
-          </div>
+        {activePanel === 'reports' && <ReportsPanel user={user} />}
+
+        {activePanel === 'my-subscription' && (
+          <MySubscriptionPanel onUpgrade={() => setActivePanel('upgrade')} />
+        )}
+
+        {activePanel === 'upgrade' && <SubscriptionView />}
+
+        {activePanel === 'notifications' && <NotificationsView />}
+
+        {activePanel === 'about' && <AboutUsView initialPolicy="about" />}
+        {activePanel === 'privacy' && <PrivacyPolicyView />}
+        {activePanel === 'terms' && <TermsConditionsView />}
+
+        {activePanel === 'faq' && (
+          <FaqPanel onNavigateComplaint={() => onNavigate?.('complaint')} />
+        )}
+
+        {activePanel === 'delete-account' && (
+          <DeleteAccountPanel user={user} onBack={() => setActivePanel(null)} />
         )}
       </div>
+    );
+  }
 
-      {/* ── Account Info Modal ── */}
-      {showAccountInfo && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
-          onClick={() => setShowAccountInfo(false)}
-        >
-          <div
-            className="w-full max-w-md bg-[#13151F] text-white rounded-3xl p-6 shadow-2xl border border-neutral-800 space-y-6 animate-scaleIn relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setShowAccountInfo(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-neutral-800/80 hover:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+  const hasPhone = Boolean(user.phone && user.phone.trim().length > 0);
+  const hasInstitute = Boolean(
+    user.institute && user.institute.trim().length > 0
+  );
+  const hasBatch = Boolean(user.batch && user.batch.trim().length > 0);
 
-            {/* Header */}
-            <div className="text-center">
-              <h2 className="text-xl font-black font-serif-exam tracking-wide text-white">
-                অ্যাকাউন্ট ইনফো
-              </h2>
-              <p className="text-xs text-neutral-400 mt-1">
-                সাপোর্ট বা অ্যাডমিন সহায়তার জন্য প্রয়োজনীয় তথ্য
-              </p>
-            </div>
-
-            {/* Rows */}
-            <div className="space-y-4 pt-2">
-              {/* User Name */}
-              <div
-                onClick={() => handleCopy('name', user.name || '')}
-                className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
-              >
-                <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-neutral-400">
-                    User Name
-                  </p>
-                  <p className="text-base font-bold text-white truncate">
-                    {user.name || 'N/A'}
-                  </p>
-                </div>
-                {copiedField === 'name' ? (
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                ) : (
-                  <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
-                )}
-              </div>
-
-              {/* User ID */}
-              <div
-                onClick={() => handleCopy('id', displayStudentId)}
-                className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
-              >
-                <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
-                  <Hash className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-neutral-400">
-                    User ID
-                  </p>
-                  <p className="text-base font-mono font-bold text-white truncate">
-                    {displayStudentId}
-                  </p>
-                </div>
-                {copiedField === 'id' ? (
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                ) : (
-                  <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
-                )}
-              </div>
-
-              {/* Email */}
-              {user.email && (
-                <div
-                  onClick={() => handleCopy('email', user.email || '')}
-                  className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
-                    <Mail className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-neutral-400">
-                      Email
-                    </p>
-                    <p className="text-base font-bold text-white truncate">
-                      {user.email}
-                    </p>
-                  </div>
-                  {copiedField === 'email' ? (
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
-                  )}
-                </div>
-              )}
-
-              {/* Phone */}
-              {user.phone && (
-                <div
-                  onClick={() => handleCopy('phone', user.phone || '')}
-                  className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
-                    <Phone className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-neutral-400">
-                      Phone
-                    </p>
-                    <p className="text-base font-bold text-white truncate">
-                      {user.phone}
-                    </p>
-                  </div>
-                  {copiedField === 'phone' ? (
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Copy All Button */}
-            <button
-              onClick={handleCopyAll}
-              className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 transition-all active:scale-[0.98]"
-            >
-              {copiedField === 'all' ? (
-                <>
-                  <Check className="w-5 h-5" />
-                  <span>কপি হয়েছে!</span>
-                </>
-              ) : (
-                <>
-                  <span>Copy</span>
-                  <Copy className="w-4 h-4" />
-                </>
-              )}
-            </button>
+  return (
+    <div className="max-w-2xl mx-auto flex flex-col gap-2 px-2.5 sm:px-4 py-3 font-['HindSiliguri',sans-serif]">
+      {/* ── 1. Top Profile Card (1:1 with Flutter SettingsView) ── */}
+      <div className="rounded-[20px] border border-[#E5E5E5] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-[0_2px_8px_rgba(0,0,0,0.03)] overflow-hidden">
+        {/* Forest Green Gradient Banner */}
+        <div className="bg-gradient-to-br from-[#166534] to-[#14532D] pt-7 pb-6 px-5 flex flex-col items-center text-center text-white">
+          <div className="ring-[3px] ring-white/30 rounded-full shadow-lg">
+            <UserAvatar user={user} size="2xl" className="w-20 h-20" />
           </div>
+          <h2 className="text-[20px] font-bold text-white leading-tight mt-3">
+            {user.name || 'শিক্ষার্থী'}
+          </h2>
+          {user.email && (
+            <p className="text-[14px] text-white/80 font-normal mt-1 truncate max-w-sm">
+              {user.email}
+            </p>
+          )}
         </div>
-      )}
 
-      {/* ─── Delete Account Modal ────────────────────────────────────────── */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md bg-neutral-900 rounded-3xl p-6 border border-red-900/50 shadow-2xl space-y-5 animate-in zoom-in-95">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-950/80 border border-red-800/60 flex items-center justify-center text-red-500">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-red-400 font-anek">
-                    অ্যাকাউন্ট মুছুন (Delete Account)
-                  </h3>
-                  <p className="text-xs text-neutral-400 font-anek">
-                    এই প্রক্রিয়াটি অপরিবর্তনীয় ও স্থায়ী
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="p-1 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Pro Warning */}
-            {user.subscription?.plan === 'Pro' && (
-              <div className="p-3.5 bg-amber-950/50 border border-amber-800/60 rounded-2xl flex items-start gap-2.5">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-200 font-anek font-semibold leading-relaxed">
-                  সতর্কতা: তোমার অ্যাকাউন্টে প্রো সাবস্ক্রিপশন সক্রিয় আছে। অ্যাকাউন্ট মুছে ফেললে সাবস্ক্রিপশন বাতিল হবে এবং কোনো রিফান্ড প্রযোজ্য হবে না।
-                </p>
+        {/* Info Chips & 4 Action Buttons Row */}
+        <div className="p-4 space-y-4">
+          {/* Info Chips */}
+          <div className="flex flex-col gap-2">
+            {(hasPhone || hasInstitute) && (
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                {hasPhone && (
+                  <div className="flex-1 min-w-[140px] px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[13px] font-medium flex items-center justify-center gap-1.5 truncate">
+                    <span>📞</span>
+                    <span className="truncate">{user.phone}</span>
+                  </div>
+                )}
+                {hasInstitute && (
+                  <div className="flex-1 min-w-[140px] px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[13px] font-medium flex items-center justify-center gap-1.5 truncate">
+                    <span>🏫</span>
+                    <span className="truncate">{user.institute}</span>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Warning Points */}
-            <div className="space-y-2 text-xs text-neutral-300 font-anek bg-neutral-950/60 p-4 rounded-2xl border border-neutral-800">
-              <p className="font-bold text-neutral-200 mb-1">অ্যাকাউন্ট মুছে ফেললে:</p>
-              <p className="flex items-center gap-2 text-neutral-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                সমস্ত ব্যক্তিগত প্রোফাইল ও লগইন চিরতরে ডিলিট হবে।
-              </p>
-              <p className="flex items-center gap-2 text-neutral-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                পরীক্ষার ইতিহাস, স্কোর, স্ট্রিক ও ফলাফল মুছে যাবে।
-              </p>
-              <p className="flex items-center gap-2 text-neutral-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                সংরক্ষিত বুকমার্ক ও স্ক্র্যাচ কার্ড নষ্ট হবে।
-              </p>
-            </div>
+            {hasBatch && (
+              <div className="w-full px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[13px] font-medium flex items-center justify-center gap-1.5 truncate">
+                <span>📅</span>
+                <span className="truncate">
+                  {user.batch?.toLowerCase().includes('ব্যাচ')
+                    ? user.batch
+                    : `ব্যাচ ${user.batch}`}
+                </span>
+              </div>
+            )}
+          </div>
 
-            {/* Confirm Type */}
-            <div>
-              <label className="block text-xs font-bold text-neutral-200 font-anek mb-1.5">
-                নিশ্চিত করতে নিচে &quot;DELETE&quot; লিখো:
-              </label>
-              <input
-                type="text"
-                value={deleteConfirmation}
-                onChange={(e) => setDeleteConfirmation(e.target.value)}
-                placeholder="DELETE"
-                className="w-full px-3.5 py-2.5 bg-neutral-800/80 border border-red-800/60 rounded-xl text-sm font-mono font-bold tracking-widest text-red-400 placeholder:text-neutral-600 focus:outline-none focus:border-red-500 uppercase"
-              />
-            </div>
+          {/* 4 Action Buttons Row */}
+          <div className="flex items-center gap-1.5 pt-1">
+            {/* 1. Profile */}
+            <button
+              type="button"
+              onClick={() => onNavigate?.('analysis')}
+              className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+            >
+              <User className="w-[17px] h-[17px]" />
+              <span className="text-[13px] font-semibold leading-none">
+                প্রোফাইল
+              </span>
+            </button>
 
-            {/* Actions */}
-            <div className="flex items-center gap-3 pt-2">
+            {/* 2. Edit */}
+            <button
+              type="button"
+              onClick={() => setActivePanel('personal')}
+              className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+            >
+              <Pencil className="w-[17px] h-[17px]" />
+              <span className="text-[13px] font-semibold leading-none">
+                এডিট
+              </span>
+            </button>
+
+            {/* 3. Info */}
+            <button
+              type="button"
+              onClick={() => setActivePanel('account-info')}
+              className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+            >
+              <Info className="w-[17px] h-[17px]" />
+              <span className="text-[13px] font-semibold leading-none">
+                ইনফো
+              </span>
+            </button>
+
+            {/* 4. Refer (Accent) */}
+            <button
+              type="button"
+              onClick={() => onNavigate?.('referral')}
+              className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#FFF1F2] dark:bg-[#881337]/20 border border-[#FECDD3] dark:border-[#7F1D1D]/50 text-[#EF4444] hover:bg-rose-100 dark:hover:bg-[#881337]/30 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
+            >
+              <Gift className="w-[17px] h-[17px]" />
+              <span className="text-[13px] font-semibold leading-none">
+                রেফার
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2. Settings Groups (Individual cards matching Flutter) ── */}
+      <div className="space-y-4 pt-2">
+        {groups.map((group, gIdx) => (
+          <div key={gIdx} className="space-y-2">
+            {/* Group Header Title */}
+            {group.title && (
+              <h3 className="px-2 text-[14px] font-bold text-[#71717A] dark:text-[#A1A1AA]">
+                {group.title}
+              </h3>
+            )}
+
+            {/* Group Items as Separate Cards */}
+            <div className="space-y-2">
+              {group.items.map((item, iIdx) => {
+                const Icon = item.icon;
+                const isAction = item.type === 'action';
+
+                return (
+                  <button
+                    key={iIdx}
+                    type="button"
+                    onClick={() => handleItemClick(item)}
+                    className="w-full p-3.5 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-[0_1px_4px_rgba(0,0,0,0.02)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.1)] flex items-center justify-between gap-3 text-left hover:bg-neutral-50 dark:hover:bg-[#202024] transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Icon Container */}
+                      <div
+                        className={`
+                          w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105
+                          ${
+                            item.danger
+                              ? 'bg-rose-500/10 dark:bg-rose-500/20 text-[#EF4444]'
+                              : 'bg-[#059669]/10 dark:bg-[#059669]/20 text-[#059669] dark:text-[#34D399]'
+                          }
+                        `}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+
+                      {/* Text Column */}
+                      <div className="min-w-0">
+                        <p
+                          className={`
+                            text-[16px] font-semibold leading-tight truncate
+                            ${
+                              item.danger
+                                ? 'text-[#EF4444]'
+                                : 'text-[#111827] dark:text-white'
+                            }
+                          `}
+                        >
+                          {item.label}
+                        </p>
+                        <p className="text-[13px] text-[#6B7280] dark:text-[#9CA3AF] font-normal truncate mt-0.5">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right Indicator (Circle with Chevron or External Link) */}
+                    {!isAction && (
+                      <div className="w-6 h-6 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] flex items-center justify-center shrink-0">
+                        <ChevronRight className="w-[15px] h-[15px] text-[#71717A] dark:text-[#A1A1AA]" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── 3. Account Info Modal ── */}
+      {showAccountInfoModal && (
+        <AccountInfoModal
+          user={user}
+          onClose={() => setShowAccountInfoModal(false)}
+        />
+      )}
+
+      {/* ── 4. Delete Account Modal ── */}
+      {showDeleteModal && (
+        <DeleteAccountModal
+          user={user}
+          onClose={() => setShowDeleteModal(false)}
+          onSuccessLogout={onLogout}
+        />
+      )}
+
+      {/* ── 5. Logout Confirmation Modal (1:1 with Flutter AlertDialog) ── */}
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <div
+            className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[20px] border border-neutral-200 dark:border-[#27272A] p-6 shadow-2xl font-['HindSiliguri',sans-serif]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+              লগ আউট
+            </h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-2">
+              তুমি কি নিশ্চিতভাবে লগ আউট করতে চাও?
+            </p>
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-2xl font-bold font-anek text-sm transition-colors"
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
               >
-                বাতিল করো
+                বাতিল
               </button>
               <button
                 type="button"
-                disabled={isDeleting || deleteConfirmation.trim() !== 'DELETE'}
-                onClick={handleDeleteAccount}
-                className="flex-1 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold font-anek text-sm shadow-lg shadow-red-950/50 transition-all active:scale-[0.98]"
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  onLogout?.();
+                }}
+                className="px-4 py-2 rounded-lg text-sm font-bold text-[#B91C1C] hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
               >
-                {isDeleting ? 'মুছে ফেলা হচ্ছে...' : 'হ্যাঁ, মুছে ফেলো'}
+                লগ আউট
               </button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
-}
+};
+
+export default SettingsView;
