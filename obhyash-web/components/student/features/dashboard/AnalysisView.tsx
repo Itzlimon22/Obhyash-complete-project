@@ -149,18 +149,19 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         const { data: rawData, error } = await supabase
           .from("exam_results")
           .select(
-            "id, score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, created_at, subject, title, status"
+            "id, score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, created_at, subject, status, negative_marking, submission_type"
           )
           .eq("user_id", uid)
-          .gte("created_at", dateFilter.toISOString())
-          .order("created_at", { ascending: true });
+          .neq("submission_type", "started")
+          .gte("date", dateFilter.toISOString())
+          .order("date", { ascending: true });
 
         if (!error && rawData && rawData.length > 0) {
           examList = rawData;
         } else if (history && history.length > 0) {
           examList = history.filter((h) => {
             const hDate = new Date(h.date || (h as any).created_at || "");
-            return hDate >= dateFilter;
+            return hDate >= dateFilter && (h as any).submissionType !== "started" && (h as any).submission_type !== "started";
           });
         }
       } catch (err) {
@@ -168,7 +169,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         if (history && history.length > 0) {
           examList = history.filter((h) => {
             const hDate = new Date(h.date || (h as any).created_at || "");
-            return hDate >= dateFilter;
+            return hDate >= dateFilter && (h as any).submissionType !== "started" && (h as any).submission_type !== "started";
           });
         }
       }
@@ -185,7 +186,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       let totalTime = 0;
       let scoreSum = 0;
       let highestScore = 0;
-      let lowestScore = 100;
+      let lowestScore = Infinity;
       let totalNegativeDeduction = 0;
 
       const subjectMap: Record<
@@ -201,25 +202,30 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         totalExams++;
         const correct = row.correct_count ?? row.correctCount ?? 0;
         const wrong = row.wrong_count ?? row.wrongCount ?? 0;
+        const totalMarks = row.total_marks ?? row.totalMarks ?? tQuestions;
+        const rawScore = row.score ?? 0;
         const score =
-          typeof row.score === "number"
-            ? row.score
+          typeof rawScore === "number"
+            ? totalMarks > 0
+              ? (rawScore / totalMarks) * 100
+              : rawScore
             : tQuestions > 0
             ? (correct / tQuestions) * 100
             : 0;
         const timeTaken = row.time_taken ?? row.timeTaken ?? 0;
         const subject = row.subject || "General";
-        const subjectLabel = row.title || row.subject_label;
+        const subjectLabel = row.subject_label || row.subjectLabel;
 
-        const rawDate = row.created_at || row.date || new Date().toISOString();
+        const rawDate = row.date || row.created_at || new Date().toISOString();
         const dateObj = new Date(rawDate);
+        const negFactor = typeof row.negative_marking === "number" ? row.negative_marking : 0.25;
 
         totalQuestions += tQuestions;
         totalCorrect += correct;
         totalWrong += wrong;
         totalTime += timeTaken;
         scoreSum += score;
-        totalNegativeDeduction += wrong * 0.25;
+        totalNegativeDeduction += wrong * negFactor;
 
         if (score > highestScore) highestScore = score;
         if (score < lowestScore) lowestScore = score;
@@ -243,7 +249,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         const dayMonth = `${dateObj.getDate()}/${dateObj.getMonth() + 1}`;
         timeline.push({
           label: dayMonth,
-          score: Math.round(score),
+          score: Math.min(100, Math.max(0, Math.round(score))),
           date: dateObj,
         });
       }
@@ -463,7 +469,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         totalSkipped: Math.max(0, totalQuestions - totalCorrect - totalWrong),
         avgTimePerQuestion,
         highestScore,
-        lowestScore: lowestScore <= 100 ? lowestScore : highestScore,
+        lowestScore: lowestScore !== Infinity ? lowestScore : (highestScore || 0),
         totalNegativeDeduction,
         masteryIndex,
         masteryTier,
@@ -494,7 +500,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
 
   if (!analytics || analytics.totalExams === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-12 flex flex-col items-center justify-center text-center min-h-[60vh] font-['HindSiliguri']">
+      <div className="max-w-4xl mx-auto px-3 sm:px-6 py-12 flex flex-col items-center justify-center text-center min-h-[60vh] font-sans">
         <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center text-[#004633] dark:text-emerald-400 mb-4 shadow-sm">
           <BarChart3 size={32} />
         </div>
@@ -518,7 +524,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const unlockedCount = a.achievements.filter((e) => e.unlocked).length;
 
   return (
-    <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 flex flex-col gap-5 font-['HindSiliguri']">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-3 flex flex-col gap-4 font-sans">
       {/* ── 1. HEADER & TIME FILTER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#141416] p-4 rounded-2xl border border-neutral-200/80 dark:border-[#27272A] shadow-sm">
         <div>

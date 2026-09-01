@@ -169,19 +169,7 @@ export const AccountInfoView: React.FC<AccountInfoViewProps> = ({
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
-      {/* Top Header / Back Action */}
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-4 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>ফিরে যাও</span>
-        </button>
-      )}
-
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── Header Card ── */}
       <div className="bg-white dark:bg-[#18181B] rounded-[20px] p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-6 text-center space-y-3">
         <div className="mx-auto w-fit">

@@ -90,19 +90,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24 animate-in fade-in duration-200">
-      {/* ── Top Header / Back ── */}
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-4 inline-flex items-center gap-2 text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>সেটিংসে ফিরে যাও</span>
-        </button>
-      )}
-
+    <div className="w-full max-w-2xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── Danger Hero Banner (1:1 with Flutter) ── */}
       <div className="p-6 sm:p-7 rounded-[24px] bg-red-50 dark:bg-[#200A0A] border border-red-200 dark:border-red-900/50 shadow-sm mb-5">
         <div className="flex items-center gap-3.5 mb-3">

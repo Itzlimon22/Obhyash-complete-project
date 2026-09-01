@@ -147,7 +147,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       ],
     },
     {
-      title: 'সাবস্ক্রিপশন',
+      title: 'সাবস্ক্রিপশন ও রিওয়ার্ডস',
       items: [
         {
           label: 'সাবস্ক্রিপশন',
@@ -162,6 +162,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           icon: TrendingUp,
           type: 'navigate',
           actionId: 'upgrade',
+        },
+        {
+          label: 'রেফারেল ও রিওয়ার্ড',
+          description: 'বন্ধুদের ইনভাইট করো এবং ফ্রি প্রো ও স্ক্র্যাচ কার্ড আনলক করো',
+          icon: Gift,
+          type: 'navigate',
+          route: 'referral',
         },
       ],
     },
@@ -264,6 +271,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       return;
     }
     if (item.actionId === 'notifications') {
+      if (onNavigate) {
+        onNavigate('notifications');
+        return;
+      }
       setActivePanel('notifications');
       return;
     }
@@ -272,27 +283,67 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       return;
     }
     if (item.actionId === 'upgrade') {
+      if (onNavigate) {
+        onNavigate('subscription');
+        return;
+      }
       setActivePanel('upgrade');
       return;
     }
+    if (item.actionId === 'account-info') {
+      if (onNavigate) {
+        onNavigate('account-info');
+        return;
+      }
+      setActivePanel('account-info');
+      return;
+    }
     if (item.actionId === 'about') {
+      if (onNavigate) {
+        onNavigate('about');
+        return;
+      }
       setActivePanel('about');
       return;
     }
     if (item.actionId === 'privacy') {
+      if (onNavigate) {
+        onNavigate('privacy');
+        return;
+      }
       setActivePanel('privacy');
       return;
     }
     if (item.actionId === 'terms') {
+      if (onNavigate) {
+        onNavigate('terms');
+        return;
+      }
       setActivePanel('terms');
       return;
     }
     if (item.actionId === 'faq') {
+      if (onNavigate) {
+        onNavigate('faq');
+        return;
+      }
       setActivePanel('faq');
       return;
     }
     if (item.actionId === 'account-linking') {
+      if (onNavigate) {
+        onNavigate('account-linking');
+        return;
+      }
       setActivePanel('account-linking');
+      return;
+    }
+    if (item.actionId === 'delete-account') {
+      if (onNavigate) {
+        onNavigate('delete-account');
+        return;
+      }
+      setActivePanel('delete-account');
       return;
     }
 
@@ -361,7 +412,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const hasBatch = Boolean(user.batch && user.batch.trim().length > 0);
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col gap-2 px-2.5 sm:px-4 py-3 font-['HindSiliguri',sans-serif]">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-3 px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif]">
       {/* ── 1. Top Profile Card (1:1 with Flutter SettingsView) ── */}
       <div className="rounded-[20px] border border-[#E5E5E5] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-[0_2px_8px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* Forest Green Gradient Banner */}

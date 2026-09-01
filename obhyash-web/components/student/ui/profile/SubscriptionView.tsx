@@ -215,7 +215,7 @@ export const SubscriptionView: React.FC = () => {
     : 0;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Active Subscription Banner (1:1 with Flutter) ── */}
       {activeSubscription && (
         <div className="mb-6 p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-neutral-800 shadow-xs flex items-center gap-3.5">

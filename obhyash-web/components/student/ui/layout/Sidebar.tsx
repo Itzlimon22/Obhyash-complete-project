@@ -9,6 +9,7 @@ import {
   PenTool,
   Trophy,
   BarChart2,
+  Gift,
   Newspaper,
   BookOpen,
   ChevronRight,
@@ -45,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   toggleTheme,
   user,
 }) => {
-  // ── Exact 9 Menu Items from Flutter MainSidebar.dart ───────────────────────
+  // ── Navigation Menu Items ──────────────────────────────────────────────────
   const menuItems = [
     { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
     { id: "setup", label: "পরীক্ষা", icon: FileEdit },
@@ -54,6 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "practice", label: "অনুশীলন", icon: PenTool },
     { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy },
     { id: "analysis", label: "এনালাইসিস", icon: BarChart2 },
+    { id: "referral", label: "রেফারেল", icon: Gift },
     { id: "blog", label: "ব্লগ", icon: Newspaper },
   ];
 

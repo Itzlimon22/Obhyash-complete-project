@@ -23,7 +23,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
     'bg-white dark:bg-[#18181B] rounded-[18px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Hero Branding Banner (1:1 with Flutter) ── */}
       <div className="p-6 sm:p-8 rounded-[24px] bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] dark:from-[#152922] dark:to-[#0F1A15] border border-[#059669]/20 dark:border-[#059669]/35 shadow-md shadow-[#059669]/10 text-center mb-5">
         <div className="w-18 h-18 rounded-full bg-gradient-to-br from-[#004633] to-[#059669] flex items-center justify-center text-white mx-auto shadow-lg shadow-[#059669]/40 mb-4">

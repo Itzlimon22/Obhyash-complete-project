@@ -26,6 +26,7 @@ interface AppLayoutProps {
   toggleTheme: () => void;
   isDarkMode: boolean;
   title?: string;
+  onBack?: () => void;
   noPadding?: boolean;
   simpleHeader?: boolean;
   customHeader?: ReactNode;
@@ -43,6 +44,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   toggleTheme,
   isDarkMode,
   title = 'ড্যাশবোর্ড',
+  onBack,
   noPadding = false,
   simpleHeader = false,
   customHeader,
@@ -205,7 +207,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    if (window.history.length > 1) {
+                    if (onBack) {
+                      onBack();
+                    } else if (window.history.length > 1) {
                       window.history.back();
                     } else {
                       onTabChange('dashboard');
@@ -284,7 +288,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           className={`flex-1 overflow-y-auto ${
             noPadding
               ? 'pb-24 lg:pb-0'
-              : 'px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-4 sm:py-6 md:py-8 pb-28 lg:pb-10'
+              : 'px-3 sm:px-5 md:px-6 py-4 sm:py-6 pb-28 lg:pb-10'
           } relative scroll-smooth`}
         >
           <div className="w-full max-w-7xl mx-auto flex flex-col">

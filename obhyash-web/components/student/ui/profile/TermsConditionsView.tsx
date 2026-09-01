@@ -86,7 +86,7 @@ export const TermsConditionsView: React.FC = () => {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Hero Banner (1:1 with Flutter) ── */}
       <div className="p-6 sm:p-7 rounded-[22px] bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] dark:from-[#1A2228] dark:to-[#101518] border border-[#0284C7]/20 dark:border-[#0284C7]/35 shadow-md shadow-[#0284C7]/10 text-center mb-5">
         <div className="w-15 h-15 rounded-full bg-[#0284C7]/12 dark:bg-[#0284C7]/25 border border-[#0284C7]/40 flex items-center justify-center text-[#38BDF8] mx-auto mb-3.5">

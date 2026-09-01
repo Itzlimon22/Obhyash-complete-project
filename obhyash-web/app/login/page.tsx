@@ -182,11 +182,11 @@ export default function LoginPage() {
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md bg-white dark:bg-neutral-900/80 rounded-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-xl shadow-neutral-200/40 dark:shadow-none p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-              স্বাগতম!
-            </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
               তোমার অ্যাকাউন্টে লগইন করো
+            </h1>
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm">
+              প্রস্তুতি শুরু করতে তোমার তথ্য দিয়ে প্রবেশ করো
             </p>
           </div>
 

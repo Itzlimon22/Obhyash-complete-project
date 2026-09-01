@@ -81,12 +81,16 @@ class CelebrationDialog extends StatefulWidget {
   static Future<void> show(
     BuildContext context, {
     required String title,
-    required String message,
+    String? message,
     String? subtitle,
+    String? badgeLabel,
+    String? badgeText,
     IconData icon = LucideIcons.flame,
     Color primaryColor = const Color(0xFF004633),
     Color secondaryColor = const Color(0xFF10B981),
     int? xpAwarded,
+    String actionText = 'চালিয়ে যাও',
+    VoidCallback? onAction,
   }) {
     HapticFeedback.heavyImpact();
     return showDialog(
@@ -94,12 +98,15 @@ class CelebrationDialog extends StatefulWidget {
       barrierDismissible: true,
       builder: (ctx) => CelebrationDialog(
         title: title,
-        subtitle: subtitle,
+        subtitle: subtitle ?? message ?? '',
         badgeLabel: badgeLabel,
+        badgeText: badgeText,
         icon: icon,
         primaryColor: primaryColor,
         secondaryColor: secondaryColor,
         xpAwarded: xpAwarded,
+        actionText: actionText,
+        onAction: onAction,
       ),
     );
   }

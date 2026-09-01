@@ -115,27 +115,19 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   const subjectTitle = BanglaNameHelper.formatSubject(subject, subject);
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-8 animate-fade-in transition-colors font-['HindSiliguri'] pb-24">
-      {/* HEADER SECTION */}
-      <div className="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#27272A] transition-all shadow-sm active:scale-95"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black text-neutral-900 dark:text-white leading-tight">
-              {subjectTitle} 📚
-            </h1>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-bold">
-              অধ্যায়ভিত্তিক বিস্তারিত পারফরম্যান্স রিপোর্ট
-            </p>
-          </div>
+    <div className="w-full max-w-6xl mx-auto px-1 sm:px-2 py-2 sm:py-4 animate-fade-in transition-colors font-['HindSiliguri'] pb-24">
+      {/* CONTROLS SECTION */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-tight">
+            {subjectTitle} 📚
+          </h2>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-bold">
+            অধ্যায়ভিত্তিক বিস্তারিত পারফরম্যান্স রিপোর্ট
+          </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 self-end sm:self-auto">
           <select
             value={timeFilter}
             onChange={(e) =>

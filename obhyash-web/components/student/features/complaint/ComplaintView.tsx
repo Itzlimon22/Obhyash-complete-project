@@ -297,7 +297,7 @@ export const ComplaintView: React.FC = () => {
   const charCount = description.trim().length;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Segmented Tab Switcher (1:1 with Flutter _buildTabButton) ── */}
       <div className="p-1 rounded-[14px] bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] flex items-center mb-4">
         {/* New Complaint Tab */}

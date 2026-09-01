@@ -177,7 +177,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
   // ── States ─────────────────────────────────────────────────────────────────
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("level");
+  const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("college");
   const [selectedLevel, setSelectedLevel] = useState<string>("Explorer");
   const [timeframe, setTimeframe] = useState<"monthly" | "all_time">("monthly");
   const [batchFilter, setBatchFilter] = useState<"all" | "my_batch">("all");
@@ -581,13 +581,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   }, [instituteRankings, searchCollegeQuery]);
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-5 px-2 sm:px-4 py-4 font-['HindSiliguri',sans-serif]">
+    <div className="w-full flex flex-col gap-4 font-['HindSiliguri',sans-serif]">
       {/* ── 1. Top View Mode Tabs (র‍্যাংকিং, আমার প্রতিষ্ঠান, সব প্রতিষ্ঠান) ── */}
       <div className="bg-white dark:bg-[#0C0A09] p-1.5 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] shadow-sm">
         <div className="grid grid-cols-3 gap-1 bg-neutral-100 dark:bg-[#141416] p-1 rounded-xl">
           <button
             onClick={() => setViewMode("level")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               viewMode === "level"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
@@ -599,7 +599,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
           <button
             onClick={() => setViewMode("college")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               viewMode === "college"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
@@ -611,7 +611,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
           <button
             onClick={() => setViewMode("rankings")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               viewMode === "rankings"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
@@ -686,7 +686,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
                 <button
                   onClick={() => setBatchFilter("all")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
                     batchFilter === "all"
                       ? "bg-white dark:bg-[#27272A] text-black dark:text-white shadow-xs"
                       : "text-neutral-500"
@@ -697,7 +697,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 {currentUser?.batch && (
                   <button
                     onClick={() => setBatchFilter("my_batch")}
-                    className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                    className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
                       batchFilter === "my_batch"
                         ? "bg-white dark:bg-[#27272A] text-emerald-600 dark:text-emerald-400 shadow-xs"
                         : "text-neutral-500"
@@ -715,7 +715,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
                 <button
                   onClick={() => setTimeframe("monthly")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
                     timeframe === "monthly"
                       ? "bg-[#059669] text-white shadow-xs"
                       : "text-neutral-500 hover:text-black dark:hover:text-white"
@@ -725,7 +725,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 </button>
                 <button
                   onClick={() => setTimeframe("all_time")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all ${
+                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
                     timeframe === "all_time"
                       ? "bg-[#059669] text-white shadow-xs"
                       : "text-neutral-500 hover:text-black dark:hover:text-white"
@@ -953,7 +953,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       {viewMode === "college" && (
         <div className="flex flex-col gap-4">
           {/* Header Card */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                 <Building2 size={15} />
@@ -969,7 +969,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
 
           {/* College Student List */}
-          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden">
+          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
             {isLoadingCollege ? (
               <div className="p-6">
                 <LeaderboardSkeleton />
@@ -1061,7 +1061,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
 
           {/* Rankings List */}
-          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden">
+          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
             {isLoadingRankings ? (
               <div className="p-6">
                 <LeaderboardSkeleton />

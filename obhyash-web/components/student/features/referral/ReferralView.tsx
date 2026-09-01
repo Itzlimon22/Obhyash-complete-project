@@ -261,7 +261,7 @@ export const ReferralView: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Hero Banner (1:1 with Flutter) ── */}
       <div className="p-5 sm:p-6 rounded-[20px] bg-gradient-to-br from-[#B91C1C] to-[#BE123C] text-white text-center shadow-lg shadow-[#B91C1C]/20 mb-5">
         <h2 className="text-lg sm:text-xl font-black leading-snug">

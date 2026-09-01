@@ -16,8 +16,10 @@ import {
   ChevronDown,
   ArrowDown,
   Layers,
+  Loader2,
 } from "lucide-react";
 import { Question, ExamResult, ExamDetails, UserProfile } from "@/lib/types";
+import { createClient } from "@/utils/supabase/client";
 import {
   getUserBookmarks,
   toggleBookmark,
@@ -107,14 +109,26 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
   // Fetch bookmarks
   const fetchBookmarks = useCallback(async () => {
-    if (!userId) return;
     try {
       setIsLoadingBookmarks(true);
-      const bSetRaw = await getUserBookmarks(userId);
+      let targetUserId = userId;
+      if (!targetUserId) {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        targetUserId = user?.id || "";
+      }
+      if (!targetUserId) {
+        setIsLoadingBookmarks(false);
+        return;
+      }
+
+      const bSetRaw = await getUserBookmarks(targetUserId);
       const bSet = new Set<string>(Array.from(bSetRaw).map((id) => String(id)));
       setBookmarkedIds(bSet);
 
-      const qs = await getBookmarkedQuestions(userId);
+      const qs = await getBookmarkedQuestions(targetUserId);
       setBookmarkedQuestionsList(qs);
     } catch (err) {
       console.error("[PracticeDashboard] Error loading bookmarks:", err);
@@ -319,7 +333,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     currentList.length > 0 && currentList.every((q) => selectedIds.has(String(q.id)));
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-3 sm:py-5 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Top Stat Row (Matching Flutter _StatBox 1:1) ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
         {/* Box 1: মোট ভুল (Red) */}
@@ -492,7 +506,14 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       )}
 
       {/* ── 5. Question Cards (Matching Flutter _buildQuestionCard 1:1) ── */}
-      {filteredList.length === 0 ? (
+      {isLoadingBookmarks && activeTab === "bookmarks" ? (
+        <div className="py-20 text-center rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 text-[#004633] dark:text-emerald-400 animate-spin" />
+          <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+            বুকমার্ক করা প্রশ্ন লোড হচ্ছে...
+          </p>
+        </div>
+      ) : filteredList.length === 0 ? (
         <div className="py-16 text-center rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6 space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center">
             {activeTab === "mistakes" ? <XOctagon size={28} /> : <Bookmark size={28} />}

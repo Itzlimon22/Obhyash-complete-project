@@ -252,16 +252,7 @@ export default function UserProfileView({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-5 animate-fade-in pb-12 pt-2">
-      {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>ফিরে যাও</span>
-      </button>
-
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto space-y-5 animate-fade-in pb-12 pt-2 px-1 sm:px-2">
       {/* 1. Target User Header Profile Card */}
       <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#27272a] p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">

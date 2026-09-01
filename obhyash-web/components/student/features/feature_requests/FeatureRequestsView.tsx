@@ -184,7 +184,7 @@ export const FeatureRequestsView: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Sticky Segmented Top Tabs (1:1 with Flutter _buildTabItem) ── */}
       <div className="sticky top-0 z-20 py-2 -mx-2 px-2 flex justify-center bg-[#F9FAFB]/90 dark:bg-[#0F0F11]/90 backdrop-blur-md">
         <div className="w-full p-1 rounded-[12px] bg-[#E5E7EB] dark:bg-[#18181B] flex items-center gap-1 shadow-xs">

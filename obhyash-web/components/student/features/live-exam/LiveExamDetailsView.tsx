@@ -96,7 +96,12 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   // Leaderboard View Screen
   if (isViewingLeaderboard) {
     return (
-      <AppLayout activeTab="live_exam" {...commonLayoutProps} title="মেধা তালিকা">
+      <AppLayout
+        activeTab="live_exam"
+        {...commonLayoutProps}
+        title={`${exam.title} - মেধা তালিকা`}
+        onBack={() => setIsViewingLeaderboard(false)}
+      >
         <LiveExamLeaderboardView
           exam={exam}
           onBack={() => setIsViewingLeaderboard(false)}
@@ -142,40 +147,31 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
     <AppLayout
       activeTab="live_exam"
       {...commonLayoutProps}
-      title="লাইভ পরীক্ষা"
+      title={exam.title || "লাইভ পরীক্ষা"}
+      onBack={onBack}
     >
-    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in zoom-in-95 duration-300">
+    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-2 md:pt-4 animate-in fade-in zoom-in-95 duration-300 pb-24">
       
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={onBack}
-            className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full transition-colors -ml-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6 text-neutral-800 dark:text-neutral-200">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-          </button>
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              {exam.category}
-            </span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white">
-              {exam.title}
-            </h2>
-          </div>
+      {/* Header Info */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+            {exam.category}
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-900 dark:text-white mt-1.5">
+            {exam.title}
+          </h2>
         </div>
 
         {isTaken && attempt && (
-          <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-3.5 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm">
+          <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-3.5 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm self-start sm:self-auto shadow-xs">
             <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>প্রাপ্ত নম্বর: {attempt.score}</span>
           </div>
         )}
       </div>
 
-      <div className={`grid gap-8 lg:gap-12 ${(isTaken && isPast) ? "lg:grid-cols-[1.1fr_0.9fr]" : "max-w-2xl mx-auto"}`}>
+      <div className={`grid gap-6 lg:gap-8 ${(isTaken && isPast) ? "lg:grid-cols-[1.1fr_0.9fr]" : "w-full max-w-4xl mx-auto"}`}>
         
         {/* Left Column: Details & Actions */}
         <div className="space-y-6">

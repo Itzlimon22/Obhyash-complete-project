@@ -101,32 +101,24 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       activeTab="live_exam"
       {...commonLayoutProps}
       title={displayCategoryTitle}
+      onBack={onBack}
     >
       <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
-        {/* Top Navigation Bar */}
+        {/* Top Header / Routine Action */}
         <div className="flex items-center justify-between gap-3 mb-5">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="p-2 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] hover:bg-neutral-100 dark:hover:bg-[#27272A] text-neutral-700 dark:text-neutral-200 transition-all shadow-sm active:scale-95"
-            >
-              <ArrowLeft size={18} />
-            </button>
-
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-tight">
-                {displayCategoryTitle} 🎯
-              </h2>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                সকল লাইভ ও আসন্ন মডেল টেস্টের তালিকা
-              </p>
-            </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-tight">
+              {displayCategoryTitle} 🎯
+            </h2>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+              সকল লাইভ ও আসন্ন মডেল টেস্টের তালিকা
+            </p>
           </div>
 
           {/* Routine Sheet Modal Button */}
           <button
             onClick={() => setIsRoutineOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-black flex items-center gap-1.5 shadow-sm hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all shrink-0"
+            className="px-3.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-black flex items-center gap-1.5 shadow-sm hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all shrink-0 cursor-pointer"
           >
             <Calendar size={14} />
             <span>রুটিন দেখুন</span>

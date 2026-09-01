@@ -236,7 +236,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-3 sm:py-5 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Single Row Filter: Subject | Chapter | Date (Matching Flutter 1:1) ── */}
       <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
         {/* 1. Subject Dropdown */}

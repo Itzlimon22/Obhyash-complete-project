@@ -202,10 +202,10 @@ export const getSubjectAnalysis = async (
       const { data: rawData, error: fallbackError } = await supabase
         .from('exam_results')
         .select(
-          'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters, questions, user_answers',
+          'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters, questions, user_answers, submission_type, status',
         )
         .eq('user_id', userId)
-        .eq('status', 'evaluated')
+        .neq('submission_type', 'started')
         .gte('date', dateFilter.toISOString());
 
       if (!fallbackError && rawData) {
@@ -398,10 +398,10 @@ export const getOverallAnalytics = async (
       const { data: rawData, error: fallbackError } = await supabase
         .from('exam_results')
         .select(
-          'score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, subject',
+          'score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, subject, submission_type, status',
         )
         .eq('user_id', userId)
-        .eq('status', 'evaluated')
+        .neq('submission_type', 'started')
         .gte('date', dateFilter.toISOString());
 
       if (!fallbackError && rawData) {

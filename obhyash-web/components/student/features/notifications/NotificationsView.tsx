@@ -245,7 +245,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl xl:max-w-5xl mx-auto px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── Top Filter Tabs & Mark All Read Action (1:1 with Flutter) ── */}
       <div className="py-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">

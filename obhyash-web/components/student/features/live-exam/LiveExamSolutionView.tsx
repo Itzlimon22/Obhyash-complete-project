@@ -150,28 +150,20 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
     <AppLayout
       activeTab="live_exam"
       {...commonLayoutProps}
-      title="সমাধান ও ব্যাখ্যা"
+      title={`${examTitle} - সমাধান`}
+      onBack={onBack}
     >
-      <div className="w-full max-w-5xl mx-auto px-3 md:px-6 py-6 animate-in fade-in duration-300 space-y-6">
+      <div className="w-full max-w-5xl mx-auto px-3 md:px-6 py-4 md:py-6 animate-in fade-in duration-300 space-y-6 pb-24">
         
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full transition-colors"
-              title="ফিরে যান"
-            >
-              <ArrowLeft className="w-6 h-6 text-neutral-800 dark:text-neutral-200" />
-            </button>
-            <div>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                {categoryTitle}
-              </span>
-              <h1 className="text-xl md:text-2xl font-extrabold text-neutral-900 dark:text-white">
-                {examTitle} - সমাধান
-              </h1>
-            </div>
+          <div>
+            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+              {categoryTitle}
+            </span>
+            <h2 className="text-xl md:text-2xl font-black text-neutral-900 dark:text-white mt-1">
+              {examTitle} - সমাধান
+            </h2>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">

@@ -129,47 +129,49 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
       </div>
 
       {/* ── 2. Compact Heatmap Grid (10 Columns x 3 Rows) ── */}
-      <div className="grid grid-cols-10 gap-1.5">
-        {last30DaysActivity.map((count, idx) => {
-          const isToday = idx === 29;
+      <div className="flex items-center justify-center sm:justify-start">
+        <div className="grid grid-cols-10 gap-1.5 sm:gap-2 w-fit">
+          {last30DaysActivity.map((count, idx) => {
+            const isToday = idx === 29;
 
-          let boxColorClass = "bg-[#F1F5F9] dark:bg-[#2C2C2E]";
-          if (count === 1) {
-            boxColorClass = "bg-[#EF4444]/35 dark:bg-[#EF4444]/40";
-          } else if (count === 2) {
-            boxColorClass = "bg-[#EF4444]/70 dark:bg-[#EF4444]/75";
-          } else if (count >= 3) {
-            boxColorClass = "bg-[#EF4444]";
-          }
+            let boxColorClass = "bg-[#F1F5F9] dark:bg-[#2C2C2E]";
+            if (count === 1) {
+              boxColorClass = "bg-[#EF4444]/35 dark:bg-[#EF4444]/40";
+            } else if (count === 2) {
+              boxColorClass = "bg-[#EF4444]/70 dark:bg-[#EF4444]/75";
+            } else if (count >= 3) {
+              boxColorClass = "bg-[#EF4444]";
+            }
 
-          const tooltipText =
-            count > 0
-              ? `${formatBoxDate(idx)}: ${BanglaNameHelper.toBanglaNumeral(count)}টি পরীক্ষা দেওয়া হয়েছে`
-              : `${formatBoxDate(idx)}: কোনো পরীক্ষা দেওয়া হয়নি`;
+            const tooltipText =
+              count > 0
+                ? `${formatBoxDate(idx)}: ${BanglaNameHelper.toBanglaNumeral(count)}টি পরীক্ষা দেওয়া হয়েছে`
+                : `${formatBoxDate(idx)}: কোনো পরীক্ষা দেওয়া হয়নি`;
 
-          return (
-            <div
-              key={idx}
-              className="relative group flex items-center justify-center"
-            >
+            return (
               <div
-                className={cn(
-                  "w-full aspect-square rounded-[6px] transition-all cursor-pointer",
-                  boxColorClass,
-                  isToday && "ring-1.5 ring-[#EF4444] ring-offset-1 dark:ring-offset-[#1C1C1E]"
-                )}
-              />
+                key={idx}
+                className="relative group flex items-center justify-center"
+              >
+                <div
+                  className={cn(
+                    "w-5 h-5 sm:w-6 sm:h-6 md:w-6.5 md:h-6.5 rounded-[5px] transition-all duration-150 cursor-pointer hover:scale-115 shadow-2xs",
+                    boxColorClass,
+                    isToday && "ring-1.5 ring-[#EF4444] ring-offset-1 dark:ring-offset-[#1C1C1E]"
+                  )}
+                />
 
-              {/* Floating Tooltip on Hover */}
-              <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col items-center z-30 pointer-events-none">
-                <div className="px-2.5 py-1 bg-[#18181B] text-white text-[11px] rounded-lg shadow-lg whitespace-nowrap font-bold border border-neutral-700">
-                  {tooltipText}
+                {/* Floating Tooltip on Hover */}
+                <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col items-center z-30 pointer-events-none">
+                  <div className="px-2.5 py-1 bg-[#18181B] text-white text-[11px] rounded-lg shadow-lg whitespace-nowrap font-bold border border-neutral-700">
+                    {tooltipText}
+                  </div>
+                  <div className="w-1.5 h-1.5 bg-[#18181B] rotate-45 -mt-1 border-r border-b border-neutral-700" />
                 </div>
-                <div className="w-1.5 h-1.5 bg-[#18181B] rotate-45 -mt-1 border-r border-b border-neutral-700" />
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

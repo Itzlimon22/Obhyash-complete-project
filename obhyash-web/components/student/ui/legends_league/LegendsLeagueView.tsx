@@ -32,8 +32,8 @@ export const LegendsLeagueView: React.FC<LegendsLeagueViewProps> = ({
   const userName = currentUser?.name;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#09090B] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri'] pb-24 pt-3 sm:pt-5">
-      <div className="max-w-3xl mx-auto px-3 sm:px-4 flex flex-col gap-4 sm:gap-5">
+    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#09090B] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri'] pb-24 pt-2 sm:pt-4">
+      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto px-1 sm:px-3 flex flex-col gap-4 sm:gap-5">
         {/* ── 1. Hero Platinum Championship Card ── */}
         <div className="p-5 sm:p-6 rounded-[22px] bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#182232] border border-[#CBD5E1] dark:border-[#334155] shadow-lg shadow-black/5 dark:shadow-black/30">
           {/* Top Tag & Crown */}

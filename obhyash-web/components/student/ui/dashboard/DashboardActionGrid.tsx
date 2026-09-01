@@ -32,49 +32,55 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
     {
       title: "পরীক্ষা",
       icon: FileText,
-      primaryColor: "text-[#059669]",
-      bgLight: "bg-[#ECFDF5] dark:bg-[#064E3B]/30",
-      borderColor: "border-[#A7F3D0]/60 dark:border-[#059669]/30",
+      primaryColor: "text-[#059669] dark:text-emerald-400",
+      bgLight: "bg-emerald-50 dark:bg-emerald-950/50",
+      borderColor: "border-emerald-200 dark:border-emerald-800/60",
+      hoverBorder: "hover:border-emerald-400 dark:hover:border-emerald-600",
       onClick: onExamClick,
     },
     {
       title: "ফর্মুলা",
       icon: Binary,
-      primaryColor: "text-[#6366F1]",
-      bgLight: "bg-[#EEF2FF] dark:bg-[#312E81]/30",
-      borderColor: "border-[#C7D2FE]/60 dark:border-[#6366F1]/30",
+      primaryColor: "text-[#6366F1] dark:text-indigo-400",
+      bgLight: "bg-indigo-50 dark:bg-indigo-950/50",
+      borderColor: "border-indigo-200 dark:border-indigo-800/60",
+      hoverBorder: "hover:border-indigo-400 dark:hover:border-indigo-600",
       onClick: onFormulasClick,
     },
     {
       title: "ইতিহাস",
       icon: History,
-      primaryColor: "text-[#0284C7]",
-      bgLight: "bg-[#F0F9FF] dark:bg-[#075985]/30",
-      borderColor: "border-[#BAE6FD]/60 dark:border-[#0284C7]/30",
+      primaryColor: "text-[#0284C7] dark:text-sky-400",
+      bgLight: "bg-sky-50 dark:bg-sky-950/50",
+      borderColor: "border-sky-200 dark:border-sky-800/60",
+      hoverBorder: "hover:border-sky-400 dark:hover:border-sky-600",
       onClick: onHistoryClick,
     },
     {
       title: "লিডারবোর্ড",
       icon: Trophy,
-      primaryColor: "text-[#D97706]",
-      bgLight: "bg-[#FFFBEB] dark:bg-[#78350F]/30",
-      borderColor: "border-[#FDE68A]/60 dark:border-[#D97706]/30",
+      primaryColor: "text-[#D97706] dark:text-amber-400",
+      bgLight: "bg-amber-50 dark:bg-amber-950/50",
+      borderColor: "border-amber-200 dark:border-amber-800/60",
+      hoverBorder: "hover:border-amber-400 dark:hover:border-amber-600",
       onClick: onLeaderboardClick,
     },
     {
       title: "এনালাইসিস",
       icon: LineChart,
-      primaryColor: "text-[#9333EA]",
-      bgLight: "bg-[#FAF5FF] dark:bg-[#581C87]/30",
-      borderColor: "border-[#E9D5FF]/60 dark:border-[#9333EA]/30",
+      primaryColor: "text-[#9333EA] dark:text-purple-400",
+      bgLight: "bg-purple-50 dark:bg-purple-950/50",
+      borderColor: "border-purple-200 dark:border-purple-800/60",
+      hoverBorder: "hover:border-purple-400 dark:hover:border-purple-600",
       onClick: onAnalysisClick,
     },
     {
       title: "লাইভ পরীক্ষা",
       icon: Radio,
-      primaryColor: "text-[#E11D48]",
-      bgLight: "bg-[#FFF1F2] dark:bg-[#881337]/30",
-      borderColor: "border-[#FECDD3]/60 dark:border-[#E11D48]/30",
+      primaryColor: "text-[#E11D48] dark:text-rose-400",
+      bgLight: "bg-rose-50 dark:bg-rose-950/50",
+      borderColor: "border-rose-200 dark:border-rose-800/60",
+      hoverBorder: "hover:border-rose-400 dark:hover:border-rose-600",
       onClick: onLiveExamClick,
     },
   ];
@@ -88,20 +94,25 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
             key={idx}
             type="button"
             onClick={action.onClick}
-            className="rounded-xl sm:rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700 py-2 sm:py-2.5 px-1.5 sm:px-2 flex flex-col items-center justify-center gap-1 sm:gap-1.5 shadow-sm hover:shadow-md transition-all active:scale-95 group select-none"
+            className={cn(
+              "rounded-xl sm:rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200/90 dark:border-[#27272A] p-2.5 sm:p-3 flex flex-col items-center justify-center gap-1.5 sm:gap-2 shadow-2xs hover:shadow-sm transition-all duration-150 active:scale-95 group cursor-pointer select-none",
+              action.hoverBorder
+            )}
           >
+            {/* Solid Icon Tile */}
             <div
               className={cn(
-                "w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-105",
+                "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border shadow-2xs transition-transform duration-150 group-hover:scale-106",
                 action.bgLight,
                 action.borderColor,
                 action.primaryColor
               )}
             >
-              <Icon size={17} strokeWidth={2.2} />
+              <Icon size={19} className="sm:w-5 sm:h-5" strokeWidth={2.3} />
             </div>
 
-            <span className="text-xs sm:text-[13px] font-bold text-neutral-800 dark:text-neutral-200 truncate w-full text-center">
+            {/* Title */}
+            <span className="text-xs sm:text-[12.5px] font-bold text-neutral-800 dark:text-neutral-200 truncate w-full text-center tracking-tight">
               {action.title}
             </span>
           </button>
@@ -112,3 +123,4 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
 };
 
 export default DashboardActionGrid;
+

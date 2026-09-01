@@ -111,7 +111,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Hero Search Header (1:1 with Flutter) ── */}
       <div className="p-6 sm:p-7 rounded-[22px] bg-gradient-to-br from-[#ECFDF5] to-[#F0FDF4] dark:from-[#1B2320] dark:to-[#121815] border border-[#059669]/20 dark:border-[#059669]/35 shadow-md shadow-[#059669]/10 text-center mb-5">
         <div className="w-14 h-14 rounded-full bg-[#059669]/12 dark:bg-[#059669]/25 border border-[#059669]/40 flex items-center justify-center text-[#10B981] mx-auto mb-3.5">

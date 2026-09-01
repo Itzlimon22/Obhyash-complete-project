@@ -67,7 +67,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const effectiveUser = currentUser || user;
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-5 flex flex-col gap-4 sm:gap-5 font-['HindSiliguri']">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-2 py-2 flex flex-col gap-4 font-['HindSiliguri']">
       {/* 1. Live Exam Announcement / Countdown Slider */}
       <LiveExamSlider
         onExamClick={(examId, cat) => {

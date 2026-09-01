@@ -46,6 +46,7 @@ import { ComplaintView } from "@/components/student/features/complaint/Complaint
 import { FeatureRequestsView } from "@/components/student/features/feature_requests/FeatureRequestsView";
 import AnalysisView from "@/components/student/features/dashboard/AnalysisView";
 import { PracticeDashboard } from "@/components/student/features/practice/PracticeDashboard";
+import FormulaAppPromoView from "@/components/student/features/formulas/FormulaAppPromoView";
 import NotificationsView from "@/components/student/features/notifications/NotificationsView";
 import LegendsLeagueView from "@/components/student/ui/legends_league/LegendsLeagueView";
 // Profile Features
@@ -57,6 +58,7 @@ import PrivacyPolicyView from "@/components/student/ui/profile/PrivacyPolicyView
 import TermsConditionsView from "@/components/student/ui/profile/TermsConditionsView";
 import FaqPanel from "@/components/student/ui/profile/settings/FaqPanel";
 import BookmarksView from "@/components/student/features/bookmarks/BookmarksView";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import AccountInfoView from "@/components/student/ui/profile/settings/AccountInfoView";
 import AccountLinkingPanel from "@/components/student/ui/profile/settings/AccountLinkingPanel";
 import DeleteAccountPanel from "@/components/student/ui/profile/settings/DeleteAccountPanel";
@@ -685,15 +687,21 @@ export default function StudentRoot({
     return () => window.removeEventListener('popstate', onPopState);
   }, [appState, activeTab]);
 
-  // On mount: sync URL to current tab so the browser address bar is always correct
-  // This fixes mobile where the initial URL might be /dashboard but the tab is "setup"
+  // On mount: sync current URL path to active tab state
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const currentPath = window.location.pathname.replace(/^\//, '');
-    if (currentPath !== activeTab && validTabs.includes(activeTab)) {
-      window.history.replaceState({ tab: activeTab }, '', '/' + activeTab);
+    if (validTabs.includes(currentPath)) {
+      setActiveTab(currentPath);
+      sessionStorage.setItem('obhyash_active_tab', currentPath);
+    } else if (currentPath.startsWith("leaderboard/user/")) {
+      setActiveTab("user_profile");
+    } else if (currentPath.startsWith("history/") && currentPath !== "history") {
+      setActiveTab("history_result");
+    } else if (currentPath.startsWith("exam/")) {
+      setActiveTab("exam");
     }
-  }, []);  // only on mount
+  }, []); // only on mount
 
   const handleTabChange = (tab: string) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
@@ -774,7 +782,7 @@ export default function StudentRoot({
               onLeaderboardClick={() => handleTabChange("leaderboard")}
               onAnalysisClick={() => handleTabChange("analysis")}
               onLiveExamClick={() => handleTabChange("live_exam")}
-              onFormulasClick={() => handleTabChange("practice")}
+              onFormulasClick={() => handleTabChange("formulas")}
               onPracticeClick={() => handleTabChange("practice")}
               onBookmarksClick={() => handleTabChange("bookmarks")}
               history={examHistory}
@@ -920,7 +928,12 @@ export default function StudentRoot({
 
       if (activeTab === "profile") {
         return (
-          <AppLayout activeTab="" {...commonLayoutProps} title="আমার প্রোফাইল">
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="আমার প্রোফাইল"
+            onBack={() => handleTabChange("dashboard")}
+          >
             <MyProfileView
               user={currentUser!}
               history={examHistory}
@@ -937,7 +950,12 @@ export default function StudentRoot({
 
       if (activeTab === "settings") {
         return (
-          <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="সেটিংস"
+            onBack={() => handleTabChange("dashboard")}
+          >
             <SettingsView
               user={currentUser!}
               onSave={handleProfileUpdate}
@@ -955,19 +973,34 @@ export default function StudentRoot({
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title="আমার বুকমার্কস"
+            title="বুকমার্ক করা প্রশ্নসমূহ"
+            onBack={() => handleTabChange("practice")}
           >
             <BookmarksView />
           </AppLayout>
         );
       }
 
-      if (activeTab === "practice" || activeTab === "formulas") {
+      if (activeTab === "formulas") {
         return (
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title={activeTab === "formulas" ? "ফর্মুলা ও অনুশীলন" : "অনুশীলন"}
+            title="ফর্মুলা ও শর্টকাট শিট"
+            onBack={() => handleTabChange("dashboard")}
+          >
+            <FormulaAppPromoView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "practice") {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="অনুশীলন ও প্র্যাকটিস"
+            onBack={() => handleTabChange("dashboard")}
           >
             <PracticeDashboard
               history={examHistory}
@@ -986,7 +1019,8 @@ export default function StudentRoot({
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title="এনালাইসিস"
+            title="পারফরম্যান্স অ্যানালিটিক্স"
+            onBack={() => handleTabChange("dashboard")}
           >
             <AnalysisView
               history={examHistory}
@@ -1003,9 +1037,10 @@ export default function StudentRoot({
       if (activeTab === "complaint") {
         return (
           <AppLayout
-            activeTab={activeTab}
+            activeTab="settings"
             {...commonLayoutProps}
             title="অভিযোগ ও পরামর্শ"
+            onBack={() => handleTabChange("settings")}
           >
             <ComplaintView />
           </AppLayout>
@@ -1015,9 +1050,10 @@ export default function StudentRoot({
       if (activeTab === "feature-requests") {
         return (
           <AppLayout
-            activeTab={activeTab}
+            activeTab="settings"
             {...commonLayoutProps}
             title="নতুন ফিচার প্রস্তাব"
+            onBack={() => handleTabChange("settings")}
           >
             <FeatureRequestsView />
           </AppLayout>
@@ -1026,7 +1062,12 @@ export default function StudentRoot({
 
       if (activeTab === "notifications") {
         return (
-          <AppLayout activeTab="" {...commonLayoutProps} title="নোটিফিকেশন">
+          <AppLayout
+            activeTab="dashboard"
+            {...commonLayoutProps}
+            title="নোটিফিকেশন"
+            onBack={() => handleTabChange("dashboard")}
+          >
             <NotificationsView onNavigate={(tab) => handleTabChange(tab)} />
           </AppLayout>
         );
@@ -1038,6 +1079,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট ইনফো"
+            onBack={() => handleTabChange("settings")}
           >
             <AccountInfoView
               user={currentUser}
@@ -1053,6 +1095,7 @@ export default function StudentRoot({
             activeTab="referral"
             {...commonLayoutProps}
             title="রেফারেল ও রিওয়ার্ড"
+            onBack={() => handleTabChange("dashboard")}
           >
             <ReferralView />
           </AppLayout>
@@ -1062,9 +1105,10 @@ export default function StudentRoot({
       if (activeTab === "about") {
         return (
           <AppLayout
-            activeTab=""
+            activeTab="settings"
             {...commonLayoutProps}
             title="আমাদের সম্পর্কে"
+            onBack={() => handleTabChange("settings")}
           >
             <AboutUsView />
           </AppLayout>
@@ -1074,9 +1118,10 @@ export default function StudentRoot({
       if (activeTab === "privacy") {
         return (
           <AppLayout
-            activeTab=""
+            activeTab="settings"
             {...commonLayoutProps}
             title="প্রাইভেসি পলিসি"
+            onBack={() => handleTabChange("settings")}
           >
             <PrivacyPolicyView />
           </AppLayout>
@@ -1086,9 +1131,10 @@ export default function StudentRoot({
       if (activeTab === "terms") {
         return (
           <AppLayout
-            activeTab=""
+            activeTab="settings"
             {...commonLayoutProps}
             title="ব্যবহারের শর্তাবলী"
+            onBack={() => handleTabChange("settings")}
           >
             <TermsConditionsView />
           </AppLayout>
@@ -1098,9 +1144,10 @@ export default function StudentRoot({
       if (activeTab === "faq" || activeTab === "help") {
         return (
           <AppLayout
-            activeTab=""
+            activeTab="settings"
             {...commonLayoutProps}
             title="সাহায্য ও জিজ্ঞাসা"
+            onBack={() => handleTabChange("settings")}
           >
             <FaqPanel onNavigateComplaint={() => handleTabChange("complaint")} />
           </AppLayout>
@@ -1113,6 +1160,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট লিংকিং"
+            onBack={() => handleTabChange("settings")}
           >
             <AccountLinkingPanel user={currentUser} />
           </AppLayout>
@@ -1125,6 +1173,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট মুছুন"
+            onBack={() => handleTabChange("settings")}
           >
             <DeleteAccountPanel
               user={currentUser}
@@ -1136,7 +1185,12 @@ export default function StudentRoot({
 
       if (activeTab === "subscription" || activeTab === "upgrade")
         return (
-          <AppLayout activeTab="subscription" {...commonLayoutProps} title="আপগ্রেড">
+          <AppLayout
+            activeTab="subscription"
+            {...commonLayoutProps}
+            title="প্রো সাবস্ক্রিপশন"
+            onBack={() => handleTabChange("dashboard")}
+          >
             <SubscriptionView />
           </AppLayout>
         );
@@ -1145,7 +1199,12 @@ export default function StudentRoot({
           <AppLayout
             activeTab="leaderboard"
             {...commonLayoutProps}
-            title="প্রোফাইল"
+            title={
+              selectedUserProfile.name
+                ? `${selectedUserProfile.name}-এর প্রোফাইল`
+                : "শিক্ষার্থীর প্রোফাইল"
+            }
+            onBack={() => handleTabChange("leaderboard")}
           >
             <UserProfileView
               user={selectedUserProfile}
@@ -1162,7 +1221,15 @@ export default function StudentRoot({
           <AppLayout
             activeTab="dashboard"
             {...commonLayoutProps}
-            title="রিপোর্ট"
+            title={
+              selectedSubjectReport
+                ? `${BanglaNameHelper.formatSubject(
+                    selectedSubjectReport,
+                    selectedSubjectReport
+                  )} রিপোর্ট`
+                : "বিষয়ভিত্তিক রিপোর্ট"
+            }
+            onBack={() => handleTabChange("dashboard")}
           >
             <SubjectReportView
               subject={selectedSubjectReport}

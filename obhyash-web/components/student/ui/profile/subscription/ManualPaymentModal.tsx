@@ -47,17 +47,25 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     try {
       setIsRedirecting(true);
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error('পেমেন্ট করতে অনুগ্রহ করে আগে লগইন করুন');
+        setIsRedirecting(false);
+        return;
+      }
 
       const res = await fetch('/api/payment/uddoktapay/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user?.id,
+          userId: user.id,
           planId: plan.id,
           planName: plan.name,
           amount: plan.price,
-          customerEmail: user?.email,
+          customerEmail: user.email,
         }),
       });
 
@@ -233,26 +241,37 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   );
 
   return (
-    <div className="min-h-[80vh] flex flex-col bg-white dark:bg-neutral-900 animate-in slide-in-from-right duration-300">
-      <div className="p-4 sm:p-6 flex items-center gap-4 border-b border-neutral-100 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-20">
-        <button
-          onClick={onClose}
-          className="p-2 -ml-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors text-neutral-500 dark:text-neutral-400"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
-          পেমেন্ট প্রসেসিং
-        </h3>
-      </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-xl bg-white dark:bg-[#18181B] rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="p-4 sm:p-5 flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 bg-white/90 dark:bg-[#18181B]/90 backdrop-blur-md sticky top-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="p-2 -ml-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors text-neutral-500 dark:text-neutral-400 cursor-pointer"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h3 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
+              পেমেন্ট প্রসেসিং
+            </h3>
+          </div>
 
-      <div className="max-w-xl mx-auto w-full flex-1 flex flex-col">
-        {renderTabs()}
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-        <div className="flex-1 p-6 pt-0">
-          {activeTab === 'details' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="flex gap-4">
+        <div className="w-full flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+          {renderTabs()}
+
+          <div className="flex-1 p-5 sm:p-6 pt-0">
+            {activeTab === 'details' && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="flex gap-4">
                 <div className="flex-1 bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl text-center border border-neutral-200 dark:border-neutral-700">
                   <span className="text-xs font-bold text-neutral-500 uppercase">
                     প্যাকেজ
@@ -796,6 +815,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

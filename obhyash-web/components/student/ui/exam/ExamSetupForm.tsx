@@ -407,7 +407,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const selectedSubData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 py-4 sm:py-6 select-none font-['HindSiliguri']">
+    <div className="w-full max-w-4xl xl:max-w-5xl mx-auto px-1 sm:px-3 py-2 sm:py-4 select-none font-['HindSiliguri']">
       <div className="flex flex-col gap-3">
         {/* 1. Subject Selector Card */}
         <CardContainer

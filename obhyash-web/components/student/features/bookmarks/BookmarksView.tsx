@@ -221,7 +221,7 @@ export const BookmarksView: React.FC = () => {
   const displayedList = filteredBookmarks.slice(0, displayCount);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 px-2 sm:px-4 py-2 font-['HindSiliguri',sans-serif]">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto space-y-4 px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif]">
       {/* ── 1. Top Filters Bar (Matching Flutter BookmarksView) ── */}
       <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
         {/* Subject Filter */}

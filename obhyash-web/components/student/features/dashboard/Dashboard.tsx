@@ -16,7 +16,6 @@ import DashboardActionGrid from "@/components/student/ui/dashboard/DashboardActi
 import DailyStreakCard from "@/components/student/ui/dashboard/DailyStreakCard";
 import DailyQuestsCard from "@/components/student/ui/dashboard/DailyQuestsCard";
 import SubjectStat from "./SubjectStat";
-import CountdownBanner from "./CountdownBanner";
 
 interface DashboardProps {
   user: UserProfile;
@@ -212,22 +211,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-2 font-['HindSiliguri']"
+      className="w-full max-w-5xl xl:max-w-6xl mx-auto px-3 sm:px-6 md:px-8 py-2 sm:py-4 font-['HindSiliguri']"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
         {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}
-        <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-4 sm:gap-6">
-          {/* 1. Target Exam Countdown Banner */}
-          {effectiveExamTarget && (
-            <motion.div variants={fadeInUp}>
-              <CountdownBanner
-                examTarget={effectiveExamTarget}
-                onChangeTarget={onChangeTarget}
-              />
-            </motion.div>
-          )}
-
-          {/* 2. Live Exam Announcement / Status Carousel Slider */}
+        <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-3.5 sm:gap-4.5">
+          {/* 1. Live Exam Announcement / Status Carousel Slider */}
           <motion.div variants={fadeInUp}>
             <LiveExamSlider
               onExamClick={() => {
@@ -263,7 +252,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* ── Right Column: Subject-wise Performance Section (Col Span 5) ── */}
-        <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-4 sm:gap-6 lg:sticky lg:top-4">
+        <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-3.5 sm:gap-4.5 lg:sticky lg:top-4">
           <motion.div variants={fadeInUp}>
             <SubjectStat
               data={subjectStats}

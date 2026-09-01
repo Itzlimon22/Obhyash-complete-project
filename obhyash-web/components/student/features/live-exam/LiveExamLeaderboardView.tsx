@@ -90,26 +90,18 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 animate-in fade-in duration-300">
       
-      {/* Top Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2.5 rounded-2xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />
-          </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                {exam.category}
-              </span>
-              <span className="text-xs font-bold text-neutral-500">অফিসিয়াল মেধা তালিকা</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mt-1">
-              {exam.title}
-            </h2>
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-2 border-b border-neutral-200 dark:border-neutral-800">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+              {exam.category}
+            </span>
+            <span className="text-xs font-bold text-neutral-500">অফিসিয়াল মেধা তালিকা</span>
           </div>
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mt-1.5">
+            {exam.title}
+          </h2>
         </div>
 
         {onViewSolutions && (
@@ -166,7 +158,7 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
           <div className="text-center mb-4">
             <span className="text-xs font-extrabold uppercase tracking-widest text-neutral-400">টপ ৩ স্থানাধিকারী</span>
           </div>
-          <div className="grid grid-cols-3 gap-3 sm:gap-6 items-end max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 items-end max-w-4xl mx-auto">
             
             {/* 2nd Place */}
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-4 text-center flex flex-col items-center justify-between shadow-sm relative pt-7">

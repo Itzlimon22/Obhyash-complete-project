@@ -146,7 +146,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 animate-fade-in pb-20">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-4 space-y-4 animate-fade-in pb-20">
       <div className="flex flex-col gap-1.5 md:gap-2 px-1 md:px-0">
         <h1 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
           <AlertTriangle className="text-red-500 w-5 h-5 md:w-6 md:h-6" />

@@ -188,7 +188,7 @@ export default function PersonalDetailsPanel({
     'w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E5E5] dark:border-[#1C1C1E] bg-[#FAFAFA] dark:bg-[#0A0A0A] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#10B981] transition-colors font-["HindSiliguri",sans-serif] cursor-pointer';
 
   return (
-    <div className="w-full max-w-2xl mx-auto font-['HindSiliguri',sans-serif] pb-16">
+    <div className="w-full max-w-4xl mx-auto font-['HindSiliguri',sans-serif] pb-16">
       {/* ── 0. Avatar Card (1:1 with Flutter) ── */}
       <div className={cardContainerClass}>
         <div className="p-5 flex items-center gap-4">
