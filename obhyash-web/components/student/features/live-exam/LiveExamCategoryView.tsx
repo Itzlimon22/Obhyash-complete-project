@@ -9,7 +9,6 @@ import {
   Zap,
   CheckCircle2,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getPublishedLiveExams } from "@/services/live-exam-student-service";

@@ -10,7 +10,6 @@ import {
   CheckCircle,
   Loader2,
   X,
-  Sparkles,
   Flame,
   Award,
 } from 'lucide-react';

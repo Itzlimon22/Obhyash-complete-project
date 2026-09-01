@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Plus, Sparkles, Building2, BookOpen, GraduationCap, Check } from 'lucide-react';
+import { X, Plus, Building2, BookOpen, GraduationCap, Check } from 'lucide-react';
 
 export interface SuggestionItem {
   name: string;
@@ -159,7 +159,7 @@ export function InstituteWriterAutocomplete({
       case 'Writer':
         return <BookOpen className="w-3.5 h-3.5 text-emerald-500" />;
       default:
-        return <Sparkles className="w-3.5 h-3.5 text-slate-400" />;
+        return <GraduationCap className="w-3.5 h-3.5 text-slate-400" />;
     }
   };
 

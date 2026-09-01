@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Crown,
-  Sparkles,
   Shield,
   Zap,
   Sprout,
@@ -64,7 +63,7 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     endColor: "to-amber-700",
     textColor: "text-amber-500",
     badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
-    icon: Sparkles,
+    icon: GraduationCap,
   },
   {
     id: "Warrior",

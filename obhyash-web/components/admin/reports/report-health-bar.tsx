@@ -7,7 +7,7 @@ import {
   XCircle,
   Gift,
   Clock,
-  Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 
 interface ReportHealthBarProps {
@@ -119,7 +119,7 @@ export function ReportHealthBar({
       >
         <div className="flex items-center justify-between text-neutral-500 dark:text-zinc-400 text-xs font-bold mb-1">
           <span>সমাধান রেট (Rate)</span>
-          <Sparkles size={16} className="text-blue-500" />
+          <TrendingUp size={16} className="text-blue-500" />
         </div>
         <p className="text-2xl font-black text-blue-600 dark:text-blue-400 font-mono">
           {resolutionRate}%{' '}

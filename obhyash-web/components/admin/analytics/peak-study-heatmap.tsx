@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Clock, Zap, Sun, Moon, Sparkles } from 'lucide-react';
+import { Clock, Zap, Sun, Moon } from 'lucide-react';
 
 interface PeakStudyHeatmapProps {
   hourlyActivity: number[];

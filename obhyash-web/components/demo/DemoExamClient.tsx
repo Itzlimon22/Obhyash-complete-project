@@ -8,7 +8,7 @@ import { ExamInstructionsView } from '@/components/student/features/exam/ExamIns
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 import ResultView from '@/components/student/ui/ResultView';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { Sparkles } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 // Fisher-Yates shuffle algorithm to pick 10 random questions
 function pickRandomQuestions(pool: Question[], count: number = 10): Question[] {
@@ -157,7 +157,7 @@ export default function DemoExamClient() {
         <div className="flex flex-col min-h-screen">
           {/* Guest Demo Header Notification Banner */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-4 py-3 text-center text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-md">
-            <Sparkles size={18} className="animate-pulse" />
+            <Trophy size={18} className="animate-pulse" />
             <span>
               তুমি ডেমো পরীক্ষা সম্পন্ন করেছ! পূর্ণাঙ্গ সিলেবাস ও আনলিমিটেড পরীক্ষার জন্য ফ্রি অ্যাকাউন্ট খোলো।
             </span>

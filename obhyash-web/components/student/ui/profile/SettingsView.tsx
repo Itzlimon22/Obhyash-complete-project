@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   Bell,
   MessageSquare,
-  Sparkles,
+  Lightbulb,
   Crown,
   TrendingUp,
   Shield,
@@ -140,7 +140,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         {
           label: 'ফিচার রিকোয়েস্ট',
           description: 'অ্যাপের জন্য নতুন ফিচারের প্রস্তাব ও আইডিয়া পাঠাও',
-          icon: Sparkles,
+          icon: Lightbulb,
           type: 'navigate',
           route: 'feature-requests',
         },

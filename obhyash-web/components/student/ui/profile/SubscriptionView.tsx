@@ -36,7 +36,6 @@ import {
   X,
   XCircle,
   ArrowRight,
-  Sparkles,
   Loader2,
 } from 'lucide-react';
 
@@ -383,7 +382,7 @@ export const SubscriptionView: React.FC = () => {
       <div className="bg-white dark:bg-[#18181B] rounded-[22px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-6">
         <div className="flex items-center gap-2.5 mb-5">
           <div className="p-1.5 rounded-lg bg-[#004633]/10 dark:bg-[#004633]/25 text-[#004633] dark:text-[#34D399]">
-            <Sparkles className="w-4 h-4" />
+            <Crown className="w-4 h-4" />
           </div>
           <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
             প্রিমিয়াম প্ল্যানে যা যা থাকছে

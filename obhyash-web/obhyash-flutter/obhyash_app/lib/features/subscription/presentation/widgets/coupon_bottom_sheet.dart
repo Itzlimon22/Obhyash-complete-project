@@ -289,7 +289,7 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                 padding: const EdgeInsets.only(left: 4),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.sparkles, size: 14, color: Color(0xFFD97706)),
+                    const Icon(LucideIcons.tag, size: 14, color: Color(0xFFD97706)),
                     const SizedBox(width: 6),
                     Text(
                       'চলতি অফার কুপন: ',

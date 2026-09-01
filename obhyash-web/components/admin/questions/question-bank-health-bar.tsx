@@ -6,7 +6,7 @@ import {
   CheckCircle2,
   Clock,
   Image as ImageIcon,
-  Sparkles,
+  AlertCircle,
   BookOpen,
   Layers,
 } from 'lucide-react';
@@ -144,7 +144,7 @@ export function QuestionBankHealthBar({
             বাতিলকৃত প্রশ্ন
           </span>
           <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
-            <Sparkles size={16} />
+            <AlertCircle size={16} />
           </div>
         </div>
         <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 font-mono">

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, BookOpen, Layers, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, BookOpen, Layers } from "lucide-react";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { cn } from "@/lib/utils";
 

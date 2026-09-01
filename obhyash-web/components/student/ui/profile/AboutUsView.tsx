@@ -4,7 +4,7 @@ import React from 'react';
 import {
   Flame,
   Target,
-  Sparkles,
+  Zap,
   Layers,
   BookOpen,
   Trophy,
@@ -91,7 +91,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
       <div className={cardContainerClass}>
         <div className="flex items-center gap-2.5 mb-4">
           <div className="p-1.5 rounded-lg bg-[#10B981]/10 text-[#10B981]">
-            <Sparkles className="w-4 h-4" />
+            <Zap className="w-4 h-4" />
           </div>
           <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
             অ্যাপের বিশেষত্বসমূহ

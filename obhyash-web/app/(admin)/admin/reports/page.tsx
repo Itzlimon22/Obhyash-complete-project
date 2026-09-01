@@ -16,7 +16,6 @@ import {
   ExternalLink,
   MessageSquare,
   School,
-  Sparkles,
   Download,
 } from 'lucide-react';
 import { toast } from 'sonner';

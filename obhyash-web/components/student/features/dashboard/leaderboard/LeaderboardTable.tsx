@@ -7,7 +7,7 @@ import UserAvatar from "@/components/student/ui/common/UserAvatar";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import LeaderboardPodium from "./LeaderboardPodium";
 import { motion } from "framer-motion";
-import { Trophy, Loader2, Sparkles, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Trophy, Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LeaderboardTableProps {

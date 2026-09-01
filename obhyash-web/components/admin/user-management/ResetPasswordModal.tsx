@@ -10,7 +10,7 @@ import {
   Check,
   RefreshCw,
   AlertTriangle,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { User } from '@/lib/types';
 import { toast } from 'sonner';
@@ -342,7 +342,7 @@ export default function ResetPasswordModal({
                     onClick={handleGenerateRandomPassword}
                     className="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
                   >
-                    <Sparkles size={12} />
+                    <Zap size={12} />
                     Generate Random
                   </button>
                 </div>

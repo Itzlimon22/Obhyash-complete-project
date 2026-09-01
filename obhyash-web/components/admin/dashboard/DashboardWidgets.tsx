@@ -15,7 +15,6 @@ import {
   Calendar,
   Radio,
   Clock,
-  Sparkles,
   Zap,
   TrendingUp,
   Layers,

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { PartyPopper, Sparkles, X, Loader2, Gift } from 'lucide-react';
+import { PartyPopper, X, Loader2, Gift } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
@@ -189,7 +189,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({
               disabled={isProcessing}
               className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <Sparkles className="w-4 h-4" />
+              <Gift className="w-4 h-4" />
               <span>পুরস্কার দেখো</span>
             </button>
           )}

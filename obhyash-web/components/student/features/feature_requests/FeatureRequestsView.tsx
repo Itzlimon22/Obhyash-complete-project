@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Check,
   CheckCircle2,
-  Sparkles,
   Lightbulb,
   Clock,
   Send,

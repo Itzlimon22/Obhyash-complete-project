@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Flame, ArrowRight, Sparkles, Layers, CheckCircle2, Clock } from 'lucide-react';
+import { Brain, Flame, ArrowRight, Zap, Layers, CheckCircle2, Clock } from 'lucide-react';
 import { getSpacedRepetitionStats, SpacedRepetitionStats } from '@/services/spaced-repetition-service';
 import SpacedRepetitionModal from '@/components/student/features/spaced-repetition/SpacedRepetitionModal';
 
@@ -74,7 +74,7 @@ export default function DailyRevisionCard({ userId }: DailyRevisionCardProps) {
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
                 +১৫ XP / প্রশ্ন
               </span>
               <span>•</span>

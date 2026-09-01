@@ -17,7 +17,7 @@ import {
   PlusCircle,
   FileQuestion,
   ArrowRight,
-  Sparkles,
+  GraduationCap,
   Target,
   Award,
   BookOpen,
@@ -188,7 +188,7 @@ export default function TeacherDashboard() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <div className="relative">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center animate-pulse shadow-xl shadow-emerald-500/20">
-            <Sparkles size={28} className="text-white" />
+            <GraduationCap size={28} className="text-white" />
           </div>
         </div>
         <p className="text-sm font-bold text-neutral-400 animate-pulse">
@@ -408,7 +408,7 @@ export default function TeacherDashboard() {
           </div>
           <div className="flex gap-3 p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30">
             <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Sparkles size={16} />
+              <CheckCircle size={16} />
             </div>
             <div>
               <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-0.5">

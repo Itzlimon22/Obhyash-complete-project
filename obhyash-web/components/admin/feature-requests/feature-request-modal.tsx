@@ -6,7 +6,7 @@ import {
   X,
   User,
   Calendar,
-  Sparkles,
+  Lightbulb,
   Loader2,
   CheckCircle2,
   Clock,
@@ -98,7 +98,7 @@ export function FeatureRequestModal({
           <div className="px-5 py-3.5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-black sticky top-0 z-10">
             <div className="flex items-center gap-2.5">
               <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
-                <Sparkles size={18} />
+                <Lightbulb size={18} />
               </div>
               <div>
                 <h2 className="text-sm md:text-base font-black text-neutral-900 dark:text-white tracking-tight">

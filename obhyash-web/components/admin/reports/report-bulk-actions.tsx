@@ -7,7 +7,6 @@ import {
   Trash2,
   Layers,
   X,
-  Sparkles,
   RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';

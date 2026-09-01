@@ -375,7 +375,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         guidelines.add(
           StudyGuideline(
             color: const Color(0xFF059669),
-            icon: LucideIcons.sparkles,
+            icon: LucideIcons.trophy,
             tag: 'সর্বোচ্চ শক্তি',
             title: best.displayName,
             metric: '${BanglaNameHelper.toBanglaNumeral(best.accuracy.round())}% নির্ভুলতা',

@@ -66,7 +66,7 @@ class GamificationService {
         {'id': 'mission_exam_2', 'title': 'ডাবল চ্যালেঞ্জ', 'desc': 'আজ যেকোনো ২টি ভিন্ন বিষয়ে পরীক্ষা সম্পন্ন করো', 'target': 2, 'xp': 45, 'icon': LucideIcons.layers, 'color': const Color(0xFF0F766E), 'type': 'exams'},
         {'id': 'mission_accuracy_80', 'title': 'পারফেকশনিস্ট', 'desc': 'যেকোনো একটি পরীক্ষায় ৮০% বা তার বেশি নির্ভুল স্কোর অর্জন করো', 'target': 1, 'xp': 35, 'icon': LucideIcons.checkCircle, 'color': const Color(0xFF7C3AED), 'type': 'acc80'},
         {'id': 'mission_live_practice', 'title': 'প্রতিযোগিতার মাঠে', 'desc': 'আজকের লাইভ এক্সাম বা কোনো অনুশীলনী পরীক্ষায় অংশগ্রহণ করো', 'target': 1, 'xp': 30, 'icon': LucideIcons.trophy, 'color': const Color(0xFFE11D48), 'type': 'live'},
-        {'id': 'mission_speed_correct_10', 'title': 'কুইক স্প্রিন্টার', 'desc': 'যেকোনো পরীক্ষায় কমপক্ষে ১০টি সঠিক উত্তর দিয়ে সাবমিট করো', 'target': 10, 'xp': 20, 'icon': LucideIcons.sparkles, 'color': const Color(0xFF059669), 'type': 'correct'},
+        {'id': 'mission_speed_correct_10', 'title': 'কুইক স্প্রিন্টার', 'desc': 'যেকোনো পরীক্ষায় কমপক্ষে ১০টি সঠিক উত্তর দিয়ে সাবমিট করো', 'target': 10, 'xp': 20, 'icon': LucideIcons.zap, 'color': const Color(0xFF059669), 'type': 'correct'},
         {'id': 'mission_solve_40_mcqs', 'title': 'এমসিকিউ ম্যারাথন', 'desc': 'আজ সব মিলিয়ে মোট ৪০টি প্রশ্ন সমাধান করো', 'target': 40, 'xp': 40, 'icon': LucideIcons.bookOpen, 'color': const Color(0xFFEA580C), 'type': 'mcqs'},
         {'id': 'mission_correct_20', 'title': 'লক্ষ্য পূরণ', 'desc': 'আজ বিভিন্ন পরীক্ষায় মোট ২০টি প্রশ্নের সঠিক উত্তর দাও', 'target': 20, 'xp': 30, 'icon': LucideIcons.compass, 'color': const Color(0xFF2563EB), 'type': 'correct'},
       ];

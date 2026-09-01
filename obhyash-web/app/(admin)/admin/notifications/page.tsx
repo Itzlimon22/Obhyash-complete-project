@@ -14,7 +14,7 @@ import {
   Trash2,
   Radio,
   Clock,
-  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { NotificationType, NotificationPriority } from '@/lib/types';
@@ -232,7 +232,7 @@ export default function NotificationManagementPage() {
         <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="flex items-center justify-between text-neutral-500 dark:text-neutral-400 text-xs font-bold mb-1">
             <span>ঘোষণা ও আপডেট</span>
-            <Sparkles size={16} className="text-purple-500" />
+            <Zap size={16} className="text-purple-500" />
           </div>
           <p className="text-2xl font-black text-purple-600 dark:text-purple-400">
             {stats.announcements}
@@ -280,7 +280,7 @@ export default function NotificationManagementPage() {
             {/* Quick Templates Bar */}
             <div className="mb-6 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200/70 dark:border-neutral-800">
               <p className="text-[11px] font-black text-neutral-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Sparkles size={14} className="text-amber-500" />
+                <Zap size={14} className="text-amber-500" />
                 কুইক টেমপ্লেট (১ ক্লিকে লোড করুন)
               </p>
               <div className="flex flex-wrap gap-2">

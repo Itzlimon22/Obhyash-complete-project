@@ -13,7 +13,6 @@ import {
   Award,
   ChevronRight,
   BookOpen,
-  Sparkles,
   BarChart3,
   CheckCircle2,
   XCircle,
@@ -313,7 +312,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(best.accuracy))}% নির্ভুলতা`,
           description:
             "এই বিষয়ে তোমার নির্ভুলতা সবচেয়ে বেশি! নিয়মিত রিভিশন বজায় রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।",
-          icon: Sparkles,
+          icon: Trophy,
         });
 
         if (subjectData.length > 1) {
@@ -429,7 +428,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#059669",
           bgLight: "bg-emerald-500/10",
           borderLight: "border-emerald-500/30",
-          icon: Sparkles,
+          icon: Award,
         },
         {
           id: "score90",

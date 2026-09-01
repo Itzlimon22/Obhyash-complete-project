@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TrendingUp, BookOpen, Clock, Activity, Sparkles } from 'lucide-react';
+import { TrendingUp, BookOpen, Clock, Activity } from 'lucide-react';
 
 interface LearningTrendsProps {
   hourlyActivity: number[];

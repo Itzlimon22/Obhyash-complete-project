@@ -13,7 +13,6 @@ import {
   ZoomOut,
   RefreshCw,
   FileQuestion,
-  Sparkles,
   Layers,
   Eye,
 } from 'lucide-react';

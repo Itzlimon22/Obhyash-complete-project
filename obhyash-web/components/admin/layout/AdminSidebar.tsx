@@ -21,7 +21,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   X,
-  Sparkles,
+  Lightbulb,
   UploadCloud,
   Gift,
   Sun,
@@ -121,7 +121,7 @@ const ADMIN_NAVIGATION: NavSection[] = [
       {
         id: 'feature-requests',
         label: 'ফিচার প্রস্তাবনা',
-        icon: Sparkles,
+        icon: Lightbulb,
         href: '/admin/feature-requests',
       },
       {

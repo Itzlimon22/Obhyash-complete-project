@@ -18,7 +18,6 @@ import {
   Crown,
   AlertTriangle,
   MessageSquare,
-  Sparkles,
 } from 'lucide-react';
 import { SystemControlsCard, AppConfig } from '@/components/admin/dashboard/system-controls-card';
 import { UserSpotlightSearchBar } from '@/components/admin/dashboard/user-spotlight-modal';

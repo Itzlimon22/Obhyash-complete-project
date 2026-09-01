@@ -60,24 +60,30 @@ class CelebrationDialog extends StatefulWidget {
   final Color primaryColor;
   final Color secondaryColor;
   final int? xpAwarded;
+  final String? badgeText;
+  final String actionText;
+  final VoidCallback? onAction;
 
   const CelebrationDialog({
     super.key,
     required this.title,
     required this.subtitle,
     this.badgeLabel,
-    this.icon = LucideIcons.sparkles,
-    this.primaryColor = const Color(0xFF004633),
+    this.icon = LucideIcons.flame,
+    this.primaryColor = const Color(0xFF10B981),
     this.secondaryColor = const Color(0xFF10B981),
     this.xpAwarded,
+    this.badgeText,
+    this.actionText = 'চালিয়ে যাও',
+    this.onAction,
   });
 
   static Future<void> show(
     BuildContext context, {
     required String title,
-    required String subtitle,
-    String? badgeLabel,
-    IconData icon = LucideIcons.sparkles,
+    required String message,
+    String? subtitle,
+    IconData icon = LucideIcons.flame,
     Color primaryColor = const Color(0xFF004633),
     Color secondaryColor = const Color(0xFF10B981),
     int? xpAwarded,

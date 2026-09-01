@@ -17,7 +17,7 @@ import {
   BookmarkCheck, 
   Award,
   BookOpen,
-  Sparkles,
+  Target,
   HelpCircle
 } from "lucide-react";
 import { toast } from "sonner";
@@ -216,7 +216,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
 
           <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-200 dark:border-neutral-800 shadow-sm flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <Sparkles className="w-6 h-6" />
+              <Target className="w-6 h-6" />
             </div>
             <div>
               <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">নির্ভুলতা (Accuracy)</p>

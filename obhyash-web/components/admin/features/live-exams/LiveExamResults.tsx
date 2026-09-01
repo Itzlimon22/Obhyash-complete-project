@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   XCircle,
   X,
-  Sparkles,
   School,
   Globe,
   Send,

@@ -11,7 +11,6 @@ import {
   Users,
   Trophy,
   Award,
-  Sparkles,
   CheckCircle2,
   ArrowRight,
   HelpCircle,

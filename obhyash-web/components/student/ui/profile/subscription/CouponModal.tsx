@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tag, X, Sparkles, CheckCircle2, ArrowRight, AlertCircle } from 'lucide-react';
+import { Tag, X, CheckCircle2, ArrowRight, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateCouponDiscount, AppliedCoupon } from '@/lib/utils/coupon-system';
 
@@ -150,7 +150,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
               {/* Promo recommendation hint */}
               <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={16} className="text-amber-500" />
+                  <Tag size={16} className="text-amber-500" />
                   <span className="text-xs text-neutral-600 dark:text-neutral-300 font-medium">
                     অফার কোড: <strong className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">PIONEER</strong>
                   </span>

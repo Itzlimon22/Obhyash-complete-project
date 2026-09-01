@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { AppFeatureRequest, FeatureRequestStatus } from '@/lib/types';
 import { getFeatureRequests } from '@/services/feature-request-service';
 import {
-  Sparkles,
+  Lightbulb,
   RefreshCw,
   Search,
   Loader2,
@@ -151,7 +151,7 @@ export default function AdminFeatureRequestsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5">
-            <Sparkles className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <Lightbulb className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             ব্যবহারকারীদের ফিচার প্রস্তাবনা
           </h1>
           <p className="text-xs md:text-sm text-neutral-500 mt-1">
@@ -302,7 +302,7 @@ export default function AdminFeatureRequestsPage() {
       ) : featureRequests.length === 0 ? (
         <Card className="rounded-3xl border-neutral-200 dark:border-neutral-800 p-12 text-center bg-white dark:bg-neutral-900">
           <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto text-neutral-400 mb-3">
-            <Sparkles className="w-6 h-6" />
+            <Lightbulb className="w-6 h-6" />
           </div>
           <h3 className="text-base font-bold text-neutral-900 dark:text-white">
             কোনো ফিচার প্রস্তাব পাওয়া যায়নি

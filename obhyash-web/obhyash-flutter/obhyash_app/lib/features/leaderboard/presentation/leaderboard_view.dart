@@ -49,7 +49,7 @@ const _levels = [
     '7K–15K XP',
     Color(0xFFF59E0B), // Amber
     Color(0xFFB45309),
-    LucideIcons.sparkles,
+    LucideIcons.graduationCap,
   ),
   _LevelInfo(
     'Warrior',

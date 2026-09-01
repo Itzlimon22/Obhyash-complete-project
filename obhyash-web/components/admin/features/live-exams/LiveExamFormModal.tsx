@@ -8,7 +8,7 @@ import {
   Clock,
   Award,
   AlertTriangle,
-  Sparkles,
+  BookOpen,
   Save,
   CheckCircle2,
 } from 'lucide-react';
@@ -172,7 +172,7 @@ export default function LiveExamFormModal({ exam, onSave, onClose }: Props) {
           <div className="space-y-1.5 p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                <Sparkles size={14} className="text-emerald-600 dark:text-emerald-400" />
+                <BookOpen size={14} className="text-emerald-600 dark:text-emerald-400" />
                 পরীক্ষার সিলেবাস ও অধ্যায়সমূহ (Syllabus for Routine) *
               </label>
               <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full">

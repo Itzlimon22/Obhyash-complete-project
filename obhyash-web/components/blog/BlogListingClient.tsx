@@ -9,11 +9,14 @@ import BlogCard from '@/components/blog/BlogCard';
 import { useReadHistory } from '@/hooks/use-read-history';
 import {
   BookOpen,
-  Sparkles,
-  TrendingUp,
   Search,
+  TrendingUp,
   X,
   Bookmark,
+  CheckCircle2,
+  Star,
+  Award,
+  GraduationCap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -193,7 +196,7 @@ export default function BlogListingClient({
             {[
               { icon: BookOpen, label: `${posts.length} আর্টিকেল` },
               { icon: TrendingUp, label: 'পরীক্ষার কৌশল' },
-              { icon: Sparkles, label: 'সম্পূর্ণ ফ্রি' },
+              { icon: CheckCircle2, label: 'সম্পূর্ণ ফ্রি' },
             ].map(({ icon: Icon, label }) => (
               <div
                 key={label}
@@ -369,7 +372,7 @@ export default function BlogListingClient({
                 </>
               ) : (
                 <div className="flex items-center gap-2 mb-6">
-                  <Sparkles className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                  <Star className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                   <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 tracking-tight font-anek">
                     তোমার জন্য প্রস্তাবিত
                   </h2>
@@ -393,7 +396,7 @@ export default function BlogListingClient({
         {showFeatured && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-4 h-4 text-slate-400" />
+              <Award className="w-4 h-4 text-slate-400" />
               <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-anek">
                 নির্বাচিত পোস্ট
               </h2>
@@ -467,7 +470,7 @@ export default function BlogListingClient({
         <div className="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-8 sm:p-12 text-center shadow-sm">
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 bg-white/50 dark:bg-[#2a2a2a] text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-[#383838]">
-              <Sparkles className="w-3.5 h-3.5" />
+              <GraduationCap className="w-3.5 h-3.5" />
               অভ্যাস প্ল্যাটফর্ম
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3 font-anek">

@@ -3,7 +3,7 @@
 import React from "react";
 import { SubscriptionPlan } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Check, Crown, Sparkles, Zap, Tag, X } from "lucide-react";
+import { Check, Crown, Trophy, Zap, Tag, X } from "lucide-react";
 import { AppliedCoupon, calculateCouponDiscount } from "@/lib/utils/coupon-system";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
@@ -89,7 +89,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             {isMasterPro ? (
               <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-amber-500" />
             ) : isTopRankers ? (
-              <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-500" />
+              <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-500" />
             ) : (
               <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-blue-500" />
             )}

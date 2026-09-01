@@ -35,7 +35,6 @@ import {
   Send,
   Bell,
   ShieldAlert,
-  Sparkles,
   UserMinus,
   UserCheck,
   MessageSquare,

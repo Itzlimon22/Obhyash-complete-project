@@ -11,7 +11,6 @@ import {
   AlertCircle,
   ExternalLink,
   Save,
-  Sparkles,
   Zap,
   CheckCircle2,
   Edit3,

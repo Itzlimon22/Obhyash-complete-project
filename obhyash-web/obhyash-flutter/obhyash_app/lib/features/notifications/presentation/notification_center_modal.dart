@@ -384,7 +384,7 @@ class _NotificationCard extends StatelessWidget {
       case 'result':
         return LucideIcons.trophy;
       case 'milestone':
-        return LucideIcons.sparkles;
+        return LucideIcons.zap;
       case 'leaderboard':
         return LucideIcons.award;
       default:

@@ -6,7 +6,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
   Flame,

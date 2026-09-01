@@ -17,7 +17,7 @@ import {
   Eye,
   Sliders,
   Database,
-  Sparkles,
+  UploadCloud,
   RefreshCw,
   X,
 } from 'lucide-react';
@@ -1146,7 +1146,7 @@ export default function BulkUploadPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4" />
+                    <UploadCloud className="w-4 h-4" />
                     Import {selectedRows.size} Selected Questions
                   </>
                 )}

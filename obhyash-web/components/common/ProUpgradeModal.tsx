@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Crown, Sparkles, X, CalendarCheck, LucideIcon } from "lucide-react";
+import { Crown, Zap, X, CalendarCheck, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export interface ProUpgradeModalProps {
@@ -99,7 +99,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({
             onClick={handleUpgrade}
             className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base font-['HindSiliguri'] shadow-lg shadow-emerald-600/25 transition active:scale-[0.98]"
           >
-            <Sparkles size={18} />
+            <Zap size={18} />
             <span>প্রো প্ল্যানগুলো দেখো</span>
           </button>
 

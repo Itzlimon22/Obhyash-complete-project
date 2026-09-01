@@ -11,7 +11,6 @@ import {
   CheckCircle2, 
   XCircle, 
   User, 
-  Sparkles,
   School,
   FileText
 } from "lucide-react";

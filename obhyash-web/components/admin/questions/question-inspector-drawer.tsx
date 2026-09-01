@@ -15,7 +15,6 @@ import {
   Layers,
   Award,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { MathText } from '@/components/admin/questions/shared';
@@ -189,7 +188,7 @@ export function QuestionInspectorDrawer({
           {question.explanation && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 space-y-2">
               <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                <Sparkles size={14} className="text-amber-500" />
+                <BookOpen size={14} className="text-amber-500" />
                 <span>বিস্তারিত ব্যাখ্যা ও সমাধান (Explanation)</span>
               </h4>
               <div className="text-sm text-neutral-800 dark:text-zinc-200 leading-relaxed">

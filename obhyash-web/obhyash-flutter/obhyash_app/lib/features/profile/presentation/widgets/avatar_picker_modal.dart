@@ -65,7 +65,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
   String _selectedCategory = 'all';
 
   static const List<_AvatarCategory> _categories = [
-    _AvatarCategory(id: 'all', label: 'সব', icon: LucideIcons.sparkles),
+    _AvatarCategory(id: 'all', label: 'সব', icon: LucideIcons.layers),
     _AvatarCategory(id: 'boys', label: 'ছাত্র', icon: LucideIcons.user),
     _AvatarCategory(id: 'girls', label: 'ছাত্রী', icon: LucideIcons.userCheck),
     _AvatarCategory(id: 'scholars', label: 'টপার ও স্কলার', icon: LucideIcons.glasses),
@@ -369,7 +369,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
-                          LucideIcons.sparkles,
+                          LucideIcons.layers,
                           size: 18,
                           color: Color(0xFF059669),
                         ),

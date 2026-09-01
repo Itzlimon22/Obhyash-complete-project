@@ -97,7 +97,7 @@ class SettingsView extends ConsumerWidget {
           _SettingsItem(
             label: 'ফিচার রিকোয়েস্ট',
             description: 'অ্যাপের জন্য নতুন ফিচারের প্রস্তাব ও আইডিয়া পাঠাও',
-            icon: LucideIcons.sparkles,
+            icon: LucideIcons.lightbulb,
             type: _ItemType.navigate,
             route: '/profile/feature-requests',
           ),

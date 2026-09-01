@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Zap } from 'lucide-react';
+import { Flame, Zap } from 'lucide-react';
 
 interface StreakCelebrationProps {
   count: number;
@@ -100,7 +100,7 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
                     Gained
                   </span>
                   <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-black">
-                    <Sparkles size={14} />
+                    <Zap size={14} />
                     <span>+20 XP</span>
                   </div>
                 </div>

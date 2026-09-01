@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Layers, Award, Sparkles, CheckCircle2, Flame, Clock } from 'lucide-react';
+import { Brain, Layers, Award, CheckCircle2, Flame, Clock } from 'lucide-react';
 import { getSpacedRepetitionStats, SpacedRepetitionStats } from '@/services/spaced-repetition-service';
 
 interface LeitnerMemoryBoxCardProps {

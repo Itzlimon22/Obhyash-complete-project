@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ShieldAlert, RefreshCw, Wrench, Sparkles } from 'lucide-react';
+import { ShieldAlert, RefreshCw, Wrench } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 

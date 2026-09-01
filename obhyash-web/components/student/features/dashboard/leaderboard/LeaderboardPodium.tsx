@@ -4,7 +4,7 @@ import React from "react";
 import { UserProfile } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import UserAvatar from "@/components/student/ui/common/UserAvatar";
-import { Crown, Sparkles, Trophy } from "lucide-react";
+import { Crown, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LeaderboardPodiumProps {

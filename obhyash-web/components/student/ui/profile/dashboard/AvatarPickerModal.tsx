@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import {
-  Sparkles,
+  Layers,
   User,
   UserCheck,
   Glasses,
@@ -52,7 +52,7 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories: AvatarCategory[] = [
-    { id: 'all', label: 'সব', icon: Sparkles },
+    { id: 'all', label: 'সব', icon: Layers },
     { id: 'boys', label: 'ছাত্র', icon: User },
     { id: 'girls', label: 'ছাত্রী', icon: UserCheck },
     { id: 'scholars', label: 'টপার ও স্কলার', icon: Glasses },

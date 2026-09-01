@@ -19,7 +19,6 @@ import {
   Check,
   X,
   Copy,
-  Sparkles,
   ShieldAlert,
   SlidersHorizontal,
   UserCheck,

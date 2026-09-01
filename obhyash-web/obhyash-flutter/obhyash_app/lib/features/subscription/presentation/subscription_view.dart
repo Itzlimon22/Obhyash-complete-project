@@ -911,7 +911,7 @@ class _UnifiedFeaturesShowcase extends StatelessWidget {
                   color: const Color(0xFF004633).withValues(alpha: isDark ? 0.25 : 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(LucideIcons.sparkles, color: Color(0xFF004633), size: 16),
+                child: const Icon(LucideIcons.crown, color: Color(0xFF004633), size: 16),
               ),
               const SizedBox(width: 10),
               Text(

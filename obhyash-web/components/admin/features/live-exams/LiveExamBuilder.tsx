@@ -8,7 +8,6 @@ import {
   Trash2,
   Check,
   AlertCircle,
-  Sparkles,
   Zap,
   BookOpen,
   Filter,
@@ -1394,7 +1393,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                                   {isSolExpanded && (
                                     <div className="mt-2 p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/25 border border-blue-200/60 dark:border-blue-900/50 text-xs text-neutral-800 dark:text-zinc-200 space-y-1 animate-in fade-in duration-150">
                                       <div className="flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300 text-[11px]">
-                                        <Sparkles size={13} />
+                                        <BookOpen size={13} />
                                         <span>সঠিক উত্তর ও বিস্তারিত সমাধান:</span>
                                       </div>
                                       <div className="pt-0.5 leading-relaxed">

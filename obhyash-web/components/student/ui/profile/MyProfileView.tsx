@@ -9,7 +9,6 @@ import Link from 'next/link';
 import {
   Gift,
   Trophy,
-  Sparkles,
   Camera,
   Layers,
   Calendar,
@@ -230,7 +229,7 @@ export default function MyProfileView({
 
       {/* ── 2. Level Progress Bar (Premium Design matching Flutter) ── */}
       <div className="bg-gradient-to-br from-[#312E81] to-[#4338CA] dark:from-[#1E1B4B] dark:to-[#312E81] text-white rounded-[24px] p-6 sm:p-7 shadow-xl relative overflow-hidden">
-        <Sparkles className="absolute -top-6 -right-6 w-36 h-36 text-white/5 pointer-events-none" />
+        <Trophy className="absolute -top-6 -right-6 w-36 h-36 text-white/5 pointer-events-none" />
 
         <div className="flex items-center justify-between mb-4 relative z-10">
           <div>

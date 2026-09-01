@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Menu,
   X,
-  Sparkles,
   GraduationCap,
   UserCircle,
   Radio,

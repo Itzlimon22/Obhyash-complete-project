@@ -205,7 +205,7 @@ enum WeeklyLeagueTier {
     id: 'luminary',
     nameBangla: 'মেধাবী',
     nameEnglish: 'Luminary',
-    icon: LucideIcons.sparkles,
+    icon: LucideIcons.award,
     minXp: 3500,
     color: Color(0xFFF59E0B),
   ),

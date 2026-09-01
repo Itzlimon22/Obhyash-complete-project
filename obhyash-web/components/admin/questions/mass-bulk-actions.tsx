@@ -7,7 +7,7 @@ import {
   Trash2,
   BookOpen,
   Layers,
-  Sparkles,
+  Zap,
   ChevronDown,
   Download,
   AlertTriangle,
@@ -175,7 +175,7 @@ export function MassBulkActions({
             }}
             className="px-3 py-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
           >
-            <Sparkles size={14} />
+            <Zap size={14} />
             <span>কাঠিন্য পরিবর্তন</span>
             <ChevronDown size={12} />
           </button>

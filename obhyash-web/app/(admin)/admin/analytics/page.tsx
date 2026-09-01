@@ -13,7 +13,6 @@ import {
   Award,
   BookOpen,
   Brain,
-  Sparkles,
   Flame,
   Crown,
 } from 'lucide-react';

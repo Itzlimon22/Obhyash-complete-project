@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Gift, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import { Gift, CheckCircle2, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
@@ -81,7 +81,6 @@ export const ScratchCardWeb: React.FC<ScratchCardWebProps> = ({ card, onRevealed
         <Loader2 className="w-10 h-10 text-white animate-spin" />
       ) : (
         <>
-          <Sparkles className="absolute top-2 right-2 w-5 h-5 text-yellow-200" />
           <Gift className="w-10 h-10 text-white mb-3" />
           <p className="font-bold text-white text-lg font-anek">খুলতে ক্লিক করুন</p>
         </>

@@ -192,7 +192,7 @@ class AboutUsView extends StatelessWidget {
                           color: const Color(0xFF10B981).withValues(alpha: isDark ? 0.18 : 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(LucideIcons.sparkles, size: 16, color: Color(0xFF10B981)),
+                        child: const Icon(LucideIcons.zap, size: 16, color: Color(0xFF10B981)),
                       ),
                       const SizedBox(width: 10),
                       Text(

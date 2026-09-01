@@ -210,7 +210,7 @@ class ProUpgradeModal extends StatelessWidget {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(LucideIcons.sparkles, size: 18),
+                  Icon(LucideIcons.zap, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'প্রো প্ল্যানগুলো দেখো',
