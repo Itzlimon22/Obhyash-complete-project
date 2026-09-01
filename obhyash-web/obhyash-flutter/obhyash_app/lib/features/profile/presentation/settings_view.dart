@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
@@ -15,7 +14,7 @@ import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 
-enum _ItemType { navigate, external, action }
+enum _ItemType { navigate, action }
 
 class _SettingsItem {
   final String label;
@@ -24,7 +23,6 @@ class _SettingsItem {
   final String? svgAsset;
   final _ItemType type;
   final String? route;
-  final String? url;
   final String? actionId;
   final bool danger;
 
@@ -35,7 +33,6 @@ class _SettingsItem {
     this.svgAsset,
     required this.type,
     this.route,
-    this.url,
     this.actionId,
     this.danger = false,
   });
@@ -227,13 +224,6 @@ class SettingsView extends ConsumerWidget {
       case _ItemType.navigate:
         if (item.route != null) {
           context.push(item.route!);
-        }
-      case _ItemType.external:
-        if (item.url != null) {
-          final uri = Uri.parse(item.url!);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
         }
       case _ItemType.action:
         if (item.actionId == 'accountInfo') {
@@ -563,6 +553,15 @@ class _NavItem extends StatelessWidget {
                     child: SvgPicture.asset(
                       item.svgAsset!,
                       fit: BoxFit.contain,
+                      placeholderBuilder: (_) => Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: iconBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(item.icon, color: iconColor, size: 18),
+                      ),
                     ),
                   )
                 else
@@ -597,9 +596,7 @@ class _NavItem extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      item.type == _ItemType.external
-                          ? LucideIcons.externalLink
-                          : LucideIcons.chevronRight,
+                      LucideIcons.chevronRight,
                       size: 15,
                       color: isDark
                           ? const Color(0xFFA1A1AA)

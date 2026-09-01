@@ -63,10 +63,10 @@ class _DashboardActionCardState extends State<DashboardActionCard>
         builder: (context, child) =>
             Transform.scale(scale: _scaleAnimation.value, child: child),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E7EB),
               width: 1,
@@ -77,13 +77,13 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                     ? Colors.black.withValues(alpha: 0.35)
                     : const Color(0xFFE4E4E7),
                 blurRadius: 0,
-                offset: const Offset(0, 2.5),
+                offset: const Offset(0, 2),
               ),
               BoxShadow(
                 color: isDark
                     ? Colors.black.withValues(alpha: 0.15)
                     : const Color(0x0A000000),
-                blurRadius: 8,
+                blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -93,16 +93,30 @@ class _DashboardActionCardState extends State<DashboardActionCard>
             children: [
               if (widget.svgAsset != null)
                 SizedBox(
-                  width: 38,
-                  height: 38,
+                  width: 42,
+                  height: 42,
                   child: SvgPicture.asset(
                     widget.svgAsset!,
                     fit: BoxFit.contain,
+                    placeholderBuilder: (_) => Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? widget.primaryColor.withValues(alpha: 0.18)
+                            : widget.lightColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        widget.icon,
+                        color: widget.primaryColor,
+                        size: 24,
+                      ),
+                    ),
                   ),
                 )
               else
                 Container(
-                  padding: const EdgeInsets.all(9),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isDark
                         ? widget.primaryColor.withValues(alpha: 0.18)
@@ -112,17 +126,17 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                   child: Icon(
                     widget.icon,
                     color: widget.primaryColor,
-                    size: 22,
+                    size: 24,
                   ),
                 ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 13.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                   fontFamily: 'Anek Bangla',

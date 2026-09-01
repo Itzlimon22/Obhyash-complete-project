@@ -21,7 +21,8 @@ class OfflineQuestionBankService {
 
   /// Store a list of questions into the local offline question bank
   static Future<void> cacheQuestions(List<Question> questions) async {
-    if (questions.isEmpty) return;
+    final validMcqs = questions.where((q) => q.isStrictMcq).toList();
+    if (validMcqs.isEmpty) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       final existingJson = prefs.getString(_kOfflineBankKey);
@@ -31,7 +32,7 @@ class OfflineQuestionBankService {
         bank = jsonDecode(existingJson) as Map<String, dynamic>;
       }
 
-      for (final q in questions) {
+      for (final q in validMcqs) {
         final subjectKey = _normalizeKey(q.subject);
         List<dynamic> subjectQuestions =
             bank[subjectKey] is List ? bank[subjectKey] : [];
@@ -56,7 +57,7 @@ class OfflineQuestionBankService {
 
       await prefs.setString(_kOfflineBankKey, jsonEncode(bank));
       debugPrint(
-        '[OfflineQuestionBankService] Cached ${questions.length} questions offline.',
+        '[OfflineQuestionBankService] Cached ${validMcqs.length} MCQ questions offline.',
       );
     } catch (e) {
       debugPrint('[OfflineQuestionBankService] Error caching questions: $e');
@@ -101,6 +102,7 @@ class OfflineQuestionBankService {
 
       List<Question> parsed = subjectQuestions
           .map((e) => Question.fromJson(e as Map<String, dynamic>))
+          .where((q) => q.isStrictMcq)
           .toList();
 
       // Filter and balance by chapter if provided

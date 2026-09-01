@@ -44,7 +44,7 @@ const _levels = [
     Color(0xFFEF4444), // Crimson
     Color(0xFF991B1B),
     LucideIcons.crown,
-    'assets/leaderboard-levels/level_legend.svg',
+    'assets/leaderboard-levels/level_5_legend.svg',
   ),
   _LevelInfo(
     'Scholar',
@@ -54,7 +54,7 @@ const _levels = [
     Color(0xFFF59E0B), // Amber
     Color(0xFFB45309),
     LucideIcons.graduationCap,
-    'assets/leaderboard-levels/level_titan.svg',
+    'assets/leaderboard-levels/level_4_titan.svg',
   ),
   _LevelInfo(
     'Warrior',
@@ -64,7 +64,7 @@ const _levels = [
     Color(0xFF8B5CF6), // Violet
     Color(0xFF6D28D9),
     LucideIcons.shield,
-    'assets/leaderboard-levels/level_warrior.svg',
+    'assets/leaderboard-levels/level_3_warrior.svg',
   ),
   _LevelInfo(
     'Challenger',
@@ -74,7 +74,7 @@ const _levels = [
     Color(0xFF0284C7), // Sky Blue
     Color(0xFF0369A1),
     LucideIcons.zap,
-    'assets/leaderboard-levels/level_scout.svg',
+    'assets/leaderboard-levels/level_2_scout.svg',
   ),
   _LevelInfo(
     'Explorer',
@@ -84,7 +84,7 @@ const _levels = [
     Color(0xFF10B981), // Emerald
     Color(0xFF047857),
     LucideIcons.sprout,
-    'assets/leaderboard-levels/level_rookie.svg',
+    'assets/leaderboard-levels/level_1_rookie.svg',
   ),
 ];
 
@@ -229,7 +229,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   String _selectedLevel = 'Explorer';
   bool _hasSetDefaultLevel = false;
   String _timeframe = 'monthly'; // 'monthly', 'all_time'
-  String _batchFilter = 'all'; // 'all', 'my_batch'
+  String _batchFilter = 'my_batch'; // Default to student's own batch
   List<_LBUser> _users = [];
   bool _isLoading = false;
   Map<String, int> _levelCounts = {};
@@ -257,6 +257,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     try {
       final supabase = Supabase.instance.client;
       final sortColumn = _timeframe == 'monthly' ? 'monthly_xp' : 'xp';
+      final myProfile = ref.read(userProfileProvider).whenOrNull(data: (u) => u);
+      final rawUserBatch = myProfile?.batch?.trim();
 
       // Count students in each league tier by their active timeframe XP
       final futures = _levels.map((lvl) async {
@@ -268,6 +270,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
             .gte(sortColumn, minXp);
         if (maxXp < 999999999) {
           query = query.lte(sortColumn, maxXp);
+        }
+        if (_batchFilter == 'my_batch' && rawUserBatch != null && rawUserBatch.isNotEmpty) {
+          query = query.ilike('batch', '%$rawUserBatch%');
         }
         final data = await query.limit(9999);
         return MapEntry(lvl.id, (data as List).length);
@@ -672,6 +677,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             onBatchFilterChanged: (b) {
                               if (_batchFilter != b) {
                                 setState(() => _batchFilter = b);
+                                _fetchCounts();
                                 _fetch();
                               }
                             },
@@ -1587,6 +1593,13 @@ class _LevelSelector extends StatelessWidget {
                               child: SvgPicture.asset(
                                 l.svgAsset,
                                 fit: BoxFit.contain,
+                                placeholderBuilder: (_) => Icon(
+                                  l.icon,
+                                  size: 24,
+                                  color: isActive
+                                      ? Colors.white
+                                      : l.start,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 5),

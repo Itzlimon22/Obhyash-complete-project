@@ -238,6 +238,43 @@ class Question {
       examType: examType ?? this.examType,
     );
   }
+
+  /// Returns true if this question is strictly a Multiple Choice Question (MCQ).
+  /// Rejects questions with fewer than 2 options, missing choices, or written/CQ stems.
+  bool get isStrictMcq {
+    // 1. Must have at least 2 options (standard MCQ)
+    if (options.length < 2) return false;
+
+    // 2. Options must not be all empty
+    final nonEmptyOptions = options.where((opt) => opt.trim().isNotEmpty).toList();
+    if (nonEmptyOptions.length < 2) return false;
+
+    // 3. Exclude written/CQ types
+    final type = (examType ?? '').toLowerCase();
+    if (type.contains('written') ||
+        type.contains('cq') ||
+        type.contains('creative') ||
+        type.contains('descriptive') ||
+        type.contains('সৃজনশীল') ||
+        type.contains('রচনামূলক') ||
+        type.contains('লিখিত')) {
+      return false;
+    }
+
+    // 4. Reject stems that are typical standalone CQ sub-questions (e.g. "ক. কাকে বলে?", "(খ) ব্যাখ্যা করো")
+    final trimmedQ = question.trim();
+    if (trimmedQ.startsWith(RegExp(r'^(ক|খ|গ|ঘ)\.\s*|^(\(ক\)|\(খ\)|\(গ\)|\(ঘ\))\s*')) &&
+        options.length < 4) {
+      return false;
+    }
+
+    // 5. Valid correct answer index
+    if (correctAnswerIndex < 0 || correctAnswerIndex >= options.length) {
+      return false;
+    }
+
+    return true;
+  }
 }
 
 class ExamConfig {

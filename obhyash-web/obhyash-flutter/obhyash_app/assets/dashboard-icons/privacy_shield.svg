@@ -13,13 +13,10 @@
       <stop offset="60%" stop-color="#EAB308" />
       <stop offset="100%" stop-color="#A16207" />
     </linearGradient>
-    <filter id="shadowShield" x="-10%" y="-10%" width="120%" height="130%">
-      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#064E3B" flood-opacity="0.35" />
-    </filter>
   </defs>
 
   <rect x="6" y="8" width="88" height="84" rx="26" fill="#064E3B" />
-  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#shieldBg)" stroke="url(#shieldBorder)" stroke-width="3.5" filter="url(#shadowShield)" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#shieldBg)" stroke="url(#shieldBorder)" stroke-width="3.5" />
   <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
 
   <!-- 3D Security Shield & Checkmark -->

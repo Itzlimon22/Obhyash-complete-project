@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -56,29 +57,20 @@ class AboutUsView extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF004633), Color(0xFF059669)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF059669).withValues(alpha: 0.4),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: SvgPicture.asset(
+                        'assets/images/obhyash_logo.svg',
+                        fit: BoxFit.cover,
+                        placeholderBuilder: (_) => Image.asset(
+                          'assets/images/app_logo.png',
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        LucideIcons.flame,
-                        color: Colors.white,
-                        size: 38,
                       ),
                     ),
                   ),

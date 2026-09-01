@@ -50,47 +50,30 @@ class FormulaSubjectsView extends ConsumerWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'বিষয় বেছে নিন ($level)',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Anek Bangla',
-                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
-                ),
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
+          child: AppRefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(userProfileProvider);
+              try {
+                await ref.read(userProfileProvider.future);
+              } catch (_) {}
+            },
+            child: GridView.builder(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-              const SizedBox(height: 14),
-              Expanded(
-                child: AppRefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(userProfileProvider);
-                    try {
-                      await ref.read(userProfileProvider.future);
-                    } catch (_) {}
-                  },
-                  child: GridView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1.42,
-                    ),
-                    itemCount: subjects.length,
-                    itemBuilder: (context, index) {
-                      final subject = subjects[index];
-                      return _SubjectCard(subject: subject, isDark: isDark);
-                    },
-                  ),
-                ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.42,
               ),
-            ],
+              itemCount: subjects.length,
+              itemBuilder: (context, index) {
+                final subject = subjects[index];
+                return _SubjectCard(subject: subject, isDark: isDark);
+              },
+            ),
           ),
         ),
       ),
@@ -172,17 +155,30 @@ class _SubjectCardState extends State<_SubjectCard>
             children: [
               if (widget.subject.svgIcon != null)
                 SizedBox(
-                  width: 34,
-                  height: 34,
+                  width: 36,
+                  height: 36,
                   child: SvgPicture.asset(
                     widget.subject.svgIcon!,
                     fit: BoxFit.contain,
+                    placeholderBuilder: (_) => Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.subject.emoji,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
                   ),
                 )
               else
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
@@ -190,7 +186,7 @@ class _SubjectCardState extends State<_SubjectCard>
                   alignment: Alignment.center,
                   child: Text(
                     widget.subject.emoji,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
               Text(

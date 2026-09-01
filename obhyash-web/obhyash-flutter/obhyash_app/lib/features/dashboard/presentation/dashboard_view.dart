@@ -98,7 +98,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 1.05,
+                  childAspectRatio: 1.14,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [

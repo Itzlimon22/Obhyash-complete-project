@@ -203,6 +203,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             if (qList.isNotEmpty) {
               final parsed = qList
                   .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                  .where((q) => q.isStrictMcq)
                   .toList();
               generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
                 parsed,
@@ -227,7 +228,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           var query = supabase
               .from('questions')
               .select('*')
-              .inFilter('subject', subjectVariants.toList());
+              .inFilter('subject', subjectVariants.toList())
+              .not('options', 'is', null);
 
           if (chaptersList != null && chaptersList.isNotEmpty) {
             final allChapterVariants = <String>{};
@@ -247,9 +249,10 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             query = query.or(orConditions);
           }
 
-          final fallbackData = await query.limit(config.questionCount * 3);
+          final fallbackData = await query.limit(config.questionCount * 4);
           var allQuestions = List<dynamic>.from(fallbackData as List)
               .map((e) => Question.fromJson(e as Map<String, dynamic>))
+              .where((q) => q.isStrictMcq)
               .toList();
 
           // Target specific exclusion filter (e.g. Medical students should not get pure Engineering questions)
