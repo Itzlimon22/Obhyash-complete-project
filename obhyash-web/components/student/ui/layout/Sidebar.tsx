@@ -48,15 +48,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // ── Navigation Menu Items ──────────────────────────────────────────────────
   const menuItems = [
-    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-    { id: "setup", label: "পরীক্ষা", icon: FileEdit },
-    { id: "live_exam", label: "লাইভ পরীক্ষা", icon: Radio },
-    { id: "history", label: "ইতিহাস", icon: History },
-    { id: "practice", label: "অনুশীলন", icon: PenTool },
-    { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy },
-    { id: "analysis", label: "এনালাইসিস", icon: BarChart2 },
-    { id: "referral", label: "রেফারেল", icon: Gift },
-    { id: "blog", label: "ব্লগ", icon: Newspaper },
+    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, svgIcon: "/dashboard-icons/fire_streak.svg" },
+    { id: "setup", label: "পরীক্ষা", icon: FileEdit, svgIcon: "/dashboard-icons/exam_pencil.svg" },
+    { id: "live_exam", label: "লাইভ পরীক্ষা", icon: Radio, svgIcon: "/dashboard-icons/live_exam.svg" },
+    { id: "history", label: "ইতিহাস", icon: History, svgIcon: "/dashboard-icons/history_clock.svg" },
+    { id: "practice", label: "অনুশীলন", icon: PenTool, svgIcon: "/dashboard-icons/practice_target.svg" },
+    { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy, svgIcon: "/dashboard-icons/leaderboard_trophy.svg" },
+    { id: "analysis", label: "এনালাইসিস", icon: BarChart2, svgIcon: "/dashboard-icons/analytics.svg" },
+    { id: "referral", label: "রেফারেল", icon: Gift, svgIcon: "/dashboard-icons/referral_gift.svg" },
+    { id: "blog", label: "ব্লগ", icon: Newspaper, svgIcon: "/dashboard-icons/feature_lightbulb.svg" },
   ];
 
   const handleItemClick = (id: string) => {
@@ -122,8 +122,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* ── 2. Navigation Items (Matching Flutter: px-3, py-6, 9 items) ── */}
-          <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar">
+          {/* ── 2. Navigation Items ── */}
+          <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -137,39 +137,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => handleItemClick(item.id)}
                   className={`
                     w-full flex items-center ${
-                      isCollapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3.5 py-2.5"
-                    } rounded-[12px] transition-all duration-200 group text-left cursor-pointer
+                      isCollapsed ? "justify-center p-2" : "gap-3 px-3.5 py-2.5"
+                    } rounded-[14px] transition-all duration-200 group text-left cursor-pointer relative
                     ${
                       isActive
-                        ? "bg-[#059669] text-white shadow-[0_2px_6px_rgba(5,150,105,0.25)] font-semibold"
+                        ? isCollapsed
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 shadow-xs"
+                          : "bg-[#059669] text-white shadow-[0_2px_6px_rgba(5,150,105,0.25)] font-semibold"
                         : "text-[#525252] dark:text-[#E5E5E5] hover:bg-[#F5F5F5] dark:hover:bg-[#1C1C1E] font-semibold"
                     }
                   `}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <span
-                    className={`shrink-0 transition-transform duration-200 ${
-                      isActive ? "" : "group-hover:scale-110"
-                    }`}
-                  >
-                    <Icon
-                      size={20}
-                      className={
-                        isActive
-                          ? "text-white stroke-[2.2]"
-                          : "text-[#525252] dark:text-[#A3A3A3] group-hover:text-neutral-900 dark:group-hover:text-white stroke-[2]"
-                      }
-                    />
-                  </span>
-
-                  {!isCollapsed && (
-                    <span
-                      className={`text-[16px] font-['Anek_Bangla',sans-serif] font-semibold tracking-[0.2px] truncate ${
-                        isActive ? "text-white font-semibold" : "text-[#525252] dark:text-[#E5E5E5]"
-                      }`}
-                    >
-                      {item.label}
+                  {isCollapsed ? (
+                    <span className="relative flex items-center justify-center">
+                      <img
+                        src={item.svgIcon}
+                        alt={item.label}
+                        className={`w-7 h-7 object-contain drop-shadow-xs transition-transform duration-200 ${
+                          isActive ? "scale-115 drop-shadow-md" : "group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                        }`}
+                      />
+                      {isActive && (
+                        <span className="absolute -right-1 -top-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0C0A09]" />
+                      )}
                     </span>
+                  ) : (
+                    <>
+                      <span
+                        className={`shrink-0 transition-transform duration-200 ${
+                          isActive ? "" : "group-hover:scale-110"
+                        }`}
+                      >
+                        <Icon
+                          size={20}
+                          className={
+                            isActive
+                              ? "text-white stroke-[2.2]"
+                              : "text-[#525252] dark:text-[#A3A3A3] group-hover:text-neutral-900 dark:group-hover:text-white stroke-[2]"
+                          }
+                        />
+                      </span>
+
+                      <span
+                        className={`text-[16px] font-['Anek_Bangla',sans-serif] font-semibold tracking-[0.2px] truncate ${
+                          isActive ? "text-white font-semibold" : "text-[#525252] dark:text-[#E5E5E5]"
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </>
                   )}
                 </button>
               );

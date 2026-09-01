@@ -138,7 +138,7 @@ export default function MySubscriptionPanel({
     <div className="min-h-full flex flex-col font-['HindSiliguri']">
       {/* Header */}
       <div className="bg-[#004633] px-6 py-4 flex items-center gap-3 rounded-t-2xl">
-        <Crown size={20} className="text-yellow-300 shrink-0" />
+        <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-7 h-7 object-contain drop-shadow-xs shrink-0" />
         <div>
           <h2 className="text-base sm:text-lg font-black text-white">আমার সাবস্ক্রিপশন</h2>
           <p className="text-xs text-emerald-100 font-medium">
@@ -183,7 +183,7 @@ export default function MySubscriptionPanel({
               /* Free user CTA */
               <div className="rounded-2xl border border-dashed border-[#004633]/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-8 flex flex-col items-center text-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-[#004633] flex items-center justify-center shadow-lg shadow-emerald-950/30">
-                  <Crown size={24} className="text-yellow-300" />
+                  <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-8 h-8 object-contain drop-shadow-md" />
                 </div>
                 <div>
                   <p className="text-base font-black text-neutral-800 dark:text-neutral-100 mb-1">

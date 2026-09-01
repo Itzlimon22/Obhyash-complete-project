@@ -214,8 +214,8 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-[#2A173B] border border-purple-200 dark:border-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
-            <Award size={22} />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-[#2A173B] border border-purple-200 dark:border-purple-900/50 flex items-center justify-center shrink-0">
+            <img src="/dashboard-icons/practice_target.svg" alt="Daily Quests" className="w-7 h-7 object-contain drop-shadow-xs" />
           </div>
 
           <div>

@@ -464,7 +464,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                         Text(
                           'মোট পরিশোধ',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
@@ -747,7 +747,7 @@ class _OverviewTab extends StatelessWidget {
                     expiresAt != null
                         ? 'মেয়াদ শেষ: ${expiresAt!.toLocal().toString().substring(0, 10)}'
                         : 'মেয়াদ অনির্ধারিত',
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13.5),
                   ),
                 ],
               ),

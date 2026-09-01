@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <linearGradient id="giftBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#DB2777" />
+    </linearGradient>
+    <linearGradient id="giftBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F472B6" />
+      <stop offset="100%" stop-color="#9D174D" />
+    </linearGradient>
+    <filter id="shadowGift" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#831843" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <rect x="6" y="8" width="88" height="84" rx="26" fill="#831843" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#giftBg)" stroke="url(#giftBorder)" stroke-width="3.5" filter="url(#shadowGift)" />
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
+
+  <!-- 3D Gift Box Illustration -->
+  <g transform="translate(50, 48)">
+    <!-- Box Body -->
+    <rect x="-18" y="-4" width="36" height="28" rx="4" fill="#FFFFFF" />
+    <!-- Box Lid -->
+    <rect x="-21" y="-12" width="42" height="10" rx="3" fill="#F1F5F9" />
+    
+    <!-- Yellow Ribbon Vertical -->
+    <rect x="-5" y="-12" width="10" height="36" fill="#F59E0B" />
+    <rect x="-1" y="-12" width="4" height="36" fill="#FEF08A" />
+    
+    <!-- Yellow Ribbon Horizontal -->
+    <rect x="-18" y="8" width="36" height="7" fill="#F59E0B" />
+    
+    <!-- Bow Loops -->
+    <path d="M -9 -12 C -18 -26 0 -22 -3 -12 Z" fill="#F59E0B" />
+    <path d="M 9 -12 C 18 -26 0 -22 3 -12 Z" fill="#F59E0B" />
+    <circle cx="0" cy="-12" r="3.5" fill="#FEF08A" />
+  </g>
+</svg>

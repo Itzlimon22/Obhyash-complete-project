@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -20,6 +21,7 @@ class _LevelInfo {
   final String xpRange;
   final Color start, end;
   final IconData icon;
+  final String svgAsset;
 
   const _LevelInfo(
     this.id,
@@ -29,6 +31,7 @@ class _LevelInfo {
     this.start,
     this.end,
     this.icon,
+    this.svgAsset,
   );
 }
 
@@ -37,46 +40,51 @@ const _levels = [
     'Legend',
     'লিজেন্ড',
     15000,
-    '15K+ XP',
+    '১৫K+ XP',
     Color(0xFFEF4444), // Crimson
     Color(0xFF991B1B),
     LucideIcons.crown,
+    'assets/leaderboard-levels/level_legend.svg',
   ),
   _LevelInfo(
     'Scholar',
-    'স্কলার',
+    'টাইটান',
     7000,
-    '7K–15K XP',
+    '৭K–১৫K XP',
     Color(0xFFF59E0B), // Amber
     Color(0xFFB45309),
     LucideIcons.graduationCap,
+    'assets/leaderboard-levels/level_titan.svg',
   ),
   _LevelInfo(
     'Warrior',
     'ওয়ারিয়র',
     3000,
-    '3K–7K XP',
+    '৩K–৭K XP',
     Color(0xFF8B5CF6), // Violet
     Color(0xFF6D28D9),
     LucideIcons.shield,
+    'assets/leaderboard-levels/level_warrior.svg',
   ),
   _LevelInfo(
     'Challenger',
-    'চ্যালেঞ্জার',
+    'স্কাউট',
     1000,
-    '1K–3K XP',
+    '১K–৩K XP',
     Color(0xFF0284C7), // Sky Blue
     Color(0xFF0369A1),
     LucideIcons.zap,
+    'assets/leaderboard-levels/level_scout.svg',
   ),
   _LevelInfo(
     'Explorer',
-    'এক্সপ্লোরার',
+    'রুকি',
     0,
-    '0–1K XP',
+    '০–১K XP',
     Color(0xFF10B981), // Emerald
     Color(0xFF047857),
     LucideIcons.sprout,
+    'assets/leaderboard-levels/level_rookie.svg',
   ),
 ];
 
@@ -1505,7 +1513,7 @@ class _LevelSelector extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: 114,
+        height: 122,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1522,7 +1530,7 @@ class _LevelSelector extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOutCubic,
-                  width: 94,
+                  width: 96,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -1572,40 +1580,22 @@ class _LevelSelector extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Icon in a soft circle
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isActive
-                                    ? Colors.white.withValues(alpha: 0.2)
-                                    : l.start.withValues(
-                                        alpha: isDark ? 0.15 : 0.1,
-                                      ),
-                                border: isActive
-                                    ? Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                        width: 1,
-                                      )
-                                    : null,
-                              ),
-                              child: Icon(
-                                l.icon,
-                                size: 15,
-                                color: isActive ? Colors.white : l.start,
+                            // 3D Level SVG Icon
+                            SizedBox(
+                              width: 36,
+                              height: 36,
+                              child: SvgPicture.asset(
+                                l.svgAsset,
+                                fit: BoxFit.contain,
                               ),
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              l.label.split(' ').first,
+                              l.label,
                               style: TextStyle(
                                 fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.w900,
-                                fontSize: 13.5,
+                                fontSize: 13,
                                 height: 1.1,
                                 color: isActive
                                     ? Colors.white
@@ -1625,7 +1615,7 @@ class _LevelSelector extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.1,
                                 color: isActive
-                                    ? Colors.white.withValues(alpha: 0.85)
+                                    ? Colors.white.withValues(alpha: 0.9)
                                     : (isDark
                                           ? const Color(0xFF737373)
                                           : const Color(0xFF8E8E93)),
@@ -1755,24 +1745,13 @@ class _UserProgressCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [lvl.start, lvl.end],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: lvl.start.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: SvgPicture.asset(
+                  lvl.svgAsset,
+                  fit: BoxFit.contain,
                 ),
-                child: Icon(lvl.icon, color: Colors.white, size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1996,11 +1975,11 @@ class _LeaderboardTable extends StatelessWidget {
           // ── Column Headers: Rank, Student, XP ────────────────────────────
           if (users.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(26, 10, 26, 4),
+              padding: const EdgeInsets.fromLTRB(20, 10, 26, 4),
               child: Row(
                 children: [
                   SizedBox(
-                    width: 36,
+                    width: 44,
                     child: Text(
                       'Rank',
                       style: TextStyle(
@@ -2014,9 +1993,9 @@ class _LeaderboardTable extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   const SizedBox(width: 40),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Student',
@@ -2095,17 +2074,14 @@ class _LeaderboardTable extends StatelessWidget {
                             : [],
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
+                        padding: const EdgeInsets.fromLTRB(8, 10, 14, 10),
                         child: Row(
                           children: [
                             SizedBox(
-                              width: 36,
+                              width: 44,
                               child: _rankBadge(i + 1, isDark),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 8),
                             UserAvatar(
                               id: u.id,
                               name: u.name,
@@ -2116,7 +2092,7 @@ class _LeaderboardTable extends StatelessWidget {
                               borderColor: const Color(0xFFFECDD3),
                               borderWidth: 2.5,
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

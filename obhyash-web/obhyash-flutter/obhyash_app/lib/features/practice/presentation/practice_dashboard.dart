@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -712,6 +713,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         color: const Color(0xFFDC2626),
                         isDark: isDark,
                         icon: LucideIcons.xOctagon,
+                        svgAsset: 'assets/dashboard-icons/mistake_review.svg',
                       ),
                       const SizedBox(width: 8),
                       _StatBox(
@@ -720,6 +722,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         color: const Color(0xFF16A34A),
                         isDark: isDark,
                         icon: LucideIcons.bookmark,
+                        svgAsset: 'assets/dashboard-icons/bookmarks.svg',
                       ),
                       const SizedBox(width: 8),
                       _StatBox(
@@ -728,6 +731,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         color: const Color(0xFF4F46E5),
                         isDark: isDark,
                         icon: LucideIcons.rotateCcw,
+                        svgAsset: 'assets/dashboard-icons/spaced_repetition.svg',
                       ),
                     ],
                   ),
@@ -1243,6 +1247,7 @@ class _StatBox extends StatelessWidget {
   final Color color;
   final bool isDark;
   final IconData icon;
+  final String? svgAsset;
 
   const _StatBox({
     required this.label,
@@ -1250,6 +1255,7 @@ class _StatBox extends StatelessWidget {
     required this.color,
     required this.isDark,
     required this.icon,
+    this.svgAsset,
   });
 
   @override
@@ -1276,14 +1282,21 @@ class _StatBox extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
-                shape: BoxShape.circle,
+            if (svgAsset != null)
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: SvgPicture.asset(svgAsset!, fit: BoxFit.contain),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 18),
               ),
-              child: Icon(icon, color: color, size: 18),
-            ),
             const SizedBox(height: 8),
             Text(
               '$value',

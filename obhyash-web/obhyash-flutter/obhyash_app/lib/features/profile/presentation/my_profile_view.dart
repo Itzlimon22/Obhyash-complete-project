@@ -186,21 +186,21 @@ class MyProfileView extends ConsumerWidget {
                                     Text(
                                       levelInfo.currentRank,
                                       style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
                                         color: Color(0xFFFBBF24),
                                         fontFamily: 'Anek Bangla',
-                                        letterSpacing: 1.1,
+                                        letterSpacing: 0.8,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 8),
                               const Text(
                                 'পরবর্তী লেভেল রিওয়ার্ড',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white70,
                                   fontFamily: 'Anek Bangla',
@@ -216,7 +216,7 @@ class MyProfileView extends ConsumerWidget {
                             Text(
                               '${levelInfo.percent}%',
                               style: const TextStyle(
-                                fontSize: 32,
+                                fontSize: 26,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 fontFamily: 'Anek Bangla',
@@ -472,8 +472,8 @@ class _UserProfileCard extends StatelessWidget {
                 Text(
                   user.name,
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 17.5,
+                    fontWeight: FontWeight.w800,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                     fontFamily: 'Anek Bangla',
                   ),
@@ -484,7 +484,7 @@ class _UserProfileCard extends StatelessWidget {
                   Text(
                     user.email!,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12.5,
                       color: isDark
                           ? const Color(0xFFA1A1AA)
                           : const Color(0xFF64748B),

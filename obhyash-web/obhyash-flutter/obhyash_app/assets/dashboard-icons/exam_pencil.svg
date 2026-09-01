@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5D73" />
+      <stop offset="100%" stop-color="#D92644" />
+    </linearGradient>
+    
+    <!-- Outer Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFA4B2" />
+      <stop offset="100%" stop-color="#C01835" />
+    </linearGradient>
+
+    <!-- Pencil Body Gradient -->
+    <linearGradient id="pencilBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A9A" />
+      <stop offset="100%" stop-color="#EB3654" />
+    </linearGradient>
+
+    <!-- Wood Tip Gradient -->
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE8A3" />
+      <stop offset="100%" stop-color="#FCD34D" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#880E24" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Base 3D Rounded Square Badge -->
+  <rect x="6" y="8" width="88" height="84" rx="26" fill="#A8122C" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="3.5" filter="url(#shadow)" />
+  
+  <!-- Glossy Highlight Curve on Badge -->
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
+
+  <!-- Pencil Illustration -->
+  <g transform="rotate(-45 50 50) translate(0, -2)">
+    <!-- Pencil Body -->
+    <rect x="40" y="24" width="20" height="42" rx="3" fill="url(#pencilBody)" />
+    <!-- Pencil Highlight Streak -->
+    <rect x="43" y="26" width="4" height="38" rx="2" fill="#FFFFFF" opacity="0.4" />
+    <!-- Pencil Shadow Edge -->
+    <rect x="56" y="24" width="4" height="42" rx="1" fill="#BA1430" opacity="0.3" />
+
+    <!-- Eraser Band / Metal Collar -->
+    <rect x="40" y="20" width="20" height="5" rx="1.5" fill="#E2E8F0" />
+    <!-- Eraser Top -->
+    <path d="M 40 20 C 40 16 60 16 60 20 Z" fill="#FDA4AF" />
+
+    <!-- Wooden Sharpened Cone Tip -->
+    <polygon points="40,66 60,66 50,86" fill="url(#woodGrad)" />
+    <!-- Wood Shadow Side -->
+    <polygon points="50,66 60,66 50,86" fill="#F59E0B" opacity="0.4" />
+
+    <!-- Graphite Lead Tip -->
+    <polygon points="46.5,79 53.5,79 50,86" fill="#1E293B" />
+  </g>
+</svg>

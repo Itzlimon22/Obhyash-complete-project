@@ -337,9 +337,10 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── 1. Top Stat Row (Matching Flutter _StatBox 1:1) ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
         {/* Box 1: মোট ভুল (Red) */}
+        {/* Box 1: মোট ভুল (Red) */}
         <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
-            <XOctagon size={20} />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/40 flex items-center justify-center shrink-0">
+            <img src="/dashboard-icons/mistake_review.svg" alt="Mistakes" className="w-7 h-7 object-contain drop-shadow-xs" />
           </div>
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400 block">
@@ -353,8 +354,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
         {/* Box 2: বুকমার্ক (Green) */}
         <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-            <Bookmark size={20} />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center shrink-0">
+            <img src="/dashboard-icons/bookmarks.svg" alt="Bookmarks" className="w-7 h-7 object-contain drop-shadow-xs" />
           </div>
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400 block">
@@ -368,8 +369,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
         {/* Box 3: রিভিউ বাকি (Indigo) */}
         <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-            <RotateCcw size={20} />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 flex items-center justify-center shrink-0">
+            <img src="/dashboard-icons/spaced_repetition.svg" alt="Spaced Repetition" className="w-7 h-7 object-contain drop-shadow-xs" />
           </div>
           <div>
             <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400 block">

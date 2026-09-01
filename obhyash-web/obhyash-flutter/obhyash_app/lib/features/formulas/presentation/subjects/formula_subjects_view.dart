@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../../dashboard/providers/dashboard_providers.dart';
 import '../../models/formula_models.dart';
 import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
@@ -24,47 +25,73 @@ class FormulaSubjectsView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'বিষয় বেছে নিন',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'Anek Bangla',
-                color: isDark ? const Color(0xFF737373) : const Color(0xFF6B7280),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: AppRefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(userProfileProvider);
-                  try {
-                    await ref.read(userProfileProvider.future);
-                  } catch (_) {}
-                },
-                child: GridView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.6,
-                  ),
-                  itemCount: subjects.length,
-                  itemBuilder: (context, index) {
-                    final subject = subjects[index];
-                    return _SubjectCard(subject: subject, isDark: isDark);
-                  },
+      appBar: AppBar(
+        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
+          ),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          'ফর্মুলা ব্যাংক',
+          style: TextStyle(
+            fontFamily: 'Anek Bangla',
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'বিষয় বেছে নিন ($level)',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Anek Bangla',
+                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 14),
+              Expanded(
+                child: AppRefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(userProfileProvider);
+                    try {
+                      await ref.read(userProfileProvider.future);
+                    } catch (_) {}
+                  },
+                  child: GridView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.42,
+                    ),
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      final subject = subjects[index];
+                      return _SubjectCard(subject: subject, isDark: isDark);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -127,12 +154,12 @@ class _SubjectCardState extends State<_SubjectCard>
               colors: [Color(g[0]), Color(g[1])],
             ),
             border: Border.all(
-              color: const Color(0xFF059669).withValues(alpha: 0.2),
+              color: const Color(0xFF059669).withValues(alpha: 0.25),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(g[0]).withValues(alpha: isDark ? 0.4 : 0.25),
+                color: Color(g[0]).withValues(alpha: isDark ? 0.45 : 0.25),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -143,27 +170,37 @@ class _SubjectCardState extends State<_SubjectCard>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+              if (widget.subject.svgIcon != null)
+                SizedBox(
+                  width: 34,
+                  height: 34,
+                  child: SvgPicture.asset(
+                    widget.subject.svgIcon!,
+                    fit: BoxFit.contain,
+                  ),
+                )
+              else
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.subject.emoji,
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  widget.subject.emoji,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
               Text(
                 widget.subject.subjectName,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
                   color: Colors.white,
                   height: 1.2,
                 ),

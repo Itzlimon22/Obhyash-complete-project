@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,6 +21,7 @@ class _SettingsItem {
   final String label;
   final String description;
   final IconData icon;
+  final String? svgAsset;
   final _ItemType type;
   final String? route;
   final String? url;
@@ -30,6 +32,7 @@ class _SettingsItem {
     required this.label,
     required this.description,
     required this.icon,
+    this.svgAsset,
     required this.type,
     this.route,
     this.url,
@@ -63,6 +66,7 @@ class SettingsView extends ConsumerWidget {
             label: 'প্রোফাইল',
             description: 'এক্সাম ইতিহাস, বিষয়ভিত্তিক স্কোর',
             icon: LucideIcons.user,
+            svgAsset: 'assets/dashboard-icons/analytics.svg',
             type: _ItemType.navigate,
             route: '/profile/stats',
           ),
@@ -70,6 +74,7 @@ class SettingsView extends ConsumerWidget {
             label: 'বুকমার্ক',
             description: 'সংরক্ষণ করা প্রশ্নগুলো',
             icon: LucideIcons.bookmark,
+            svgAsset: 'assets/dashboard-icons/bookmarks.svg',
             type: _ItemType.navigate,
             route: '/bookmarks',
           ),
@@ -77,6 +82,7 @@ class SettingsView extends ConsumerWidget {
             label: 'রিপোর্ট',
             description: 'রিপোর্ট করা প্রশ্ন ও অ্যাডমিন ফিডব্যাক',
             icon: LucideIcons.alertTriangle,
+            svgAsset: 'assets/dashboard-icons/mistake_review.svg',
             type: _ItemType.navigate,
             route: '/my-reports',
           ),
@@ -84,6 +90,7 @@ class SettingsView extends ConsumerWidget {
             label: 'নোটিফিকেশন',
             description: 'নতুন আপডেট ও বার্তা',
             icon: LucideIcons.bell,
+            svgAsset: 'assets/dashboard-icons/bell_notification.svg',
             type: _ItemType.navigate,
             route: '/notifications',
           ),
@@ -91,6 +98,7 @@ class SettingsView extends ConsumerWidget {
             label: 'অভিযোগ ও মতামত',
             description: 'অ্যাপের সমস্যা, বাগ বা ফিচারের পরামর্শ জানাও',
             icon: LucideIcons.messageSquare,
+            svgAsset: 'assets/dashboard-icons/feedback_chat.svg',
             type: _ItemType.navigate,
             route: '/profile/complaint',
           ),
@@ -98,6 +106,7 @@ class SettingsView extends ConsumerWidget {
             label: 'ফিচার রিকোয়েস্ট',
             description: 'অ্যাপের জন্য নতুন ফিচারের প্রস্তাব ও আইডিয়া পাঠাও',
             icon: LucideIcons.lightbulb,
+            svgAsset: 'assets/dashboard-icons/feature_lightbulb.svg',
             type: _ItemType.navigate,
             route: '/profile/feature-requests',
           ),
@@ -110,6 +119,7 @@ class SettingsView extends ConsumerWidget {
             label: 'সাবস্ক্রিপশন',
             description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
             icon: LucideIcons.crown,
+            svgAsset: 'assets/dashboard-icons/pro_crown.svg',
             type: _ItemType.navigate,
             route: '/profile/my-subscription',
           ),
@@ -117,6 +127,7 @@ class SettingsView extends ConsumerWidget {
             label: 'আপগ্রেড',
             description: 'নতুন প্ল্যান কিনুন',
             icon: LucideIcons.trendingUp,
+            svgAsset: 'assets/dashboard-icons/leaderboard_trophy.svg',
             type: _ItemType.navigate,
             route: '/profile/subscription',
           ),
@@ -130,6 +141,7 @@ class SettingsView extends ConsumerWidget {
             label: 'পরিচিতি',
             description: 'Obhyash সম্পর্কে জানো',
             icon: LucideIcons.info,
+            svgAsset: 'assets/dashboard-icons/app_icon.svg',
             type: _ItemType.navigate,
             route: '/profile/about',
           ),
@@ -137,6 +149,7 @@ class SettingsView extends ConsumerWidget {
             label: 'প্রাইভেসি',
             description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
             icon: LucideIcons.shield,
+            svgAsset: 'assets/dashboard-icons/privacy_shield.svg',
             type: _ItemType.navigate,
             route: '/profile/privacy',
           ),
@@ -144,6 +157,7 @@ class SettingsView extends ConsumerWidget {
             label: 'শর্তাবলী',
             description: 'শর্ত ও বিধিমালা',
             icon: LucideIcons.fileText,
+            svgAsset: 'assets/dashboard-icons/terms_doc.svg',
             type: _ItemType.navigate,
             route: '/profile/terms',
           ),
@@ -151,6 +165,7 @@ class SettingsView extends ConsumerWidget {
             label: 'সাহায্য',
             description: 'সাধারণ প্রশ্নের উত্তর',
             icon: LucideIcons.helpCircle,
+            svgAsset: 'assets/dashboard-icons/help_question.svg',
             type: _ItemType.navigate,
             route: '/profile/faq',
           ),
@@ -163,6 +178,7 @@ class SettingsView extends ConsumerWidget {
             label: 'অ্যাকাউন্ট ইনফো',
             description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার জরুরি তথ্য',
             icon: LucideIcons.fingerprint,
+            svgAsset: 'assets/dashboard-icons/account_card.svg',
             type: _ItemType.action,
             actionId: 'accountInfo',
           ),
@@ -170,6 +186,7 @@ class SettingsView extends ConsumerWidget {
             label: 'অ্যাকাউন্ট লিংকিং',
             description: 'গুগল ও অন্যান্য অ্যাকাউন্ট সংযুক্ত ও ম্যানেজ করো',
             icon: LucideIcons.link2,
+            svgAsset: 'assets/dashboard-icons/settings_gear.svg',
             type: _ItemType.navigate,
             route: '/profile/account-linking',
           ),
@@ -273,11 +290,11 @@ class SettingsView extends ConsumerWidget {
     return Scaffold(
       backgroundColor: bg,
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.fromLTRB(0, 4, 0, 20),
         children: [
           // ── Profile Card ──────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+            padding: const EdgeInsets.fromLTRB(10, 2, 10, 4),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -536,24 +553,34 @@ class _NavItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(10),
+                if (item.svgAsset != null)
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: SvgPicture.asset(
+                      item.svgAsset!,
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                else
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: iconBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(item.icon, color: iconColor, size: 18),
                   ),
-                  child: Icon(item.icon, color: iconColor, size: 20),
-                ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14.5,
                       fontWeight: FontWeight.w600,
                       color: labelColor,
                       fontFamily: 'HindSiliguri',

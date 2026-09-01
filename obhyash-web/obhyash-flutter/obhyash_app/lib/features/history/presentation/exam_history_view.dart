@@ -1912,8 +1912,8 @@ class _ExamCardState extends State<_ExamCard> {
                       Text(
                         label,
                         style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
                           fontFamily: 'HindSiliguri',
                           color: isDark
                               ? Colors.white

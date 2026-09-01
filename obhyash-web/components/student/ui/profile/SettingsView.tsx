@@ -250,14 +250,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   ];
 
   const handleItemClick = (item: SettingsItem) => {
-    if (item.actionId === 'accountInfo') {
-      setActivePanel('account-info');
-      return;
-    }
-    if (item.actionId === 'deleteAccount') {
-      setActivePanel('delete-account');
-      return;
-    }
     if (item.actionId === 'logout') {
       setShowLogoutModal(true);
       return;
@@ -266,84 +258,52 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       toggleTheme?.();
       return;
     }
+    if (item.actionId === 'accountInfo' || item.actionId === 'account-info') {
+      onNavigate?.('account-info');
+      return;
+    }
+    if (item.actionId === 'deleteAccount' || item.actionId === 'delete-account') {
+      onNavigate?.('delete-account');
+      return;
+    }
+    if (item.actionId === 'personal' || item.actionId === 'edit-profile') {
+      onNavigate?.('personal');
+      return;
+    }
     if (item.actionId === 'reports') {
-      setActivePanel('reports');
+      onNavigate?.('reports');
       return;
     }
     if (item.actionId === 'notifications') {
-      if (onNavigate) {
-        onNavigate('notifications');
-        return;
-      }
-      setActivePanel('notifications');
+      onNavigate?.('notifications');
       return;
     }
     if (item.actionId === 'my-subscription') {
-      setActivePanel('my-subscription');
+      onNavigate?.('my-subscription');
       return;
     }
     if (item.actionId === 'upgrade') {
-      if (onNavigate) {
-        onNavigate('subscription');
-        return;
-      }
-      setActivePanel('upgrade');
-      return;
-    }
-    if (item.actionId === 'account-info') {
-      if (onNavigate) {
-        onNavigate('account-info');
-        return;
-      }
-      setActivePanel('account-info');
+      onNavigate?.('subscription');
       return;
     }
     if (item.actionId === 'about') {
-      if (onNavigate) {
-        onNavigate('about');
-        return;
-      }
-      setActivePanel('about');
+      onNavigate?.('about');
       return;
     }
     if (item.actionId === 'privacy') {
-      if (onNavigate) {
-        onNavigate('privacy');
-        return;
-      }
-      setActivePanel('privacy');
+      onNavigate?.('privacy');
       return;
     }
     if (item.actionId === 'terms') {
-      if (onNavigate) {
-        onNavigate('terms');
-        return;
-      }
-      setActivePanel('terms');
+      onNavigate?.('terms');
       return;
     }
     if (item.actionId === 'faq') {
-      if (onNavigate) {
-        onNavigate('faq');
-        return;
-      }
-      setActivePanel('faq');
+      onNavigate?.('faq');
       return;
     }
     if (item.actionId === 'account-linking') {
-      if (onNavigate) {
-        onNavigate('account-linking');
-        return;
-      }
-      setActivePanel('account-linking');
-      return;
-    }
-    if (item.actionId === 'delete-account') {
-      if (onNavigate) {
-        onNavigate('delete-account');
-        return;
-      }
-      setActivePanel('delete-account');
+      onNavigate?.('account-linking');
       return;
     }
 
@@ -351,59 +311,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       onNavigate?.(item.route);
     }
   };
-
-  // ── Render Sub-Panels if Active ────────────────────────────────────────────
-  if (activePanel) {
-    return (
-      <div className="max-w-4xl mx-auto p-2 sm:p-4 font-['HindSiliguri',sans-serif]">
-        <button
-          onClick={() => setActivePanel(null)}
-          className="mb-4 flex items-center gap-2 text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-        >
-          <ArrowLeft size={18} />
-          <span>সেটিংস এ ফিরে যান</span>
-        </button>
-
-        {activePanel === 'personal' && (
-          <PersonalDetailsPanel
-            user={user}
-            onSave={async (data) => {
-              if (onSave) await onSave(data);
-              setActivePanel(null);
-            }}
-          />
-        )}
-
-        {activePanel === 'account-linking' && <AccountLinkingPanel user={user} />}
-
-        {activePanel === 'account-info' && (
-          <AccountInfoView user={user} onBack={() => setActivePanel(null)} />
-        )}
-
-        {activePanel === 'reports' && <ReportsPanel user={user} />}
-
-        {activePanel === 'my-subscription' && (
-          <MySubscriptionPanel onUpgrade={() => setActivePanel('upgrade')} />
-        )}
-
-        {activePanel === 'upgrade' && <SubscriptionView />}
-
-        {activePanel === 'notifications' && <NotificationsView />}
-
-        {activePanel === 'about' && <AboutUsView initialPolicy="about" />}
-        {activePanel === 'privacy' && <PrivacyPolicyView />}
-        {activePanel === 'terms' && <TermsConditionsView />}
-
-        {activePanel === 'faq' && (
-          <FaqPanel onNavigateComplaint={() => onNavigate?.('complaint')} />
-        )}
-
-        {activePanel === 'delete-account' && (
-          <DeleteAccountPanel user={user} onBack={() => setActivePanel(null)} />
-        )}
-      </div>
-    );
-  }
 
   const hasPhone = Boolean(user.phone && user.phone.trim().length > 0);
   const hasInstitute = Boolean(
@@ -468,7 +375,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             {/* 1. Profile */}
             <button
               type="button"
-              onClick={() => onNavigate?.('analysis')}
+              onClick={() => onNavigate?.('profile')}
               className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
             >
               <User className="w-[17px] h-[17px]" />
@@ -480,7 +387,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             {/* 2. Edit */}
             <button
               type="button"
-              onClick={() => setActivePanel('personal')}
+              onClick={() => onNavigate?.('personal')}
               className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
             >
               <Pencil className="w-[17px] h-[17px]" />
@@ -492,7 +399,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             {/* 3. Info */}
             <button
               type="button"
-              onClick={() => setActivePanel('account-info')}
+              onClick={() => onNavigate?.('account-info')}
               className="flex-1 py-2.5 px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer"
             >
               <Info className="w-[17px] h-[17px]" />

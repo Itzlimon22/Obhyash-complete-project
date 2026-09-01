@@ -38,6 +38,7 @@ export interface LevelInfo {
   textColor: string;
   badgeBg: string;
   icon: React.ElementType;
+  svgBadge: string;
 }
 
 export const LEADERBOARD_LEVELS: LevelInfo[] = [
@@ -52,18 +53,20 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     textColor: "text-red-500",
     badgeBg: "bg-red-500/10 text-red-500 border-red-500/30",
     icon: Crown,
+    svgBadge: "/leaderboard-levels/level_5_legend.svg",
   },
   {
     id: "Scholar",
-    label: "স্কলার",
+    label: "টাইটান",
     minXP: 7000,
     maxXP: 14999,
     xpRange: "7K–15K XP",
-    startColor: "from-amber-500",
-    endColor: "to-amber-700",
-    textColor: "text-amber-500",
-    badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+    startColor: "from-purple-500",
+    endColor: "to-purple-700",
+    textColor: "text-purple-500",
+    badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
     icon: GraduationCap,
+    svgBadge: "/leaderboard-levels/level_4_titan.svg",
   },
   {
     id: "Warrior",
@@ -71,15 +74,16 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     minXP: 3000,
     maxXP: 6999,
     xpRange: "3K–7K XP",
-    startColor: "from-purple-500",
-    endColor: "to-purple-700",
-    textColor: "text-purple-500",
-    badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+    startColor: "from-amber-500",
+    endColor: "to-amber-700",
+    textColor: "text-amber-500",
+    badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
     icon: Shield,
+    svgBadge: "/leaderboard-levels/level_3_warrior.svg",
   },
   {
     id: "Challenger",
-    label: "চ্যালেঞ্জার",
+    label: "স্কাউট",
     minXP: 1000,
     maxXP: 2999,
     xpRange: "1K–3K XP",
@@ -88,10 +92,11 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     textColor: "text-sky-500",
     badgeBg: "bg-sky-500/10 text-sky-500 border-sky-500/30",
     icon: Zap,
+    svgBadge: "/leaderboard-levels/level_2_scout.svg",
   },
   {
     id: "Explorer",
-    label: "এক্সপ্লোরার",
+    label: "রুকি",
     minXP: 0,
     maxXP: 999,
     xpRange: "0–1K XP",
@@ -100,6 +105,7 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     textColor: "text-emerald-500",
     badgeBg: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
     icon: Sprout,
+    svgBadge: "/leaderboard-levels/level_1_rookie.svg",
   },
 ];
 
@@ -647,11 +653,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     }
                   `}
                 >
-                  {/* Top: Icon + Count Badge */}
+                  {/* Top: 3D Level Crest + Count Badge */}
                   <div className="flex items-center justify-between mb-2">
-                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${lvl.startColor} ${lvl.endColor} flex items-center justify-center text-white shadow-xs`}>
-                      <Icon size={18} className="stroke-[2.2]" />
-                    </div>
+                    <img
+                      src={lvl.svgBadge}
+                      alt={lvl.label}
+                      className="w-10 h-10 object-contain drop-shadow-md transition-transform group-hover:scale-105"
+                    />
                     <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-300">
                       {toBengaliNum(count)} জন
                     </span>

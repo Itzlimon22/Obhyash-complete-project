@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <linearGradient id="fireBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5722" />
+      <stop offset="100%" stop-color="#D84315" />
+    </linearGradient>
+    <linearGradient id="fireBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFAB91" />
+      <stop offset="100%" stop-color="#BF360C" />
+    </linearGradient>
+    <filter id="shadowFire" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#BF360C" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <rect x="6" y="8" width="88" height="84" rx="26" fill="#BF360C" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#fireBg)" stroke="url(#fireBorder)" stroke-width="3.5" filter="url(#shadowFire)" />
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
+
+  <!-- 3D Flame Illustration -->
+  <g transform="translate(50, 48)">
+    <!-- Outer Flame -->
+    <path d="M 0 -24 C 8 -12 18 -6 18 10 C 18 20 10 26 0 26 C -10 26 -18 20 -18 10 C -18 -4 -6 -10 0 -24 Z" fill="#FFC107" />
+    <!-- Inner Flame -->
+    <path d="M 0 -12 C 5 -4 10 0 10 10 C 10 16 5 20 0 20 C -5 20 -10 16 -10 10 C -10 2 -3 -2 0 -12 Z" fill="#FF5722" />
+    <!-- Core White/Yellow Sparkle -->
+    <ellipse cx="0" cy="12" rx="4" ry="6" fill="#FFF9C4" />
+  </g>
+</svg>

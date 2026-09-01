@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="sigmaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+    
+    <!-- Outer Border Gradient -->
+    <linearGradient id="sigmaBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C4B5FD" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+
+    <!-- 3D Golden Sigma Gradient -->
+    <linearGradient id="goldSigma" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="25%" stop-color="#FDE047" />
+      <stop offset="65%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="sigmaShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#312E81" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Base 3D Tile -->
+  <rect x="6" y="8" width="88" height="84" rx="26" fill="#312E81" />
+  <rect x="6" y="6" width="88" height="84" rx="26" fill="url(#sigmaBg)" stroke="url(#sigmaBorder)" stroke-width="3.5" filter="url(#sigmaShadow)" />
+  
+  <!-- Glossy Highlight Curve -->
+  <path d="M 16 28 C 16 18 24 10 36 10 L 64 10 C 30 14 16 34 16 54 Z" fill="#FFFFFF" opacity="0.22" />
+
+  <!-- 3D Summation (Sigma Notation ∑) -->
+  <g transform="translate(50, 48)">
+    <!-- 3D Depth Shadow of Sigma Symbol -->
+    <path d="M 18 -20 L -10 -20 L 4 -2 L -10 18 L 18 18 L 18 22 L -14 22 L 2 -2 L -14 -24 L 18 -24 Z" fill="#312E81" opacity="0.4" />
+
+    <!-- 3D Golden Summation (Sigma) Glyph -->
+    <path d="M 16 -20 L -8 -20 L 5 -2 L -8 18 L 16 18" 
+          stroke="url(#goldSigma)" 
+          stroke-width="7.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none" />
+
+    <!-- Top & Bottom Serif Bars -->
+    <line x1="16" y1="-24" x2="16" y2="-16" stroke="url(#goldSigma)" stroke-width="4.5" stroke-linecap="round" />
+    <line x1="16" y1="14" x2="16" y2="22" stroke="url(#goldSigma)" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Subtle White Specular Highlights on Sigma -->
+    <path d="M 14 -20 L -4 -20 L 4 -4" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.6" fill="none" />
+
+    <!-- Floating Mini Formula Accents: (n, i=1, +) -->
+    <!-- Top 'n' index dot -->
+    <circle cx="0" cy="-28" r="2" fill="#FEF08A" />
+    <!-- Bottom 'i=1' indicator dots -->
+    <circle cx="-3" cy="27" r="1.6" fill="#FEF08A" />
+    <circle cx="3" cy="27" r="1.6" fill="#FEF08A" />
+
+    <!-- Floating Plus / Math Accents -->
+    <g stroke="#E0E7FF" stroke-width="2" stroke-linecap="round" opacity="0.8">
+      <!-- Plus top right -->
+      <line x1="24" y1="-12" x2="24" y2="-6" />
+      <line x1="21" y1="-9" x2="27" y2="-9" />
+      <!-- Dot bottom right -->
+      <circle cx="24" cy="12" r="1.5" fill="#E0E7FF" />
+    </g>
+  </g>
+
+  <!-- Top Right Sparkle -->
+  <polygon points="76,20 78,16 82,16 79,13 80,9 76,12 72,9 73,13 70,16 74,16" fill="#FEF08A" />
+</svg>

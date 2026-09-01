@@ -105,6 +105,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'পরীক্ষা',
                       icon: Icons.quiz_rounded,
+                      svgAsset: 'assets/dashboard-icons/exam_pencil.svg',
                       primaryColor: const Color(0xFF059669),
                       lightColor: const Color(0xFFECFDF5),
                       onTap: () => context.go('/setup'),
@@ -112,6 +113,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'ফর্মুলা',
                       icon: Icons.functions_rounded,
+                      svgAsset: 'assets/dashboard-icons/formulas.svg',
                       primaryColor: const Color(0xFF6366F1),
                       lightColor: const Color(0xFFEEF2FF),
                       onTap: () => context.push('/formulas'),
@@ -119,6 +121,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'ইতিহাস',
                       icon: Icons.history_rounded,
+                      svgAsset: 'assets/dashboard-icons/history_clock.svg',
                       primaryColor: const Color(0xFF0284C7),
                       lightColor: const Color(0xFFF0F9FF),
                       onTap: () => context.go('/history'),
@@ -126,6 +129,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'লিডারবোর্ড',
                       icon: Icons.emoji_events_rounded,
+                      svgAsset: 'assets/dashboard-icons/leaderboard_trophy.svg',
                       primaryColor: const Color(0xFFD97706),
                       lightColor: const Color(0xFFFFFBEB),
                       onTap: () => context.go('/leaderboard'),
@@ -133,6 +137,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'এনালাইসিস',
                       icon: Icons.insights_rounded,
+                      svgAsset: 'assets/dashboard-icons/analytics.svg',
                       primaryColor: const Color(0xFF9333EA),
                       lightColor: const Color(0xFFFAF5FF),
                       onTap: () => context.go('/analysis'),
@@ -140,6 +145,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     DashboardActionCard(
                       title: 'লাইভ পরীক্ষা',
                       icon: LucideIcons.radio,
+                      svgAsset: 'assets/dashboard-icons/live_exam.svg',
                       primaryColor: const Color(0xFFE11D48),
                       lightColor: const Color(0xFFFFF1F2),
                       onTap: () => context.go('/live_exam'),

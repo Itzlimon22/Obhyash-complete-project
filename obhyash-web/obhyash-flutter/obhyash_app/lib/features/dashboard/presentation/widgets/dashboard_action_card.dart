@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardActionCard extends StatefulWidget {
   final String title;
   final IconData icon;
+  final String? svgAsset;
   final Color primaryColor;
   final Color lightColor;
   final VoidCallback onTap;
@@ -11,6 +13,7 @@ class DashboardActionCard extends StatefulWidget {
     super.key,
     required this.title,
     required this.icon,
+    this.svgAsset,
     required this.primaryColor,
     required this.lightColor,
     required this.onTap,
@@ -88,20 +91,30 @@ class _DashboardActionCardState extends State<DashboardActionCard>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? widget.primaryColor.withValues(alpha: 0.18)
-                      : widget.lightColor,
-                  shape: BoxShape.circle,
+              if (widget.svgAsset != null)
+                SizedBox(
+                  width: 38,
+                  height: 38,
+                  child: SvgPicture.asset(
+                    widget.svgAsset!,
+                    fit: BoxFit.contain,
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? widget.primaryColor.withValues(alpha: 0.18)
+                        : widget.lightColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    color: widget.primaryColor,
+                    size: 22,
+                  ),
                 ),
-                child: Icon(
-                  widget.icon,
-                  color: widget.primaryColor,
-                  size: 22,
-                ),
-              ),
               const SizedBox(height: 8),
               Text(
                 widget.title,
@@ -109,8 +122,8 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                   fontFamily: 'Anek Bangla',
                 ),

@@ -533,7 +533,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             ? const Color(0xFF0C0A09)
             : const Color(0xFFFAFAF9),
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(68),
+          preferredSize: const Size.fromHeight(52),
           child: ClipRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
@@ -554,7 +554,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                 child: SafeArea(
                   bottom: false,
                   child: SizedBox(
-                    height: 68,
+                    height: 52,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(

@@ -179,144 +179,161 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
-      body: Column(
-        children: [
-          // Header Search Bar Section (Expandable via search icon)
-          if (_isSearchOpen)
-            Container(
-              margin: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              height: 46,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFF059669).withValues(alpha: 0.4),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    LucideIcons.search,
-                    size: 18,
-                    color: Color(0xFF059669),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      autofocus: true,
-                      onChanged: (val) => setState(() => _searchQuery = val),
-                      style: TextStyle(
-                        fontSize: 14.5,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white : const Color(0xFF111827),
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'সূত্র বা টপিক খুঁজুন...',
-                        hintStyle: TextStyle(
-                          fontSize: 13.5,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(LucideIcons.x, size: 18),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {
-                        _searchQuery = '';
-                        _isSearchOpen = false;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _chapter?.chapterName ?? 'সূত্র তালিকা',
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white70 : const Color(0xFF475569),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(LucideIcons.search, size: 20),
-                    color: isDark ? Colors.white70 : const Color(0xFF475569),
-                    onPressed: () {
-                      setState(() {
-                        _isSearchOpen = true;
-                      });
-                    },
-                    tooltip: 'সূত্র খুঁজুন',
-                  ),
-                ],
-              ),
-            ),
-
-          // Formula List
-          Expanded(
-            child: filteredFormulas.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.searchX,
-                            size: 40,
-                            color: isDark ? Colors.white30 : Colors.black26,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'কোনো সূত্র পাওয়া যায়নি',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'HindSiliguri',
-                              color: isDark ? Colors.white60 : Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(10, 4, 10, 32),
-                    itemCount: filteredFormulas.length,
-                    itemBuilder: (context, index) {
-                      final formula = filteredFormulas[index];
-                      return _BookFormulaCard(
-                        formula: formula,
-                        isDark: isDark,
-                        index: index,
-                        serialNumber: _toBengaliNumber(index + 1),
-                        chapterName: _chapter?.chapterName,
-                      );
-                    },
-                  ),
+      appBar: AppBar(
+        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          _chapter?.chapterName ?? 'সূত্র তালিকা',
+          style: TextStyle(
+            fontFamily: 'Anek Bangla',
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSearchOpen ? LucideIcons.x : LucideIcons.search,
+              size: 20,
+              color: isDark ? Colors.white70 : const Color(0xFF18181B),
+            ),
+            onPressed: () {
+              setState(() {
+                if (_isSearchOpen) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+                _isSearchOpen = !_isSearchOpen;
+              });
+            },
+            tooltip: _isSearchOpen ? 'বন্ধ করুন' : 'সূত্র খুঁজুন',
+          ),
+          const SizedBox(width: 6),
         ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Search Bar Section (Expandable via search icon)
+            if (_isSearchOpen)
+              Container(
+                margin: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                height: 46,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF059669).withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: Color(0xFF059669),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        autofocus: true,
+                        onChanged: (val) => setState(() => _searchQuery = val),
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? Colors.white : const Color(0xFF111827),
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'সূত্র বা টপিক খুঁজুন...',
+                          hintStyle: TextStyle(
+                            fontSize: 13.5,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
+                          ),
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.x, size: 18),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          _searchQuery = '';
+                          _isSearchOpen = false;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+            // Formula List
+            Expanded(
+              child: filteredFormulas.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              LucideIcons.searchX,
+                              size: 40,
+                              color: isDark ? Colors.white30 : Colors.black26,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'কোনো সূত্র পাওয়া যায়নি',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? Colors.white60 : Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(10, 4, 10, 32),
+                      itemCount: filteredFormulas.length,
+                      itemBuilder: (context, index) {
+                        final formula = filteredFormulas[index];
+                        return _BookFormulaCard(
+                          formula: formula,
+                          isDark: isDark,
+                          index: index,
+                          serialNumber: _toBengaliNumber(index + 1),
+                          chapterName: _chapter?.chapterName,
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -228,34 +228,51 @@ export default function MyProfileView({
       </div>
 
       {/* ── 2. Level Progress Bar (Premium Design matching Flutter) ── */}
-      <div className="bg-gradient-to-br from-[#312E81] to-[#4338CA] dark:from-[#1E1B4B] dark:to-[#312E81] text-white rounded-[24px] p-6 sm:p-7 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#312E81] via-[#3730A3] to-[#4338CA] dark:from-[#1E1B4B] dark:via-[#2E1065] dark:to-[#312E81] text-white rounded-[24px] p-5 sm:p-7 shadow-xl relative overflow-hidden border border-indigo-500/30">
         <Trophy className="absolute -top-6 -right-6 w-36 h-36 text-white/5 pointer-events-none" />
 
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#F59E0B]/20 border border-[#F59E0B]/50 rounded-[12px] text-[#FBBF24] text-sm font-black mb-2">
-              <Trophy className="w-4 h-4" />
-              <span>{levelInfo.currentRank}</span>
+        <div className="flex items-center justify-between mb-4 relative z-10 gap-3">
+          <div className="flex items-center gap-3.5 sm:gap-4">
+            {/* Big 3D SVG Level Crest */}
+            <img
+              src={
+                levelInfo.currentRank === 'লিজেন্ড'
+                  ? '/leaderboard-levels/level_5_legend.svg'
+                  : levelInfo.currentRank === 'টাইটান'
+                  ? '/leaderboard-levels/level_4_titan.svg'
+                  : levelInfo.currentRank === 'ওয়ারিয়র'
+                  ? '/leaderboard-levels/level_3_warrior.svg'
+                  : levelInfo.currentRank === 'স্কাউট'
+                  ? '/leaderboard-levels/level_2_scout.svg'
+                  : '/leaderboard-levels/level_1_rookie.svg'
+              }
+              alt={levelInfo.currentRank}
+              className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-xl shrink-0 transition-transform hover:scale-105"
+            />
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 border border-white/20 rounded-[10px] text-[#FDE047] text-xs sm:text-sm font-black mb-1.5 backdrop-blur-xs">
+                <span>{levelInfo.currentRank} স্তর</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-white/80 leading-snug">
+                পরবর্তী স্তর: <strong className="text-white font-extrabold">{levelInfo.nextRank}</strong>
+              </h3>
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-white/80 leading-snug">
-              পরবর্তী লেভেল রিওয়ার্ড
-            </h3>
           </div>
 
-          <div className="text-right">
-            <span className="text-3xl sm:text-4xl font-black text-white block tabular-nums leading-none">
+          <div className="text-right shrink-0">
+            <span className="text-2xl sm:text-4xl font-black text-white block tabular-nums leading-none">
               {BanglaNameHelper.toBanglaNumeral(levelInfo.percent)}%
             </span>
-            <span className="text-xs font-bold text-[#FDE047] bg-black/25 px-2.5 py-0.5 rounded-[6px] border border-white/10 mt-1 inline-block">
+            <span className="text-[11px] sm:text-xs font-bold text-[#FDE047] bg-black/30 px-2.5 py-0.5 rounded-[6px] border border-white/10 mt-1.5 inline-block">
               {levelInfo.xpText}
             </span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="h-2.5 bg-black/25 rounded-full overflow-hidden border border-white/10 relative my-1">
+        <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/10 relative my-1">
           <div
-            className="h-full bg-gradient-to-r from-[#60A5FA] to-[#FDE047] transition-all duration-700 rounded-full shadow-[0_2px_8px_rgba(245,158,11,0.4)]"
+            className="h-full bg-gradient-to-r from-[#38BDF8] via-[#818CF8] to-[#FDE047] transition-all duration-700 rounded-full shadow-[0_2px_8px_rgba(245,158,11,0.4)]"
             style={{ width: `${levelInfo.progress * 100}%` }}
           />
         </div>

@@ -62,6 +62,9 @@ import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import AccountInfoView from "@/components/student/ui/profile/settings/AccountInfoView";
 import AccountLinkingPanel from "@/components/student/ui/profile/settings/AccountLinkingPanel";
 import DeleteAccountPanel from "@/components/student/ui/profile/settings/DeleteAccountPanel";
+import PersonalDetailsPanel from "@/components/student/ui/profile/settings/PersonalDetailsPanel";
+import ReportsPanel from "@/components/student/ui/profile/settings/ReportsPanel";
+import MySubscriptionPanel from "@/components/student/ui/profile/settings/MySubscriptionPanel";
 import ReferralView from "@/components/student/features/referral/ReferralView";
 
 // Exam Features
@@ -937,7 +940,7 @@ export default function StudentRoot({
             <MyProfileView
               user={currentUser!}
               history={examHistory}
-              onEditProfile={() => handleTabChange("settings")}
+              onEditProfile={() => handleTabChange("personal")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
                 setActiveTab("subject_report"); // internal-only, no route
@@ -1183,13 +1186,58 @@ export default function StudentRoot({
         );
       }
 
+      if (activeTab === "personal" || activeTab === "edit-profile") {
+        return (
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="প্রোফাইল সম্পাদনা"
+            onBack={() => handleTabChange("settings")}
+          >
+            <PersonalDetailsPanel
+              user={currentUser!}
+              onSave={async (data) => {
+                await handleProfileUpdate(data);
+                handleTabChange("settings");
+              }}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "reports") {
+        return (
+          <AppLayout
+            activeTab="settings"
+            {...commonLayoutProps}
+            title="রিপোর্টসমূহ"
+            onBack={() => handleTabChange("settings")}
+          >
+            <ReportsPanel user={currentUser!} />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "my-subscription") {
+        return (
+          <AppLayout
+            activeTab="subscription"
+            {...commonLayoutProps}
+            title="আমার সাবস্ক্রিপশন"
+            onBack={() => handleTabChange("settings")}
+          >
+            <MySubscriptionPanel onUpgrade={() => handleTabChange("upgrade")} />
+          </AppLayout>
+        );
+      }
+
       if (activeTab === "subscription" || activeTab === "upgrade")
         return (
           <AppLayout
             activeTab="subscription"
             {...commonLayoutProps}
             title="প্রো সাবস্ক্রিপশন"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => handleTabChange("settings")}
           >
             <SubscriptionView />
           </AppLayout>

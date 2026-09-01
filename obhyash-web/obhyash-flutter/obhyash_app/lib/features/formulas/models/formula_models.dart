@@ -102,6 +102,7 @@ class SubjectMeta {
   final String subjectName;
   final String assetPath;
   final String emoji;
+  final String? svgIcon;
   final List<int> gradientColors;
 
   const SubjectMeta({
@@ -109,6 +110,7 @@ class SubjectMeta {
     required this.subjectName,
     required this.assetPath,
     required this.emoji,
+    this.svgIcon,
     required this.gradientColors,
   });
 }
@@ -119,6 +121,7 @@ const kHscFormulaSubjects = [
     subjectName: 'পদার্থবিজ্ঞান ১ম পত্র',
     assetPath: 'assets/formulas/hsc_physics_1/index.json',
     emoji: '⚡',
+    svgIcon: 'assets/dashboard-icons/subject_physics.svg',
     gradientColors: [0xFF0F172A, 0xFF1E3A5F],
   ),
   SubjectMeta(
@@ -126,6 +129,7 @@ const kHscFormulaSubjects = [
     subjectName: 'পদার্থবিজ্ঞান ২য় পত্র',
     assetPath: 'assets/formulas/hsc_physics_2/index.json',
     emoji: '🔋',
+    svgIcon: 'assets/dashboard-icons/subject_physics.svg',
     gradientColors: [0xFF0F1A2E, 0xFF1E4080],
   ),
   SubjectMeta(
@@ -133,6 +137,7 @@ const kHscFormulaSubjects = [
     subjectName: 'রসায়ন ১ম পত্র',
     assetPath: 'assets/formulas/hsc_chemistry_1/index.json',
     emoji: '🧪',
+    svgIcon: 'assets/dashboard-icons/subject_chemistry.svg',
     gradientColors: [0xFF0D2818, 0xFF1B4332],
   ),
   SubjectMeta(
@@ -140,6 +145,7 @@ const kHscFormulaSubjects = [
     subjectName: 'রসায়ন ২য় পত্র',
     assetPath: 'assets/formulas/hsc_chemistry_2/index.json',
     emoji: '⚗️',
+    svgIcon: 'assets/dashboard-icons/subject_chemistry.svg',
     gradientColors: [0xFF1A1A2E, 0xFF16213E],
   ),
   SubjectMeta(
@@ -147,6 +153,7 @@ const kHscFormulaSubjects = [
     subjectName: 'উচ্চতর গণিত ১ম পত্র',
     assetPath: 'assets/formulas/hsc_math_1/index.json',
     emoji: '📐',
+    svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF2D1B69, 0xFF1B1B4B],
   ),
   SubjectMeta(
@@ -154,6 +161,7 @@ const kHscFormulaSubjects = [
     subjectName: 'উচ্চতর গণিত ২য় পত্র',
     assetPath: 'assets/formulas/hsc_math_2/index.json',
     emoji: '🔢',
+    svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
 ];
@@ -164,6 +172,7 @@ const kSscFormulaSubjects = [
     subjectName: 'পদার্থবিজ্ঞান',
     assetPath: 'assets/formulas/ssc_physics/index.json',
     emoji: '⚡',
+    svgIcon: 'assets/dashboard-icons/subject_physics.svg',
     gradientColors: [0xFF0F172A, 0xFF1E3A5F],
   ),
   SubjectMeta(
@@ -171,6 +180,7 @@ const kSscFormulaSubjects = [
     subjectName: 'রসায়ন',
     assetPath: 'assets/formulas/ssc_chemistry/index.json',
     emoji: '🧪',
+    svgIcon: 'assets/dashboard-icons/subject_chemistry.svg',
     gradientColors: [0xFF0D2818, 0xFF1B4332],
   ),
   SubjectMeta(
@@ -178,6 +188,7 @@ const kSscFormulaSubjects = [
     subjectName: 'সাধারণ গণিত',
     assetPath: 'assets/formulas/ssc_math/index.json',
     emoji: '📐',
+    svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF2D1B69, 0xFF1B1B4B],
   ),
   SubjectMeta(
@@ -185,6 +196,7 @@ const kSscFormulaSubjects = [
     subjectName: 'উচ্চতর গণিত',
     assetPath: 'assets/formulas/ssc_higher_math/index.json',
     emoji: '🔢',
+    svgIcon: 'assets/dashboard-icons/subject_math.svg',
     gradientColors: [0xFF1E1035, 0xFF2D1550],
   ),
 ];

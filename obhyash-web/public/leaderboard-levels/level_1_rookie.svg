@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none">
+  <defs>
+    <!-- Outer Shield Gradient (Bronze & Emerald) -->
+    <linearGradient id="bronzeShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <linearGradient id="bronzeBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6EE7B7" />
+      <stop offset="30%" stop-color="#34D399" />
+      <stop offset="70%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#022C22" />
+    </linearGradient>
+
+    <linearGradient id="bevelLight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <linearGradient id="innerRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A7F3D0" />
+      <stop offset="50%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <filter id="bigShadowRookie" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#022C22" flood-opacity="0.45" />
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#022C22" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Base 3D Crest Shadow -->
+  <path d="M 100 12 L 176 46 C 176 116 142 168 100 188 C 58 168 24 116 24 46 Z" fill="#022C22" />
+
+  <!-- Outer Shield Frame with 3D Border -->
+  <path d="M 100 8 L 176 42 C 176 112 142 164 100 184 C 58 164 24 112 24 42 Z" 
+        fill="url(#bronzeShield)" 
+        stroke="url(#bronzeBorder)" 
+        stroke-width="7" 
+        stroke-linejoin="round"
+        filter="url(#bigShadowRookie)" />
+
+  <!-- Inner Inset Shield -->
+  <path d="M 100 22 L 162 50 C 162 106 134 148 100 166 C 66 148 38 106 38 50 Z" 
+        fill="#064E3B" 
+        stroke="#047857" 
+        stroke-width="3" />
+
+  <!-- Top Glass Highlight Specular -->
+  <path d="M 100 22 L 162 50 C 162 76 150 102 130 114 C 100 86 64 66 38 50 Z" 
+        fill="url(#bevelLight)" 
+        opacity="0.35" />
+
+  <!-- Center Metallic Medallion -->
+  <circle cx="100" cy="100" r="46" fill="url(#innerRing)" stroke="#FDE68A" stroke-width="4" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))" />
+  <circle cx="100" cy="100" r="37" fill="#065F46" />
+
+  <!-- 3D Sprout / Rookie Seedling Emblem -->
+  <g transform="translate(100, 100)">
+    <!-- Stem -->
+    <path d="M 0 24 C 0 2 8 -8 14 -14" stroke="#FEF08A" stroke-width="5" stroke-linecap="round" fill="none" />
+    <!-- Left Leaf -->
+    <path d="M 0 8 C -20 8 -24 -16 0 -12 C 0 -12 -5 5 0 8 Z" fill="url(#leafGrad)" stroke="#FEF08A" stroke-width="1.8" />
+    <!-- Right Leaf -->
+    <path d="M 7 -3 C 25 -7 28 -27 7 -22 C 7 -22 9 -9 7 -3 Z" fill="url(#leafGrad)" stroke="#FEF08A" stroke-width="1.8" />
+    <!-- Seed base -->
+    <ellipse cx="0" cy="24" rx="8" ry="4.5" fill="#78350F" stroke="#FDE68A" stroke-width="1.5" />
+    <!-- Sparkle -->
+    <polygon points="12,-20 14,-16 18,-16 15,-13 16,-9 12,-11 8,-9 9,-13 6,-16 10,-16" fill="#FFFFFF" />
+  </g>
+</svg>

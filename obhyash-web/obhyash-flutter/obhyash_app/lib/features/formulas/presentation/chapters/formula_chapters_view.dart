@@ -87,18 +87,43 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
-      body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 24),
-        itemCount: chapters.length,
-        itemBuilder: (context, index) {
-          final chapter = chapters[index];
-          return _ChapterTile(
-            chapter: chapter,
-            isDark: isDark,
-            subjectId: widget.subjectId,
-            index: index,
-          );
-        },
+      appBar: AppBar(
+        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
+          ),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          _subject!.subjectName,
+          style: TextStyle(
+            fontFamily: 'Anek Bangla',
+            fontSize: 19,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : const Color(0xFF18181B),
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+          itemCount: chapters.length,
+          itemBuilder: (context, index) {
+            final chapter = chapters[index];
+            return _ChapterTile(
+              chapter: chapter,
+              isDark: isDark,
+              subjectId: widget.subjectId,
+              index: index,
+            );
+          },
+        ),
       ),
     );
   }
