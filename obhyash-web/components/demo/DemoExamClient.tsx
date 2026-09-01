@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Question, UserAnswers, ExamConfig } from '@/lib/types';
+import { Question, UserAnswers, ExamConfig, ExamDetails, AppState } from '@/lib/types';
 import { DEMO_QUESTION_POOL } from '@/lib/data/demo-questions';
 import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
@@ -20,6 +20,8 @@ function pickRandomQuestions(pool: Question[], count: number = 10): Question[] {
   return array.slice(0, count);
 }
 
+const TOTAL_DURATION_SECONDS = 10 * 60; // 10 minutes
+
 export default function DemoExamClient() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
@@ -27,22 +29,62 @@ export default function DemoExamClient() {
   const [stage, setStage] = useState<'instructions' | 'exam' | 'result'>(
     'instructions',
   );
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    pickRandomQuestions(DEMO_QUESTION_POOL, 10),
+  );
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number | string>>(
+    new Set(),
+  );
+  const [timeLeft, setTimeLeft] = useState<number>(TOTAL_DURATION_SECONDS);
   const [timeTaken, setTimeTaken] = useState<number>(0);
+  const [appState, setAppState] = useState<AppState>(AppState.RUNNING);
 
-  // Initialize with 10 random questions from the 20 pool
+  // Re-initialize/reset demo with 10 random questions from the pool
   const initializeDemo = useCallback(() => {
     const picked = pickRandomQuestions(DEMO_QUESTION_POOL, 10);
     setQuestions(picked);
     setUserAnswers({});
+    setFlaggedQuestions(new Set());
+    setTimeLeft(TOTAL_DURATION_SECONDS);
     setTimeTaken(0);
     setStage('instructions');
+    setAppState(AppState.RUNNING);
   }, []);
 
+  const handleStartExam = async (): Promise<boolean> => {
+    setTimeLeft(TOTAL_DURATION_SECONDS);
+    setStage('exam');
+    return true;
+  };
+
+  const handleExamSubmit = useCallback((_manual = false) => {
+    setTimeLeft((currentLeft) => {
+      const spent = TOTAL_DURATION_SECONDS - currentLeft;
+      setTimeTaken(Math.max(1, spent));
+      return currentLeft;
+    });
+    setStage('result');
+    setAppState(AppState.COMPLETED);
+  }, []);
+
+  // Active Countdown Timer for Exam Stage
   useEffect(() => {
-    initializeDemo();
-  }, [initializeDemo]);
+    if (stage !== 'exam') return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleExamSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [stage, handleExamSubmit]);
 
   const examConfig: ExamConfig = useMemo(
     () => ({
@@ -59,7 +101,7 @@ export default function DemoExamClient() {
     [],
   );
 
-  const examDetails = useMemo(
+  const examDetails: ExamDetails = useMemo(
     () => ({
       subject: 'demo',
       subjectLabel: 'ডেমো মডেল টেস্ট',
@@ -73,17 +115,6 @@ export default function DemoExamClient() {
     }),
     [],
   );
-
-  const handleStartExam = async (): Promise<boolean> => {
-    setStage('exam');
-    return true;
-  };
-
-  const handleExamComplete = (answers: UserAnswers, time: number) => {
-    setUserAnswers(answers);
-    setTimeTaken(time);
-    setStage('result');
-  };
 
   if (!questions.length) {
     return (
@@ -107,14 +138,17 @@ export default function DemoExamClient() {
       {/* ── 2. Active Exam Runner View ── */}
       {stage === 'exam' && (
         <ExamRunner
-          questions={questions}
-          durationMinutes={10}
-          negativeMarking={0.25}
-          onComplete={handleExamComplete}
-          onExit={() => router.push('/')}
-          isDarkMode={isDark}
-          toggleTheme={toggleTheme}
+          appState={appState}
           examDetails={examDetails}
+          questions={questions}
+          userAnswers={userAnswers}
+          setUserAnswers={setUserAnswers}
+          flaggedQuestions={flaggedQuestions}
+          setFlaggedQuestions={setFlaggedQuestions}
+          timeLeft={timeLeft}
+          onSubmit={handleExamSubmit}
+          onExit={() => router.push('/')}
+          setAppState={setAppState}
         />
       )}
 

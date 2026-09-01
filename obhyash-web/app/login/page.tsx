@@ -4,7 +4,7 @@ import { useState, Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
+import { Mail, Lock, LogIn, Loader2, ArrowRight } from 'lucide-react';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 
 const AUTH_TIMEOUT_MS = 30000;
@@ -158,44 +158,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black px-4 font-sans">
-      <div className="w-full max-w-md bg-white dark:bg-neutral-950 rounded-[2rem] shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 relative z-10 animate-in fade-in zoom-in duration-300">
-        {/* Header Decor */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-red-500" />
+    <div className="min-h-screen flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
+      {/* Top Header / Branding */}
+      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
+            অ
+          </div>
+          <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
+            OBHYASH
+          </span>
+        </Link>
+        <Link
+          href="/"
+          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+        >
+          <span>হোমপেজে ফিরে যাও</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </header>
 
-        {/* Background Glow */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="p-6 md:p-10 relative">
-          <div className="text-center mb-6">
-            <h4 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
+      {/* Center Auth Form */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div className="w-full max-w-md bg-white dark:bg-neutral-900/80 rounded-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-xl shadow-neutral-200/40 dark:shadow-none p-6 sm:p-8 space-y-6">
+          <div className="text-center space-y-1.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
               স্বাগতম!
-            </h4>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+            </h1>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               তোমার অ্যাকাউন্টে লগইন করো
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium animate-in slide-in-from-top-2 flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
-              {error}
+            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 text-xs sm:text-sm font-medium flex items-center gap-2 animate-in slide-in-from-top-2">
+              <span className="text-base">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 ml-1">
                 মোবাইল নম্বর অথবা ইমেইল
               </label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 group-focus-within:text-emerald-600 transition-colors" />
                 <input
                   id="identifier"
                   type="text"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium text-neutral-800 dark:text-neutral-200"
                   placeholder="017XXXXXXXX অথবা example@mail.com"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
@@ -204,16 +217,16 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 ml-1">
                 পাসওয়ার্ড
               </label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 group-focus-within:text-emerald-600 transition-colors" />
                 <input
                   id="password"
                   type="password"
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium text-neutral-800 dark:text-neutral-200"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -224,28 +237,28 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 md:py-3.5"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  প্রবেশ করা হচ্ছে...
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>প্রবেশ করা হচ্ছে...</span>
                 </>
               ) : (
                 <>
-                  <LogIn className="w-5 h-5" />
-                  লগইন
+                  <LogIn className="w-4 h-4" />
+                  <span>লগইন</span>
                 </>
               )}
             </button>
           </form>
 
-          <div className="relative py-4">
+          <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+              <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-neutral-950 px-2 text-slate-500 dark:text-slate-400 font-bold">
+            <div className="relative flex justify-center text-[11px] uppercase">
+              <span className="bg-white dark:bg-neutral-900 px-3 text-neutral-500 dark:text-neutral-400 font-bold">
                 অথবা
               </span>
             </div>
@@ -253,29 +266,38 @@ export default function LoginPage() {
 
           <Suspense
             fallback={
-              <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
+              <div className="h-11 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
             }
           >
             <SocialLoginButton mode="signin" />
           </Suspense>
 
-          <div className="mt-6 text-center space-y-4 md:mt-8">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              অ্যাকাউন্ট নেই?{' '}
-              <Link
-                href="/signup"
-                className="text-red-600 hover:text-red-700 font-bold hover:underline transition-all"
-              >
-                নতুন অ্যাকাউন্ট খোলো
-              </Link>
-            </p>
-            {/* Optional: Forgot Password Link */}
-            {/* <Link href="/forgot-password" className="block text-xs text-slate-400 hover:text-slate-600 transition-colors">
-              পাসওয়ার্ড ভুলে গেছেন?
-            </Link> */}
+          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+            অ্যাকাউন্ট নেই?{' '}
+            <Link
+              href="/signup"
+              className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
+            >
+              নতুন অ্যাকাউন্ট খোলো
+            </Link>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Bottom Footer */}
+      <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
+        <Link href="/privacy" className="hover:underline">
+          গোপনীয়তা নীতি
+        </Link>
+        <span>•</span>
+        <Link href="/terms" className="hover:underline">
+          শর্তাবলী
+        </Link>
+        <span>•</span>
+        <Link href="/faq" className="hover:underline">
+          সহায়তা / FAQ
+        </Link>
+      </footer>
     </div>
   );
 }

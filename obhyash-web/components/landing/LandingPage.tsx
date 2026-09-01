@@ -23,6 +23,21 @@ import {
   Phone,
   Mail,
   CheckCircle,
+  CheckCircle2,
+  Check,
+  Crown,
+  Bookmark,
+  Flag,
+  Lock,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Printer,
+  CheckCheck,
+  Smartphone,
+  Laptop,
+  RefreshCw,
+  ShieldCheck,
   Menu,
   X,
   Flame,
@@ -65,22 +80,34 @@ interface PricingPlan {
 
 const DEMO_QUESTIONS = [
   {
-    text: 'একটি কণা $v = u + at$ সূত্র মেনে চলে। যদি $u=0$ এবং $a=5 ms^{-2}$ হয়, তবে $t=4s$ এ বেগ কত?',
-    options: ['10 $ms^{-1}$', '20 $ms^{-1}$', '15 $ms^{-1}$', '25 $ms^{-1}$'],
+    number: '০১',
+    text: 'একটি কণা $v = u + at$ সূত্র মেনে চলে। যদি $u = 0$ এবং $a = 5 \\text{ ms}^{-2}$ হয়, তবে $t = 4\\text{ s}$ এ কণাটির বেগ কত হবে?',
+    options: ['10 ms⁻¹', '20 ms⁻¹', '15 ms⁻¹', '25 ms⁻¹'],
     correct: 1,
-    topic: 'পদার্থবিজ্ঞান ১ম পত্র',
+    subject: 'পদার্থবিজ্ঞান ১ম পত্র',
+    chapter: 'গতিবিদ্যা',
+    source: 'CU-18',
+    explanation: 'আমরা জানি, $v = u + at$\nযেহেতু $u = 0, a = 5 \\text{ ms}^{-2}, t = 4\\text{ s}$\nসুতরাং, $v = 0 + (5 \\times 4) = 20\\text{ ms}^{-1}$।\n(রেফারেন্স: ড. শাহজাহান তপন স্যার - গতিবিদ্যা)',
   },
   {
-    text: 'পানির রাসায়নিক সংকেত কী?',
-    options: ['$CO_2$', '$NaCl$', '$H_2O$', '$O_2$'],
-    correct: 2,
-    topic: 'রসায়ন ১ম পত্র',
-  },
-  {
-    text: 'নিউটনের দ্বিতীয় সূত্র কোনটি?',
-    options: ['$F = ma$', '$E = mc^2$', '$v = u + at$', '$s = vt$'],
+    number: '০২',
+    text: 'নিচের কোন অরবিটালটির শক্তি সবচেয়ে কম?',
+    options: ['4s', '3d', '4p', '4f'],
     correct: 0,
-    topic: 'পদার্থবিজ্ঞান ১ম পত্র',
+    subject: 'রসায়ন ১ম পত্র',
+    chapter: 'গুণগত রসায়ন',
+    source: 'DU-A-21',
+    explanation: 'আউফবাউ নীতি অনুযায়ী $(n+l)$ এর মান যার কম তার শক্তি কম। 4s এর জন্য $n+l = 4+0 = 4$, যা 3d (৫) অপেক্ষা কম।\n(রেফারেন্স: হাজারী ও নাগ স্যার - গুণগত রসায়ন)',
+  },
+  {
+    number: '০৩',
+    text: '$\\lim_{x \\to 0} \\frac{\\sin 5x}{x}$ এর মান কত?',
+    options: ['0', '1', '5', 'অসংজ্ঞায়িত'],
+    correct: 2,
+    subject: 'উচ্চতর গণিত ১ম পত্র',
+    chapter: 'অন্তরীকরণ',
+    source: 'BUET-19',
+    explanation: 'মৌলিক সূত্রানুযায়ী $\\lim_{x \\to 0} \\frac{\\sin ax}{x} = a$। এখানে $a = 5$, অতএব মান 5।\n(রেফারেন্স: এস ইউ আহাম্মদ স্যার - অন্তরীকরণ)',
   },
 ];
 
@@ -97,23 +124,42 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   // --- Interactive Demo Logic ---
   const [demoQIndex, setDemoQIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(1200);
+  const [timeLeft, setTimeLeft] = useState(592);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState<boolean>(false);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
-  // ✅ Update useEffect to use the external constant
+  // Auto-play demo cycle (Question -> Option Lock -> Warm Book Explanation -> Next Question)
   useEffect(() => {
     if (activeDemoTab !== 'generate') return;
 
-    const interval = setInterval(() => {
+    let timer1: NodeJS.Timeout;
+    let timer2: NodeJS.Timeout;
+    let timer3: NodeJS.Timeout;
+
+    // Step 1: Select/Lock option after 1.5s
+    timer1 = setTimeout(() => {
       setSelectedOpt(DEMO_QUESTIONS[demoQIndex].correct);
 
-      setTimeout(() => {
-        setDemoQIndex((prev) => (prev + 1) % DEMO_QUESTIONS.length);
-        setSelectedOpt(null);
-      }, 1500);
-    }, 4000);
+      // Step 2: Reveal warm book explanation after 1s of locking
+      timer2 = setTimeout(() => {
+        setShowExplanation(true);
 
-    return () => clearInterval(interval);
+        // Step 3: Transition to next question after 3.5s
+        timer3 = setTimeout(() => {
+          setDemoQIndex((prev) => (prev + 1) % DEMO_QUESTIONS.length);
+          setSelectedOpt(null);
+          setShowExplanation(false);
+          setIsBookmarked(false);
+        }, 3500);
+      }, 1000);
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
   }, [activeDemoTab, demoQIndex]);
 
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
@@ -171,54 +217,119 @@ const LandingPage: React.FC<LandingPageProps> = ({
       price: '০',
       period: 'আজীবন',
       features: [
-        'প্রতিদিন ১টি ফ্রি এক্সাম',
-        'লিডারবোর্ড এক্সেস',
-        'বেসিক এনালাইসিস',
-        'লিমিটেড প্রশ্ন ব্যাংক',
+        'দৈনিক ২টি প্র্যাকটিস এক্সাম',
+        'সর্বোচ্চ ২৫টি বুকমার্ক সংরক্ষণ',
+        'বেসিক ফলাফল স্কোরকার্ড',
+        'ডেইলি স্ট্রাইক ও লিডারবোর্ড',
       ],
       cta: 'বিনামূল্যে শুরু করো',
       color: 'border-neutral-200 dark:border-neutral-800',
       buttonColor:
         'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700',
     },
-    // Skeletons or initial state could go here, but starting with Basic is safe
+    {
+      title: 'মাসিক প্ল্যান (১ মাস)',
+      price: '১৪৯',
+      period: '/মাস',
+      features: [
+        'সীমাহীন আনলিমিটেড এক্সাম',
+        'বইয়ের রেফারেন্স সহ বিস্তারিত সমাধান',
+        '২-কলাম প্রশ্ন ও উত্তরপত্র PDF প্রিন্ট',
+        '৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব',
+      ],
+      cta: 'মাসিক প্ল্যান নাও',
+      color: 'border-emerald-500 ring-2 ring-emerald-500/20',
+      buttonColor:
+        'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-500/30',
+    },
+    {
+      title: 'এডমিশন প্যাক (৩ মাস)',
+      price: '২৯৯',
+      period: '/৩ মাস',
+      highlight: true,
+      features: [
+        'সব প্রো ফিচার ৩ মাস আনলিমিটেড',
+        'বইয়ের রেফারেন্স সহ সম্পূর্ণ ব্যাখ্যা',
+        'আনলিমিটেড অফলাইন PDF ডাউনলোড',
+        '১০০% বিজ্ঞাপনমুক্ত পরিবেশ',
+      ],
+      cta: 'এডমিশন প্যাক নাও',
+      color: 'border-emerald-600 ring-2 ring-emerald-600/30',
+      buttonColor:
+        'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-600/30',
+    },
   ]);
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        // Dynamically import to avoid server-side issues if any
         const { getSubscriptionPlans } = await import('@/services/database');
         const plans = await getSubscriptionPlans();
 
         if (plans && plans.length > 0) {
           const mappedPlans = plans.map((plan) => {
+            const days = plan.duration_days || 0;
             const isYearly =
               plan.name.toLowerCase().includes('year') ||
-              plan.billingCycle === 'Yearly';
+              plan.billingCycle === 'Yearly' ||
+              days >= 180;
             const isQuarterly =
               plan.name.toLowerCase().includes('quarter') ||
-              plan.billingCycle.includes('৩ মাস');
+              plan.billingCycle.includes('৩ মাস') ||
+              (days >= 80 && days <= 120);
             const isMonthly =
               plan.name.toLowerCase().includes('month') ||
               plan.billingCycle === 'Monthly' ||
-              plan.billingCycle === '/মাস';
+              plan.billingCycle === '/মাস' ||
+              (days >= 28 && days <= 60);
             const isFree = plan.price === 0;
 
             let buttonColor =
               'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700';
             let color = 'border-neutral-200 dark:border-neutral-800';
 
+            let dynamicFeatures = plan.features || [];
+            if (!dynamicFeatures || dynamicFeatures.length === 0) {
+              if (isFree) {
+                dynamicFeatures = [
+                  'দৈনিক ২টি প্র্যাকটিস এক্সাম',
+                  'সর্বোচ্চ ২৫টি বুকমার্ক সংরক্ষণ',
+                  'বেসিক ফলাফল স্কোরকার্ড',
+                  'ডেইলি স্ট্রাইক ও লিডারবোর্ড',
+                ];
+              } else if (isMonthly) {
+                dynamicFeatures = [
+                  'সীমাহীন আনলিমিটেড এক্সাম',
+                  'বইয়ের রেফারেন্স সহ বিস্তারিত সমাধান',
+                  '২-কলাম প্রশ্ন ও উত্তরপত্র PDF প্রিন্ট',
+                  '৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব',
+                ];
+              } else if (isQuarterly || plan.isPopular) {
+                dynamicFeatures = [
+                  'সব প্রো ফিচার ৩ মাস আনলিমিটেড',
+                  'বইয়ের রেফারেন্স সহ সম্পূর্ণ ব্যাখ্যা',
+                  'আনলিমিটেড অফলাইন PDF ডাউনলোড',
+                  '১০০% বিজ্ঞাপনমুক্ত পরিবেশ',
+                ];
+              } else {
+                dynamicFeatures = [
+                  'সব প্রো ফিচার ৬ মাস আনলিমিটেড',
+                  'এইচএসসি ও পূর্ণাঙ্গ এডমিশন প্রস্তুতি',
+                  'বইয়ের রেফারেন্স সহ ব্যাখ্যা PDF',
+                  '১০০% বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
+                ];
+              }
+            }
+
             if (isMonthly) {
               buttonColor =
                 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-500/30';
               color = 'border-emerald-500 ring-2 ring-emerald-500/20';
-            } else if (isQuarterly) {
+            } else if (isQuarterly || plan.isPopular) {
               buttonColor =
-                'bg-gradient-to-r from-red-600 to-red-600 text-white hover:from-red-700 hover:to-red-700 shadow-lg shadow-red-500/30';
-              color = 'border-red-500';
+                'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-600/30';
+              color = 'border-emerald-600 ring-2 ring-emerald-600/30';
             } else if (plan.price > 0) {
-              // Fallback for other paid plans
               buttonColor = 'bg-emerald-600 text-white hover:bg-emerald-700';
               color = 'border-emerald-500';
             }
@@ -234,8 +345,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     : plan.billingCycle === 'Quarterly'
                       ? '/৩ মাস'
                       : plan.billingCycle,
-              features: plan.features,
-              cta: isFree ? 'বিনামূল্যে শুরু করো' : 'সাবস্ক্রাইব করো',
+              features: dynamicFeatures,
+              cta: isFree ? 'বিনামূল্যে শুরু করো' : 'প্ল্যানটি বেছে নাও',
               highlight: plan.isPopular,
               color: color,
               buttonColor: buttonColor,
@@ -510,38 +621,117 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Demo Content Area */}
               <div className="p-6 min-h-[380px] flex flex-col relative">
-                {/* 1. Generate Question Demo (Auto-playing) */}
+                {/* 1. Generate Question Demo (Realistic QuestionCard with Lock & Explanation) */}
                 {activeDemoTab === 'generate' && (
                   <div className="animate-in fade-in zoom-in duration-300 space-y-4">
-                    <div className="flex justify-between items-center mb-2 border-b pb-2 border-neutral-100 dark:border-neutral-800">
-                      <span className="font-bold text-neutral-800 dark:text-white flex items-center gap-2 text-sm">
-                        <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                        {DEMO_QUESTIONS[demoQIndex].topic}
-                      </span>
-                      <span className="px-2 py-0.5 bg-red-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-mono font-bold rounded border border-red-100 dark:border-neutral-700">
-                        {formatTime(timeLeft)}
-                      </span>
+                    {/* Question Header Bar */}
+                    <div className="flex justify-between items-center border-b pb-2.5 border-neutral-100 dark:border-neutral-800">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>প্রশ্ন {DEMO_QUESTIONS[demoQIndex].number}</span>
+                        <span className="text-neutral-300 dark:text-neutral-700">•</span>
+                        <span className="text-neutral-500 dark:text-neutral-400 font-medium">
+                          {DEMO_QUESTIONS[demoQIndex].subject}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/60">
+                        <Clock className="w-3 h-3 text-emerald-600" />
+                        <span>{formatTime(timeLeft)}</span>
+                      </div>
                     </div>
-                    <h3 className="font-serif-exam text-lg text-neutral-900 dark:text-neutral-200 mb-4">
+
+                    {/* Question Statement */}
+                    <h3 className="font-serif-exam text-base sm:text-lg text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed">
                       <LatexText text={DEMO_QUESTIONS[demoQIndex].text} />
                     </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {DEMO_QUESTIONS[demoQIndex].options.map((opt, i) => (
-                        <div
-                          key={i}
-                          className={`px-4 py-2.5 rounded-xl border flex items-center transition-all duration-300 text-sm ${
-                            selectedOpt === i
-                              ? 'bg-red-50 dark:bg-red-900/20 border-red-600 text-red-700 dark:text-red-300 scale-[1.02]'
-                              : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'
+
+                    {/* Source Pill & Action Buttons */}
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 text-[11px] font-bold tracking-wide shadow-2xs">
+                        <span>🏛️</span>
+                        <span>{DEMO_QUESTIONS[demoQIndex].source}</span>
+                      </span>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setIsBookmarked(!isBookmarked)}
+                          className={`p-1.5 rounded-lg border transition-colors ${
+                            isBookmarked
+                              ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-600'
+                              : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-600'
                           }`}
                         >
-                          <LatexText text={opt} />
-                          {selectedOpt === i && (
-                            <CheckCircle className="w-4 h-4 text-red-600 ml-auto" />
-                          )}
-                        </div>
-                      ))}
+                          <Bookmark className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-red-500 transition-colors"
+                        >
+                          <Flag className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Options Grid (2x2 on desktop, 1-col on mobile) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      {DEMO_QUESTIONS[demoQIndex].options.map((opt, i) => {
+                        const bengaliLetters = ['ক', 'খ', 'গ', 'ঘ'];
+                        const isSelected = selectedOpt === i;
+                        const isCorrect = DEMO_QUESTIONS[demoQIndex].correct === i;
+
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => {
+                              setSelectedOpt(i);
+                              setShowExplanation(true);
+                            }}
+                            className={`px-3.5 py-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 text-xs sm:text-sm cursor-pointer select-none ${
+                              isSelected
+                                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-600 text-emerald-900 dark:text-emerald-200 shadow-sm ring-1 ring-emerald-500/30 font-bold scale-[1.01]'
+                                : 'bg-neutral-50 dark:bg-neutral-800/60 border-neutral-200 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600'
+                            }`}
+                          >
+                            <span
+                              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
+                                isSelected
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+                              }`}
+                            >
+                              {bengaliLetters[i]}
+                            </span>
+                            <span className="flex-1 truncate">
+                              <LatexText text={opt} />
+                            </span>
+                            {isSelected && (
+                              <span className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold shrink-0 bg-emerald-100/80 dark:bg-emerald-900/50 px-1.5 py-0.5 rounded">
+                                <Lock className="w-2.5 h-2.5" /> লক
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Warm Book Style Explanation Preview */}
+                    {showExplanation && (
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-300 rounded-xl overflow-hidden border border-[#E6DCBF] dark:border-neutral-800 shadow-sm mt-3">
+                        <div className="flex items-center justify-between px-3.5 py-2 bg-[#F3ECE4] dark:bg-[#1A1816] border-b border-[#E6DCBF]/70 dark:border-neutral-800">
+                          <div className="flex items-center gap-2 text-xs font-bold text-[#5C4D3C] dark:text-[#E0D5C1]">
+                            <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span>ব্যাখ্যা ও পাঠ্যবই রেফারেন্স</span>
+                          </div>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold">
+                            সঠিক উত্তর
+                          </span>
+                        </div>
+                        <div className="p-3 bg-[#FAF7F2] dark:bg-[#121110] text-xs text-[#42372A] dark:text-neutral-300 leading-relaxed space-y-1.5">
+                          <LatexText text={DEMO_QUESTIONS[demoQIndex].explanation} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -992,6 +1182,163 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* Offline PDF & Print Showcase Section */}
+      <section className="py-24 bg-white dark:bg-neutral-950 border-b border-neutral-100 dark:border-neutral-800/80 relative overflow-hidden">
+        <div className="absolute top-1/2 -left-48 w-96 h-96 bg-emerald-500/5 dark:bg-emerald-500/3 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 -right-48 w-96 h-96 bg-teal-500/5 dark:bg-teal-500/3 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <Printer className="w-3.5 h-3.5 text-emerald-600" />
+              <span>অফলাইন রিভিশন ও প্রিন্ট রেডি</span>
+            </div>
+            <h2 className="text-3xl lg:text-5xl font-extrabold text-neutral-900 dark:text-white tracking-tight leading-tight">
+              স্ক্রিন ছাড়াও পড়ার সুবিধা — <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
+                এক ক্লিকে সম্পূর্ণ প্রশ্ন ও সমাধান PDF
+              </span>
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg leading-relaxed">
+              অনলাইন পরীক্ষার পরেও যাতে অফলাইনে বন্ধুদের সাথে অনুশীলন বা প্রিন্ট করে রিভিশন দিতে পারো, সেজন্য পাচ্ছ পূর্ণাঙ্গ ২-কলাম প্রশ্নপত্র এবং পাঠ্যবই রেফারেন্স সহ সমাধান শিট।
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* Card 1: 2-Column Standard Question Paper PDF */}
+            <div className="relative rounded-3xl p-6 sm:p-8 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/90 dark:border-neutral-800 flex flex-col justify-between shadow-lg shadow-neutral-200/40 dark:shadow-none hover:border-emerald-500/50 transition-all duration-300 group">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider">
+                    স্ট্যান্ডার্ড ২-কলাম
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+                    প্রশ্নপত্র PDF ডাউনলোড
+                  </h3>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    আসল বোর্ড ও ভর্তি পরীক্ষার স্ট্যান্ডার্ড অনুযায়ী ২-কলাম পেপার ফরম্যাট। প্রিন্ট করে বাসায় বা কোচিংয়ে অফলাইন পরীক্ষা দাও।
+                  </p>
+                </div>
+
+                {/* Mockup Preview of PDF Sheet */}
+                <div className="bg-white dark:bg-neutral-950 rounded-2xl p-5 border border-neutral-200 dark:border-neutral-800/90 shadow-xs space-y-3 font-sans select-none pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-between border-b pb-2 border-neutral-100 dark:border-neutral-800 text-[11px] text-neutral-500 font-bold">
+                    <span>OBHYASH MODEL TEST</span>
+                    <span>পূর্ণমান: ২৫ • সময়: ২৫ মিনিট</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-[11px] text-neutral-800 dark:text-neutral-300">
+                    <div className="space-y-1.5 border-r pr-2 border-neutral-100 dark:border-neutral-800">
+                      <div className="font-semibold text-neutral-900 dark:text-neutral-100">১. $v = u + at$ সূত্রে ত্বরণ $a$ কী?</div>
+                      <div className="text-[10px] text-neutral-500 grid grid-cols-2 gap-1">
+                        <span>(ক) বেগ</span><span>(খ) ত্বরণ</span>
+                        <span>(গ) সরণ</span><span>(ঘ) সময়</span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 pl-1">
+                      <div className="font-semibold text-neutral-900 dark:text-neutral-100">২. সবচেয়ে শক্তিশালী H-বন্ধন?</div>
+                      <div className="text-[10px] text-neutral-500 grid grid-cols-2 gap-1">
+                        <span>(ক) H-F</span><span>(খ) H-O</span>
+                        <span>(গ) H-N</span><span>(ঘ) H-Cl</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+                  <div className="flex items-center gap-2">
+                    <CheckCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>A4 সাইজে প্রিন্ট-ফ্রেন্ডলি লেআউট</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>স্পষ্ট গাণিতিক সমীকরণ ও চিত্র</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-neutral-200/80 dark:border-neutral-800 mt-6">
+                <Link
+                  href="/demo"
+                  className="w-full py-3 px-4 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border border-emerald-300/80 dark:border-emerald-700/50 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>ডেমো পরীক্ষায় প্রশ্নপত্র PDF দেখো</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 2: Solution & Textbook Explanation PDF */}
+            <div className="relative rounded-3xl p-6 sm:p-8 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/90 dark:border-neutral-800 flex flex-col justify-between shadow-lg shadow-neutral-200/40 dark:shadow-none hover:border-teal-500/50 transition-all duration-300 group">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/30">
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 text-xs font-black uppercase tracking-wider">
+                    বইয়ের রেফারেন্স সহ
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+                    ফলাফল ও সমাধান PDF
+                  </h3>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    প্রতিটি প্রশ্নের সঠিক উত্তরের সাথে মূল পাঠ্যবইয়ের অধ্যায় ও লেখকদের রেফারেন্স সহ নিখুঁত সমাধান শিট।
+                  </p>
+                </div>
+
+                {/* Mockup Preview of Solution Sheet */}
+                <div className="bg-[#FAF7F2] dark:bg-neutral-950 rounded-2xl p-5 border border-[#E6DCBF] dark:border-neutral-800/90 shadow-xs space-y-3 font-sans select-none pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-between border-b pb-2 border-[#E6DCBF]/70 dark:border-neutral-800 text-[11px] text-[#78644E] dark:text-neutral-400 font-bold">
+                    <span>সমাধান ও ব্যাখ্যা শিট</span>
+                    <span className="text-emerald-700 dark:text-emerald-400">সঠিকতা: ৯২%</span>
+                  </div>
+                  <div className="space-y-2 text-[11px] text-[#42372A] dark:text-neutral-300">
+                    <div className="p-2 rounded bg-[#F3ECE4] dark:bg-neutral-900/80 border border-[#E6DCBF]/50 dark:border-neutral-800 space-y-1">
+                      <div className="font-bold flex items-center justify-between">
+                        <span>প্রশ্ন ১ • সঠিক উত্তর: (খ) ২০ ms⁻¹</span>
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">✓ সঠিক</span>
+                      </div>
+                      <p className="text-[10px] text-neutral-600 dark:text-neutral-400">
+                        {'ব্যাখ্যা: v = 0 + (5 × 4) = 20 ms⁻¹। (রেফারেন্স: ড. শাহজাহান তপন স্যার - গতিবিদ্যা)'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+                  <div className="flex items-center gap-2">
+                    <CheckCheck className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>ভুল হওয়া প্রশ্নের নিখুঁত অ্যানালাইসিস</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCheck className="w-4 h-4 text-teal-600 shrink-0" />
+                    <span>মূল পাঠ্যবই ও লেখকের সঠিক রেফারেন্স</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-neutral-200/80 dark:border-neutral-800 mt-6">
+                <Link
+                  href="/demo"
+                  className="w-full py-3 px-4 bg-teal-50 dark:bg-teal-950/40 hover:bg-teal-100 text-teal-800 dark:text-teal-300 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border border-teal-300/80 dark:border-teal-700/50 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>ডেমো পরীক্ষায় সমাধান PDF দেখো</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Blog Highlights Section */}
       {latestPosts.length > 0 && (
         <section className="py-24 bg-neutral-50 dark:bg-black overflow-hidden border-y border-neutral-100 dark:border-neutral-900/60">
@@ -1227,8 +1574,170 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 ফলাফল দেখো
               </h3>
               <p className="text-neutral-500 text-sm max-w-xs px-4">
-                AI জেনারেটেড রিপোর্ট দেখে নিজের দুর্বলতাগুলো কাটিয়ে ওঠো।
+                সঠিকতা ও নেগেটিভ মার্কিংয়ের নিখুঁত রিপোর্ট দেখে নিজের দুর্বলতাগুলো কাটিয়ে ওঠো।
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile App & Cross-Platform Sync Section */}
+      <section className="py-24 bg-gradient-to-b from-white via-neutral-50/70 to-white dark:from-neutral-950 dark:via-neutral-900/40 dark:to-neutral-950 border-b border-neutral-100 dark:border-neutral-800/80 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                <span>যেকোনো ডিভাইসে প্রস্তুতি</span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 dark:text-white tracking-tight leading-[1.2]">
+                ল্যাপটপে কিংবা বাসে চলতে চলতে মোবাইলে — <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
+                  প্রস্তুতি চলবে বিরতিহীন
+                </span>
+              </h2>
+
+              <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+                অভ্যাসের সুপারফাস্ট ক্লাউড সিঙ্ক প্রযুক্তির সাহায্যে তোমার বুকমার্ক, এক্সাম হিস্ট্রি, পারফরম্যান্স ডাটা এবং ডেইলি স্ট্রাইক থাকবে সম্পূর্ণ নিরাপদ ও যেকোনো ডিভাইসে মুহূর্তেই প্রস্তুত।
+              </p>
+
+              {/* 4 Key Value Props */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-lg mx-auto lg:mx-0">
+                <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white">
+                    <RefreshCw className="w-4 h-4 text-emerald-600" />
+                    <span>রিয়েল-টাইম ক্লাউড সিঙ্ক</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    ল্যাপটপে এক্সাম দাও আর মোবাইলে বাসে যেতে যেতে রিভিশন করো।
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white">
+                    <Flame className="w-4 h-4 text-red-500" />
+                    <span>ডেইলি স্ট্রাইক নোটিফিকেশন</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    প্রতিদিনের পড়াশোনার ধারাবাহিকতা ধরে রাখতে পুশ অ্যালার্ট।
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white">
+                    <Zap className="w-4 h-4 text-emerald-600" />
+                    <span>০ মিলিসেকেন্ড রেসপন্স</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    Flutter ও আধুনিক ইঞ্জিনে তৈরি দ্রুততম মসৃণ অভিজ্ঞতা।
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white">
+                    <ShieldCheck className="w-4 h-4 text-teal-600" />
+                    <span>১০০% ডাটা ব্যাকআপ</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    কোনো এক্সাম বা হিস্ট্রি হারাবে না, আজীবন সংরক্ষিত থাকবে।
+                  </p>
+                </div>
+              </div>
+
+              {/* Download CTA Buttons */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <a
+                  href="https://play.google.com/store"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 bg-neutral-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-neutral-100 rounded-2xl font-bold text-sm flex items-center gap-3 shadow-lg shadow-neutral-900/10 transition-all hover:scale-105"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M3.609 1.814L13.792 12 3.61 22.186a2.408 2.408 0 0 1-.61-.318c-.468-.344-.75-.907-.75-1.535V3.667c0-.628.282-1.191.75-1.535.19-.14.398-.248.609-.318zm11.235 11.238l2.25 2.25-11.83 6.83 9.58-9.08zm0-2.104l-9.58-9.08 11.83 6.83-2.25 2.25zm1.53 1.052l3.418-1.974c1.077-.622 1.077-1.636 0-2.258l-3.418-1.974-2.482 2.482 2.482 2.482z" />
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-[10px] uppercase font-semibold opacity-75">GET IT ON</div>
+                    <div className="text-xs font-black leading-tight">Google Play</div>
+                  </div>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={onGetStarted}
+                  className="px-6 py-3.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all hover:scale-105 cursor-pointer"
+                >
+                  <Laptop className="w-5 h-5" />
+                  <span>ওয়েব পোর্টালে চলো</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right Visual Phone Mockup */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative w-full max-w-[320px] sm:max-w-[340px] rounded-[2.5rem] p-3 bg-neutral-900 dark:bg-neutral-800 shadow-2xl shadow-neutral-400/40 dark:shadow-black/80 ring-8 ring-neutral-200 dark:ring-neutral-700/50">
+                {/* Phone Speaker & Camera Notch */}
+                <div className="w-24 h-4 bg-neutral-800 dark:bg-neutral-900 rounded-full mx-auto mb-2" />
+
+                {/* Inner Screen Preview */}
+                <div className="bg-[#FAF7F2] dark:bg-neutral-950 rounded-[2rem] p-4 text-neutral-900 dark:text-neutral-100 font-sans space-y-4 overflow-hidden border border-neutral-200 dark:border-neutral-800">
+                  {/* Mock App Header */}
+                  <div className="flex items-center justify-between border-b pb-3 border-neutral-200/80 dark:border-neutral-800">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                        অ
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold leading-none">অভ্যাস অ্যাপ</div>
+                        <div className="text-[10px] text-neutral-500">HSC Science</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-black border border-amber-200 dark:border-amber-800">
+                      <Flame className="w-3.5 h-3.5 text-red-500" />
+                      <span>৭ দিন</span>
+                    </div>
+                  </div>
+
+                  {/* Mock Active Exam Widget */}
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xs space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <span className="text-emerald-700 dark:text-emerald-400">মডেল টেস্ট চলছে</span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[10px]">০৮:৪৫</span>
+                    </div>
+                    <div className="text-xs font-bold text-neutral-900 dark:text-white">
+                      গতিবিদ্যা ও ভেক্টর স্পেশাল
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-neutral-500">
+                      <span>১০টি প্রশ্ন • ০.২৫ নেগেটিভ</span>
+                      <span className="font-bold text-amber-600">CU-18</span>
+                    </div>
+                  </div>
+
+                  {/* Mock Subject Quick Chips */}
+                  <div className="space-y-1.5">
+                    <div className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400">দ্রুত প্র্যাকটিস:</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 text-[11px] font-bold flex items-center gap-1.5">
+                        <span>⚡</span>
+                        <span className="truncate">পদার্থবিজ্ঞান</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 text-[11px] font-bold flex items-center gap-1.5">
+                        <span>🧪</span>
+                        <span className="truncate">রসায়ন</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mock Start Button */}
+                  <Link
+                    href="/demo"
+                    className="block w-full py-2.5 bg-emerald-600 text-white rounded-xl text-center font-bold text-xs shadow-md shadow-emerald-600/30"
+                  >
+                    ডেমো পরীক্ষা শুরু করো →
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1350,59 +1859,176 @@ const LandingPage: React.FC<LandingPageProps> = ({
         className="py-24 bg-gradient-to-b from-neutral-50 to-white dark:from-neutral-950 dark:to-neutral-900/20 border-y border-neutral-100 dark:border-neutral-800/60"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white mb-4">
-              তোমার পছন্দের প্ল্যানটি{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:to-emerald-500">
+          <div className="text-center mb-16 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <Crown className="w-3.5 h-3.5 text-emerald-600" />
+              <span>সাশ্রয়ী ও ট্রান্সপারেন্ট প্রাইসিং</span>
+            </div>
+            <h2 className="text-3xl lg:text-5xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+              তোমার প্রস্তুতির সেরা প্ল্যানটি{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
                 বেছে নাও
               </span>
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400">
-              সাশ্রয়ী সাবস্ক্রিপশন প্ল্যান।
+            <p className="text-neutral-600 dark:text-neutral-400 text-base max-w-xl mx-auto">
+              কোনো লুকানো চার্জ নেই। যেকোনো সময় বিকাশ, নগদ বা কার্ড দিয়ে সহজে সাবস্ক্রাইব করো।
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 items-center">
+          {/* Pricing Cards */}
+          <div className="grid md:grid-cols-3 gap-8 items-stretch mb-16">
             {pricingPlans.map((plan, i) => (
               <div
                 key={i}
-                className={`relative bg-white dark:bg-neutral-900/80 rounded-2xl p-8 border transition-all duration-300 hover:-translate-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-emerald-500/15 scale-105 z-10 dark:border-emerald-700/50' : 'shadow-md hover:shadow-xl'}`}
+                className={`relative bg-white dark:bg-neutral-900/80 rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-emerald-500/15 scale-[1.03] z-10 dark:border-emerald-600' : 'shadow-md hover:shadow-xl'}`}
               >
                 {plan.highlight && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md">
                     সবচেয়ে জনপ্রিয়
                   </div>
                 )}
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
-                  {plan.title}
-                </h3>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-4xl font-extrabold text-neutral-900 dark:text-white">
-                    ৳{plan.price}
-                  </span>
-                  <span className="text-neutral-500 text-sm">
-                    {plan.period}
-                  </span>
+                <div>
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
+                    {plan.title}
+                  </h3>
+                  <div className="flex items-baseline gap-1 mb-6">
+                    <span className="text-4xl font-black text-neutral-900 dark:text-white">
+                      ৳{plan.price}
+                    </span>
+                    <span className="text-neutral-500 text-sm font-medium">
+                      {plan.period}
+                    </span>
+                  </div>
+                  <ul className="space-y-3.5 mb-8">
+                    {(plan.features || []).map((feature: string, f: number) => (
+                      <li
+                        key={f}
+                        className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300 font-medium"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  {(plan.features || []).map((feature: string, f: number) => (
-                    <li
-                      key={f}
-                      className="flex items-start gap-3 text-sm text-neutral-600 dark:text-neutral-300"
-                    >
-                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
                 <button
                   onClick={onGetStarted}
-                  className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.buttonColor}`}
+                  className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all cursor-pointer ${plan.buttonColor}`}
                 >
                   {plan.cta}
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* Free vs Pro Detailed Comparison Table */}
+          <div className="rounded-3xl bg-white dark:bg-neutral-900/90 border border-neutral-200/90 dark:border-neutral-800 shadow-xl overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900">
+              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white text-center sm:text-left">
+                ফ্রি বনাম প্রো প্যাকেজের স্পষ্ট তুলনা
+              </h3>
+              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1 text-center sm:text-left">
+                দেখে নাও ফ্রি প্ল্যানে কী কী পাচ্ছ আর প্রো প্ল্যান কেন তোমার প্রস্তুতিকে এগিয়ে রাখবে
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200/80 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 dark:bg-neutral-950/40">
+                    <th className="py-4 px-6">ফিচার সমূহ</th>
+                    <th className="py-4 px-6 text-center">ফ্রি প্ল্যান (Free)</th>
+                    <th className="py-4 px-6 text-center text-emerald-600 dark:text-emerald-400 font-extrabold bg-emerald-50/50 dark:bg-emerald-950/20">
+                      প্রো প্যাকেজ (Pro)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 font-medium text-neutral-700 dark:text-neutral-300">
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      দৈনিক প্র্যাকটিস ও এক্সাম
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-500">২টি / দিন</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      সীমাহীন আনলিমিটেড
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-400">❌ সীমিত</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      ২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-400">❌ নেই</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      ৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-500">বেসিক স্কোর</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ সঠিকতা %, ব্যয়িত সময় ও নেগেটিভ টেবিল
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      বুকমার্ক ও ভুল প্রশ্নের রিভিশন শিট
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-500">সর্বোচ্চ ২৫টি</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ সীমাহীন সেভ ও রিভিশন
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      ডেইলি স্ট্রিক ও লিডারবোর্ড
+                    </td>
+                    <td className="py-4 px-6 text-center text-emerald-600 dark:text-emerald-400">✓ সাধারণ</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ প্রো ব্যাজ ও লিডারবোর্ড অগ্রাধিকার
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      বিজ্ঞাপনমুক্ত নিরবচ্ছিন্ন পরিবেশ
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-500">স্ট্যান্ডার্ড</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      ✓ ১০০% বিজ্ঞাপনমুক্ত
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-6 bg-neutral-50/70 dark:bg-neutral-900/50 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-neutral-100 dark:border-neutral-800">
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                বিকাশ, নগদ, রকেট ও ভিসা/মাস্টারকার্ড সাপোর্টেড
+              </span>
+              <button
+                type="button"
+                onClick={onGetStarted}
+                className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer"
+              >
+                প্রো প্ল্যানে আপগ্রেড করো →
+              </button>
+            </div>
           </div>
         </div>
       </section>

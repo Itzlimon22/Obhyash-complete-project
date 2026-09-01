@@ -24,6 +24,7 @@ import {
   X,
   AlertCircle,
   Info,
+  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -395,24 +396,53 @@ function SignupForm() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black px-4">
-        <div className="w-full max-w-md bg-white dark:bg-neutral-950 rounded-3xl p-8 shadow-xl text-center border border-neutral-200 dark:border-neutral-800 animate-in fade-in zoom-in duration-300">
-          <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
-            অ্যাকাউন্ট তৈরি সফল!
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-8">
-            তোমার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।
-          </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center w-full py-3.5 px-6 font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
-          >
-            লগইন পেজে যাও
+      <div className="min-h-screen flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
+        <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
+              অ
+            </div>
+            <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
+              OBHYASH
+            </span>
           </Link>
-        </div>
+        </header>
+
+        <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+          <div className="w-full max-w-md bg-white dark:bg-neutral-900/80 rounded-2xl p-8 shadow-xl border border-neutral-200/90 dark:border-neutral-800 text-center animate-in fade-in zoom-in duration-300 space-y-4">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+              অ্যাকাউন্ট তৈরি সফল!
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+              তোমার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center w-full py-3.5 px-6 font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-md shadow-emerald-600/20 text-sm"
+              >
+                লগইন পেজে যাও
+              </Link>
+            </div>
+          </div>
+        </main>
+
+        <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
+          <Link href="/privacy" className="hover:underline">
+            গোপনীয়তা নীতি
+          </Link>
+          <span>•</span>
+          <Link href="/terms" className="hover:underline">
+            শর্তাবলী
+          </Link>
+          <span>•</span>
+          <Link href="/faq" className="hover:underline">
+            সহায়তা / FAQ
+          </Link>
+        </footer>
       </div>
     );
   }
@@ -421,22 +451,22 @@ function SignupForm() {
 
   // Progress Bar
   const renderProgress = () => (
-    <div className="flex items-center justify-center mb-4 md:mb-8 gap-3">
+    <div className="flex items-center justify-center mb-4 md:mb-6 gap-3">
       {[1, 2, 3].map((s) => (
         <div key={s} className="flex items-center">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+            className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 ${
               step >= s
-                ? 'bg-red-600 text-white shadow-lg shadow-red-500/30 scale-100'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 scale-90'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 scale-100'
+                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 scale-90'
             }`}
           >
             {s}
           </div>
           {s < 3 && (
             <div
-              className={`w-12 h-1 rounded-full mx-2 transition-all duration-500 ${
-                step > s ? 'bg-red-600' : 'bg-slate-100 dark:bg-slate-800'
+              className={`w-10 sm:w-12 h-1 rounded-full mx-2 transition-all duration-500 ${
+                step > s ? 'bg-emerald-600' : 'bg-neutral-200 dark:bg-neutral-800'
               }`}
             />
           )}
@@ -446,14 +476,34 @@ function SignupForm() {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black p-4 font-sans">
-      <div className="w-full max-w-lg bg-white dark:bg-neutral-950 rounded-[2rem] shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 relative z-10">
-        {/* Header Decor */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-red-500" />
+    <div className="min-h-screen flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
+      {/* Top Header / Branding */}
+      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
+            অ
+          </div>
+          <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
+            OBHYASH
+          </span>
+        </Link>
+        <Link
+          href="/"
+          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+        >
+          <span>হোমপেজে ফিরে যাও</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </header>
 
-        <div className="p-5 md:p-10">
-          <div className="text-center mb-4 md:mb-8">
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+      {/* Center Form Container */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div className="w-full max-w-lg bg-white dark:bg-neutral-900/80 rounded-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-xl shadow-neutral-200/40 dark:shadow-none p-6 sm:p-8 space-y-6">
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+              নতুন অ্যাকাউন্ট খোলো
+            </h1>
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm">
               মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন
             </p>
           </div>
@@ -461,7 +511,7 @@ function SignupForm() {
           {renderProgress()}
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium animate-in slide-in-from-top-2">
+            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 text-xs sm:text-sm font-medium animate-in slide-in-from-top-2">
               ⚠️ {error}
             </div>
           )}
@@ -932,19 +982,32 @@ function SignupForm() {
             </div>
           )}
 
-          <div className="mt-4 text-center md:mt-8">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              আগেই অ্যাকাউন্ট আছে?{' '}
-              <Link
-                href="/login"
-                className="text-red-600 hover:text-red-700 font-bold hover:underline"
-              >
-                লগইন করো
-              </Link>
-            </p>
+          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+            আগেই অ্যাকাউন্ট আছে?{' '}
+            <Link
+              href="/login"
+              className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
+            >
+              লগইন করো
+            </Link>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Bottom Footer */}
+      <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
+        <Link href="/privacy" className="hover:underline">
+          গোপনীয়তা নীতি
+        </Link>
+        <span>•</span>
+        <Link href="/terms" className="hover:underline">
+          শর্তাবলী
+        </Link>
+        <span>•</span>
+        <Link href="/faq" className="hover:underline">
+          সহায়তা / FAQ
+        </Link>
+      </footer>
     </div>
   );
 }
