@@ -186,16 +186,16 @@ export function QuestionInspectorDrawer({
 
           {/* Explanation & Solution */}
           {question.explanation && (
-            <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 space-y-2">
-              <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                <BookOpen size={14} className="text-amber-500" />
-                <span>বিস্তারিত ব্যাখ্যা ও সমাধান (Explanation)</span>
+            <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-[#141416] border border-[#E2D7C9] dark:border-[#27272A] space-y-2.5 shadow-xs">
+              <h4 className="text-xs font-bold text-[#42352B] dark:text-[#F4F4F5] flex items-center gap-1.5">
+                <BookOpen size={14} className="text-[#8C7A6B] dark:text-neutral-400" />
+                <span>বিস্তারিত ব্যাখ্যা ও সমাধান (বইয়ের লেআউট)</span>
               </h4>
-              <div className="text-sm text-neutral-800 dark:text-zinc-200 leading-relaxed">
-                <MathText text={question.explanation || ''} />
+              <div className="text-[15px] text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed">
+                <MathText text={question.explanation || ''} block />
               </div>
               {question.explanationImageUrl && (
-                <div className="mt-2 rounded-xl overflow-hidden border border-amber-200 dark:border-amber-900/60 max-w-sm bg-white dark:bg-black p-2">
+                <div className="mt-2 rounded-xl overflow-hidden border border-[#E2D7C9] dark:border-[#27272A] max-w-sm bg-white dark:bg-black p-2">
                   <img
                     src={question.explanationImageUrl}
                     alt="Explanation Solution Diagram"

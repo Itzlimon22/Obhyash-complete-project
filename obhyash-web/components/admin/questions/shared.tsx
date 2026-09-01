@@ -6,13 +6,13 @@ import { MathRenderer } from '@/components/common/MathRenderer';
 
 // --- Rich Text Renderer (Markdown + LaTeX) ---
 // Supports: **Bold**, *Italic*, and $$Math$$
-export const MathText: React.FC<{ text?: string }> = ({ text }) => {
+export const MathText: React.FC<{ text?: string; block?: boolean }> = ({ text, block = false }) => {
   if (!text)
     return (
       <span className="text-gray-400 italic text-xs">(কোনো কন্টেন্ট নেই)</span>
     );
 
-  return <MathRenderer text={text} />;
+  return <MathRenderer text={text} block={block} />;
 };
 
 // Alias specifically for clearer intent in new code

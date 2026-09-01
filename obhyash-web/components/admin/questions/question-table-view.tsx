@@ -11,7 +11,7 @@ import {
   resolveTopicName,
   resolveTaxonomyHierarchy,
 } from '@/lib/data/hsc-helpers';
-import { Trash2, Edit, Copy } from 'lucide-react';
+import { Trash2, Edit, Copy, BookOpen } from 'lucide-react';
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 
 interface QuestionTableViewProps {
@@ -562,18 +562,21 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
             </div>
 
             {(previewQ?.explanation || previewQ?.explanationImageUrl) && (
-              <div className="bg-emerald-50 dark:bg-emerald-900/10 p-5 rounded-xl mt-4 border border-emerald-100 dark:border-emerald-800">
-                <h4 className="font-bold mb-3 text-emerald-900 dark:text-emerald-300">
-                  Explanation
+              <div className="bg-[#FAF7F2] dark:bg-[#141416] p-5 rounded-2xl mt-4 border border-[#E2D7C9] dark:border-[#27272A] shadow-xs">
+                <h4 className="font-bold mb-3 text-[#42352B] dark:text-[#F4F4F5] flex items-center gap-2 text-sm">
+                  <BookOpen size={16} className="text-[#8C7A6B] dark:text-neutral-400" />
+                  <span>ব্যাখ্যা ও সমাধান (Explanation)</span>
                 </h4>
                 {previewQ.explanationImageUrl && (
                   <img
                     src={previewQ.explanationImageUrl}
                     alt="explanation"
-                    className="max-h-60 object-contain mb-3"
+                    className="max-h-60 object-contain mb-3 rounded-lg border border-[#E2D7C9] dark:border-[#27272A] bg-white p-1"
                   />
                 )}
-                <MathRenderer text={previewQ.explanation || ''} />
+                <div className="text-[15px] leading-relaxed text-[#2E2621] dark:text-[#F4F4F5]">
+                  <MathRenderer text={previewQ.explanation || ''} block />
+                </div>
               </div>
             )}
           </div>

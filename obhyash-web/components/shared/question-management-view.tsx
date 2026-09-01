@@ -16,6 +16,7 @@ import {
   Table,
   ZoomIn,
   ZoomOut,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Question } from '@/lib/types';
@@ -515,12 +516,13 @@ export default function QuestionManagementView({
 
               {/* Explanation Section */}
               {(previewData.explanation || previewData.explanationImageUrl) && (
-                <div className="mt-6 p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-emerald-900/30 dark:bg-emerald-900/10">
-                  <h3 className="text-sm font-bold text-emerald-900 dark:text-emerald-300 mb-3 block">
-                    ব্যাখ্যা / সমাধান
+                <div className="mt-6 p-4 rounded-2xl border border-[#E2D7C9] bg-[#FAF7F2] dark:border-[#27272A] dark:bg-[#141416] shadow-xs">
+                  <h3 className="text-sm font-bold text-[#42352B] dark:text-[#F4F4F5] mb-3 flex items-center gap-1.5">
+                    <BookOpen size={16} className="text-[#8C7A6B] dark:text-neutral-400" />
+                    <span>ব্যাখ্যা / সমাধান (বইয়ের লেআউট)</span>
                   </h3>
                   {previewData.explanationImageUrl && (
-                    <div className="mb-4 w-full md:w-1/2 rounded-lg overflow-hidden border border-emerald-100 dark:border-emerald-800 bg-white dark:bg-neutral-900">
+                    <div className="mb-4 w-full md:w-1/2 rounded-lg overflow-hidden border border-[#E2D7C9] dark:border-[#27272A] bg-white dark:bg-neutral-900 p-1">
                       <img
                         src={previewData.explanationImageUrl}
                         alt="Explanation"
@@ -529,8 +531,8 @@ export default function QuestionManagementView({
                     </div>
                   )}
                   {previewData.explanation && (
-                    <div className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                      <MathText text={previewData.explanation} />
+                    <div className="text-[15px] text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed">
+                      <MathText text={previewData.explanation} block />
                     </div>
                   )}
                 </div>

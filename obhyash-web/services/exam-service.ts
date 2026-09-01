@@ -1,6 +1,7 @@
 import { ExamConfig, Question, ExamResult, UserAnswers } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { ExamXpCalculator } from '@/lib/exam-xp-calculator';
 
 // --- DB TYPES ---
@@ -192,42 +193,52 @@ export const fetchQuestionsWithDiagnostics = async (
         ? config.examType.split('+').map((t) => t.trim())
         : null;
 
-    const chapters =
+    const rawChapters =
       config.chapters && config.chapters !== 'All'
-        ? config.chapters.split(',').map((c) => c.trim())
+        ? config.chapters.split(',').map((c) => c.trim()).filter(Boolean)
         : null;
 
-    const topics =
+    const rawTopics =
       config.topics && config.topics !== 'General' && config.topics !== 'All'
-        ? config.topics.split(',').map((t) => t.trim())
+        ? config.topics.split(',').map((t) => t.trim()).filter(Boolean)
         : null;
 
-    // Normalize subject name for NFC/NFD dual-match
-    const subjectName = config.subjectLabel || '';
-    const nameForms = [subjectName];
-    const nfd = subjectName.normalize('NFD');
-    if (nfd !== subjectName) nameForms.push(nfd);
-    const nfc = subjectName.normalize('NFC');
-    if (nfc !== subjectName && !nameForms.includes(nfc)) nameForms.push(nfc);
+    // Generate comprehensive subject variants (Bengali য়/য+়, slugs, labels)
+    const subjectVariants = BanglaNameHelper.getSubjectSearchVariants(
+      config.subject,
+      config.subjectLabel,
+    );
 
-    debug.diagnosis.push(`🔍 Subject forms: ${nameForms.join(', ')}`);
+    // Generate chapter search variants (synonyms, stripped prefixes, Unicode variants)
+    const expandedChapters = rawChapters && rawChapters.length > 0
+      ? Array.from(new Set(rawChapters.flatMap((c) => BanglaNameHelper.getChapterSearchVariants(c))))
+      : null;
+
+    // Generate topic search variants (prefixes, Unicode variants)
+    const expandedTopics = rawTopics && rawTopics.length > 0
+      ? Array.from(new Set(rawTopics.flatMap((t) => BanglaNameHelper.getTopicSearchVariants(t))))
+      : null;
+
+    debug.diagnosis.push(`🔍 Subject variants: ${subjectVariants.join(', ')}`);
     debug.diagnosis.push(
-      `🎯 Filters — chapters: ${chapters?.length ?? 'all'}, ` +
+      `🎯 Filters — chapters: ${expandedChapters?.length ?? 'all'} (from ${rawChapters?.length ?? 'all'}), ` +
+        `topics: ${expandedTopics?.length ?? 'all'} (from ${rawTopics?.length ?? 'all'}), ` +
         `difficulties: ${difficulties?.join('+') ?? 'all'}, ` +
         `examTypes: ${examTypes?.join('+') ?? 'all'}`,
     );
 
     // ── Primary: Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix) ──
-    for (const formName of nameForms) {
+    for (const formName of subjectVariants) {
+      // 1. Try with specific topics if requested
       const { data, error } = await supabase.rpc(
         'get_adaptive_mock_exam_questions',
         {
           p_user_id: user?.id ?? null,
-          p_subject: config.subject,
+          p_subject: formName,
           p_subject_name: formName,
           p_total: config.questionCount,
-          p_chapters: chapters,
-          p_topics: topics,
+          p_chapters: expandedChapters,
+          p_topics: expandedTopics,
           p_difficulties: difficulties,
           p_exam_types: examTypes,
         },
@@ -240,9 +251,38 @@ export const fetchQuestionsWithDiagnostics = async (
         debug.fetchMethod = 'ADAPTIVE_SMART_MOCK_RPC';
         debug.resultCount = questions.length;
         debug.diagnosis.push(
-          `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (75% New + 25% Spaced Weakness Mix)`,
+          `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (form: "${formName}")`,
         );
         return { questions, debug };
+      }
+
+      // 2. If topics were selected but returned 0, try chapter level so user still gets questions
+      if (expandedTopics && expandedTopics.length > 0) {
+        const { data: chapOnlyData, error: chapOnlyError } = await supabase.rpc(
+          'get_adaptive_mock_exam_questions',
+          {
+            p_user_id: user?.id ?? null,
+            p_subject: formName,
+            p_subject_name: formName,
+            p_total: config.questionCount,
+            p_chapters: expandedChapters,
+            p_topics: null,
+            p_difficulties: difficulties,
+            p_exam_types: examTypes,
+          },
+        );
+
+        if (!chapOnlyError && chapOnlyData && chapOnlyData.length > 0) {
+          const questions = fisherYatesShuffle(
+            (chapOnlyData as unknown as QuestionDbRow[]).map(mapDbRow),
+          );
+          debug.fetchMethod = 'ADAPTIVE_SMART_MOCK_RPC_CHAPTER_FALLBACK';
+          debug.resultCount = questions.length;
+          debug.diagnosis.push(
+            `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (chapter fallback, form: "${formName}")`,
+          );
+          return { questions, debug };
+        }
       }
 
       // Secondary Distributed Fallback
@@ -250,11 +290,11 @@ export const fetchQuestionsWithDiagnostics = async (
         'get_distributed_exam_questions',
         {
           p_user_id: user?.id ?? null,
-          p_subject: config.subject,
+          p_subject: formName,
           p_subject_name: formName,
           p_total: config.questionCount,
-          p_chapters: chapters,
-          p_topics: topics,
+          p_chapters: expandedChapters,
+          p_topics: expandedTopics,
           p_difficulties: difficulties,
           p_exam_types: examTypes,
         },
@@ -275,7 +315,7 @@ export const fetchQuestionsWithDiagnostics = async (
         debug.fetchMethod = 'DISTRIBUTED_RPC';
         debug.resultCount = questions.length;
         debug.diagnosis.push(
-          `✅ Distributed RPC returned ${questions.length}/${config.questionCount}`,
+          `✅ Distributed RPC returned ${questions.length}/${config.questionCount} (form: "${formName}")`,
         );
         return { questions, debug };
       }
@@ -285,30 +325,56 @@ export const fetchQuestionsWithDiagnostics = async (
     debug.diagnosis.push(
       '⚠️ Distributed RPC returned 0 — falling back to direct query',
     );
-    const matchConditions = [`subject.eq.${config.subject}`];
-    if (config.subject !== config.subjectLabel && config.subjectLabel) {
-      matchConditions.push(`subject.eq.${config.subjectLabel}`);
-    }
-    nameForms.forEach((form) => {
-      if (form !== config.subject && form !== config.subjectLabel) {
-        matchConditions.push(`subject.eq.${form}`);
-      }
-    });
 
     let query = supabase
       .from('questions')
       .select('*')
-      .or(matchConditions.join(','))
+      .in('subject', subjectVariants)
       .eq('status', 'Approved');
-    if (chapters) query = query.in('chapter', chapters);
-    if (topics) query = query.in('topic', topics);
-    // Independent OR filter: any question matching ANY selected difficulty is included
-    if (difficulties && difficulties.length > 0) query = query.in('difficulty', difficulties);
-    // Independent OR filter: any question matching ANY selected exam type is included
-    if (examTypes && examTypes.length > 0) query = query.in('exam_type', examTypes);
+
+    if (expandedChapters && expandedChapters.length > 0) {
+      query = query.in('chapter', expandedChapters);
+    }
+    if (expandedTopics && expandedTopics.length > 0) {
+      query = query.in('topic', expandedTopics);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.in('difficulty', difficulties);
+    }
+    if (examTypes && examTypes.length > 0) {
+      query = query.in('exam_type', examTypes);
+    }
     query = query.limit(config.questionCount * 3);
 
-    const { data: fallbackData, error: fallbackError } = await query;
+    let { data: fallbackData, error: fallbackError } = await query;
+
+    // If direct query with topics returned 0, retry without topic restriction to guarantee questions
+    if ((!fallbackData || fallbackData.length === 0) && expandedTopics && expandedTopics.length > 0) {
+      debug.diagnosis.push('⚠️ Direct query with topics returned 0, retrying at chapter level');
+      let retryQuery = supabase
+        .from('questions')
+        .select('*')
+        .in('subject', subjectVariants)
+        .eq('status', 'Approved');
+
+      if (expandedChapters && expandedChapters.length > 0) {
+        retryQuery = retryQuery.in('chapter', expandedChapters);
+      }
+      if (difficulties && difficulties.length > 0) {
+        retryQuery = retryQuery.in('difficulty', difficulties);
+      }
+      if (examTypes && examTypes.length > 0) {
+        retryQuery = retryQuery.in('exam_type', examTypes);
+      }
+      retryQuery = retryQuery.limit(config.questionCount * 3);
+
+      const retryRes = await retryQuery;
+      if (!retryRes.error && retryRes.data && retryRes.data.length > 0) {
+        fallbackData = retryRes.data;
+        fallbackError = null;
+      }
+    }
+
     if (fallbackError) {
       debug.queryError = fallbackError.message;
       debug.diagnosis.push(`❌ Fallback query error: ${fallbackError.message}`);
@@ -319,13 +385,13 @@ export const fetchQuestionsWithDiagnostics = async (
     const finalQuestions = balanceQuestionsByChapter(
       mappedQuestions,
       config.questionCount,
-      chapters,
+      rawChapters,
     );
 
     debug.fetchMethod = 'BALANCED_FALLBACK';
     debug.resultCount = finalQuestions.length;
     debug.diagnosis.push(
-      `🏁 Fallback returned ${finalQuestions.length}/${config.questionCount} (balanced across ${chapters?.length || 1} chapter(s))`,
+      `🏁 Fallback returned ${finalQuestions.length}/${config.questionCount} (balanced across ${rawChapters?.length || 1} chapter(s))`,
     );
     return { questions: finalQuestions, debug };
   } catch (err) {
@@ -356,28 +422,19 @@ export const getAvailableQuestionCount = async (
   if (!isSupabaseConfigured() || !supabase) return 0;
 
   try {
-    // Build OR conditions for subject (handle NFC/NFD)
-    const matchConditions = [`subject.eq.${subject}`];
-    if (subjectLabel && subjectLabel !== subject) {
-      matchConditions.push(`subject.eq.${subjectLabel}`);
-    }
-    const nfd = (subjectLabel || subject).normalize('NFD');
-    const nfc = (subjectLabel || subject).normalize('NFC');
-    if (nfd !== subject && !matchConditions.includes(`subject.eq.${nfd}`)) {
-      matchConditions.push(`subject.eq.${nfd}`);
-    }
-    if (nfc !== subject && !matchConditions.includes(`subject.eq.${nfc}`)) {
-      matchConditions.push(`subject.eq.${nfc}`);
-    }
+    const subjectVariants = BanglaNameHelper.getSubjectSearchVariants(subject, subjectLabel);
+    const expandedChapters = chapters && chapters.length > 0
+      ? Array.from(new Set(chapters.flatMap((c) => BanglaNameHelper.getChapterSearchVariants(c))))
+      : null;
 
     let query = supabase
       .from('questions')
       .select('id', { count: 'exact', head: true })
-      .or(matchConditions.join(','))
+      .in('subject', subjectVariants)
       .eq('status', 'Approved');
 
-    if (chapters && chapters.length > 0) {
-      query = query.in('chapter', chapters);
+    if (expandedChapters && expandedChapters.length > 0) {
+      query = query.in('chapter', expandedChapters);
     }
     // Independent OR: any question matching ANY selected difficulty is included
     if (difficulty && difficulty !== 'Mixed' && difficulty !== 'All') {

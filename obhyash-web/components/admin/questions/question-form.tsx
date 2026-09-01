@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Save, X, Trash2 } from 'lucide-react';
+import { Save, X, Trash2, BookOpen } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
@@ -543,11 +543,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               )}
 
               {data.explanation && (
-                <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
-                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
-                    সমাধান প্রিভিউ
-                  </span>
-                  <MathRenderer text={data.explanation} />
+                <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] border border-[#E2D7C9] dark:border-[#27272A] rounded-2xl min-h-[60px] shadow-xs">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#8C7A6B] dark:text-neutral-400 uppercase tracking-wider mb-2.5">
+                    <BookOpen size={14} className="text-[#8C7A6B] dark:text-neutral-400" />
+                    <span>ব্যাখ্যা ও সমাধান প্রিভিউ (বইয়ের লেআউট)</span>
+                  </div>
+                  <div className="text-[15px] leading-relaxed text-[#2E2621] dark:text-[#F4F4F5]">
+                    <MathRenderer text={data.explanation} block />
+                  </div>
                 </div>
               )}
             </div>

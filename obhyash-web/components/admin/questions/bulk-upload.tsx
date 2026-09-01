@@ -18,6 +18,7 @@ import {
   Square,
   FileUp,
   ImageIcon,
+  BookOpen,
 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { MathText } from './shared';
@@ -830,11 +831,14 @@ const EditModal: React.FC<{
                 </p>
               )}
             {localData.explanation && (
-              <div className="p-3 bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-xl">
-                <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
-                  সমাধান প্রিভিউ
-                </span>
-                <MathRenderer text={localData.explanation} />
+              <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] border border-[#E2D7C9] dark:border-[#27272A] rounded-2xl shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#8C7A6B] dark:text-neutral-400 uppercase tracking-wider mb-2.5">
+                  <BookOpen size={14} className="text-[#8C7A6B] dark:text-neutral-400" />
+                  <span>ব্যাখ্যা ও সমাধান প্রিভিউ (বইয়ের লেআউট)</span>
+                </div>
+                <div className="text-[15px] leading-relaxed text-[#2E2621] dark:text-[#F4F4F5]">
+                  <MathRenderer text={localData.explanation} block />
+                </div>
               </div>
             )}
           </div>

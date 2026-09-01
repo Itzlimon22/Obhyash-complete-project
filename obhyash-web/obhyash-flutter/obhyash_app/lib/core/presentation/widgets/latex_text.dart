@@ -185,7 +185,7 @@ String _cleanIntraSentenceNewlines(String text) {
 
     // Check if the line is an intentional list item, section header, or equation line
     final isListItem = RegExp(
-      r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক|সুতরাং|অতএব|ধরি|দেওয়া আছে)',
+      r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক|সুতরাং|অতএব|ধরি|দেওয়া আছে|প্রদত্ত মানসমূহ|মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|সঠিক উত্তর)',
     ).hasMatch(line);
 
     final isTableLine = line.startsWith('|') || line.endsWith('|');
@@ -215,8 +215,94 @@ String _cleanIntraSentenceNewlines(String text) {
   return buffer.toString().replaceAll(placeholder, '\n\n');
 }
 
+String _cleanPipesAndDelimiters(String text) {
+  final lines = text.split('\n');
+  final cleaned = lines.map((line) {
+    final trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.split('|').length > 2) {
+      return line;
+    }
+    return line.replaceAll(RegExp(r'\s*\|\s*'), '\n\n');
+  });
+  return cleaned.join('\n');
+}
+
+String _separateTransitionSteps(String text) {
+  var t = text;
+
+  t = t.replaceAllMapped(
+    RegExp(
+      r'([।\?\!\:\;\|])\s*(ধরি|মনে করি|প্রদত্ত মানসমূহ|প্রদত্ত তথ্য|দেওয়া আছে|দেয়া আছে|আমরা জানি|জানা আছে|প্রশ্নমতে|শর্তমতে|অর্থাৎ|সুতরাং|অতএব|মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|গণনা করে পাই|সঠিক উত্তর|উত্তর|নোট|টিপস)[\s:\-–—\.]*',
+    ),
+    (m) => '${m.group(1)}\n\n${m.group(2)}: ',
+  );
+
+  t = t.replaceAllMapped(
+    RegExp(
+      r'(\))\s*(মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|অতএব|সুতরাং|অর্থাৎ)[\s:\-–—\.]*',
+    ),
+    (m) => '${m.group(1)}\n\n${m.group(2)}: ',
+  );
+
+  t = t.replaceAll(RegExp(r':\s*:\s*'), ': ');
+  return t;
+}
+
 String _preprocess(String text) {
   var processedText = QuestionFormatter.format(text);
+  processedText = _cleanPipesAndDelimiters(processedText);
+  processedText = _separateTransitionSteps(processedText);
+
+  // Single dollar balancing per line
+  final rawLines = processedText.split('\n');
+  final balancedLines = rawLines.map((line) {
+    var l = line.trim();
+    if (l.isEmpty) return '';
+
+    final dollarCount = RegExp(r'\$').allMatches(l).length;
+    if (dollarCount % 2 != 0) {
+      if (l.endsWith(r'$')) {
+        final withoutTrailing = l.substring(0, l.length - 1).trim();
+        final colonIdx = withoutTrailing.lastIndexOf(':');
+        if (colonIdx != -1 && colonIdx < withoutTrailing.length - 1) {
+          final prefix = withoutTrailing.substring(0, colonIdx + 1);
+          final math = withoutTrailing.substring(colonIdx + 1).trim();
+          l = '$prefix \$$math\$';
+        } else {
+          final firstBackslash = withoutTrailing.indexOf(r'\');
+          if (firstBackslash != -1) {
+            final prefix = withoutTrailing.substring(0, firstBackslash);
+            final math = withoutTrailing.substring(firstBackslash).trim();
+            l = '$prefix\$$math\$';
+          } else if (withoutTrailing.startsWith('=')) {
+            l = '\$$withoutTrailing\$';
+          } else {
+            l = withoutTrailing;
+          }
+        }
+      } else if (l.startsWith(r'$')) {
+        l = '$l\$';
+      }
+    }
+
+    if (!l.contains(r'$') && !RegExp(r'[\u0980-\u09FF]').hasMatch(l) && (l.contains(r'\') || l.contains('='))) {
+      l = '\$$l\$';
+    }
+
+    l = l.replaceAllMapped(
+      RegExp(r'(:\s*)([A-Za-z0-9\(\)\_]+(?:\s*(?:\\cap|\\cup|\\times|=|\\pm)\s*[A-Za-z0-9\(\)\_\s\+\-\*\/\\\{\}\^]+)+)(?=$|[\n\।])'),
+      (m) {
+        final p1 = m.group(1) ?? '';
+        final p2 = m.group(2) ?? '';
+        if (p2.contains(r'$') || RegExp(r'[\u0980-\u09FF]').hasMatch(p2)) return m.group(0)!;
+        return '$p1\$${p2.trim()}\$';
+      },
+    );
+
+    return l;
+  });
+
+  processedText = balancedLines.join('\n\n');
 
   // 0. Normalize any raw or spaced @@CHEM_ARROW tokens from database
   processedText = processedText.replaceAllMapped(

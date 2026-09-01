@@ -629,20 +629,32 @@ class BanglaNameHelper {
 
   /// Returns all possible query variants (slugs, IDs, English names, Bengali names with Unicode variations)
   /// for a given subject to ensure database queries find all matching questions.
-  static List<String> getSubjectSearchVariants(String subjectKey, String banglaName) {
+  static List<String> getSubjectSearchVariants(String subjectKey, [String? banglaName]) {
     final variants = <String>{};
-    if (subjectKey.trim().isNotEmpty) variants.add(subjectKey.trim());
-    if (banglaName.trim().isNotEmpty) variants.add(banglaName.trim());
+    final trimmedKey = subjectKey.trim();
+    final trimmedBangla = (banglaName ?? '').trim();
+
+    if (trimmedKey.isNotEmpty) variants.add(trimmedKey);
+    if (trimmedBangla.isNotEmpty) variants.add(trimmedBangla);
+
+    // Strip parenthesized descriptions: e.g. "জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)" -> "জীববিজ্ঞান ১ম পত্র"
+    for (final raw in [trimmedKey, trimmedBangla]) {
+      if (raw.isEmpty) continue;
+      final strippedParen = raw.replaceAll(RegExp(r'\s*\([^)]*\)\s*'), ' ').trim();
+      if (strippedParen.isNotEmpty && strippedParen != raw) {
+        variants.add(strippedParen);
+      }
+    }
 
     // Stripped prefix (e.g. hsc_chemistry_1 -> chemistry_1)
-    final rawKey = subjectKey
+    final rawKey = trimmedKey
         .replaceAll('hsc_', '')
         .replaceAll('ssc_', '')
         .trim();
     if (rawKey.isNotEmpty) variants.add(rawKey);
 
-    final lowerKey = subjectKey.toLowerCase();
-    final lowerBangla = banglaName.toLowerCase();
+    final lowerKey = trimmedKey.toLowerCase();
+    final lowerBangla = trimmedBangla.toLowerCase();
 
     // Determine paper number
     final isPaper1 = lowerKey.contains('1') ||
@@ -1133,10 +1145,82 @@ class BanglaNameHelper {
     for (final v in variants) {
       extra.add(v.replaceAll('\u09df', '\u09af\u09bc'));
       extra.add(v.replaceAll('\u09af\u09bc', '\u09df'));
+      extra.add(v.replaceAll('২য়', '২য়'));
+      extra.add(v.replaceAll('২য়', '২য়'));
+      extra.add(v.replaceAll('১ম', '১ম'));
     }
     variants.addAll(extra);
 
-    return variants.where((s) => s.trim().isNotEmpty).toList();
+    return variants.where((s) => s.trim().isNotEmpty).toSet().toList();
+  }
+
+  /// Normalizes Bengali text for consistent comparison.
+  static String normalizeBengali(String? text) {
+    if (text == null || text.isEmpty) return '';
+    return text
+        .replaceAll('\u09df', '\u09af\u09bc')
+        .replaceAll('২য়', '২য়')
+        .replaceAll('১ম', '১ম')
+        .replaceAll('৩য়', '৩য়')
+        .replaceAll('৪র্থ', '৪র্থ')
+        .trim();
+  }
+
+
+  /// Returns all search variants for a topic name (handling prefixes and Unicode)
+  static List<String> getTopicSearchVariants(String topicName, [List<String>? knownQuestionTopics]) {
+    final set = <String>{};
+    final trimmed = topicName.trim();
+    if (trimmed.isEmpty) return [];
+
+    set.add(trimmed);
+
+    // Strip prefixes like "টপিক 01 - ", "টপিক ১: ", "১.১৪ ", "২.৯ ", "৫.৫ "
+    final strippedPrefix = trimmed
+        .replaceAll(
+          RegExp(
+            r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*)',
+            caseSensitive: false,
+          ),
+          '',
+        )
+        .trim();
+
+    if (strippedPrefix.isNotEmpty && strippedPrefix != trimmed) {
+      set.add(strippedPrefix);
+    }
+
+    // Unicode variations
+    final extra = <String>[];
+    for (final t in set) {
+      extra.add(t.replaceAll('\u09df', '\u09af\u09bc'));
+      extra.add(t.replaceAll('\u09af\u09bc', '\u09df'));
+      extra.add(t.replaceAll('২য়', '২য়'));
+      extra.add(t.replaceAll('২য়', '২য়'));
+      extra.add(t.replaceAll('১ম', '১ম'));
+    }
+    set.addAll(extra);
+
+    if (knownQuestionTopics != null && knownQuestionTopics.isNotEmpty) {
+      final cleanNorm = normalizeBengali(strippedPrefix.isNotEmpty ? strippedPrefix : trimmed).toLowerCase();
+      for (final qTop in knownQuestionTopics) {
+        final qStripped = qTop
+            .replaceAll(
+              RegExp(
+                r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*)',
+                caseSensitive: false,
+              ),
+              '',
+            )
+            .trim();
+        final qNorm = normalizeBengali(qStripped).toLowerCase();
+        if (qNorm == cleanNorm || qNorm.contains(cleanNorm) || cleanNorm.contains(qNorm)) {
+          set.add(qTop);
+        }
+      }
+    }
+
+    return set.where((s) => s.trim().isNotEmpty).toList();
   }
 }
 

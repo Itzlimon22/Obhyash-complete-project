@@ -133,18 +133,18 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           : config.examType.split('+').map((e) => e.trim()).toList();
 
       // Generate all possible subject spellings/encodings (e.g. য় vs য+়, slug, label)
-      final subjectVariants = <String>{};
-      subjectVariants.add(config.subject);
-      if (config.subjectLabel.isNotEmpty) {
-        subjectVariants.add(config.subjectLabel);
-      }
-      for (final s in subjectVariants.toList()) {
-        subjectVariants.add(s.replaceAll('\u09df', '\u09af\u09bc')); // য় -> য+়
-        subjectVariants.add(s.replaceAll('\u09af\u09bc', '\u09df')); // য+় -> য়
-        subjectVariants.add(s.replaceAll('২য়', '২য়'));
-        subjectVariants.add(s.replaceAll('২য়', '২য়'));
-        subjectVariants.add(s.replaceAll('১ম', '১ম'));
-      }
+      final subjectVariants = BanglaNameHelper.getSubjectSearchVariants(
+        config.subject,
+        config.subjectLabel,
+      );
+
+      final expandedChapters = chaptersList != null && chaptersList.isNotEmpty
+          ? chaptersList.expand((c) => BanglaNameHelper.getChapterSearchVariants(c)).toSet().toList()
+          : null;
+
+      final expandedTopics = topicsList != null && topicsList.isNotEmpty
+          ? topicsList.expand((t) => BanglaNameHelper.getTopicSearchVariants(t)).toSet().toList()
+          : null;
 
       List<Question> generatedQuestions = [];
 
@@ -159,8 +159,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               'p_subject': sVar,
               'p_subject_name': sVar,
               'p_total': config.questionCount,
-              'p_chapters': chaptersList,
-              'p_topics': topicsList,
+              'p_chapters': expandedChapters,
+              'p_topics': expandedTopics,
               'p_difficulties': difficultiesList,
               'p_exam_types': examTypesList,
             },
@@ -183,6 +183,36 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           );
         }
 
+        // Try chapter level if specific topic returned 0
+        if (generatedQuestions.isEmpty && expandedTopics != null && expandedTopics.isNotEmpty) {
+          try {
+            final data = await supabase.rpc(
+              'get_adaptive_mock_exam_questions',
+              params: {
+                'p_user_id': supabase.auth.currentUser?.id,
+                'p_subject': sVar,
+                'p_subject_name': sVar,
+                'p_total': config.questionCount,
+                'p_chapters': expandedChapters,
+                'p_topics': null,
+                'p_difficulties': difficultiesList,
+                'p_exam_types': examTypesList,
+              },
+            );
+            final qList = (data as List<dynamic>?) ?? [];
+            if (qList.isNotEmpty) {
+              final parsed = qList
+                  .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                  .toList();
+              generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+                parsed,
+                config.questionCount,
+                chaptersList,
+              );
+            }
+          } catch (_) {}
+        }
+
         // Secondary Distributed RPC Fallback
         if (generatedQuestions.isEmpty) {
           try {
@@ -193,8 +223,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 'p_subject': sVar,
                 'p_subject_name': sVar,
                 'p_total': config.questionCount,
-                'p_chapters': chaptersList,
-                'p_topics': topicsList,
+                'p_chapters': expandedChapters,
+                'p_topics': expandedTopics,
                 'p_difficulties': difficultiesList,
                 'p_exam_types': examTypesList,
               },
@@ -228,18 +258,14 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           var query = supabase
               .from('questions')
               .select('*')
-              .inFilter('subject', subjectVariants.toList())
+              .inFilter('subject', subjectVariants)
               .not('options', 'is', null);
 
-          if (chaptersList != null && chaptersList.isNotEmpty) {
-            final allChapterVariants = <String>{};
-            for (final ch in chaptersList) {
-              allChapterVariants.addAll(BanglaNameHelper.getChapterSearchVariants(ch));
-            }
-            query = query.inFilter('chapter', allChapterVariants.toList());
+          if (expandedChapters != null && expandedChapters.isNotEmpty) {
+            query = query.inFilter('chapter', expandedChapters);
           }
-          if (topicsList != null && topicsList.isNotEmpty) {
-            query = query.inFilter('topic', topicsList);
+          if (expandedTopics != null && expandedTopics.isNotEmpty) {
+            query = query.inFilter('topic', expandedTopics);
           }
           if (difficultiesList != null && difficultiesList.isNotEmpty) {
             query = query.inFilter('difficulty', difficultiesList);
@@ -249,8 +275,32 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             query = query.or(orConditions);
           }
 
-          final fallbackData = await query.limit(config.questionCount * 4);
-          var allQuestions = List<dynamic>.from(fallbackData as List)
+          var fallbackData = await query.limit(config.questionCount * 4);
+          var qList = List<dynamic>.from(fallbackData as List);
+
+          // If topic query yielded 0, retry without topic filter to get chapter questions
+          if (qList.isEmpty && expandedTopics != null && expandedTopics.isNotEmpty) {
+            var retryQuery = supabase
+                .from('questions')
+                .select('*')
+                .inFilter('subject', subjectVariants)
+                .not('options', 'is', null);
+
+            if (expandedChapters != null && expandedChapters.isNotEmpty) {
+              retryQuery = retryQuery.inFilter('chapter', expandedChapters);
+            }
+            if (difficultiesList != null && difficultiesList.isNotEmpty) {
+              retryQuery = retryQuery.inFilter('difficulty', difficultiesList);
+            }
+            if (examTypesList != null && examTypesList.isNotEmpty) {
+              final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+              retryQuery = retryQuery.or(orConditions);
+            }
+            final retryData = await retryQuery.limit(config.questionCount * 4);
+            qList = List<dynamic>.from(retryData as List);
+          }
+
+          var allQuestions = qList
               .map((e) => Question.fromJson(e as Map<String, dynamic>))
               .where((q) => q.isStrictMcq)
               .toList();

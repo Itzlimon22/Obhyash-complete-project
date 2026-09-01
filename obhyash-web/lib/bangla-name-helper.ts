@@ -656,5 +656,331 @@ export class BanglaNameHelper {
     if (l.includes('general_knowledge') || l.includes('সাধারণ জ্ঞান')) return '🌍';
     return '📚';
   }
+
+  /**
+   * Normalizes Bengali text for consistent comparison.
+   * Handles NFC normalization and standardizes য় / য+় and numerals.
+   */
+  static normalizeBengali(text?: string | null): string {
+    if (!text) return '';
+    return text
+      .normalize('NFC')
+      .replace(/\u09df/g, '\u09af\u09bc')
+      .replace(/২য়/g, '২য়')
+      .replace(/১ম/g, '১ম')
+      .replace(/৩য়/g, '৩য়')
+      .replace(/৪র্থ/g, '৪র্থ')
+      .trim();
+  }
+
+  /**
+   * Generates all phonetic, encoding, and slug search variants for a subject.
+   */
+  static getSubjectSearchVariants(subject?: string, subjectLabel?: string): string[] {
+    const set = new Set<string>();
+    const rawList = [subject, subjectLabel].filter(Boolean) as string[];
+
+    for (const raw of rawList) {
+      const trimmed = raw.trim();
+      if (!trimmed) continue;
+
+      set.add(trimmed);
+      set.add(trimmed.normalize('NFC'));
+      set.add(trimmed.normalize('NFD'));
+
+      // Strip parenthesized descriptions: e.g. "জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)" -> "জীববিজ্ঞান ১ম পত্র"
+      const strippedParen = trimmed.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      if (strippedParen && strippedParen !== trimmed) {
+        set.add(strippedParen);
+        set.add(strippedParen.normalize('NFC'));
+        set.add(strippedParen.normalize('NFD'));
+      }
+
+      // Map common slugs
+      const lower = trimmed.toLowerCase().replace(/-/g, '_');
+      if (lower.includes('chemistry_1') || lower.includes('chem_1') || lower.includes('chem1')) {
+        set.add('রসায়ন ১ম পত্র');
+        set.add('রসায়ন ১ম পত্র');
+      }
+      if (lower.includes('chemistry_2') || lower.includes('chem_2') || lower.includes('chem2')) {
+        set.add('রসায়ন ২য় পত্র');
+        set.add('রসায়ন ২য় পত্র');
+        set.add('রসায়ন ২য় পত্র');
+        set.add('রসায়ন ২য় পত্র');
+      }
+      if (lower.includes('physics_1') || lower.includes('phy_1') || lower.includes('phy1')) {
+        set.add('পদার্থবিজ্ঞান ১ম পত্র');
+      }
+      if (lower.includes('physics_2') || lower.includes('phy_2') || lower.includes('phy2')) {
+        set.add('পদার্থবিজ্ঞান ২য় পত্র');
+        set.add('পদার্থবিজ্ঞান ২য় পত্র');
+      }
+      if (lower.includes('math_1') || lower.includes('higher_math_1') || lower.includes('hm_1') || lower.includes('math1')) {
+        set.add('উচ্চতর গণিত ১ম পত্র');
+      }
+      if (lower.includes('math_2') || lower.includes('higher_math_2') || lower.includes('hm_2') || lower.includes('math2')) {
+        set.add('উচ্চতর গণিত ২য় পত্র');
+        set.add('উচ্চতর গণিত ২য় পত্র');
+      }
+      if (lower.includes('biology_1') || lower.includes('bio_1') || lower.includes('bio1')) {
+        set.add('জীববিজ্ঞান ১ম পত্র');
+      }
+      if (lower.includes('biology_2') || lower.includes('bio_2') || lower.includes('bio2')) {
+        set.add('জীববিজ্ঞান ২য় পত্র');
+        set.add('জীববিজ্ঞান ২য় পত্র');
+      }
+      if (lower.includes('bangla_1')) {
+        set.add('বাংলা ১ম পত্র');
+      }
+      if (lower.includes('bangla_2')) {
+        set.add('বাংলা ২য় পত্র');
+        set.add('বাংলা ২য় পত্র');
+      }
+      if (lower.includes('english_1')) {
+        set.add('ইংরেজি ১ম পত্র');
+        set.add('English 1st Paper');
+      }
+      if (lower.includes('english_2')) {
+        set.add('ইংরেজি ২য় পত্র');
+        set.add('ইংরেজি ২য় পত্র');
+        set.add('English 2nd Paper');
+      }
+      if (lower.includes('ict')) {
+        set.add('তথ্য ও যোগাযোগ প্রযুক্তি');
+        set.add('তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)');
+      }
+    }
+
+    // Unicode expansion for Bengali য় vs য+়, ২য় vs ২য়
+    for (const s of Array.from(set)) {
+      set.add(s.replace(/\u09df/g, '\u09af\u09bc'));
+      set.add(s.replace(/\u09af\u09bc/g, '\u09df'));
+      set.add(s.replace(/২য়/g, '২য়'));
+      set.add(s.replace(/২য়/g, '২য়'));
+      set.add(s.replace(/১ম/g, '১ম'));
+    }
+    for (const s of Array.from(set)) {
+      set.add(s.replace(/\u09df/g, '\u09af\u09bc'));
+      set.add(s.replace(/\u09af\u09bc/g, '\u09df'));
+    }
+
+    return Array.from(set).filter(Boolean);
+  }
+
+  /**
+   * Returns all search variants for a chapter name (handling punctuation, conjunctions, prefixes, and Unicode)
+   */
+  static getChapterSearchVariants(chapterName: string): string[] {
+    const set = new Set<string>();
+    const trimmed = (chapterName || '').trim();
+    if (!trimmed) return [];
+
+    set.add(trimmed);
+    set.add(trimmed.normalize('NFC'));
+    set.add(trimmed.normalize('NFD'));
+
+    // Stripped prefixes like "১ম অধ্যায়: ", "অধ্যায় ১: ", "Chapter 1: ", "1. "
+    const strippedPrefix = trimmed
+      .replace(/^(?:[০-৯0-9]+[ম্থর্থশষ্ঠতম]*\s*অধ্যায়\s*[:\-–—\.]\s*|অধ্যায়\s*[০-৯0-9]+\s*[:\-–—\.]\s*|Chapter\s*[0-9]+\s*[:\-–—\.]\s*|[0-9০-৯]+[\.\:\-–—]\s*)/i, '')
+      .trim();
+    if (strippedPrefix && strippedPrefix !== trimmed) {
+      set.add(strippedPrefix);
+    }
+
+    // Punctuation and conjunction variants
+    for (const v of Array.from(set)) {
+      set.add(v.replace(/,/g, ''));
+      set.add(v.replace(/,/g, ' '));
+      set.add(v.replace(/\s+/g, ' ').trim());
+      set.add(v.replace(/ ও /g, ' এবং '));
+      set.add(v.replace(/ এবং /g, ' ও '));
+      set.add(v.replace(/ ও /g, ' '));
+      set.add(v.replace(/ এবং /g, ' '));
+    }
+
+    // Canonical chapter keyword synonyms across HSC/SSC
+    const raw = trimmed.toLowerCase();
+    if (raw.includes('ভৌত') && (raw.includes('জগত') || raw.includes('জগৎ') || raw.includes('পরিমাপ'))) {
+      set.add('ভৌতজগত ও পরিমাপ');
+      set.add('ভৌত জগৎ ও পরিমাপ');
+      set.add('ভৌতজগৎ ও পরিমাপ');
+      set.add('ভৌতজগত');
+      set.add('ভৌতজগৎ');
+    }
+    if (raw.includes('ভেক্টর')) {
+      set.add('ভেক্টর');
+    }
+    if (raw.includes('গতিবিদ্যা')) {
+      set.add('গতিবিদ্যা');
+    }
+    if (raw.includes('বলবিদ্যা') || raw.includes('নিউটন')) {
+      set.add('নিউটনিয়ান বলবিদ্যা');
+      set.add('নিউটনিয়ান বলবিদ্যা');
+      set.add('বলবিদ্যা');
+    }
+    if (raw.includes('কাজ') && (raw.includes('শক্তি') || raw.includes('ক্ষমতা'))) {
+      set.add('কাজ, শক্তি ও ক্ষমতা');
+      set.add('কাজ, শক্তি');
+      set.add('কাজ ও শক্তি');
+    }
+    if (raw.includes('ল্যাবরেটরি') || raw.includes('ল্যাবরেটরী')) {
+      set.add('ল্যাবরেটরীর নিরাপদ ব্যবহার');
+      set.add('ল্যাবরেটরির নিরাপদ ব্যবহার');
+      set.add('ল্যাবরেটরি এর নিরাপত্তা ও ব্যাবহার বিধি');
+    }
+    if (raw.includes('গুণগত')) {
+      set.add('গুণগত রসায়ন');
+      set.add('গুণগত রসায়ন');
+    }
+    if (raw.includes('পর্যায়বৃত্ত') || raw.includes('পর্যায়বৃত্ত')) {
+      set.add('মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন');
+      set.add('মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন');
+      set.add('পর্যায়বৃত্ত ধর্ম');
+      set.add('পর্যায়বৃত্ত ধর্ম');
+    }
+    if (raw.includes('রাসায়নিক পরিবর্তন') || raw.includes('রাসায়নিক পরিবর্তন')) {
+      set.add('রাসায়নিক পরিবর্তন');
+      set.add('রাসায়নিক পরিবর্তন');
+    }
+    if (raw.includes('কর্মমুখী')) {
+      set.add('কর্মমুখী রসায়ন');
+      set.add('কর্মমুখী রসায়ন');
+    }
+    if (raw.includes('পরিবেশ')) {
+      set.add('পরিবেশ রসায়ন');
+      set.add('পরিবেশ রসায়ন');
+    }
+    if (raw.includes('জৈব')) {
+      set.add('জৈব যৌগ');
+      set.add('জৈব রসায়ন');
+      set.add('জৈব রসায়ন');
+    }
+    if (raw.includes('পরিমাণগত') || raw.includes('পরিমানগত')) {
+      set.add('পরিমাণগত রসায়ন');
+      set.add('পরিমাণগত রসায়ন');
+    }
+    if (raw.includes('তড়িৎ রসায়ন') || raw.includes('তড়িৎ রসায়ন') || raw.includes('তড়িৎ রসায়ন')) {
+      set.add('তড়িৎ রসায়ন');
+      set.add('তড়িৎ রসায়ন');
+      set.add('তড়িৎ রসায়ন');
+    }
+    if (raw.includes('অর্থনৈতিক')) {
+      set.add('অর্থনৈতিক রসায়ন');
+      set.add('অর্থনৈতিক রসায়ন');
+    }
+    if (raw.includes('ম্যাট্রিক্স') || raw.includes('নির্ণায়ক') || raw.includes('নির্ণায়ক')) {
+      set.add('ম্যাট্রিক্স ও নির্ণায়ক');
+      set.add('ম্যাট্রিক্স ও নির্ণায়ক');
+      set.add('ম্যাট্রিক্স');
+    }
+    if (raw.includes('সরলরেখা')) {
+      set.add('সরলরেখা');
+    }
+    if (raw.includes('বৃত্ত')) {
+      set.add('বৃত্ত');
+    }
+    if (raw.includes('জটিল সংখ্যা')) {
+      set.add('জটিল সংখ্যা');
+    }
+    if (raw.includes('কোষ') && (raw.includes('গঠন') || raw.includes('এর গঠন'))) {
+      set.add('কোষ ও এর গঠন');
+      set.add('কোষের গঠন');
+    }
+    if (raw.includes('কোষ রসায়ন') || raw.includes('কোষ রসায়ন')) {
+      set.add('কোষ রসায়ন');
+      set.add('কোষ রসায়ন');
+    }
+    if (raw.includes('শৈবাল') || raw.includes('ছত্রাক')) {
+      set.add('শৈবাল ও ছত্রাক');
+    }
+    if (raw.includes('ব্রায়োফাইটা') || raw.includes('টেরিডোফাইটা') || raw.includes('ব্রায়োফাইটা')) {
+      set.add('ব্রায়োফাইটা ও টেরিডোফাইটা');
+      set.add('ব্রায়োফাইটা ও টেরিডোফাইটা');
+    }
+    if (raw.includes('নগ্নবীজী') || raw.includes('আবৃতবীজী')) {
+      set.add('নগ্নবীজী ও আবৃতবীজী উদ্ভিদ');
+      set.add('নগ্নবীজী ও আবৃতবীজী');
+    }
+    if (raw.includes('টিস্যু')) {
+      set.add('টিস্যু ও টিস্যুতন্ত্র');
+    }
+    if (raw.includes('উদ্ভিদ শারীরতত্ত্ব')) {
+      set.add('উদ্ভিদ শারীরতত্ত্ব');
+    }
+    if (raw.includes('উদ্ভিদ প্রজনন') || raw.includes('উদ্ভিদের প্রজনন')) {
+      set.add('উদ্ভিদ প্রজনন');
+      set.add('উদ্ভিদের প্রজনন');
+    }
+    if (raw.includes('জীবপ্রযুক্তি') || raw.includes('জীব প্রযুক্তি')) {
+      set.add('জীব প্রযুক্তি');
+      set.add('জীবপ্রযুক্তি');
+    }
+    if (raw.includes('জীবের পরিবেশ') || raw.includes('বিস্তার ও সংরক্ষণ') || raw.includes('বিস্তার')) {
+      set.add('জীবের পরিবেশ, বিস্তার ও সংরক্ষণ');
+      set.add('বিস্তার ও সংরক্ষণ,জীবের পরিবেশ');
+      set.add('জীবের পরিবেশ');
+    }
+
+    // Unicode expansion for Bengali য় vs য+়, ২য় vs ২য়
+    for (const c of Array.from(set)) {
+      set.add(c.replace(/\u09df/g, '\u09af\u09bc'));
+      set.add(c.replace(/\u09af\u09bc/g, '\u09df'));
+      set.add(c.replace(/২য়/g, '২য়'));
+      set.add(c.replace(/২য়/g, '২য়'));
+      set.add(c.replace(/১ম/g, '১ম'));
+    }
+
+    return Array.from(set).filter(Boolean);
+  }
+
+  /**
+   * Returns all search variants for a topic name (handling prefixes, Unicode, and dataset variations).
+   */
+  static getTopicSearchVariants(topicName: string, knownQuestionTopics: string[] = []): string[] {
+    const set = new Set<string>();
+    const trimmed = (topicName || '').trim();
+    if (!trimmed) return [];
+
+    set.add(trimmed);
+    set.add(trimmed.normalize('NFC'));
+    set.add(trimmed.normalize('NFD'));
+
+    // Strip prefixes like "টপিক 01 - ", "টপিক ১: ", "১.১৪ ", "২.৯ ", "৫.৫ "
+    const strippedPrefix = trimmed
+      .replace(/^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*)/i, '')
+      .trim();
+
+    if (strippedPrefix && strippedPrefix !== trimmed) {
+      set.add(strippedPrefix);
+      set.add(strippedPrefix.normalize('NFC'));
+      set.add(strippedPrefix.normalize('NFD'));
+    }
+
+    // Unicode variations
+    for (const t of Array.from(set)) {
+      set.add(t.replace(/\u09df/g, '\u09af\u09bc'));
+      set.add(t.replace(/\u09af\u09bc/g, '\u09df'));
+      set.add(t.replace(/২য়/g, '২য়'));
+      set.add(t.replace(/২য়/g, '২য়'));
+      set.add(t.replace(/১ম/g, '১ম'));
+    }
+
+    // Match against known question topics if provided
+    if (knownQuestionTopics && knownQuestionTopics.length > 0) {
+      const cleanNorm = (strippedPrefix || trimmed).normalize('NFC').replace(/\u09df/g, '\u09af\u09bc').toLowerCase();
+      for (const qTop of knownQuestionTopics) {
+        const qStripped = qTop
+          .replace(/^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*)/i, '')
+          .trim();
+        const qNorm = qStripped.normalize('NFC').replace(/\u09df/g, '\u09af\u09bc').toLowerCase();
+        if (qNorm === cleanNorm || qNorm.includes(cleanNorm) || cleanNorm.includes(qNorm)) {
+          set.add(qTop);
+        }
+      }
+    }
+
+    return Array.from(set).filter(Boolean);
+  }
 }
+
 
