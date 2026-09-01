@@ -53,6 +53,7 @@ class BadgeItem {
   final String titleBangla;
   final String description;
   final IconData icon;
+  final String? svgAsset;
   final Color gradientStart;
   final Color gradientEnd;
   final bool isUnlocked;
@@ -64,6 +65,7 @@ class BadgeItem {
     required this.titleBangla,
     required this.description,
     required this.icon,
+    this.svgAsset,
     required this.gradientStart,
     required this.gradientEnd,
     this.isUnlocked = false,
@@ -80,6 +82,7 @@ class BadgeItem {
       titleBangla: titleBangla,
       description: description,
       icon: icon,
+      svgAsset: svgAsset,
       gradientStart: gradientStart,
       gradientEnd: gradientEnd,
       isUnlocked: isUnlocked ?? this.isUnlocked,
@@ -97,6 +100,7 @@ class ObhyashBadges {
       titleBangla: 'প্রথম পদক্ষেপ',
       description: 'প্রথম পরীক্ষা সফলভাবে সম্পন্ন করেছো',
       icon: LucideIcons.rocket,
+      svgAsset: 'assets/dashboard-icons/badge_first_step.svg',
       gradientStart: Color(0xFF0284C7),
       gradientEnd: Color(0xFF0EA5E9),
     ),
@@ -106,6 +110,7 @@ class ObhyashBadges {
       titleBangla: 'পারফেক্ট স্কোর',
       description: 'যেকোনো পরীক্ষায় শতভাগ (১০০%) নির্ভুল স্কোর অর্জন',
       icon: LucideIcons.target,
+      svgAsset: 'assets/dashboard-icons/badge_precision_master.svg',
       gradientStart: Color(0xFF059669),
       gradientEnd: Color(0xFF10B981),
     ),
@@ -115,6 +120,7 @@ class ObhyashBadges {
       titleBangla: '৩ দিনের স্ট্রিক',
       description: 'টানা ৩ দিন নিয়মিত পড়ার অভ্যাস বজায় রেখেছো',
       icon: LucideIcons.zap,
+      svgAsset: 'assets/dashboard-icons/badge_streak_3.svg',
       gradientStart: Color(0xFFD97706),
       gradientEnd: Color(0xFFF59E0B),
     ),
@@ -124,6 +130,7 @@ class ObhyashBadges {
       titleBangla: 'স্ট্রিক মাস্টার',
       description: 'টানা ৭ দিনের ধারাবাহিক পড়ার স্ট্রিক ধরে রেখেছো',
       icon: LucideIcons.flame,
+      svgAsset: 'assets/dashboard-icons/badge_streak_7.svg',
       gradientStart: Color(0xFFEA580C),
       gradientEnd: Color(0xFFF97316),
     ),
@@ -133,6 +140,7 @@ class ObhyashBadges {
       titleBangla: 'স্পিড স্টার',
       description: '৬০ সেকেন্ডের মধ্যে ৮০%+ স্কোরে পরীক্ষা সম্পন্ন',
       icon: LucideIcons.timer,
+      svgAsset: 'assets/dashboard-icons/badge_speed_demon.svg',
       gradientStart: Color(0xFF0891B2),
       gradientEnd: Color(0xFF06B6D4),
     ),
@@ -142,6 +150,7 @@ class ObhyashBadges {
       titleBangla: 'নাইট আউল',
       description: 'রাত ১১টার পর গভীর মনোযোগে পরীক্ষা সম্পন্ন',
       icon: LucideIcons.moon,
+      svgAsset: 'assets/dashboard-icons/badge_night_owl.svg',
       gradientStart: Color(0xFF7C3AED),
       gradientEnd: Color(0xFF8B5CF6),
     ),
@@ -151,6 +160,7 @@ class ObhyashBadges {
       titleBangla: 'সেঞ্চুরি স্কলার',
       description: '১০০টির বেশি প্রশ্নের সঠিক উত্তর প্রদান করেছো',
       icon: LucideIcons.brain,
+      svgAsset: 'assets/dashboard-icons/badge_knowledge_sage.svg',
       gradientStart: Color(0xFF9333EA),
       gradientEnd: Color(0xFFA855F7),
     ),
@@ -160,6 +170,7 @@ class ObhyashBadges {
       titleBangla: 'লিজেন্ড ট্রফি',
       description: '৫,০০০+ মোট XP অর্জন করে শীর্ষ স্তরে পৌঁছেছো',
       icon: LucideIcons.crown,
+      svgAsset: 'assets/dashboard-icons/badge_apex_legend.svg',
       gradientStart: Color(0xFFE11D48),
       gradientEnd: Color(0xFFF43F5E),
     ),
@@ -169,6 +180,7 @@ class ObhyashBadges {
       titleBangla: 'লাইভ চ্যাম্পিয়ন',
       description: 'অফিসিয়াল লাইভ পরীক্ষায় অংশ নিয়ে শীর্ষস্থান ও বিজয় অর্জন',
       icon: LucideIcons.swords,
+      svgAsset: 'assets/dashboard-icons/badge_live_champion.svg',
       gradientStart: Color(0xFFEAB308),
       gradientEnd: Color(0xFFEA580C),
     ),

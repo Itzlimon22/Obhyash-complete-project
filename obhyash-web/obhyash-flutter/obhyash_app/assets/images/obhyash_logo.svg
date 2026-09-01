@@ -1,128 +1,143 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
   <defs>
-    <!-- Background Gradient -->
-    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%" fx="50%" fy="30%">
-      <stop offset="0%" stop-color="#0E2D1F" />
-      <stop offset="60%" stop-color="#061911" />
-      <stop offset="100%" stop-color="#020B07" />
+    <!-- Deepest Midnight Forest Emerald Background -->
+    <linearGradient id="deepestBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#021C12" />
+      <stop offset="40%" stop-color="#01120B" />
+      <stop offset="100%" stop-color="#000805" />
+    </linearGradient>
+
+    <radialGradient id="ambientGlow" cx="50%" cy="46%" r="55%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.18" />
+      <stop offset="50%" stop-color="#059669" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Ribbon Gradients for Isometric Depth -->
-    <!-- Top-Right Ribbon Layer (Bright Neon Lime) -->
-    <linearGradient id="facetTop" x1="20%" y1="0%" x2="80%" y2="100%">
-      <stop offset="0%" stop-color="#F2FF59" />
-      <stop offset="100%" stop-color="#C5F724" />
+    <!-- Squircle Border Gradient -->
+    <linearGradient id="squircleBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#059669" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#064E3B" stop-opacity="0.4" />
     </linearGradient>
 
-    <!-- Right-Down Fold (Vibrant Lime-Green) -->
-    <linearGradient id="facetRight" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#C5F724" />
-      <stop offset="100%" stop-color="#80E61A" />
+    <!-- Infinity Loop 1: Crisp Pure White & Platinum -->
+    <linearGradient id="whiteRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#F8FAFC" />
+      <stop offset="80%" stop-color="#E2E8F0" />
+      <stop offset="100%" stop-color="#94A3B8" />
     </linearGradient>
 
-    <!-- Bottom Fold Layer (Bright Volt Neon) -->
-    <linearGradient id="facetBottom" x1="80%" y1="100%" x2="20%" y2="0%">
-      <stop offset="0%" stop-color="#E8FF42" />
-      <stop offset="100%" stop-color="#B2F219" />
+    <!-- Infinity Loop 2: Deep Crimson / Ruby Accent -->
+    <linearGradient id="deepRedRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB7185" />
+      <stop offset="30%" stop-color="#E11D48" />
+      <stop offset="70%" stop-color="#BE123C" />
+      <stop offset="100%" stop-color="#881337" />
     </linearGradient>
 
-    <!-- Left-Up Fold (Mid Lime) -->
-    <linearGradient id="facetLeft" x1="100%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#B2F219" />
-      <stop offset="100%" stop-color="#72D612" />
+    <!-- Emerald Jade Glow Loop -->
+    <linearGradient id="emeraldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6EE7B7" />
+      <stop offset="40%" stop-color="#10B981" />
+      <stop offset="80%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
     </linearGradient>
 
-    <!-- Inner Shadow & Depth Facet 1 (Dark Emerald Fold) -->
-    <linearGradient id="innerShadow1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#092B1B" />
-      <stop offset="100%" stop-color="#04150D" />
-    </linearGradient>
+    <!-- Red Energy Core Glow -->
+    <radialGradient id="redCoreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE4E6" />
+      <stop offset="30%" stop-color="#F43F5E" />
+      <stop offset="70%" stop-color="#E11D48" />
+      <stop offset="100%" stop-color="#9F1239" stop-opacity="0" />
+    </radialGradient>
 
-    <!-- Inner Shadow & Depth Facet 2 (Deep Greenish Shade) -->
-    <linearGradient id="innerShadow2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#0D3521" />
-      <stop offset="100%" stop-color="#05180E" />
-    </linearGradient>
-
-    <!-- Center Glow -->
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Drop Shadows for 3D Overlaps -->
+    <filter id="ribbonShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.4" />
     </filter>
-    
-    <!-- Drop Shadow for Upper Ribbons -->
-    <filter id="foldShadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="-2" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55" />
+
+    <filter id="coreGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Background Rounded Canvas -->
-  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
+  <!-- App Icon Base Squircle -->
+  <rect width="512" height="512" rx="116" fill="url(#deepestBg)" stroke="url(#squircleBorder)" stroke-width="3" />
+  <rect width="512" height="512" rx="116" fill="url(#ambientGlow)" />
 
-  <!-- Subtle Ambient Glow Behind Logo -->
-  <circle cx="256" cy="256" r="140" fill="#80E61A" opacity="0.12" filter="blur(40px)" />
+  <!-- Background Decorative Precision Tech Ring (Subtle) -->
+  <circle cx="256" cy="256" r="170" stroke="#059669" stroke-width="1.2" stroke-opacity="0.2" stroke-dasharray="8 6" />
+  <circle cx="256" cy="256" r="140" stroke="#10B981" stroke-width="1" stroke-opacity="0.12" />
 
-  <!-- MAIN EMBLEM: Isometric Continuous "O" Habit Loop -->
-  <g transform="translate(0, 0)">
-    
-    <!-- 1. Background Inner Shadow Segment (Top-Right to Center depth) -->
-    <path d="M 256,136 L 356,236 L 306,286 L 256,236 Z" 
-          fill="url(#innerShadow1)" />
+  <!-- ====================================================================== -->
+  <!-- 3D INFINITY MÖBIUS LOOP OF HABIT + BENGALI 'অ' (OBHYASH) MONOGRAM     -->
+  <!-- ====================================================================== -->
+  <g filter="url(#ribbonShadow)">
 
-    <!-- 2. Background Inner Shadow Segment (Bottom-Left to Center depth) -->
-    <path d="M 256,376 L 156,276 L 206,226 L 256,276 Z" 
-          fill="url(#innerShadow2)" />
-
-    <!-- 3. Left Ribbon Wing (Folding Upward into 'O') -->
-    <path d="M 198,162 
-             C 186,146 160,154 142,180 
-             L 116,218 
-             C 100,240 100,272 116,294 
-             L 174,374 
-             C 188,394 212,398 230,384 
-             L 282,342 
-             L 194,254 
-             Z" 
-          fill="url(#facetLeft)" 
-          filter="url(#foldShadow)" />
-
-    <!-- 4. Bottom-Right Fold Ribbon (Isometric Corner) -->
-    <path d="M 230,384 
-             L 304,384 
-             C 328,384 350,370 362,350 
-             L 396,294 
-             C 412,268 406,238 384,222 
-             L 318,174 
-             L 256,236 
-             L 312,292 
-             L 282,342 
-             Z" 
-          fill="url(#facetBottom)" />
-
-    <!-- 5. Top Ribbon Cap (Forming the complete 'O' Loop) -->
-    <path d="M 204,136 
-             C 214,126 232,120 256,120 
-             L 326,120 
-             C 350,120 372,134 384,154 
-             L 404,188 
-             C 418,212 412,240 392,256 
-             L 338,298 
-             L 256,216 
-             L 336,156 
-             L 242,156 
-             C 222,156 208,148 204,136 
-             Z" 
-          fill="url(#facetTop)" 
-          filter="url(#foldShadow)" />
-
-    <!-- 6. Center Connecting Isometric Core Facet (Bright Highlight) -->
-    <path d="M 256,216 
-             L 306,266 
-             L 256,316 
-             L 206,266 
-             Z" 
-          fill="#D6FF38" 
+    <!-- 1. Under-Layer: Deep Red Arc (Left Loop Foundation of 'অ') -->
+    <path d="M 190 320 C 120 320 90 270 90 216 C 90 156 140 120 200 120 C 250 120 280 155 305 190 L 335 235 C 365 280 400 320 440 320 C 470 320 490 295 490 256 C 490 205 450 180 400 180" 
+          stroke="url(#deepRedRibbon)" 
+          stroke-width="38" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
           opacity="0.95" />
 
+    <!-- 2. Mid-Layer: Emerald Wave ('অ' Head Curl & Infinity Bridge) -->
+    <path d="M 120 210 C 120 170 150 144 195 144 C 242 144 278 180 310 226 L 338 266 C 368 308 402 334 442 334 C 476 334 496 308 496 264 C 496 210 454 172 396 172 C 342 172 300 210 266 256" 
+          stroke="url(#emeraldRibbon)" 
+          stroke-width="32" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+
+    <!-- 3. Top-Layer: Solid Pure White Möbius Ribbon (The Spine & Letterform 'অ') -->
+    <!-- Continuous graceful ribbon weaving over the red and emerald bridges -->
+    <path d="M 160 160 C 130 160 112 184 112 216 C 112 258 145 298 202 298 C 265 298 312 238 350 190 C 382 148 416 126 450 126 C 484 126 502 152 502 186 C 502 230 466 276 408 276 C 345 276 295 214 256 168 C 228 135 195 116 156 116 C 118 116 84 146 84 198 C 84 262 134 326 214 326 C 298 326 364 246 414 186" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="26" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+
+    <!-- 4. Bengali 'অ' Vertical Stem & Right Wing Anchor (Pure White + Platinum) -->
+    <path d="M 374 126 L 374 386" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="28" 
+          stroke-linecap="round" />
+
+    <!-- Top Horizontal Matra Header (Sleek aerodynamic bar) -->
+    <path d="M 280 126 L 440 126" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="24" 
+          stroke-linecap="round" />
+
+    <!-- 5. Central Deep Red Catalyst Node (Inner Spark) -->
+    <circle cx="256" cy="256" r="18" fill="url(#redCoreGlow)" filter="url(#coreGlowFilter)" />
+    <circle cx="256" cy="256" r="10" fill="#FFFFFF" />
+
+    <!-- 6. Specular Glass Highlights (3D Lustre) -->
+    <path d="M 145 154 C 175 140 215 150 250 185" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.9" />
+    <path d="M 374 140 L 374 240" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.8" />
+    <path d="M 430 148 C 455 148 472 165 472 190" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.75" />
+
+    <!-- Sparkle Flare on Top Stem -->
+    <polygon points="374,116 377,124 385,126 377,128 374,136 371,128 363,126 371,124" fill="#FFFFFF" />
   </g>
+
+  <!-- Bottom Brand Text (Subtle Minimalist Accent) -->
+  <text x="256" y="445" 
+        text-anchor="middle" 
+        font-family="'HindSiliguri', 'Outfit', sans-serif" 
+        font-size="28" 
+        font-weight="900" 
+        letter-spacing="4" 
+        fill="#FFFFFF">OBHYASH</text>
+  <text x="256" y="475" 
+        text-anchor="middle" 
+        font-family="'HindSiliguri', sans-serif" 
+        font-size="14" 
+        font-weight="700" 
+        letter-spacing="6" 
+        fill="#10B981">অভ্যাস • নিরন্তর প্রস্তুতি</text>
 </svg>

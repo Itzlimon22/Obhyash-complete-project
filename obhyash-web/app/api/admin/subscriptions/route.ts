@@ -437,8 +437,23 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        const expiryDate = new Date(now);
-        expiryDate.setDate(expiryDate.getDate() + durationDays);
+        // Fetch existing subscription to stack validity on top of remaining days
+        const { data: currentUser } = await supabaseAdmin
+          .from('users')
+          .select('subscription, subscription_expires_at')
+          .eq('id', reqData.user_id)
+          .maybeSingle();
+
+        const currentExp = currentUser?.subscription_expires_at
+          ? new Date(currentUser.subscription_expires_at)
+          : (currentUser?.subscription?.expiry ? new Date(currentUser.subscription.expiry) : null);
+
+        let baseDate = now;
+        if (currentExp && currentExp > now) {
+          baseDate = currentExp;
+        }
+
+        const expiryDate = new Date(baseDate.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
         // 1. Update all subscription & access fields on users table
         const { error: userErr } = await supabaseAdmin
@@ -688,8 +703,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + Number(durationDays));
+      const { data: targetUser } = await supabaseAdmin
+        .from('users')
+        .select('subscription, subscription_expires_at')
+        .eq('id', targetUserId)
+        .maybeSingle();
+
+      const now = new Date();
+      const currentExp = targetUser?.subscription_expires_at
+        ? new Date(targetUser.subscription_expires_at)
+        : (targetUser?.subscription?.expiry ? new Date(targetUser.subscription.expiry) : null);
+
+      let baseDate = now;
+      if (currentExp && currentExp > now) {
+        baseDate = currentExp;
+      }
+
+      const expiryDate = new Date(baseDate.getTime() + Number(durationDays) * 24 * 60 * 60 * 1000);
 
       let matchedPlanId: string | null = null;
       try {

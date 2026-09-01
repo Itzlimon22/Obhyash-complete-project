@@ -84,8 +84,8 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
 
   Future<void> _handleVerify() async {
     final otp = _otpController.text.trim();
-    if (otp.length != 6) {
-      setState(() => _errorMessage = 'অনুগ্রহ করে ৬ ডিজিটের সম্পূর্ণ ওটিপি লিখো');
+    if (otp.length < 6 || otp.length > 8) {
+      setState(() => _errorMessage = 'অনুগ্রহ করে সঠিক ওটিপি কোডটি লিখুন');
       return;
     }
 
@@ -162,12 +162,17 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
     final textColor = isDark ? Colors.white : const Color(0xFF111827);
     final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
+    final isEmail = widget.phone.contains('@');
+    final targetLabel = isEmail ? 'ইমেইল:' : 'নম্বর:';
+    final headerTitle = isEmail ? 'ইমেইল যাচাই' : 'মোবাইল নম্বর যাচাই';
+    final sentBadgeText = isEmail ? 'কোড পাঠানো হয়েছে' : 'SMS পাঠানো হয়েছে';
+
     return Container(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: keyboardHeight + 28,
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: keyboardHeight + 24,
       ),
       decoration: BoxDecoration(
         color: bgColor,
@@ -187,40 +192,40 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
           // Drag handle
           Center(
             child: Container(
-              width: 44,
-              height: 5,
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB),
-                borderRadius: BorderRadius.circular(3),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Header Icon + Title
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF059669).withValues(alpha: 0.12),
+                  color: (isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669)).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  LucideIcons.shieldCheck,
-                  size: 24,
-                  color: Color(0xFF059669),
+                child: Icon(
+                  isEmail ? LucideIcons.mailCheck : LucideIcons.shieldCheck,
+                  size: 22,
+                  color: isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'মোবাইল নম্বর যাচাই',
+                      headerTitle,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'Anek Bangla',
                         color: textColor,
@@ -228,9 +233,9 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'নিরাপত্তা স্বার্থে ৬ ডিজিটের ওটিপি যাচাই করো',
+                      'নিরাপত্তা স্বার্থে ওটিপি কোডটি যাচাই করো',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12.5,
                         fontFamily: 'HindSiliguri',
                         color: subTextColor,
                       ),
@@ -242,18 +247,18 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                 onPressed: () => Navigator.of(context).pop(false),
                 icon: Icon(
                   LucideIcons.x,
-                  size: 20,
+                  size: 18,
                   color: subTextColor,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // Sent To Phone Badge
+          // Sent To Phone / Email Badge (Responsive, No Overflow)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: cardBg,
               borderRadius: BorderRadius.circular(14),
@@ -261,44 +266,48 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
             ),
             child: Row(
               children: [
-                const Icon(
-                  LucideIcons.smartphone,
-                  size: 18,
-                  color: Color(0xFF059669),
+                Icon(
+                  isEmail ? LucideIcons.mail : LucideIcons.smartphone,
+                  size: 17,
+                  color: isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Text(
-                  'নম্বর: ',
+                  targetLabel,
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     fontFamily: 'HindSiliguri',
                     color: subTextColor,
                   ),
                 ),
-                Text(
-                  widget.phone,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
-                    color: textColor,
-                    letterSpacing: 1.2,
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    widget.phone,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: isEmail ? 'HindSiliguri' : 'monospace',
+                      color: textColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: 0.1),
+                    color: (isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669)).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
-                    'SMS পাঠানো হয়েছে',
+                  child: Text(
+                    sentBadgeText,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'HindSiliguri',
-                      color: Color(0xFF059669),
+                      color: isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669),
                     ),
                   ),
                 ),
@@ -306,9 +315,9 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // OTP Input Box (Digit-spaced styling)
+          // OTP Input Box (Adaptive 6-8 Digit styling)
           Container(
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF3F4F6),
@@ -325,11 +334,11 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
               focusNode: _focusNode,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              maxLength: 6,
+              maxLength: 8,
               style: TextStyle(
-                fontSize: 28,
+                fontSize: _otpController.text.length > 6 ? 22 : 26,
                 fontWeight: FontWeight.w900,
-                letterSpacing: 14,
+                letterSpacing: _otpController.text.length > 6 ? 6 : 10,
                 fontFamily: 'monospace',
                 color: textColor,
               ),
@@ -339,17 +348,19 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
               onChanged: (val) {
                 if (_errorMessage != null) {
                   setState(() => _errorMessage = null);
+                } else {
+                  setState(() {});
                 }
-                if (val.length == 6) {
+                if (val.length == 6 || val.length == 8) {
                   _handleVerify();
                 }
               },
               decoration: InputDecoration(
                 counterText: '',
-                hintText: '••••••',
+                hintText: '••••••••',
                 hintStyle: TextStyle(
                   color: isDark ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF),
-                  letterSpacing: 14,
+                  letterSpacing: 8,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),

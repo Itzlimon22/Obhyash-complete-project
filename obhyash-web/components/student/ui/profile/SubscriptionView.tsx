@@ -32,6 +32,7 @@ import {
   Shield,
   RefreshCw,
   Crown,
+  Sparkles,
   Check,
   X,
   XCircle,
@@ -204,6 +205,21 @@ export const SubscriptionView: React.FC = () => {
     }
   };
 
+  const formatBengaliDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('bn-BD', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   const daysRemaining = activeSubscription?.expiresAt
     ? Math.max(
         0,
@@ -216,26 +232,34 @@ export const SubscriptionView: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
-      {/* ── 1. Active Subscription Banner (1:1 with Flutter) ── */}
+      {/* ── 1. Active Subscription Banner (with Day Count & Stacking Info) ── */}
       {activeSubscription && (
-        <div className="mb-6 p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-neutral-800 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-            <Crown className="w-6 h-6" />
+        <div className="mb-6 p-4.5 rounded-[22px] bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-950/40 dark:via-amber-900/20 bg-white dark:bg-[#18181B] border border-amber-200/80 dark:border-amber-900/50 shadow-xs flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 shadow-xs">
+            <Crown className="w-6 h-6 animate-pulse" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-extrabold text-neutral-900 dark:text-white truncate leading-tight">
-              {activeSubscription.name}
-            </h3>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              মেয়াদ: {daysRemaining} দিন বাকি
-              {activeSubscription.expiresAt && ` (${activeSubscription.expiresAt})`}
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-neutral-900 dark:text-white truncate leading-tight">
+                {activeSubscription.name}
+              </h3>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold border border-emerald-300 dark:border-emerald-800/50 shrink-0">
+                সক্রিয়
+              </span>
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-neutral-300 mt-1 flex flex-wrap items-center gap-1.5 font-medium">
+              <span>মেয়াদ:</span>
+              <strong className="text-amber-700 dark:text-amber-400 font-bold">
+                {daysRemaining} দিন বাকি
+              </strong>
+              {activeSubscription.expiresAt && (
+                <span className="text-neutral-400 dark:text-neutral-500 text-[11px]">
+                  ({formatBengaliDate(activeSubscription.expiresAt)} পর্যন্ত)
+                </span>
+              )}
             </p>
           </div>
-
-          <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-[#004633] dark:text-[#34D399] text-xs font-bold border border-emerald-200 dark:border-emerald-900/50 shrink-0">
-            সক্রিয়
-          </span>
         </div>
       )}
 
@@ -326,6 +350,28 @@ export const SubscriptionView: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* ── Validity Stacking Info (Day count added to previous) ── */}
+        {daysRemaining > 0 && selectedPlan && (
+          <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/5 dark:from-emerald-950/40 dark:to-teal-950/20 border border-emerald-300/80 dark:border-emerald-800/60 flex items-center gap-3 text-xs">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-emerald-900 dark:text-emerald-200 text-[13px]">
+                পূর্বের মেয়াদের সাথে নতুন দিন যোগ হবে ⚡
+              </p>
+              <p className="text-neutral-600 dark:text-neutral-300 text-[11.5px] mt-0.5 leading-relaxed">
+                বর্তমান <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{daysRemaining} দিনের</strong> সাথে নতুন প্ল্যানের{' '}
+                <strong>{selectedPlan.duration_days ?? (selectedPlan as any).durationDays ?? 30} দিন</strong> যুক্ত হয়ে মোট{' '}
+                <strong className="text-emerald-700 dark:text-emerald-400 font-black underline">
+                  {daysRemaining + (selectedPlan.duration_days ?? (selectedPlan as any).durationDays ?? 30)} দিন
+                </strong>{' '}
+                সক্রিয় থাকবে।
+              </p>
+            </div>
           </div>
         )}
 

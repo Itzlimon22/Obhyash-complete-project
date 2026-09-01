@@ -7,6 +7,7 @@ import { getLiveExamSolutions } from "@/services/live-exam-student-service";
 import { toggleBookmark, getUserBookmarks } from "@/services/bookmark-service";
 import LatexText from "@/components/student/ui/common/LatexText";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
+import ProUpgradeModal from "@/components/common/ProUpgradeModal";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { 
   ArrowLeft, 
@@ -39,13 +40,24 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   commonLayoutProps,
   onBack,
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string | number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "skipped" | "bookmarked">("all");
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
+  const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
+
+  const isPro = Boolean(
+    (profile as any)?.isPro ||
+    (profile as any)?.is_pro ||
+    (profile as any)?.is_subscribed ||
+    (profile as any)?.subscription_status === "active" ||
+    (profile as any)?.plan === "pro" ||
+    profile?.subscription?.plan === "Pro" ||
+    (profile?.role as string)?.toLowerCase() === "admin"
+  );
 
   useEffect(() => {
     fetchSolutions();
@@ -77,10 +89,16 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
     }
 
     const isBookmarked = bookmarkedIds.has(questionId);
+
+    if (!isBookmarked && !isPro && bookmarkedIds.size >= 25) {
+      setShowProBookmarkModal(true);
+      return;
+    }
+
     setBookmarkingId(String(questionId));
 
     try {
-      const newStatus = await toggleBookmark(user.id, questionId, isBookmarked);
+      const newStatus = await toggleBookmark(user.id, questionId, isBookmarked, isPro);
       setBookmarkedIds((prev) => {
         const next = new Set(prev);
         if (newStatus) {
@@ -96,8 +114,12 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
       } else {
         toast.info("প্রশ্নটি রিভিশন তালিকা থেকে সরানো হয়েছে");
       }
-    } catch (e) {
-      toast.error("বুকমার্ক সংরক্ষণে ব্যর্থ হয়েছে");
+    } catch (e: any) {
+      if (e?.message === "BOOKMARK_LIMIT_EXCEEDED") {
+        setShowProBookmarkModal(true);
+      } else {
+        toast.error("বুকমার্ক সংরক্ষণে ব্যর্থ হয়েছে");
+      }
     } finally {
       setBookmarkingId(null);
     }
@@ -397,6 +419,15 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
         )}
 
       </div>
+
+      {/* Pro Upgrade Modal for Bookmark Limit */}
+      <ProUpgradeModal
+        isOpen={showProBookmarkModal}
+        onClose={() => setShowProBookmarkModal(false)}
+        title="বুকমার্ক লিমিট শেষ 📌"
+        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও প্র্যাকটিসের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        featurePill="বুকমার্ক লিমিট: ২৫/২৫"
+      />
     </AppLayout>
   );
 };

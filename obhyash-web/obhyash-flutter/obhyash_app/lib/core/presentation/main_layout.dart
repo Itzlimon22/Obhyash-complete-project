@@ -200,11 +200,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (tab.startsWith('live_exam_')) {
       final cat = tab.replaceFirst('live_exam_', '').toLowerCase();
       const liveNames = {
-        'engineering': 'ইঞ্জিনিয়ারিং উইকলি',
-        'medical': 'মেডিকেল উইকলি',
-        'varsity': 'ভার্সিটি উইকলি',
-        'varsity_a': 'ভার্সিটি উইকলি',
-        'hsc': 'এইচএসসি উইকলি',
+        'engineering': 'ইঞ্জিনিয়ারিং লাইভ এক্সাম',
+        'medical': 'মেডিকেল লাইভ এক্সাম',
+        'varsity': 'ভার্সিটি লাইভ এক্সাম',
+        'varsity_a': 'ভার্সিটি লাইভ এক্সাম',
+        'hsc': 'এইচএসসি লাইভ এক্সাম',
         'all': 'সকল লাইভ পরীক্ষা',
       };
       return liveNames[cat] ?? 'লাইভ পরীক্ষা';

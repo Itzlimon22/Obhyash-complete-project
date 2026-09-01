@@ -132,23 +132,43 @@ export async function startLiveExam(
     attemptId = attemptData.id;
   }
 
-  // 2. Fetch the questions for this exam
-  const { data: questionsData, error: questionsError } = await supabase
+  // 2. Fetch junction rows with question_id, points, serial
+  const { data: junctionData, error: junctionError } = await supabase
     .from("live_exam_questions")
-    .select(`
-      serial,
-      points,
-      questions (*)
-    `)
+    .select("serial, points, question_id")
     .eq("live_exam_id", examId)
     .order("serial", { ascending: true });
 
-  if (questionsError) throw questionsError;
+  if (junctionError) throw junctionError;
 
-  const questions = questionsData.map((q: any) => ({
-    ...(Array.isArray(q.questions) ? q.questions[0] : q.questions),
-    points: q.points,
-  }));
+  const questionIds = (junctionData || [])
+    .map((j: any) => j.question_id)
+    .filter(Boolean);
+
+  if (questionIds.length === 0) {
+    return { attemptId: attemptId!, questions: [] };
+  }
+
+  // 3. Fetch actual questions
+  const { data: qListData, error: qListError } = await supabase
+    .from("questions")
+    .select("*")
+    .in("id", questionIds);
+
+  if (qListError) throw qListError;
+
+  const questionMap = new Map((qListData || []).map((q: any) => [q.id, q]));
+
+  const questions: Question[] = [];
+  for (const j of junctionData || []) {
+    if (questionMap.has(j.question_id)) {
+      const q = questionMap.get(j.question_id);
+      questions.push({
+        ...q,
+        points: Number(j.points) || q.points || 1,
+      });
+    }
+  }
 
   return { attemptId: attemptId!, questions };
 }
@@ -343,29 +363,45 @@ export async function getLiveExamSolutions(
     return { questions: mockQuestions, userAnswers: mockAnswers };
   }
 
-  // 1. Fetch questions
-  const { data: questionsData, error: qErr } = await supabase
+  // 1. Fetch junction rows with question_id, points, serial
+  const { data: junctionData, error: junctionErr } = await supabase
     .from("live_exam_questions")
-    .select(`
-      serial,
-      points,
-      questions (*)
-    `)
+    .select("serial, points, question_id")
     .eq("live_exam_id", examId)
     .order("serial", { ascending: true });
 
-  if (qErr) {
-    console.error("Error fetching exam solution questions:", qErr);
-    throw qErr;
+  if (junctionErr) {
+    console.error("Error fetching exam solution junction:", junctionErr);
+    throw junctionErr;
   }
 
-  const questions: Question[] = questionsData.map((item: any) => {
-    const q = Array.isArray(item.questions) ? item.questions[0] : item.questions;
-    return {
-      ...q,
-      points: item.points ?? q.points ?? 1,
-    };
-  });
+  const questionIds = (junctionData || [])
+    .map((j: any) => j.question_id)
+    .filter(Boolean);
+
+  let questions: Question[] = [];
+  if (questionIds.length > 0) {
+    const { data: qListData, error: qListErr } = await supabase
+      .from("questions")
+      .select("*")
+      .in("id", questionIds);
+
+    if (qListErr) {
+      console.error("Error fetching solution questions:", qListErr);
+      throw qListErr;
+    }
+
+    const questionMap = new Map((qListData || []).map((q: any) => [q.id, q]));
+    for (const j of junctionData || []) {
+      if (questionMap.has(j.question_id)) {
+        const q = questionMap.get(j.question_id);
+        questions.push({
+          ...q,
+          points: Number(j.points) || q.points || 1,
+        });
+      }
+    }
+  }
 
   // 2. Fetch user's answers if user is provided
   let userAnswers: Record<string, number> = {};

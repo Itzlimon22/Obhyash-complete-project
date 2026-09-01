@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../../core/utils/bangla_name_helper.dart';
+import '../../gamification/presentation/widgets/xp_guide_bottom_sheet.dart';
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
 import 'widgets/badges_showcase_section.dart';
@@ -34,50 +37,70 @@ class MyProfileView extends ConsumerWidget {
     int currentXp,
     int nextTargetXp,
     String xpText,
+    Color badgeColor,
+    IconData badgeIcon,
+    Color startColor,
+    Color endColor,
   }) _getLevelInfo(int xp) {
-    if (xp < 500) {
-      final p = (xp / 500.0).clamp(0.0, 1.0);
+    if (xp < 1000) {
+      final p = (xp / 1000.0).clamp(0.0, 1.0);
       return (
         currentRank: 'রুকি',
         nextRank: 'স্কাউট',
         progress: p,
         percent: (p * 100).round(),
         currentXp: xp,
-        nextTargetXp: 500,
-        xpText: '$xp / ৫০০ XP',
+        nextTargetXp: 1000,
+        xpText: '${BanglaNameHelper.toBanglaNumeral(xp)} / ১,০০০ XP',
+        badgeColor: const Color(0xFF10B981),
+        badgeIcon: LucideIcons.sprout,
+        startColor: const Color(0xFF064E3B),
+        endColor: const Color(0xFF047857),
       );
-    } else if (xp < 2000) {
-      final p = ((xp - 500) / 1500.0).clamp(0.0, 1.0);
+    } else if (xp < 3000) {
+      final p = ((xp - 1000) / 2000.0).clamp(0.0, 1.0);
       return (
         currentRank: 'স্কাউট',
         nextRank: 'ওয়ারিয়র',
         progress: p,
         percent: (p * 100).round(),
         currentXp: xp,
-        nextTargetXp: 2000,
-        xpText: '$xp / ২,০০০ XP',
+        nextTargetXp: 3000,
+        xpText: '${BanglaNameHelper.toBanglaNumeral(xp)} / ৩,০০০ XP',
+        badgeColor: const Color(0xFF0284C7),
+        badgeIcon: LucideIcons.zap,
+        startColor: const Color(0xFF0C4A6E),
+        endColor: const Color(0xFF0369A1),
       );
-    } else if (xp < 5000) {
-      final p = ((xp - 2000) / 3000.0).clamp(0.0, 1.0);
+    } else if (xp < 7000) {
+      final p = ((xp - 3000) / 4000.0).clamp(0.0, 1.0);
       return (
         currentRank: 'ওয়ারিয়র',
         nextRank: 'টাইটান',
         progress: p,
         percent: (p * 100).round(),
         currentXp: xp,
-        nextTargetXp: 5000,
-        xpText: '$xp / ৫,০০০ XP',
+        nextTargetXp: 7000,
+        xpText: '${BanglaNameHelper.toBanglaNumeral(xp)} / ৭,০০০ XP',
+        badgeColor: const Color(0xFF8B5CF6),
+        badgeIcon: LucideIcons.shield,
+        startColor: const Color(0xFF4C1D95),
+        endColor: const Color(0xFF6D28D9),
       );
-    } else if (xp < 10000) {
-      final p = ((xp - 5000) / 5000.0).clamp(0.0, 1.0);
+    } else if (xp < 15000) {
+      final p = ((xp - 7000) / 8000.0).clamp(0.0, 1.0);
       return (
         currentRank: 'টাইটান',
         nextRank: 'লিজেন্ড',
         progress: p,
         percent: (p * 100).round(),
         currentXp: xp,
-        nextTargetXp: 10000,
-        xpText: '$xp / ১০,০০০ XP',
+        nextTargetXp: 15000,
+        xpText: '${BanglaNameHelper.toBanglaNumeral(xp)} / ১৫,০০০ XP',
+        badgeColor: const Color(0xFFF59E0B),
+        badgeIcon: LucideIcons.graduationCap,
+        startColor: const Color(0xFF78350F),
+        endColor: const Color(0xFFB45309),
       );
     } else {
       return (
@@ -86,8 +109,12 @@ class MyProfileView extends ConsumerWidget {
         progress: 1.0,
         percent: 100,
         currentXp: xp,
-        nextTargetXp: 10000,
-        xpText: '$xp XP (সর্বোচ্চ স্তর)',
+        nextTargetXp: 15000,
+        xpText: '${BanglaNameHelper.toBanglaNumeral(xp)} XP (সর্বোচ্চ স্তর)',
+        badgeColor: const Color(0xFFEF4444),
+        badgeIcon: LucideIcons.crown,
+        startColor: const Color(0xFF881337),
+        endColor: const Color(0xFFBE123C),
       );
     }
   }
@@ -118,202 +145,219 @@ class MyProfileView extends ConsumerWidget {
           // User Profile Card
           _UserProfileCard(user: user, isDark: isDark),
           const SizedBox(height: 20),
-          // Level Progress Bar (Premium Design)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [const Color(0xFF1E1B4B), const Color(0xFF312E81)]
-                    : [const Color(0xFF312E81), const Color(0xFF4338CA)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark ? Colors.black38 : const Color(0x4D312E81),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+          // Level Progress Bar (Premium Design with XP Guide Tap)
+          InkWell(
+            onTap: () => XpGuideBottomSheet.show(context),
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [levelInfo.startColor.withValues(alpha: 0.85), const Color(0xFF18181B)]
+                      : [levelInfo.startColor, levelInfo.endColor],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  top: -40,
-                  right: -20,
-                  child: Icon(
-                    Icons.stars_rounded,
-                    size: 130,
-                    color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isDark ? levelInfo.badgeColor.withValues(alpha: 0.3) : Colors.white24,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black45 : levelInfo.badgeColor.withValues(alpha: 0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0x33F59E0B),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0x80F59E0B),
-                                    width: 1,
+                ],
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    top: -30,
+                    right: -15,
+                    child: Icon(
+                      levelInfo.badgeIcon,
+                      size: 110,
+                      color: Colors.white.withValues(alpha: 0.07),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: levelInfo.badgeColor.withValues(alpha: 0.22),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: levelInfo.badgeColor.withValues(alpha: 0.6),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        levelInfo.badgeIcon,
+                                        color: Colors.white,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        levelInfo.currentRank,
+                                        style: const TextStyle(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                          fontFamily: 'HindSiliguri',
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                const SizedBox(height: 8),
+                                Row(
                                   children: [
-                                    const Icon(
-                                      Icons.emoji_events_rounded,
-                                      color: Color(0xFFFBBF24),
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      levelInfo.currentRank,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFFFBBF24),
-                                        fontFamily: 'Anek Bangla',
-                                        letterSpacing: 0.8,
+                                    const Text(
+                                      'পরবর্তী লেভেল প্রগ্রেস',
+                                      style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white70,
+                                        fontFamily: 'HindSiliguri',
                                       ),
                                     ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      LucideIcons.info,
+                                      size: 13,
+                                      color: Colors.white.withValues(alpha: 0.6),
+                                    ),
                                   ],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'পরবর্তী লেভেল রিওয়ার্ড',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white70,
-                                  fontFamily: 'Anek Bangla',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${levelInfo.percent}%',
-                              style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                fontFamily: 'Anek Bangla',
-                                height: 1,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black26,
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: Colors.white12,
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Text(
-                                levelInfo.xpText,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFFDE047),
-                                  fontFamily: 'Anek Bangla',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    // The Bar
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white12,
-                        ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: FractionallySizedBox(
-                          widthFactor: levelInfo.progress,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF60A5FA),
-                                  Color(0xFFFDE047),
-                                ],
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x66F59E0B),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${BanglaNameHelper.toBanglaNumeral(levelInfo.percent)}%',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  fontFamily: 'HindSiliguri',
+                                  height: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: Colors.white12,
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  levelInfo.xpText,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFFDE047),
+                                    fontFamily: 'HindSiliguri',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // The Bar
+                      Container(
+                        height: 9,
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white12,
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: FractionallySizedBox(
+                            widthFactor: levelInfo.progress,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFF60A5FA),
+                                    levelInfo.badgeColor,
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: levelInfo.badgeColor.withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          levelInfo.currentRank,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white60,
-                            fontFamily: 'Anek Bangla',
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            levelInfo.currentRank,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                              fontFamily: 'HindSiliguri',
+                            ),
                           ),
-                        ),
-                        Text(
-                          levelInfo.nextRank,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white60,
-                            fontFamily: 'Anek Bangla',
+                          Text(
+                            levelInfo.nextRank,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                              fontFamily: 'HindSiliguri',
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 20),

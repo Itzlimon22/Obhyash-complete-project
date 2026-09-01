@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
+import '../../../core/services/device_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
@@ -275,19 +276,12 @@ class AuthController extends AsyncNotifier<void> {
                   .maybeSingle();
 
               if (referral != null) {
-                // Redeem via RPC
+                final deviceId = await DeviceService.getDeviceId();
+                // Redeem via RPC with Device Lock
                 await _supabase.rpc('redeem_referral_tx', params: {
                   'p_referral_id': referral['id'],
                   'p_redeemer_id': response.user!.id,
-                });
-
-                // Record history
-                await _supabase.from('referral_history').insert({
-                  'referral_id': referral['id'],
-                  'redeemed_by': response.user!.id,
-                  'redeemed_at': DateTime.now().toIso8601String(),
-                  'admin_status': 'Pending',
-                  'reward_given': false,
+                  'p_device_id': deviceId,
                 });
 
                 // Clear saved referral code

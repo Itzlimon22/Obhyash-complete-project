@@ -54,76 +54,101 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         return;
       }
 
-      // Active subscription
       SubscriptionPlan? activePlan;
       DateTime? expiresAt;
-      final histData = await supabase
-          .from('subscription_history')
-          .select('*, subscription_plans(*)')
-          .eq('user_id', userId)
-          .eq('is_active', true)
-          .order('started_at', ascending: false)
-          .limit(1);
-      final hist = histData as List;
-      if (hist.isNotEmpty) {
-        final h = hist.first as Map<String, dynamic>;
-        final planJson = h['subscription_plans'] as Map<String, dynamic>?;
-        final rawExpires = h['expires_at'] as String?;
-        if (rawExpires != null) expiresAt = DateTime.tryParse(rawExpires);
+      final List<Invoice> invoices = [];
 
-        if (planJson != null) {
-          activePlan = SubscriptionPlan.fromJson(
-            planJson,
-            expiresAt: rawExpires?.substring(0, 10),
-          );
-        } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
-          final days = expiresAt.difference(DateTime.now()).inDays.clamp(1, 999);
-          activePlan = SubscriptionPlan(
-            id: 'active_plan',
-            name: 'প্রো সাবস্ক্রিপশন',
-            price: 0,
-            billingCycle: days >= 365 ? 'Yearly Plan' : days >= 90 ? 'Quarterly Plan' : 'Monthly Plan',
-            durationDays: days,
+      // 1. Subscription History (All subscriptions including referral bonuses)
+      try {
+        final subHistData = await supabase
+            .from('subscription_history')
+            .select('*')
+            .eq('user_id', userId)
+            .order('started_at', ascending: false)
+            .limit(50);
+
+        final subHistList = subHistData as List;
+        for (final item in subHistList) {
+          final h = item as Map<String, dynamic>;
+          final rawStarted = h['started_at']?.toString() ?? h['created_at']?.toString() ?? '';
+          final dateStr = rawStarted.length >= 10 ? rawStarted.substring(0, 10) : rawStarted;
+          final isCompleted = (h['status'] as String?)?.toLowerCase() == 'completed' || h['is_active'] == true;
+          
+          invoices.add(Invoice(
+            id: h['id']?.toString() ?? '',
+            date: dateStr,
+            amount: (h['amount'] as num?)?.toInt() ?? 0,
             currency: '৳',
-            features: const [
-              'সকল প্রিমিয়াম ফিচার আনলকড',
-              'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
-              'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
-            ],
-            colorTheme: 'emerald',
-            expiresAt: rawExpires?.substring(0, 10),
-          );
+            status: isCompleted ? 'paid' : (h['status']?.toString() ?? 'paid'),
+            planName: h['plan_name']?.toString() ?? 'প্রো সাবস্ক্রিপশন',
+          ));
+
+          // Check if active
+          final rawExp = h['expires_at'] as String?;
+          if (rawExp != null) {
+            final parsed = DateTime.tryParse(rawExp);
+            if (parsed != null && parsed.isAfter(DateTime.now())) {
+              if (activePlan == null || (expiresAt != null && parsed.isAfter(expiresAt))) {
+                expiresAt = parsed;
+                final days = parsed.difference(DateTime.now()).inDays.clamp(1, 999);
+                final planName = h['plan_name']?.toString() ?? 'প্রো সাবস্ক্রিপশন';
+                activePlan = SubscriptionPlan(
+                  id: h['id']?.toString() ?? 'sub_hist_active',
+                  name: planName,
+                  price: (h['amount'] as num?)?.toInt() ?? 0,
+                  billingCycle: days >= 365 ? 'Yearly Plan' : days >= 90 ? 'Quarterly Plan' : 'Monthly Plan',
+                  durationDays: days,
+                  currency: '৳',
+                  features: const [
+                    'সকল প্রিমিয়াম ফিচার আনলকড',
+                    'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                    'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+                  ],
+                  colorTheme: 'emerald',
+                  expiresAt: rawExp.length >= 10 ? rawExp.substring(0, 10) : rawExp,
+                );
+              }
+            }
+          }
         }
+      } catch (e) {
+        debugPrint('[MySubscriptionView] Error fetching subscription_history: $e');
       }
 
-      // If no active plan found in subscription_history, check user profile
-      if (activePlan == null) {
-        try {
-          final userRes = await supabase
-              .from('users')
-              .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
-              .eq('id', userId)
-              .maybeSingle();
-          if (userRes != null) {
-            final subJson = userRes['subscription'] as Map<String, dynamic>?;
-            final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
-            final rawExp = subJson?['expiry'] ?? subJson?['expires_at'] ?? userRes['subscription_expires_at'];
-            DateTime? parsedExp;
-            if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
-            final bool isExpired = parsedExp != null && parsedExp.isBefore(DateTime.now());
+      // 2. Fallback to Users table for Pro status / referral bonus
+      try {
+        final userRes = await supabase
+            .from('users')
+            .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
+            .eq('id', userId)
+            .maybeSingle();
 
-            final bool isSub = !isExpired &&
-                parsedExp != null &&
-                parsedExp.isAfter(DateTime.now()) &&
-                (userRes['is_subscribed'] == true || rawStatus == 'active');
+        if (userRes != null) {
+          final subJson = userRes['subscription'] as Map<String, dynamic>?;
+          final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
+          final rawExp = userRes['subscription_expires_at'] ?? subJson?['expiry'] ?? subJson?['expires_at'];
+          DateTime? parsedExp;
+          if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
 
-            if (isSub) {
+          final isPro = userRes['is_subscribed'] == true ||
+              rawStatus == 'active' ||
+              (userRes['plan'] as String?)?.toLowerCase() == 'pro' ||
+              (userRes['level'] as String?)?.toLowerCase() == 'pro' ||
+              (subJson?['plan'] as String?)?.toLowerCase() == 'pro';
+
+          if (isPro) {
+            if (parsedExp == null || parsedExp.isBefore(DateTime.now())) {
+              parsedExp = DateTime.now().add(const Duration(days: 15));
+            }
+
+            if (activePlan == null) {
               expiresAt = parsedExp;
               final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
-              final planTitle = (subJson?['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+              final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+              final planTitle = rawPlan == 'Pro' || rawPlan == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlan;
               final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
                   ? 'Yearly Plan'
-                  : planTitle.toLowerCase().contains('pro') || planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                  : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
                       ? 'Quarterly Plan'
                       : 'Monthly Plan';
 
@@ -146,21 +171,31 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
               );
             }
           }
-        } catch (_) {}
+        }
+      } catch (e) {
+        debugPrint('[MySubscriptionView] Error fetching user profile: $e');
       }
 
-      // Payment history
-      final reqData = await supabase
-          .from('payment_requests')
-          .select('id, plan_name, amount, currency, status, requested_at')
-          .eq('user_id', userId)
-          .order('requested_at', ascending: false)
-          .limit(50);
-      final invoices = (reqData as List)
-          .map((r) => Invoice.fromJson(r as Map<String, dynamic>))
-          .toList();
+      // 3. Payment Requests
+      try {
+        final reqData = await supabase
+            .from('payment_requests')
+            .select('id, plan_name, amount, currency, status, requested_at, transaction_id')
+            .eq('user_id', userId)
+            .order('requested_at', ascending: false)
+            .limit(50);
 
-      // Referral rewards history
+        for (final r in (reqData as List)) {
+          final m = r as Map<String, dynamic>;
+          final id = m['id']?.toString() ?? '';
+          final exists = invoices.any((i) => i.id == id);
+          if (!exists) {
+            invoices.add(Invoice.fromJson(m));
+          }
+        }
+      } catch (_) {}
+
+      // 4. Referral rewards history
       try {
         final myReferralRes = await supabase
             .from('referrals')
@@ -172,27 +207,31 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         final query = supabase
             .from('referral_history')
             .select('id, redeemed_at, admin_status, reward_given, redeemed_by, referral_id');
-        
+
         final refHistList = myReferralId != null
-            ? await query.or('redeemed_by.eq.$userId,referral_id.eq.$myReferralId').eq('reward_given', true).limit(20)
-            : await query.eq('redeemed_by', userId).eq('reward_given', true).limit(20);
+            ? await query.or('redeemed_by.eq.$userId,referral_id.eq.$myReferralId').limit(20)
+            : await query.eq('redeemed_by', userId).limit(20);
 
         for (final r in refHistList) {
           final m = r;
-          final rawDate = m['redeemed_at']?.toString() ?? '';
-          final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
-          invoices.add(Invoice(
-            id: m['id']?.toString() ?? '',
-            date: dateStr,
-            amount: 0,
-            currency: '৳',
-            status: 'paid',
-            planName: '🎁 রেফারেল রিওয়ার্ড বোনাস (১ মাস)',
-          ));
+          final id = m['id']?.toString() ?? '';
+          final exists = invoices.any((i) => i.id == id);
+          if (!exists) {
+            final rawDate = m['redeemed_at']?.toString() ?? '';
+            final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
+            invoices.add(Invoice(
+              id: id,
+              date: dateStr,
+              amount: 0,
+              currency: '৳',
+              status: 'paid',
+              planName: '🎁 রেফারেল রিওয়ার্ড বোনাস',
+            ));
+          }
         }
       } catch (_) {}
 
-      // Scratch card gifts history
+      // 5. Scratch card gifts history
       try {
         final cardRes = await supabase
             .from('scratch_cards')
@@ -204,27 +243,31 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
 
         for (final c in (cardRes as List)) {
           final m = c as Map<String, dynamic>;
-          final rawDate = m['scratched_at']?.toString() ?? '';
-          final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
-          final rewardType = m['reward_type']?.toString() ?? '';
-          String label = '🎁 স্ক্র্যাচ কার্ড গিফট বোনাস';
-          if (rewardType == '1_month_free') {
-            label = '🎁 স্ক্র্যাচ কার্ড গিফট (১ মাস ফ্রি)';
-          } else if (rewardType == '2_months_free') {
-            label = '🎁 স্ক্র্যাচ কার্ড গিফট (২ মাস ফ্রি)';
-          } else if (rewardType == '3_months_free') {
-            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৩ মাস ফ্রি)';
-          } else if (rewardType == '50_percent_off') {
-            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৫০% ছাড় কুপন)';
+          final id = m['id']?.toString() ?? '';
+          final exists = invoices.any((i) => i.id == id);
+          if (!exists) {
+            final rawDate = m['scratched_at']?.toString() ?? '';
+            final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
+            final rewardType = m['reward_type']?.toString() ?? '';
+            String label = '🎁 স্ক্র্যাচ কার্ড গিফট বোনাস';
+            if (rewardType == '1_month_free') {
+              label = '🎁 স্ক্র্যাচ কার্ড গিফট (১ মাস ফ্রি)';
+            } else if (rewardType == '2_months_free') {
+              label = '🎁 স্ক্র্যাচ কার্ড গিফট (২ মাস ফ্রি)';
+            } else if (rewardType == '3_months_free') {
+              label = '🎁 স্ক্র্যাচ কার্ড গিফট (৩ মাস ফ্রি)';
+            } else if (rewardType == '50_percent_off') {
+              label = '🎁 স্ক্র্যাচ কার্ড গিফট (৫০% ছাড় কুপন)';
+            }
+            invoices.add(Invoice(
+              id: id,
+              date: dateStr,
+              amount: 0,
+              currency: '৳',
+              status: 'paid',
+              planName: label,
+            ));
           }
-          invoices.add(Invoice(
-            id: m['id']?.toString() ?? '',
-            date: dateStr,
-            amount: 0,
-            currency: '৳',
-            status: 'paid',
-            planName: label,
-          ));
         }
       } catch (_) {}
 
@@ -239,7 +282,8 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (err) {
+      debugPrint('[MySubscriptionView] Unexpected loadData error: $err');
       if (mounted) setState(() => _isLoading = false);
     }
   }

@@ -17,6 +17,7 @@ import '../../exam/services/local_exam_cache_service.dart';
 import '../../dashboard/services/streak_service.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -345,6 +346,22 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       if (uid == null) return;
 
       final isBookmarked = _bookmarkedIds.contains(questionId);
+
+      if (!isBookmarked) {
+        final profile = ref.read(userProfileProvider).value;
+        final isPro = profile?.isPro ?? false;
+        if (!isPro && _bookmarkedIds.length >= 25) {
+          ProUpgradeModal.show(
+            context,
+            title: 'বুকমার্ক লিমিট শেষ 📌',
+            message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।',
+            featurePill: 'বুকমার্ক লিমিট: ২৫/২৫',
+            icon: LucideIcons.bookmark,
+          );
+          return;
+        }
+      }
+
       setState(() {
         if (isBookmarked) {
           _bookmarkedIds.remove(questionId);

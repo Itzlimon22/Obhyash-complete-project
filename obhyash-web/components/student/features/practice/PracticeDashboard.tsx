@@ -31,6 +31,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import FlashcardMode, { FlashcardResult } from "./FlashcardMode";
 import PracticeSummary from "./PracticeSummary";
 import LatexText from "@/components/student/ui/common/LatexText";
+import ProUpgradeModal from "@/components/common/ProUpgradeModal";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -82,9 +83,21 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   currentUser,
   initialTab = "mistakes",
 }) => {
-  const { user: authUser } = useAuth();
-  const userId = currentUser?.id || authUser?.id || "";
+  const { user: authUser, profile: authProfile } = useAuth();
+  const effectiveUser = currentUser || authProfile;
+  const userId = effectiveUser?.id || authUser?.id || "";
 
+  const isPro = Boolean(
+    (effectiveUser as any)?.isPro ||
+    (effectiveUser as any)?.is_pro ||
+    (effectiveUser as any)?.is_subscribed ||
+    (effectiveUser as any)?.subscription_status === "active" ||
+    (effectiveUser as any)?.plan === "pro" ||
+    effectiveUser?.subscription?.plan === "Pro" ||
+    (effectiveUser?.role as string)?.toLowerCase() === "admin"
+  );
+
+  const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
@@ -244,6 +257,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     const qId = String(q.id);
     const isMarked = bookmarkedIds.has(qId);
 
+    if (!isMarked && !isPro && bookmarkedIds.size >= 25) {
+      setShowProBookmarkModal(true);
+      return;
+    }
+
     // Optimistic UI update
     setBookmarkedIds((prev) => {
       const next = new Set(prev);
@@ -264,10 +282,14 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     }
 
     try {
-      await toggleBookmark(userId, q.id, isMarked);
+      await toggleBookmark(userId, q.id, isMarked, isPro);
       toast.success(isMarked ? "বুকমার্ক সরানো হয়েছে" : "বুকমার্কে যোগ করা হয়েছে");
-    } catch {
-      toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে");
+    } catch (err: any) {
+      if (err?.message === "BOOKMARK_LIMIT_EXCEEDED") {
+        setShowProBookmarkModal(true);
+      } else {
+        toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে");
+      }
       fetchBookmarks();
     }
   };
@@ -682,6 +704,15 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           )}
         </div>
       )}
+
+      {/* Pro Upgrade Modal for Bookmark Limit */}
+      <ProUpgradeModal
+        isOpen={showProBookmarkModal}
+        onClose={() => setShowProBookmarkModal(false)}
+        title="বুকমার্ক লিমিট শেষ 📌"
+        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও প্র্যাকটিসের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        featurePill="বুকমার্ক লিমিট: ২৫/২৫"
+      />
     </div>
   );
 };

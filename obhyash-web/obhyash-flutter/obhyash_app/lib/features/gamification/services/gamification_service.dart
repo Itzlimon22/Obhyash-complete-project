@@ -384,6 +384,7 @@ class GamificationService {
                     '${badgeItem.titleBangla} (${badgeItem.name})\n${badgeItem.description}',
                 badgeLabel: badgeItem.titleBangla,
                 icon: badgeItem.icon,
+                svgAsset: badgeItem.svgAsset,
                 primaryColor: badgeItem.gradientStart,
                 secondaryColor: badgeItem.gradientEnd,
                 xpAwarded: 50,

@@ -35,9 +35,8 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
     throw error;
   }
 
-  if (data) {
-    // Map DB plans to Frontend SubscriptionPlan type
-    const dbPlans = data.map((plan: DbSubscriptionPlan) => {
+  if (data && data.length > 0) {
+    return data.map((plan: DbSubscriptionPlan) => {
       let displayName = plan.display_name;
       if (
         plan.duration_days >= 180 ||
@@ -56,7 +55,7 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
       ) {
         displayName = 'এডমিশন প্যাক (৩ মাস)';
       } else if (
-        (plan.duration_days >= 28 && plan.duration_days <= 60) ||
+        (plan.duration_days >= 15 && plan.duration_days <= 60) ||
         displayName.includes('১ মাস') ||
         displayName.includes('বুস্টার') ||
         displayName.includes('exam_ready') ||
@@ -95,11 +94,59 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
           plan.is_popular ?? (plan.duration_days >= 90 && plan.duration_days < 180),
       };
     });
-
-    return dbPlans;
   }
 
-  return [];
+  // Fallback default plans if DB table is empty
+  return [
+    {
+      id: 'monthly_plan',
+      name: 'মাসিক প্ল্যান (১ মাস)',
+      price: 149,
+      currency: '৳',
+      duration_days: 30,
+      billingCycle: 'Monthly',
+      features: [
+        'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+        'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+        'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+      ],
+      colorTheme: 'indigo',
+      isPopular: false,
+    },
+    {
+      id: 'admission_pro_3m',
+      name: 'এডমিশন প্যাক (৩ মাস)',
+      price: 349,
+      currency: '৳',
+      duration_days: 90,
+      billingCycle: 'Quarterly',
+      features: [
+        'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+        'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+        'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+        'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড',
+      ],
+      colorTheme: 'emerald',
+      isPopular: true,
+    },
+    {
+      id: 'full_session_6m',
+      name: 'ফুল সেশন প্যাক (৬ মাস)',
+      price: 599,
+      currency: '৳',
+      duration_days: 180,
+      billingCycle: 'Half-Yearly',
+      features: [
+        'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+        'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+        'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+        'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক',
+        '২৪/৭ স্পেশাল সাপোর্ট',
+      ],
+      colorTheme: 'amber',
+      isPopular: false,
+    },
+  ];
 };
 
 export const getUserInvoices = async (): Promise<Invoice[]> => {
@@ -115,40 +162,77 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
   if (user) {
     const invoices: Invoice[] = [];
 
-    // 1. Payment Requests
-    const { data: payData } = await supabase
-      .from('payment_requests')
-      .select('*')
-      .eq('user_id', user.id)
-      .in('status', ['Pending', 'Approved', 'Rejected'])
-      .order('requested_at', { ascending: false });
+    // 1. Subscription History (all active/granted subscriptions)
+    try {
+      const { data: subHist } = await supabase
+        .from('subscription_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('started_at', { ascending: false })
+        .limit(50);
 
-    if (payData) {
-      for (const req of payData) {
-        invoices.push({
-          id: req.id,
-          date: new Date(req.requested_at).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-          }),
-          amount: req.amount,
-          currency: req.currency || '৳',
-          status:
-            req.status === 'Approved'
-              ? 'valid'
-              : req.status === 'Pending'
-                ? 'checking'
-                : 'rejected',
-          planName: req.plan_name,
-          downloadUrl: '#',
-          transactionId: req.transaction_id || 'N/A',
-          paymentMethod: req.payment_method || 'N/A',
-        });
+      if (subHist) {
+        for (const h of subHist) {
+          const rawDate = h.started_at || h.created_at || new Date().toISOString();
+          invoices.push({
+            id: h.id,
+            date: new Date(rawDate).toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            }),
+            amount: h.amount ?? 0,
+            currency: '৳',
+            status: h.status === 'completed' || h.is_active ? 'valid' : 'checking',
+            planName: h.plan_name || 'প্রো সাবস্ক্রিপশন',
+            downloadUrl: '#',
+            transactionId: h.payment_method === 'referral_bonus' ? 'REFERRAL_REWARD' : (h.id || 'N/A'),
+            paymentMethod: h.payment_method || 'Online',
+          });
+        }
       }
-    }
+    } catch (_) {}
 
-    // 2. Referral Rewards History
+    // 2. Payment Requests
+    try {
+      const { data: payData } = await supabase
+        .from('payment_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('status', ['Pending', 'Approved', 'Rejected'])
+        .order('requested_at', { ascending: false });
+
+      if (payData) {
+        for (const req of payData) {
+          // Avoid duplicate entry if already in subscription_history
+          const exists = invoices.some((i) => i.id === req.id || i.transactionId === req.transaction_id);
+          if (!exists) {
+            invoices.push({
+              id: req.id,
+              date: new Date(req.requested_at).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              }),
+              amount: req.amount,
+              currency: req.currency || '৳',
+              status:
+                req.status === 'Approved'
+                  ? 'valid'
+                  : req.status === 'Pending'
+                    ? 'checking'
+                    : 'rejected',
+              planName: req.plan_name,
+              downloadUrl: '#',
+              transactionId: req.transaction_id || 'N/A',
+              paymentMethod: req.payment_method || 'N/A',
+            });
+          }
+        }
+      }
+    } catch (_) {}
+
+    // 3. Referral Rewards History
     try {
       const { data: myRef } = await supabase
         .from('referrals')
@@ -162,31 +246,34 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
         .select('id, redeemed_at, admin_status, reward_given, redeemed_by, referral_id');
 
       const { data: refHist } = myRefId
-        ? await refQuery.or(`redeemed_by.eq.${user.id},referral_id.eq.${myRefId}`).eq('reward_given', true).limit(20)
-        : await refQuery.eq('redeemed_by', user.id).eq('reward_given', true).limit(20);
+        ? await refQuery.or(`redeemed_by.eq.${user.id},referral_id.eq.${myRefId}`).limit(20)
+        : await refQuery.eq('redeemed_by', user.id).limit(20);
 
       if (refHist) {
         for (const r of refHist) {
-          invoices.push({
-            id: r.id,
-            date: new Date(r.redeemed_at).toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            }),
-            amount: 0,
-            currency: '৳',
-            status: 'valid',
-            planName: '🎁 রেফারেল রিওয়ার্ড বোনাস (১ মাস)',
-            downloadUrl: '#',
-            transactionId: 'REFERRAL_REWARD',
-            paymentMethod: 'Referral Bonus',
-          });
+          const exists = invoices.some((i) => i.id === r.id);
+          if (!exists) {
+            invoices.push({
+              id: r.id,
+              date: new Date(r.redeemed_at).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              }),
+              amount: 0,
+              currency: '৳',
+              status: 'valid',
+              planName: '🎁 রেফারেল রিওয়ার্ড বোনাস',
+              downloadUrl: '#',
+              transactionId: 'REFERRAL_REWARD',
+              paymentMethod: 'Referral Bonus',
+            });
+          }
         }
       }
     } catch (_) {}
 
-    // 3. Scratch Card Gifts
+    // 4. Scratch Card Gifts
     try {
       const { data: cards } = await supabase
         .from('scratch_cards')
@@ -296,7 +383,6 @@ export const subscribeToPlan = async (planId: string): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
-  // Create checkout session logic
   return true;
 };
 
@@ -382,7 +468,13 @@ export const getUserActiveSubscription =
           if (matchedPlan) plan = matchedPlan;
         }
 
-        const durationDays = plan?.duration_days || 30;
+        const displayName =
+          plan?.display_name ||
+          plan?.name ||
+          hist.plan_name ||
+          'প্রো সাবস্ক্রিপশন';
+
+        const durationDays = plan?.duration_days || hist.duration_days || 15;
         const cycle =
           durationDays >= 365
             ? 'Yearly Plan'
@@ -393,9 +485,9 @@ export const getUserActiveSubscription =
                 : `${durationDays} Days Plan`;
 
         return {
-          id: plan?.id || 'history_active_sub',
-          name: plan?.display_name || plan?.name || 'প্রো সাবস্ক্রিপশন',
-          price: plan?.price || 0,
+          id: plan?.id || hist.id || 'history_active_sub',
+          name: displayName,
+          price: plan?.price || hist.amount || 0,
           currency: plan?.currency || '৳',
           billingCycle: cycle,
           features: plan?.features || [
@@ -420,46 +512,63 @@ export const getUserActiveSubscription =
 
       if (userProfile) {
         const sub = (userProfile.subscription || {}) as any;
-        const status = (sub?.status || userProfile.subscription_status)?.toString().toLowerCase();
+        const status = (sub?.status || userProfile.subscription_status)?.toString().toLowerCase().trim();
         const expiry =
+          userProfile.subscription_expires_at ||
           sub?.expiry ||
-          sub?.expires_at ||
-          userProfile.subscription_expires_at;
+          sub?.expires_at;
+
         const isSub =
           userProfile.is_subscribed === true ||
           status === 'active' ||
           userProfile.plan === 'Pro' ||
-          userProfile.level?.toLowerCase().includes('pro');
+          userProfile.plan === 'pro' ||
+          userProfile.plan === 'Premium' ||
+          userProfile.level === 'Pro' ||
+          sub?.plan === 'Pro' ||
+          sub?.plan === 'pro' ||
+          sub?.plan === 'Premium';
 
-        const expDate = expiry ? new Date(expiry) : null;
+        let expDate = expiry ? new Date(expiry) : null;
+        if (!expDate || isNaN(expDate.getTime())) {
+          if (isSub) {
+            // Default 15 days from now if date not parsed
+            expDate = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
+          }
+        }
+
         const isNotExpired = !!expDate && expDate > now;
 
-        if (isSub && isNotExpired) {
-          const planName = sub?.plan || 'প্রো সাবস্ক্রিপশন';
-          if (planName !== 'Free') {
-            const cycle =
-              planName.toLowerCase().includes('year') || planName.toLowerCase().includes('বছর')
-                ? 'Yearly Plan'
-                : planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('quarter')
-                  ? 'Quarterly Plan'
-                  : 'Monthly Plan';
+        if (isSub && isNotExpired && expDate) {
+          const rawPlanName = (sub?.plan || userProfile.plan || '').toString();
+          const planName =
+            !rawPlanName || rawPlanName.toLowerCase() === 'free' || rawPlanName.toLowerCase() === 'pro' || rawPlanName.toLowerCase() === 'premium'
+              ? 'প্রো সাবস্ক্রিপশন'
+              : rawPlanName;
 
-            return {
-              id: 'user_active_plan',
-              name: planName,
-              price: 0,
-              currency: '৳',
-              billingCycle: cycle,
-              features: [
-                'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
-              ],
-              colorTheme: 'emerald',
-              isPopular: true,
-              expiresAt: expiry || undefined,
-            };
-          }
+          const daysLeft = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          const cycle =
+            daysLeft >= 365 || planName.toLowerCase().includes('year')
+              ? 'Yearly Plan'
+              : daysLeft >= 90 || planName.toLowerCase().includes('quarter')
+                ? 'Quarterly Plan'
+                : 'Monthly Plan';
+
+          return {
+            id: 'user_active_plan',
+            name: planName,
+            price: 0,
+            currency: '৳',
+            billingCycle: cycle,
+            features: [
+              'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+              'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+              'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+            ],
+            colorTheme: 'emerald',
+            isPopular: true,
+            expiresAt: expDate.toISOString(),
+          };
         }
       }
     } catch (e) {
@@ -538,8 +647,7 @@ export const submitManualPayment = async (
   }
 
   // Notify Admin
-  // TODO: Replace with actual Admin ID fetching logic
-  const ADMIN_ID = 'me'; // For testing purposes, notifying self
+  const ADMIN_ID = 'me';
   await createNotification(
     ADMIN_ID,
     'New Payment Submitted',

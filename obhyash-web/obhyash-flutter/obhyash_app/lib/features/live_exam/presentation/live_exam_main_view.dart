@@ -31,7 +31,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         key: 'engineering',
         tag: 'ইঞ্জিনিয়ারিং',
         title: 'ইঞ্জিনিয়ারিং',
-        subtitle: 'উইকলি মডেল টেস্ট',
+        subtitle: 'মডেল টেস্ট',
         description: 'বুয়েট • কুয়েট • রুয়েট • চুয়েট • আইইউটি',
         icon: Icons.architecture_rounded,
         gradientColors: isDark
@@ -45,7 +45,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         key: 'medical',
         tag: 'মেডিকেল',
         title: 'মেডিকেল',
-        subtitle: 'উইকলি মডেল টেস্ট',
+        subtitle: 'মডেল টেস্ট',
         description: 'মেডিকেল ও ডেন্টাল সরকারি ভর্তি পরীক্ষা',
         icon: Icons.medical_services_rounded,
         gradientColors: isDark
@@ -59,7 +59,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         key: 'varsity',
         tag: 'ভার্সিটি',
         title: 'ভার্সিটি ক-ইউনিট',
-        subtitle: 'উইকলি মডেল টেস্ট',
+        subtitle: 'মডেল টেস্ট',
         description: 'ঢাকা বিশ্ববিদ্যালয় • সমন্বিত গুচ্ছ • জাহাঙ্গীরনগর',
         icon: Icons.school_rounded,
         gradientColors: isDark
@@ -268,33 +268,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
                             ),
                           )
                         else
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.bolt_rounded,
-                                  size: 13,
-                                  color: cat.accentColor,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  "সাপ্তাহিক",
-                                  style: TextStyle(
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: cat.accentColor,
-                                    fontFamily: "HindSiliguri",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          const SizedBox.shrink(),
 
                         const SizedBox(width: 8),
 

@@ -74,24 +74,38 @@ class _SubjectAccum {
 
 List<MonthCalendarDay> _buildCalendarData(List<ExamResult> history) {
   final now = DateTime.now();
-  final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-  final examCounts = <int, int>{};
+  final examCounts = <String, int>{};
+
   for (final e in history) {
-    if (e.createdAt != null &&
-        e.createdAt!.year == now.year &&
-        e.createdAt!.month == now.month) {
-      examCounts[e.createdAt!.day] = (examCounts[e.createdAt!.day] ?? 0) + 1;
+    if (e.createdAt != null) {
+      final key = '${e.createdAt!.year}-${e.createdAt!.month}-${e.createdAt!.day}';
+      examCounts[key] = (examCounts[key] ?? 0) + 1;
     }
   }
-  return List.generate(daysInMonth, (i) {
-    final d = i + 1;
-    return MonthCalendarDay(
-      date: DateTime(now.year, now.month, d),
-      dayOfMonth: d,
-      examCount: examCounts[d] ?? 0,
-      isCurrentMonth: true,
-    );
-  });
+
+  final List<MonthCalendarDay> allDays = [];
+
+  // Generate calendar days for only previous month (mOffset = 1) and current month (mOffset = 0)
+  for (int mOffset = 1; mOffset >= 0; mOffset--) {
+    final mDate = DateTime(now.year, now.month - mOffset, 1);
+    final y = mDate.year;
+    final m = mDate.month;
+    final daysInMonth = DateTime(y, m + 1, 0).day;
+
+    for (int d = 1; d <= daysInMonth; d++) {
+      final key = '$y-$m-$d';
+      allDays.add(
+        MonthCalendarDay(
+          date: DateTime(y, m, d),
+          dayOfMonth: d,
+          examCount: examCounts[key] ?? 0,
+          isCurrentMonth: true,
+        ),
+      );
+    }
+  }
+
+  return allDays;
 }
 
 class ProfileStatsPage extends ConsumerWidget {

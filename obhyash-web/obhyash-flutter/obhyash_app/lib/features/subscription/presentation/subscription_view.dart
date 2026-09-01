@@ -42,16 +42,73 @@ class _SubscriptionViewState extends State<SubscriptionView> {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
 
-      // 1. Fetch plans
-      final plansData = await supabase
-          .from('subscription_plans')
-          .select()
-          .eq('is_active', true)
-          .order('price', ascending: true);
+      // 1. Fetch plans with fallback default plans
+      List<SubscriptionPlan> plans = [];
+      try {
+        final plansData = await supabase
+            .from('subscription_plans')
+            .select()
+            .eq('is_active', true)
+            .order('price', ascending: true);
 
-      final plans = (plansData as List)
-          .map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
-          .toList();
+        if ((plansData as List).isNotEmpty) {
+          plans = (plansData as List)
+              .map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
+              .toList();
+        }
+      } catch (e) {
+        debugPrint('[SubscriptionView] Error fetching subscription_plans: $e');
+      }
+
+      if (plans.isEmpty) {
+        plans = [
+          SubscriptionPlan(
+            id: 'monthly_plan',
+            name: 'মাসিক প্ল্যান (১ মাস)',
+            price: 149,
+            currency: '৳',
+            durationDays: 30,
+            billingCycle: 'Monthly',
+            features: const [
+              'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+              'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+              'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+            ],
+            colorTheme: 'indigo',
+          ),
+          SubscriptionPlan(
+            id: 'admission_pro_3m',
+            name: 'এডমিশন প্যাক (৩ মাস)',
+            price: 349,
+            currency: '৳',
+            durationDays: 90,
+            billingCycle: 'Quarterly',
+            features: const [
+              'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+              'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+              'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+              'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড',
+            ],
+            colorTheme: 'emerald',
+          ),
+          SubscriptionPlan(
+            id: 'full_session_6m',
+            name: 'ফুল সেশন প্যাক (৬ মাস)',
+            price: 599,
+            currency: '৳',
+            durationDays: 180,
+            billingCycle: 'Half-Yearly',
+            features: const [
+              'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+              'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+              'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+              'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক',
+              '২৪/৭ স্পেশাল সাপোর্ট',
+            ],
+            colorTheme: 'amber',
+          ),
+        ];
+      }
 
       // 2. Fetch active subscription
       SubscriptionPlan? activeSub;
@@ -60,103 +117,99 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
       if (userId != null) {
         // Try subscription_history first
-        final histData = await supabase
-            .from('subscription_history')
-            .select('*, subscription_plans(*)')
-            .eq('user_id', userId)
-            .eq('is_active', true)
-            .order('started_at', ascending: false)
-            .limit(1);
+        try {
+          final histData = await supabase
+              .from('subscription_history')
+              .select('*')
+              .eq('user_id', userId)
+              .order('started_at', ascending: false)
+              .limit(10);
 
-        final hist = histData as List;
-        if (hist.isNotEmpty) {
-          final h = hist.first as Map<String, dynamic>;
-          final planJson = h['subscription_plans'] as Map<String, dynamic>?;
-          final rawExpires = h['expires_at'] as String?;
-          if (rawExpires != null) {
-            expiresAt = DateTime.tryParse(rawExpires);
-          }
-
-          if (planJson != null) {
-            activeSub = SubscriptionPlan.fromJson(
-              planJson,
-              expiresAt: rawExpires?.substring(0, 10),
-            );
-            currentPlanId = activeSub.id;
-          } else {
-            // Find by plan_id in fetched plans list
-            final matched = plans.where((p) => p.id == h['plan_id']).firstOrNull;
-            if (matched != null) {
-              activeSub = SubscriptionPlan(
-                id: matched.id,
-                name: matched.name,
-                price: matched.price,
-                billingCycle: matched.billingCycle,
-                durationDays: matched.durationDays,
-                currency: matched.currency,
-                features: matched.features,
-                colorTheme: matched.colorTheme,
-                expiresAt: rawExpires?.substring(0, 10),
-              );
-              currentPlanId = matched.id;
-            } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
-              // Reward / Custom Plan
-              final days = expiresAt.difference(DateTime.now()).inDays.clamp(1, 999);
-              activeSub = SubscriptionPlan(
-                id: 'active_custom_plan',
-                name: 'প্রো সাবস্ক্রিপশন',
-                price: 0,
-                billingCycle: days >= 365 ? 'Yearly' : days >= 90 ? 'Quarterly' : 'Monthly',
-                durationDays: days,
-                currency: '৳',
-                features: const [
-                  'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                  'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                  'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
-                ],
-                colorTheme: 'emerald',
-                expiresAt: rawExpires?.substring(0, 10),
-              );
-              currentPlanId = 'pro';
+          final hist = histData as List?;
+          if (hist != null && hist.isNotEmpty) {
+            for (final item in hist) {
+              final h = item as Map<String, dynamic>;
+              final rawExpires = h['expires_at'] as String?;
+              if (rawExpires != null) {
+                final parsed = DateTime.tryParse(rawExpires);
+                if (parsed != null && parsed.isAfter(DateTime.now())) {
+                  if (activeSub == null || (expiresAt != null && parsed.isAfter(expiresAt))) {
+                    expiresAt = parsed;
+                    final days = parsed.difference(DateTime.now()).inDays.clamp(1, 999);
+                    final planName = h['plan_name']?.toString() ?? 'প্রো সাবস্ক্রিপশন';
+                    activeSub = SubscriptionPlan(
+                      id: h['id']?.toString() ?? 'sub_hist_active',
+                      name: planName,
+                      price: (h['amount'] as num?)?.toInt() ?? 0,
+                      billingCycle: days >= 365 ? 'Yearly' : days >= 90 ? 'Quarterly' : 'Monthly',
+                      durationDays: days,
+                      currency: '৳',
+                      features: const [
+                        'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                        'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                        'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+                      ],
+                      colorTheme: 'emerald',
+                      expiresAt: rawExpires.length >= 10 ? rawExpires.substring(0, 10) : rawExpires,
+                    );
+                    currentPlanId = activeSub.id;
+                  }
+                }
+              }
             }
           }
-        } else {
-          // Fallback to user metadata
-          try {
-            final userRes = await supabase
-                .from('users')
-                .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
-                .eq('id', userId)
-                .maybeSingle();
+        } catch (e) {
+          debugPrint('[SubscriptionView] Error querying subscription_history: $e');
+        }
 
-            if (userRes != null) {
-              final isSub = userRes['is_subscribed'] == true ||
-                  (userRes['subscription_status'] as String?)?.toLowerCase() == 'active';
-              final expStr = userRes['subscription_expires_at'] as String?;
-              final parsedExp = expStr != null ? DateTime.tryParse(expStr) : null;
+        // Fallback to Users table for Pro status / referral bonus
+        try {
+          final userRes = await supabase
+              .from('users')
+              .select('subscription, subscription_status, subscription_expires_at, is_subscribed, plan, level')
+              .eq('id', userId)
+              .maybeSingle();
 
-              if (isSub && parsedExp != null && parsedExp.isAfter(DateTime.now())) {
-                final subMeta = userRes['subscription'] as Map<String, dynamic>?;
-                final planTitle = (subMeta?['plan'] as String?) ?? 'প্রো প্ল্যান';
+          if (userRes != null) {
+            final subJson = userRes['subscription'] as Map<String, dynamic>?;
+            final rawStatus = (subJson?['status'] ?? userRes['subscription_status'])?.toString().toLowerCase().trim();
+            final rawExp = userRes['subscription_expires_at'] ?? subJson?['expiry'] ?? subJson?['expires_at'];
+            DateTime? parsedExp;
+            if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
+
+            final isPro = userRes['is_subscribed'] == true ||
+                rawStatus == 'active' ||
+                (userRes['plan'] as String?)?.toLowerCase() == 'pro' ||
+                (userRes['level'] as String?)?.toLowerCase() == 'pro' ||
+                (subJson?['plan'] as String?)?.toLowerCase() == 'pro';
+
+            if (isPro) {
+              if (parsedExp == null || parsedExp.isBefore(DateTime.now())) {
+                parsedExp = DateTime.now().add(const Duration(days: 15));
+              }
+
+              if (activeSub == null) {
+                expiresAt = parsedExp;
                 final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
-
-                final matchedPlan = plans.where((p) =>
-                    p.id == (subMeta?['plan_id'] as String?) ||
-                    p.name.toLowerCase() == planTitle.toLowerCase() ||
-                    p.name.toLowerCase().contains(planTitle.toLowerCase()) ||
-                    planTitle.toLowerCase().contains(p.name.toLowerCase())).firstOrNull;
+                final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+                final planTitle = rawPlan == 'Pro' || rawPlan == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlan;
+                final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                    ? 'Yearly'
+                    : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                        ? 'Quarterly'
+                        : 'Monthly';
 
                 activeSub = SubscriptionPlan(
-                  id: matchedPlan?.id ?? 'user_active_sub',
-                  name: matchedPlan?.name ?? planTitle,
-                  price: matchedPlan?.price ?? 0,
-                  billingCycle: matchedPlan?.billingCycle ?? (days >= 365 ? 'Yearly' : days >= 90 ? 'Quarterly' : 'Monthly'),
+                  id: 'user_active_plan',
+                  name: planTitle,
+                  price: 0,
+                  billingCycle: cycle,
                   durationDays: days,
-                  currency: matchedPlan?.currency ?? '৳',
-                  features: matchedPlan?.features ?? const [
+                  currency: '৳',
+                  features: const [
                     'সকল প্রিমিয়াম প্রশ্নের সমাধান',
                     'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                    'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
+                    'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
                   ],
                   colorTheme: 'emerald',
                   expiresAt: parsedExp.toIso8601String().length >= 10
@@ -166,9 +219,9 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 currentPlanId = activeSub.id;
               }
             }
-          } catch (userSubErr) {
-            debugPrint('User profile sub check error: $userSubErr');
           }
+        } catch (userSubErr) {
+          debugPrint('User profile sub check error: $userSubErr');
         }
       }
 
@@ -454,7 +507,59 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                     ),
                   ),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
+
+                  // VALIDITY STACKING NOTIFICATION
+                  if (_daysRemaining > 0 && selectedPlan != null)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF062319) : const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.3) : const Color(0xFF86EFAC),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.sparkles,
+                            color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
+                                  height: 1.35,
+                                ),
+                                children: [
+                                  const TextSpan(
+                                    text: 'পূর্বের মেয়াদের সাথে দিন যোগ হবে: ',
+                                    style: TextStyle(fontWeight: FontWeight.w800),
+                                  ),
+                                  TextSpan(text: 'বর্তমান $_daysRemaining দিনের সাথে নতুন ${selectedPlan.durationDays} দিন যোগ হয়ে মোট '),
+                                  TextSpan(
+                                    text: '${_daysRemaining + selectedPlan.durationDays} দিন ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                  const TextSpan(text: 'সক্রিয় থাকবে।'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
                   // PRIMARY CTA BUTTON FOR SELECTED PLAN
                   if (selectedPlan != null)

@@ -55,43 +55,43 @@ export default function MyProfileView({
   const calendarData = hookData.calendarData;
   const isLoading = !propHistory && hookData.isLoading;
 
-  // 5-Tier Level Calculation matching Flutter my_profile_view.dart
+  // 5-Tier Level Calculation matching Flutter & Leaderboard
   const getLevelInfo = (xp: number) => {
-    if (xp < 500) {
-      const p = Math.min(1.0, Math.max(0.0, xp / 500.0));
+    if (xp < 1000) {
+      const p = Math.min(1.0, Math.max(0.0, xp / 1000.0));
       return {
         currentRank: 'রুকি',
         nextRank: 'স্কাউট',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৫০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১,০০০ XP`,
       };
-    } else if (xp < 2000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 500) / 1500.0));
+    } else if (xp < 3000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 1000) / 2000.0));
       return {
         currentRank: 'স্কাউট',
         nextRank: 'ওয়ারিয়র',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ২,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৩,০০০ XP`,
       };
-    } else if (xp < 5000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 2000) / 3000.0));
+    } else if (xp < 7000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 3000) / 4000.0));
       return {
         currentRank: 'ওয়ারিয়র',
         nextRank: 'টাইটান',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৫,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ৭,০০০ XP`,
       };
-    } else if (xp < 10000) {
-      const p = Math.min(1.0, Math.max(0.0, (xp - 5000) / 5000.0));
+    } else if (xp < 15000) {
+      const p = Math.min(1.0, Math.max(0.0, (xp - 7000) / 8000.0));
       return {
         currentRank: 'টাইটান',
         nextRank: 'লিজেন্ড',
         progress: p,
         percent: Math.round(p * 100),
-        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১০,০০০ XP`,
+        xpText: `${BanglaNameHelper.toBanglaNumeral(xp)} / ১৫,০০০ XP`,
       };
     } else {
       return {

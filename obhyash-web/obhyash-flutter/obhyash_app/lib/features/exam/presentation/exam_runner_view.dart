@@ -12,6 +12,7 @@ import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 class ExamRunnerView extends ConsumerStatefulWidget {
   const ExamRunnerView({super.key});
@@ -782,7 +783,16 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
               },
               isBookmarked: state.bookmarkedQuestions.contains(q.id),
               onToggleBookmark: () {
-                ref.read(examEngineProvider.notifier).toggleBookmark(q.id);
+                final isPro = ref.read(userProfileProvider).value?.isPro ?? false;
+                final isBookmarked = state.bookmarkedQuestions.contains(q.id);
+                if (!isBookmarked && !isPro && state.bookmarkedQuestions.length >= 25) {
+                  AppPopups.warning(
+                    context,
+                    message: 'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
+                  );
+                  return;
+                }
+                ref.read(examEngineProvider.notifier).toggleBookmark(q.id, isPro: isPro);
               },
             );
           },

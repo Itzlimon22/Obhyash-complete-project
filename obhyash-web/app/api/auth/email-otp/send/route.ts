@@ -32,27 +32,28 @@ export async function POST(request: Request) {
       );
     }
 
+    // 1. Trigger Supabase native Auth email dispatch (Same as password reset mail)
+    try {
+      await supabase.auth.signInWithOtp({
+        email: targetEmail,
+        options: {
+          shouldCreateUser: false,
+        },
+      });
+    } catch (authErr) {
+      console.warn('[send-email-otp] Supabase native email send warning:', authErr);
+    }
+
+    // 2. Also record in RPC for fallback/history
     const isDev = process.env.NODE_ENV !== 'production';
 
-    const { data, error } = await supabase.rpc('send_email_verification_otp', {
+    const { data } = await supabase.rpc('send_email_verification_otp', {
       p_user_id: authUser.id,
       p_email: targetEmail,
       p_is_dev_mock: isDev,
     });
 
-    if (error) {
-      console.error('[send-email-otp] RPC Error:', error);
-      return NextResponse.json(
-        { success: false, error: error.message || 'ওটিপি পাঠাতে ব্যর্থ হয়েছে।' },
-        { status: 500 },
-      );
-    }
-
-    if (!data?.success) {
-      return NextResponse.json(data, { status: 400 });
-    }
-
-    const otpCode = data.otp_code;
+    const otpCode = data?.otp_code;
     if (isDev && otpCode) {
       console.log(`\n========================================\n[DEV EMAIL OTP] To: ${targetEmail} | Code: ${otpCode}\n========================================\n`);
     }

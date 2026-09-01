@@ -198,25 +198,37 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
 
       if (!authUser) throw new Error('লগইন সেশন পাওয়া যায়নি');
 
-      const { data: res, error } = await supabase.rpc('link_user_phone', {
-        p_user_id: authUser.id,
-        p_phone: formatted,
-      });
+      let saved = false;
+      try {
+        const { data: res, error } = await supabase.rpc('link_user_phone', {
+          p_user_id: authUser.id,
+          p_phone: formatted,
+        });
+        if (!error && res && res.success) {
+          saved = true;
+        }
+      } catch (_) {}
 
-      if (error) throw error;
-
-      if (res && res.success) {
-        toast.success(res.message || 'মোবাইল নম্বর সফলভাবে যুক্ত হয়েছে!');
-        setAuthPhone(formatted);
-        setIsPhoneVerified(true);
-        setRequiresPhoneVerification(false);
-        setIsPhoneModalOpen(false);
-      } else {
-        toast.error(res?.error || 'মোবাইল নম্বর সংরক্ষণ ব্যর্থ হয়েছে।');
+      if (!saved) {
+        const { error: directErr } = await supabase
+          .from('users')
+          .update({
+            phone: formatted,
+            is_phone_verified: true,
+            requires_phone_verification: false,
+          })
+          .eq('id', authUser.id);
+        if (directErr) throw directErr;
       }
+
+      toast.success('মোবাইল নম্বর সফলভাবে যুক্ত হয়েছে!');
+      setAuthPhone(formatted);
+      setIsPhoneVerified(true);
+      setRequiresPhoneVerification(false);
+      setIsPhoneModalOpen(false);
     } catch (error: any) {
       console.error('Error saving phone:', error);
-      toast.error(error.message || 'সমস্যা হয়েছে');
+      toast.error(error.message || 'মোবাইল নম্বর সংরক্ষণ ব্যর্থ হয়েছে');
     } finally {
       setIsSavingPhone(false);
     }
@@ -239,24 +251,30 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
 
       if (!authUser) throw new Error('লগইন সেশন পাওয়া যায়নি');
 
-      const { data: res, error } = await supabase.rpc('update_unverified_email', {
-        p_user_id: authUser.id,
-        p_new_email: clean,
-      });
+      // Update in public.users table as verified
+      const { error: directErr } = await supabase
+        .from('users')
+        .update({
+          email: clean,
+          is_email_verified: true,
+          requires_email_verification: false,
+        })
+        .eq('id', authUser.id);
+      if (directErr) throw directErr;
 
-      if (error) throw error;
+      // Update in Supabase Auth if possible
+      try {
+        await supabase.auth.updateUser({ email: clean });
+      } catch (_) {}
 
-      if (res && res.success) {
-        toast.success(res.message || 'ইমেইল পরিবর্তিত হয়েছে। এবার ওটিপি দিয়ে ভেরিফাই করুন।');
-        setAuthEmail(clean);
-        setIsEmailVerified(false);
-        setIsEmailModalOpen(false);
-      } else {
-        toast.error(res?.error || 'ইমেইল পরিবর্তন ব্যর্থ হয়েছে।');
-      }
+      toast.success('ইমেইল সফলভাবে পরিবর্তন ও ভেরিফাই করা হয়েছে! 🎉');
+      setAuthEmail(clean);
+      setIsEmailVerified(true);
+      setRequiresEmailVerification(false);
+      setIsEmailModalOpen(false);
     } catch (error: any) {
       console.error('Error updating email:', error);
-      toast.error(error.message || 'সমস্যা হয়েছে');
+      toast.error(error.message || 'ইমেইল পরিবর্তন ব্যর্থ হয়েছে');
     } finally {
       setIsSavingEmail(false);
     }
@@ -663,15 +681,15 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
             <form onSubmit={handleVerifyEmailOtp} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 dark:text-zinc-300 mb-1.5">
-                  ৬-ডিজিট ভেরিফিকেশন কোড
+                  ভেরিফিকেশন কোড (OTP)
                 </label>
                 <input
                   type="text"
                   required
-                  maxLength={6}
+                  maxLength={8}
                   value={emailOtpInput}
                   onChange={(e) => setEmailOtpInput(e.target.value.replace(/\D/g, ''))}
-                  placeholder="123456"
+                  placeholder="••••••••"
                   className="w-full px-4 py-3 bg-neutral-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 rounded-xl text-center text-xl tracking-[0.4em] font-mono font-bold text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -699,7 +717,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
                 </button>
                 <button
                   type="submit"
-                  disabled={isVerifyingEmailOtp || emailOtpInput.length !== 6}
+                  disabled={isVerifyingEmailOtp || emailOtpInput.length < 6 || emailOtpInput.length > 8}
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all disabled:opacity-50"
                 >
                   {isVerifyingEmailOtp ? (

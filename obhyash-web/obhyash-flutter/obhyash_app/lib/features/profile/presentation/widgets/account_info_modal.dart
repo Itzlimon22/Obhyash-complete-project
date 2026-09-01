@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../dashboard/domain/models.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
@@ -58,7 +59,6 @@ class AccountInfoModal extends StatelessWidget {
     final cardBg = isDark ? const Color(0xFF1E2235) : const Color(0xFFF8FAFC);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final iconBg = const Color(0xFF0D9488); // Teal color matching screenshot
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
@@ -67,160 +67,160 @@ class AccountInfoModal extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 44,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
-                borderRadius: BorderRadius.circular(2),
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
-            const SizedBox(height: 18),
-
-            // Title
-            Text(
-              'অ্যাকাউন্ট ইনফো',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
-                color: textPrimary,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য',
-              style: TextStyle(
-                fontSize: 13,
-                fontFamily: 'HindSiliguri',
-                color: textSecondary,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Item 1: User Name
-            _buildInfoRow(
-              context: context,
-              icon: LucideIcons.user,
-              iconBg: iconBg,
-              label: 'User Name',
-              value: user.name,
-              textPrimary: textPrimary,
-              textSecondary: textSecondary,
-              cardBg: cardBg,
-              isDark: isDark,
-            ),
-            const SizedBox(height: 16),
-
-            // Item 2: Student ID (User ID)
-            _buildInfoRow(
-              context: context,
-              icon: LucideIcons.hash,
-              iconBg: iconBg,
-              label: 'User ID',
-              value: user.displayStudentId,
-              textPrimary: textPrimary,
-              textSecondary: textSecondary,
-              cardBg: cardBg,
-              isDark: isDark,
-              isMonospace: true,
-              showCopyIcon: true,
-            ),
-            const SizedBox(height: 16),
-
-            // Item 3: Email
-            if (user.email != null && user.email!.isNotEmpty) ...[
-              _buildInfoRow(
-                context: context,
-                icon: LucideIcons.mail,
-                iconBg: iconBg,
-                label: 'Email',
-                value: user.email!,
-                textPrimary: textPrimary,
-                textSecondary: textSecondary,
-                cardBg: cardBg,
-                isDark: isDark,
-                showCopyIcon: true,
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Item 4: Phone (if available)
-            if (user.phone != null && user.phone!.isNotEmpty) ...[
-              _buildInfoRow(
-                context: context,
-                icon: LucideIcons.phone,
-                iconBg: iconBg,
-                label: 'Phone',
-                value: user.phone!,
-                textPrimary: textPrimary,
-                textSecondary: textSecondary,
-                cardBg: cardBg,
-                isDark: isDark,
-                showCopyIcon: true,
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            const SizedBox(height: 10),
-
-            // Copy All Button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: () => _copyAll(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF047857), // Green button from screenshot
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Copy',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(LucideIcons.copy, size: 18),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
           ],
         ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              // Title
+              Text(
+                'অ্যাকাউন্ট ইনফো',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
+                  color: textPrimary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'HindSiliguri',
+                  color: textSecondary,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Item 1: User Name
+              _buildInfoRow(
+                context: context,
+                svgAsset: 'assets/dashboard-icons/user_profile.svg',
+                fallbackIcon: LucideIcons.user,
+                label: 'User Name',
+                value: user.name,
+                textPrimary: textPrimary,
+                textSecondary: textSecondary,
+                cardBg: cardBg,
+                isDark: isDark,
+              ),
+              const SizedBox(height: 16),
+
+              // Item 2: Student ID (User ID)
+              _buildInfoRow(
+                context: context,
+                svgAsset: 'assets/dashboard-icons/account_card.svg',
+                fallbackIcon: LucideIcons.hash,
+                label: 'User ID',
+                value: user.displayStudentId,
+                textPrimary: textPrimary,
+                textSecondary: textSecondary,
+                cardBg: cardBg,
+                isDark: isDark,
+                isMonospace: true,
+                showCopyIcon: true,
+              ),
+              const SizedBox(height: 16),
+
+              // Item 3: Email
+              if (user.email != null && user.email!.isNotEmpty) ...[
+                _buildInfoRow(
+                  context: context,
+                  svgAsset: 'assets/dashboard-icons/email_mail.svg',
+                  fallbackIcon: LucideIcons.mail,
+                  label: 'Email',
+                  value: user.email!,
+                  textPrimary: textPrimary,
+                  textSecondary: textSecondary,
+                  cardBg: cardBg,
+                  isDark: isDark,
+                  showCopyIcon: true,
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              // Item 4: Phone (if available)
+              if (user.phone != null && user.phone!.isNotEmpty) ...[
+                _buildInfoRow(
+                  context: context,
+                  svgAsset: 'assets/dashboard-icons/phone_call.svg',
+                  fallbackIcon: LucideIcons.phone,
+                  label: 'Phone',
+                  value: user.phone!,
+                  textPrimary: textPrimary,
+                  textSecondary: textSecondary,
+                  cardBg: cardBg,
+                  isDark: isDark,
+                  showCopyIcon: true,
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              const SizedBox(height: 10),
+
+              // Copy All Button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () => _copyAll(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF047857), // Obhyash Emerald
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'Copy',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(LucideIcons.copy, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildInfoRow({
     required BuildContext context,
-    required IconData icon,
-    required Color iconBg,
+    required String svgAsset,
+    required IconData fallbackIcon,
     required String label,
     required String value,
     required Color textPrimary,
@@ -237,18 +237,15 @@ class AccountInfoModal extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         child: Row(
           children: [
-            // Teal circular icon container
-            Container(
+            // Real 3D SVG Icon
+            SizedBox(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(
-                color: iconBg,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 20,
+              child: SvgPicture.asset(
+                svgAsset,
+                width: 44,
+                height: 44,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(width: 16),

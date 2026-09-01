@@ -5,6 +5,7 @@ export const toggleBookmark = async (
   userId: string,
   questionId: string | number,
   isBookmarked: boolean,
+  isPro: boolean = false,
 ): Promise<boolean> => {
   if (!isSupabaseConfigured()) {
     console.warn('Database not configured');
@@ -25,6 +26,20 @@ export const toggleBookmark = async (
       if (error) throw error;
       return false;
     } else {
+      // For free tier users, verify current bookmark count before adding
+      if (!isPro) {
+        const { count, error: countErr } = await supabase
+          .from('bookmarks')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId);
+
+        if (!countErr && typeof count === 'number' && count >= 25) {
+          const err = new Error('BOOKMARK_LIMIT_EXCEEDED');
+          (err as any).code = 'BOOKMARK_LIMIT_EXCEEDED';
+          throw err;
+        }
+      }
+
       // Add bookmark
       const { error } = await supabase.from('bookmarks').insert({
         user_id: userId,

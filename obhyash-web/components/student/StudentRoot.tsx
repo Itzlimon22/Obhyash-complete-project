@@ -28,6 +28,7 @@ import { useSessionMonitor } from "@/hooks/use-session-monitor";
 // Components - Layout & Common
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import TimeoutModal from "@/components/student/ui/TimeoutModal";
+import ProUpgradeModal from "@/components/common/ProUpgradeModal";
 import { toast } from "sonner";
 import { celebration } from "@/lib/confetti";
 import StreakCelebration from "@/components/student/ui/common/StreakCelebration";
@@ -280,12 +281,40 @@ export default function StudentRoot({
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
 
   const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
+  const isPro = Boolean(
+    (currentUser as any)?.isPro ||
+    (currentUser as any)?.is_pro ||
+    (currentUser as any)?.is_subscribed ||
+    (currentUser as any)?.subscription_status === "active" ||
+    (currentUser as any)?.plan === "pro" ||
+    currentUser?.subscription?.plan === "Pro" ||
+    (currentUser?.role as string)?.toLowerCase() === "admin"
+  );
+
+  const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
+
+  const handleBookmarkLimitReached = useCallback(() => {
+    if (appState === AppState.ACTIVE) {
+      toast.error(
+        "বুকমার্ক লিমিট শেষ! ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন সংরক্ষণ করা যাবে। পরীক্ষা শেষে প্রো সাবস্ক্রিপশন আপগ্রেড করো।",
+        { duration: 4000 }
+      );
+    } else {
+      setShowProBookmarkModal(true);
+    }
+  }, [appState]);
+
   const {
     bookmarkedIds,
     isBookmarked,
     toggle: toggleBookmark,
     isLoading: isBookmarksLoading,
-  } = useBookmarks(activeUserId, authLoading);
+  } = useBookmarks(
+    activeUserId,
+    authLoading,
+    isPro,
+    handleBookmarkLimitReached,
+  );
 
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[] | undefined>(undefined);
   
@@ -1497,6 +1526,20 @@ export default function StudentRoot({
           }}
         />
       )}
+      <ProUpgradeModal
+        isOpen={showProBookmarkModal}
+        onClose={() => setShowProBookmarkModal(false)}
+        title="বুকমার্ক লিমিট শেষ 📌"
+        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও প্র্যাকটিসের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        featurePill="বুকমার্ক লিমিট: ২৫/২৫"
+        onUpgradeClick={() => {
+          setShowProBookmarkModal(false);
+          setActiveTab("subscription");
+          if (typeof window !== "undefined") {
+            window.history.pushState({ tab: "subscription" }, "", "/subscription");
+          }
+        }}
+      />
     </>
   );
 }

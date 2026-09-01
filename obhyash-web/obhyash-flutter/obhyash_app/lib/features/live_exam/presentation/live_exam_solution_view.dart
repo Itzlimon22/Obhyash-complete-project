@@ -4,6 +4,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/app_popups.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../domain/models.dart';
@@ -36,6 +38,22 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
     }
 
     final isBookmarked = _bookmarkedIds.contains(questionId);
+
+    if (!isBookmarked) {
+      final profile = ref.read(userProfileProvider).value;
+      final isPro = profile?.isPro ?? false;
+      if (!isPro && _bookmarkedIds.length >= 25) {
+        ProUpgradeModal.show(
+          context,
+          title: 'বুকমার্ক লিমিট শেষ 📌',
+          message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।',
+          featurePill: 'বুকমার্ক লিমিট: ২৫/২৫',
+          icon: LucideIcons.bookmark,
+        );
+        return;
+      }
+    }
+
     setState(() {
       if (isBookmarked) {
         _bookmarkedIds.remove(questionId);

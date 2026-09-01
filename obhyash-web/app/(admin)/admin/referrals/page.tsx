@@ -57,6 +57,8 @@ interface UserReferralItem {
   approvedUses: number;
   pendingUses: number;
   rejectedUses: number;
+  hourlyUses?: number;
+  hasAnomalyAlert?: boolean;
   referees: RefereeRecord[];
 }
 
@@ -529,15 +531,23 @@ export default function AdminReferralsPage() {
 
                         {/* Referral Code */}
                         <td className="py-3.5 px-4">
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-neutral-100 dark:bg-zinc-800 border border-neutral-200/80 dark:border-zinc-700/80 font-mono font-black text-xs text-neutral-900 dark:text-white">
-                            <span>{item.code}</span>
-                            <button
-                              onClick={() => handleCopyCode(item.code)}
-                              className="text-neutral-400 hover:text-neutral-700 dark:hover:text-zinc-200 transition"
-                              title="কপি করুন"
-                            >
-                              <Copy size={11} />
-                            </button>
+                          <div className="flex flex-col gap-1 items-start">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-neutral-100 dark:bg-zinc-800 border border-neutral-200/80 dark:border-zinc-700/80 font-mono font-black text-xs text-neutral-900 dark:text-white">
+                              <span>{item.code}</span>
+                              <button
+                                onClick={() => handleCopyCode(item.code)}
+                                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-zinc-200 transition"
+                                title="কপি করুন"
+                              >
+                                <Copy size={11} />
+                              </button>
+                            </div>
+                            {item.hasAnomalyAlert && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800 text-[10px] font-black animate-pulse">
+                                <ShieldAlert size={11} className="text-red-600" />
+                                ১ ঘণ্টায় {item.hourlyUses || 10}+ (অ্যানোমালি)
+                              </span>
+                            )}
                           </div>
                         </td>
 

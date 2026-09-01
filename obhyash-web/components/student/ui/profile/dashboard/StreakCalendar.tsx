@@ -23,13 +23,12 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
 }) => {
   const [hoveredDay, setHoveredDay] = useState<MonthCalendarDay | null>(null);
 
-  // 4-level distinct heatmap intensity
+  // Clean, solid colors without light faded pastel tints
   const getColorClass = (examCount: number, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return 'bg-neutral-100 dark:bg-[#27272a]/30 text-neutral-400 dark:text-[#52525b]';
-    if (examCount === 0) return 'bg-neutral-200 dark:bg-[#27272a] text-neutral-600 dark:text-[#a1a1aa]';
-    if (examCount === 1) return 'bg-emerald-200 dark:bg-[#065f46] text-emerald-950 dark:text-white';
-    if (examCount === 2) return 'bg-emerald-400 dark:bg-[#059669] text-white';
-    return 'bg-emerald-600 dark:bg-[#10b981] text-white shadow-sm';
+    if (!isCurrentMonth) return 'bg-neutral-50 dark:bg-[#141416] text-neutral-300 dark:text-[#3f3f46]';
+    if (examCount === 0) return 'bg-neutral-100 dark:bg-[#222226] text-neutral-600 dark:text-[#a1a1aa] border border-neutral-200/80 dark:border-[#2c2c30]';
+    if (examCount === 1) return 'bg-[#059669] text-white shadow-sm font-bold';
+    return 'bg-[#047857] dark:bg-[#10b981] text-white shadow-md font-bold';
   };
 
   // Get current month name in Bengali
@@ -131,23 +130,19 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
         )}
       </div>
 
-      {/* Legend */}
+      {/* Clean Minimal Legend */}
       <div className="flex items-center justify-center gap-4 mt-5 text-xs text-neutral-500 dark:text-neutral-400">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-neutral-200 dark:bg-[#27272a]" />
-          <span>০</span>
+          <div className="w-3.5 h-3.5 rounded-[4px] bg-neutral-100 dark:bg-[#222226] border border-neutral-300 dark:border-[#3f3f46]" />
+          <span>০ পরীক্ষা</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-[#065f46]" />
-          <span>১</span>
+          <div className="w-3.5 h-3.5 rounded-[4px] bg-[#059669]" />
+          <span>১টি পরীক্ষা</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-emerald-400 dark:bg-[#059669]" />
-          <span>২</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-[#10b981]" />
-          <span>৩+</span>
+          <div className="w-3.5 h-3.5 rounded-[4px] bg-[#047857] dark:bg-[#10b981]" />
+          <span>২+ পরীক্ষা</span>
         </div>
       </div>
     </div>

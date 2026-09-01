@@ -7,6 +7,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/presentation/widgets/celebration_dialog.dart';
+import '../../../core/services/device_service.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'widgets/scratch_card_dialog.dart';
 
@@ -284,27 +287,39 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       final uid = sb.auth.currentUser?.id;
       if (uid == null) throw Exception('User not logged in');
 
+      final deviceId = await DeviceService.getDeviceId();
       final res = await sb.rpc('redeem_referral_by_code', params: {
         'p_code': input,
         'p_user_id': uid,
+        'p_device_id': deviceId,
       });
 
       if (!mounted) return;
 
       if (res is Map<String, dynamic>) {
         if (res['success'] == true) {
-          HapticFeedback.mediumImpact();
+          HapticFeedback.heavyImpact();
           _claimCodeController.clear();
           setState(() {
             _hasUsedReferral = true;
             _isClaiming = false;
             _remainingAttempts = 3;
           });
-          AppPopups.success(
+
+          // Ensure local user profile provider is refreshed
+          ref.invalidate(userProfileProvider);
+
+          CelebrationDialog.show(
             context,
-            message: res['message']?.toString() ??
-                'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉',
+            title: 'অভিনন্দন! 🎉',
+            subtitle: 'রেফারেল কোড সফলভাবে ব্যবহারের জন্য তোমার অ্যাকাউন্টে ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন সক্রিয় হয়েছে!',
+            badgeLabel: '১৫ দিনের প্রো সক্রিয় 👑',
+            icon: LucideIcons.crown,
+            primaryColor: const Color(0xFFD97706),
+            secondaryColor: const Color(0xFFF59E0B),
+            actionText: 'দারুণ! শুরু করো 🚀',
           );
+
           _loadReferral();
           return;
         } else {
@@ -321,7 +336,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           });
 
           if (isLocked || lockSec > 0) {
-            _startLockoutTimer(lockSec > 0 ? lockSec : 600);
+            _startLockoutTimer(lockSec > 0 ? lockSec : 180);
             AppPopups.error(context, message: errorMsg);
           } else {
             AppPopups.warning(context, message: errorMsg);
@@ -334,13 +349,13 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         setState(() => _isClaiming = false);
         final rawMsg = e is PostgrestException ? e.message : e.toString();
 
-        if (rawMsg.contains('১০ মিনিট') || rawMsg.contains('লক')) {
-          _startLockoutTimer(600);
+        if (rawMsg.contains('৩ মিনিট') || rawMsg.contains('১০ মিনিট') || rawMsg.contains('লক')) {
+          _startLockoutTimer(180);
           setState(() => _remainingAttempts = 0);
           AppPopups.error(
             context,
             message:
-                'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।',
+                'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ৩ মিনিটের জন্য রেফারেল ক্লেইম সাময়িকভাবে লক করা হলো।',
           );
         } else if (rawMsg.contains('চেষ্টা করা যাবে')) {
           final match = RegExp(r'আর (\d+) বার').firstMatch(rawMsg);
@@ -383,13 +398,13 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   void _shareCode() async {
     if (_code == null) return;
     final text =
-        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১ মাসের প্রিমিয়াম সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
+        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
     try {
       final box = context.findRenderObject() as RenderBox?;
       await SharePlus.instance.share(
         ShareParams(
           text: text,
-          subject: 'অভ্যাস অ্যাপ - ১ মাসের ফ্রি প্রিমিয়াম রেফারেল কোড',
+          subject: 'অভ্যাস অ্যাপ - ১৫ দিনের ফ্রি প্রো সাবস্ক্রিপশন',
           sharePositionOrigin: box != null
               ? (box.localToGlobal(Offset.zero) & box.size)
               : null,
@@ -454,7 +469,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                     ),
                     child: const Center(
                       child: Text(
-                        'বন্ধুদের আমন্ত্রণ জানাও,\nপ্রতি ৩ রেফারে পাও একটি স্ক্র্যাচ কার্ড!',
+                        'বন্ধুদের আমন্ত্রণ জানাও, প্রতি রেফারে পাও ৭ দিন!\nপ্রতি ৩ রেফারে আনলক করো একটি স্ক্র্যাচ কার্ড 🎉',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -525,7 +540,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       ),
                                     ),
                                     Text(
-                                      '১ মাসের ফ্রি প্রিমিয়াম উপভোগ করো',
+                                      '১৫ দিনের সম্পূর্ণ প্রো প্রিমিয়াম উপভোগ করো',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: textSecondary,
@@ -926,12 +941,18 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 ? const Color(0xFF059669)
                                 : status == 'Rejected'
                                 ? const Color(0xFFB91C1C)
+                                : status == 'Pending Exam'
+                                ? const Color(0xFFD97706)
                                 : const Color(0xFF1E3A8A);
                             final statusLabel = status == 'Approved'
-                                ? 'অনুমোদিত'
+                                ? 'অনুমোদিত (৭ দিন সক্রিয়)'
                                 : status == 'Rejected'
                                 ? 'বাতিল'
-                                : 'অপেক্ষমান';
+                                : status == 'Pending Exam'
+                                ? '১ম পরীক্ষা বাকি ⏳'
+                                : status == 'Pending Review'
+                                ? 'পর্যালোচনাধীন ⏳'
+                                : 'অপেক্ষমাণ';
 
                             return Container(
                               margin: const EdgeInsets.only(bottom: 8),
@@ -1055,18 +1076,23 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         ...[
                           (
                             '১',
-                            'বন্ধুর জন্য ১ মাস ফ্রি প্রিমিয়াম',
-                            'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
+                            'বন্ধুর জন্য ১৫ দিন সম্পূর্ণ ফ্রি প্রো',
+                            'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন।',
                           ),
                           (
                             '২',
-                            'তোমার জন্য স্ক্র্যাচ কার্ড',
-                            'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখানে থাকতে পারে ফ্রি প্রিমিয়াম।',
+                            'তোমার জন্য প্রতি রেফারে ৭ দিন ফ্রি প্রো',
+                            'যেকোনো বন্ধু তোমার কোড ব্যবহার করলে তোমার অ্যাকাউন্টে ৭ দিন প্রো সাবস্ক্রিপশন যোগ হবে।',
                           ),
                           (
                             '৩',
-                            'আনলিমিটেড রেফারেল',
-                            'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি স্ক্র্যাচ কার্ড জেতার সুযোগ পাবে।',
+                            'প্রতি ৩ রেফারে ১টি স্ক্র্যাচ কার্ড',
+                            'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখান থেকে পেতে পারো আকর্ষণীয় পুরস্কার!',
+                          ),
+                          (
+                            '৪',
+                            'মাসিক লিমিট ও লিডারবোর্ড',
+                            'প্রতি ইউজার প্রতি মাসে ১ বার রেফারেল কোড ক্লেইম করতে পারবেন। টপ রেফারারদের জন্য রয়েছে মান্থলি লিডারবোর্ড।',
                           ),
                         ].map(
                           (item) => Container(

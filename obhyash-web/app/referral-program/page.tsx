@@ -25,23 +25,27 @@ export default function ReferralProgramPage() {
   const faqs = [
     {
       q: 'আমি কীভাবে আমার রেফারেল কোড বা লিংক পাব?',
-      a: 'অভ্যাসে লগইন করার পর তোমার স্টুডেন্ট ড্যাশবোর্ডে "রেফারেল ও রিওয়ার্ডস" ট্যাবে যাও। সেখানে তোমার ইউনিক রেফারেল কোড এবং ওয়ান-ক্লিক কপি লিংক পেয়ে যাবে।',
+      a: 'অভ্যাসে লগইন করার পর তোমার স্টুডেন্ট ড্যাশবোর্ডে "রেফারেল ও রিওয়ার্ডস" ট্যাবে যাও। সেখানে তোমার ইউনিক রেফারেল কোড এবং ওয়ান-ক্লিক কপি ও শেয়ার লিংক পেয়ে যাবে।',
     },
     {
       q: 'আমার রেফারেল কোড ব্যবহার করে বন্ধু কী সুবিধা পাবে?',
-      a: 'তোমার রেফারেল কোড ব্যবহার করে যেকোনো নতুন শিক্ষার্থী সাইনআপ করলে বা কোড রিডিম করলে সে সাথে সাথে ১ মাসের সম্পূর্ণ ফ্রি প্রো (Pro) প্রিমিয়াম অ্যাক্সেস পেয়ে যাবে।',
+      a: 'তোমার রেফারেল কোড ব্যবহার করে যেকোনো শিক্ষার্থী রিডিম করলে সে সাথে সাথে ১৫ দিনের সম্পূর্ণ ফ্রি প্রো (Pro) প্রিমিয়াম অ্যাক্সেস পেয়ে যাবে।',
     },
     {
       q: 'রেফারকারী হিসেবে আমি কী রিওয়ার্ড পাব?',
-      a: 'প্রতিটি সফল রেফারেলের জন্য তুমি পাবে একটি সারপ্রাইজ স্ক্র্যাচ কার্ড (Scratch Card), প্রো মেম্বারশিপ ডেজ এবং ন্যাশনাল রেফারেল লিডারবোর্ডে পয়েন্ট। স্ক্র্যাচ কার্ড ঘষে আকর্ষণীয় সব রিওয়ার্ড আনলক করতে পারবে।',
+      a: 'প্রতিটি সফল রেফারেলের জন্য তোমার অ্যাকাউন্টে ৭ দিনের ফ্রি প্রো প্রিমিয়াম যোগ হবে এবং প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে পাবে একটি আকর্ষণীয় স্ক্র্যাচ কার্ড (Scratch Card) ও ন্যাশনাল লিডারবোর্ডে র‍্যাঙ্কিং।',
     },
     {
       q: 'আমি কতজন বন্ধুকে রেফার করতে পারব? কোনো লিমিট আছে কি?',
-      a: 'না, কোনো সর্বোচ্চ সীমা নেই! তুমি যত খুশি বন্ধু ও সহপাঠীকে আমন্ত্রণ জানাতে পারবে এবং আনলিমিটেড স্ক্র্যাচ কার্ড ও প্রিমিয়াম মেয়াদ অর্জন করতে পারবে।',
+      a: 'না, রেফার করার কোনো সর্বোচ্চ সীমা নেই! তুমি যত খুশি বন্ধু ও সহপাঠীকে তোমার কোড শেয়ার করতে পারবে। তবে মেয়াদের ফেয়ার-ইউজ পলিসি অনুযায়ী একসাথে সর্বোচ্চ ১২ মাস (৩৬৫ দিন) পর্যন্ত প্রো সাবস্ক্রিপশন মেয়াদ জমিয়ে রাখা যাবে। ৩৬৫ দিন পূর্ণ হলেও অতিরিক্ত রেফারে স্ক্র্যাচ কার্ড, পয়েন্ট ও ন্যাশনাল লিডারবোর্ড ট্রফি নিয়মিত পাওয়া যাবে।',
+    },
+    {
+      q: 'একজন শিক্ষার্থী কতবার রেফারেল কোড ব্যবহার করতে পারবে?',
+      a: 'প্রতিটি শিক্ষার্থী এবং প্রতিটি ডিভাইসে প্রতি ৩০ দিনে সর্বোচ্চ ১ বার রেফারেল কোড ক্লেইম করা যাবে। ভুল কোড ইনপুট দিলে ৩ মিনিটের জন্য সাময়িক লক থাকবে।',
     },
     {
       q: 'রেফারেল প্রোগ্রামের নীতিমালা ও ফেয়ার-ইউজ পলিসি কী?',
-      a: 'নিজের অ্যাকাউন্টে নিজের কোড ব্যবহার করা যাবে না। প্রতিটি নতুন একাউন্ট কেবল একবারই রেফারেল কোড ব্যবহার করতে পারবে। ফেক বা স্প্যামিং রোধে সিস্টেমে স্বয়ংক্রিয় সিকিউরিটি গার্ড ও রেট-লিমিট সক্রিয় রয়েছে।',
+      a: 'নিজের অ্যাকাউন্টে নিজের কোড ব্যবহার করা যাবে না। ফেক অ্যাকাউন্ট বা বট রোধে আমন্ত্রিত বন্ধু প্রথম পরীক্ষা সম্পন্ন করলেই রেফারারের অ্যাকাউন্টে বোনাস সক্রিয় হয়। এছাড়া একই ডিভাইস ও আইপিতে যুক্তিসঙ্গত নিরাপত্তা সীমা কার্যকর রয়েছে।',
     },
   ];
 
@@ -96,12 +100,12 @@ export default function ReferralProgramPage() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-neutral-900 dark:text-white tracking-tight leading-[1.25]">
             বন্ধুকে আমন্ত্রণ জানাও — <br />
             <span className="text-[#004633] dark:text-emerald-400">
-              দুজনেই উপভোগ করো এক্সক্লুসিভ রিওয়ার্ড!
+              বন্ধু পাবে ১৫ দিন, তুমি পাবে ৭ দিন ও স্ক্র্যাচ কার্ড!
             </span>
           </h1>
 
           <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-            তোমার ইউনিক রেফারেল লিংক দিয়ে কোনো বন্ধু যুক্ত হলে সে পাবে <strong className="text-neutral-900 dark:text-white font-bold">১ মাসের ফ্রি প্রো সাবস্ক্রিপশন</strong>, আর তোমার অ্যাকাউন্টে যোগ হবে <strong className="text-neutral-900 dark:text-white font-bold">সারপ্রাইজ স্ক্র্যাচ কার্ড</strong> ও আনলিমিটেড প্রিমিয়াম সুবিধা।
+            তোমার ইউনিক রেফারেল লিংক দিয়ে কোনো বন্ধু যুক্ত হলে সে পাবে <strong className="text-neutral-900 dark:text-white font-bold">১৫ দিনের ফ্রি প্রো সাবস্ক্রিপশন</strong>, আর তোমার অ্যাকাউন্টে প্রতি রেফারেলে যোগ হবে <strong className="text-neutral-900 dark:text-white font-bold">৭ দিনের প্রো মেয়াদ</strong> ও প্রতি ৩ রেফারে <strong className="text-neutral-900 dark:text-white font-bold">সারপ্রাইজ স্ক্র্যাচ কার্ড</strong>।
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -123,16 +127,16 @@ export default function ReferralProgramPage() {
           {/* Quick Metrics Banner */}
           <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto pt-8 border-t border-neutral-200/80 dark:border-neutral-800">
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-center shadow-xs">
-              <div className="text-xl sm:text-2xl font-black text-[#004633] dark:text-emerald-400">১ মাস</div>
+              <div className="text-xl sm:text-2xl font-black text-[#004633] dark:text-emerald-400">১৫ দিন</div>
               <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">বন্ধুর জন্য ফ্রি প্রো</div>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-center shadow-xs">
-              <div className="text-xl sm:text-2xl font-black text-red-600 dark:text-red-400">🎁 কার্ড</div>
-              <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">প্রতি রেফারেলে স্ক্র্যাচ</div>
+              <div className="text-xl sm:text-2xl font-black text-red-600 dark:text-red-400">৭ দিন</div>
+              <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">তোমার জন্য প্রতি রেফারে</div>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-center shadow-xs">
-              <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">আনলিমিটেড</div>
-              <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">রেফারেল আর্নিং সীমা</div>
+              <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">🎁 কার্ড</div>
+              <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">প্রতি ৩ রেফারে ১টি স্ক্র্যাচ</div>
             </div>
           </div>
         </div>
@@ -142,13 +146,13 @@ export default function ReferralProgramPage() {
       <section className="py-16 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
           <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">
-            উভয়ের জন্যই লাভ
+            উভয়ের জন্যই নিশ্চিত লাভ
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white">
             রেফারেল প্রোগ্রামে কে কী পাচ্ছে?
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-            শুধু তুমি একাই নও, তোমার মাধ্যমে যুক্ত হওয়া বন্ধুও সাথে সাথে পুরস্কৃত হবে।
+            শুধু তুমি একাই নও, তোমার কোড ব্যবহার করা বন্ধুও সাথে সাথে পুরস্কৃত হবে।
           </p>
         </div>
 
@@ -167,25 +171,25 @@ export default function ReferralProgramPage() {
 
               <div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-                  নিশ্চিত স্ক্র্যাচ কার্ড ও প্রিমিয়াম এক্সটেনশন
+                  প্রতি রেফারে ৭ দিন প্রো ও প্রতি ৩ রেফারে স্ক্র্যাচ কার্ড
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  তোমার কোড দিয়ে কোনো বন্ধু সাইনআপ করলেই তোমার অ্যাকাউন্টে স্বয়ংক্রিয়ভাবে রিওয়ার্ড যোগ হবে।
+                  তোমার কোড দিয়ে কোনো বন্ধু রিডিম করলেই তোমার অ্যাকাউন্টে স্বয়ংক্রিয়ভাবে ৭ দিন প্রিমিয়াম যোগ হবে।
                 </p>
               </div>
 
               <ul className="space-y-3 pt-2">
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>প্রতি রেফারেলে স্ক্র্যাচ কার্ড:</strong> কার্ড ঘষে জিতে নাও এক্সক্লুসিভ প্রো প্রিমিয়াম প্যাকেজ ও মেম্বারশিপ।</span>
+                  <span><strong>প্রতি রেফারে ৭ দিন প্রো:</strong> যত খুশি বন্ধুকে রেফার করো, প্রতিবার ৭ দিন করে মেম্বারশিপ মেয়াদ বৃদ্ধি পাবে।</span>
                 </li>
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>টিয়ার আনলক ও ব্যাজ:</strong> ৫, ১০ ও ২৫টি রেফারেলে বিশেষ সিলভার, গোল্ড ও লিজেন্ডারি ব্যাজ।</span>
+                  <span><strong>প্রতি ৩ রেফারে স্ক্র্যাচ কার্ড:</strong> ৩টি সফল রেফারেলের পর ১টি স্ক্র্যাচ কার্ড আনলক হবে, যেখান থেকে পাওয়া যাবে সারপ্রাইজ গিফট।</span>
                 </li>
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>ন্যাশনাল লিডারবোর্ড র‍্যাংক:</strong> সেরা রেফারারদের তালিকায় নিজের নাম ও ইনস্টিটিউট তুলে ধরো।</span>
+                  <span><strong>মান্থলি লিডারবোর্ড র‍্যাঙ্ক:</strong> সেরা ১০ জন রেফারারদের তালিকায় স্থান অর্জন করে বিশেষ সম্মাননা পাও।</span>
                 </li>
               </ul>
             </div>
@@ -215,25 +219,25 @@ export default function ReferralProgramPage() {
 
               <div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-                  ১ মাসের সম্পূর্ণ ফ্রি প্রো প্রিমিয়াম
+                  ১৫ দিনের সম্পূর্ণ ফ্রি প্রো প্রিমিয়াম
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  তোমার লিংকের মাধ্যমে যুক্ত হয়ে রেজিস্ট্রেশন করলেই কোনো খরচ ছাড়াই ১ মাসের প্রিমিয়াম এক্টিভ।
+                  তোমার কোড ক্লেইম করলেই কোনো খরচ ছাড়াই অ্যাকাউন্টে ১৫ দিনের প্রো প্রিমিয়াম সক্রিয় হবে।
                 </p>
               </div>
 
               <ul className="space-y-3 pt-2">
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <span><strong>আনলিমিটেড মডেল টেস্ট ও এক্সাম:</strong> অধ্যায়ভিত্তিক ও সমন্বিত সব প্রশ্ন ও পরীক্ষা আনলক।</span>
+                  <span><strong>আনলিমিটেড মডেল টেস্ট ও এক্সাম:</strong> অধ্যায়ভিত্তিক ও সমন্বিত সব প্রশ্ন ও আনলিমিটেড পরীক্ষা আনলক।</span>
                 </li>
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <span><strong>পাঠ্যবই রেফারেন্স সহ সমাধান:</strong> মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সমৃদ্ধ এক্সপ্ল্যানেশন।</span>
+                  <span><strong>পাঠ্যবই রেফারেন্স সহ সমাধান:</strong> মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সমৃদ্ধ KaTeX এক্সপ্ল্যানেশন।</span>
                 </li>
                 <li className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <span><strong>অফলাইন ২-কলাম PDF প্রিন্ট:</strong> যেকোনো পরীক্ষার প্রশ্ন ও উত্তরপত্র এক ক্লিকে ডাউনলোড।</span>
+                  <span><strong>আনলিমিটেড বুকমার্ক ও অ্যানালিটিক্স:</strong> আনলিমিটেড প্রশ্ন সংরক্ষণ এবং পারফরম্যান্স গ্রাফ সুবিধা।</span>
                 </li>
               </ul>
             </div>
@@ -302,7 +306,7 @@ export default function ReferralProgramPage() {
                 বন্ধু যুক্ত হওয়া ও ক্লেইম
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                বন্ধু সাইনআপ করার সাথে সাথে অথবা কোড রিডিম করলেই পাবে ১ মাসের ফ্রি প্রো।
+                বন্ধু কোড রিডিম করার সাথে সাথে অ্যাকাউন্টে পেয়ে যাবে ১৫ দিনের ফ্রি প্রো সাবস্ক্রিপশন।
               </p>
             </div>
 
@@ -312,10 +316,10 @@ export default function ReferralProgramPage() {
                 ৪
               </div>
               <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">
-                স্ক্র্যাচ কার্ড ও উপহার
+                ৭ দিন বোনাস ও স্ক্র্যাচ কার্ড
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                তোমার ড্যাশবোর্ডে সারপ্রাইজ স্ক্র্যাচ কার্ড জমা হবে। কার্ড ঘষে জিতে নাও উপহার!
+                তোমার অ্যাকাউন্টে যোগ হবে ৭ দিন এবং প্রতি ৩ রেফারে ১টি সারপ্রাইজ স্ক্র্যাচ কার্ড!
               </p>
             </div>
           </div>
@@ -332,7 +336,7 @@ export default function ReferralProgramPage() {
             রেফারেল মাইলস্টোন ও রিওয়ার্ড টিয়ার
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-            যত বেশি বন্ধু যুক্ত করবে, তত বড় বড় স্পেশাল গিফট প্যাক আনলক হবে।
+            যত বেশি বন্ধু যুক্ত করবে, তত দ্রুত স্ক্র্যাচ কার্ড ও লিডারবোর্ডের শীর্ষে পৌঁছাতে পারবে।
           </p>
         </div>
 
@@ -341,21 +345,21 @@ export default function ReferralProgramPage() {
             <div className="text-2xl">🥉</div>
             <div className="text-xs font-black text-neutral-500 uppercase tracking-wide">১-৪ জন রেফারেল</div>
             <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">ব্রোঞ্জ টিয়ার</h4>
-            <p className="text-xs text-neutral-500 leading-relaxed">প্রতিটি রেফারেলে ইনস্ট্যান্ট স্ক্র্যাচ কার্ড ও রিওয়ার্ড।</p>
+            <p className="text-xs text-neutral-500 leading-relaxed">প্রতি রেফারে ৭ দিন ফ্রি প্রো ও প্রতি ৩ রেফারে ১টি স্ক্র্যাচ কার্ড।</p>
           </div>
 
           <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-2 text-left">
             <div className="text-2xl">🥈</div>
             <div className="text-xs font-black text-neutral-500 uppercase tracking-wide">৫-৯ জন রেফারেল</div>
             <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">সিলভার টিয়ার</h4>
-            <p className="text-xs text-neutral-500 leading-relaxed">সিলভার রেফারার ব্যাজ + ৩ মাসের ফ্রি প্রো এক্সটেনশন।</p>
+            <p className="text-xs text-neutral-500 leading-relaxed">সিলভার রেফারার ব্যাজ + অতিরিক্ত প্রিমিয়াম এক্সটেনশন ও কার্ড।</p>
           </div>
 
           <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-2 text-left">
             <div className="text-2xl">🥇</div>
             <div className="text-xs font-black text-neutral-500 uppercase tracking-wide">১০-২৪ জন রেফারেল</div>
             <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">গোল্ড টিয়ার</h4>
-            <p className="text-xs text-neutral-500 leading-relaxed">গোল্ডেন ব্যাজ + ৬ মাসের মেম্বারশিপ ও বোনাস পয়েন্ট।</p>
+            <p className="text-xs text-neutral-500 leading-relaxed">গোল্ডেন ব্যাজ + দীর্ঘমেয়াদী মেম্বারশিপ ও মান্থলি লিডারবোর্ড টপ।</p>
           </div>
 
           <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-[#004633]/30 dark:border-emerald-800/60 shadow-xs space-y-2 text-left bg-gradient-to-br from-emerald-50/40 to-white dark:from-emerald-950/20 dark:to-neutral-900">
@@ -379,7 +383,7 @@ export default function ReferralProgramPage() {
                 ন্যায্য ব্যবহার নীতি ও নিরাপত্তা নির্দেশিকা
               </h3>
               <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                অভ্যাসের রেফারেল প্রোগ্রামটি প্রকৃত শিক্ষার্থীদের সহযোগিতার জন্য প্রণীত। নিজের ডিভাইসে ফেক অ্যাকাউন্ট তৈরি করে নিজের কোড ব্যবহার করা বা অনৈতিক উপায় অবলম্বন করা সম্পূর্ণ নিষিদ্ধ। সিস্টেম স্বয়ংক্রিয়ভাবে ভেরিফিকেশন করে এবং নিয়ম লঙ্ঘনে রেফারেল সুবিধা স্থগিত করা হতে পারে।
+                অভ্যাসের রেফারেল প্রোগ্রামটি প্রকৃত শিক্ষার্থীদের পারস্পরিক সহযোগিতার জন্য প্রণীত। নিজের অ্যাকাউন্টে নিজের কোড ব্যবহার করা যাবে না। প্রতিটি শিক্ষার্থী ও ডিভাইসে প্রতি ৩০ দিনে সর্বোচ্চ ১টি কোড ক্লেইম করা যাবে। ৩ বার ভুল কোড দিলে ৩ মিনিটের লক প্রযোজ্য। রেফারেল বোনাসের মাধ্যমে সর্বোচ্চ ১২ মাস (৩৬৫ দিন) পর্যন্ত প্রো মেয়াদ স্ট্যাক করে রাখা যায়।
               </p>
             </div>
           </div>

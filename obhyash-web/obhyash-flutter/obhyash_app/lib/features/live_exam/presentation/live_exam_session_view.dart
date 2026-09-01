@@ -124,6 +124,19 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     }
 
     final isBookmarked = _bookmarkedIds.contains(questionId);
+
+    if (!isBookmarked) {
+      final profile = ref.read(userProfileProvider).value;
+      final isPro = profile?.isPro ?? false;
+      if (!isPro && _bookmarkedIds.length >= 25) {
+        AppPopups.warning(
+          context,
+          message: 'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
+        );
+        return;
+      }
+    }
+
     setState(() {
       if (isBookmarked) {
         _bookmarkedIds.remove(questionId);

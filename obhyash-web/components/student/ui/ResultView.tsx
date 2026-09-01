@@ -102,6 +102,16 @@ export const ResultView: React.FC<ResultViewProps> = ({
     }
   }, [propBookmarks]);
 
+  const isPro = Boolean(
+    (currentUser as any)?.isPro ||
+    (currentUser as any)?.is_pro ||
+    (currentUser as any)?.is_subscribed ||
+    (currentUser as any)?.subscription_status === 'active' ||
+    (currentUser as any)?.plan === 'pro' ||
+    currentUser?.subscription?.plan === 'Pro' ||
+    (currentUser?.role as string)?.toLowerCase() === 'admin'
+  );
+
   // Toggle Bookmark Handler
   const handleToggleBookmark = async (qId: string | number) => {
     const idStr = qId.toString();
@@ -109,8 +119,8 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
     if (
       !isBookmarked &&
-      localBookmarks.size >= 25 &&
-      !currentUser?.subscription?.plan
+      !isPro &&
+      localBookmarks.size >= 25
     ) {
       setShowProBookmarkModal(true);
       return;
@@ -141,8 +151,15 @@ export const ResultView: React.FC<ResultViewProps> = ({
               .insert({ user_id: userData.user.id, question_id: idStr });
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error('[ResultView] Bookmark toggle failed:', e);
+        // Rollback
+        setLocalBookmarks((prev) => {
+          const next = new Set(prev);
+          if (isBookmarked) next.add(idStr);
+          else next.delete(idStr);
+          return next;
+        });
       }
     }
   };

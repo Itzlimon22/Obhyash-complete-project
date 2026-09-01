@@ -49,20 +49,35 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 2. Calculate Expiration Date
-    const now = new Date();
-    let expiresAt = new Date(now);
+    // 2. Calculate Expiration Date with Validity Stacking (add to previous remaining days)
+    const { data: userProfile } = await supabaseAdmin
+      .from('users')
+      .select('subscription, subscription_expires_at')
+      .eq('id', userId)
+      .maybeSingle();
 
-    if (planId.includes('year') || planId.includes('12')) {
-      expiresAt.setDate(expiresAt.getDate() + 365);
-    } else if (planId.includes('6month') || planId.includes('half')) {
-      expiresAt.setDate(expiresAt.getDate() + 180);
-    } else if (planId.includes('life')) {
-      expiresAt.setFullYear(expiresAt.getFullYear() + 50);
-    } else {
-      // Default monthly
-      expiresAt.setDate(expiresAt.getDate() + 30);
+    const now = new Date();
+    let baseExpiry = now;
+    const currentExp = userProfile?.subscription_expires_at
+      ? new Date(userProfile.subscription_expires_at)
+      : (userProfile?.subscription?.expiry ? new Date(userProfile.subscription.expiry) : null);
+
+    if (currentExp && currentExp > now) {
+      baseExpiry = currentExp;
     }
+
+    let durationDays = 30;
+    if (planId.includes('year') || planId.includes('12')) {
+      durationDays = 365;
+    } else if (planId.includes('6month') || planId.includes('half') || planId.includes('180')) {
+      durationDays = 180;
+    } else if (planId.includes('quarter') || planId.includes('90') || planId.includes('3month')) {
+      durationDays = 90;
+    } else if (planId.includes('life')) {
+      durationDays = 365 * 50;
+    }
+
+    const expiresAt = new Date(baseExpiry.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
     const planDisplayName =
       metadata.plan_name ||

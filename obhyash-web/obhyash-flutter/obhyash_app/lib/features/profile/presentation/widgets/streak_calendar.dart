@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 
 // Since MonthCalendarDay isn't defined in dart models yet
 class MonthCalendarDay {
@@ -63,39 +64,31 @@ class _StreakCalendarState extends State<StreakCalendar> {
   Color _getColorClass(int examCount, bool isCurrentMonth, bool isDark) {
     if (!isCurrentMonth) {
       return isDark
-          ? const Color(0x3327272A)
-          : const Color(0xFFF4F4F5);
+          ? const Color(0xFF141416)
+          : const Color(0xFFF8FAFC);
     }
     if (examCount == 0) {
       return isDark
-          ? const Color(0xFF27272A)
-          : const Color(0xFFE4E4E7);
+          ? const Color(0xFF222226)
+          : const Color(0xFFF1F5F9);
     }
     if (examCount == 1) {
-      return isDark
-          ? const Color(0xFF065F46) // Level 1: Deep forest emerald
-          : const Color(0xFFA7F3D0); // Level 1 light
+      return const Color(0xFF059669); // Clean Solid Emerald
     }
-    if (examCount == 2) {
-      return isDark
-          ? const Color(0xFF059669) // Level 2: Vibrant emerald
-          : const Color(0xFF34D399); // Level 2 light
-    }
+    // 2 or more exams
     return isDark
-        ? const Color(0xFF10B981) // Level 3+: Bright glowing emerald
-        : const Color(0xFF059669); // Level 3+ light
+        ? const Color(0xFF10B981)
+        : const Color(0xFF047857); // Deep Solid Emerald
   }
 
   Color _getTextColor(int examCount, bool isCurrentMonth, bool isDark) {
     if (!isCurrentMonth) {
-      return isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA);
+      return isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1);
     }
     if (examCount == 0) {
-      return isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B);
+      return isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569);
     }
-    return isDark
-        ? Colors.white
-        : (examCount == 1 ? const Color(0xFF064E3B) : Colors.white);
+    return Colors.white;
   }
 
   String _getMonthName(DateTime date) {
@@ -166,15 +159,14 @@ class _StreakCalendarState extends State<StreakCalendar> {
     }
 
     final now = DateTime.now();
-    bool isCurrentOrFutureMonth = _displayedMonth.year > now.year ||
-        (_displayedMonth.year == now.year && _displayedMonth.month >= now.month);
-
-    final prevMonthDate = DateTime(now.year, now.month - 1, 1);
-    bool isPreviousOrOlderMonth = _displayedMonth.year < prevMonthDate.year ||
-        (_displayedMonth.year == prevMonthDate.year && _displayedMonth.month <= prevMonthDate.month);
+    final minMonthDate = DateTime(now.year, now.month - 1, 1);
+    final bool canGoPrevious = _displayedMonth.year > minMonthDate.year ||
+        (_displayedMonth.year == minMonthDate.year && _displayedMonth.month > minMonthDate.month);
+    final bool canGoNext = _displayedMonth.year < now.year ||
+        (_displayedMonth.year == now.year && _displayedMonth.month < now.month);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -192,49 +184,56 @@ class _StreakCalendarState extends State<StreakCalendar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
+          // Header (Responsive, Never Squeezed)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: isPreviousOrOlderMonth ? null : _goToPreviousMonth,
+                      onPressed: canGoPrevious ? _goToPreviousMonth : null,
                       icon: const Icon(Icons.chevron_left_rounded),
-                      splashRadius: 24,
-                      color: isPreviousOrOlderMonth
-                          ? (isDark ? Colors.white24 : Colors.black26)
-                          : (isDark ? Colors.white70 : Colors.black87),
+                      splashRadius: 20,
+                      iconSize: 22,
+                      color: canGoPrevious
+                          ? (isDark ? Colors.white70 : const Color(0xFF334155))
+                          : (isDark ? Colors.white24 : const Color(0xFFCBD5E1)),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 2),
                     Expanded(
-                      child: Text(
-                        _getMonthName(_displayedMonth),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
-                          fontFamily: 'Anek Bangla',
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Text(
+                          _getMonthName(_displayedMonth),
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
+                            fontFamily: 'HindSiliguri',
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 2),
                     IconButton(
-                      onPressed: isCurrentOrFutureMonth ? null : _goToNextMonth,
+                      onPressed: canGoNext ? _goToNextMonth : null,
                       icon: const Icon(Icons.chevron_right_rounded),
-                      splashRadius: 24,
-                      color: isCurrentOrFutureMonth
-                          ? (isDark ? Colors.white24 : Colors.black26)
-                          : (isDark ? Colors.white70 : Colors.black87),
+                      splashRadius: 20,
+                      iconSize: 22,
+                      color: canGoNext
+                          ? (isDark ? Colors.white70 : const Color(0xFF334155))
+                          : (isDark ? Colors.white24 : const Color(0xFFCBD5E1)),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
                   ],
                 ),
@@ -243,8 +242,8 @@ class _StreakCalendarState extends State<StreakCalendar> {
               // Streak Badge
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 10,
+                  vertical: 4.5,
                 ),
                 decoration: BoxDecoration(
                   color: isDark
@@ -253,8 +252,8 @@ class _StreakCalendarState extends State<StreakCalendar> {
                   borderRadius: BorderRadius.circular(40),
                   border: Border.all(
                     color: isDark
-                        ? const Color(0xFFEF4444).withValues(alpha: 0.3)
-                        : const Color(0xFFFECACA),
+                      ? const Color(0xFFEF4444).withValues(alpha: 0.3)
+                      : const Color(0xFFFECACA),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -270,16 +269,16 @@ class _StreakCalendarState extends State<StreakCalendar> {
                     const Icon(
                       Icons.local_fire_department_rounded,
                       color: Color(0xFFEF4444),
-                      size: 18,
+                      size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Text(
-                      '${widget.streakCount} দিন স্ট্রিক',
+                      '${BanglaNameHelper.toBanglaNumeral(widget.streakCount)} দিন স্ট্রিক',
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
                         color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                       ),
                     ),
                   ],
@@ -340,7 +339,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                                 )
                               : Tooltip(
                                   message:
-                                      '${week[i].examCount > 0 ? '${week[i].examCount}টি পরীক্ষা' : 'কোনো পরীক্ষা নেই'}\n${'${week[i].date.day}/${week[i].date.month}'}',
+                                      '${week[i].examCount > 0 ? '${BanglaNameHelper.toBanglaNumeral(week[i].examCount)}টি পরীক্ষা সম্পন্ন' : 'কোনো পরীক্ষা নেই'}\n${'${BanglaNameHelper.toBanglaNumeral(week[i].date.day)} ${_getMonthName(week[i].date)}'}',
                                   child: AspectRatio(
                                     aspectRatio: 1,
                                     child: Container(
@@ -350,22 +349,35 @@ class _StreakCalendarState extends State<StreakCalendar> {
                                           week[i].isCurrentMonth,
                                           isDark,
                                         ),
-                                        borderRadius: BorderRadius.circular(
-                                          10,
-                                        ), // sm:rounded-xl
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: week[i].examCount > 0
+                                              ? Colors.transparent
+                                              : (isDark ? const Color(0xFF2C2C30) : const Color(0xFFE2E8F0)),
+                                          width: 1,
+                                        ),
+                                        boxShadow: week[i].examCount > 0
+                                            ? [
+                                                BoxShadow(
+                                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1.5),
+                                                ),
+                                              ]
+                                            : [],
                                       ),
                                       child: Center(
                                         child: Text(
-                                          week[i].dayOfMonth.toString(),
+                                          BanglaNameHelper.toBanglaNumeral(week[i].dayOfMonth),
                                           style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800,
+                                            fontSize: 14,
+                                            fontWeight: week[i].examCount > 0 ? FontWeight.w900 : FontWeight.w700,
                                             color: _getTextColor(
                                               week[i].examCount,
                                               week[i].isCurrentMonth,
                                               isDark,
                                             ),
-                                            fontFamily: 'Anek Bangla',
+                                            fontFamily: 'HindSiliguri',
                                           ),
                                         ),
                                       ),
@@ -381,36 +393,30 @@ class _StreakCalendarState extends State<StreakCalendar> {
             ),
           ),
 
-          const SizedBox(height: 16), // mt-4
-          // Legend
+          const SizedBox(height: 18),
+          // Clean Minimal Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildLegendItem(
                 context,
-                '০',
+                '০ পরীক্ষা',
                 _getColorClass(0, true, isDark),
                 isDark,
+                hasBorder: true,
               ),
-              const SizedBox(width: 16), // gap-4
+              const SizedBox(width: 16),
               _buildLegendItem(
                 context,
-                '১',
+                '১টি পরীক্ষা',
                 _getColorClass(1, true, isDark),
                 isDark,
               ),
               const SizedBox(width: 16),
               _buildLegendItem(
                 context,
-                '২',
+                '২+ পরীক্ষা',
                 _getColorClass(2, true, isDark),
-                isDark,
-              ),
-              const SizedBox(width: 16),
-              _buildLegendItem(
-                context,
-                '৩+',
-                _getColorClass(3, true, isDark),
                 isDark,
               ),
             ],
@@ -424,27 +430,36 @@ class _StreakCalendarState extends State<StreakCalendar> {
     BuildContext context,
     String label,
     Color color,
-    bool isDark,
-  ) {
+    bool isDark, {
+    bool hasBorder = false,
+  }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 13,
+          height: 13,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(4),
+            border: hasBorder
+                ? Border.all(
+                    color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                    width: 1,
+                  )
+                : null,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 6),
         Text(
           label,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
             color: isDark
-                ? const Color(0xFFA3A3A3)
-                : const Color(0xFF737373), // neutral-400 : neutral-500
+                ? const Color(0xFFA1A1AA)
+                : const Color(0xFF64748B),
+            fontFamily: 'HindSiliguri',
           ),
         ),
       ],

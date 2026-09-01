@@ -229,7 +229,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   String _selectedLevel = 'Explorer';
   bool _hasSetDefaultLevel = false;
   String _timeframe = 'monthly'; // 'monthly', 'all_time'
-  String _batchFilter = 'my_batch'; // Default to student's own batch
+  static const String _batchFilter = 'my_batch'; // Strictly student's own batch
   List<_LBUser> _users = [];
   bool _isLoading = false;
   Map<String, int> _levelCounts = {};
@@ -671,16 +671,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                           // ── My Batch Badge & Timeframe Filter (Below Level Selector) ──
                           _BatchAndTimelineHeader(
                             userBatchLabel: userBatchLabel,
-                            selectedBatchFilter: _batchFilter,
                             timeframe: _timeframe,
                             isDark: isDark,
-                            onBatchFilterChanged: (b) {
-                              if (_batchFilter != b) {
-                                setState(() => _batchFilter = b);
-                                _fetchCounts();
-                                _fetch();
-                              }
-                            },
                             onTimeframeChanged: (t) {
                               if (_timeframe != t) {
                                 setState(() {
@@ -792,25 +784,19 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 // ─── Batch and Timeline Header ───────────────────────────────────────────────
 class _BatchAndTimelineHeader extends StatelessWidget {
   final String userBatchLabel;
-  final String selectedBatchFilter;
   final String timeframe;
   final bool isDark;
-  final ValueChanged<String> onBatchFilterChanged;
   final ValueChanged<String> onTimeframeChanged;
 
   const _BatchAndTimelineHeader({
     required this.userBatchLabel,
-    required this.selectedBatchFilter,
     required this.timeframe,
     required this.isDark,
-    required this.onBatchFilterChanged,
     required this.onTimeframeChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isMyBatchSelected = selectedBatchFilter == 'my_batch';
-
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 6, 10, 12),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -824,96 +810,35 @@ class _BatchAndTimelineHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Batch Selector Popup
-          PopupMenuButton<String>(
-            initialValue: selectedBatchFilter,
-            onSelected: onBatchFilterChanged,
-            offset: const Offset(0, 36),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: BorderSide(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+          // Left: User Batch Badge (Static clean display)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1F1F23) : const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE5E7EB),
               ),
             ),
-            color: isDark ? const Color(0xFF1E1E22) : Colors.white,
-            elevation: 8,
-            itemBuilder: (ctx) => [
-              PopupMenuItem(
-                value: 'all',
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.users, size: 15, color: Color(0xFF10B981)),
-                    const SizedBox(width: 8),
-                    Text(
-                      'সকল ব্যাচ (All Batches)',
-                      style: TextStyle(
-                        fontFamily: 'Anek Bangla',
-                        fontSize: 13,
-                        fontWeight: !isMyBatchSelected ? FontWeight.w800 : FontWeight.w500,
-                        color: !isMyBatchSelected
-                            ? const Color(0xFF10B981)
-                            : (isDark ? Colors.white : const Color(0xFF1F2937)),
-                      ),
-                    ),
-                  ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  LucideIcons.graduationCap,
+                  size: 14,
+                  color: Color(0xFF6366F1),
                 ),
-              ),
-              PopupMenuItem(
-                value: 'my_batch',
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.graduationCap, size: 15, color: Color(0xFF6366F1)),
-                    const SizedBox(width: 8),
-                    Text(
-                      'আমার ব্যাচ ($userBatchLabel)',
-                      style: TextStyle(
-                        fontFamily: 'Anek Bangla',
-                        fontSize: 13,
-                        fontWeight: isMyBatchSelected ? FontWeight.w800 : FontWeight.w500,
-                        color: isMyBatchSelected
-                            ? const Color(0xFF6366F1)
-                            : (isDark ? Colors.white : const Color(0xFF1F2937)),
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 6),
+                Text(
+                  userBatchLabel,
+                  style: TextStyle(
+                    fontFamily: 'Anek Bangla',
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
                 ),
-              ),
-            ],
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1F1F23) : const Color(0xFFF3F4F6),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE5E7EB),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isMyBatchSelected ? LucideIcons.graduationCap : LucideIcons.users,
-                    size: 13,
-                    color: isMyBatchSelected ? const Color(0xFF6366F1) : const Color(0xFF10B981),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    isMyBatchSelected ? userBatchLabel : 'সকল ব্যাচ',
-                    style: TextStyle(
-                      fontFamily: 'Anek Bangla',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    LucideIcons.chevronDown,
-                    size: 14,
-                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
 

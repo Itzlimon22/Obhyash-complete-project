@@ -541,9 +541,15 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     _persistActiveDraft();
   }
 
-  void toggleBookmark(String questionId) {
+  void toggleBookmark(String questionId, {bool isPro = false, VoidCallback? onLimitReached}) {
     final updated = Set<String>.from(state.bookmarkedQuestions);
     final wasBookmarked = updated.contains(questionId);
+
+    if (!wasBookmarked && !isPro && updated.length >= 25) {
+      onLimitReached?.call();
+      return;
+    }
+
     if (wasBookmarked) {
       updated.remove(questionId);
     } else {

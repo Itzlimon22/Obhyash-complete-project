@@ -59,8 +59,11 @@ export async function GET(request: NextRequest) {
     const { user, token } = await getAuthUserAndToken(request, supabase);
     const db = getDbClient(token) || supabase;
 
-    // Fetch comments with upvote_count
-    const { data: comments, error } = await db
+    // Fetch comments with graceful fallback if upvote_count column is missing
+    let comments: any[] | null = null;
+    let queryError: any = null;
+
+    const res = await db
       .from('blog_comments')
       .select(
         'id, post_slug, user_id, parent_id, content, created_at, updated_at, upvote_count, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
@@ -68,20 +71,38 @@ export async function GET(request: NextRequest) {
       .eq('post_slug', slug)
       .order('created_at', { ascending: true });
 
-    if (error) throw error;
+    if (res.error) {
+      // Fallback if upvote_count column does not exist
+      const fallbackRes = await db
+        .from('blog_comments')
+        .select(
+          'id, post_slug, user_id, parent_id, content, created_at, updated_at, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
+        )
+        .eq('post_slug', slug)
+        .order('created_at', { ascending: true });
+
+      if (fallbackRes.error) {
+        throw fallbackRes.error;
+      }
+      comments = fallbackRes.data;
+    } else {
+      comments = res.data;
+    }
 
     // Merge user_upvoted flag for the current session user
     let userUpvotedIds: string[] = [];
     if (user && comments && comments.length > 0) {
-      const { data: upvoteRows } = await db
-        .from('blog_comment_upvotes')
-        .select('comment_id')
-        .eq('user_id', user.id)
-        .in(
-          'comment_id',
-          comments.map((c: any) => c.id),
-        );
-      userUpvotedIds = (upvoteRows ?? []).map((r: any) => r.comment_id);
+      try {
+        const { data: upvoteRows } = await db
+          .from('blog_comment_upvotes')
+          .select('comment_id')
+          .eq('user_id', user.id)
+          .in(
+            'comment_id',
+            comments.map((c: any) => c.id),
+          );
+        userUpvotedIds = (upvoteRows ?? []).map((r: any) => r.comment_id);
+      } catch (_) {}
     }
 
     const enriched = (comments ?? []).map((c: any) => ({
@@ -141,7 +162,8 @@ export async function POST(request: NextRequest) {
 
     const db = getDbClient(token) || supabase;
 
-    const { data: inserted, error: insertError } = await db
+    let inserted: any = null;
+    const insertRes = await db
       .from('blog_comments')
       .insert({
         post_slug: slug,
@@ -154,12 +176,33 @@ export async function POST(request: NextRequest) {
       )
       .single();
 
-    if (insertError) throw insertError;
+    if (insertRes.error) {
+      // Fallback if upvote_count column does not exist
+      const fallbackInsert = await db
+        .from('blog_comments')
+        .insert({
+          post_slug: slug,
+          user_id: user.id,
+          content: trimmed,
+          parent_id: parentId ?? null,
+        })
+        .select(
+          'id, post_slug, user_id, parent_id, content, created_at, updated_at, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
+        )
+        .single();
+
+      if (fallbackInsert.error) {
+        throw fallbackInsert.error;
+      }
+      inserted = fallbackInsert.data;
+    } else {
+      inserted = insertRes.data;
+    }
 
     return NextResponse.json({
       comment: {
         ...inserted,
-        upvote_count: 0,
+        upvote_count: inserted?.upvote_count ?? 0,
         user_upvoted: false,
       },
     });

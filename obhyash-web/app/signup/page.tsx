@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
+import { getDeviceFingerprint } from '@/lib/device-fingerprint';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
 import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
@@ -349,6 +350,7 @@ function SignupForm() {
         // Handle referral code redemption
         if (formData.referralCode) {
           try {
+            const deviceId = getDeviceFingerprint();
             const res = await withTimeout(
               fetch('/api/referral/redeem', {
                 method: 'POST',
@@ -356,6 +358,7 @@ function SignupForm() {
                 body: JSON.stringify({
                   code: formData.referralCode,
                   newUserId: data.user.id,
+                  deviceId,
                 }),
               }),
               'রেফারেল যাচাই করতে দেরি হচ্ছে। পরে আবার চেষ্টা করো।',
@@ -843,7 +846,7 @@ function SignupForm() {
                         />
                       </div>
                       <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 ml-1">
-                        রেফারেল কোড ব্যবহার করলে পাবেন ১ মাসের{' '}
+                        রেফারেল কোড ব্যবহার করলে পাবেন ১৫ দিনের{' '}
                         <b>ফ্রি Premium Subscriptions!</b>
                       </p>
                     </div>

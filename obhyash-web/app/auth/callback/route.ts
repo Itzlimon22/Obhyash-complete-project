@@ -25,7 +25,28 @@ async function withTimeout<T>(
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/dashboard';
+  const nextParam =
+    searchParams.get('next') ||
+    searchParams.get('redirect_to') ||
+    searchParams.get('redirect_uri') ||
+    '';
+
+  const isMobileApp =
+    nextParam.startsWith('io.supabase.obhyash') ||
+    nextParam.startsWith('obhyash://') ||
+    nextParam.startsWith('com.example.obhyash_app') ||
+    searchParams.get('source') === 'app' ||
+    searchParams.get('client') === 'mobile';
+
+  const getMobileRedirectUrl = (params: Record<string, string> = {}) => {
+    const base =
+      nextParam.startsWith('io.supabase.obhyash') || nextParam.startsWith('obhyash://')
+        ? nextParam
+        : 'io.supabase.obhyash://login-callback/';
+    const url = new URL(base);
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    return url.toString();
+  };
 
   if (code) {
     const cookieStore = await cookies();
@@ -63,7 +84,7 @@ export async function GET(request: Request) {
         'Auth user fetch timed out',
       );
 
-      let redirectPath = next;
+      let redirectPath = nextParam || '/dashboard';
 
       if (user) {
         // Verify if user is registered in public.users
@@ -95,6 +116,17 @@ export async function GET(request: Request) {
         // Deny Google login if user has no profile (not registered)
         if (!isRegistered) {
           await supabase.auth.signOut();
+
+          // If request was initiated from Flutter mobile app, redirect back to mobile app
+          if (isMobileApp) {
+            return NextResponse.redirect(
+              getMobileRedirectUrl({
+                error: 'unregistered_google',
+                error_description: 'এই গুগল ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে আগে নতুন অ্যাকাউন্ট খুলুন।',
+              }),
+            );
+          }
+
           const redirectUrl = new URL('/login', origin);
           redirectUrl.searchParams.set('error', 'unregistered_google');
           const res = NextResponse.redirect(redirectUrl);
@@ -108,6 +140,11 @@ export async function GET(request: Request) {
           res.cookies.delete('obhyash_role_cache');
           res.cookies.delete('obhyash_user_profile');
           return res;
+        }
+
+        // If registered from mobile app, redirect back to app
+        if (isMobileApp) {
+          return NextResponse.redirect(getMobileRedirectUrl({ code }));
         }
 
         // If registered, sync Google OAuth user if needed
@@ -150,6 +187,10 @@ export async function GET(request: Request) {
   }
 
   // Return user to login page with error
+  if (isMobileApp) {
+    return NextResponse.redirect(getMobileRedirectUrl({ error: 'oauth_cancelled' }));
+  }
+
   const redirectUrl = new URL('/login', origin);
   redirectUrl.searchParams.set('error', 'oauth_cancelled');
   return NextResponse.redirect(redirectUrl);

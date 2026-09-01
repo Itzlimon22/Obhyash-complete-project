@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 // ─── Particle Data ─────────────────────────────────────────────────────────────
@@ -57,6 +58,7 @@ class CelebrationDialog extends StatefulWidget {
   final String subtitle;
   final String? badgeLabel;
   final IconData icon;
+  final String? svgAsset;
   final Color primaryColor;
   final Color secondaryColor;
   final int? xpAwarded;
@@ -70,6 +72,7 @@ class CelebrationDialog extends StatefulWidget {
     required this.subtitle,
     this.badgeLabel,
     this.icon = LucideIcons.flame,
+    this.svgAsset,
     this.primaryColor = const Color(0xFF10B981),
     this.secondaryColor = const Color(0xFF10B981),
     this.xpAwarded,
@@ -86,6 +89,7 @@ class CelebrationDialog extends StatefulWidget {
     String? badgeLabel,
     String? badgeText,
     IconData icon = LucideIcons.flame,
+    String? svgAsset,
     Color primaryColor = const Color(0xFF004633),
     Color secondaryColor = const Color(0xFF10B981),
     int? xpAwarded,
@@ -102,6 +106,7 @@ class CelebrationDialog extends StatefulWidget {
         badgeLabel: badgeLabel,
         badgeText: badgeText,
         icon: icon,
+        svgAsset: svgAsset,
         primaryColor: primaryColor,
         secondaryColor: secondaryColor,
         xpAwarded: xpAwarded,
@@ -219,39 +224,59 @@ class _CelebrationDialogState extends State<CelebrationDialog>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Glowing Icon Badge
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [widget.primaryColor, widget.secondaryColor],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                // 3D Realistic Badge Icon or Glowing Icon
+                if (widget.svgAsset != null)
+                  SizedBox(
+                    width: 104,
+                    height: 104,
+                    child: SvgPicture.asset(
+                      widget.svgAsset!,
+                      width: 104,
+                      height: 104,
+                      fit: BoxFit.contain,
                     ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.primaryColor.withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 6),
+                  )
+                      .animate()
+                      .scale(
+                        begin: const Offset(0.3, 0.3),
+                        end: const Offset(1, 1),
+                        duration: 400.ms,
+                        curve: Curves.elasticOut,
+                      )
+                      .rotate(begin: -0.1, end: 0, duration: 400.ms)
+                else
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [widget.primaryColor, widget.secondaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    widget.icon,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                )
-                    .animate()
-                    .scale(
-                      begin: const Offset(0.3, 0.3),
-                      end: const Offset(1, 1),
-                      duration: 400.ms,
-                      curve: Curves.elasticOut,
-                    )
-                    .rotate(begin: -0.1, end: 0, duration: 400.ms),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.primaryColor.withValues(alpha: 0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      widget.icon,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  )
+                      .animate()
+                      .scale(
+                        begin: const Offset(0.3, 0.3),
+                        end: const Offset(1, 1),
+                        duration: 400.ms,
+                        curve: Curves.elasticOut,
+                      )
+                      .rotate(begin: -0.1, end: 0, duration: 400.ms),
 
                 const SizedBox(height: 20),
 

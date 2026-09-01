@@ -14,15 +14,23 @@ import {
   CheckCircle2,
   ArrowRight,
   HelpCircle,
+  Crown,
+  Sparkles,
+  Zap,
+  X,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+import { celebration } from '@/lib/confetti';
+import { useAuth } from '@/components/auth/AuthProvider';
 import ScratchCardModal from './ScratchCardModal';
+import { getDeviceFingerprint } from '@/lib/device-fingerprint';
 
 interface ReferralHistoryItem {
   id: string;
   redeemed_at: string;
-  admin_status: 'Approved' | 'Rejected' | 'Pending';
+  admin_status: 'Approved' | 'Rejected' | 'Pending' | 'Pending Exam' | 'Pending Review' | string;
   name?: string;
   redeemed_by?: { name?: string; email?: string } | string;
 }
@@ -163,6 +171,10 @@ export const ReferralView: React.FC = () => {
     loadReferralData();
   }, []);
 
+  const router = useRouter();
+  const { refreshProfile } = useAuth();
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+
   const handleClaimReferral = async () => {
     const input = claimCodeInput.trim().toUpperCase();
     if (!input) {
@@ -181,10 +193,11 @@ export const ReferralView: React.FC = () => {
 
     setIsClaiming(true);
     try {
+      const deviceId = getDeviceFingerprint();
       const res = await fetch('/api/referral/redeem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: input }),
+        body: JSON.stringify({ code: input, deviceId }),
       });
 
       const json = await res.json();
@@ -193,9 +206,14 @@ export const ReferralView: React.FC = () => {
         toast.success(
           json.message || 'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉'
         );
+        celebration.levelUp();
+        setShowCelebrationModal(true);
         setClaimCodeInput('');
         setHasUsedReferral(true);
         setRemainingAttempts(3);
+        try {
+          await refreshProfile();
+        } catch (_) {}
         loadReferralData();
       } else {
         const isLocked = json.locked === true;
@@ -228,12 +246,12 @@ export const ReferralView: React.FC = () => {
   const shareCode = async () => {
     if (!code) return;
     const shareUrl = `https://obhyash.com/signup?ref=${code}`;
-    const text = `অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১ মাসের প্রিমিয়াম সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: ${code}\n\nএখানে রেজিস্টার করো: ${shareUrl}`;
+    const text = `অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: ${code}\n\nএখানে রেজিস্টার করো: ${shareUrl}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'অভ্যাস অ্যাপ - ১ মাসের ফ্রি প্রিমিয়াম রেফারেল কোড',
+          title: 'অভ্যাস অ্যাপ - ১৫ দিনের ফ্রি প্রো প্রিমিয়াম',
           text,
           url: shareUrl,
         });
@@ -265,9 +283,9 @@ export const ReferralView: React.FC = () => {
       {/* ── 1. Hero Banner (1:1 with Flutter) ── */}
       <div className="p-5 sm:p-6 rounded-[20px] bg-gradient-to-br from-[#B91C1C] to-[#BE123C] text-white text-center shadow-lg shadow-[#B91C1C]/20 mb-5">
         <h2 className="text-lg sm:text-xl font-black leading-snug">
-          বন্ধুদের আমন্ত্রণ জানাও,
+          বন্ধুদের আমন্ত্রণ জানাও, প্রতি রেফারে পাও ৭ দিন!
           <br />
-          প্রতি ৩ রেফারে পাও একটি স্ক্র্যাচ কার্ড!
+          প্রতি ৩ রেফারে আনলক করো একটি স্ক্র্যাচ কার্ড 🎉
         </h2>
       </div>
 
@@ -283,7 +301,7 @@ export const ReferralView: React.FC = () => {
                 বন্ধুর রেফারেল কোড ক্লেইম করো
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                ১ মাসের ফ্রি প্রিমিয়াম উপভোগ করো
+                ১৫ দিনের সম্পূর্ণ প্রো প্রিমিয়াম উপভোগ করো
               </p>
             </div>
           </div>
@@ -300,7 +318,7 @@ export const ReferralView: React.FC = () => {
             </div>
           ) : (
             <p className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mb-2">
-              ⚠️ সর্বোচ্চ ৩ বার ভুল কোড দেওয়া যাবে (অবশিষ্ট: {remainingAttempts} টি চেষ্টা)
+              ⚠️ সর্বোচ্চ ৩ বার ভুল কোড দেওয়া যাবে (ভুল হলে ৩ মিনিট পর আবার চেষ্টা করা যাবে)
             </p>
           )}
 
@@ -566,14 +584,20 @@ export const ReferralView: React.FC = () => {
                   ? 'bg-emerald-50 text-[#059669] border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900/50'
                   : status === 'Rejected'
                   ? 'bg-red-50 text-[#B91C1C] border-red-200 dark:bg-red-950/40 dark:border-red-900/50'
+                  : status === 'Pending Exam'
+                  ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/50'
                   : 'bg-blue-50 text-[#1E3A8A] border-blue-200 dark:bg-blue-950/40 dark:border-blue-900/50';
 
               const statusLabel =
                 status === 'Approved'
-                  ? 'অনুমোদিত'
+                  ? 'অনুমোদিত (৭ দিন সক্রিয়)'
                   : status === 'Rejected'
                   ? 'বাতিল'
-                  : 'অপেক্ষমান';
+                  : status === 'Pending Exam'
+                  ? '১ম পরীক্ষা বাকি ⏳'
+                  : status === 'Pending Review'
+                  ? 'পর্যালোচনাধীন ⏳'
+                  : 'অপেক্ষমাণ';
 
               return (
                 <div
@@ -618,18 +642,23 @@ export const ReferralView: React.FC = () => {
           {[
             {
               num: '১',
-              title: 'বন্ধুর জন্য ১ মাস ফ্রি প্রিমিয়াম',
-              desc: 'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
+              title: 'বন্ধুর জন্য ১৫ দিন সম্পূর্ণ ফ্রি প্রো',
+              desc: 'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১৫ দিনের সম্পূর্ণ প্রো প্রিমিয়াম সাবস্ক্রিপশন।',
             },
             {
               num: '২',
-              title: 'তোমার জন্য স্ক্র্যাচ কার্ড',
-              desc: 'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখানে থাকতে পারে ফ্রি প্রিমিয়াম।',
+              title: 'তোমার জন্য প্রতি রেফারে ৭ দিন ফ্রি প্রো',
+              desc: 'যেকোনো বন্ধু তোমার রেফারেল কোড সফলভাবে ব্যবহার করলে তোমার অ্যাকাউন্টে ৭ দিন প্রো সাবস্ক্রিপশন যোগ হবে।',
             },
             {
               num: '৩',
-              title: 'আনলিমিটেড রেফারেল',
-              desc: 'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি স্ক্র্যাচ কার্ড জেতার সুযোগ পাবে।',
+              title: 'প্রতি ৩ রেফারে ১টি স্ক্র্যাচ কার্ড',
+              desc: 'প্রতি ৩ জন বন্ধুকে যুক্ত করলেই তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখান থেকে পেতে পারো আরও অতিরিক্ত ফ্রি প্রিমিয়াম!',
+            },
+            {
+              num: '৪',
+              title: 'মাসিক ক্লেইম লিমিট ও লিডারবোর্ড',
+              desc: 'প্রতি ইউজার প্রতি মাসে ১ বার রেফারেল কোড ব্যবহার করতে পারবেন। টপ রেফারারদের জন্য রয়েছে মান্থলি লিডারবোর্ড।',
             },
           ].map((item) => (
             <div
@@ -661,6 +690,89 @@ export const ReferralView: React.FC = () => {
             loadReferralData();
           }}
         />
+      )}
+
+      {/* ── 5. Referral Claim Celebration Modal ── */}
+      {showCelebrationModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0"
+            onClick={() => setShowCelebrationModal(false)}
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-md bg-white dark:bg-[#13151F] rounded-3xl p-6 sm:p-7 shadow-2xl border border-amber-300 dark:border-amber-500/40 z-10 text-center animate-in zoom-in-95 duration-300">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowCelebrationModal(false)}
+              className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+            >
+              <X size={18} />
+            </button>
+
+            {/* Glowing Crown Icon */}
+            <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center shadow-xl shadow-amber-500/30 mb-4 animate-bounce">
+              <Crown className="w-10 h-10 text-white drop-shadow-md" />
+            </div>
+
+            {/* Badge */}
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-3">
+              <Sparkles size={14} className="text-emerald-500" />
+              <span>১৫ দিনের প্রো প্রিমিয়াম সক্রিয় 👑</span>
+            </div>
+
+            <h3 className="text-2xl font-black text-neutral-900 dark:text-white mb-2">
+              অভিনন্দন! 🎉
+            </h3>
+
+            <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed mb-5">
+              রেফারেল কোড ব্যবহারের জন্য তোমার অ্যাকাউন্টে <strong className="text-amber-600 dark:text-amber-400">১ মাসের সম্পূর্ণ প্রো সাবস্ক্রিপশন</strong> যুক্ত করা হয়েছে!
+            </p>
+
+            {/* Benefit Highlights */}
+            <div className="bg-neutral-50 dark:bg-[#1C1E2D] p-4 rounded-2xl border border-neutral-200 dark:border-[#2E334D] mb-6 text-left space-y-2.5">
+              <div className="flex items-center gap-2.5 text-xs text-neutral-700 dark:text-neutral-200 font-semibold">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                <span>আনলিমিটেড এক্সাম ও প্র্যাকটিস সেশন</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-neutral-700 dark:text-neutral-200 font-semibold">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                <span>প্রশ্নের KaTeX বিস্তারিত ব্যাখ্যা ও সমাধান</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-neutral-700 dark:text-neutral-200 font-semibold">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                <span>আনলিমিটেড বুকমার্ক সংরক্ষণ</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-neutral-700 dark:text-neutral-200 font-semibold">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                <span>সম্পূর্ণ পারফরম্যান্স ও রেজাল্ট অ্যানালিটিক্স</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2.5">
+              <button
+                onClick={() => {
+                  setShowCelebrationModal(false);
+                  router.push('/setup');
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/25 transition active:scale-[0.98]"
+              >
+                <Zap size={18} />
+                <span>পরীক্ষা শুরু করো</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowCelebrationModal(false);
+                  router.push('/subscription');
+                }}
+                className="w-full py-2.5 text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition"
+              >
+                সাবস্ক্রিপশন স্টেটাস দেখো
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -104,6 +104,8 @@ export async function GET(request: NextRequest) {
       if (h.admin_status === 'Approved') approvedRewardsCount++;
     });
 
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
     const userReferrals = referralList.map((ref) => {
       const owner = userMap[ref.owner_id] || {
         id: ref.owner_id,
@@ -113,9 +115,13 @@ export async function GET(request: NextRequest) {
       const referees = redemptionsByRefId[ref.id] || [];
       const totalUses = referees.length;
       const approvedUses = referees.filter((r) => r.admin_status === 'Approved').length;
-      const pendingUses = referees.filter((r) => r.admin_status === 'Pending' || !r.admin_status).length;
+      const pendingUses = referees.filter(
+        (r) => r.admin_status === 'Pending' || r.admin_status === 'Pending Review' || !r.admin_status,
+      ).length;
       const rejectedUses = referees.filter((r) => r.admin_status === 'Rejected').length;
       const isBlocked = ref.expires_at ? new Date(ref.expires_at) < new Date() : false;
+      const hourlyUses = referees.filter((r) => new Date(r.redeemed_at) > oneHourAgo).length;
+      const hasAnomalyAlert = hourlyUses >= 10;
 
       return {
         id: ref.id,
@@ -128,6 +134,8 @@ export async function GET(request: NextRequest) {
         approvedUses,
         pendingUses,
         rejectedUses,
+        hourlyUses,
+        hasAnomalyAlert,
         referees,
       };
     });
@@ -203,6 +211,7 @@ export async function GET(request: NextRequest) {
         uniqueReferrers: userReferrals.filter((u) => u.totalUses > 0).length,
         pendingApprovals: pendingApprovalsCount,
         approvedRewards: approvedRewardsCount,
+        anomalyAlerts: userReferrals.filter((u) => u.hasAnomalyAlert).length,
       },
     });
   } catch (error: any) {

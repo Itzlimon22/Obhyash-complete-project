@@ -189,19 +189,46 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
 final liveExamQuestionsProvider =
     FutureProvider.autoDispose.family<List<Question>, String>((ref, examId) async {
   final supabase = Supabase.instance.client;
-  final res = await supabase
+
+  // 1. Fetch junction rows with serial, points, question_id
+  final junctionRes = await supabase
       .from('live_exam_questions')
-      .select('serial, points, questions(*)')
+      .select('serial, points, question_id')
       .eq('live_exam_id', examId)
       .order('serial', ascending: true);
 
+  final junctionList = (junctionRes as List).cast<Map<String, dynamic>>();
+  if (junctionList.isEmpty) return [];
+
+  final questionIds = junctionList
+      .map((j) => j['question_id']?.toString())
+      .where((id) => id != null && id.isNotEmpty)
+      .cast<String>()
+      .toList();
+
+  if (questionIds.isEmpty) return [];
+
+  // 2. Fetch actual question details from questions table
+  final questionsRes = await supabase
+      .from('questions')
+      .select()
+      .inFilter('id', questionIds);
+
+  final Map<String, Map<String, dynamic>> questionMap = {
+    for (final q in (questionsRes as List)) q['id'].toString(): q as Map<String, dynamic>
+  };
+
   final List<Question> questions = [];
-  for (final item in res as List) {
-    final qMap = item['questions'] as Map<String, dynamic>?;
-    if (qMap != null) {
-      questions.add(Question.fromJson(qMap));
+  for (final j in junctionList) {
+    final qId = j['question_id']?.toString();
+    if (qId != null && questionMap.containsKey(qId)) {
+      final rawQ = questionMap[qId]!;
+      final parsed = Question.fromJson(rawQ);
+      final points = (j['points'] as num?)?.toInt() ?? parsed.points;
+      questions.add(parsed.copyWith(points: points));
     }
   }
+
   return questions;
 });
 

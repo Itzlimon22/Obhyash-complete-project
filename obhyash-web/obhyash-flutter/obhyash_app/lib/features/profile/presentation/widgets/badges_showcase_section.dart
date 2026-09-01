@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../gamification/domain/gamification_models.dart';
 import '../../../gamification/services/gamification_service.dart';
@@ -174,35 +175,47 @@ class _BadgeCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                 child: Column(
                   children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        gradient: isUnlocked
-                            ? LinearGradient(
-                                colors: [badge.gradientStart, badge.gradientEnd],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : null,
-                        color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-                        shape: BoxShape.circle,
-                        boxShadow: isUnlocked
-                            ? [
-                                BoxShadow(
-                                  color: badge.gradientStart.withValues(alpha: 0.35),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ]
-                            : null,
+                    if (isUnlocked && badge.svgAsset != null)
+                      SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: SvgPicture.asset(
+                          badge.svgAsset!,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          gradient: isUnlocked
+                              ? LinearGradient(
+                                  colors: [badge.gradientStart, badge.gradientEnd],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
+                          color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                          shape: BoxShape.circle,
+                          boxShadow: isUnlocked
+                              ? [
+                                  BoxShadow(
+                                    color: badge.gradientStart.withValues(alpha: 0.35),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Icon(
+                          isUnlocked ? badge.icon : LucideIcons.lock,
+                          color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
+                          size: 34,
+                        ),
                       ),
-                      child: Icon(
-                        isUnlocked ? badge.icon : LucideIcons.lock,
-                        color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
-                        size: 34,
-                      ),
-                    ),
                     const SizedBox(height: 16),
                     Text(
                       badge.titleBangla,
@@ -334,36 +347,48 @@ class _BadgeCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon Bubble
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: isUnlocked
-                      ? LinearGradient(
-                          colors: [badge.gradientStart, badge.gradientEnd],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                  color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1)),
-                  shape: BoxShape.circle,
-                  boxShadow: isUnlocked
-                      ? [
-                          BoxShadow(
-                            color: badge.gradientStart.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : null,
+              // 3D Realistic Badge or Locked Icon
+              if (isUnlocked && badge.svgAsset != null)
+                SizedBox(
+                  width: 46,
+                  height: 46,
+                  child: SvgPicture.asset(
+                    badge.svgAsset!,
+                    width: 46,
+                    height: 46,
+                    fit: BoxFit.contain,
+                  ),
+                )
+              else
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: isUnlocked
+                        ? LinearGradient(
+                            colors: [badge.gradientStart, badge.gradientEnd],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: isUnlocked ? null : (isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1)),
+                    shape: BoxShape.circle,
+                    boxShadow: isUnlocked
+                        ? [
+                            BoxShadow(
+                              color: badge.gradientStart.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Icon(
+                    isUnlocked ? badge.icon : LucideIcons.lock,
+                    color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  isUnlocked ? badge.icon : LucideIcons.lock,
-                  color: isUnlocked ? Colors.white : (isDark ? Colors.white38 : Colors.black38),
-                  size: 20,
-                ),
-              ),
               const SizedBox(height: 8),
               Text(
                 badge.titleBangla,
