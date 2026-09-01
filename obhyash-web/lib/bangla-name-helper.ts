@@ -461,32 +461,180 @@ export class BanglaNameHelper {
   /**
    * Formats question institute/year/history tags nicely.
    */
+  /**
+   * Formats question institute/year/history tags into standardized codes like CU-18, DB-24, etc.
+   */
   static formatQuestionSource(data: {
     institutes?: string[];
     years?: (string | number)[];
-    examHistory?: (string | { institute?: string; year?: string | number })[];
+    examHistory?: (string | { code?: string; institute?: string; year?: string | number })[];
   }): string {
-    const tags: string[] = [];
-    const len = Math.max(data.institutes?.length || 0, data.years?.length || 0);
-    for (let i = 0; i < len; i++) {
-      const inst = data.institutes?.[i] || '';
-      const yr = data.years?.[i] ? `'${data.years[i].toString().slice(-2)}` : '';
-      const combined = `${inst} ${yr}`.trim();
-      if (combined) tags.push(combined);
-    }
-    if (tags.length === 0 && data.examHistory && data.examHistory.length > 0) {
-      data.examHistory.forEach((item) => {
+    // 1. Structured examHistory priority
+    if (data.examHistory && data.examHistory.length > 0) {
+      const tags: string[] = [];
+      for (const item of data.examHistory) {
+        let code = '';
+        let inst = '';
+        let rawYear = '';
+
         if (typeof item === 'string') {
-          tags.push(item);
+          tags.push(this._normalizeInstituteOrAuthor(item));
+          continue;
         } else if (item && typeof item === 'object') {
-          const inst = item.institute || '';
-          const yr = item.year ? `'${item.year.toString().slice(-2)}` : '';
-          const combined = `${inst} ${yr}`.trim();
-          if (combined) tags.push(combined);
+          code = (item.code || '').trim();
+          inst = (item.institute || '').trim();
+          rawYear = (item.year || '').toString();
         }
-      });
+
+        const yr = this._formatYearShort(rawYear);
+        const label = code.length > 0 ? code : this._normalizeInstituteOrAuthor(inst);
+
+        if (label && yr) {
+          tags.push(`${label}-${yr}`);
+        } else if (label) {
+          tags.push(label);
+        } else if (yr) {
+          tags.push(yr);
+        }
+      }
+      if (tags.length > 0) return tags.join(', ');
     }
-    return tags.join(' • ');
+
+    const rawInsts = (data.institutes || []).map((e) => e.toString().trim()).filter(Boolean);
+    const yrs = (data.years || []).map((e) => this._formatYearShort(e.toString())).filter(Boolean);
+
+    if (rawInsts.length === 0 && yrs.length === 0) return '';
+
+    const tags: string[] = [];
+    let yearIdx = 0;
+
+    for (const raw of rawInsts) {
+      const isAuthor = this._isTextbookAuthor(raw);
+      if (isAuthor) {
+        tags.push(this._normalizeInstituteOrAuthor(raw));
+        continue;
+      }
+
+      // Check if raw already has embedded year digits (e.g. "CU-18", "DINAJPUR BOARD 22")
+      const embeddedYearMatch = raw.match(/(\d{2,4}(?:\s*[-–/]\s*\d{2,4})?|\b\d{2}\b)/);
+      let embeddedYear: string | null = null;
+      let cleanRaw = raw;
+      if (embeddedYearMatch) {
+        embeddedYear = this._formatYearShort(embeddedYearMatch[0]);
+        cleanRaw = raw.replace(embeddedYearMatch[0], '').trim();
+      }
+
+      const normalized = this._normalizeInstituteOrAuthor(cleanRaw.length > 0 ? cleanRaw : raw);
+
+      let yearToUse: string | null = null;
+      if (yearIdx < yrs.length) {
+        yearToUse = yrs[yearIdx];
+        yearIdx++;
+      } else if (embeddedYear) {
+        yearToUse = embeddedYear;
+      }
+
+      if (yearToUse && !normalized.includes(yearToUse)) {
+        tags.push(`${normalized}-${yearToUse}`);
+      } else {
+        tags.push(normalized);
+      }
+    }
+
+    while (yearIdx < yrs.length) {
+      if (tags.length === 0) {
+        tags.push(yrs[yearIdx]);
+      } else {
+        if (!tags[tags.length - 1].includes('-')) {
+          tags[tags.length - 1] = `${tags[tags.length - 1]}-${yrs[yearIdx]}`;
+        } else {
+          tags.push(yrs[yearIdx]);
+        }
+      }
+      yearIdx++;
+    }
+
+    return tags.join(', ');
+  }
+
+  private static _formatYearShort(raw: string): string {
+    const trimmed = raw.trim();
+    if (!trimmed) return '';
+    const clean = trimmed.replace(/['’]/g, '');
+    const sessionMatch = clean.match(/^(\d{2,4})\s*[-–/]\s*(\d{2,4})$/);
+    if (sessionMatch) {
+      const y1 = sessionMatch[1].slice(-2);
+      const y2 = sessionMatch[2].slice(-2);
+      return `${y1}-${y2}`;
+    }
+    const singleMatch = clean.match(/\d{2,4}/);
+    if (singleMatch) {
+      return singleMatch[0].slice(-2);
+    }
+    return trimmed;
+  }
+
+  private static _isTextbookAuthor(name: string): boolean {
+    const lower = name.toLowerCase();
+    return (
+      lower.includes('ম্যাম') ||
+      lower.includes('স্যার') ||
+      lower.includes('আজমল') ||
+      lower.includes('হাসান') ||
+      lower.includes('মাজেদা') ||
+      lower.includes('হাজারী') ||
+      lower.includes('ইসহাক') ||
+      lower.includes('তপন') ||
+      lower.includes('কেতাব')
+    );
+  }
+
+  private static _normalizeInstituteOrAuthor(raw: string): string {
+    const trimmed = raw.trim();
+    if (!trimmed) return '';
+    const upper = trimmed.toUpperCase().replace(/-/g, ' ').replace(/_/g, ' ');
+
+    // Boards
+    if (upper === 'DB' || upper.includes('DHAKA') || upper.includes('ঢাকা')) return 'DB';
+    if (upper === 'DIN' || upper.includes('DINAJPUR') || upper.includes('দিনাজপুর')) return 'DIN';
+    if (upper === 'RB' || upper.includes('RAJSHAHI') || upper.includes('রাজশাহী')) return 'RB';
+    if (upper === 'CB' || upper.includes('CHITTAGONG') || upper.includes('CHATTOGRAM') || upper.includes('চট্টগ্রাম')) return 'CB';
+    if (upper === 'COM' || upper.includes('COMILLA') || upper.includes('CUMILLA') || upper.includes('কুমিল্লা')) return 'COM';
+    if (upper === 'JB' || upper.includes('JESSORE') || upper.includes('JASHORE') || upper.includes('যশোর')) return 'JB';
+    if (upper === 'BB' || upper.includes('BARISAL') || upper.includes('BARISHAL') || upper.includes('বরিশাল')) return 'BB';
+    if (upper === 'SB' || upper.includes('SYLHET') || upper.includes('সিলেট')) return 'SB';
+    if (upper === 'MB' || upper.includes('MYMENSINGH') || upper.includes('ময়মনসিংহ')) return 'MB';
+    if (upper === 'MAD' || upper.includes('MADRASAH') || upper.includes('মাদ্রাসা')) return 'MAD';
+    if (upper === 'ALL' || upper.includes('ALL BOARD') || upper.includes('সকল বোর্ড')) return 'ALL';
+
+    // Universities
+    if (upper === 'DU A' || upper === 'DU KA') return 'DU-A';
+    if (upper === 'DU D' || upper === 'DU GHA') return 'DU-D';
+    if (upper === 'DU B' || upper === 'DU KHA') return 'DU-B';
+    if (upper === 'DU' || upper.includes('DHAKA UNIVERSITY')) return 'DU';
+    if (upper.includes('BUET')) return 'BUET';
+    if (upper.includes('CKRUET')) return 'CKRUET';
+    if (upper.includes('RUET')) return 'RUET';
+    if (upper.includes('KUET')) return 'KUET';
+    if (upper.includes('CUET')) return 'CUET';
+    if (upper.includes('BUTEX')) return 'BUTEX';
+    if (upper.includes('SUST')) return 'SUST';
+    if (upper.includes('MIST')) return 'MIST';
+    if (upper.includes('IUT')) return 'IUT';
+    if (upper.includes('BUP')) return 'BUP';
+    if (upper === 'JU A') return 'JU-A';
+    if (upper === 'JU D') return 'JU-D';
+    if (upper.includes('JU') || upper.includes('JAHANGIRNAGAR')) return 'JU';
+    if (upper === 'RU A') return 'RU-A';
+    if (upper === 'RU C') return 'RU-C';
+    if (upper.includes('RU') || upper.includes('RAJSHAHI UNIVERSITY')) return 'RU';
+    if (upper === 'CU A') return 'CU-A';
+    if (upper === 'CU D') return 'CU-D';
+    if (upper === 'CU' || upper.includes('CHITTAGONG UNIVERSITY') || upper.includes('চট্টগ্রাম বিশ্ববিদ্যালয়')) return 'CU';
+    if (upper.includes('GST')) return 'GST';
+    if (upper.includes('MEDICAL') || upper.includes('MAT') || upper.includes('মেডিকেল')) return 'MAT';
+
+    return trimmed;
   }
 
   /**

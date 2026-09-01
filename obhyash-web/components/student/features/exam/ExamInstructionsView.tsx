@@ -2,17 +2,20 @@
 
 import React, { useState } from 'react';
 import {
-  Clock,
-  AlertTriangle,
   ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  ShieldCheck,
   CheckCircle2,
-  MinusCircle,
-  Wifi,
-  Sparkles,
+  Timer,
+  LayoutGrid,
+  AlertTriangle,
+  Atom,
+  FlaskConical,
+  Dna,
+  Calculator,
+  Binary,
   BookOpen,
-  Layers,
-  HelpCircle,
-  Hourglass,
 } from 'lucide-react';
 import { ExamConfig } from '@/lib/types';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
@@ -24,12 +27,18 @@ interface ExamInstructionsViewProps {
   onBack: () => void;
 }
 
+const toBanglaNumeral = (num: number | string): string => {
+  const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/[0-9]/g, (w) => bengaliDigits[+w]);
+};
+
 export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   config,
   onStart,
   onBack,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
   const handleStart = async () => {
     setIsLoading(true);
@@ -42,223 +51,282 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
     }
   };
 
-  const formattedSubject = BanglaNameHelper.formatSubject(config.subject, config.subjectLabel);
-  const hasNegative = config.negativeMarking > 0;
+  const formattedSubject = BanglaNameHelper.formatSubject(
+    config.subject,
+    config.subjectLabel,
+  );
 
-  const chapterCount = config.chapters && config.chapters !== 'All' ? config.chapters.split(',').length.toString() : 'সব';
+  const cleanChapters = (config.chapters || '')
+    .split(',')
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0 && c.toLowerCase() !== 'all');
 
-  const getSubjectColor = (subjectId?: string) => {
-    if (!subjectId) return 'from-emerald-500/20 to-transparent';
-    const s = subjectId.toLowerCase();
-    if (s.includes('physics')) return 'from-blue-500/20 to-transparent';
-    if (s.includes('chemistry')) return 'from-orange-500/20 to-transparent';
-    if (s.includes('biology')) return 'from-teal-500/20 to-transparent';
-    if (s.includes('math')) return 'from-purple-500/20 to-transparent';
-    return 'from-emerald-500/20 to-transparent';
+  const chapterCountLabel =
+    cleanChapters.length > 0
+      ? `${toBanglaNumeral(cleanChapters.length)}টি অধ্যায়`
+      : 'সকল অধ্যায়';
+
+  const durationStr = toBanglaNumeral(config.durationMinutes || 25);
+  const totalQStr = toBanglaNumeral(config.questionCount || 25);
+  const negMarkStr =
+    config.negativeMarking > 0
+      ? `-${toBanglaNumeral(config.negativeMarking)}`
+      : 'নেই';
+  const totalMarksStr = toBanglaNumeral(config.questionCount || 25);
+
+  // Subject Icon Mapping
+  const getSubjectIcon = (subjectStr: string) => {
+    const s = subjectStr.toLowerCase();
+    if (s.includes('physics') || s.includes('পদার্থ'))
+      return <Atom className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+    if (s.includes('chem') || s.includes('রসায়ন') || s.includes('রসায়ন'))
+      return (
+        <FlaskConical className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+      );
+    if (s.includes('bio') || s.includes('জীব'))
+      return <Dna className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+    if (s.includes('math') || s.includes('গণিত'))
+      return (
+        <Calculator className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+      );
+    if (s.includes('ict') || s.includes('তথ্য'))
+      return <Binary className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+    return <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
   };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto pb-4 md:pb-8 px-2 md:px-6 font-['HindSiliguri']">
-      
-      {/* 3. Ambient Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 flex justify-center">
-        <div className={cn("w-[600px] h-[300px] rounded-full bg-gradient-radial blur-[100px] opacity-60 dark:opacity-30", getSubjectColor(config.subject))} />
-      </div>
-
-      {/* 6. Contextual Header */}
-      <div className="flex justify-center mb-3 pt-2 md:mb-8 md:pt-4 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
-        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 dark:bg-neutral-900/60 backdrop-blur-md border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
-          <span className="text-neutral-800 dark:text-neutral-200">{formattedSubject}</span>
-          <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-          <span>{config.examType}</span>
-          <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-          <span>{config.difficulty}</span>
-        </div>
-      </div>
-
-      {/* Exam Summary Card (Staggered Animation 1) */}
-      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-3 md:mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
-        <div className="px-4 pt-3 pb-2 md:px-6 md:pt-5 md:pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
-          <p className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-            পরীক্ষার সারসংক্ষেপ
-          </p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-100/50 dark:divide-neutral-800/50">
-          {/* 1. Professional Icons & 4. Typography Hierarchy */}
-          <StatCell
-            icon={<BookOpen size={18} strokeWidth={2.5} />}
-            iconColor="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-            label="বিষয়"
-            value={formattedSubject}
-          />
-          <StatCell
-            icon={<Layers size={18} strokeWidth={2.5} />}
-            iconColor="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-            label="অধ্যায়"
-            value={chapterCount}
-          />
-          <StatCell
-            icon={<HelpCircle size={18} strokeWidth={2.5} />}
-            iconColor="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-            label="প্রশ্ন"
-            value={`${config.questionCount}`}
-            highlight
-          />
-          <StatCell
-            icon={<Hourglass size={18} strokeWidth={2.5} />}
-            iconColor="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-            label="সময় (মিনিট)"
-            value={`${config.durationMinutes}`}
-            highlight
-          />
-        </div>
-      </div>
-
-      {/* Rules Card (Staggered Animation 2) */}
-      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-3 md:mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
-        <div className="px-4 pt-3 pb-2 md:px-6 md:pt-5 md:pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
-          <p className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-            নিয়মাবলী
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-px bg-neutral-100/50 dark:bg-neutral-800/50">
-          <RuleRow
-            iconBg="bg-emerald-100 dark:bg-emerald-900/30"
-            icon={<Clock size={13} className="text-emerald-700 dark:text-emerald-400" />}
-            title="সময় ব্যবস্থাপনা"
-            desc={`${config.durationMinutes} মিনিট — সময় শেষে স্বয়ংক্রিয় জমা`}
-          />
-          <RuleRow
-            iconBg={hasNegative ? 'bg-red-100 dark:bg-red-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}
-            icon={
-              hasNegative
-                ? <MinusCircle size={13} className="text-red-600 dark:text-red-400" />
-                : <CheckCircle2 size={13} className="text-emerald-700 dark:text-emerald-400" />
-            }
-            title="নেগেটিভ মার্কিং"
-            desc={hasNegative ? `প্রতি ভুলে −${config.negativeMarking} নম্বর কাটা` : 'নেগেটিভ মার্কিং নেই'}
-            badge={hasNegative ? `−${config.negativeMarking}` : '✓'}
-            badgeColor={hasNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'}
-          />
-
-          <RuleRow
-            iconBg="bg-amber-100 dark:bg-amber-900/30"
-            icon={<AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />}
-            title="ট্যাব পরিবর্তন"
-            desc="ট্যাব বদলালে পরীক্ষা বাতিল হতে পারে"
-          />
-
-        </div>
-      </div>
-
-      {/* CTA (Staggered Animation 3) */}
-      <div className="flex flex-row gap-2 sm:gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+    <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col font-['HindSiliguri',sans-serif] select-none text-[#0F172A] dark:text-[#F8FAFC]">
+      {/* ── Top App Bar ── */}
+      <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-4 sm:px-6 shadow-xs">
         <button
+          type="button"
           onClick={onBack}
           disabled={isLoading}
-          className="w-1/3 group relative overflow-hidden bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-extrabold py-3 sm:py-5 rounded-xl sm:rounded-3xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 px-2"
+          aria-label="Back"
+          className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#1E293B] dark:text-[#E2E8F0] hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
         >
-          <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform shrink-0" />
-            <span className="text-[13px] sm:text-lg whitespace-nowrap">ফিরে যাও</span>
-          </div>
+          <ArrowLeft className="w-5 h-5" />
         </button>
+        <h1 className="flex-1 text-center font-bold text-base sm:text-lg text-[#0F172A] dark:text-white mr-9">
+          পরীক্ষার নির্দেশাবলী
+        </h1>
+      </header>
 
-        <button
-          onClick={handleStart}
-          disabled={isLoading}
-          className="w-2/3 group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3 sm:py-5 rounded-xl sm:rounded-3xl shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none px-2"
-        >
-          <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-3">
+      {/* ── Main Scrollable Content ── */}
+      <main className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 flex justify-center">
+        <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-24">
+          {/* ── Card 1: Subject & Scope Accordion ── */}
+          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] overflow-hidden transition-all">
+            <button
+              type="button"
+              onClick={() => setIsAccordionOpen((prev) => !prev)}
+              className="w-full p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-neutral-50/50 dark:hover:bg-white/[0.02] transition-colors"
+            >
+              {/* Left: Icon & Subject Title */}
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-[14px] bg-[#FAF5FF] dark:bg-[#251833] border border-[#F3E8FF] dark:border-[#3B2252] flex items-center justify-center shrink-0">
+                  {getSubjectIcon(config.subject || config.subjectLabel || '')}
+                </div>
+                <h2 className="font-bold text-base sm:text-[17px] text-[#0F172A] dark:text-white truncate">
+                  {formattedSubject}
+                </h2>
+              </div>
+
+              {/* Right: Pill with Chapter Count & Chevron */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#1E2028] border border-[#E2E8F0] dark:border-[#2D303B] text-[#334155] dark:text-[#CBD5E1] text-xs sm:text-sm font-semibold shrink-0">
+                <span>{chapterCountLabel}</span>
+                <ChevronDown
+                  className={cn(
+                    'w-4 h-4 text-[#64748B] dark:text-[#94A3B8] transition-transform duration-200',
+                    isAccordionOpen && 'rotate-180',
+                  )}
+                />
+              </div>
+            </button>
+
+            {/* Accordion Expandable Chapters List */}
+            {isAccordionOpen && (
+              <div className="px-4 pb-4 pt-1 border-t border-[#F1F5F9] dark:border-[#1F2026] flex flex-col gap-2 animate-in fade-in duration-200">
+                <p className="text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] pt-2">
+                  অন্তর্ভুক্ত অধ্যায়সমূহ:
+                </p>
+                {cleanChapters.length === 0 ? (
+                  <div className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A1B22] text-xs text-[#64748B] dark:text-[#94A3B8]">
+                    সম্পূর্ণ সিলেবাসের সকল অধ্যায় অন্তর্ভুক্ত।
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+                    {cleanChapters.map((chapter, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2.5 p-2 rounded-xl bg-[#F8FAFC] dark:bg-[#181920] border border-[#E2E8F0]/60 dark:border-[#272935] text-xs sm:text-sm font-medium text-[#1E293B] dark:text-[#E2E8F0]"
+                      >
+                        <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold text-[11px] flex items-center justify-center shrink-0">
+                          {toBanglaNumeral(idx + 1)}
+                        </span>
+                        <span className="truncate">{chapter}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Card 2: 4-Column Stat Ribbon ── */}
+          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] py-4 px-2 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] grid grid-cols-4 divide-x divide-[#F1F5F9] dark:divide-[#1F2026] text-center">
+            {/* Stat 1: সময়সীমা */}
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+                সময়সীমা
+              </span>
+              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                {durationStr} মিনিট
+              </span>
+            </div>
+
+            {/* Stat 2: মোট প্রশ্ন */}
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+                মোট প্রশ্ন
+              </span>
+              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                {totalQStr}টি MCQ
+              </span>
+            </div>
+
+            {/* Stat 3: নেগেটিভ */}
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+                নেগেটিভ
+              </span>
+              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                {negMarkStr}
+              </span>
+            </div>
+
+            {/* Stat 4: পূর্ণমান */}
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+                পূর্ণমান
+              </span>
+              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                {totalMarksStr} নম্বর
+              </span>
+            </div>
+          </div>
+
+          {/* ── Card 3: Important Instructions Timeline Card ── */}
+          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]">
+            {/* Header */}
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="w-8 h-8 rounded-[10px] bg-[#ECFDF5] dark:bg-[#064E3B]/30 flex items-center justify-center text-[#059669] dark:text-[#34D399]">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base sm:text-lg text-[#0F172A] dark:text-white">
+                গুরুত্বপূর্ণ নির্দেশনাবলী
+              </h3>
+            </div>
+
+            {/* Timeline Items */}
+            <div className="relative flex flex-col gap-6 pl-1">
+              {/* Timeline Connector Line */}
+              <div className="absolute left-[19px] top-6 bottom-6 w-[2px] bg-[#E2E8F0] dark:bg-[#22242D]" />
+
+              {/* Item 1: সঠিক উত্তর নির্বাচন */}
+              <div className="relative flex items-start gap-3.5 z-10">
+                <div className="w-10 h-10 rounded-[12px] bg-[#ECFDF5] dark:bg-[#064E3B]/40 text-[#10B981] dark:text-[#34D399] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                    সঠিক উত্তর নির্বাচন
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                    প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর
+                    দাও। একবার অপশন সিলেক্ট করলে তা লক হয়ে যাবে।
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 2: টাইমার ও স্বয়ংক্রিয় সাবমিট */}
+              <div className="relative flex items-start gap-3.5 z-10">
+                <div className="w-10 h-10 rounded-[12px] bg-[#EFF6FF] dark:bg-[#1E3A8A]/40 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                  <Timer className="w-5 h-5" />
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                    টাইমার ও স্বয়ংক্রিয় সাবমিট
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                    স্ক্রিনের শীর্ষে কাউন্টডাউন থাকবে। সময় শেষ হলে পরীক্ষা
+                    নিজেই সাবমিট হয়ে রেজাল্ট দেখাবে।
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 3: প্রশ্ন প্যালেট জাম্প */}
+              <div className="relative flex items-start gap-3.5 z-10">
+                <div className="w-10 h-10 rounded-[12px] bg-[#F5F3FF] dark:bg-[#4C1D95]/40 text-[#8B5CF6] dark:text-[#A78BFA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                  <LayoutGrid className="w-5 h-5" />
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                    প্রশ্ন প্যালেট জাম্প
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                    উপরের প্রশ্ন নম্বরে ট্যাপ করে সরাসরি যেকোনো প্রশ্নে চলে যাও।
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 4: অ্যাপ ত্যাগ সতর্কতা */}
+              <div className="relative flex items-start gap-3.5 z-10">
+                <div className="w-10 h-10 rounded-[12px] bg-[#FEF2F2] dark:bg-[#7F1D1D]/40 text-[#EF4444] dark:text-[#F87171] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <h4 className="font-bold text-sm sm:text-base text-[#EF4444] dark:text-[#F87171] leading-tight">
+                    অ্যাপ ত্যাগ সতর্কতা
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                    পরীক্ষা চলাকালে অ্যাপ থেকে বের বা ব্যাকগ্রাউন্ডে গেলে
+                    পরীক্ষা অকার্যকর হতে পারে।
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* ── Fixed Bottom CTA Bar ── */}
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#111216]/95 backdrop-blur-md border-t border-[#E5E9F0] dark:border-[#1F2026] p-3.5 sm:p-4 flex justify-center shadow-lg">
+        <div className="w-full max-w-lg">
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={isLoading}
+            className="w-full py-3.5 sm:py-4 px-6 rounded-[16px] bg-[#004633] hover:bg-[#003828] active:scale-[0.99] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(0,70,51,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {isLoading ? (
               <>
-                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
-                <span className="text-[14px] sm:text-lg whitespace-nowrap">লোড হচ্ছে...</span>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>শুরু হচ্ছে...</span>
               </>
             ) : (
               <>
-                <span className="text-[14px] sm:text-lg whitespace-nowrap">পরীক্ষা শুরু করো</span>
-                <Sparkles size={16} className="group-hover:rotate-12 transition-transform duration-300 shrink-0 hidden sm:block" />
+                <span>পরীক্ষা শুরু করো</span>
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center ml-0.5">
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
               </>
             )}
-          </div>
-        </button>
-      </div>
-
-      <p className="text-center text-[10px] sm:text-[11px] text-neutral-400 mt-2 md:mt-4 font-bold uppercase tracking-widest animate-in fade-in duration-500 delay-500 fill-mode-both">
-        শুরু করলে টাইমার চালু হয়ে যাবে
-      </p>
+          </button>
+        </div>
+      </footer>
     </div>
   );
 };
 
-// ─── Stat Cell (summary grid) ─────────────────────────────────────────────────
-const StatCell = ({
-  icon,
-  iconColor,
-  label,
-  value,
-  highlight = false,
-}: {
-  icon: React.ReactNode;
-  iconColor?: string;
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) => (
-  <div className="flex flex-col items-center justify-center py-3 px-2 md:py-6 md:px-3 text-center">
-    <div className={cn("w-7 h-7 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1.5 md:mb-3 shadow-inner", iconColor || "bg-neutral-100 text-neutral-500 dark:bg-neutral-800")}>
-      {icon}
-    </div>
-    <p
-      className={cn(
-        'font-black text-lg md:text-3xl leading-none mb-1 md:mb-1.5',
-        highlight
-          ? 'text-emerald-700 dark:text-emerald-400'
-          : 'text-neutral-900 dark:text-white',
-      )}
-    >
-      {value}
-    </p>
-    <p className="text-[9px] md:text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-      {label}
-    </p>
-  </div>
-);
-
-// ─── Rule Card (compact 2-col grid) ──────────────────────────────────────────
-const RuleRow = ({
-  icon,
-  iconBg,
-  title,
-  desc,
-  badge,
-  badgeColor,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  title: string;
-  desc: string;
-  badge?: string;
-  badgeColor?: string;
-}) => (
-  <div className="flex items-start gap-2.5 md:gap-3 px-3 py-2.5 md:px-4 md:py-3.5 bg-white/60 dark:bg-neutral-900/60 backdrop-blur hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors">
-    <div className={cn('w-5 h-5 md:w-6 md:h-6 rounded-md md:rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-sm', iconBg)}>
-      {icon}
-    </div>
-    <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <p className="text-[11px] md:text-xs font-extrabold text-neutral-900 dark:text-white leading-tight">{title}</p>
-        {badge && (
-          <span className={cn('text-[8px] md:text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none shadow-sm', badgeColor)}>
-            {badge}
-          </span>
-        )}
-      </div>
-      <p className="text-[9px] md:text-[10px] text-neutral-500 dark:text-neutral-400 leading-snug mt-0.5">{desc}</p>
-    </div>
-  </div>
-);
-
-
+export default ExamInstructionsView;

@@ -911,6 +911,51 @@ export const getExamHistory = async (knownUserId?: string): Promise<ExamResult[]
   return [];
 };
 
+export const getExamResultById = async (
+  examId: string,
+  knownUserId?: string,
+): Promise<ExamResult | null> => {
+  if (isSupabaseConfigured() && supabase) {
+    let resolvedUserId = knownUserId;
+    if (!resolvedUserId) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      resolvedUserId = session?.user?.id;
+    }
+
+    let query = supabase.from('exam_results').select('*').eq('id', examId);
+    if (resolvedUserId) {
+      query = query.eq('user_id', resolvedUserId);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    if (error || !data) {
+      return null;
+    }
+
+    const result = mapDbResultToExamResult(data as unknown as ExamResultDbRow);
+    if (!result.subjectLabel || result.subjectLabel === result.subject) {
+      result.subjectLabel = getSubjectDisplayName(result.subject);
+    }
+    return result;
+  }
+
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('obhyash_exam_history');
+    if (stored) {
+      try {
+        const list: ExamResult[] = JSON.parse(stored);
+        return list.find((e) => e.id === examId) || null;
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  return null;
+};
+
 export const clearExamHistory = async (): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) return false;
 

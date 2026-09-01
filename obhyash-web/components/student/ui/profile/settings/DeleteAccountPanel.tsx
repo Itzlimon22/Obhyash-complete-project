@@ -42,33 +42,44 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
     try {
       const supabase = createClient();
 
-      // 1. Call secure RPC delete_user_account
-      try {
+      // 1. Call server-side delete-account API endpoint
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        // Fallback: Attempt direct RPC delete_user_account from client
         const { error: rpcErr } = await supabase.rpc('delete_user_account', {
-          p_reason: 'User requested deletion from web',
+          p_reason: 'User requested deletion from web panel',
         });
-        if (rpcErr) throw rpcErr;
-      } catch (rpcErr) {
-        console.warn('RPC delete_user_account failed, attempting fallback deletion:', rpcErr);
-        // Fallback: Delete from public.users directly
-        const { error: dbErr } = await supabase
-          .from('users')
-          .delete()
-          .eq('id', user.id);
-        if (dbErr) throw dbErr;
+        if (rpcErr) {
+          const { error: dbErr } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', user.id);
+          if (dbErr) throw dbErr;
+        }
       }
 
-      // 2. Clear local storage
+      // 2. Clear all local storage & session storage
       try {
         localStorage.clear();
         sessionStorage.clear();
       } catch (_) {}
 
-      // 3. Sign out from Supabase Auth
-      await supabase.auth.signOut();
+      // 3. Clear all client cookies
+      try {
+        document.cookie = 'obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'obhyash_user_profile=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      } catch (_) {}
+
+      // 4. Sign out from Supabase Auth & server
+      await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
+      await supabase.auth.signOut().catch(() => {});
 
       toast.success('তোমার অ্যাকাউন্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে।');
-      router.push('/login');
+      window.location.href = '/login?logout=true';
     } catch (e: any) {
       console.error('Delete account error:', e);
       const msg = e?.message || 'অ্যাকাউন্ট মুছতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';

@@ -5,47 +5,24 @@ import { createClient } from '@/utils/supabase/client';
 import { UserProfile } from '@/lib/types';
 
 export const EXAM_TARGETS = [
-  { id: 'hsc_2026', label: 'এইচএসসি ২০২৬', sub: 'HSC 2026', emoji: '📚' },
-  { id: 'hsc_2027', label: 'এইচএসসি ২০২৭', sub: 'HSC 2027', emoji: '📚' },
   {
-    id: 'mbbs_2026',
-    label: 'মেডিকেল ভর্তি ২০২৬',
-    sub: 'MBBS Admission',
-    emoji: '🏥',
+    id: 'Medical',
+    label: 'মেডিকেল ভর্তি',
+    sub: 'Medical Admission',
+    emoji: '🩺',
   },
   {
-    id: 'mbbs_2027',
-    label: 'মেডিকেল ভর্তি ২০২৭',
-    sub: 'MBBS Admission',
-    emoji: '🏥',
-  },
-  {
-    id: 'eng_2026',
-    label: 'ইঞ্জিনিয়ারিং ভর্তি ২০২৬',
+    id: 'Engineering',
+    label: 'ইঞ্জিনিয়ারিং ভর্তি',
     sub: 'BUET/CKRUET Admission',
     emoji: '⚙️',
   },
   {
-    id: 'eng_2027',
-    label: 'ইঞ্জিনিয়ারিং ভর্তি ২০২৭',
-    sub: 'BUET/CKRUET Admission',
-    emoji: '⚙️',
-  },
-  {
-    id: 'varsity_2026',
-    label: 'ভার্সিটি ভর্তি ২০২৬',
+    id: 'University',
+    label: 'ভার্সিটি ভর্তি',
     sub: 'DU/RU/JU Admission',
     emoji: '🏛️',
   },
-  {
-    id: 'varsity_2027',
-    label: 'ভার্সিটি ভর্তি ২০২৭',
-    sub: 'DU/RU/JU Admission',
-    emoji: '🏛️',
-  },
-  { id: 'ssc_2026', label: 'এসএসসি ২০২৬', sub: 'SSC 2026', emoji: '✏️' },
-  { id: 'ssc_2027', label: 'এসএসসি ২০২৭', sub: 'SSC 2027', emoji: '✏️' },
-  { id: 'other', label: 'অন্যান্য', sub: 'Other', emoji: '🎯' },
 ];
 
 interface ExamTargetModalProps {

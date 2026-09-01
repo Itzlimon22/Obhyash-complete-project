@@ -1,9 +1,16 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Trophy, Clock, Target, MinusCircle, CheckCircle2, XCircle, HelpCircle } from "lucide-react";
-import { BanglaNameHelper } from "@/lib/bangla-name-helper";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import {
+  Trophy,
+  Clock,
+  Target,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  MinusCircle,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface ResultStatsProps {
   percentage: number;
@@ -35,181 +42,196 @@ export const ResultStats: React.FC<ResultStatsProps> = ({
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    if (mins > 0) {
-      return `${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(
-        secs
-      )} সে.`;
-    }
-    return `${BanglaNameHelper.toBanglaNumeral(secs)} সেকেন্ড`;
+    return `${mins}m ${secs}s`;
   };
 
   const roundedPercentage = Math.round(percentage);
 
+  // Dot color for accuracy ring
+  const accuracyColor =
+    roundedPercentage >= 75
+      ? '#10B981'
+      : roundedPercentage >= 40
+        ? '#F59E0B'
+        : '#EF4444';
+
   return (
-    <div className="flex flex-col gap-4 font-['HindSiliguri']">
-      {/* ── 1. Top 3 Cards Row (Matching Flutter _CircularAccuracyCard & _StatCard) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Accuracy Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 block mb-0.5">
-              সঠিকতা
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                {BanglaNameHelper.toBanglaNumeral(roundedPercentage)}%
-              </span>
-            </div>
-            <span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-semibold">
-              {BanglaNameHelper.toBanglaNumeral(correctCount)}/{BanglaNameHelper.toBanglaNumeral(answeredCount || 1)} নির্ভুল
-            </span>
-          </div>
+    <div className="flex flex-col gap-4 font-['HindSiliguri',sans-serif]">
+      {/* ── 1. Top 3 Cards Row (Matching Flutter Exact Layout) ── */}
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+        {/* Card 1: সঠিকতা (Accuracy) */}
+        <div className="p-3 sm:p-4 rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-between text-center min-h-[140px] sm:min-h-[155px]">
+          <div className="flex-1 flex items-center justify-center pt-1">
+            {/* Circular Ring with Centered Percentage and Top Dot */}
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
+              <svg
+                className="w-full h-full transform -rotate-90"
+                viewBox="0 0 36 36"
+              >
+                {/* Background Ring */}
+                <path
+                  className="text-neutral-100 dark:text-[#27272A]"
+                  strokeWidth="3.5"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                {/* Active Progress Ring */}
+                <path
+                  className="transition-all duration-1000 ease-out"
+                  strokeDasharray={`${Math.max(roundedPercentage, 2)}, 100`}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  stroke={accuracyColor}
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
 
-          {/* Circular Progress Ring */}
-          <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-            <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
-              <path
-                className="text-neutral-200 dark:text-neutral-800"
-                strokeWidth="3.5"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              {/* Indicator Dot at top of ring */}
+              <div
+                className="absolute top-0 w-2 h-2 rounded-full"
+                style={{ backgroundColor: accuracyColor }}
               />
-              <path
-                className="text-blue-600 dark:text-blue-500 transition-all duration-1000 ease-out"
-                strokeDasharray={`${roundedPercentage}, 100`}
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-            </svg>
-            <Target size={18} className="absolute text-blue-600 dark:text-blue-400" />
-          </div>
-        </div>
 
-        {/* Score Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 block mb-0.5">
-              প্রাপ্ত নম্বর
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-red-500 dark:text-red-400">
-                {BanglaNameHelper.toBanglaNumeral(finalScore.toFixed(2).replace(/\.00$/, ""))}
-              </span>
-              <span className="text-sm font-bold text-neutral-400">
-                / {BanglaNameHelper.toBanglaNumeral(totalPoints)}
+              {/* Center Percentage */}
+              <span className="absolute font-black text-sm sm:text-base text-neutral-900 dark:text-white">
+                {roundedPercentage}%
               </span>
             </div>
-            {negativeMarksDeduction > 0 && (
-              <span className="text-[11px] text-red-500 font-semibold block">
-                -{BanglaNameHelper.toBanglaNumeral(negativeMarksDeduction.toFixed(2))} নেগেটিভ
-              </span>
-            )}
           </div>
 
-          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center text-red-500 shrink-0">
-            <Trophy size={22} />
-          </div>
-        </div>
-
-        {/* Time Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex items-center justify-between gap-3">
-          <div>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 block mb-0.5">
-              সময় লেগেছে
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xl sm:text-2xl font-black text-teal-600 dark:text-teal-400">
-                {formatDuration(timeTaken)}
-              </span>
-            </div>
-            <span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-semibold">
-              মোট ব্যয়িত সময়
-            </span>
-          </div>
-
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
-            <Clock size={22} />
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2. Summary Table Card (Matching Flutter ResultStats Table) ── */}
-      <div className="rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm overflow-hidden">
-        {/* Table Header */}
-        <div className="px-4 py-3.5 bg-neutral-50 dark:bg-[#202024] border-b border-neutral-200 dark:border-[#27272A] flex items-center justify-between">
-          <h4 className="text-base font-bold text-neutral-900 dark:text-white">
-            ফলাফল বিস্তারিত
-          </h4>
-          <span className="text-xs text-neutral-500 dark:text-neutral-400 font-semibold">
-            সংক্ষিপ্ত পরিসংখ্যান
+          <span className="text-xs sm:text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8] mt-2">
+            সঠিকতা
           </span>
         </div>
 
+        {/* Card 2: প্রাপ্ত নম্বর (Score) */}
+        <div className="p-3 sm:p-4 rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-between text-center min-h-[140px] sm:min-h-[155px]">
+          {/* Trophy Icon Capsule */}
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#FEE2E2] dark:bg-[#7F1D1D]/30 flex items-center justify-center text-[#EF4444] dark:text-[#F87171] mt-1">
+            <Trophy size={18} />
+          </div>
+
+          <div className="flex flex-col items-center my-0.5">
+            <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-tight">
+              {finalScore.toFixed(2).replace(/\.00$/, '')}
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-[#94A3B8] dark:text-[#64748B]">
+              / {totalPoints}
+            </span>
+          </div>
+
+          <span className="text-xs sm:text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8]">
+            প্রাপ্ত নম্বর
+          </span>
+        </div>
+
+        {/* Card 3: সময় লেগেছে (Time Taken) */}
+        <div className="p-3 sm:p-4 rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-between text-center min-h-[140px] sm:min-h-[155px]">
+          {/* Timer Icon Capsule */}
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#CCFBF1] dark:bg-[#134E4A]/40 flex items-center justify-center text-[#0D9488] dark:text-[#2DD4BF] mt-1">
+            <Clock size={18} />
+          </div>
+
+          <div className="flex flex-col items-center my-0.5">
+            <span className="text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-tight">
+              {formatDuration(timeTaken)}
+            </span>
+          </div>
+
+          <span className="text-xs sm:text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8]">
+            সময় লেগেছে
+          </span>
+        </div>
+      </div>
+
+      {/* ── 2. Detailed Performance Table Card (Matching Flutter Exactly) ── */}
+      <div className="rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs overflow-hidden">
+        {/* Table Title Header */}
+        <div className="px-4 sm:px-5 py-3.5 bg-white dark:bg-[#18181B] border-b border-[#E2E8F0] dark:border-[#27272A]">
+          <h4 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+            ফলাফল বিস্তারিত
+          </h4>
+        </div>
+
         {/* 2-Column Table Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-neutral-100 dark:divide-neutral-800">
+        <div className="grid grid-cols-2 divide-x divide-[#E2E8F0] dark:divide-[#27272A]">
           {/* Left Column */}
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">মোট প্রশ্ন</span>
+          <div className="divide-y divide-[#E2E8F0] dark:divide-[#27272A]">
+            {/* Row 1: মোট প্রশ্ন */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
+                মোট প্রশ্ন
+              </span>
               <span className="font-bold text-neutral-900 dark:text-white">
-                {BanglaNameHelper.toBanglaNumeral(totalQuestions)}টি
+                {totalQuestions}
               </span>
             </div>
 
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+            {/* Row 2: উত্তর দেওয়া হয়েছে */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
                 উত্তর দেওয়া হয়েছে
               </span>
               <span className="font-bold text-neutral-900 dark:text-white">
-                {BanglaNameHelper.toBanglaNumeral(answeredCount)}টি
+                {answeredCount}
               </span>
             </div>
 
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">
-                সঠিক উত্তর
+            {/* Row 3: উত্তর দেওয়া হয়নি */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
+                উত্তর দেওয়া হয়নি
               </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 size={15} />
-                {BanglaNameHelper.toBanglaNumeral(correctCount)}টি
+              <span className="font-bold text-neutral-900 dark:text-white">
+                {skippedCount}
               </span>
             </div>
           </div>
 
           {/* Right Column */}
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">ভুল উত্তর</span>
-              <span className="font-bold text-red-500 dark:text-red-400 flex items-center gap-1">
-                <XCircle size={15} />
-                {BanglaNameHelper.toBanglaNumeral(wrongCount)}টি
+          <div className="divide-y divide-[#E2E8F0] dark:divide-[#27272A]">
+            {/* Row 1: সঠিক উত্তর */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
+                সঠিক উত্তর
+              </span>
+              <span className="font-bold text-[#10B981]">
+                {correctCount}
               </span>
             </div>
 
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">
-                উত্তর দেওয়া হয়নি
+            {/* Row 2: ভুল উত্তর */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
+                ভুল উত্তর
               </span>
-              <span className="font-bold text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                <HelpCircle size={15} />
-                {BanglaNameHelper.toBanglaNumeral(skippedCount)}টি
+              <span className="font-bold text-[#EF4444]">
+                {wrongCount}
               </span>
             </div>
 
-            <div className="px-4 py-3 flex items-center justify-between text-sm">
-              <span className="text-neutral-600 dark:text-neutral-400 font-medium">
-                নেগেটিভ মার্কিং কর্তন
+            {/* Row 3: নেগেটিভ মার্কিং (Highlighted Tint) */}
+            <div className="px-3 sm:px-4 py-3 flex items-center justify-between text-xs sm:text-sm bg-[#FEF2F2]/60 dark:bg-[#7F1D1D]/15">
+              <span className="text-[#64748B] dark:text-[#94A3B8] font-medium">
+                নেগেটিভ ({negativeMarking}x)
               </span>
-              <span className="font-bold text-red-500 dark:text-red-400 flex items-center gap-1">
-                <MinusCircle size={15} />
-                -{BanglaNameHelper.toBanglaNumeral(negativeMarksDeduction.toFixed(2))}
+              <span className="font-bold text-[#EF4444]">
+                -{negativeMarksDeduction.toFixed(2)}
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Highlighted Footer Summary Row */}
+        <div className="px-4 sm:px-5 py-3.5 bg-white dark:bg-[#18181B] border-t border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-between">
+          <span className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white">
+            মোট প্রাপ্ত নম্বর
+          </span>
+          <span className="font-black text-base sm:text-lg text-[#10B981]">
+            {finalScore.toFixed(2).replace(/\.00$/, '')} / {totalPoints}
+          </span>
         </div>
       </div>
     </div>

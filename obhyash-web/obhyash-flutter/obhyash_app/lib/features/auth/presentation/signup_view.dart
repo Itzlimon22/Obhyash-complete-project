@@ -135,9 +135,6 @@ class _SignupViewState extends ConsumerState<SignupView>
       if (_gender.isEmpty) {
         return 'লিঙ্গ (Gender) নির্বাচন করা আবশ্যক';
       }
-      if (_examTarget.trim().isEmpty) {
-        return 'তোমার মূল লক্ষ্য / টার্গেট নির্বাচন করা আবশ্যক';
-      }
     } else if (currentStep == 3) {
       if (_emailController.text.trim().isEmpty ||
           _passwordController.text.isEmpty ||
@@ -855,58 +852,57 @@ class _SignupViewState extends ConsumerState<SignupView>
             );
           }).toList(),
         ),
-        const SizedBox(height: 20),
-
-        _buildLabel(
-          'মূল লক্ষ্য / টার্গেট (Target Exam)',
-          isDark,
-          tooltip: 'এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
-        ),
-        const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF059669).withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFF059669).withValues(alpha: 0.25),
-            ),
+        if (_stream == 'HSC') ...[
+          const SizedBox(height: 20),
+          _buildLabel(
+            'টার্গেট / লক্ষ্য (ঐচ্ছিক)',
+            isDark,
+            tooltip:
+                'এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
           ),
-          child: Row(
-            children: [
-              const Icon(LucideIcons.info, size: 16, color: Color(0xFF10B981)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  '💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
-                  style: TextStyle(
-                    fontFamily: 'Anek Bangla',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white70 : Colors.black87,
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF059669).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFF059669).withValues(alpha: 0.25),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.info, size: 16, color: Color(0xFF10B981)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
+                    style: TextStyle(
+                      fontFamily: 'Anek Bangla',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 1.5,
+            children: [
+              _examTargetOption('Medical', '🩺', 'মেডিকেল', isDark),
+              _examTargetOption('Engineering', '⚙️', 'ইঞ্জিনিয়ারিং', isDark),
+              _examTargetOption('University', '🏛️', 'ভার্সিটি', isDark),
             ],
           ),
-        ),
-        const SizedBox(height: 12),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 2.3,
-          children: [
-            _examTargetOption('mbbs_2026', '🩺', 'মেডিকেল ভর্তি', isDark),
-            _examTargetOption('eng_2026', '⚙️', 'ইঞ্জিনিয়ারিং ভর্তি', isDark),
-            _examTargetOption('varsity_2026', '🏛️', 'ভার্সিটি ভর্তি', isDark),
-            _examTargetOption('hsc_2026', '📚', 'এইচএসসি ২০২৬', isDark),
-            _examTargetOption('ssc_2026', '🎓', 'এসএসসি ২০২৬', isDark),
-            _examTargetOption('other', '🎯', 'অন্যান্য / সাধারণ', isDark),
-          ],
-        ),
+        ],
       ],
     );
   }
@@ -914,7 +910,7 @@ class _SignupViewState extends ConsumerState<SignupView>
   Widget _examTargetOption(String id, String emoji, String label, bool isDark) {
     final isSelected = _examTarget == id;
     return GestureDetector(
-      onTap: () => setState(() => _examTarget = id),
+      onTap: () => setState(() => _examTarget = isSelected ? '' : id),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(

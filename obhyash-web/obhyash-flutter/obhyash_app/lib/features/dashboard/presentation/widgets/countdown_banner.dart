@@ -2,24 +2,34 @@ import 'package:flutter/material.dart';
 
 // Exam target → date map (same as web app)
 final Map<String, DateTime> examDates = {
-  'hsc_2026': DateTime(2026, 4, 1),
-  'hsc_2027': DateTime(2027, 4, 1),
+  'Medical': DateTime(2026, 10, 5),
   'mbbs_2026': DateTime(2026, 10, 5),
   'mbbs_2027': DateTime(2027, 10, 5),
+  'Engineering': DateTime(2026, 11, 15),
+  'eng_2026': DateTime(2026, 11, 15),
   'buet_2026': DateTime(2026, 9, 15),
   'buet_2027': DateTime(2027, 9, 15),
+  'University': DateTime(2026, 12, 1),
+  'varsity_2026': DateTime(2026, 12, 1),
+  'hsc_2026': DateTime(2026, 4, 1),
+  'hsc_2027': DateTime(2027, 4, 1),
   'ssc_2026': DateTime(2026, 2, 15),
   'ssc_2027': DateTime(2027, 2, 15),
 };
 
 // Human-readable labels
 final Map<String, String> examLabels = {
+  'Medical': 'মেডিকেল ভর্তি',
+  'mbbs_2026': 'মেডিকেল ভর্তি',
+  'mbbs_2027': 'মেডিকেল ভর্তি',
+  'Engineering': 'ইঞ্জিনিয়ারিং ভর্তি',
+  'eng_2026': 'ইঞ্জিনিয়ারিং ভর্তি',
+  'buet_2026': 'বুয়েট ভর্তি',
+  'buet_2027': 'বুয়েট ভর্তি',
+  'University': 'ভার্সিটি ভর্তি',
+  'varsity_2026': 'ভার্সিটি ভর্তি',
   'hsc_2026': 'এইচএসসি ২০২৬',
   'hsc_2027': 'এইচএসসি ২০২৭',
-  'mbbs_2026': 'মেডিকেল ভর্তি ২০২৬',
-  'mbbs_2027': 'মেডিকেল ভর্তি ২০২৭',
-  'buet_2026': 'বুয়েট ভর্তি ২০২৬',
-  'buet_2027': 'বুয়েট ভর্তি ২০২৭',
   'ssc_2026': 'এসএসসি ২০২৬',
   'ssc_2027': 'এসএসসি ২০২৭',
   'other': 'লক্ষ্য পরীক্ষা',

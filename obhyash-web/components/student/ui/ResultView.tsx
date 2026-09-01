@@ -1,24 +1,32 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useMemo } from "react";
-import { Question, UserAnswers, UserProfile } from "@/lib/types";
-import { celebration } from "@/lib/confetti";
-import { BanglaNameHelper } from "@/lib/bangla-name-helper";
-import QuestionCard from "@/components/student/ui/exam/QuestionCard";
-import ExamScopeHeader from "@/components/student/ui/exam/ExamScopeHeader";
-import ResultStats from "@/components/student/ui/exam/ResultStats";
-import ReportModal from "@/components/student/ui/common/ReportModal";
-import ProUpgradeModal from "@/components/common/ProUpgradeModal";
-import { supabase } from "@/services/core";
+import React, { useState, useEffect, useMemo } from 'react';
+import { Question, UserAnswers, UserProfile } from '@/lib/types';
+import { celebration } from '@/lib/confetti';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
+import QuestionCard from '@/components/student/ui/exam/QuestionCard';
+import ExamScopeHeader from '@/components/student/ui/exam/ExamScopeHeader';
+import ResultStats from '@/components/student/ui/exam/ResultStats';
+import ReportModal from '@/components/student/ui/common/ReportModal';
+import ProUpgradeModal from '@/components/common/ProUpgradeModal';
 import {
-  Trophy,
-  RotateCcw,
+  downloadQuestionPaper,
+  downloadResultWithExplanations,
+} from '@/services/download-service';
+import { supabase } from '@/services/core';
+import {
+  X,
+  ArrowLeft,
   Download,
+  CheckCircle2,
+  Check,
   Bookmark,
-  TrendingUp,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+  Sun,
+  Moon,
+  RotateCcw,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export interface ResultViewProps {
   questions: Question[];
@@ -31,7 +39,7 @@ export interface ResultViewProps {
   negativeMarking?: number;
   onDownloadQuestionPaper?: () => void;
   onDownloadResultWithExplanations?: () => void;
-  submissionType?: "digital" | "script";
+  submissionType?: 'digital' | 'script';
   onChallengeEvaluation?: () => void;
   initialBookmarks?: Set<number | string>;
   currentUser?: UserProfile | null;
@@ -42,8 +50,13 @@ export interface ResultViewProps {
     subjectLabel?: string;
     chapters?: string;
     topics?: string;
+    durationMinutes?: number;
+    totalMarks?: number;
+    negativeMarking?: number;
+    examType?: string;
   };
   onRetryWrongAnswers?: (wrongQuestions: Question[]) => void;
+  onReexam?: () => void;
 }
 
 export const ResultView: React.FC<ResultViewProps> = ({
@@ -53,25 +66,29 @@ export const ResultView: React.FC<ResultViewProps> = ({
   onRestart,
   isHistoryMode = false,
   negativeMarking = 0.25,
-  onDownloadQuestionPaper,
-  onDownloadResultWithExplanations,
-  initialBookmarks,
+  onDownloadQuestionPaper: propDownloadQuestionPaper,
+  onDownloadResultWithExplanations: propDownloadResultWithExplanations,
   currentUser,
   bookmarkedIds: propBookmarks,
   onToggleBookmark: propToggleBookmark,
   examDetails,
-  onRetryWrongAnswers,
+  onToggleTheme,
+  isDarkMode = false,
+  onReexam,
 }) => {
   const [reviewFilter, setReviewFilter] = useState<
-    "all" | "correct" | "wrong" | "skipped" | "bookmarked"
-  >("all");
+    'all' | 'correct' | 'wrong' | 'skipped'
+  >('all');
   const [localBookmarks, setLocalBookmarks] = useState<Set<string>>(
-    propBookmarks ? new Set(propBookmarks) : new Set()
+    propBookmarks ? new Set(propBookmarks) : new Set(),
   );
-  const [reportingQuestionId, setReportingQuestionId] = useState<string | number | null>(null);
-  const [showProBookmarkModal, setShowProBookmarkModal] = useState<boolean>(false);
+  const [reportingQuestionId, setReportingQuestionId] = useState<
+    string | number | null
+  >(null);
+  const [showProBookmarkModal, setShowProBookmarkModal] =
+    useState<boolean>(false);
 
-  // Confetti on mount (if direct exam finish)
+  // Confetti celebration on mount (if direct exam finish)
   useEffect(() => {
     if (!isHistoryMode) {
       celebration.levelUp();
@@ -85,39 +102,16 @@ export const ResultView: React.FC<ResultViewProps> = ({
     }
   }, [propBookmarks]);
 
-  // Fetch bookmarks from DB if not provided
-  useEffect(() => {
-    const fetchBookmarks = async () => {
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user && questions.length > 0) {
-          const qIds = questions.map((q) => q.id.toString());
-          const { data } = await supabase
-            .from("bookmarks")
-            .select("question_id")
-            .eq("user_id", userData.user.id)
-            .in("question_id", qIds);
-
-          if (data) {
-            setLocalBookmarks(new Set(data.map((r: any) => r.question_id.toString())));
-          }
-        }
-      } catch (e) {
-        console.warn("[ResultView] Error fetching bookmarks:", e);
-      }
-    };
-
-    if (!propBookmarks) {
-      fetchBookmarks();
-    }
-  }, [questions, propBookmarks]);
-
   // Toggle Bookmark Handler
   const handleToggleBookmark = async (qId: string | number) => {
     const idStr = qId.toString();
     const isBookmarked = localBookmarks.has(idStr);
 
-    if (!isBookmarked && localBookmarks.size >= 25 && !currentUser?.subscription?.plan) {
+    if (
+      !isBookmarked &&
+      localBookmarks.size >= 25 &&
+      !currentUser?.subscription?.plan
+    ) {
       setShowProBookmarkModal(true);
       return;
     }
@@ -137,18 +131,18 @@ export const ResultView: React.FC<ResultViewProps> = ({
         if (userData?.user) {
           if (isBookmarked) {
             await supabase
-              .from("bookmarks")
+              .from('bookmarks')
               .delete()
-              .eq("user_id", userData.user.id)
-              .eq("question_id", idStr);
+              .eq('user_id', userData.user.id)
+              .eq('question_id', idStr);
           } else {
             await supabase
-              .from("bookmarks")
+              .from('bookmarks')
               .insert({ user_id: userData.user.id, question_id: idStr });
           }
         }
       } catch (e) {
-        console.error("[ResultView] Bookmark toggle failed:", e);
+        console.error('[ResultView] Bookmark toggle failed:', e);
       }
     }
   };
@@ -170,7 +164,8 @@ export const ResultView: React.FC<ResultViewProps> = ({
       } else {
         const isCorrect =
           ua === q.correctAnswerIndex ||
-          (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua));
+          (q.correctAnswerIndices != null &&
+            q.correctAnswerIndices.includes(ua));
 
         if (isCorrect) {
           rawScore += points;
@@ -182,11 +177,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
       }
     });
 
-    const negativeMarksDeduction = wrongCount * negativeMarking;
+    const effNeg = examDetails?.negativeMarking ?? negativeMarking;
+    const negativeMarksDeduction = wrongCount * effNeg;
     const finalScore = Math.max(0, rawScore - negativeMarksDeduction);
-    const totalPoints = questions.reduce((acc, q) => acc + (q.points ?? 1), 0);
+    const totalPoints =
+      examDetails?.totalMarks ||
+      questions.reduce((acc, q) => acc + (q.points ?? 1), 0);
     const percentage = totalPoints > 0 ? (finalScore / totalPoints) * 100 : 0;
-    const xpEarned = correctCount * 2;
 
     return {
       rawScore,
@@ -197,40 +194,141 @@ export const ResultView: React.FC<ResultViewProps> = ({
       negativeMarksDeduction,
       totalPoints,
       percentage,
-      xpEarned,
       wrongQuestions,
     };
-  }, [questions, userAnswers, negativeMarking]);
+  }, [questions, userAnswers, negativeMarking, examDetails]);
 
   // Filtered questions for review
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
       const ua = userAnswers[q.id];
+      const isSkipped = ua === undefined;
       const isCorrect =
-        ua !== undefined &&
+        !isSkipped &&
         (ua === q.correctAnswerIndex ||
-          (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua)));
+          (q.correctAnswerIndices != null &&
+            q.correctAnswerIndices.includes(ua)));
+      const isWrong = !isSkipped && !isCorrect;
 
-      if (reviewFilter === "correct") return isCorrect;
-      if (reviewFilter === "wrong") return ua !== undefined && !isCorrect;
-      if (reviewFilter === "skipped") return ua === undefined;
-      if (reviewFilter === "bookmarked") return localBookmarks.has(q.id.toString());
+      if (reviewFilter === 'correct') return isCorrect;
+      if (reviewFilter === 'wrong') return isWrong;
+      if (reviewFilter === 'skipped') return isSkipped;
       return true;
     });
-  }, [questions, userAnswers, reviewFilter, localBookmarks]);
+  }, [questions, userAnswers, reviewFilter]);
 
   // Subject and chapters
   const subjectTitle = BanglaNameHelper.formatSubject(
     examDetails?.subject,
-    examDetails?.subjectLabel || (examDetails as any)?.title
+    examDetails?.subjectLabel || (examDetails as any)?.title,
   );
-  const chapterList = examDetails?.chapters ? examDetails.chapters.split(", ") : [];
-  const topicList = examDetails?.topics ? examDetails.topics.split(", ") : [];
+  const chapterList = examDetails?.chapters
+    ? examDetails.chapters.split(', ').filter(Boolean)
+    : Array.from(new Set(questions.map((q) => q.chapter).filter(Boolean)));
+  const topicList = examDetails?.topics
+    ? examDetails.topics.split(', ').filter(Boolean)
+    : [];
+
+  const handleDownloadPaper = () => {
+    if (propDownloadQuestionPaper) {
+      propDownloadQuestionPaper();
+    } else {
+      toast.info('প্রশ্নপত্র PDF তৈরি হচ্ছে...');
+      const fallbackDetails = {
+        subject: examDetails?.subject || 'Exam',
+        subjectLabel: examDetails?.subjectLabel || subjectTitle,
+        durationMinutes: examDetails?.durationMinutes || 25,
+        totalMarks: stats.totalPoints,
+        negativeMarking: examDetails?.negativeMarking || negativeMarking,
+        examType: examDetails?.examType || 'Mock Exam',
+        chapters: chapterList.join(', ') || 'সকল অধ্যায়',
+      };
+      downloadQuestionPaper(fallbackDetails as any, questions);
+    }
+  };
+
+  const handleDownloadSolution = () => {
+    if (propDownloadResultWithExplanations) {
+      propDownloadResultWithExplanations();
+    } else {
+      toast.info('ফলাফল ও ব্যাখ্যা PDF তৈরি হচ্ছে...');
+      const fallbackDetails = {
+        subject: examDetails?.subject || 'Exam',
+        subjectLabel: examDetails?.subjectLabel || subjectTitle,
+        durationMinutes: examDetails?.durationMinutes || 25,
+        totalMarks: stats.totalPoints,
+        negativeMarking: examDetails?.negativeMarking || negativeMarking,
+        examType: examDetails?.examType || 'Mock Exam',
+        chapters: chapterList.join(', ') || 'সকল অধ্যায়',
+      };
+      downloadResultWithExplanations(fallbackDetails as any, questions, userAnswers);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri'] pb-24 pt-4 sm:pt-6">
-      <div className="max-w-3xl mx-auto px-3 sm:px-4 flex flex-col gap-4 sm:gap-5">
-        {/* ── 1. Exam Scope Accordion Header (Matching Flutter ExamScopeHeader) ── */}
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col">
+      {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar) ── */}
+      <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
+        <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between">
+          {/* Left Close / Back Button */}
+          <button
+            type="button"
+            onClick={onRestart}
+            title={isHistoryMode ? 'পিছনে যাও' : 'বন্ধ করো'}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-colors cursor-pointer"
+          >
+            {isHistoryMode ? <ArrowLeft size={20} /> : <X size={20} />}
+          </button>
+
+          {/* Centered Page Title */}
+          <h1 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+            পরীক্ষার ফলাফল
+          </h1>
+
+          {/* Right Action / Theme Toggle */}
+          <div className="w-9 h-9 flex items-center justify-center">
+            {onToggleTheme && (
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
+                className="w-8 h-8 rounded-lg bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:bg-[#E2E8F0] dark:hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ── Main Content Container ── */}
+      <main className="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
+        {/* ── 2. Top Action Buttons (PDF Downloads) ── */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Button 1: প্রশ্নপত্র */}
+          <button
+            type="button"
+            onClick={handleDownloadPaper}
+            title="শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো"
+            className="py-3 px-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#004633] dark:border-[#27272A] text-[#004633] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#004633]/5 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+          >
+            <Download size={16} />
+            <span>প্রশ্নপত্র</span>
+          </button>
+
+          {/* Button 2: ফলাফল ও ব্যাখ্যা */}
+          <button
+            type="button"
+            onClick={handleDownloadSolution}
+            title="প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো"
+            className="py-3 px-4 rounded-[14px] bg-[#004633]/10 dark:bg-[#059669]/20 border border-[#004633] dark:border-[#059669]/40 text-[#004633] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#004633]/15 dark:hover:bg-[#059669]/30 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+          >
+            <Check size={16} className="stroke-[3]" />
+            <span>ফলাফল ও ব্যাখ্যা</span>
+          </button>
+        </div>
+
+        {/* ── 3. Subject & Scope Accordion Header ── */}
         <ExamScopeHeader
           subjectName={subjectTitle}
           chapters={chapterList}
@@ -238,7 +336,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           initiallyExpanded={false}
         />
 
-        {/* ── 2. Result Stats & Detailed Performance Table (Matching Flutter ResultStats) ── */}
+        {/* ── 4. 3-Card Summary Metrics & Detailed Performance Table ── */}
         <ResultStats
           percentage={stats.percentage}
           finalScore={stats.finalScore}
@@ -248,83 +346,90 @@ export const ResultView: React.FC<ResultViewProps> = ({
           correctCount={stats.correctCount}
           wrongCount={stats.wrongCount}
           skippedCount={stats.skippedCount}
-          negativeMarking={negativeMarking}
+          negativeMarking={examDetails?.negativeMarking ?? negativeMarking}
           negativeMarksDeduction={stats.negativeMarksDeduction}
         />
 
-        {/* ── 3. Primary Action Buttons (Matching Flutter Result View) ── */}
-        <div className="w-full flex items-center justify-center gap-2.5 flex-wrap">
-          <button
-            type="button"
-            onClick={onRestart}
-            className="flex-1 min-w-[140px] py-3.5 px-4 rounded-xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-sm shadow-md shadow-[#004633]/25 transition flex items-center justify-center gap-1.5 active:scale-95"
-          >
-            <RotateCcw size={16} />
-            <span>পুনরায় পরীক্ষা দাও</span>
-          </button>
+        {/* ── 5. Answer Review Section Header ── */}
+        <div className="pt-2">
+          <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-3">
+            উত্তরপত্র পর্যালোচনা
+          </h3>
 
-          {stats.wrongQuestions.length > 0 && onRetryWrongAnswers && (
+          {/* Filter Chips Pill Row */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {/* Filter: সব */}
             <button
               type="button"
-              onClick={() => onRetryWrongAnswers(stats.wrongQuestions)}
-              className="flex-1 min-w-[140px] py-3.5 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm shadow-md shadow-orange-600/25 transition flex items-center justify-center gap-1.5 active:scale-95"
+              onClick={() => setReviewFilter('all')}
+              className={cn(
+                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer',
+                reviewFilter === 'all'
+                  ? 'bg-[#E2E8F0] dark:bg-[#27272A] text-neutral-900 dark:text-white shadow-xs'
+                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+              )}
             >
-              <TrendingUp size={16} />
-              <span>ভুলগুলো রিভিশন ({BanglaNameHelper.toBanglaNumeral(stats.wrongQuestions.length)})</span>
+              সব ({questions.length})
             </button>
-          )}
 
-          {onDownloadResultWithExplanations && (
+            {/* Filter: সঠিক */}
             <button
               type="button"
-              onClick={onDownloadResultWithExplanations}
-              className="py-3.5 px-4 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-bold text-sm transition flex items-center justify-center gap-1.5 shadow-sm"
+              onClick={() => setReviewFilter('correct')}
+              className={cn(
+                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                reviewFilter === 'correct'
+                  ? 'bg-[#D1FAE5] dark:bg-[#064E3B]/60 text-[#065F46] dark:text-[#34D399] border border-[#10B981]'
+                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+              )}
             >
-              <Download size={16} />
-              <span>PDF সমাধান</span>
+              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+              <span>সঠিক ({stats.correctCount})</span>
             </button>
-          )}
-        </div>
 
-        {/* ── 4. Review Filter Tabs (Matching Flutter Review Filters) ── */}
-        <div className="flex items-center justify-between gap-2 overflow-x-auto select-none mt-2">
-          <div className="flex items-center gap-1 p-1 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm w-full">
-            {[
-              { id: "all", label: `সবগুলো (${BanglaNameHelper.toBanglaNumeral(questions.length)})` },
-              { id: "correct", label: `সঠিক (${BanglaNameHelper.toBanglaNumeral(stats.correctCount)})` },
-              { id: "wrong", label: `ভুল (${BanglaNameHelper.toBanglaNumeral(stats.wrongCount)})` },
-              { id: "skipped", label: `বাকি (${BanglaNameHelper.toBanglaNumeral(stats.skippedCount)})` },
-              { id: "bookmarked", label: `বুকমার্ক (${BanglaNameHelper.toBanglaNumeral(localBookmarks.size)})` },
-            ].map((tab) => {
-              const isSelected = reviewFilter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setReviewFilter(tab.id as any)}
-                  className={cn(
-                    "flex-1 py-2 px-2.5 rounded-xl text-xs sm:text-sm font-bold transition text-center whitespace-nowrap",
-                    isSelected
-                      ? "bg-[#004633] dark:bg-[#003D2C] text-white border border-[#004633] dark:border-[#059669] shadow-sm"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                  )}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+            {/* Filter: ভুল */}
+            <button
+              type="button"
+              onClick={() => setReviewFilter('wrong')}
+              className={cn(
+                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                reviewFilter === 'wrong'
+                  ? 'bg-[#FEE2E2] dark:bg-[#7F1D1D]/40 text-[#991B1B] dark:text-[#F87171] border border-[#EF4444]'
+                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+              )}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
+              <span>ভুল ({stats.wrongCount})</span>
+            </button>
+
+            {/* Filter: স্কিপ */}
+            <button
+              type="button"
+              onClick={() => setReviewFilter('skipped')}
+              className={cn(
+                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                reviewFilter === 'skipped'
+                  ? 'bg-[#F1F5F9] dark:bg-[#27272A] text-neutral-900 dark:text-white border border-[#94A3B8]'
+                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+              )}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#94A3B8]" />
+              <span>স্কিপ ({stats.skippedCount})</span>
+            </button>
           </div>
         </div>
 
-        {/* ── 5. Question By Question Review List ── */}
-        <div className="flex flex-col mt-1">
+        {/* ── 6. Virtualized Question Cards Review List ── */}
+        <div className="flex flex-col gap-3 sm:gap-4 mt-1">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 font-bold">
+            <div className="p-8 text-center rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 font-bold">
               এই ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি।
             </div>
           ) : (
             filteredQuestions.map((question) => {
-              const originalIndex = questions.findIndex((q) => q.id === question.id);
+              const originalIndex = questions.findIndex(
+                (q) => q.id === question.id,
+              );
               const isBookmarked = localBookmarks.has(question.id.toString());
 
               return (
@@ -339,13 +444,27 @@ export const ResultView: React.FC<ResultViewProps> = ({
                   isBookmarked={isBookmarked}
                   onToggleBookmark={() => handleToggleBookmark(question.id)}
                   onReport={() => setReportingQuestionId(question.id)}
-                  initiallyExpanded={true}
+                  initiallyExpanded={false}
                 />
               );
             })
           )}
         </div>
-      </div>
+
+        {/* ── 7. Bottom Action: আবার পরীক্ষা দাও (Only shown when not in history mode) ── */}
+        {!isHistoryMode && (
+          <div className="pt-2 pb-6">
+            <button
+              type="button"
+              onClick={onReexam ? onReexam : () => onRestart()}
+              className="w-full py-3.5 px-6 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.99] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-md shadow-[#004633]/25 transition-all cursor-pointer"
+            >
+              <RotateCcw size={18} />
+              <span>আবার পরীক্ষা দাও</span>
+            </button>
+          </div>
+        )}
+      </main>
 
       {/* Question Report Modal */}
       {reportingQuestionId && (
@@ -354,20 +473,19 @@ export const ResultView: React.FC<ResultViewProps> = ({
           onClose={() => setReportingQuestionId(null)}
           onSubmit={() => {
             setReportingQuestionId(null);
-            toast.success("রিপোর্ট গ্রহণ করা হয়েছে। ধন্যবাদ!");
+            toast.success('রিপোর্ট গ্রহণ করা হয়েছে। ধন্যবাদ!');
           }}
           questionId={reportingQuestionId}
         />
       )}
 
-      {/* Pro Bookmark Limit Upgrade Modal */}
+      {/* Pro Bookmark Upgrade Modal */}
       <ProUpgradeModal
         isOpen={showProBookmarkModal}
         onClose={() => setShowProBookmarkModal(false)}
         title="বুকমার্ক লিমিট শেষ 📌"
-        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        message="ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও প্র্যাকটিসের জন্য প্রো সাবস্ক্রিপশন নাও।"
         featurePill="বুকমার্ক লিমিট: ২৫/২৫"
-        icon={Bookmark}
       />
     </div>
   );

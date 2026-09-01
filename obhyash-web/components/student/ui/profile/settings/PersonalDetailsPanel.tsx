@@ -415,20 +415,23 @@ export default function PersonalDetailsPanel({
             </div>
           </div>
 
-          {/* Target */}
-          <div>
-            <label className={labelClass}>টার্গেট</label>
-            <select
-              name="target"
-              value={formData.target}
-              onChange={handleChange}
-              className={selectClass}
-            >
-              <option value="Medical">Medical</option>
-              <option value="Engineering">Engineering</option>
-              <option value="University">University</option>
-            </select>
-          </div>
+          {/* Target - Only for HSC stream (Optional) */}
+          {formData.stream === 'HSC' && (
+            <div>
+              <label className={labelClass}>টার্গেট (ঐচ্ছিক)</label>
+              <select
+                name="target"
+                value={formData.target}
+                onChange={handleChange}
+                className={selectClass}
+              >
+                <option value="">কোনোটিই নয় / প্রযোজ্য নয়</option>
+                <option value="Medical">Medical (মেডিকেল)</option>
+                <option value="Engineering">Engineering (ইঞ্জিনিয়ারিং)</option>
+                <option value="University">University (ভার্সিটি)</option>
+              </select>
+            </div>
+          )}
 
           {/* SSC Info Header */}
           <div className="pt-2 pb-1 border-t border-neutral-100 dark:border-neutral-800">

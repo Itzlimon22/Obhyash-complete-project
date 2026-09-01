@@ -379,14 +379,15 @@ export const useExamEngine = () => {
         newResult.userAnswers = userAnswers;
         newResult.status = 'evaluated';
 
-        // Save using central database service
-        await saveExamResult(newResult);
-
-        // Update local state
+        // 1. Immediately update local history and transition to COMPLETED (Instant like Flutter)
         setExamHistory((prev) => [...prev, newResult]);
-
         setAppState(AppState.COMPLETED);
-        // console.log('✅ [ExamEngine] Exam State moved to COMPLETED');
+
+        // 2. Persist to database in background
+        saveExamResult(newResult).catch((dbErr) => {
+          console.error('Background DB save error:', dbErr);
+        });
+
         return { success: true, result: newResult };
       } catch (error: unknown) {
         console.error('Submit Exam Failed:', error);

@@ -141,7 +141,7 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -170,7 +170,7 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <div className="flex flex-col gap-3">
         {data.map((subject, idx) => (
           <SubjectItem
             key={idx}

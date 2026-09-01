@@ -6,6 +6,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
+import '../../../../services/secure_storage_service.dart';
+import '../../../../services/session_monitor_service.dart';
 import '../../../dashboard/domain/models.dart';
 
 class DeleteAccountModal extends StatefulWidget {
@@ -74,8 +76,13 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
         }
       }
 
-      // Clear local storage and preferences
+      // Stop session monitor & clear tokens/preferences
       try {
+        await SessionMonitorService.stop(userId: widget.user.id);
+        await Future.wait([
+          SecureStorageService.clearSession().catchError((_) {}),
+          SecureStorageService.clearUserMeta().catchError((_) {}),
+        ]);
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
       } catch (_) {}

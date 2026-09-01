@@ -37,28 +37,40 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     try {
       const supabase = createClient();
 
-      // Call secure RPC if present, or fallback to user delete
-      try {
+      // 1. Call server-side delete-account API endpoint
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        // Fallback to RPC delete_user_account
         const { error: rpcErr } = await supabase.rpc('delete_user_account', {
-          p_reason: 'User requested deletion',
+          p_reason: 'User requested deletion from modal',
         });
-        if (rpcErr) throw rpcErr;
-      } catch (rpcErr) {
-        console.warn('RPC delete failed, falling back to db delete:', rpcErr);
-        const { error: dbErr } = await supabase
-          .from('users')
-          .delete()
-          .eq('id', user.id);
-        if (dbErr) throw dbErr;
+        if (rpcErr) {
+          const { error: dbErr } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', user.id);
+          if (dbErr) throw dbErr;
+        }
       }
 
-      // Clear local storage and sign out
+      // 2. Clear local storage, session storage, and cookies
       try {
         localStorage.clear();
         sessionStorage.clear();
       } catch (_) {}
 
-      await supabase.auth.signOut();
+      try {
+        document.cookie = 'obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'obhyash_user_profile=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      } catch (_) {}
+
+      // 3. Sign out from server & client
+      await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
+      await supabase.auth.signOut().catch(() => {});
 
       toast.success('তোমার অ্যাকাউন্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে।');
       onClose();
@@ -66,7 +78,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
       if (onSuccessLogout) {
         onSuccessLogout();
       } else {
-        window.location.href = '/login';
+        window.location.href = '/login?logout=true';
       }
     } catch (e: any) {
       console.error('Delete account error:', e);

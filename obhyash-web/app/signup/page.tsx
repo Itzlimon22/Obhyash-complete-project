@@ -159,9 +159,6 @@ function SignupForm() {
       if (!formData.gender) {
         return 'লিঙ্গ নির্বাচন করা আবশ্যক';
       }
-      if (!formData.examTarget) {
-        return 'আপনার মূল লক্ষ্য / টার্গেট নির্বাচন করুন';
-      }
     }
     if (currentStep === 3) {
       // Credentials
@@ -662,66 +659,48 @@ function SignupForm() {
                   </div>
                 </div>
 
-                {/* Exam Target in Step 2 */}
-                <div className="space-y-2 pt-2">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    মূল লক্ষ্য / টার্গেট (Target Exam)
-                  </label>
-                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                    <Info className="w-4 h-4 shrink-0 text-emerald-500" />
-                    <span>💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {EXAM_TARGETS.filter((t) => t.id !== 'other').map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() =>
-                          setFormData({ ...formData, examTarget: t.id })
-                        }
-                        className={`flex items-center justify-center gap-1.5 p-2.5 rounded-xl border-2 text-center transition-all active:scale-95 ${
-                          formData.examTarget === t.id
-                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
-                            : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
-                        }`}
-                      >
-                        <span className="text-sm">{t.emoji}</span>
-                        <span
-                          className={`text-xs font-bold leading-tight ${
+                {/* Exam Target in Step 2 — Only for HSC Stream (Optional) */}
+                {formData.stream === 'HSC' && (
+                  <div className="space-y-2 pt-2">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                      <span>টার্গেট / লক্ষ্য (ঐচ্ছিক)</span>
+                    </label>
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      <Info className="w-4 h-4 shrink-0 text-emerald-500" />
+                      <span>💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2.5 mt-2">
+                      {EXAM_TARGETS.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              examTarget: formData.examTarget === t.id ? '' : t.id,
+                            })
+                          }
+                          className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
                             formData.examTarget === t.id
-                              ? 'text-emerald-700 dark:text-emerald-400'
-                              : 'text-neutral-700 dark:text-neutral-300'
+                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
+                              : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
                           }`}
                         >
-                          {t.label}
-                        </span>
-                      </button>
-                    ))}
-                    {/* Other option — full width */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, examTarget: 'other' })
-                      }
-                      className={`col-span-2 flex items-center justify-center gap-1.5 p-2.5 rounded-xl border-2 text-center transition-all active:scale-95 ${
-                        formData.examTarget === 'other'
-                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
-                          : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
-                      }`}
-                    >
-                      <span className="text-sm">🎯</span>
-                      <span
-                        className={`text-xs font-bold ${
-                          formData.examTarget === 'other'
-                            ? 'text-emerald-700 dark:text-emerald-400'
-                            : 'text-neutral-700 dark:text-neutral-300'
-                        }`}
-                      >
-                        অন্যান্য / সাধারণ
-                      </span>
-                    </button>
+                          <span className="text-xl">{t.emoji}</span>
+                          <span
+                            className={`text-xs font-bold leading-tight ${
+                              formData.examTarget === t.id
+                                ? 'text-emerald-700 dark:text-emerald-400'
+                                : 'text-neutral-700 dark:text-neutral-300'
+                            }`}
+                          >
+                            {t.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 

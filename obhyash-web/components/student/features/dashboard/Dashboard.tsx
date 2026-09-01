@@ -215,8 +215,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
       className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-2 font-['HindSiliguri']"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
-        {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7/8) ── */}
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-4 sm:gap-6">
+        {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}
+        <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-4 sm:gap-6">
           {/* 1. Target Exam Countdown Banner */}
           {effectiveExamTarget && (
             <motion.div variants={fadeInUp}>
@@ -262,8 +262,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </motion.div>
         </div>
 
-        {/* ── Right Column: Subject-wise Performance Section (Col Span 5/4) ── */}
-        <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 sm:gap-6 lg:sticky lg:top-4">
+        {/* ── Right Column: Subject-wise Performance Section (Col Span 5) ── */}
+        <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-4 sm:gap-6 lg:sticky lg:top-4">
           <motion.div variants={fadeInUp}>
             <SubjectStat
               data={subjectStats}

@@ -6,20 +6,34 @@ import { Timer, CalendarClock, CheckCircle2, Target, Pencil } from 'lucide-react
 
 // Static map: exam_target → exam date
 export const EXAM_DATES: Record<string, Date> = {
-  hsc_2026: new Date('2026-04-01'),
-  hsc_2027: new Date('2027-04-01'),
+  Medical: new Date('2026-10-05'),
   mbbs_2026: new Date('2026-10-05'),
   mbbs_2027: new Date('2027-10-05'),
+  Engineering: new Date('2026-11-15'),
+  eng_2026: new Date('2026-11-15'),
+  eng_2027: new Date('2027-11-15'),
+  University: new Date('2026-12-01'),
+  varsity_2026: new Date('2026-12-01'),
+  varsity_2027: new Date('2027-12-01'),
+  hsc_2026: new Date('2026-04-01'),
+  hsc_2027: new Date('2027-04-01'),
   ssc_2026: new Date('2026-02-15'),
   ssc_2027: new Date('2027-02-15'),
   other: null as unknown as Date,
 };
 
 export const EXAM_LABELS: Record<string, string> = {
+  Medical: 'মেডিকেল ভর্তি',
+  mbbs_2026: 'মেডিকেল ভর্তি',
+  mbbs_2027: 'মেডিকেল ভর্তি',
+  Engineering: 'ইঞ্জিনিয়ারিং ভর্তি',
+  eng_2026: 'ইঞ্জিনিয়ারিং ভর্তি',
+  eng_2027: 'ইঞ্জিনিয়ারিং ভর্তি',
+  University: 'ভার্সিটি ভর্তি',
+  varsity_2026: 'ভার্সিটি ভর্তি',
+  varsity_2027: 'ভার্সিটি ভর্তি',
   hsc_2026: 'এইচএসসি ২০২৬',
   hsc_2027: 'এইচএসসি ২০২৭',
-  mbbs_2026: 'মেডিকেল ভর্তি ২০২৬',
-  mbbs_2027: 'মেডিকেল ভর্তি ২০২৭',
   ssc_2026: 'এসএসসি ২০২৬',
   ssc_2027: 'এসএসসি ২০২৭',
   other: 'আমার লক্ষ্য',

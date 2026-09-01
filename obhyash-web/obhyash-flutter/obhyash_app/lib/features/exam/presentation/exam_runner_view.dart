@@ -1089,7 +1089,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                             icon: LucideIcons.checkCircle2,
                             iconColor: const Color(0xFF10B981),
                             title: 'সঠিক উত্তর নির্বাচন',
-                            desc: 'প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর দাও। সাবমিটের আগে যেকোনো সময় পরিবর্তন করা যাবে।',
+                            desc: 'প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর দাও। একবার অপশন সিলেক্ট করলে তা লক হয়ে যাবে।',
                             isDark: isDark,
                             isLast: false,
                           ),

@@ -14,6 +14,7 @@ import {
 import {
   downloadQuestionPaper,
   downloadResult,
+  downloadResultWithExplanations,
 } from "@/services/download-service";
 import { updateUserProfile } from "@/services/database";
 import { calculateLevel } from "@/lib/utils";
@@ -273,13 +274,13 @@ export default function StudentRoot({
   // Pending Config for Pre-Fetch Instructions
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
 
-  // ── Centralised bookmark state (decoupled from exam flags) ─────────────────
+  const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
   const {
     bookmarkedIds,
     isBookmarked,
     toggle: toggleBookmark,
     isLoading: isBookmarksLoading,
-  } = useBookmarks(currentUser?.id, authLoading);
+  } = useBookmarks(activeUserId, authLoading);
 
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[] | undefined>(undefined);
   
@@ -326,28 +327,63 @@ export default function StudentRoot({
   // Deep-link restore: /history/[examId] → open that exam result
   const deepLinkRestored = useRef(false);
   useEffect(() => {
-    if (deepLinkRestored.current || !initialDeepExamId || !examHistory.length) return;
+    if (deepLinkRestored.current || !initialDeepExamId) return;
+
+    // 1. Try local history cache first
     const res = examHistory.find((e) => e.id === initialDeepExamId);
-    if (!res) return;
-    deepLinkRestored.current = true;
-    setQuestions(res.questions || []);
-    setUserAnswers(res.userAnswers || {});
-    setFlaggedQuestions(new Set(res.flaggedQuestions || []));
-    setExamDetails({
-      subject: res.subject,
-      subjectLabel: res.subjectLabel || res.subject,
-      examType: res.examType || "",
-      chapters: "",
-      topics: "",
-      totalQuestions: res.totalQuestions,
-      durationMinutes: 0,
-      totalMarks: res.totalMarks,
-      negativeMarking: res.negativeMarking,
-    });
-    setTimeTaken(res.timeTaken);
-    setIsReviewingHistory(true);
-    setAppState(AppState.COMPLETED);
-  }, [initialDeepExamId, examHistory]);
+    if (res) {
+      deepLinkRestored.current = true;
+      setQuestions(res.questions || []);
+      setUserAnswers(res.userAnswers || {});
+      setFlaggedQuestions(new Set(res.flaggedQuestions || []));
+      setExamDetails({
+        subject: res.subject,
+        subjectLabel: res.subjectLabel || res.subject,
+        examType: res.examType || "",
+        chapters: res.chapters || "",
+        topics: "",
+        totalQuestions: res.totalQuestions,
+        durationMinutes: 0,
+        totalMarks: res.totalMarks,
+        negativeMarking: res.negativeMarking,
+      });
+      setTimeTaken(res.timeTaken);
+      setIsReviewingHistory(true);
+      setAppState(AppState.COMPLETED);
+      return;
+    }
+
+    // 2. Fetch directly from DB if not in local memory yet
+    if (activeUserId || !authLoading) {
+      import("@/services/exam-service").then(async ({ getExamResultById }) => {
+        try {
+          const fetched = await getExamResultById(initialDeepExamId, activeUserId);
+          if (fetched) {
+            deepLinkRestored.current = true;
+            setQuestions(fetched.questions || []);
+            setUserAnswers(fetched.userAnswers || {});
+            setFlaggedQuestions(new Set(fetched.flaggedQuestions || []));
+            setExamDetails({
+              subject: fetched.subject,
+              subjectLabel: fetched.subjectLabel || fetched.subject,
+              examType: fetched.examType || "",
+              chapters: fetched.chapters || "",
+              topics: "",
+              totalQuestions: fetched.totalQuestions,
+              durationMinutes: 0,
+              totalMarks: fetched.totalMarks,
+              negativeMarking: fetched.negativeMarking,
+            });
+            setTimeTaken(fetched.timeTaken);
+            setIsReviewingHistory(true);
+            setAppState(AppState.COMPLETED);
+          }
+        } catch (err) {
+          console.error("Failed to load deep exam history:", err);
+        }
+      });
+    }
+  }, [initialDeepExamId, examHistory, activeUserId, authLoading]);
 
   // Deep-link restore: /leaderboard/user/[userId] → fetch + open that user profile
   const deepLinkUserRestored = useRef(false);
@@ -1157,17 +1193,11 @@ export default function StudentRoot({
       // Otherwise show Pre-Fetch Instructions
       if (pendingConfig) {
         return (
-          <AppLayout
-            activeTab="setup"
-            {...commonLayoutProps}
-            title="নির্দেশাবলী"
-          >
-            <ExamInstructionsView
-              config={pendingConfig}
-              onStart={handleProceedToExam}
-              onBack={() => setAppState(AppState.IDLE)}
-            />
-          </AppLayout>
+          <ExamInstructionsView
+            config={pendingConfig}
+            onStart={handleProceedToExam}
+            onBack={() => setAppState(AppState.IDLE)}
+          />
         );
       }
     }
@@ -1254,54 +1284,55 @@ export default function StudentRoot({
 
     if (appState === AppState.COMPLETED) {
       return (
-        <AppLayout
-          activeTab="results"
-          onTabChange={handleTabChange}
-          onLogout={handleLogoutClick}
-          toggleTheme={toggleTheme}
-          isDarkMode={theme === "dark"}
-          title="ফলাফল"
-          user={currentUser!}
-        >
-          <ResultView
-            questions={questions}
-            userAnswers={userAnswers}
-            timeTaken={timeTaken}
-            initialBookmarks={flaggedQuestions} // Pass the hydrated bookmarks
-            onRestart={() => {
-              setAppState(AppState.IDLE);
-              setIsReviewingHistory(false);
-              // Ensure the URL matches the active tab when returning
+        <ResultView
+          questions={questions}
+          userAnswers={userAnswers}
+          timeTaken={timeTaken}
+          initialBookmarks={flaggedQuestions}
+          onRestart={() => {
+            setAppState(AppState.IDLE);
+            setIsReviewingHistory(false);
+            const targetTab = isReviewingHistory ? "history" : "dashboard";
+            setActiveTab(targetTab);
+            if (typeof window !== "undefined") {
               window.history.pushState(
-                { tab: isReviewingHistory ? "history" : activeTab },
+                { tab: targetTab },
                 "",
-                "/" + (isReviewingHistory ? "history" : activeTab)
+                "/" + targetTab
               );
-            }}
-            isDarkMode={theme === "dark"}
-            onToggleTheme={toggleTheme}
-            isHistoryMode={isReviewingHistory}
-            negativeMarking={examDetails?.negativeMarking}
-            submissionType={
-              examHistory[examHistory.length - 1]?.submissionType === "script"
-                ? "script"
-                : "digital"
             }
-            onDownloadQuestionPaper={() =>
-              examDetails && downloadQuestionPaper(examDetails, questions)
+          }}
+          isDarkMode={theme === "dark"}
+          onToggleTheme={toggleTheme}
+          isHistoryMode={isReviewingHistory}
+          negativeMarking={examDetails?.negativeMarking}
+          submissionType={
+            examHistory[examHistory.length - 1]?.submissionType === "script"
+              ? "script"
+              : "digital"
+          }
+          onDownloadQuestionPaper={() =>
+            examDetails && downloadQuestionPaper(examDetails, questions)
+          }
+          onDownloadResultWithExplanations={() =>
+            examDetails && downloadResultWithExplanations(examDetails, questions, userAnswers)
+          }
+          currentUser={currentUser}
+          bookmarkedIds={bookmarkedIds}
+          onToggleBookmark={toggleBookmark}
+          examDetails={examDetails ?? undefined}
+          onRetryWrongAnswers={
+            isReviewingHistory ? undefined : handleRetryWrongAnswers
+          }
+          onReexam={() => {
+            setAppState(AppState.IDLE);
+            setIsReviewingHistory(false);
+            setActiveTab("setup");
+            if (typeof window !== "undefined") {
+              window.history.pushState({ tab: "setup" }, "", "/setup");
             }
-            onDownloadResultWithExplanations={() =>
-              examDetails && downloadResult(examDetails, questions, userAnswers)
-            }
-            currentUser={currentUser}
-            bookmarkedIds={bookmarkedIds}
-            onToggleBookmark={toggleBookmark}
-            examDetails={examDetails ?? undefined}
-            onRetryWrongAnswers={
-              isReviewingHistory ? undefined : handleRetryWrongAnswers
-            }
-          />
-        </AppLayout>
+          }}
+        />
       );
     }
 

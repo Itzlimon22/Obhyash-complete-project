@@ -251,26 +251,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
   }, []);
 
   const testimonials = [
-    /*
-    {
-      name: 'সাদিয়া আফরিন',
-      role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
-      text: 'সাথে সাথে রেজাল্ট পাওয়ার ফিচারটি অসাধারণ। কোচিং-এর ভিড় এড়িয়ে বাসায় বসেই এখন নিজেকে যাচাই করতে পারছি।',
-      initial: 'S',
-      color: 'bg-emerald-500',
-    },
-    */
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
-      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্লানেশনগুলোও খুব স্পষ্ট।',
+      text: 'অধ্যায়ভিত্তিক মডেল টেস্ট এবং প্রতিটি প্রশ্নের পাঠ্যবই ভিত্তিক রেফারেন্স ও ব্যাখ্যা আমার পরীক্ষার প্রস্তুতিকে অনেক সহজ করে দিয়েছে।',
       initial: 'T',
+      color: 'bg-emerald-600',
+    },
+    {
+      name: 'সাদিয়া আফরিন',
+      role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
+      text: 'পরীক্ষার হলের মতো একবার অপশন ক্লিক করলেই লক হয়ে যাওয়ার সিস্টেমটা সিলি মিসটেক বা ভুল দাগানো কমানোর জন্য অসাধারণ!',
+      initial: 'S',
       color: 'bg-red-500',
     },
     {
       name: 'রাফসান জামান',
-      role: 'বিশ্ববিদ্যালয় ভর্তি পরীক্ষার্থী',
-      text: 'Analytics ড্যাশবোর্ড দেখে আমি বুঝতে পেরেছি ফিজিক্সের কোন চ্যাপ্টারে আমার দুর্বলতা আছে। এখন সেই অনুযায়ী প্রস্তুতি নিচ্ছি।',
+      role: 'ইঞ্জিনিয়ারিং ও ভার্সিটি ভর্তি পরীক্ষার্থী',
+      text: 'পরীক্ষা শেষেই নেগেটিভ মার্কিংয়ের নিখুঁত হিসাব পাওয়া যায় এবং এক ক্লিকে সম্পূর্ণ প্রশ্নপত্র ও ব্যাখ্যা PDF ডাউনলোড করে অফলাইনেও রিভিশন দেওয়া যায়।',
       initial: 'R',
       color: 'bg-emerald-500',
     },
@@ -278,22 +276,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   const faqs = [
     {
-      q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
-    },
-    /*
-    {
-      
-      a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
-    },
-    */
-    {
-      q: 'পেমেন্ট পদ্ধতি কি কি?',
-      a: 'বর্তমানে আমরা বিকাশ, নগদ এবং রকেটের মাধ্যমে পেমেন্ট গ্রহণ করছি। খুব শীঘ্রই কার্ড পেমেন্ট যুক্ত করা হবে।',
+      q: 'Obhyash এ কীভাবে পরীক্ষা দেওয়া যায়?',
+      a: 'তুমি তোমার পছন্দমতো বিষয়, অধ্যায় ও টপিক সিলেক্ট করে পরীক্ষার সময়, প্রশ্ন সংখ্যা ও নেগেটিভ মার্কিং কাস্টমাইজ করে মুহূর্তেই পরীক্ষা শুরু করতে পারবে।',
     },
     {
-      q: 'আমি কি মোবাইল থেকে পরীক্ষা দিতে পারবো?',
-      a: 'হ্যাঁ, Obhyash সম্পূর্ণ মোবাইল-ফ্রেন্ডলি। তুমি যেকোনো স্মার্টফোন, ট্যাবলেট বা কম্পিউটার থেকে এটি ব্যবহার করতে পারবেন।',
+      q: 'পরীক্ষার পর কি সমাধান ও PDF পাওয়া যায়?',
+      a: 'হ্যাঁ! প্রতিটি পরীক্ষার সাথে সাথে নির্ভুল ফলাফল, পাঠ্যবইয়ের রেফারেন্স সহ বিস্তারিত সমাধান পাওয়া যায় এবং এক ক্লিকেই সম্পূর্ণ প্রশ্নপত্র ও সমাধান PDF ডাউনলোড করা যায়।',
+    },
+    {
+      q: 'অপশন লকিং সিস্টেম কী?',
+      a: 'আসল পরীক্ষার হলের নিয়মানুযায়ী একবার কোনো অপশন সিলেক্ট করলে তা লক হয়ে যায়, যাতে পরীক্ষার হলে অসাবধানতাবশত ভুল করার প্রবণতা দূর হয়।',
+    },
+    {
+      q: 'মোবাইল এবং কম্পিউটার দুটি থেকেই কি ব্যবহার করা যাবে?',
+      a: 'হ্যাঁ! Obhyash-এর ওয়েব পোর্টাল এবং মোবাইল অ্যাপে একই অ্যাকাউন্ট দিয়ে যেকোনো ডিভাইসে রিয়েল-টাইম সিঙ্ক সুবিধা নিয়ে প্র্যাকটিস করা যায়।',
+    },
+    {
+      q: 'পেমেন্ট পদ্ধতি কী কী?',
+      a: 'বিকাশ, নগদ ও রকেটের মাধ্যমে খুব সহজেই প্রো সাবস্ক্রিপশন নেওয়া যায়।',
     },
   ];
 
@@ -354,6 +354,16 @@ const LandingPage: React.FC<LandingPageProps> = ({
             >
               ব্লগ
             </Link>
+
+            {/* Demo Exam Link in Desktop Header */}
+            <Link
+              href="/demo"
+              className="px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center gap-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-all shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>ডেমো পরীক্ষা</span>
+            </Link>
+
             <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-700 mx-1"></div>
 
             <button
@@ -385,27 +395,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Mobile Navigation - Direct Buttons */}
-          <div className="md:hidden flex items-center gap-3">
+          <div className="md:hidden flex items-center gap-2">
+            <Link
+              href="/demo"
+              className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] flex items-center gap-1 shadow-xs"
+            >
+              <span>ডেমো</span>
+            </Link>
+
             <button
               onClick={toggleTheme}
               className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
             >
               {isDarkMode ? (
-                <Sun className="w-4.5 h-4.5" />
+                <Sun className="w-4 h-4" />
               ) : (
-                <Moon className="w-4.5 h-4.5" />
+                <Moon className="w-4 h-4" />
               )}
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={onLogin}
-                className="text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors pr-1"
+                className="text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
               >
                 লগইন
               </button>
               <button
                 onClick={onGetStarted}
-                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-[11px] transition-all shadow-md shadow-emerald-500/20"
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-[11px] transition-all shadow-md shadow-emerald-500/20"
               >
                 রেজিস্ট্রেশন
               </button>
@@ -424,42 +441,36 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              এক সাবস্ক্রিপশনেই সব ফিচার
+              HSC, মেডিকেল ও ভার্সিটি এডমিশন স্পেশাল
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 dark:text-white leading-[1.2]">
-              তোমার প্রস্তুতি হোক <br />
+              ভুল থেকেই শুরু হোক <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-red-600 py-2">
-                স্মার্ট ও নির্ভুল
+                নিখুঁত প্রস্তুতি
               </span>
             </h1>
 
             <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                Adaptive AI
-              </span>{' '}
-              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে ওঠো। আনলিমিটেড প্রশ্ন,
-              স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
+              অধ্যায়ভিত্তিক মডেল টেস্ট, একবার ক্লিকেই অপশন লকিং, মূল পাঠ্যবইয়ের প্রমাণসহ সমাধান এবং অফলাইন PDF ডাউনলোড—সবকিছু এক প্ল্যাটফর্মে।
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="sm:w-auto w-full px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
+                className="sm:w-auto w-full px-7 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
               >
                 বিনামূল্যে শুরু করো
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
-              <button
-                onClick={() =>
-                  document
-                    .getElementById('features')
-                    ?.scrollIntoView({ behavior: 'smooth' })
-                }
-                className="sm:w-auto w-full px-8 py-4 bg-white dark:bg-black border-2 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-xl font-bold text-base transition-all active:scale-95 flex items-center justify-center whitespace-nowrap"
+
+              <Link
+                href="/demo"
+                className="sm:w-auto w-full px-6 py-3.5 bg-white dark:bg-black border-2 border-emerald-600/60 dark:border-emerald-500/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 rounded-xl font-bold text-base transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
               >
-                ফিচারগুলো দেখো
-              </button>
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span>ডেমো পরীক্ষা দাও</span>
+              </Link>
             </div>
           </div>
 
@@ -843,119 +854,81 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
-              {/* Smart Analytics */}
+              {/* 1. Real Exam & Option Locking */}
+              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
+                  <Zap className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                  রিয়েল এক্সাম ও অপশন লকিং
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                  পরীক্ষার হলের মতোই একবার অপশন দাগালে লক হয়ে যাবে। সাথে থাকছে ০ মিলিসেকেন্ডে তাৎক্ষণিক খাতা জমা ও ফলাফল।
+                </p>
+              </div>
+
+              {/* 2. Textbook Solutions & References */}
+              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
+                  <BookOpen className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                  প্রমাণসহ বিস্তারিত সমাধান
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                  প্রতিটি প্রশ্নের সাথে মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সহ পুঙ্খানুপুঙ্খ ব্যাখ্যা ও সঠিক সূত্র।
+                </p>
+              </div>
+
+              {/* 3. Question Paper & Result PDF Downloads */}
+              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
+                  <FileText className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                  অফলাইন PDF ডাউনলোড
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                  অনুশীলনের পর এক ক্লিকেই সম্পূর্ণ ২-কলাম প্রশ্নপত্র এবং ব্যাখ্যা সহ উত্তরপত্র PDF প্রিন্ট বা ডাউনলোড করো।
+                </p>
+              </div>
+
+              {/* 4. 3-Metric Detailed Analytics */}
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
                   <BarChart3 className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  স্মার্ট এনালাইসিস
+                  সঠিকতা ও নেগেটিভ হিসাব
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  প্রতিটি পরীক্ষার পর দেখো তোমার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
-                  চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করো।
+                  সঠিকতা (%), ব্যয়িত সময় ও নেগেটিভ মার্কিংয়ের নিখুঁত ২-কলাম টেবিল দেখে নিজের অবস্থান স্পষ্ট বোঝো।
                 </p>
               </div>
 
-              {/* Scanning
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তোলো। নিমিষেই পেয়ে
-                  যাবেন নির্ভুল ফলাফল ও বিস্তারিত সমাধান।
-                </p>
-              </div>
-              */}
-
-              {/* AI Question Generator */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <Sparkles className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  AI প্রশ্ন জেনারেটর
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  তোমার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
-                  প্রশ্নপত্র তৈরি করো এক ক্লিকেই।
-                </p>
-              </div>
-
-              {/* Leaderboard */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <Trophy className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  লিডারবোর্ড
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  সারা দেশের শিক্ষার্থীদের সাথে মেধা তালিকায় নিজের অবস্থান যাচাই
-                  করো এবং নিজেকে এগিয়ে রাখো।
-                </p>
-              </div>
-
-              {/* Exam History */}
+              {/* 5. Daily Streak & Leaderboard */}
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
-                  <History className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+                  <Flame className="w-8 h-8 md:w-7 md:h-7 text-red-500" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  এক্সাম হিস্ট্রি
+                  ডেইলি স্ট্রাইক ও লিডারবোর্ড
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  তোমার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখো
-                  যেকোনো সময়।
+                  পড়াশোনার ধারাবাহিকতা বজায় রাখতে ফ্লেম স্ট্রিক এবং কলেজ ও জাতীয় লিডারবোর্ডে বন্ধুদের সাথে প্রতিযোগিতা।
                 </p>
               </div>
 
-              {/* Smart Adaptive System (NEW) */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded-bl-xl shadow-lg z-10">
-                  NEW
-                </div>
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Zap className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  স্মার্ট প্রশ্ন ব্যাংক
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  সিস্টেম তোমার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন
-                  করে, যাতে তোমার প্রস্তুতি হয় পূর্ণাঙ্গ।
-                </p>
-              </div>
-
-              {/* Practice Mode / Flashcard */}
+              {/* 6. Spaced Repetition Revision */}
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
                   <RotateCcw className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  ভুল থেকে শেখো
+                  ভুল প্রশ্নের স্মার্ট রিভিশন
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  পুরনো ভুল প্রশ্নগুলো ফ্ল্যাশকার্ডে বারবার অনুশীলন করো। Spaced
-                  Repetition প্রযুক্তিতে চিরকালের জন্য মনে রাখো।
-                </p>
-              </div>
-
-              {/* Daily Goal */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
-                  <Target className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  দৈনিক লক্ষ্যমাত্রা
-                </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  প্রতিদিনের MCQ লক্ষ্যমাত্রা নির্ধারণ করো। লক্ষ্য পূরণ হলে
-                  উদযাপন করো এবং streak ধরে রাখো।
+                  পরীক্ষায় যেসব প্রশ্ন ভুল হয়, সেগুলোকে চিহ্নিত করে বারবার অনুশীলনের মাধ্যমে দুর্বলতা চিরতরে দূর করো।
                 </p>
               </div>
             </div>
@@ -1549,8 +1522,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </span>
               </div>
               <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed">
-                বাংলাদেশের সবচেয়ে আধুনিক AI-ভিত্তিক এক্সাম প্ল্যাটফর্ম। তোমার
-                প্রস্তুতিকে আরও সহজ ও কার্যকর করতে আমরা অঙ্গীকারবদ্ধ।
+                HSC, ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি ভর্তি পরীক্ষার জন্য বাংলাদেশের সবচেয়ে দ্রুত ও আধুনিক অনলাইন এক্সাম ও প্র্যাকটিস প্ল্যাটফর্ম।
               </p>
               <div className="flex gap-4">
                 <a

@@ -520,6 +520,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
   }
 
   void setAnswer(String questionId, int optionIndex) {
+    if (state.userAnswers.containsKey(questionId)) return; // Locked once selected
     final updated = Map<String, int>.from(state.userAnswers);
     updated[questionId] = optionIndex;
     state = state.copyWith(userAnswers: updated);

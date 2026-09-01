@@ -3,17 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
 const kExamTargets = [
-  {'value': 'hsc_2026', 'label': 'এইচএসসি ২০২৬', 'icon': '📚'},
-  {'value': 'hsc_2027', 'label': 'এইচএসসি ২০২৭', 'icon': '📚'},
-  {'value': 'mbbs_2026', 'label': 'মেডিকেল ভর্তি ২০২৬', 'icon': '🏥'},
-  {'value': 'mbbs_2027', 'label': 'মেডিকেল ভর্তি ২০২৭', 'icon': '🏥'},
-  {'value': 'eng_2026', 'label': 'ইঞ্জিনিয়ারিং ভর্তি ২০২৬', 'icon': '⚙️'},
-  {'value': 'eng_2027', 'label': 'ইঞ্জিনিয়ারিং ভর্তি ২০২৭', 'icon': '⚙️'},
-  {'value': 'varsity_2026', 'label': 'ভার্সিটি ভর্তি ২০২৬', 'icon': '🏛️'},
-  {'value': 'varsity_2027', 'label': 'ভার্সিটি ভর্তি ২০২৭', 'icon': '🏛️'},
-  {'value': 'ssc_2026', 'label': 'এসএসসি ২০২৬', 'icon': '🎓'},
-  {'value': 'ssc_2027', 'label': 'এসএসসি ২০২৭', 'icon': '🎓'},
-  {'value': 'other', 'label': 'অন্যান্য', 'icon': '🎯'},
+  {'value': 'Medical', 'label': 'মেডিকেল ভর্তি', 'icon': '🩺'},
+  {'value': 'Engineering', 'label': 'ইঞ্জিনিয়ারিং ভর্তি', 'icon': '⚙️'},
+  {'value': 'University', 'label': 'ভার্সিটি ভর্তি', 'icon': '🏛️'},
 ];
 
 /// Shows a bottom sheet to select exam target.

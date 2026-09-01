@@ -197,7 +197,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
           <header
-            className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] flex items-center justify-between px-3.5 sm:px-5 md:px-6 z-30 shrink-0 sticky top-0 transition-all duration-300 select-none"
+            className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 z-30 shrink-0 sticky top-0 transition-all duration-300 select-none"
           >
             {/* ── Left: Back Button (Sub-routes) + Title ── */}
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -279,13 +279,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           </header>
         )}
 
-        {/* ── Content Body ── */}
+        {/* ── Content Body (Uniform left & right padding across all pages) ── */}
         <main
           className={`flex-1 overflow-y-auto ${
-            noPadding ? 'pb-24 lg:pb-0' : 'px-2 py-3 md:p-5 pb-24 lg:pb-5'
+            noPadding
+              ? 'pb-24 lg:pb-0'
+              : 'px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-4 sm:py-6 md:py-8 pb-28 lg:pb-10'
           } relative scroll-smooth`}
         >
-          {children}
+          <div className="w-full max-w-7xl mx-auto flex flex-col">
+            {children}
+          </div>
         </main>
 
         {/* ── Mobile Bottom Navigation ── */}
