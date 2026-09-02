@@ -94,7 +94,6 @@ export const POST = async (req: Request) => {
       await supabaseAdmin
         .from('users')
         .update({
-          plan: 'Pro',
           subscription: {
             ...sub,
             plan: 'Pro',

@@ -88,11 +88,7 @@ export async function POST(request: NextRequest) {
     await supabaseAdmin
       .from('users')
       .update({
-        is_pro: true,
         is_subscribed: true,
-        level: 'Pro',
-        plan: 'Pro',
-        subscription_tier: planId,
         subscription_status: 'Active',
         subscription_expires_at: expiresAt.toISOString(),
         subscription: {

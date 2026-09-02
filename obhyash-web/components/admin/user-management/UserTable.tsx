@@ -22,6 +22,7 @@ import { User } from '@/lib/types'; // Assuming User type is in types.ts
 import { useUserManagement } from '@/hooks/use-user-management';
 import { toast } from 'sonner';
 import { isUserPro } from '@/lib/subscription-utils';
+import Link from 'next/link';
 
 interface UserTableProps {
   users: User[];
@@ -134,7 +135,8 @@ const UserTable: React.FC<UserTableProps> = ({
                     onChange={() => onSelectUser(user.id)}
                     className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 cursor-pointer shrink-0"
                   />
-                  <div
+                  <Link
+                    href={`/admin/user-management/${user.id}`}
                     onClick={() => onViewDetails(user)}
                     className="flex items-center gap-3 min-w-0 cursor-pointer group"
                   >
@@ -155,7 +157,7 @@ const UserTable: React.FC<UserTableProps> = ({
                         {user.email || 'No email'}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 </div>
 
                 <div className="relative">
@@ -174,7 +176,8 @@ const UserTable: React.FC<UserTableProps> = ({
                   {showActionMenu === user.id && (
                     <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50">
                       <div className="py-2">
-                        <button
+                        <Link
+                          href={`/admin/user-management/${user.id}`}
                           onClick={() => {
                             onViewDetails(user);
                             setShowActionMenu(null);
@@ -183,7 +186,7 @@ const UserTable: React.FC<UserTableProps> = ({
                         >
                           <Eye className="w-4 h-4" />
                           View Full Details
-                        </button>
+                        </Link>
                         <button
                           onClick={() => {
                             onViewActivityLog(user);
@@ -367,7 +370,8 @@ const UserTable: React.FC<UserTableProps> = ({
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div
+                      <Link
+                        href={`/admin/user-management/${user.id}`}
                         onClick={() => onViewDetails(user)}
                         className="flex items-center gap-3 cursor-pointer group"
                       >
@@ -391,7 +395,7 @@ const UserTable: React.FC<UserTableProps> = ({
                             {isUserPro(user) ? (user.subscription?.plan || 'Pro') : 'Free'} Plan
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1 text-left">
@@ -477,7 +481,8 @@ const UserTable: React.FC<UserTableProps> = ({
                         {showActionMenu === user.id && (
                           <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 text-left">
                             <div className="py-2">
-                              <button
+                              <Link
+                                href={`/admin/user-management/${user.id}`}
                                 onClick={() => {
                                   onViewDetails(user);
                                   setShowActionMenu(null);
@@ -486,7 +491,7 @@ const UserTable: React.FC<UserTableProps> = ({
                               >
                                 <Eye className="w-4 h-4" />
                                 View Full Details
-                              </button>
+                              </Link>
                               <button
                                 onClick={() => {
                                   onViewActivityLog(user);

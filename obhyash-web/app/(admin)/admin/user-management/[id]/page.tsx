@@ -197,6 +197,12 @@ export default function UserDetailsPage() {
     }
   };
 
+  const formatDateSafe = (d?: string | null) => {
+    if (!d) return 'N/A';
+    const parsed = new Date(d);
+    return isNaN(parsed.getTime()) ? 'N/A' : parsed.toLocaleDateString();
+  };
+
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -556,7 +562,7 @@ export default function UserDetailsPage() {
               <div className="flex justify-between">
                 <span className="text-neutral-500">Joined Date:</span>
                 <span className="font-medium text-neutral-700 dark:text-neutral-300">
-                  {new Date(userData.lastActive).toLocaleDateString()}
+                  {formatDateSafe(userData.lastActive)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -569,7 +575,7 @@ export default function UserDetailsPage() {
                 <div className="flex justify-between">
                   <span className="text-neutral-500">Subscription Expiry:</span>
                   <span className="font-mono font-semibold text-neutral-700 dark:text-neutral-300">
-                    {new Date(subDetails.expiresAt).toLocaleDateString()} ({subDetails.daysLeft}d left)
+                    {formatDateSafe(subDetails.expiresAt)} ({subDetails.daysLeft}d left)
                   </span>
                 </div>
               )}
@@ -779,7 +785,7 @@ export default function UserDetailsPage() {
                                 )}
                               </div>
                               <p className="text-[11px] text-neutral-500 flex items-center gap-2">
-                                <span>{new Date(exam.date).toLocaleDateString()}</span>
+                                <span>{formatDateSafe(exam.date)}</span>
                                 <span>•</span>
                                 <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                                   ✓ {exam.correct_count} correct
@@ -880,7 +886,7 @@ export default function UserDetailsPage() {
                               ৳{p.amount}
                             </p>
                             <p className="text-[10px] text-neutral-500 mt-0.5">
-                              {new Date(p.requested_at).toLocaleDateString()}
+                              {formatDateSafe(p.requested_at)}
                             </p>
                           </div>
                         </div>
