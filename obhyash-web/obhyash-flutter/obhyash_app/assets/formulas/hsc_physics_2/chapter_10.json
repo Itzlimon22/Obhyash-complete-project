@@ -1,1 +1,105 @@
-[]
+[
+  {
+    "title": "সেমিকন্ডাক্টরের ভর ক্রিয়া সূত্র ও পরিবাহিতা (Mass Action Law & Conductivity)",
+    "latex": "n_e \\cdot n_h = n_i^2, \\quad \\sigma = e(n_e \\mu_e + n_h \\mu_h), \\quad \\rho = \\frac{1}{\\sigma}",
+    "description": "$n_e, n_h$ = ইলেকট্রন ও হোল ঘনত্ব, $n_i$ = বিশুদ্ধ সেমিকন্ডাক্টরের নিজস্ব চার্জ বাহক ঘনত্ব, $\\mu_e, \\mu_h$ = ইলেকট্রন ও হোলের গতিশীলতা (Mobility in $\\text{m}^2\\text{/V}\\cdot\\text{s}$), $\\sigma$ = তড়িৎ পরিবাহিতাঙ্ক ($\\text{S/m}$)। তাপমাত্রা বাড়লে সেমিকন্ডাক্টরের পরিবাহিতা বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি সিলিকন নমুনায় $n_i = 1.5 \\times 10^{16}\\text{ m}^{-3}$। এতে ডোপিং করে $n_e = 4.5 \\times 10^{21}\\text{ m}^{-3}$ করা হলে হোল ঘনত্ব $n_h$ কত?",
+        "answer": "Ans: $n_h = \\frac{n_i^2}{n_e} = \\frac{(1.5 \\times 10^{16})^2}{4.5 \\times 10^{21}} = 5 \\times 10^{10}\\text{ m}^{-3}$"
+      }
+    ]
+  },
+  {
+    "title": "পি-এন জংশন ডায়োড ও গতিশীল রোধ (P-N Junction & Dynamic Resistance)",
+    "latex": "r_d = \\frac{\\Delta V}{\\Delta I} = \\frac{V_2 - V_1}{I_2 - I_1}",
+    "description": "ফরওয়ার্ড বায়াস অবস্থায় বিভব পার্থক্যের ক্ষুদ্র পরিবর্তনে ($\\Delta V$) প্রবাহের যে ক্ষুদ্র পরিবর্তন ($\\Delta I$) ঘটে, তাদের অনুপাতই হলো ডায়োডের গতিশীল রোধ ($r_d$)। ব্যারিয়ার পটেনশিয়াল: সিলিকনের জন্য $\\approx 0.7\\text{ V}$, জার্মেনিয়ামের জন্য $\\approx 0.3\\text{ V}$।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ডায়োডের বিভব $0.7\\text{ V}$ থেকে $0.75\\text{ V}$-এ পরিবর্তন করায় প্রবাহ $10\\text{ mA}$ থেকে $35\\text{ mA}$ হলো। ডায়োডটির গতিশীল রোধ কত?",
+        "answer": "Ans: $r_d = \\frac{0.75 - 0.70}{(35 - 10) \\times 10^{-3}} = \\frac{0.05}{25 \\times 10^{-3}} = 2\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "অর্ধ-তরঙ্গ ও পূর্ণ-তরঙ্গ রেকটিফায়ার (Rectifier Circuits)",
+    "latex": "\\text{Half-wave: } f_{\\text{out}} = f_{\\text{in}}, \\; \\eta = 40.6\\%, \\; V_{\\text{dc}} = \\frac{V_m}{\\pi}; \\quad \\text{Full-wave: } f_{\\text{out}} = 2 f_{\\text{in}}, \\; \\eta = 81.2\\%, \\; V_{\\text{dc}} = \\frac{2V_m}{\\pi}",
+    "description": "$f_{\\text{in}}$ = এসি ইনপুট কম্পাঙ্ক, $f_{\\text{out}}$ = ডিসি আউটপুট রিপল কম্পাঙ্ক, $V_m$ = ইনপুট শীর্ষ ভোল্টেজ। পূর্ণ-তরঙ্গ রেকটিফায়ারে ইনপুট $50\\text{ Hz}$ হলে আউটপুট কম্পাঙ্ক $100\\text{ Hz}$ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$50\\text{ Hz}$ এসি উৎসের সাথে একটি ব্রিজ রেকটিফায়ার যুক্ত থাকলে ডিসি আউটপুটের কম্পাঙ্ক কত?",
+        "answer": "Ans: পূর্ণ-তরঙ্গ রেকটিফায়ারের জন্য $f_{\\text{out}} = 2 f_{\\text{in}} = 2 \\times 50 = 100\\text{ Hz}$"
+      }
+    ]
+  },
+  {
+    "title": "জেনার ডায়োড ভোল্টেজ রেগুলেটর (Zener Diode Voltage Regulator)",
+    "latex": "I_L = \\frac{V_Z}{R_L}, \\quad I_S = \\frac{V_{\\text{in}} - V_Z}{R_S}, \\quad I_Z = I_S - I_L",
+    "description": "$V_Z$ = জেনার ব্রেকডাউন ভোল্টেজ (লোড ভোল্টেজ), $V_{\\text{in}}$ = অনিয়ন্ত্রিত ইনপুট ভোল্টেজ, $R_S$ = সিরিজ রোধ, $R_L$ = লোড রোধ, $I_Z$ = জেনার ডায়োডের প্রবাহ। রিভার্স বায়াসে ব্রেকডাউন অঞ্চলে জেনার ডায়োড ভোল্টেজ স্থির রাখে।",
+    "practiceQuestions": [
+      {
+        "question": "একটি $10\\text{ V}$ জেনার ডায়োডের সাথে $R_S = 100\\,\\Omega$ এবং $R_L = 1\\text{ k}\\Omega$ যুক্ত। ইনপুট $15\\text{ V}$ হলে জেনার কারেন্ট কত?",
+        "answer": "Ans: $I_L = \\frac{10}{1000} = 10\\text{ mA}$। $I_S = \\frac{15 - 10}{100} = 50\\text{ mA}$। $I_Z = 50 - 10 = 40\\text{ mA}$"
+      }
+    ]
+  },
+  {
+    "title": "ট্রানজিস্টরের মূল প্রবাহ সম্পর্ক (Transistor Fundamental Current Relation)",
+    "latex": "I_E = I_B + I_C, \\quad I_C = I_E - I_B",
+    "description": "$I_E$ = নিঃসারক বা এমিটার প্রবাহ ($100\\%$), $I_B$ = পীঠ বা বেস প্রবাহ ($1\\% - 5\\%$), $I_C$ = সংগ্রাহক বা কালেক্টর প্রবাহ ($95\\% - 99\\%$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ট্রানজিস্টরের এমিটার কারেন্ট $5\\text{ mA}$ এবং বেস কারেন্ট $50\\,\\mu\\text{A}$ হলে কালেক্টর কারেন্ট কত?",
+        "answer": "Ans: $I_C = I_E - I_B = 5\\text{ mA} - 0.05\\text{ mA} = 4.95\\text{ mA}$"
+      }
+    ]
+  },
+  {
+    "title": "প্রবাহ বিবর্ধন গুণক: আলফা ও বিটা (Current Gain: Alpha & Beta)",
+    "latex": "\\alpha = \\frac{\\Delta I_C}{\\Delta I_E} \\approx \\frac{I_C}{I_E} \\; (\\alpha < 1), \\quad \\beta = \\frac{\\Delta I_C}{\\Delta I_B} \\approx \\frac{I_C}{I_B} \\; (\\beta \\gg 1), \\quad \\beta = \\frac{\\alpha}{1 - \\alpha}, \\quad \\alpha = \\frac{\\beta}{1 + \\beta}",
+    "description": "$\\alpha$ = সাধারণ পীঠ (Common Base - CB) কারেন্ট গেইন ($0.95 - 0.99$), $\\beta$ = সাধারণ নিঃসারক (Common Emitter - CE) কারেন্ট গেইন ($20 - 500$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ট্রানজিস্টরের $\\alpha = 0.98$ হলে এর $\\beta$ এর মান কত?",
+        "answer": "Ans: $\\beta = \\frac{0.98}{1 - 0.98} = \\frac{0.98}{0.02} = 49$"
+      },
+      {
+        "question": "একটি ট্রানজিস্টরের $\\beta = 100$ হলে এর $\\alpha$ কত?",
+        "answer": "Ans: $\\alpha = \\frac{100}{100 + 1} = \\frac{100}{101} \\approx 0.9901$"
+      }
+    ]
+  },
+  {
+    "title": "ভোল্টেজ ও ক্ষমতা বিবর্ধন (Voltage & Power Gain)",
+    "latex": "A_v = \\frac{\\Delta V_o}{\\Delta V_i} = \\beta \\left(\\frac{R_L}{R_i}\\right), \\quad A_p = A_i \\times A_v = \\beta^2 \\left(\\frac{R_L}{R_i}\\right)",
+    "description": "$A_v$ = ভোল্টেজ বিবর্ধন, $A_p$ = ক্ষমতা বিবর্ধন, $R_L$ = আউটপুট লোড রোধ, $R_i$ = ইনপুট রোধ, $\\beta$ = কারেন্ট গেইন ($A_i = \\beta$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি CE অ্যামপ্লিফায়ারের $\\beta = 50$, ইনপুট রোধ $1\\text{ k}\\Omega$ এবং লোড রোধ $5\\text{ k}\\Omega$ হলে ভোল্টেজ গেইন ও পাওয়ার গেইন কত?",
+        "answer": "Ans: $A_v = 50 \\times \\frac{5000}{1000} = 250$। $A_p = 50 \\times 250 = 12500$"
+      }
+    ]
+  },
+  {
+    "title": "ডি-মরগানের উপপাদ্য ও বুলিয়ান অ্যালজেবরা (De Morgan's Laws & Boolean Identities)",
+    "latex": "\\overline{A + B} = \\bar{A} \\cdot \\bar{B}, \\quad \\overline{A \\cdot B} = \\bar{A} + \\bar{B}, \\quad A + 1 = 1, \\quad A \\cdot 0 = 0, \\quad A + \\bar{A} = 1, \\quad A \\cdot \\bar{A} = 0",
+    "description": "NAND এবং NOR গেট হলো সার্বজনীন গেট (Universal Gates)। যেকোনো জটিল বুলিয়ান সমীকরণকে এদের মাধ্যমে বাস্তবায়ন করা সম্ভব।",
+    "practiceQuestions": [
+      {
+        "question": "বুলিয়ান রাশি $Y = \\overline{A \\cdot B} + \\bar{A}$ কে সরলীকরণ করো।",
+        "answer": "Ans: $Y = (\\bar{A} + \\bar{B}) + \\bar{A} = \\bar{A} + \\bar{B} = \\overline{A \\cdot B}$"
+      }
+    ]
+  },
+  {
+    "title": "বিশেষ লজিক গেটস: XOR ও XNOR (XOR & XNOR Gates)",
+    "latex": "A \\oplus B = \\bar{A} B + A \\bar{B}, \\quad A \\odot B = \\overline{A \\oplus B} = A B + \\bar{A} \\bar{B}",
+    "description": "XOR গেটের আউটপুট ১ হয় যখন বিজোড় সংখ্যক ইনপুট ১ থাকে (অসম ইনপুট)। XNOR গেটের আউটপুট ১ হয় যখন ইনপুট দুটি সমান হয় ($0,0$ বা $1,1$)।",
+    "practiceQuestions": [
+      {
+        "question": "$A = 1, B = 0$ হলে $A \\oplus B$ এবং $A \\odot B$ এর মান কত?",
+        "answer": "Ans: $A \\oplus B = 1 \\oplus 0 = 1$। $A \\odot B = 1 \\odot 0 = 0$"
+      }
+    ]
+  }
+]

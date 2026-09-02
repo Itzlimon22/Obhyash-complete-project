@@ -1,1 +1,134 @@
-[]
+[
+  {
+    "title": "চৌম্বক ফ্লাক্স (Magnetic Flux)",
+    "latex": "\\Phi = \\vec{B} \\cdot \\vec{A} = B A \\cos\\theta",
+    "description": "$\\Phi$ = চৌম্বক ফ্লাক্স (Weber বা $\\text{T}\\cdot\\text{m}^2$), $B$ = চৌম্বক ক্ষেত্র, $A$ = কুণ্ডলীর ক্ষেত্রফল, $\\theta$ = তলের অভিলম্বের সাথে চৌম্বক ক্ষেত্রের অন্তর্ভুক্ত কোণ। তল চৌম্বক ক্ষেত্রের সমান্তরালে থাকলে ফ্লাক্স শূন্য ($\\theta = 90^\\circ$)।",
+    "practiceQuestions": [
+      {
+        "question": "$0.2\\text{ m}^2$ ক্ষেত্রফলের একটি কুণ্ডলীর তলের সাথে লম্বভাবে $0.5\\text{ T}$ সুষম চৌম্বক ক্ষেত্র প্রযুক্ত হলে ফ্লাক্স কত?",
+        "answer": "Ans: তলের অভিলম্বের সাথে কোণ $\\theta = 0^\\circ$। $\\Phi = B A \\cos 0^\\circ = 0.5 \\times 0.2 \\times 1 = 0.1\\text{ Wb}$"
+      }
+    ]
+  },
+  {
+    "title": "ফ্যারাডের আবেশ সূত্র ও লেঞ্জের সূত্র (Faraday's & Lenz's Law)",
+    "latex": "\\mathcal{E} = -N \\frac{d\\Phi}{dt} = -N \\frac{\\Delta\\Phi}{\\Delta t} = -N \\frac{\\Phi_2 - \\Phi_1}{t_2 - t_1}",
+    "description": "$\\mathcal{E}$ = আবিষ্ট তড়িৎচালক বল (Induced EMF in Volts), $N$ = কুণ্ডলীর পাক সংখ্যা, $d\\Phi/dt$ = ফ্লাক্স পরিবর্তনের হার। ঋণাত্মক চিহ্ন নির্দেশ করে আবিষ্ট প্রবাহ এমন দিকে প্রবাহিত হয় যা সৃষ্টির মূল কারণকে বাধা দেয় (লেঞ্জের সূত্র)।",
+    "practiceQuestions": [
+      {
+        "question": "$200$ পাকের একটি কুণ্ডলীতে $0.05\\text{ s}$-এ ফ্লাক্স $0.08\\text{ Wb}$ থেকে কমে $0.02\\text{ Wb}$ হলো। আবিষ্ট তড়িৎচালক বল কত?",
+        "answer": "Ans: $\\mathcal{E} = -200 \\times \\frac{0.02 - 0.08}{0.05} = 200 \\times 1.2 = 240\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "গতিশীল ও ঘূর্ণায়মান দণ্ডের তড়িৎচালক বল (Motional & Rotating EMF)",
+    "latex": "\\mathcal{E}_{\\text{linear}} = B l v \\sin\\theta, \\quad \\mathcal{E}_{\\text{rotating}} = \\frac{1}{2} B \\omega l^2 = B A f",
+    "description": "$B$ = চৌম্বক ক্ষেত্র, $l$ = পরিবাহী দণ্ডের দৈর্ঘ্য, $v$ = রৈখিক বেগ, $\\omega = 2\\pi f$ = ঘূর্ণন কৌণিক বেগ, $A = \\pi l^2$ = ঘূর্ণনে অতিক্রান্ত ক্ষেত্রফল।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ m}$ দীর্ঘ একটি পরিবাহী তার $0.4\\text{ T}$ চৌম্বক ক্ষেত্রের সাথে লম্বভাবে $10\\text{ m/s}$ বেগে চললে আবিষ্ট তড়িৎচালক বল কত?",
+        "answer": "Ans: $\\mathcal{E} = B l v \\sin 90^\\circ = 0.4 \\times 1 \\times 10 = 4\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "এসি জেনারেটরের সমীকরণ (AC Generator Equation)",
+    "latex": "e = E_0 \\sin(\\omega t) = N A B \\omega \\sin(2\\pi f t), \\quad E_0 = N A B \\omega",
+    "description": "$e$ = যেকোনো মুহূর্তের তাৎক্ষণিক তড়িৎচালক বল, $E_0$ = শীর্ষ বা পিক তড়িৎচালক বল, $N$ = পাক সংখ্যা, $A$ = কুণ্ডলীর ক্ষেত্রফল, $B$ = চৌম্বক ক্ষেত্র, $\\omega$ = ঘূর্ণন কৌণিক বেগ।",
+    "practiceQuestions": [
+      {
+        "question": "$100$ পাক ও $0.05\\text{ m}^2$ ক্ষেত্রফলের একটি কুণ্ডলী $0.2\\text{ T}$ চৌম্বক ক্ষেত্রে $50\\text{ rev/s}$ হারে ঘুরলে শীর্ষ ভোল্টেজ $E_0$ কত?",
+        "answer": "Ans: $E_0 = N A B (2\\pi f) = 100 \\times 0.05 \\times 0.2 \\times (2\\pi \\times 50) = 1 \\times 100\\pi \\approx 314.16\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "স্বকীয় আবেশ ও সঞ্চিত শক্তি (Self Induction & Magnetic Energy)",
+    "latex": "\\mathcal{E} = -L \\frac{dI}{dt}, \\quad L = \\frac{\\mu_0 \\mu_r N^2 A}{l}, \\quad U = \\frac{1}{2} L I^2",
+    "description": "$L$ = স্বকীয় আবেশ গুণাঙ্ক (Henry - H), $N$ = সলিনয়েডের পাক সংখ্যা, $A$ = প্রস্থচ্ছেদ, $l$ = দৈর্ঘ্য, $U$ = আবেশকে সঞ্চিত চৌম্বক স্থৈতিক শক্তি (Joule)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি কুণ্ডলীর স্বকীয় আবেশ $0.2\\text{ H}$। এর মধ্যে কারেন্ট $0.02\\text{ s}$-এ $5\\text{ A}$ থেকে শূন্যে নামলে আবিষ্ট emf এবং সঞ্চিত আদি শক্তি কত?",
+        "answer": "Ans: $\\mathcal{E} = -0.2 \\times \\frac{0 - 5}{0.02} = 50\\text{ V}$। সঞ্চিত শক্তি $U = \\frac{1}{2} \\times 0.2 \\times 5^2 = 2.5\\text{ J}$"
+      }
+    ]
+  },
+  {
+    "title": "পারস্পরিক আবেশ গুণাঙ্ক (Mutual Inductance)",
+    "latex": "\\mathcal{E}_s = -M \\frac{dI_p}{dt}, \\quad M = \\frac{\\mu_0 N_p N_s A}{l} = k\\sqrt{L_p L_s}",
+    "description": "$M$ = পারস্পরিক আবেশ গুণাঙ্ক (Henry), $dI_p/dt$ = মুখ্য কুণ্ডলীতে প্রবাহ পরিবর্তনের হার, $\\mathcal{E}_s$ = গৌণ কুণ্ডলীতে আবিষ্ট emf, $k$ = যুগলন গুণাঙ্ক (Coupling coefficient, $0 \\le k \\le 1$)।",
+    "practiceQuestions": [
+      {
+        "question": "মুখ্য কুণ্ডলীতে $0.05\\text{ s}$-এ প্রবাহ $4\\text{ A}$ পরিবর্তিত হওয়ায় গৌণ কুণ্ডলীতে $20\\text{ V}$ emf আবিষ্ট হলো। $M$ এর মান কত?",
+        "answer": "Ans: $M = \\frac{|\\mathcal{E}_s|}{\\Delta I_p / \\Delta t} = \\frac{20}{4 / 0.05} = \\frac{20}{80} = 0.25\\text{ H}$"
+      }
+    ]
+  },
+  {
+    "title": "এসি ভোল্টেজ ও প্রবাহের পিক, আরএমএস ও গড় মান (AC Peak, RMS & Average)",
+    "latex": "I_{\\text{rms}} = \\frac{I_0}{\\sqrt{2}} \\approx 0.707 I_0, \\quad V_{\\text{rms}} = \\frac{V_0}{\\sqrt{2}} \\approx 0.707 V_0, \\quad I_{\\text{avg}} = \\frac{2 I_0}{\\pi} \\approx 0.637 I_0",
+    "description": "$I_0, V_0$ = পিক মান, $I_{\\text{rms}}, V_{\\text{rms}}$ = কার্যকর মান (RMS Value), $I_{\\text{avg}}$ = অর্ধ-চক্রের গড় মান। ফর্ম ফ্যাক্টর: $\\frac{V_{\\text{rms}}}{V_{\\text{avg}}} = \\frac{\\pi}{2\\sqrt{2}} \\approx 1.11$।",
+    "practiceQuestions": [
+      {
+        "question": "বাংলাদেশের গৃহস্থালির এসি সাপ্লাই $220\\text{ V}$ হলে শীর্ষ ভোল্টেজ $V_0$ কত?",
+        "answer": "Ans: $V_0 = \\sqrt{2} \\times 220 \\approx 1.414 \\times 220 \\approx 311.13\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "আবেশীয় ও ধারকীয় প্রতিক্রিয়া (Inductive & Capacitive Reactance)",
+    "latex": "X_L = \\omega L = 2\\pi f L, \\quad X_C = \\frac{1}{\\omega C} = \\frac{1}{2\\pi f C}",
+    "description": "$X_L$ = আবেশীয় প্রতিক্রিয়া ($\\Omega$), $X_C$ = ধারকীয় প্রতিক্রিয়া ($\\Omega$), $f$ = এসি কম্পাঙ্ক (Hz)। ডিসির ক্ষেত্রে $f=0 \\implies X_L = 0, X_C = \\infty$ (ধারক ডিসিকে সম্পূর্ণ ব্লক করে)।",
+    "practiceQuestions": [
+      {
+        "question": "$50\\text{ Hz}$ এসি উৎসে $0.1\\text{ H}$ আবেশক ও $10\\,\\mu\\text{F}$ ধারকের প্রতিক্রিয়া কত?",
+        "answer": "Ans: $X_L = 2\\pi \\times 50 \\times 0.1 \\approx 31.42\\,\\Omega$। $X_C = \\frac{1}{2\\pi \\times 50 \\times 10^{-5}} \\approx 318.31\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "LCR শ্রেণি বর্তনীর প্রতিবন্ধকতা ও দশা কোণ (LCR Series Circuit Impedance)",
+    "latex": "Z = \\sqrt{R^2 + (X_L - X_C)^2}, \\quad \\tan\\phi = \\frac{X_L - X_C}{R}, \\quad I_{\\text{rms}} = \\frac{V_{\\text{rms}}}{Z}",
+    "description": "$Z$ = মোট প্রতিবন্ধকতা (Impedance in $\\Omega$), $\\phi$ = ভোল্টেজ ও প্রবাহের দশা পার্থক্য। $X_L > X_C$ হলে ভোল্টেজ এগিয়ে থাকে; $X_C > X_L$ হলে কারেন্ট এগিয়ে থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "একটি LCR বর্তনীতে $R = 30\\,\\Omega, X_L = 80\\,\\Omega, X_C = 40\\,\\Omega$ হলে মোট প্রতিবন্ধকতা $Z$ কত?",
+        "answer": "Ans: $Z = \\sqrt{30^2 + (80 - 40)^2} = \\sqrt{30^2 + 40^2} = 50\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ অনুনাদ ও কোয়ালিটি ফ্যাক্টর (Resonance & Q-Factor)",
+    "latex": "f_0 = \\frac{1}{2\\pi \\sqrt{L C}}, \\quad Z_{\\text{min}} = R, \\quad I_{\\text{max}} = \\frac{V}{R}, \\quad Q = \\frac{1}{R}\\sqrt{\\frac{L}{C}}",
+    "description": "অনুনাদের শর্ত: $X_L = X_C$। অনুনাদে প্রতিবন্ধকতা সর্বনিম্ন ($Z=R$), প্রবাহ সর্বোচ্চ এবং ক্ষমতা গুণাঙ্ক $\\cos\\phi = 1$। $Q$-ফ্যাক্টর দ্বারা টিউনিং বর্তনীর সূক্ষ্মতা ও তীক্ষ্ণতা পরিমাপ করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$L = 20\\text{ mH}, C = 5\\,\\mu\\text{F}$ এবং $R = 10\\,\\Omega$ এর অনুনাদী কম্পাঙ্ক ও Q-ফ্যাক্টর কত?",
+        "answer": "Ans: $f_0 = \\frac{1}{2\\pi\\sqrt{(20 \\times 10^{-3}) \\times (5 \\times 10^{-6})}} \\approx 503.3\\text{ Hz}$। $Q = \\frac{1}{10}\\sqrt{\\frac{20 \\times 10^{-3}}{5 \\times 10^{-6}}} = \\frac{1}{10}\\sqrt{4000} = \\frac{63.25}{10} \\approx 6.325$"
+      }
+    ]
+  },
+  {
+    "title": "এসি বর্তনীর ক্ষমতা ও ওয়াটলেস প্রবাহ (Power, Power Factor & Wattless Current)",
+    "latex": "P = V_{\\text{rms}} I_{\\text{rms}} \\cos\\phi, \\quad \\cos\\phi = \\frac{R}{Z}, \\quad I_{\\text{wattless}} = I_{\\text{rms}} \\sin\\phi",
+    "description": "$P$ = গড় প্রকৃত ক্ষমতা (Real Power in Watts), $\\cos\\phi$ = ক্ষমতা গুণাঙ্ক ($0 \\le \\cos\\phi \\le 1$), $V_{\\text{rms}}I_{\\text{rms}}$ = আপাত ক্ষমতা (VA)। বিশুদ্ধ $L$ বা $C$ বর্তনীতে $\\phi = 90^\\circ \\implies P = 0$ (ওয়াটহীন প্রবাহ)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি এসি বর্তনীতে $V_{\\text{rms}} = 200\\text{ V}, I_{\\text{rms}} = 2\\text{ A}$ এবং দশা পার্থক্য $60^\\circ$ হলে প্রকৃত ক্ষমতা কত?",
+        "answer": "Ans: $P = 200 \\times 2 \\times \\cos 60^\\circ = 400 \\times 0.5 = 200\\text{ Watt}$"
+      }
+    ]
+  },
+  {
+    "title": "ট্রান্সফরমারের সমীকরণ ও রূপান্তর অনুপাত (Transformer Equations & Efficiency)",
+    "latex": "\\frac{V_p}{V_s} = \\frac{N_p}{N_s} = \\frac{I_s}{I_p} = \\frac{1}{k}, \\quad \\eta = \\frac{V_s I_s}{V_p I_p} \\times 100\\%",
+    "description": "$V_p, V_s$ = মুখ্য ও গৌণ ভোল্টেজ, $N_p, N_s$ = মুখ্য ও গৌণ পাক সংখ্যা, $I_p, I_s$ = মুখ্য ও গৌণ কারেন্ট, $k = N_s / N_p$ = রূপান্তর অনুপাত ($k > 1$ স্টেপ আপ, $k < 1$ স্টেপ ডাউন)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি স্টেপ-ডাউন ট্রান্সফরমারের $N_p = 1000, N_s = 100$। মুখ্য ভোল্টেজ $220\\text{ V}$ ও প্রবাহ $0.5\\text{ A}$ হলে গৌণ ভোল্টেজ ও প্রবাহ কত? (আদর্শ ট্রান্সফরমার)",
+        "answer": "Ans: $V_s = 220 \\times \\frac{100}{1000} = 22\\text{ V}$। $I_s = 0.5 \\times \\frac{1000}{100} = 5\\text{ A}$"
+      }
+    ]
+  }
+]

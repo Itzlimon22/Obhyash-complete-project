@@ -105,6 +105,11 @@ class LiveExamSlider extends ConsumerWidget {
       statusIcon = LucideIcons.zap;
       statusColor = isDark ? const Color(0xFF34D399) : const Color(0xFF12544F);
       bottomStripBg = isDark ? const Color(0xFF12544F).withValues(alpha: 0.25) : const Color(0xFFE6F0EC);
+    } else if (exam.isPast) {
+      statusText = 'সমাপ্ত';
+      statusIcon = LucideIcons.checkCircle;
+      statusColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+      bottomStripBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9);
     } else {
       statusText = 'Upcoming';
       statusIcon = LucideIcons.clock;
@@ -120,8 +125,7 @@ class LiveExamSlider extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          final cat = exam.category.isNotEmpty ? exam.category : 'hsc';
-          context.go('/live_exam/$cat');
+          context.push('/live_exam_details/${exam.id}', extra: exam);
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(

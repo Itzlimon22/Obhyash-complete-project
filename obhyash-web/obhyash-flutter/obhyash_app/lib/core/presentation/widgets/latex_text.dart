@@ -705,7 +705,7 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
       );
     }
 
-    return Math.tex(
+    final mathWidget = Math.tex(
       latex,
       mathStyle: MathStyle.text,
       textStyle: style,
@@ -714,6 +714,24 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
         style: style,
       ),
     );
+
+    // If inline equation contains reaction arrows or is long, wrap in SingleChildScrollView so it never overflows horizontally
+    if (latex.length > 25 ||
+        latex.contains(r'\to') ||
+        latex.contains(r'\rightarrow') ||
+        latex.contains(r'\xrightarrow') ||
+        latex.contains(r'\longrightarrow') ||
+        latex.contains('=')) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: mathWidget,
+        ),
+      );
+    }
+
+    return mathWidget;
   }
 }
 

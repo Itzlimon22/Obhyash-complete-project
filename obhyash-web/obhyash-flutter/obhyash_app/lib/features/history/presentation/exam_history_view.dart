@@ -200,9 +200,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
     try {
       final profile = ref.read(userProfileProvider).value;
-      final level = profile?.level?.trim() ?? profile?.stream?.trim();
+      final stream = profile?.stream?.trim() ?? '';
+      final level = profile?.level?.trim() ?? '';
       final division = profile?.division?.trim();
       final optionalSubject = profile?.optionalSubject?.trim();
+      final isSSC = level.toUpperCase().contains('SSC') || stream.toUpperCase().contains('SSC');
 
       final sb = Supabase.instance.client;
       dynamic data;
@@ -231,13 +233,13 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         final subLevel = (e['level'] ?? '').toString().toUpperCase();
 
         // Level safety check (HSC vs SSC)
-        if (level != null && level.toUpperCase().contains('SSC')) {
+        if (isSSC) {
           if (subId.startsWith('hsc_') ||
               subName.contains('hsc') ||
               subLevel == 'HSC') {
             return false;
           }
-        } else if (level != null && level.toUpperCase().contains('HSC')) {
+        } else {
           if (subId.startsWith('ssc_') ||
               subName.contains('ssc') ||
               subLevel == 'SSC' ||
@@ -245,8 +247,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               subId == 'general_math' ||
               subId == 'ssc_general_math' ||
               subId == 'ssc_math' ||
+              subId == 'general-math' ||
               subName == 'গণিত' ||
-              subName == 'সাধারণ গণিত') {
+              subName == 'সাধারণ গণিত' ||
+              subName == 'math' ||
+              subName == 'general math') {
             return false;
           }
         }
@@ -272,7 +277,25 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }).toList();
 
       if (filteredData.isEmpty) {
-        filteredData = rawList;
+        filteredData = rawList.where((e) {
+          final subName = (e['name'] ?? '').toString().toLowerCase();
+          final subId = e['id'].toString().toLowerCase();
+          final subLevel = (e['level'] ?? '').toString().toUpperCase();
+          if (!isSSC) {
+            if (subId.startsWith('ssc_') ||
+                subLevel == 'SSC' ||
+                subId == 'math' ||
+                subId == 'general_math' ||
+                subId == 'ssc_general_math' ||
+                subId == 'ssc_math' ||
+                subId == 'general-math' ||
+                subName == 'গণিত' ||
+                subName == 'সাধারণ গণিত') {
+              return false;
+            }
+          }
+          return true;
+        }).toList();
       }
 
       final sortOrderMap = <String, int>{};
@@ -285,6 +308,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           rawNameEn.isNotEmpty ? rawNameEn : rawName,
           rawName,
         );
+
+        if (formattedName.isEmpty || seen.containsKey(id)) continue;
+        if (!isSSC && (formattedName == 'গণিত' || formattedName == 'সাধারণ গণিত')) continue;
         if (id.isNotEmpty && formattedName.isNotEmpty) {
           seen[id] = formattedName;
           if (s['sort_order'] is int) {

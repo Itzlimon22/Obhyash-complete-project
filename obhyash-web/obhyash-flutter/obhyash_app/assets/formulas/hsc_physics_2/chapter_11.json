@@ -1,1 +1,120 @@
-[]
+[
+  {
+    "title": "মহাজাগতিক দূরত্বের এককসমূহ (Cosmic Distance Units)",
+    "latex": "1\\text{ AU} = 1.496 \\times 10^{11}\\text{ m}, \\quad 1\\text{ ly} = 9.46 \\times 10^{15}\\text{ m}, \\quad 1\\text{ pc} = 3.26\\text{ ly} = 3.086 \\times 10^{16}\\text{ m}",
+    "description": "• AU (Astronomical Unit): পৃথিবী ও সূর্যের মধ্যকার গড় দূরত্ব ($1.496 \\times 10^{11}\\text{ m}$)\n• ly (Light Year): আলো ১ বছরে যে দূরত্ব অতিক্রম করে ($9.46 \\times 10^{15}\\text{ m}$)\n• pc (Parsec): ১ AU বৃত্তচাপ যে দূরত্বে $1''$ কোণ উৎপন্ন করে ($1\\text{ pc} = 3.26\\text{ ly} = 206265\\text{ AU}$)।",
+    "practiceQuestions": [
+      {
+        "question": "সূর্য থেকে পৃথিবীতে আলো আসতে $8$ মিনিট $20$ সেকেন্ড সময় লাগলে সূর্য-পৃথিবীর দূরত্ব কত?",
+        "answer": "Ans: $t = 500\\text{ s}$। $d = c \\times t = (3 \\times 10^8) \\times 500 = 1.5 \\times 10^{11}\\text{ m} = 1\\text{ AU}$"
+      },
+      {
+        "question": "প্রক্সিমা সেন্টরাই পৃথিবী থেকে $4.24\\text{ ly}$ দূরে অবস্থিত। পারসেকে এর দূরত্ব কত?",
+        "answer": "Ans: $d = \\frac{4.24}{3.26} \\approx 1.30\\text{ pc}$"
+      }
+    ]
+  },
+  {
+    "title": "নক্ষত্রের লম্বন কোণ ও দূরত্ব নির্ণয় (Stellar Parallax Method)",
+    "latex": "d = \\frac{1}{p}\\text{ (parsec)} = \\frac{1\\text{ AU}}{\\theta(\\text{radian})}",
+    "description": "$d$ = নক্ষত্রের দূরত্ব (Parsec এককে), $p$ = লম্বন কোণ (Arcsecond বা $''$ এককে)। লম্বন কোণ $1''$ হলে দূরত্ব হয় $1\\text{ pc}$।",
+    "practiceQuestions": [
+      {
+        "question": "একটি দূরবর্তী নক্ষত্রের লম্বন কোণ $0.25''$ হলে পৃথিবী থেকে এর দূরত্ব কত পারসেক ও কত আলোকবর্ষ?",
+        "answer": "Ans: $d = \\frac{1}{0.25} = 4\\text{ pc}$। আলোকবর্ষে $d = 4 \\times 3.26 = 13.04\\text{ ly}$"
+      }
+    ]
+  },
+  {
+    "title": "দৃশ্যমান ও পরম ঔজ্জ্বল্যের মান মডিউলাস (Distance Modulus)",
+    "latex": "m - M = 5 \\log_{10}(d) - 5 = 5 \\log_{10}\\left(\\frac{d}{10}\\right)",
+    "description": "$m$ = আপাত উজ্জ্বলতা মান (Apparent Magnitude), $M$ = পরম উজ্জ্বলতা মান (Absolute Magnitude - $10\\text{ pc}$ দূরত্বে নক্ষত্রের উজ্জ্বলতা), $d$ = নক্ষত্রের দূরত্ব (Parsec এককে)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি নক্ষত্রের আপাত মান $m = 6$ এবং পরম মান $M = 1$ হলে পৃথিবী থেকে নক্ষত্রটির দূরত্ব কত পারসেক?",
+        "answer": "Ans: $6 - 1 = 5 \\log_{10}(d) - 5 \\implies 5 \\log_{10}(d) = 10 \\implies \\log_{10}(d) = 2 \\implies d = 10^2 = 100\\text{ pc}$"
+      }
+    ]
+  },
+  {
+    "title": "স্টিফান-বোল্টজম্যান সূত্র ও নক্ষত্রের ঔজ্জ্বল্য (Stefan-Boltzmann Law & Luminosity)",
+    "latex": "L = 4\\pi R^2 \\sigma T^4, \\quad \\frac{L_1}{L_2} = \\left(\\frac{R_1}{R_2}\\right)^2 \\left(\\frac{T_1}{T_2}\\right)^4",
+    "description": "$L$ = নক্ষত্রের মোট বিকিরণ ক্ষমতা বা ঔজ্জ্বল্য (Luminosity in Watts), $R$ = নক্ষত্রের ব্যাসার্ধ, $T$ = পৃষ্ঠের পরম তাপমাত্রা (Kelvin), $\\sigma = 5.67 \\times 10^{-8}\\text{ W/m}^2\\text{K}^4$ হলো স্টিফান ধ্রুবক।",
+    "practiceQuestions": [
+      {
+        "question": "একটি নক্ষত্রের তাপমাত্রা সূর্যের দ্বিগুণ ($2T_{\\odot}$) এবং ব্যাসার্ধ সূর্যের সমান হলে এর বিকিরণ ক্ষমতা সূর্যের কত গুণ হবে?",
+        "answer": "Ans: $\\frac{L}{L_{\\odot}} = (1)^2 \\times (2)^4 = 16$ (সূর্যের ১৬ গুণ)"
+      }
+    ]
+  },
+  {
+    "title": "ওয়েনের সরণ সূত্র ও নক্ষত্রের বর্ণ (Wien's Displacement Law)",
+    "latex": "\\lambda_{\\text{max}} T = b \\approx 2.898 \\times 10^{-3}\\text{ m}\\cdot\\text{K}",
+    "description": "কৃষ্ণবস্তু বিকিরণে সর্বাধিক শক্তি নির্গমনের তরঙ্গদৈর্ঘ্য ($\\lambda_{\\max}$) পরম তাপমাত্রা $T$ এর ব্যস্তানুপাতিক। তাপমাত্রা বাড়লে নক্ষত্রের বর্ণ লাল থেকে হলুদ এবং নীল-সাদা বর্ণের দিকে পরিবর্তিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "সূর্যের পৃষ্ঠের তাপমাত্রা $5800\\text{ K}$ হলে সর্বাধিক বিকিরণের তরঙ্গদৈর্ঘ্য কত?",
+        "answer": "Ans: $\\lambda_{\\max} = \\frac{2.898 \\times 10^{-3}}{5800} \\approx 4.996 \\times 10^{-7}\\text{ m} = 4996\\text{ \\AA} \\approx 500\\text{ nm}$"
+      }
+    ]
+  },
+  {
+    "title": "হাবলের সূত্র ও গ্যালাক্সির পশ্চাদপসরণ বেগ (Hubble's Law)",
+    "latex": "v = H_0 d",
+    "description": "$v$ = গ্যালাক্সির পশ্চাদপসরণ বেগ (km/s), $d$ = গ্যালাক্সির দূরত্ব (Mpc এককে), $H_0 \\approx 70\\text{ km/s/Mpc}$ (হাবল ধ্রুবক)। গ্যালাক্সিগুলোর দূরত্ব বাড়ার সাথে সাথে পশ্চাদপসরণ বেগ সরলরৈখিকভাবে বাড়ে।",
+    "practiceQuestions": [
+      {
+        "question": "পৃথিবী থেকে $50\\text{ Mpc}$ দূরে অবস্থিত একটি গ্যালাক্সির পশ্চাদপসরণ দ্রুতি কত? ($H_0 = 70\\text{ km/s/Mpc}$)",
+        "answer": "Ans: $v = H_0 d = 70 \\times 50 = 3500\\text{ km/s}$"
+      }
+    ]
+  },
+  {
+    "title": "মহাবিশ্বের বয়স ও সংকট ঘনত্ব (Age of Universe & Critical Density)",
+    "latex": "T = \\frac{1}{H_0} \\approx 13.8 \\times 10^9\\text{ years}, \\quad \\rho_c = \\frac{3 H_0^2}{8\\pi G} \\approx 9.5 \\times 10^{-27}\\text{ kg/m}^3",
+    "description": "$T$ = হাবল সময় বা মহাবিশ্বের বয়স (১৩.৮ বিলিয়ন বছর), $\\rho_c$ = মহাবিশ্বের সমতল জ্যামিতির জন্য প্রয়োজনীয় সংকট ঘনত্ব। $\\rho > \\rho_c$ হলে বদ্ধ মহাবিশ্ব, $\\rho < \\rho_c$ হলে উন্মুক্ত মহাবিশ্ব।",
+    "practiceQuestions": [
+      {
+        "question": "যদি হাবল ধ্রুবক $H_0 = 70\\text{ km/s/Mpc}$ হয় তবে মহাবিশ্বের বয়স কত?",
+        "answer": "Ans: $H_0 = \\frac{70 \\times 10^3}{3.086 \\times 10^{22}} \\approx 2.27 \\times 10^{-18}\\text{ s}^{-1}$। $T = \\frac{1}{H_0} \\approx 4.4 \\times 10^{17}\\text{ s} \\approx 13.8\\text{ বিলিয়ন বছর}$"
+      }
+    ]
+  },
+  {
+    "title": "লোহিত সরণ ও ডপলার ক্রিয়া (Redshift & Doppler Effect)",
+    "latex": "z = \\frac{\\Delta\\lambda}{\\lambda_0} = \\frac{\\lambda - \\lambda_0}{\\lambda_0} = \\frac{v}{c} \\quad (v \\ll c)",
+    "description": "$z$ = লোহিত সরণ (Redshift), $\\lambda_0$ = প্রকৃত তরঙ্গদৈর্ঘ্য, $\\lambda$ = পর্যবেক্ষণে দৃশ্যমান তরঙ্গদৈর্ঘ্য, $v$ = গ্যালাক্সির দ্রুতি, $c$ = আলোর বেগ। আলো লাল প্রান্তের দিকে সরে যাওয়া ($z > 0$) প্রমাণ করে গ্যালাক্সি দূরে সরে যাচ্ছে (মহাবিশ্ব সম্প্রসারণশীল)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি নক্ষত্র থেকে আসা $6000\\text{ \\AA}$ তরঙ্গদৈর্ঘ্যের আলো পৃথিবীতে $6020\\text{ \\AA}$ পাওয়া গেল। নক্ষত্রটির পশ্চাদপসরণ বেগ কত?",
+        "answer": "Ans: $z = \\frac{6020 - 6000}{6000} = \\frac{20}{6000} = \\frac{1}{300}$। বেগ $v = z \\times c = \\frac{3 \\times 10^8}{300} = 10^6\\text{ m/s} = 1000\\text{ km/s}$"
+      }
+    ]
+  },
+  {
+    "title": "কৃষ্ণগহ্বরের শোয়ার্জশিল্ড ব্যাসার্ধ (Schwarzschild Radius of Black Hole)",
+    "latex": "R_s = \\frac{2 G M}{c^2}",
+    "description": "$R_s$ = কৃষ্ণগহ্বরের ঘটনা দিগন্ত (Event Horizon) এর ব্যাসার্ধ, $M$ = ভর, $G = 6.674 \\times 10^{-11}\\text{ N}\\cdot\\text{m}^2\\text{/kg}^2$, $c = 3 \\times 10^8\\text{ m/s}$। কোনো বস্তুর আকার এই ব্যাসার্ধের মধ্যে সংকুচিত হলে এর মুক্তিবেগ আলোর বেগের সমান ($v_e = c$) হয়ে কৃষ্ণগহ্বরে পরিণত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পৃথিবীর ভর ($M = 6 \\times 10^{24}\\text{ kg}$) ঠিক রেখে কৃষ্ণগহ্বরে পরিণত করতে চাইলে ব্যাসার্ধ কত হতে হবে?",
+        "answer": "Ans: $R_s = \\frac{2 \\times (6.674 \\times 10^{-11}) \\times (6 \\times 10^{24})}{(3 \\times 10^8)^2} \\approx 8.9 \\times 10^{-3}\\text{ m} = 8.9\\text{ mm}$"
+      },
+      {
+        "question": "সূর্যের ($M = 2 \\times 10^{30}\\text{ kg}$) শোয়ার্জশিল্ড ব্যাসার্ধ কত?",
+        "answer": "Ans: $R_s = \\frac{2 \\times (6.674 \\times 10^{-11}) \\times (2 \\times 10^{30})}{9 \\times 10^{16}} \\approx 2966\\text{ m} \\approx 2.97\\text{ km}$"
+      }
+    ]
+  },
+  {
+    "title": "চন্দ্রশেখর সীমা (Chandrasekhar Limit)",
+    "latex": "M_{\\text{limit}} \\approx 1.4 M_{\\odot} \\approx 1.4 \\times (1.989 \\times 10^{30}\\text{ kg}) \\approx 2.765 \\times 10^{30}\\text{ kg}",
+    "description": "একটি স্থায়ী শ্বেত বামন (White Dwarf) নক্ষত্রের সম্ভাব্য সর্বোচ্চ ভর।\n• কোর ভর $M \\le 1.4 M_\\odot$: শ্বেত বামন (White Dwarf)\n• কোর ভর $1.4 M_\\odot < M \\le 3 M_\\odot$: নিউট্রন স্টার (Neutron Star)\n• কোর ভর $M > 3 M_\\odot$: কৃষ্ণগহ্বর (Black Hole)",
+    "practiceQuestions": [
+      {
+        "question": "সুপারনোভার পর একটি নক্ষত্রের কোরের ভর $2.5 M_{\\odot}$ হলে সেটি কীসে পরিণত হবে?",
+        "answer": "Ans: যেহেতু $1.4 M_{\\odot} < 2.5 M_{\\odot} \\le 3 M_{\\odot}$, তাই এটি নিউট্রন স্টারে পরিণত হবে।"
+      }
+    ]
+  }
+]

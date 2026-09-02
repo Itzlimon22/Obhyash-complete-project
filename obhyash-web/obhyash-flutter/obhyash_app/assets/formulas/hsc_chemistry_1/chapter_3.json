@@ -1,1 +1,552 @@
-[]
+[
+  {
+    "title": "পর্যায় সারণির ব্লক বিভাগ ও সাধারণ ইলেকট্রন বিন্যাস (Periodic Blocks & Configurations)",
+    "latex": "s\\text{-block (14): } ns^{1-2}; \\quad p\\text{-block (36): } ns^2 np^{1-6}; \\quad d\\text{-block (41): } (n-1)d^{1-10} ns^{1-2}; \\quad f\\text{-block (27): } (n-2)f^{1-14} (n-1)d^{0-1} ns^2",
+    "description": "সর্বমোট ১১৮টি মৌল ৪টি ব্লকে বিভক্ত। সর্ববহিস্থ স্তরের ইলেকট্রন যে উপস্তরে প্রবেশ করে মৌলটি সেই ব্লকের অন্তর্ভুক্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পর্যায় সারণিতে $p$-ব্লক মৌলের মোট সংখ্যা কত?",
+        "answer": "Ans: ৩৬টি (গ্রুপ ১৩ থেকে ১৮ পর্যন্ত, হিলিয়াম ব্যতীত)"
+      }
+    ]
+  },
+  {
+    "title": "পর্যায় ও গ্রুপ নির্ণয়ের নিয়মাবলী (Period & Group Determination)",
+    "latex": "\\text{Period} = n_{\\text{max}}; \\quad \\text{s-block Group} = \\text{e in } ns; \\quad \\text{p-block Group} = 10 + \\text{e in }(ns + np); \\quad \\text{d-block Group} = \\text{e in }[(n-1)d + ns]",
+    "description": "• $s$-ব্লক: $ns$ এর ইলেকট্রন সংখ্যাই গ্রুপ নম্বর (গ্রুপ ১ বা ২)\n• $p$-ব্লক: $10 + ns + np$ ইলেকট্রন (গ্রুপ ১৩-১৮)\n• $d$-ব্লক: $(n-1)d + ns$ ইলেকট্রনের যোগফল (গ্রুপ ৩-১২)।",
+    "practiceQuestions": [
+      {
+        "question": "Fe ($Z=26: [\\text{Ar}] 3d^6 4s^2$) এর পর্যায় ও গ্রুপ কত?",
+        "answer": "Ans: পর্যায় $= 4$ (সর্বোচ্চ প্রধান কোয়ান্টাম সংখ্যা) এবং গ্রুপ $= 6 + 2 = 8$ (গ্রুপ ৮)"
+      }
+    ]
+  },
+  {
+    "title": "পারমাণবিক ও ভ্যান্ডারওয়ালস ব্যাসার্ধের তুলনা (Atomic & van der Waals Radii)",
+    "latex": "r_{\\text{vanderWaals}} > r_{\\text{metallic}} > r_{\\text{covalent}}, \\quad \\text{Period Trend: } \\text{বামে বড়, ডানে ছোট}; \\quad \\text{Group Trend: } \\text{উপরে ছোট, নিচে বড়}",
+    "description": "একই পর্যায়ে বাম থেকে ডানে প্রোটন সংখ্যা বৃদ্ধি পাওয়ায় নিউক্লিয়াসের আকর্ষণ বাড়ে এবং আকার ছোট হয়। গ্রুপে উপর থেকে নিচে নতুন শক্তিস্তর যুক্ত হওয়ায় আকার বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "সমযোজী ব্যাসার্ধ ও ভ্যান্ডারওয়ালস ব্যাসার্ধের মধ্যে কোনটি বড়?",
+        "answer": "Ans: ভ্যান্ডারওয়ালস ব্যাসার্ধ (কারণ কোনো রাসায়নিক বন্ধন ছাড়াই দুটি অণুর মধ্যকার দুর্বল আকর্ষণের দূরত্ব মাপা হয়)"
+      }
+    ]
+  },
+  {
+    "title": "আয়নসমূহের আকারের তুলনা ও আইসোইলেকট্রনিক ক্রম (Ionic Radii & Isoelectronic Series)",
+    "latex": "r_{\\text{anion}} > r_{\\text{neutral}} > r_{\\text{cation}}, \\quad \\text{আইসোইলেকট্রনিক: } \\text{N}^{3-} > \\text{O}^{2-} > \\text{F}^- > \\text{Na}^+ > \\text{Mg}^{2+} > \\text{Al}^{3+}",
+    "description": "• ক্যাটায়নে ইলেকট্রন কমায় কার্যকর নিউক্লীয় চার্জ বাড়ে $\\implies$ আকার সংকুচিত হয় ($Fe > Fe^{2+} > Fe^{3+}$)\n• অ্যানায়নে ইলেকট্রন বাড়ায় আন্তঃইলেকট্রন বিকর্ষণ বাড়ে $\\implies$ আকার বড় হয় ($Cl^- > Cl$)\n• আইসোইলেকট্রনিক আয়নসমূহে প্রোটন সংখ্যা যত বেশি আকার তত ছোট।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{Na}^+, \\text{Mg}^{2+}, \\text{F}^-, \\text{O}^{2-}$ এর মধ্যে কার আকার সবচেয়ে বড় এবং কার সবচেয়ে ছোট?",
+        "answer": "Ans: সবচেয়ে বড় $\\text{O}^{2-}$ এবং সবচেয়ে ছোট $\\text{Mg}^{2+}$"
+      }
+    ]
+  },
+  {
+    "title": "১ম ও ২য় আয়নায়ন শক্তি (1st & 2nd Ionization Energy)",
+    "latex": "IE_3 > IE_2 > IE_1, \\quad \\text{General: } \\text{বামে কম, ডানে বেশি}; \\quad \\text{Group: } \\text{উপরে বেশি, নিচে কম}",
+    "description": "গ্যাসীয় অবস্থায় ১ মোল বিচ্ছিন্ন পরমাণু থেকে ১ মোল ইলেকট্রন অপসারণ করে একক ধনাত্মক আয়নে পরিণত করতে প্রয়োজনীয় শক্তি হলো ১ম আয়নায়ন শক্তি। ক্যাটায়ন থেকে পরবর্তী ইলেকট্রন সরাতে আকর্ষণ বেশি থাকায় $IE_2 > IE_1$ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "সোডিয়ামের ২য় আয়নায়ন শক্তি ১ম আয়নায়ন শক্তির চেয়ে অনেক বেশি কেন?",
+        "answer": "Ans: $\\text{Na}^+$ ($1s^2 2s^2 2p^6$) নিয়নের মতো অত্যন্ত সুস্থিত অষ্টক পূর্ণ কাঠামো অর্জন করায় ২য় ইলেকট্রন সরাতে প্রচুর শক্তি লাগে।"
+      }
+    ]
+  },
+  {
+    "title": "আয়নায়ন শক্তির ব্যতিক্রমসমূহ (Ionization Energy Exceptions)",
+    "latex": "\\text{Be} (1s^2 2s^2) > \\text{B} (1s^2 2s^2 2p^1), \\quad \\text{N} (2s^2 2p^3) > \\text{O} (2s^2 2p^4), \\quad \\text{Mg} (3s^2) > \\text{Al} (3s^2 3p^1), \\quad \\text{P} (3s^2 3p^3) > \\text{S} (3s^2 3p^4)",
+    "description": "পূর্ণ ($s^2$) এবং অর্ধপূর্ণ ($p^3$) উপস্তর অধিক সুস্থিত থাকায় এদের থেকে ইলেকট্রন অপসারণে অতিরিক্ত শক্তির প্রয়োজন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "নাইট্রোজেনের ১ম আয়নায়ন শক্তি অক্সিজেনের চেয়ে বেশি কেন?",
+        "answer": "Ans: নাইট্রোজেনের $2p$ উপস্তর অর্ধপূর্ণ ($2p^3$) হওয়ায় এটি সুস্থিত, তাই ইলেকট্রন সহজে ত্যাগ করতে চায় না।"
+      }
+    ]
+  },
+  {
+    "title": "ইলেকট্রন আসক্তি ও ব্যতিক্রমসমূহ (Electron Affinity Trends)",
+    "latex": "\\text{Trend: } \\text{হ্যালোজেন সমূহে সর্বাধিক}; \\quad \\text{Exception: } \\text{Cl} > \\text{F} > \\text{Br} > \\text{I}, \\quad \\text{S} > \\text{O}",
+    "description": "ফ্লোরিনের আকার অতি ক্ষুদ্র হওয়ায় $2p$ স্তরে উচ্চ ইলেকট্রন ঘনত্বের কারণে আগত ইলেকট্রন তীব্র বিকর্ষণের সম্মুখীন হয়। তাই ক্লোরিনের ($3p$) ইলেকট্রন আসক্তি ফ্লোরিনের চেয়ে বেশি।",
+    "practiceQuestions": [
+      {
+        "question": "পর্যায় সারণিতে কোন মৌলের ইলেকট্রন আসক্তি সর্বাধিক?",
+        "answer": "Ans: ক্লোরিন (Cl)"
+      }
+    ]
+  },
+  {
+    "title": "পাউলিং স্কেলে তড়িৎ ঋণাত্মকতা ও পোলারিটি (Electronegativity & Polarity)",
+    "latex": "\\text{F} (4.0) > \\text{O} (3.5) > \\text{Cl} (3.0) \\approx \\text{N} (3.0) > \\text{Br} (2.8) > \\text{C} (2.5) \\approx \\text{I} (2.5) > \\text{H} (2.1)",
+    "description": "• $\\Delta EN \\ge 1.7 \\implies$ মূলত আয়নিক যৌগ\n• $0.5 < \\Delta EN < 1.7 \\implies$ পোলার সমযোজী যৌগ\n• $\\Delta EN \\le 0.4 \\implies$ অপোলার সমযোজী যৌগ\n• হ্যানি-স্মিথ সমীকরণ: $\\% \\text{আয়নিক চরিত্র} = 16\\Delta EN + 3.5(\\Delta EN)^2$।",
+    "practiceQuestions": [
+      {
+        "question": "$HCl$ অণুতে শতকরা আয়নিক চরিত্র কত? ($H = 2.1, Cl = 3.0$)",
+        "answer": "Ans: $\\Delta EN = 3.0 - 2.1 = 0.9$। $\\% \\text{আয়নিক} = 16(0.9) + 3.5(0.9)^2 = 14.4 + 2.835 \\approx 17.24\\%$"
+      }
+    ]
+  },
+  {
+    "title": "ডায়াগোনাল রিলেশন বা কর্ণ সম্পর্ক (Diagonal Relationship)",
+    "latex": "\\text{Li} \\sim \\text{Mg}, \\quad \\text{Be} \\sim \\text{Al}, \\quad \\text{B} \\sim \\text{Si}",
+    "description": "২য় পর্যায়ের কিছু মৌলের সাথে পরবর্তী পর্যায়ের কর্ণ বরাবর ডানে অবস্থিত মৌলের আকার, চার্জ ঘনত্ব ও তড়িৎ ঋণাত্মকতা প্রায় সমান হওয়ায় ধর্মে আশ্চর্যজনক সাদৃশ্য দেখা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "বেরিলিয়ামের ($Be$) সাথে পর্যায় সারণির কোন মৌলের কর্ণ সম্পর্ক দেখা যায়?",
+        "answer": "Ans: অ্যালুমিনিয়াম (Al)"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নীতি: ক্যাটায়নের আকার ও পোলারায়ন (Fajan's Rule: Cation Size)",
+    "latex": "\\text{Covalent Character} \\propto \\frac{1}{\\text{Cation Size}} \\implies \\text{LiCl} > \\text{NaCl} > \\text{KCl} > \\text{RbCl} > \\text{CsCl}",
+    "description": "ক্যাটায়নের আকার যত ছোট হয়, এর চার্জ ঘনত্ব তত বেশি হয় এবং অ্যানায়নের ইলেকট্রন মেঘকে তীব্রভাবে বিকৃত (পোলারাইজ) করে সমযোজী বৈশিষ্ট্য বাড়িয়ে দেয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{LiCl}$ ও $\\text{NaCl}$ এর মধ্যে কার গলনাঙ্ক কম এবং কেন?",
+        "answer": "Ans: $\\text{LiCl}$ এর গলনাঙ্ক কম, কারণ $\\text{Li}^+$ এর আকার ছোট হওয়ায় পোলারায়ন বেশি এবং সমযোজী চরিত্র বেশি।"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নীতি: অ্যানায়নের আকার ও পোলারায়ন (Fajan's Rule: Anion Size)",
+    "latex": "\\text{Covalent Character} \\propto \\text{Anion Size} \\implies \\text{AgI} > \\text{AgBr} > \\text{AgCl} > \\text{AgF}",
+    "description": "অ্যানায়নের আকার যত বড় হয়, এর সর্ববহিস্থ ইলেকট্রন মেঘ নিউক্লিয়াস থেকে দূরে থাকায় সহজে বিকৃত হয় এবং সমযোজী চরিত্র বাড়ে। ফলে $\\text{AgI}$ হলুদ ও পানিতে অদ্রবণীয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{AgCl}$ সাদা কিন্তু $\\text{AgI}$ হলুদ কেন?",
+        "answer": "Ans: $\\text{I}^-$ আয়নের আকার অনেক বড় হওয়ায় পোলারায়ন মাত্রা বেশি এবং সমযোজী চরিত্র বেশি থাকায় $\\text{AgI}$ হলুদ দেখায়।"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নীতি: চার্জের প্রভাব (Fajan's Rule: Ionic Charge)",
+    "latex": "\\text{Covalent Character} \\propto \\text{Cation Charge} \\implies \\text{SnCl}_4 > \\text{SnCl}_2, \\quad \\text{FeCl}_3 > \\text{FeCl}_2, \\quad \\text{AlCl}_3 > \\text{MgCl}_2 > \\text{NaCl}",
+    "description": "ক্যাটায়নের ধনাত্মক চার্জ যত বেশি হবে, তার পোলারায়ন ক্ষমতা তত বাড়বে এবং সমযোজী চরিত্র তত বৃদ্ধি পাবে। $\\text{AlCl}_3$ উচ্চ সমযোজী হওয়ায় ঊর্ধ্বপাতিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{FeCl}_2$ ও $\\text{FeCl}_3$ এর মধ্যে কোনটি অধিক সমযোজী?",
+        "answer": "Ans: $\\text{FeCl}_3$ (কারণ $\\text{Fe}^{3+}$ এর চার্জ $\\text{Fe}^{2+}$ অপেক্ষা বেশি)"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নীতি: সিউডো ইনার্ট কাঠামো (Fajan's Rule: Pseudo-Inert Structure)",
+    "latex": "(n-1)d^{10} ns^0 \\text{ ক্যাটায়ন} > ns^2 np^6 \\text{ ক্যাটায়ন} \\implies \\text{CuCl} > \\text{NaCl}, \\quad \\text{AgCl} > \\text{KCl}",
+    "description": "সিউডো নোবেল গ্যাস কাঠামোযুক্ত ক্যাটায়নের $d$-ইলেকট্রনগুলোর দুর্বল আবরণী প্রভাবের (Shielding effect) কারণে পোলারায়ন মাত্রা নিষ্ক্রিয় গ্যাস কাঠামোর চেয়ে অনেক বেশি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CuCl}$ এবং $\\text{NaCl}$ উভয় ক্যাটায়নের চার্জ $+1$ এবং আকার কাছাকাছি হওয়া সত্ত্বেও $\\text{CuCl}$ অধিক সমযোজী কেন?",
+        "answer": "Ans: $\\text{Cu}^+$ এর $3d^{10}$ কাঠামো থাকায় এর পোলারায়ন ক্ষমতা $\\text{Na}^+$ ($2s^2 2p^6$) অপেক্ষা অনেক বেশি।"
+      }
+    ]
+  },
+  {
+    "title": "সংকরায়ন শর্টকাট সূত্র (Hybridization Master Shortcut Formula)",
+    "latex": "H = \\frac{1}{2}[V + M - C + A]",
+    "description": "$V$ = কেন্দ্রীয় পরমাণুর যোজ্যতার ইলেকট্রন সংখ্যা, $M$ = একযোজী পরমাণু সংখ্যা ($H, F, Cl, Br, I$), $C$ = ক্যাটায়নের চার্জ, $A$ = অ্যানায়নের চার্জ।\n• $H=2 \\implies sp$\n• $H=3 \\implies sp^2$\n• $H=4 \\implies sp^3$\n• $H=5 \\implies sp^3d$\n• $H=6 \\implies sp^3d^2$\n• $H=7 \\implies sp^3d^3$",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CO}_3^{2-}$ এবং $\\text{IF}_7$ এর সংকরায়ন কী?",
+        "answer": "Ans: $\\text{CO}_3^{2-}$: $H = \\frac{1}{2}[4 + 0 - 0 + 2] = 3 \\implies sp^2$। $\\text{IF}_7$: $H = \\frac{1}{2}[7 + 7] = 7 \\implies sp^3d^3$"
+      }
+    ]
+  },
+  {
+    "title": "sp সংকরায়ন ও আকৃতি (sp Hybridization)",
+    "latex": "sp \\implies \\text{রৈখিক (Linear)}, \\quad \\text{বন্ধন কোণ } = 180^\\circ, \\quad \\text{s-character } = 50\\%",
+    "description": "উদাহরণ: $\\text{BeCl}_2, \\text{BeF}_2, \\text{CO}_2, \\text{CS}_2, \\text{HCN}, \\text{C}_2\\text{H}_2$ (ইথাইন)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CO}_2$ অণুর আকৃতি ও বন্ধন কোণ কত?",
+        "answer": "Ans: রৈখিক এবং বন্ধন কোণ $180^\\circ$ ($sp$ সংকরায়ন)"
+      }
+    ]
+  },
+  {
+    "title": "sp2 সংকরায়ন ও আকৃতি (sp2 Hybridization)",
+    "latex": "sp^2 \\implies \\text{ত্রিকোণাকার সমতলীয় (Trigonal Planar)}, \\quad \\text{বন্ধন কোণ } = 120^\\circ, \\quad \\text{s-character } = 33.33\\%",
+    "description": "উদাহরণ: $\\text{BF}_3, \\text{BCl}_3, \\text{AlCl}_3, \\text{C}_2\\text{H}_4, \\text{SO}_3, \\text{NO}_3^-, \\text{CO}_3^{2-}$। মুক্তজোড় থাকলে ($SO_2, O_3, NO_2^-$) আকৃতি কৌণিক বা বেন্ট ($\\approx 119.5^\\circ$) হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{BF}_3$ অণুর সংকরায়ন ও বন্ধন কোণ কত?",
+        "answer": "Ans: $sp^2$ সংকরায়ন এবং বন্ধন কোণ $120^\\circ$"
+      }
+    ]
+  },
+  {
+    "title": "sp3 সংকরায়ন ও চতুস্তলকীয় আকৃতি (sp3 Hybridization)",
+    "latex": "sp^3 \\implies \\text{চতুস্তলকীয় (Tetrahedral)}, \\quad \\text{বন্ধন কোণ } = 109.5^\\circ \\; (109^\\circ 28'), \\quad \\text{s-character } = 25\\%",
+    "description": "উদাহরণ: $\\text{CH}_4, \\text{CCl}_4, \\text{SiH}_4, \\text{NH}_4^+, \\text{SO}_4^{2-}, \\text{ClO}_4^-$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{NH}_4^+$ আয়নের আকৃতি কী?",
+        "answer": "Ans: চতুস্তলকীয় ($sp^3$ সংকরায়ন, 0 মুক্তজোড়)"
+      }
+    ]
+  },
+  {
+    "title": "sp3d সংকরায়ন ও আকৃতি (sp3d Hybridization)",
+    "latex": "sp^3d \\implies \\text{ত্রিকোণাকার দ্বি-পিরামিডীয় (Trigonal Bipyramidal)}, \\quad \\text{বন্ধন কোণ } = 90^\\circ, 120^\\circ, 180^\\circ",
+    "description": "উদাহরণ: $\\text{PCl}_5, \\text{PF}_5, \\text{PBr}_5$। অক্ষীয় বন্ধনগুলো (Axial bonds) নিরক্ষীয় বন্ধন (Equatorial bonds) অপেক্ষা কিছুটা দীর্ঘ ও দুর্বল হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{PCl}_5$ এর সব বন্ধন দৈর্ঘ্য কি সমান?",
+        "answer": "Ans: না, ২টি অক্ষীয় বন্ধন (Axial) ৩টি নিরক্ষীয় বন্ধন (Equatorial) অপেক্ষা সামান্য দীর্ঘ ও দুর্বল।"
+      }
+    ]
+  },
+  {
+    "title": "sp3d2 ও sp3d3 সংকরায়ন (sp3d2 & sp3d3 Hybridization)",
+    "latex": "sp^3d^2 \\implies \\text{অষ্টতলকীয় (Octahedral, } 90^\\circ\\text{)}; \\quad sp^3d^3 \\implies \\text{পঞ্চকোণীয় দ্বি-পিরামিডীয় (} 72^\\circ, 90^\\circ\\text{)}",
+    "description": "• $sp^3d^2$: $\\text{SF}_6, [\\text{Fe(CN)}_6]^{4-}, [\\text{Cr(H}_2\\text{O)}_6]^{3+}$\n• $sp^3d^3$: $\\text{IF}_7$ (Pentagonal bipyramidal)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{SF}_6$ অণুর আকৃতি কী?",
+        "answer": "Ans: সুষম অষ্টতলকীয় (Octahedral, $90^\\circ$)"
+      }
+    ]
+  },
+  {
+    "title": "ভেসপার তত্ত্ব ও মুক্তজোড়ের বিকর্ষণ (VSEPR Lone Pair Distortions)",
+    "latex": "\\text{Repulsion: } \\text{LP-LP} > \\text{LP-BP} > \\text{BP-BP}; \\quad \\text{CH}_4 (109.5^\\circ) \\to \\text{NH}_3 (107^\\circ) \\to \\text{H}_2\\text{O} (104.5^\\circ)",
+    "description": "• $\\text{CH}_4$: 0 LP $\\implies 109.5^\\circ$ (চতুস্তলকীয়)\n• $\\text{NH}_3$: 1 LP $\\implies 107^\\circ$ (ত্রিকোণাকার পিরামিডীয়)\n• $\\text{H}_2\\text{O}$: 2 LP $\\implies 104.5^\\circ$ (কৌণিক বা V-আকৃতি)। প্রতি মুক্তজোড়ে কোণ প্রায় $2^\\circ - 2.5^\\circ$ সংকুচিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানির অণুর ($H_2O$) আকৃতি ও বন্ধন কোণ কত?",
+        "answer": "Ans: কৌণিক বা V-আকৃতি এবং বন্ধন কোণ $104.5^\\circ$"
+      }
+    ]
+  },
+  {
+    "title": "বিশেষ অণুর আকৃতি: SF4, ClF3, XeF4 ও I3- (Special VSEPR Shapes)",
+    "latex": "\\text{SF}_4 (sp^3d, 1\\text{LP}): \\text{সী-স (See-saw)}; \\; \\text{ClF}_3 (sp^3d, 2\\text{LP}): \\text{T-আকৃতি}; \\; \\text{XeF}_4 (sp^3d^2, 2\\text{LP}): \\text{সমতলীয় বর্গাকার}; \\; \\text{I}_3^- (sp^3d, 3\\text{LP}): \\text{রৈখিক}",
+    "description": "ভর্তি পরীক্ষার অন্যতম হট টপিক! মুক্তজোড় ইলেকট্রন নিরক্ষীয় অবস্থানে থেকে বিকর্ষণ সর্বনিম্ন রাখে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{XeF}_4$ অণুর আকৃতি কী?",
+        "answer": "Ans: সমতলীয় বর্গাকার (Square Planar, $sp^3d^2$ সংকরায়ন ও ২টি মুক্তজোড়)"
+      }
+    ]
+  },
+  {
+    "title": "সিগমা ও পাই বন্ধন গণনা (Sigma & Pi Bond Count)",
+    "latex": "\\text{Single Bond} = 1\\sigma, \\quad \\text{Double Bond} = 1\\sigma + 1\\pi, \\quad \\text{Triple Bond} = 1\\sigma + 2\\pi",
+    "description": "• সামনাসামনি বা অক্ষীয় অধিক্রমণে $\\sigma$ বন্ধন (দৃঢ়) এবং পাশাপাশি অধিক্রমণে $\\pi$ বন্ধন গঠিত হয়।\n• বেনজিন: $12\\sigma + 3\\pi$; ইথাইন: $3\\sigma + 2\\pi$; সাইক্লোহেক্সেন: $18\\sigma$।",
+    "practiceQuestions": [
+      {
+        "question": "ইথাইনে ($\\text{H-C}\\equiv\\text{C-H}$) কয়টি সিগমা ও কয়টি পাই বন্ধন থাকে?",
+        "answer": "Ans: ৩টি সিগমা ($\\sigma$) এবং ২টি পাই ($\\pi$) বন্ধন"
+      }
+    ]
+  },
+  {
+    "title": "হাইড্রোজেন বন্ধন ও স্ফুটনাঙ্ক (Hydrogen Bonding & Boiling Point)",
+    "latex": "\\text{H-Bond Condition: } \\text{H পরমাণু উচ্চ তড়িৎ ঋণাত্মক ক্ষুদ্র পরমাণুর (F, O, N) সাথে যুক্ত}",
+    "description": "• আন্তঃআণবিক H-বন্ধন: অণুগুলোকে একসাথে বেঁধে রাখে $\\implies$ স্ফুটনাঙ্ক ও দ্রাব্যতা বৃদ্ধি পায় ($H_2O$ স্ফুটনাঙ্ক $100^\\circ\\text{C}$ কিন্তু $H_2S$ গ্যাস $-60^\\circ\\text{C}$)।\n• অন্তঃআণবিক H-বন্ধন: একই অণুর মধ্যে ঘটে $\\implies$ স্ফুটনাঙ্ক কমে (অর্থো-নাইট্রোফেনল বনাম প্যারা-নাইট্রোফেনল)।",
+    "practiceQuestions": [
+      {
+        "question": "সাধারণ তাপমাত্রায় $H_2O$ তরল কিন্তু $H_2S$ গ্যাস কেন?",
+        "answer": "Ans: পানিতে অক্সিজেনের উচ্চ তড়িৎ ঋণাত্মকতার কারণে শক্তিশালী আন্তঃআণবিক হাইড্রোজেন বন্ধন তৈরি হয়, কিন্তু সালফারের আকার বড় ও তড়িৎ ঋণাত্মকতা কম থাকায় $H_2S$ এ হাইড্রোজেন বন্ধন গঠিত হয় না।"
+      }
+    ]
+  },
+  {
+    "title": "পানির ঘনত্ব ও বরফের গঠন (Water Density Anomaly & Ice Structure)",
+    "latex": "\\text{সর্বোচ্চ ঘনত্ব: } 4^\\circ\\text{C} \\; (1.000\\text{ g/cm}^3), \\quad \\text{বরফের ঘনত্ব: } 0.917\\text{ g/cm}^3 \\; (\\text{বরফে } 9\\% \\text{ ফাঁকা স্থান})",
+    "description": "বরফে প্রতিটি পানির অণু ৪টি চতুস্তলকীয় হাইড্রোজেন বন্ধন দ্বারা ত্রিমাত্রিক উন্মুক্ত খাঁচার মতো (Open Cage) কাঠামো তৈরি করে, ফলে বরফের আয়তন বাড়ে এবং ঘনত্ব কমে পানিতে ভাসে।",
+    "practiceQuestions": [
+      {
+        "question": "কত তাপমাত্রায় পানির ঘনত্ব সর্বাধিক হয়?",
+        "answer": "Ans: $4^\\circ\\text{C}$ (বা $277.15\\text{ K}$)"
+      }
+    ]
+  },
+  {
+    "title": "অবস্থান্তর মৌল ও d-d রূপান্তর (Transition Elements & d-d Transition)",
+    "latex": "\\text{সংজ্ঞা: } \\text{যাদের অন্তত একটি সুস্থিত আয়নে আংশিক পূর্ণ d-উপস্তর } (d^{1-9}) \\text{ থাকে}",
+    "description": "$\\text{Sc}^{3+} (3d^0)$ এবং $\\text{Zn}^{2+} (3d^{10})$ অবস্থান্তর মৌল নয় (কারণ $d$-উপস্তর অপূর্ণ নয়)। লিগ্যান্ডের প্রভাবে $d$-অরবিটাল দ্বিধাবিভক্ত ($t_{2g}$ ও $e_g$) হয়ে $d-d$ ইলেকট্রন রূপান্তরের মাধ্যমে দৃশ্যমান আলো শোষণ করে রঙিন যৌগ গঠন করে।",
+    "practiceQuestions": [
+      {
+        "question": "জিংক ($Zn$) এবং স্ক্যান্ডিয়াম ($Sc$) $d$-ব্লক মৌল হওয়া সত্ত্বেও অবস্থান্তর মৌল নয় কেন?",
+        "answer": "Ans: কারণ এদের সুস্থিত আয়নসমূহে ($\\text{Zn}^{2+}: 3d^{10}$ এবং $\\text{Sc}^{3+}: 3d^0$) $d$-উপস্তর আংশিক পূর্ণ ($d^{1-9}$) থাকে না।"
+      }
+    ]
+  },
+  {
+    "title": "স্পিন-অনলি চুম্বক ভ্রামক সূত্র (Spin-Only Magnetic Moment Formula)",
+    "latex": "\\mu = \\sqrt{n(n + 2)} \\text{ BM (Bohr Magneton)}",
+    "description": "$n$ = ধাতব আয়নের $d$-অরবিটালে অযুগ্ম ইলেকট্রন সংখ্যা। $n = 1 \\implies 1.73\\text{ BM}, n = 2 \\implies 2.83\\text{ BM}, n = 3 \\implies 3.87\\text{ BM}, n = 4 \\implies 4.90\\text{ BM}, n = 5 \\implies 5.92\\text{ BM}$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{Fe}^{3+}$ ($3d^5$) আয়নের চুম্বক ভ্রামকের মান কত?",
+        "answer": "Ans: $n = 5 \\implies \\mu = \\sqrt{5(5 + 2)} = \\sqrt{35} \\approx 5.92\\text{ BM}$ (তীব্র প্যারাচৌম্বক)"
+      }
+    ]
+  },
+  {
+    "title": "জটিল যৌগ ও সন্নিবেশ সংখ্যা (Complex Compounds & Coordination Number)",
+    "latex": "[\\text{Cu(NH}_3)_4]^{2+} \\; (\\text{সন্নিবেশ সংখ্যা } = 4, \\; dsp^2 \\text{ সমতলীয় বর্গাকার}), \\quad [\\text{Fe(CN)}_6]^{4-} \\; (\\text{সন্নিবেশ সংখ্যা } = 6, \\; d^2sp^3 \\text{ অষ্টতলকীয়})",
+    "description": "লিগ্যান্ড হলো মুক্তজোড় ইলেকট্রন দাতা (Lewis Base) এবং কেন্দ্রীয় ধাতব আয়ন হলো ইলেকট্রন গ্রহীতা (Lewis Acid)। সন্নিবেশ বন্ধনের সংখ্যাই হলো সন্নিবেশ সংখ্যা (Coordination Number)।",
+    "practiceQuestions": [
+      {
+        "question": "$[\\text{Fe(CN)}_6]^{4-}$ জটিল আয়নে আয়রনের জারণ সংখ্যা ও সন্নিবেশ সংখ্যা কত?",
+        "answer": "Ans: জারণ সংখ্যা $+2$ এবং সন্নিবেশ সংখ্যা $6$"
+      }
+    ]
+  },
+  {
+    "title": "অক্সাইডের অম্ল-ক্ষারীয় প্রকৃতি (Nature of Oxides)",
+    "latex": "\\text{ক্ষারীয়: } \\text{Na}_2\\text{O}, \\text{MgO}; \\quad \\text{উভধর্মী: } \\text{Al}_2\\text{O}_3, \\text{ZnO}, \\text{BeO}, \\text{PbO}; \\quad \\text{অম্লীয়: } \\text{CO}_2, \\text{SiO}_2, \\text{P}_2\\text{O}_5, \\text{SO}_3, \\text{Cl}_2\\text{O}_7; \\quad \\text{নিরপেক্ষ: } \\text{CO}, \\text{NO}, \\text{N}_2\\text{O}",
+    "description": "পর্যায়ে বাম থেকে ডানে অক্সাইডের ক্ষারীয় ধর্ম হ্রাস পেয়ে অম্লীয় ধর্ম বৃদ্ধি পায়। উভধর্মী অক্সাইড এসিড ও ক্ষার উভয়ের সাথে বিক্রিয়া করে লবণ ও পানি তৈরি করে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{Al}_2\\text{O}_3$ কেন উভধর্মী অক্সাইড?",
+        "answer": "Ans: এটি এসিড ($HCl$) ও ক্ষার ($NaOH$) উভয়ের সাথে বিক্রিয়া করে লবণ ও পানি তৈরি করে।"
+      }
+    ]
+  },
+  {
+    "title": "অক্সি-এসিডের তীব্রতা ও জারণ সংখ্যা (Strength of Oxy-acids)",
+    "latex": "\\text{HClO}_4 (+7) > \\text{HClO}_3 (+5) > \\text{HClO}_2 (+3) > \\text{HClO} (+1), \\quad \\text{HNO}_3 (+5) > \\text{H}_3\\text{PO}_4 (+5)",
+    "description": "কেন্দ্রীয় পরমাণুর জারণ সংখ্যা যত বৃদ্ধি পায় এসিডের তীব্রতা তত বাড়ে। জারণ সংখ্যা সমান হলে কেন্দ্রীয় পরমাণুর আকার ছোট হলে চার্জ ঘনত্ব বেশি হওয়ায় তীব্রতা বেশি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HClO}_4$ এবং $\\text{H}_2\\text{SO}_4$ এর মধ্যে কোনটি অধিক তীব্র এসিড এবং কেন?",
+        "answer": "Ans: $\\text{HClO}_4$ অধিক তীব্র, কারণ ক্লোরিনের জারণ সংখ্যা $+7$ যা সালফারের জারণ সংখ্যা $+6$ অপেক্ষা বেশি।"
+      }
+    ]
+  },
+  {
+    "title": "হ্যালোজেন এসিডসমূহের তীব্রতা ও তাপীয় স্থায়িত্ব (Halogen Acids Strength)",
+    "latex": "\\text{এসিড তীব্রতা: } \\text{HI} > \\text{HBr} > \\text{HCl} > \\text{HF}; \\quad \\text{তাপীয় স্থায়িত্ব: } \\text{HF} > \\text{HCl} > \\text{HBr} > \\text{HI}",
+    "description": "হ্যালোজেনের আকার বাড়লে $H-X$ বন্ধন দৈর্ঘ্য বৃদ্ধি পায় এবং বন্ধন বিয়োজন শক্তি হ্রাস পায়, ফলে জলীয় দ্রবণে সহজে $H^+$ ত্যাগ করে তীব্র এসিডে পরিণত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "হ্যালোজেন এসিডগুলোর মধ্যে সবচেয়ে শক্তিশালী এসিড কোনটি?",
+        "answer": "Ans: হাইড্রোআয়োডিক এসিড (HI)"
+      }
+    ]
+  },
+  {
+    "title": "বোরন ট্রাইহ্যালাইডের লুইস অম্লতা ক্রম (Lewis Acidity of Boron Trihalides)",
+    "latex": "\\text{Lewis Acidity: } \\text{BI}_3 > \\text{BBr}_3 > \\text{BCl}_3 > \\text{BF}_3",
+    "description": "$\\text{BF}_3$-এ ফ্লোরিন ও বোরনের $2p$ অরবিটালের মধ্যে শক্তিশালী $p\\pi-p\\pi$ ব্যাক-বন্ডিং (Back-bonding) ঘটার কারণে বোরনের অষ্টক ঘাটতি কিছুটা পূরণ হয়, ফলে এর লুইস অম্লতা সর্বনিম্ন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{BF}_3, \\text{BCl}_3, \\text{BBr}_3, \\text{BI}_3$ এর মধ্যে সবচেয়ে তীব্র লুইস এসিড কোনটি?",
+        "answer": "Ans: $\\text{BI}_3$ (বোরন ট্রাইআয়োডাইড)"
+      }
+    ]
+  },
+  {
+    "title": "ডাইপোল মোমেন্ট ও অণুর পোলারিটি (Dipole Moment & Polarity)",
+    "latex": "\\mu = q \\times d \\quad (\\text{Debye - D}, \\; 1\\text{ D} = 3.336 \\times 10^{-30}\\text{ C}\\cdot\\text{m}), \\quad \\mu_{\\text{trans}} = 0, \\; \\mu_{\\text{cis}} > 0",
+    "description": "প্রতিসম অণুসমূহের (যেমন $\\text{CO}_2, \\text{BF}_3, \\text{CH}_4, \\text{CCl}_4$) ক্ষেত্রে বন্ধন ডাইপোল পরস্পরকে বাতিল করে দেয়, ফলে লব্ধি ডাইপোল মোমেন্ট $\\mu = 0$ (অপোলার)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CCl}_4$ অপোলার কিন্তু $\\text{CHCl}_3$ পোলার কেন?",
+        "answer": "Ans: $\\text{CCl}_4$ সুষম চতুস্তলকীয় হওয়ায় এর ভেক্টর লব্ধি ডাইপোল মোমেন্ট $\\mu = 0$; কিন্তু $\\text{CHCl}_3$ তে অসম বন্ধনের কারণে লব্ধি $\\mu > 0$।"
+      }
+    ]
+  },
+  {
+    "title": "কার্বনের বহুরূপতা: হীরা, গ্রাফাইট ও ফুলারিন (Allotropes of Carbon)",
+    "latex": "\\text{হীরা: } sp^3 \\; (\\text{বিদ্যুৎ অপরিবাহী, কঠিনতম}); \\quad \\text{গ্রাফাইট: } sp^2 \\; (\\text{বিদ্যুৎ সুপরিবাহী, পিচ্ছিল}); \\quad \\text{ফুলারিন (C}_{60}\\text{): } sp^2",
+    "description": "গ্রাফাইটে স্তরভিত্তিক সমতলীয় ষড়ভুজীয় গঠন থাকে যেখানে প্রতিটি কার্বনে ১টি মুক্ত $\\pi$-ইলেকট্রন স্তরের মধ্যে মুক্তভাবে চলাচল করে বিদ্যুৎ পরিবহন করে। হীরায় কোনো মুক্ত ইলেকট্রন থাকে না।",
+    "practiceQuestions": [
+      {
+        "question": "গ্রাফাইট অধাতু হওয়া সত্ত্বেও বিদ্যুৎ সুপরিবাহী কেন?",
+        "answer": "Ans: গ্রাফাইটে প্রতিটি কার্বন $sp^2$ সংকরিত এবং ১টি মুক্ত সঞ্চরণশীল $\\pi$-ইলেকট্রন থাকায় এটি চমৎকার বিদ্যুৎ পরিবহন করে।"
+      }
+    ]
+  },
+  {
+    "title": "ক্ষার ধাতুসমূহের অক্সাইডের ধরন (Oxides of Alkali Metals)",
+    "latex": "\\text{Li: } \\text{সাধারণ অক্সাইড (Li}_2\\text{O)}, \\quad \\text{Na: } \\text{পারঅক্সাইড (Na}_2\\text{O}_2), \\quad \\text{K, Rb, Cs: } \\text{সুপারঅক্সাইড (KO}_2, \\text{RbO}_2, \\text{CsO}_2)",
+    "description": "ক্যাটায়নের আকার বৃদ্ধির সাথে সাথে বড় আকারের পারঅক্সাইড ($O_2^{2-}$) ও সুপারঅক্সাইড ($O_2^-$) আয়ন সুস্থিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পটাসিয়াম বায়ুর অক্সিজেনে পুড়লে কোন অক্সাইড গঠন করে?",
+        "answer": "Ans: পটাসিয়াম সুপারঅক্সাইড ($\\text{KO}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "মৃৎক্ষার ধাতুর হাইড্রক্সাইড ও সালফেটের দ্রাব্যতা (Solubility of Group 2 Compounds)",
+    "latex": "\\text{Hydroxide Solubility: } \\text{Be(OH)}_2 < \\text{Mg(OH)}_2 < \\text{Ca(OH)}_2 < \\text{Ba(OH)}_2; \\quad \\text{Sulphate Solubility: } \\text{BeSO}_4 > \\text{MgSO}_4 > \\text{CaSO}_4 > \\text{BaSO}_4",
+    "description": "গ্রুপ ২ এ নিচে নামলে হাইড্রক্সাইডের ল্যাটিস শক্তি দ্রুত হ্রাস পাওয়ায় দ্রাব্যতা বাড়ে; অপরদিকে সালফেটের ক্ষেত্রে হাইড্রেশন শক্তি দ্রুত হ্রাস পাওয়ায় দ্রাব্যতা কমে ($\\,\\text{BaSO}_4\\,$ অদ্রবণীয়)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{BaSO}_4$ পানিতে অদ্রবণীয় কেন?",
+        "answer": "Ans: বেরিয়াম সালফেটের ল্যাটিস শক্তি এর হাইড্রেশন এনথালপি অপেক্ষা অনেক বেশি হওয়ায় এটি পানিতে অদ্রবণীয়।"
+      }
+    ]
+  },
+  {
+    "title": "সমযোজী বন্ধনের শতকরা আয়নিক চরিত্র (Percentage Ionic Character)",
+    "latex": "\\% \\text{ Ionic Character} = 16 |\\Delta \\chi| + 3.5 (\\Delta \\chi)^2 \\quad (\\text{হ্যানি-স্মিথ সমীকরণ})",
+    "description": "দুটি পরমাণুর তড়িৎ ঋণাত্মকতার পার্থক্য $\\Delta \\chi$ জানা থাকলে বন্ধনের শতকরা আয়নিক বৈশিষ্ট্য নিখুঁতভাবে পরিমাপ করা যায়। $\\Delta \\chi = 1.7$ হলে বন্ধনটি প্রায় ৫০% আয়নিক ও ৫০% সমযোজী হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HCl}$ এ $\\text{H}$ ($2.1$) ও $\\text{Cl}$ ($3.0$) এর তড়িৎ ঋণাত্মকতার পার্থক্য $0.9$ হলে শতকরা আয়নিক চরিত্র কত?",
+        "answer": "Ans: $\\% = 16(0.9) + 3.5(0.9)^2 = 14.4 + 2.835 = 17.235\\%$"
+      }
+    ]
+  },
+  {
+    "title": "কেন্দ্রীয় পরমাণুর সংকরায়ন নির্ণয়ের সার্বজনীন সূত্র (Hybridization Formula)",
+    "latex": "H = \\frac{1}{2} (V + M - C + A), \\quad H=2(sp), \\; 3(sp^2), \\; 4(sp^3), \\; 5(sp^3d), \\; 6(sp^3d^2), \\; 7(sp^3d^3)",
+    "description": "• $V$ = কেন্দ্রীয় পরমাণুর যোজ্যতা ইলেকট্রন\n• $M$ = একযোজী পরমাণুর সংখ্যা ($H, F, Cl, Br, I$)\n• $C$ = ক্যাটায়নের চার্জ\n• $A$ = অ্যানায়নের চার্জ।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{PCl}_5$ এবং $\\text{SF}_6$ এর কেন্দ্রীয় পরমাণুর সংকরায়ন কী?",
+        "answer": "Ans: $\\text{PCl}_5: H = \\frac{1}{2}(5 + 5) = 5 \\implies sp^3d$; $\\text{SF}_6: H = \\frac{1}{2}(6 + 6) = 6 \\implies sp^3d^2$"
+      }
+    ]
+  },
+  {
+    "title": "আণবিক অরবিটাল তত্ত্ব ও বন্ধন ক্রম (Bond Order in MOT)",
+    "latex": "\\text{Bond Order (B.O.)} = \\frac{N_b - N_a}{2}",
+    "description": "$N_b$ = বন্ডিং আণবিক অরবিটালে ইলেকট্রন সংখ্যা, $N_a$ = অ্যান্টিবন্ডিং আণবিক অরবিটালে ইলেকট্রন সংখ্যা। বন্ড অর্ডার যত বেশি হয়, বন্ধন শক্তি তত বাড়ে এবং বন্ধন দৈর্ঘ্য তত ছোট হয়। $\\text{B.O.} = 0$ হলে অণুর অস্তিত্ব থাকে না (যেমন $\\text{He}_2$)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{N}_2$ অণুর বন্ধন ক্রম কত?",
+        "answer": "Ans: $N_b = 10, N_a = 4 \\implies \\text{B.O.} = \\frac{10 - 4}{2} = 3$ (ত্ৰিবন্ধন)"
+      }
+    ]
+  },
+  {
+    "title": "অক্সিজেন অণুর প্যারাচৌম্বকত্ব (Paramagnetism of O2 Molecule)",
+    "latex": "\\text{O}_2: (\\sigma_{1s})^2 (\\sigma^*_{1s})^2 (\\sigma_{2s})^2 (\\sigma^*_{2s})^2 (\\sigma_{2p_z})^2 (\\pi_{2p_x}^2 = \\pi_{2p_y}^2) (\\pi^*_{2p_x}^1 = \\pi^*_{2p_y}^1)",
+    "description": "MOT অনুসারে অক্সিজেন অণুর দুটি ডিজেনারেট অ্যান্টিবন্ডিং $\\pi^*$ অরবিটালে ১টি করে মোট ২টি বিজোড় ইলেকট্রন থাকে। ফলে $\\text{O}_2$ অণু তীব্রভাবে প্যারাচৌম্বকীয়।",
+    "practiceQuestions": [
+      {
+        "question": "লুইস তত্ত্ব ব্যর্থ হলেও MOT কীভাবে অক্সিজেনের প্যারাচৌম্বকত্ব প্রমাণ করে?",
+        "answer": "Ans: অ্যান্টি-বন্ডিং $\\pi^*_{2p_x}$ ও $\\pi^*_{2p_y}$ অরবিটালে দুটি বিজোড় ইলেকট্রনের উপস্থিতি দেখিয়ে।"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নিয়ম: ক্যাটায়নের চার্জ ও আকার অনুপাত (Ionic Potential / Fajan's Rule)",
+    "latex": "\\text{Ionic Potential } \\phi = \\frac{z^+}{r^+} \\implies \\phi \\text{ বাড়লে পোলারায়ন ক্ষমতা বাড়ে ও সমযোজী বৈশিষ্ট্য বাড়ে}",
+    "description": "ক্যাটায়নের চার্জ যত বেশি এবং আকার যত ছোট হয়, তার পোলারায়ন ক্ষমতা তত তীব্র হয় এবং যৌগটির গলনাঙ্ক ও স্ফুটনাঙ্ক তত হ্রাস পায়। যেমন: $\\text{NaCl} > \\text{MgCl}_2 > \\text{AlCl}_3$ (গলনাঙ্ক হ্রাস)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{NaCl}, \\text{MgCl}_2, \\text{AlCl}_3$ এর মধ্যে কোনটি সর্বাধিক সমযোজী?",
+        "answer": "Ans: $\\text{AlCl}_3$ (কারণ $\\text{Al}^{3+}$ এর চার্জ সর্বাধিক ও আকার ক্ষুদ্রতম হওয়ায় পোলারায়ন সর্বোচ্চ)।"
+      }
+    ]
+  },
+  {
+    "title": "ফাজানের নিয়ম: অ্যানায়নের আকার ও পোলারায়ন (Anion Size in Fajan's Rule)",
+    "latex": "\\text{Anion Size: } \\text{I}^- > \\text{Br}^- > \\text{Cl}^- > \\text{F}^- \\implies \\text{পোলারায়িত হওয়ার প্রবণতা বাড়ে}",
+    "description": "অ্যানায়নের আকার যত বড় হয়, তার বহিঃস্থ ইলেকট্রন মেঘ নিউক্লিয়াস থেকে দূরে থাকায় ক্যাটায়ন দ্বারা সহজে বিকৃত বা পোলারায়িত হয়। তাই $\\text{AgI}$ হলুদ ও পানিতে অদ্রবণীয় (অধিক সমযোজী), কিন্তু $\\text{AgF}$ পানিতে দ্রবণীয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{AgCl}, \\text{AgBr}, \\text{AgI}$ এর মধ্যে কার সমযোজী বৈশিষ্ট্য সর্বোচ্চ?",
+        "answer": "Ans: $\\text{AgI}$ (কারণ আয়োডাইড $\\text{I}^-$ অ্যানায়নটি আকারে সবচেয়ে বড় হওয়ায় সহজে পোলারায়িত হয়)।"
+      }
+    ]
+  },
+  {
+    "title": "সিউডো নোবেল গ্যাস কনফিগারেশন ও পোলারায়ন (Pseudo Noble Gas Configuration)",
+    "latex": "18e^- \\; (s^2 p^6 d^{10}) \\text{ ক্যাটায়ন } [\\text{Cu}^+, \\text{Ag}^+, \\text{Zn}^{2+}] > 8e^- \\; (s^2 p^6) \\text{ ক্যাটায়ন } [\\text{Na}^+, \\text{K}^+, \\text{Ca}^{2+}]",
+    "description": "$d$-অরবিটালের দুর্বল স্ক্রিনিং বা আবরণী প্রভাবের কারণে সিউডো নোবেল গ্যাস ইলেকট্রন বিন্যাসযুক্ত ক্যাটায়নগুলো একই আকারের ক্ষার ধাতু ক্যাটায়নের চেয়ে অনেক বেশি পোলারায়ন ঘটায়। যেমন: $\\text{CuCl}$ সমযোজী কিন্তু $\\text{NaCl}$ আয়নিক।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{NaCl}$ এর গলনাঙ্ক $801^\\circ\\text{C}$ কিন্তু $\\text{CuCl}$ এর গলনাঙ্ক $426^\\circ\\text{C}$ কেন?",
+        "answer": "Ans: $\\text{Cu}^+$ এর $18e^-$ সিউডো নোবেল গ্যাস বিন্যাস থাকায় এর পোলারায়ন ক্ষমতা তীব্র এবং $\\text{CuCl}$ অধিক সমযোজী।"
+      }
+    ]
+  },
+  {
+    "title": "CO2 গ্যাস কিন্তু SiO2 কঠিন কেন? (CO2 Gas vs SiO2 Network Solid)",
+    "latex": "\\text{CO}_2: O=C=O \\; (\\text{সরলরৈখিক অপোলার বিচ্ছিন্ন একক অণু}); \\quad \\text{SiO}_2: [-\\text{Si-O-Si-}]_n \\; (\\text{ত্রিমাত্রিক বিশালাকার পলিমারিক জালিকা})",
+    "description": "কার্বনের আকার ছোট হওয়ায় $p\\pi-p\\pi$ দ্বিবন্ধন তৈরি করে পৃথক অণু হিসেবে থাকে। কিন্তু সিলিকনের আকার বড় হওয়ায় $p\\pi-p\\pi$ দ্বিবন্ধন গঠন অসম্ভব, ফলে ৪টি একক $\\text{Si-O}$ বন্ধন দ্বারা উচ্চ গলনাঙ্কের ($1710^\\circ\\text{C}$) দৈত্যাকার কেলাস গঠন করে।",
+    "practiceQuestions": [
+      {
+        "question": "একই গ্রুপের হওয়া সত্ত্বেও $\\text{CO}_2$ সাধারণ তাপমাত্রায় গ্যাস কিন্তু $\\text{SiO}_2$ উচ্চ গলনাঙ্কের কঠিন কেন?",
+        "answer": "Ans: $\\text{CO}_2$ দুর্বল ভ্যান ডার ওয়ালস বলযুক্ত একক অণু, আর $\\text{SiO}_2$ একটি ত্রিমাত্রিক বিশালাকার পলিমারিক সমযোজী জালক।"
+      }
+    ]
+  },
+  {
+    "title": "পানির অস্বাভাবিক স্ফুটনাঙ্ক ও হাইড্রোজেন বন্ধন (Hydrogen Bonding in H2O vs H2S)",
+    "latex": "\\text{H}_2\\text{O: তীব্র আন্তঃআণবিক H-বন্ধন (স্ফুটনাঙ্ক } 100^\\circ\\text{C}); \\quad \\text{H}_2\\text{S: H-বন্ধন অনুপস্থিত (স্ফুটনাঙ্ক } -60^\\circ\\text{C})",
+    "description": "অক্সিজেনের উচ্চ তড়িৎ ঋণাত্মকতা ($3.5$) ও ক্ষুদ্র আকারের কারণে পানিতে শক্তিশালী আন্তঃআণবিক হাইড্রোজেন বন্ধন থাকে। সালফারের তড়িৎ ঋণাত্মকতা কম ($2.5$) ও আকার বড় হওয়ায় $\\text{H}_2\\text{S}$ এ হাইড্রোজেন বন্ধন গঠিত হতে পারে না।",
+    "practiceQuestions": [
+      {
+        "question": "সাধারণ তাপমাত্রায় পানি তরল কিন্তু হাইড্রোজেন সালফাইড গ্যাস কেন?",
+        "answer": "Ans: পানির অণুসমূহের মধ্যে শক্তিশালী আন্তঃআণবিক হাইড্রোজেন বন্ধন বিদ্যমান থাকে যা $\\text{H}_2\\text{S}$ এ থাকে না।"
+      }
+    ]
+  },
+  {
+    "title": "অর্থো বনাম প্যারা নাইট্রোফেনল (Intra vs Intermolecular H-Bond)",
+    "latex": "\\text{o-নাইট্রোফেনল: অন্তঃআণবিক (Intra) H-বন্ধন} \\implies \\text{বাষ্প উদ্বায়ী ও কম স্ফুটনাঙ্ক}; \\quad \\text{p-নাইট্রোফেনল: আন্তঃআণবিক (Inter) H-বন্ধন} \\implies \\text{উচ্চ স্ফুটনাঙ্ক}",
+    "description": "অর্থো-নাইট্রোফেনলে একই অণুর ভেতরে চিলেশন বলয় তৈরি হওয়ায় এটি বিচ্ছিন্ন থাকে এবং সহজেই বাষ্পীভূত হয়। প্যারা-নাইট্রোফেনলে একাধিক অণু পরস্পরের সাথে শিকল তৈরি করায় এর গলনাঙ্ক ও স্ফুটনাঙ্ক অনেক বেশি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অর্থো-নাইট্রোফেনল ও প্যারা-নাইট্রোফেনলের মধ্যে কোনটি বাষ্প পাতন দ্বারা সহজে পৃথক করা যায়?",
+        "answer": "Ans: অর্থো-নাইট্রোফেনল (কারণ এতে অন্তঃআণবিক হাইড্রোজেন বন্ধন থাকায় এটি সহজে বাষ্প উদ্বায়ী)।"
+      }
+    ]
+  },
+  {
+    "title": "ক্রিস্টাল ফিল্ড স্প্লিটিং শক্তি (Crystal Field Splitting - Delta)",
+    "latex": "\\Delta_t = \\frac{4}{9} \\Delta_o, \\quad \\text{Octahedral: } e_g (\\text{উচ্চ শক্তি}) + t_{2g} (\\text{নিম্ন শক্তি}); \\quad \\text{Tetrahedral: } t_2 (\\text{উচ্চ}) + e (\\text{নিম্ন})",
+    "description": "অষ্টতলকীয় জটিল যৌগে লিগ্যান্ডের বিকর্ষণে $d$-অরবিটাল দুটি সেটে বিভক্ত হয়: উচ্চ শক্তির $e_g$ ($d_{x^2-y^2}, d_{z^2}$) এবং নিম্ন শক্তির $t_{2g}$ ($d_{xy}, d_{yz}, d_{zx}$)।",
+    "practiceQuestions": [
+      {
+        "question": "চতুস্তলকীয় ও অষ্টতলকীয় জটিল যৌগের ক্রিস্টাল ফিল্ড বিভাজন শক্তির অনুপাত কত?",
+        "answer": "Ans: $\\Delta_t = \\frac{4}{9} \\Delta_o$"
+      }
+    ]
+  },
+  {
+    "title": "স্পেকট্রোকেমিক্যাল সিরিজ (Spectrochemical Series of Ligands)",
+    "latex": "\\text{I}^- < \\text{Br}^- < \\text{Cl}^- < \\text{F}^- < \\text{OH}^- < \\text{H}_2\\text{O} < \\text{NH}_3 < \\text{en} < \\text{NO}_2^- < \\text{CN}^- < \\text{CO}",
+    "description": "দুর্বল লিগ্যান্ড ($\\,\\text{I}^- \\to \\text{H}_2\\text{O}\\,\\,$) কম ক্রিস্টাল ফিল্ড বিভাজন ঘটায় এবং হাই-স্পিন কমপ্লেক্স তৈরি করে। শক্তিশালী লিগ্যান্ড ($\\,\\text{NH}_3, \\text{CN}^-, \\text{CO}\\,\\,$) তীব্র বিভাজন ঘটায় ও ইলেকট্রন জোড়াবদ্ধ করে লো-স্পিন কমপ্লেক্স তৈরি করে।",
+    "practiceQuestions": [
+      {
+        "question": "স্পেকট্রোকেমিক্যাল সিরিজে সবচেয়ে শক্তিশালী লিগ্যান্ড কোনটি?",
+        "answer": "Ans: কার্বনিল লিগ্যান্ড ($\\text{CO}$) ও সায়ানাইড আয়ন ($\\text{CN}^-$)"
+      }
+    ]
+  },
+  {
+    "title": "উচ্চ স্পিন বনাম নিম্ন স্পিন জটিল যৌগ (High-Spin vs Low-Spin Complexes)",
+    "latex": "\\Delta_o < P \\implies \\text{High-Spin (দুর্বল লিগ্যান্ড)}; \\quad \\Delta_o > P \\implies \\text{Low-Spin (শক্তিশালী লিগ্যান্ড)} \\quad (P = \\text{ইলেকট্রন জোড়াবদ্ধকরণ শক্তি})",
+    "description": "যদি লিগ্যান্ডের বিভাজন শক্তি $\\Delta_o$ পেয়ারিং এনার্জি $P$ এর চেয়ে বেশি হয়, তবে ইলেকট্রনগুলো হুন্ডের নিয়ম ভঙ্গ করে নিচের $t_{2g}$ অরবিটালে জোড় বাঁধে (ডায়াচৌম্বকীয় বা কম প্যারাচৌম্বকীয়)।",
+    "practiceQuestions": [
+      {
+        "question": "$[\\text{Fe(CN)}_6]^{4-}$ জটিল আয়নটি ডায়াচৌম্বকীয় কেন?",
+        "answer": "Ans: শক্তিশালী লিগ্যান্ড $\\text{CN}^-$ এর প্রভাবে $\\text{Fe}^{2+}$ এর ৬টি $d$-ইলেকট্রনই $t_{2g}$ অরবিটালে জোড়াবদ্ধ হয়ে যায় (অযুগ্ম ইলেকট্রন সংখ্যা $= 0$)।"
+      }
+    ]
+  },
+  {
+    "title": "জটিল যৌগের IUPAC নামকরণ সূত্র (IUPAC Nomenclature of Complexes)",
+    "latex": "\\text{ক্যাটায়ন নাম} + [\\text{লিগ্যান্ড সংখ্যা-নাম} + \\text{কেন্দ্রীয় ধাতু (জারণ মান)}] + \\text{অ্যানায়ন নাম}",
+    "description": "জটিল অ্যানায়ন হলে ধাতুর নামের শেষে '-ate' যুক্ত হয় (যেমন Ferrate, Cuprate, Plumbate, Argentate)। জটিল ক্যাটায়ন বা নিরপেক্ষ হলে ধাতুর স্বাভাবিক ইংরেজি নাম বহাল থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{K}_4[\\text{Fe(CN)}_6]$ এর IUPAC নাম কী?",
+        "answer": "Ans: পটাশিয়াম হেক্সাসায়ানোফেরেট(II) (Potassium hexacyanoferrate(II))"
+      }
+    ]
+  },
+  {
+    "title": "চিলেশন প্রভাব ও পলিডেন্টেট লিগ্যান্ড (Chelation Effect & EDTA)",
+    "latex": "\\text{Chelate Complex Stability} \\gg \\text{Monodentate Complex Stability} \\quad (\\Delta S > 0)",
+    "description": "দ্বিদন্তী (যেমন ইথিলিন ডাইঅ্যামিন $en$) বা ষড়দন্তী (যেমন $\\text{EDTA}^{4-}$) লিগ্যান্ডসমূহ ধাতুর সাথে ৫ বা ৬ সদস্যের স্থিতিশীল বলয় (Ring) তৈরি করে জটিল যৌগের স্থায়িত্ব ও এন্ট্রপি অভাবনীয়ভাবে বৃদ্ধি করে।",
+    "practiceQuestions": [
+      {
+        "question": "চিলেটিং লিগ্যান্ড হিসেবে $\\text{EDTA}^{4-}$ এর দন্তকতা (Denticity) কত?",
+        "answer": "Ans: ৬ (হেক্সাডেন্টেট বা ষড়দন্তী লিগ্যান্ড, ২টি নাইট্রোজেন ও ৪টি অক্সিজেন পরমাণু দিয়ে বন্ধন করে)।"
+      }
+    ]
+  }
+]

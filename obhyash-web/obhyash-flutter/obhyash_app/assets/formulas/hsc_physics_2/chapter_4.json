@@ -1,1 +1,145 @@
-[]
+[
+  {
+    "title": "বায়ো-সাভার্ট সূত্র (Biot-Savart Law)",
+    "latex": "d\\vec{B} = \\frac{\\mu_0}{4\\pi} \\frac{I d\\vec{l} \\times \\hat{r}}{r^2} \\implies dB = \\frac{\\mu_0}{4\\pi} \\frac{I dl \\sin\\theta}{r^2}",
+    "description": "$\\mu_0 = 4\\pi \\times 10^{-7}\\text{ T}\\cdot\\text{m/A}$ হলো শূন্যস্থানের চৌম্বক প্রবেশ্যতা (Permeability)। $\\theta$ হলো বিদ্যুৎবাহী ক্ষুদ্র দৈর্ঘ্য $dl$ এবং সংযোগকারী ভেক্টর $\\vec{r}$ এর মধ্যকার কোণ।",
+    "practiceQuestions": [
+      {
+        "question": "শূন্য মাধ্যমে $2\\text{ cm}$ দৈর্ঘ্যের ক্ষুদ্র তারে $5\\text{ A}$ প্রবাহ চলছে। তারটি থেকে $0.5\\text{ m}$ দূরে লম্ব অভিমুখে ($90^\\circ$) চৌম্বক ক্ষেত্র $dB$ কত?",
+        "answer": "Ans: $dB = 10^{-7} \\times \\frac{5 \\times 0.02 \\times 1}{(0.5)^2} = 10^{-7} \\times \\frac{0.1}{0.25} = 4 \\times 10^{-8}\\text{ T}$"
+      }
+    ]
+  },
+  {
+    "title": "সোজা ও সীমিত দৈর্ঘ্যের পরিবাহীর চৌম্বক ক্ষেত্র (Magnetic Field of Straight Conductor)",
+    "latex": "B_{\\text{infinite}} = \\frac{\\mu_0 I}{2\\pi r}, \\quad B_{\\text{finite}} = \\frac{\\mu_0 I}{4\\pi r}(\\sin\\theta_1 + \\sin\\theta_2), \\quad B_{\\text{semi-infinite}} = \\frac{\\mu_0 I}{4\\pi r}",
+    "description": "$I$ = পরিবাহীতে প্রবাহ, $r$ = তার হতে লম্ব দূরত্ব, $\\theta_1, \\theta_2$ = তারের দুই প্রান্তের উৎপন্ন কোণ। দিক: ডানহস্ত বৃদ্ধাঙ্গুলী নিয়ম দ্বারা নির্ধারিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি সোজা দীর্ঘ তারে $10\\text{ A}$ বিদ্যুৎ প্রবাহিত হলে তার হতে $5\\text{ cm}$ দূরে চৌম্বক ক্ষেত্রের মান কত?",
+        "answer": "Ans: $B = \\frac{(4\\pi \\times 10^{-7}) \\times 10}{2\\pi \\times (0.05)} = \\frac{2 \\times 10^{-6}}{0.05} = 4 \\times 10^{-5}\\text{ Tesla}$"
+      }
+    ]
+  },
+  {
+    "title": "বৃত্তাকার কুণ্ডলী ও বৃত্তচাপের চৌম্বক ক্ষেত্র (Circular Coil & Arc Magnetic Field)",
+    "latex": "B_{\\text{center}} = \\frac{\\mu_0 N I}{2 r}, \\quad B_{\\text{axis}} = \\frac{\\mu_0 N I r^2}{2(r^2 + x^2)^{3/2}}, \\quad B_{\\text{arc}} = \\frac{\\mu_0 I \\theta}{4\\pi r}",
+    "description": "$N$ = পাক সংখ্যা, $r$ = বৃত্তাকার কুণ্ডলীর ব্যাসার্ধ, $I$ = প্রবাহ, $x$ = কেন্দ্র হতে অক্ষীয় দূরত্ব, $\\theta$ = কেন্দ্রে বৃত্তচাপের কোণ (রেডিয়ান)।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\text{ cm}$ ব্যাসার্ধের এবং $50$ পাকের একটি বৃত্তাকার তারের কুণ্ডলীতে $2\\text{ A}$ প্রবাহ দিলে কেন্দ্রে চৌম্বক ক্ষেত্র কত হবে?",
+        "answer": "Ans: $B = \\frac{(4\\pi \\times 10^{-7}) \\times 50 \\times 2}{2 \\times 0.1} = 2\\pi \\times 10^{-4} \\approx 6.28 \\times 10^{-4}\\text{ T}$"
+      }
+    ]
+  },
+  {
+    "title": "সলিনয়েড ও টরয়েডের চৌম্বক ক্ষেত্র (Solenoid & Toroid)",
+    "latex": "B_{\\text{solenoid}} = \\mu_0 n I = \\mu_0 \\left(\\frac{N}{L}\\right) I, \\quad B_{\\text{end}} = \\frac{1}{2}\\mu_0 n I, \\quad B_{\\text{toroid}} = \\frac{\\mu_0 N I}{2\\pi r}",
+    "description": "$n = N / L$ = সলিনয়েডের প্রতি একক দৈর্ঘ্যে পাক সংখ্যা, $N$ = মোট পাক সংখ্যা, $L$ = সলিনয়েডের দৈর্ঘ্য, $r$ = টরয়েডের গড় ব্যাসার্ধ। সলিনয়েডের প্রান্তে চৌম্বক ক্ষেত্র কেন্দ্রের অর্ধেক।",
+    "practiceQuestions": [
+      {
+        "question": "$0.5\\text{ m}$ দীর্ঘ একটি সলিনয়েডে $1000$ টি পাক রয়েছে। এর মধ্য দিয়ে $3\\text{ A}$ প্রবাহ চললে কেন্দ্রে ও প্রান্তে চৌম্বক ক্ষেত্র কত?",
+        "answer": "Ans: $n = \\frac{1000}{0.5} = 2000\\text{ m}^{-1}$। কেন্দ্রে $B = (4\\pi \\times 10^{-7}) \\times 2000 \\times 3 \\approx 7.54 \\times 10^{-3}\\text{ T}$। প্রান্তে $B_{\\text{end}} = \\frac{7.54}{2} \\approx 3.77 \\times 10^{-3}\\text{ T}$"
+      }
+    ]
+  },
+  {
+    "title": "অ্যাম্পিয়ারের সার্কিটাল সূত্র (Ampere's Circuital Law)",
+    "latex": "\\oint \\vec{B} \\cdot d\\vec{l} = \\mu_0 I_{\\text{enclosed}}",
+    "description": "যেকোনো বদ্ধ পথ বরাবর চৌম্বক ক্ষেত্রের রৈখিক সমাকলন (Line Integral) ঐ বদ্ধ পথ দ্বারা আবদ্ধ মোট তড়িৎ প্রবাহের $\\mu_0$ গুণের সমান।",
+    "practiceQuestions": [
+      {
+        "question": "একটি বদ্ধ লুপের ভেতর দিয়ে $4\\text{ A}$ এবং $6\\text{ A}$ প্রবাহ একই দিকে চলছে। ঐ লুপের জন্য $\\oint \\vec{B} \\cdot d\\vec{l}$ এর মান কত?",
+        "answer": "Ans: $\\oint \\vec{B} \\cdot d\\vec{l} = \\mu_0 (4 + 6) = 10 \\times (4\\pi \\times 10^{-7}) = 4\\pi \\times 10^{-6}\\text{ T}\\cdot\\text{m}$"
+      }
+    ]
+  },
+  {
+    "title": "লরেঞ্জ বল (Lorentz Force on Charged Particle)",
+    "latex": "\\vec{F} = q(\\vec{E} + \\vec{v} \\times \\vec{B}) \\implies F_B = q v B \\sin\\theta",
+    "description": "$q$ = আধানের পরিমাণ, $v$ = বেগ, $B$ = চৌম্বক ক্ষেত্র, $\\theta$ = বেগ ও চৌম্বক ক্ষেত্রের কোণ। $\\theta = 90^\\circ$ হলে বল সর্বোচ্চ ($F_{\\max} = qvB$); $\\theta = 0^\\circ$ বা $180^\\circ$ হলে চৌম্বক বল শূন্য। চৌম্বক বল কোনো কাজ করে না ($W = 0$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি প্রোটন ($q = 1.6 \\times 10^{-19}\\text{ C}$) $2 \\times 10^6\\text{ m/s}$ বেগে $0.5\\text{ T}$ সুষম চৌম্বক ক্ষেত্রের সাথে লম্বভাবে প্রবেশ করলে এর উপর প্রযুক্ত বল কত?",
+        "answer": "Ans: $F = q v B \\sin 90^\\circ = (1.6 \\times 10^{-19}) \\times (2 \\times 10^6) \\times 0.5 = 1.6 \\times 10^{-13}\\text{ N}$"
+      }
+    ]
+  },
+  {
+    "title": "চৌম্বক ক্ষেত্রে আহিত কণার গতিপথ ও সাইক্লোট্রন কম্পাঙ্ক (Charged Particle in Magnetic Field)",
+    "latex": "r = \\frac{m v}{q B} = \\frac{\\sqrt{2 m E_k}}{q B}, \\quad T = \\frac{2\\pi m}{q B}, \\quad f = \\frac{q B}{2\\pi m}, \\quad \\text{Pitch } p = (v\\cos\\theta)\\frac{2\\pi m}{q B}",
+    "description": "$r$ = বৃত্তাকার পথের ব্যাসার্ধ, $T$ = পর্যায়কাল, $f$ = সাইক্লোট্রন কম্পাঙ্ক। কোণে প্রবেশ করলে গতিপথ কুন্ডলাকার (Helical) হয় এবং তার পিচ $p = v_\\parallel T$।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ইলেকট্রন ($m = 9.1 \\times 10^{-31}\\text{ kg}, q = 1.6 \\times 10^{-19}\\text{ C}$) $0.01\\text{ T}$ চৌম্বক ক্ষেত্রে $4 \\times 10^6\\text{ m/s}$ বেগে ঘুরলে ব্যাসার্ধ কত?",
+        "answer": "Ans: $r = \\frac{m v}{q B} = \\frac{(9.1 \\times 10^{-31}) \\times (4 \\times 10^6)}{(1.6 \\times 10^{-19}) \\times 0.01} = 2.275 \\times 10^{-3}\\text{ m} = 2.275\\text{ mm}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎবাহী তারের উপর চৌম্বক বল (Magnetic Force on Current-Carrying Wire)",
+    "latex": "\\vec{F} = I(\\vec{L} \\times \\vec{B}) \\implies F = I L B \\sin\\theta",
+    "description": "$I$ = প্রবাহ, $L$ = চৌম্বক ক্ষেত্রে অবস্থিত তারের দৈর্ঘ্য, $B$ = চৌম্বক ক্ষেত্র, $\\theta$ = তারের দৈর্ঘ্য ও চৌম্বক ক্ষেত্রের কোণ। দিক: ফ্লেমিং-এর বামহস্ত নিয়ম দ্বারা নির্ধারিত।",
+    "practiceQuestions": [
+      {
+        "question": "$0.4\\text{ m}$ দীর্ঘ একটি তারের মধ্য দিয়ে $5\\text{ A}$ প্রবাহ চলছে। তারটি $0.8\\text{ T}$ চৌম্বক ক্ষেত্রের সাথে $30^\\circ$ কোণে থাকলে এর উপর বল কত?",
+        "answer": "Ans: $F = I L B \\sin 30^\\circ = 5 \\times 0.4 \\times 0.8 \\times 0.5 = 0.8\\text{ N}$"
+      }
+    ]
+  },
+  {
+    "title": "দুটি সমান্তরাল পরিবাহীর মধ্যবর্তী আকর্ষণ ও বিকর্ষণ বল (Force between Parallel Currents)",
+    "latex": "\\frac{F}{L} = \\frac{\\mu_0 I_1 I_2}{2\\pi d}",
+    "description": "$I_1, I_2$ = দুটি তারের তড়িৎ প্রবাহ, $d$ = তারদ্বয়ের দূরত্ব, $F/L$ = প্রতি একক দৈর্ঘ্যে বল ($\\text{N/m}$)। একই দিকে প্রবাহ চললে পরস্পরকে আকর্ষণ করে, বিপরীত দিকে প্রবাহ চললে বিকর্ষণ করে।",
+    "practiceQuestions": [
+      {
+        "question": "বায়ুতে $10\\text{ cm}$ দূরত্বে অবস্থিত দুটি সমান্তরাল তারের মধ্য দিয়ে যথাক্রমে $4\\text{ A}$ ও $6\\text{ A}$ প্রবাহ চললে প্রতি মিটার দৈর্ঘ্যে বল কত?",
+        "answer": "Ans: $\\frac{F}{L} = \\frac{(4\\pi \\times 10^{-7}) \\times 4 \\times 6}{2\\pi \\times 0.1} = 4.8 \\times 10^{-5}\\text{ N/m}$"
+      }
+    ]
+  },
+  {
+    "title": "চৌম্বক দ্বিমেরু ভ্রামক ও টর্ক (Magnetic Dipole Moment & Torque)",
+    "latex": "\\vec{M} = N I \\vec{A}, \\quad \\vec{\\tau} = \\vec{M} \\times \\vec{B} \\implies \\tau = N I A B \\sin\\theta, \\quad U = -\\vec{M}\\cdot\\vec{B} = -M B \\cos\\theta",
+    "description": "$M$ = চৌম্বক ভ্রামক ($\\text{A}\\cdot\\text{m}^2$ বা $\\text{J/T}$), $N$ = পাক সংখ্যা, $A$ = কুণ্ডলীর ক্ষেত্রফল, $\\theta$ = কুণ্ডলীর তলের অভিলম্ব ও চৌম্বক ক্ষেত্রের অন্তর্ভুক্ত কোণ।",
+    "practiceQuestions": [
+      {
+        "question": "$100$ পাক ও $50\\text{ cm}^2$ ক্ষেত্রফলের একটি কুণ্ডলীতে $2\\text{ A}$ প্রবাহ চলছে। কুণ্ডলীর চৌম্বক ভ্রামক কত?",
+        "answer": "Ans: $M = N I A = 100 \\times 2 \\times (50 \\times 10^{-4}\\text{ m}^2) = 1\\text{ A}\\cdot\\text{m}^2$"
+      }
+    ]
+  },
+  {
+    "title": "হল ক্রিয়া ও হল ভোল্টেজ (Hall Effect & Hall Voltage)",
+    "latex": "V_H = \\frac{B I}{n t e} = E_H \\cdot d",
+    "description": "$V_H$ = হল ভোল্টেজ, $B$ = চৌম্বক ক্ষেত্র, $I$ = তড়িৎ প্রবাহ, $n$ = চার্জ বাহকের ঘনত্ব ($\\text{m}^{-3}$), $t$ = পরিবাহীর পুরুত্ব (বেধ), $e = 1.6 \\times 10^{-19}\\text{ C}$। সেমিকন্ডাক্টরের ধরন (P-type বা N-type) নির্ধারণে ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mm}$ পুরু একটি ধাতব পাতে $10\\text{ A}$ প্রবাহ চলছে। $1.5\\text{ T}$ চৌম্বক ক্ষেত্র প্রয়োগ করায় $V_H = 1.5\\,\\mu\\text{V}$ তৈরি হলে মুক্ত ইলেকট্রন ঘনত্ব $n$ কত?",
+        "answer": "Ans: $n = \\frac{B I}{V_H t e} = \\frac{1.5 \\times 10}{(1.5 \\times 10^{-6}) \\times (10^{-3}) \\times (1.6 \\times 10^{-19})} = 6.25 \\times 10^{28}\\text{ m}^{-3}$"
+      }
+    ]
+  },
+  {
+    "title": "ভূ-চৌম্বকত্বের উপাদানসমূহ (Elements of Earth's Magnetism)",
+    "latex": "H = B \\cos\\delta, \\quad V = B \\sin\\delta, \\quad \\tan\\delta = \\frac{V}{H}, \\quad B = \\sqrt{H^2 + V^2}",
+    "description": "$B$ = মোট ভূ-চৌম্বক প্রাবল্য, $H$ = অনুভূমিক উপাংশ, $V$ = উলম্ব উপাংশ, $\\delta$ = বিনতি কোণ (Dip Angle)। চৌম্বক বিষুবরেখায় $\\delta = 0^\\circ (V=0, B=H)$ এবং চৌম্বক মেরুতে $\\delta = 90^\\circ (H=0, B=V)$।",
+    "practiceQuestions": [
+      {
+        "question": "কোনো স্থানে অনুভূমিক উপাংশ $H = 28\\,\\mu\\text{T}$ এবং বিনতি কোণ $60^\\circ$ হলে ঐ স্থানের মোট ভূ-চৌম্বক ক্ষেত্র $B$ কত?",
+        "answer": "Ans: $B = \\frac{H}{\\cos 60^\\circ} = \\frac{28}{0.5} = 56\\,\\mu\\text{T}$"
+      }
+    ]
+  },
+  {
+    "title": "চৌম্বক তীব্রতা, চুম্বকন ও প্রবেশ্যতা (Magnetic Intensity, Magnetization & Permeability)",
+    "latex": "B = \\mu_0(H + I), \\quad \\chi_m = \\frac{I}{H}, \\quad \\mu = \\frac{B}{H} = \\mu_0 (1 + \\chi_m) = \\mu_0 \\mu_r",
+    "description": "$H$ = চৌম্বক তীব্রতা ($\\text{A/m}$), $I$ = চুম্বকন তীব্রতা ($\\text{A/m}$), $\\chi_m$ = চৌম্বক গ্রাহিতা (Susceptibility), $\\mu_r$ = আপেক্ষিক প্রবেশ্যতা। ডায়াচৌম্বক পদার্থের জন্য $\\chi_m < 0$, প্যারার জন্য $\\chi_m > 0$ (ক্ষুদ্র), ফেরোর জন্য $\\chi_m \\gg 1$।",
+    "practiceQuestions": [
+      {
+        "question": "একটি লোহার রডের আপেক্ষিক চৌম্বক প্রবেশ্যতা $\\mu_r = 1000$ হলে এর চৌম্বক গ্রাহিতা $\\chi_m$ কত?",
+        "answer": "Ans: $\\chi_m = \\mu_r - 1 = 1000 - 1 = 999$"
+      }
+    ]
+  }
+]

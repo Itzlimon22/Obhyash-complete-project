@@ -80,52 +80,60 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       }
 
       bool hasUsed = false;
-      try {
-        final usedCheck = await sb
-            .from('referral_history')
-            .select('id')
-            .eq('redeemed_by', uid)
-            .maybeSingle();
-        hasUsed = usedCheck != null;
-      } catch (e) {
-        debugPrint('[ReferralView] usedCheck error: $e');
-      }
-
       int remainingAttempts = _remainingAttempts;
-      // Check existing lockout or attempt logs via RPC or table
+
+      // 1. Check eligibility & used status via RPC
       try {
-        final statusRes = await sb.rpc('get_referral_attempt_status', params: {
+        final eligRes = await sb.rpc('check_referral_eligibility', params: {
           'p_user_id': uid,
         });
-        if (statusRes is Map<String, dynamic>) {
-          remainingAttempts = (statusRes['remaining_attempts'] as num?)?.toInt() ?? 3;
-          final lockSec = (statusRes['lock_seconds'] as num?)?.toInt() ?? 0;
+        if (eligRes is Map<String, dynamic>) {
+          if (eligRes['has_used_referral'] == true) {
+            hasUsed = true;
+          }
+          if (eligRes['remaining_attempts'] != null) {
+            remainingAttempts = (eligRes['remaining_attempts'] as num).toInt();
+          }
+          final lockSec = (eligRes['lock_seconds'] as num?)?.toInt() ?? 0;
           if (lockSec > 0) {
             _startLockoutTimer(lockSec);
           }
-        } else {
-          // Fallback direct table check
-          final log = await sb
-              .from('referral_attempt_logs')
-              .select('failed_attempts, locked_until')
-              .eq('user_id', uid)
-              .maybeSingle();
-
-          if (log != null) {
-            final lockedUntilStr = log['locked_until']?.toString();
-            if (lockedUntilStr != null) {
-              final lockedUntil = DateTime.tryParse(lockedUntilStr);
-              if (lockedUntil != null && lockedUntil.isAfter(DateTime.now())) {
-                final diff = lockedUntil.difference(DateTime.now()).inSeconds;
-                _startLockoutTimer(diff);
-              }
-            }
-            final failed = (log['failed_attempts'] as num?)?.toInt() ?? 0;
-            remainingAttempts = (3 - failed).clamp(0, 3);
-          }
         }
       } catch (e) {
-        debugPrint('[ReferralView] attempt status check error: $e');
+        debugPrint('[ReferralView] check_referral_eligibility rpc error: $e');
+      }
+
+      // 2. Direct table fallback check if RPC wasn't definitive
+      if (!hasUsed) {
+        try {
+          final usedCheck = await sb
+              .from('referral_history')
+              .select('id')
+              .eq('redeemed_by', uid)
+              .limit(1)
+              .maybeSingle();
+          hasUsed = usedCheck != null;
+        } catch (e) {
+          debugPrint('[ReferralView] usedCheck error: $e');
+        }
+      }
+
+      // 3. Fallback attempt status check
+      if (_lockoutSeconds == 0) {
+        try {
+          final statusRes = await sb.rpc('get_referral_attempt_status', params: {
+            'p_user_id': uid,
+          });
+          if (statusRes is Map<String, dynamic>) {
+            remainingAttempts = (statusRes['remaining_attempts'] as num?)?.toInt() ?? remainingAttempts;
+            final lockSec = (statusRes['lock_seconds'] as num?)?.toInt() ?? 0;
+            if (lockSec > 0) {
+              _startLockoutTimer(lockSec);
+            }
+          }
+        } catch (e) {
+          debugPrint('[ReferralView] attempt status check error: $e');
+        }
       }
 
       // Try fetching existing code or create one

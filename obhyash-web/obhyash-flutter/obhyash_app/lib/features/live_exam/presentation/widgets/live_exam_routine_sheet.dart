@@ -424,14 +424,10 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     final isHSC = categoryTitle.toLowerCase().contains('hsc') ||
         categoryTitle.contains('এইচএসসি');
 
-    final liveExamsAsync = ref.watch(liveExamsProvider);
+    final liveExamsAsync = ref.watch(liveExamsCategoryProvider(categoryTitle));
     final dynamicRoutine = liveExamsAsync.maybeWhen(
       data: (exams) => _convertLiveExamsToRoutine(
-        exams.where((e) {
-          if (categoryTitle.toLowerCase() == 'all') return true;
-          return e.category.toLowerCase() == categoryTitle.toLowerCase() ||
-              e.category.toLowerCase() == 'all';
-        }).toList(),
+        exams,
         categoryTitle,
       ),
       orElse: () => <RoutineItemModel>[],

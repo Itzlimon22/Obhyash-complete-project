@@ -1,1 +1,556 @@
-[]
+[
+  {
+    "title": "মোলারিটি সূত্র ও ঘনমাত্রা (Molarity Formula)",
+    "latex": "S = \\frac{n}{V_{\\text{L}}} = \\frac{1000 W}{M V_{\\text{mL}}} \\quad [\\text{mol/L বা M}], \\quad n = \\frac{W}{M} = S \\times V_{\\text{L}}",
+    "description": "$S$ = মোলার ঘনমাত্রা, $W$ = দ্রবের ভর (গ্রাম), $M$ = মোলার ভর ($\\text{g/mol}$), $V_{\\text{mL}}$ = দ্রবণের আয়তন (মিলি)। মোলারিটি তাপমাত্রা নির্ভরশীল (তাপমাত্রা বাড়লে আয়তন বেড়ে মোলারিটি কমে)।",
+    "practiceQuestions": [
+      {
+        "question": "$250\\text{ mL}$ দ্রবণে $5.3\\text{ g } \\text{Na}_2\\text{CO}_3$ ($M=106$) দ্রবীভূত থাকলে দ্রবণের মোলারিটি কত?",
+        "answer": "Ans: $S = \\frac{1000 \\times 5.3}{106 \\times 250} = \\frac{5300}{26500} = 0.2\\text{ M}$ (ডেসিমোলার দ্রবণ)"
+      }
+    ]
+  },
+  {
+    "title": "দ্রবণের দ্রবের ভর নির্ণয় (Mass of Solute)",
+    "latex": "W = \\frac{S \\times M \\times V_{\\text{mL}}}{1000} \\quad [\\text{গ্রাম}]",
+    "description": "নির্দিষ্ট মোলারিটির ও নির্দিষ্ট আয়তনের প্রমাণ দ্রবণ প্রস্তুত করতে যে পরিমাণ দ্রব নিক্তিতে মেপে নিতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$500\\text{ mL } 0.1\\text{ M } \\text{Na}_2\\text{CO}_3$ দ্রবণ তৈরিতে কত গ্রাম সোডিয়াম কার্বনেট প্রয়োজন?",
+        "answer": "Ans: $W = \\frac{0.1 \\times 106 \\times 500}{1000} = 5.3\\text{ g}$"
+      }
+    ]
+  },
+  {
+    "title": "দ্রবণ লঘুকরণ সূত্র (Dilution Formula)",
+    "latex": "V_1 S_1 = V_2 S_2 \\implies V_2 = \\frac{V_1 S_1}{S_2}, \\quad V_{\\text{পানি যোগ}} = V_2 - V_1",
+    "description": "স্থির তাপমাত্রায় দ্রবণ লঘু করার পূর্বে ও পরে দ্রবের মোট মোল সংখ্যা সর্বদা অপরিবর্তিত থাকে ($n_1 = n_2$)।",
+    "practiceQuestions": [
+      {
+        "question": "$100\\text{ mL } 2\\text{ M } \\text{HCl}$ দ্রবণ থেকে $0.5\\text{ M}$ দ্রবণ তৈরি করতে কতটুকু পানি যোগ করতে হবে?",
+        "answer": "Ans: $V_2 = \\frac{100 \\times 2}{0.5} = 400\\text{ mL}$। অতিরিক্ত পানি $= 400 - 100 = 300\\text{ mL}$"
+      }
+    ]
+  },
+  {
+    "title": "একাধিক দ্রবণের মিশ্রণ মোলারিটি (Mixture Molarity)",
+    "latex": "S_{\\text{mix}} = \\frac{V_1 S_1 + V_2 S_2 + V_3 S_3 + \\dots}{V_1 + V_2 + V_3 + \\dots} = \\frac{\\sum V_i S_i}{V_{\\text{total}}}",
+    "description": "একই দ্রবের একাধিক ভিন্ন ঘনমাত্রার দ্রবণ একত্রে মিশ্রিত করলে মিশ্রণের চূড়ান্ত মোলার ঘনমাত্রা নির্ণয়ের সূত্র।",
+    "practiceQuestions": [
+      {
+        "question": "$200\\text{ mL } 0.5\\text{ M } \\text{HCl}$ এবং $300\\text{ mL } 0.2\\text{ M } \\text{HCl}$ মিশ্রিত করলে মিশ্রণের মোলারিটি কত?",
+        "answer": "Ans: $S_{\\text{mix}} = \\frac{(200 \\times 0.5) + (300 \\times 0.2)}{200 + 300} = \\frac{100 + 60}{500} = \\frac{160}{500} = 0.32\\text{ M}$"
+      }
+    ]
+  },
+  {
+    "title": "শতকরা মাত্রা থেকে মোলারিটি শর্টকাট (Percentage to Molarity Shortcut)",
+    "latex": "S = \\frac{10 \\times x\\%}{M} \\quad [\\text{w/v বা কেবল } \\% \\text{ থাকলে}], \\quad S = \\frac{10 \\times x\\% \\times d}{M} \\quad [\\text{w/w ও ঘনত্ব } d \\text{ থাকলে}]",
+    "description": "$x\\%$ = শতকরা মাত্রা, $M$ = আণবিক ভর, $d$ = ঘনত্ব ($\\text{g/mL}$)। ভর্তি পরীক্ষা ও দ্রুত হিসাবের জন্য অত্যন্ত কার্যকরী শর্টকাট।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\% \\; \\text{Na}_2\\text{CO}_3$ দ্রবণের মোলারিটি কত? ($M = 106$)",
+        "answer": "Ans: $S = \\frac{10 \\times 10}{106} = \\frac{100}{106} \\approx 0.9434\\text{ M}$"
+      },
+      {
+        "question": "$98\\% (\\text{w/w}) \\; \\text{H}_2\\text{SO}_4$ এসিডের ঘনত্ব $1.84\\text{ g/mL}$ হলে মোলারিটি কত?",
+        "answer": "Ans: $S = \\frac{10 \\times 98 \\times 1.84}{98} = 18.4\\text{ M}$"
+      }
+    ]
+  },
+  {
+    "title": "পিপিএম (ppm - Parts Per Million) ঘনমাত্রা",
+    "latex": "ppm = \\frac{W_{\\text{solute}}}{W_{\\text{solution}}} \\times 10^6 = \\frac{\\text{mg}}{\\text{L}} = S \\times M \\times 10^3",
+    "description": "লঘু জলীয় দ্রবণে ($d \\approx 1\\text{ g/mL}$) প্রতি লিটার দ্রবণে কত মিলিগ্রাম ($mg$) দ্রব দ্রবীভূত আছে তাই হলো $ppm$ মান।",
+    "practiceQuestions": [
+      {
+        "question": "$0.005\\text{ M } \\text{Ca(OH)}_2$ দ্রবণের ঘনমাত্রা $ppm$ এককে কত? ($M = 74$)",
+        "answer": "Ans: $ppm = S \\times M \\times 10^3 = 0.005 \\times 74 \\times 1000 = 370\\text{ ppm}$"
+      }
+    ]
+  },
+  {
+    "title": "পিপিবি (ppb) ও পিপিটি (ppt) এককে ঘনমাত্রা",
+    "latex": "ppb = \\frac{\\mu\\text{g}}{\\text{L}} = ppm \\times 10^3 = S \\times M \\times 10^6, \\quad ppt = \\frac{\\text{ng}}{\\text{L}} = ppb \\times 10^3 = S \\times M \\times 10^9",
+    "description": "• $ppb$ = Parts Per Billion ($10^{-9}$ ভাগ বা মাইক্রোগ্রাম/লিটার)\n• $ppt$ = Parts Per Trillion ($10^{-12}$ ভাগ বা ন্যানোগ্রাম/লিটার)। পরিবেশীয় বিষাক্ত ধাতু পরিমাপে ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$2\\text{ ppm}$ আর্সেনিক দ্রবণ সমান কত $ppb$?",
+        "answer": "Ans: $2 \\times 1000 = 2000\\text{ ppb}$"
+      }
+    ]
+  },
+  {
+    "title": "মোলালিটি (Molality - m)",
+    "latex": "m = \\frac{1000 \\times w}{M \\times W_{\\text{solvent}}} \\quad [\\text{mol/kg}], \\quad m = \\frac{1000 S}{1000 d - S M}",
+    "description": "$1000\\text{ g}$ বা $1\\text{ kg}$ দ্রাবকে দ্রবীভূত দ্রবের মোল সংখ্যা। এটি ভরের উপর ভিত্তি করে সংজ্ঞায়িত হওয়ায় তাপমাত্রা পরিবর্তনে মোলালিটির মান পরিবর্তন হয় না।",
+    "practiceQuestions": [
+      {
+        "question": "মোলালিটি তাপমাত্রা নিরপেক্ষ কেন?",
+        "answer": "Ans: কারণ মোলালিটি দ্রবের মোল এবং দ্রাবকের ভরের অনুপাত, এবং ভর তাপমাত্রার উপর নির্ভর করে না।"
+      }
+    ]
+  },
+  {
+    "title": "নরমালিটি ও তুল্য ভর (Normality & Equivalent Mass)",
+    "latex": "N = S \\times e = \\frac{1000 W}{E \\times V_{\\text{mL}}} \\quad [\\text{eq/L}], \\quad E = \\frac{M}{e}",
+    "description": "$E$ = তুল্য ভর, $e$ = তুল্য সংখ্যা (Valence factor), $M$ = মোলার ভর। প্রতি লিটার দ্রবণে দ্রবীভূত দ্রবের গ্রাম-তুল্য ভর সংখ্যাকে নরমালিটি বলে।",
+    "practiceQuestions": [
+      {
+        "question": "$0.5\\text{ M } \\text{H}_2\\text{SO}_4$ দ্রবণের নরমালিটি কত? ($e = 2$)",
+        "answer": "Ans: $N = S \\times e = 0.5 \\times 2 = 1.0\\text{ N}$"
+      }
+    ]
+  },
+  {
+    "title": "এসিডের তুল্য সংখ্যা ও তুল্য ভর (Equivalent Mass of Acids)",
+    "latex": "e = \\text{প্রতিস্থাপনীয় } \\text{H}^+ \\text{ সংখ্যা}, \\quad E = \\frac{M}{e}",
+    "description": "• $\\text{HCl}: e = 1, E = 36.5$\n• $\\text{H}_2\\text{SO}_4: e = 2, E = 98/2 = 49$\n• $\\text{H}_3\\text{PO}_4: e = 3, E = 98/3 = 32.67$\n• $\\text{H}_3\\text{PO}_3: e = 2, E = 82/2 = 41$ (দ্বিখারীয়!)\n• $\\text{H}_3\\text{PO}_2: e = 1, E = 66/1 = 66$ (একক্ষারীয়!)\n• $\\text{H}_2\\text{C}_2\\text{O}_4\\cdot 2\\text{H}_2\\text{O}: e = 2, E = 126/2 = 63$।",
+    "practiceQuestions": [
+      {
+        "question": "ফসফরাস এসিড ($\\text{H}_3\\text{PO}_3$) এর ক্ষারকত্ব ও তুল্য ভর কত?",
+        "answer": "Ans: ক্ষারকত্ব $e = 2$ (কারণ সরাসরি $P$ এর সাথে যুক্ত ১টি $H$ প্রতিস্থাপিত হয় না); তুল্য ভর $E = 82/2 = 41\\text{ g/eq}$।"
+      }
+    ]
+  },
+  {
+    "title": "ক্ষারের তুল্য সংখ্যা ও তুল্য ভর (Equivalent Mass of Bases)",
+    "latex": "e = \\text{প্রতিস্থাপনীয় } \\text{OH}^- \\text{ সংখ্যা বা অম্লগ্রাহিতা}, \\quad E = \\frac{M}{e}",
+    "description": "• $\\text{NaOH}: e = 1, E = 40$\n• $\\text{Ca(OH)}_2: e = 2, E = 74/2 = 37$\n• $\\text{Al(OH)}_3: e = 3, E = 78/3 = 26$\n• $\\text{Na}_2\\text{CO}_3: e = 2, E = 106/2 = 53$\n• $\\text{NaHCO}_3: e = 1, E = 84/1 = 84$।",
+    "practiceQuestions": [
+      {
+        "question": "সোডিয়াম কার্বনেটের ($\\text{Na}_2\\text{CO}_3$) তুল্য ভর কত?",
+        "answer": "Ans: $E = \\frac{106}{2} = 53\\text{ g/eq}$"
+      }
+    ]
+  },
+  {
+    "title": "জারক ও বিজারকের তুল্য সংখ্যা (e of Redox Reagents)",
+    "latex": "e = \\text{বিক্রিয়ায় ১ অণু কর্তৃক গৃহীত বা বর্জিত ইলেকট্রন সংখ্যা}",
+    "description": "জারক ইলেকট্রন গ্রহণ করে বিজারিত হয় এবং বিজারক ইলেকট্রন বর্জন করে জারিত হয়। ১ মোল জারক/বিজারক মোট যত মোল ইলেকট্রন আদান-প্রদান করে তাই তার তুল্য সংখ্যা $e$।",
+    "practiceQuestions": [
+      {
+        "question": "জারণ-বিজারণ বিক্রিয়ায় তুল্য সংখ্যা বলতে কী বোঝায়?",
+        "answer": "Ans: ১ অণু জারক বা বিজারক কর্তৃক গৃহিত বা বর্জিত মোট ইলেকট্রন সংখ্যা।"
+      }
+    ]
+  },
+  {
+    "title": "KMnO4 এর তুল্য সংখ্যা ও বিভিন্ন মাধ্যমে তুল্য ভর (e of KMnO4)",
+    "latex": "\\text{অম্লীয় মাধ্যম: } \\text{Mn}^{+7} + 5e^- \\to \\text{Mn}^{2+} \\implies e = 5, \\; E = \\frac{158}{5} = 31.6; \\quad \\text{ক্ষারীয়: } e = 1, \\; E = 158; \\quad \\text{নিরপেক্ষ: } e = 3, \\; E = \\frac{158}{3} = 52.67",
+    "description": "অম্লীয় মাধ্যমে ১ মোল $\\text{KMnO}_4$ ৫টি ইলেকট্রন গ্রহণ করায় $e = 5$; ক্ষারীয় মাধ্যমে ম্যাঙ্গানেট ($\\text{MnO}_4^{2-}$) তৈরি হওয়ায় $e = 1$; নিরপেক্ষ মাধ্যমে $\\text{MnO}_2$ তৈরি হওয়ায় $e = 3$।",
+    "practiceQuestions": [
+      {
+        "question": "অম্লীয় মাধ্যমে পটাশিয়াম পারম্যাঙ্গানেটের ($\\text{KMnO}_4$) তুল্য ভর কত?",
+        "answer": "Ans: $E = \\frac{M}{5} = \\frac{158}{5} = 31.6\\text{ g/eq}$"
+      }
+    ]
+  },
+  {
+    "title": "K2Cr2O7 এর তুল্য সংখ্যা ও তুল্য ভর (e of K2Cr2O7)",
+    "latex": "\\text{Cr}_2\\text{O}_7^{2-} + 14\\text{H}^+ + 6e^- \\to 2\\text{Cr}^{3+} + 7\\text{H}_2\\text{O} \\implies e = 6, \\quad E = \\frac{M}{6} = \\frac{294.2}{6} = 49.03\\text{ g/eq}",
+    "description": "পটাশিয়াম ডাইক্রোমেট একটি উৎকৃষ্ট প্রাইমারি স্ট্যান্ডার্ড পদার্থ। অম্লীয় মাধ্যমে এর প্রতি অণুতে ২টি ক্রোমিয়াম পরমাণু মোট ৬টি ইলেকট্রন গ্রহণ করে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{K}_2\\text{Cr}_2\\text{O}_7$ এর তুল্য সংখ্যা কত?",
+        "answer": "Ans: $e = 6$"
+      }
+    ]
+  },
+  {
+    "title": "সোডিয়াম থায়োসালফেটের তুল্য সংখ্যা ও তুল্য ভর (e of Na2S2O3)",
+    "latex": "2\\text{S}_2\\text{O}_3^{2-} \\to \\text{S}_4\\text{O}_6^{2-} (\\text{টেট্রাথায়োনেট}) + 2e^- \\implies 1\\text{ mol } \\text{Na}_2\\text{S}_2\\text{O}_3 \\equiv 1e^- \\implies e = 1, \\; E = M = 158.1\\text{ g/eq}",
+    "description": "আয়োডোমিতি টাইট্রেশনে ব্যবহৃত প্রধান বিজারক। ১ মোল থায়োসালফেট ১ মোল ইলেকট্রন ত্যাগ করায় এর আণবিক ভর ও তুল্য ভর সমান ($158.1$) হয়।",
+    "practiceQuestions": [
+      {
+        "question": "আয়োডিনের সাথে বিক্রিয়ায় সোডিয়াম থায়োসালফেটের তুল্য সংখ্যা কত?",
+        "answer": "Ans: $e = 1$"
+      }
+    ]
+  },
+  {
+    "title": "Fe2+ ও অক্সালিক এসিডের তুল্য সংখ্যা (e of Fe2+ & Oxalic Acid)",
+    "latex": "\\text{Fe}^{2+} \\to \\text{Fe}^{3+} + e^- \\implies e = 1; \\quad \\text{C}_2\\text{O}_4^{2-} \\to 2\\text{CO}_2 + 2e^- \\implies e = 2",
+    "description": "• $\\text{FeSO}_4$ এর $e = 1$ ($E = 151.9\\text{ g/eq}$)\n• অক্সালিক এসিড ডাইহাইড্রেট ($\\text{H}_2\\text{C}_2\\text{O}_4\\cdot 2\\text{H}_2\\text{O}$) এর $e = 2$ ($E = 126/2 = 63\\text{ g/eq}$)।",
+    "practiceQuestions": [
+      {
+        "question": "অক্সালিক এসিড ডাইহাইড্রেটের আণবিক ভর ১২৬ হলে তুল্য ভর কত?",
+        "answer": "Ans: $E = \\frac{126}{2} = 63\\text{ g/eq}$"
+      }
+    ]
+  },
+  {
+    "title": "টাইট্রেশনের সার্বজনীন মূলসূত্র (Universal Titration Formula)",
+    "latex": "V_A \\times S_A \\times e_A = V_B \\times S_B \\times e_B \\iff \\frac{V_A S_A}{a} = \\frac{V_B S_B}{b} \\quad (aA + bB \\to \\text{Products})",
+    "description": "$V_A, S_A, e_A$ = এসিড/জারকের আয়তন, মোলারিটি ও তুল্য সংখ্যা; $V_B, S_B, e_B$ = ক্ষার/বিজারকের আয়তন, মোলারিটি ও তুল্য সংখ্যা। তুল্য সংখ্যার গুণফল সমান হলেই পূর্ণ প্রশমন বা জারণ-বিজারণ ঘটে।",
+    "practiceQuestions": [
+      {
+        "question": "$20\\text{ mL } 0.1\\text{ M } \\text{H}_2\\text{SO}_4$ কে সম্পূর্ণরূপে প্রশমিত করতে $0.2\\text{ M } \\text{NaOH}$ দ্রবণের কত আয়তন লাগবে?",
+        "answer": "Ans: $V_B = \\frac{V_A S_A e_A}{S_B e_B} = \\frac{20 \\times 0.1 \\times 2}{0.2 \\times 1} = 20\\text{ mL}$"
+      }
+    ]
+  },
+  {
+    "title": "এসিড-ক্ষার মিশ্রণের প্রকৃতি ও অবশিষ্ট ঘনমাত্রা (Mixture pH & Residual Concentration)",
+    "latex": "S_{\\text{rem}} = \\frac{|V_A S_A e_A - V_B S_B e_B|}{V_A + V_B}",
+    "description": "• $V_A S_A e_A > V_B S_B e_B \\implies$ মিশ্রণ অম্লীয় ($[H^+] = S_{\\text{rem}} \\implies pH = -\\log[H^+]$)\n• $V_B S_B e_B > V_A S_A e_A \\implies$ মিশ্রণ ক্ষারীয় ($[OH^-] = S_{\\text{rem}} \\implies pH = 14 + \\log[OH^-]$)\n• উভয় সমান হলে মিশ্রণ নিরপেক্ষ ($pH = 7$)।",
+    "practiceQuestions": [
+      {
+        "question": "$50\\text{ mL } 0.2\\text{ M } \\text{HCl}$ এবং $50\\text{ mL } 0.1\\text{ M } \\text{NaOH}$ মিশ্রিত করলে মিশ্রণের প্রকৃতি কী এবং $pH$ কত?",
+        "answer": "Ans: $[H^+] = \\frac{(50 \\times 0.2 \\times 1) - (50 \\times 0.1 \\times 1)}{100} = \\frac{10 - 5}{100} = 0.05\\text{ M}$ (অম্লীয়); $pH = -\\log(0.05) \\approx 1.30$।"
+      }
+    ]
+  },
+  {
+    "title": "KMnO4 দ্বারা Fe2+ এর জারণ টাইট্রেশন (KMnO4 Titration with Fe2+)",
+    "latex": "2\\text{KMnO}_4 + 10\\text{FeSO}_4 + 8\\text{H}_2\\text{SO}_4 \\to \\text{K}_2\\text{SO}_4 + 2\\text{MnSO}_4 + 5\\text{Fe}_2(\\text{SO}_4)_3 + 8\\text{H}_2\\text{O} \\implies 1\\text{ mol } \\text{KMnO}_4 \\equiv 5\\text{ mol } \\text{Fe}^{2+}",
+    "description": "গাণিতিক সম্পর্ক: $\\frac{V_1 S_1 (\\text{KMnO}_4)}{2} = \\frac{V_2 S_2 (\\text{Fe}^{2+})}{10} \\iff 5 \\times V_1 S_1 = V_2 S_2$। এখানে $\\text{KMnO}_4$ নিজেই স্ব-নির্দেশক (গোলাপী বর্ণ)।",
+    "practiceQuestions": [
+      {
+        "question": "$25\\text{ mL } \\text{FeSO}_4$ দ্রবণকে জারিত করতে $0.02\\text{ M } \\text{KMnO}_4$ এর $20\\text{ mL}$ লাগলে $\\text{FeSO}_4$ এর মোলারিটি কত?",
+        "answer": "Ans: $S_2 = \\frac{5 \\times V_1 S_1}{V_2} = \\frac{5 \\times 20 \\times 0.02}{25} = 0.08\\text{ M}$"
+      }
+    ]
+  },
+  {
+    "title": "K2Cr2O7 দ্বারা Fe2+ এর জারণ টাইট্রেশন (K2Cr2O7 Titration with Fe2+)",
+    "latex": "\\text{K}_2\\text{Cr}_2\\text{O}_7 + 6\\text{FeSO}_4 + 7\\text{H}_2\\text{SO}_4 \\to \\text{K}_2\\text{SO}_4 + \\text{Cr}_2(\\text{SO}_4)_3 + 3\\text{Fe}_2(\\text{SO}_4)_3 + 7\\text{H}_2\\text{O} \\implies 1\\text{ mol } \\text{K}_2\\text{Cr}_2\\text{O}_7 \\equiv 6\\text{ mol } \\text{Fe}^{2+}",
+    "description": "গাণিতিক সম্পর্ক: $6 \\times V_{\\text{dichromate}} S_{\\text{dichromate}} = V_{\\text{iron}} S_{\\text{iron}}$। নির্দেশক হিসেবে সোডিয়াম বা ডাইফিনাইলঅ্যামিন সালফেট ও ফসফরিক এসিড ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mol } \\text{K}_2\\text{Cr}_2\\text{O}_7$ সম্পূর্ণরূপে কত মোল $\\text{FeSO}_4$ কে জারিত করতে পারে?",
+        "answer": "Ans: ৬ মোল $\\text{FeSO}_4$"
+      }
+    ]
+  },
+  {
+    "title": "KMnO4 দ্বারা অক্সালিক এসিড টাইট্রেশন (KMnO4 with Oxalic Acid)",
+    "latex": "2\\text{KMnO}_4 + 5\\text{H}_2\\text{C}_2\\text{O}_4 + 3\\text{H}_2\\text{SO}_4 \\xrightarrow{60^\\circ\\text{C}} \\text{K}_2\\text{SO}_4 + 2\\text{MnSO}_4 + 10\\text{CO}_2 \\uparrow + 8\\text{H}_2\\text{O} \\implies 2\\text{ mol } \\text{KMnO}_4 \\equiv 5\\text{ mol } \\text{H}_2\\text{C}_2\\text{O}_4",
+    "description": "বিক্রিয়াটি প্রথমে ধীর গতিতে শুরু হয় কিন্তু উৎপন্ন $\\text{Mn}^{2+}$ স্ব-প্রভাবক হিসেবে কাজ করায় পরবর্তীতে দ্রুত গতিতে সম্পন্ন হয়। দ্রবণকে $60^\\circ\\text{C}$ এ উত্তপ্ত করে টাইট্রেশন করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{KMnO}_4$ ও অক্সালিক এসিড টাইট্রেশনে দ্রবণকে কেন $60^\\circ\\text{C}$ এ উত্তপ্ত করা হয়?",
+        "answer": "Ans: কারণ কক্ষ তাপমাত্রায় বিক্রিয়ার গতি অত্যন্ত ধীর থাকে; উত্তপ্ত করলে বিক্রিয়া দ্রুত শুরু হয়ে $\\text{Mn}^{2+}$ স্ব-প্রভাবক তৈরি করে।"
+      }
+    ]
+  },
+  {
+    "title": "আয়োডিমিতি বনাম আয়োডোমিতি (Iodimetry vs Iodometry)",
+    "latex": "\\text{Iodimetry: প্রমাণ } \\text{I}_2 \\text{ দ্রবণ দ্বারা সরাসরি বিজারকের টাইট্রেশন}; \\quad \\text{Iodometry: জারকের বিক্রিয়ায় মুক্ত } \\text{I}_2 \\text{ কে } \\text{Na}_2\\text{S}_2\\text{O}_3 \\text{ দ্বারা টাইট্রেশন}",
+    "description": "উভয় পদ্ধতিতেই নির্দেশক হিসেবে স্টার্চ দ্রবণ ব্যবহৃত হয়, যা মুক্ত আয়োডিনের সাথে গাঢ় নীল বর্ণ তৈরি করে এবং সমাপ্তিবিন্দুতে নীল বর্ণ সম্পূর্ণ বিলীন হয়ে বর্ণহীন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "আয়োডোমিতি টাইট্রেশনে সমাপ্তিবিন্দুতে স্টার্চের নীল বর্ণ কী হয়?",
+        "answer": "Ans: নীল বর্ণ সম্পূর্ণ দূরীভূত হয়ে বর্ণহীন হয়ে যায়।"
+      }
+    ]
+  },
+  {
+    "title": "কপার নির্ণয়ে আয়োডোমিতি সূত্র (Estimation of Copper by Iodometry)",
+    "latex": "2\\text{CuSO}_4 + 4\\text{KI} \\to \\text{Cu}_2\\text{I}_2 \\downarrow + \\text{I}_2 + 2\\text{K}_2\\text{SO}_4, \\quad \\text{I}_2 + 2\\text{Na}_2\\text{S}_2\\text{O}_3 \\to 2\\text{NaI} + \\text{Na}_2\\text{S}_4\\text{O}_6 \\implies 1\\text{ mol } \\text{Cu}^{2+} \\equiv 1\\text{ mol } \\text{Na}_2\\text{S}_2\\text{O}_3",
+    "description": "$W_{\\text{Cu}} = \\frac{V_{\\text{thio}} \\times S_{\\text{thio}} \\times 63.54}{1000} \\text{ g}$। কিউপ্রাস আয়োডাইড ($\\text{Cu}_2\\text{I}_2$) সাদা অধঃক্ষেপ হিসেবে আলাদা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "মুক্ত $\\text{I}_2$ কে টাইট্রেট করতে $0.1\\text{ M } \\text{Na}_2\\text{S}_2\\text{O}_3$ এর $25\\text{ mL}$ লাগলে দ্রবণে কপারের ভর কত? ($M_{\\text{Cu}} = 63.54$)",
+        "answer": "Ans: $W_{\\text{Cu}} = \\frac{25 \\times 0.1 \\times 63.54}{1000} = 0.15885\\text{ g}$"
+      }
+    ]
+  },
+  {
+    "title": "ব্লিচিং পাউডারে লভ্য ক্লোরিনের শতকরা পরিমাণ (Available Chlorine in Bleaching Powder)",
+    "latex": "\\% \\text{ Available } \\text{Cl}_2 = \\frac{V_{\\text{thio}} \\times S_{\\text{thio}} \\times 0.03545 \\times 100}{W_{\\text{sample}}} = \\frac{3.545 \\times V_{\\text{thio}} \\times S_{\\text{thio}}}{W_{\\text{sample}}}",
+    "description": "ব্লিচিং পাউডারের ($\\,\\text{Ca(OCl)Cl}\\,\\,$) দ্রবণে এসিটিক এসিড ও অতিরিক্ত $\\text{KI}$ যোগ করলে নির্গত $\\text{I}_2$ কে প্রমাণ থায়োসালফেট দ্রবণ দ্বারা টাইট্রেট করে লভ্য ক্লোরিন মাপা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$2.0\\text{ g}$ ব্লিচিং পাউডারের মুক্ত আয়োডিনকে প্রশমিত করতে $0.1\\text{ M } \\text{Na}_2\\text{S}_2\\text{O}_3$ এর $40\\text{ mL}$ লাগলে লভ্য ক্লোরিনের শতকরা হার কত?",
+        "answer": "Ans: $\\% \\text{Cl}_2 = \\frac{3.545 \\times 40 \\times 0.1}{2.0} = \\frac{14.18}{2.0} = 7.09\\%$"
+      }
+    ]
+  },
+  {
+    "title": "লোহার আকরিক বা তারে বিশুদ্ধ লোহার শতকরা পরিমাণ (Purity of Iron Wire)",
+    "latex": "\\% \\text{ Fe} = \\frac{V_{\\text{KMnO}_4} \\times S_{\\text{KMnO}_4} \\times 5 \\times 55.85 \\times 100}{1000 \\times W_{\\text{sample}}}",
+    "description": "ভেজাল লোহার টুকরাকে লঘু $\\text{H}_2\\text{SO}_4$ এ দ্রবীভূত করে $\\text{Fe}^{2+}$ আয়নে রূপান্তর করে প্রমাণ $\\text{KMnO}_4$ দ্বারা টাইট্রেশন করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$1.4\\text{ g}$ ওজনের লোহার তার লঘু এসিডে দ্রবীভূত করে টাইট্রেট করতে $0.05\\text{ M } \\text{KMnO}_4$ এর $90\\text{ mL}$ লাগলে তারে লোহার বিশুদ্ধতা কত?",
+        "answer": "Ans: $n_{\\text{Fe}} = 5 \\times (0.090 \\times 0.05) = 0.0225\\text{ mol}$। $W_{\\text{Fe}} = 0.0225 \\times 55.85 = 1.2566\\text{ g}$। $\\% \\text{ Fe} = \\frac{1.2566}{1.4} \\times 100\\% \\approx 89.76\\%$"
+      }
+    ]
+  },
+  {
+    "title": "বিয়ার-ল্যাম্বার্ট সূত্র (Beer-Lambert Law)",
+    "latex": "A = \\log\\left(\\frac{I_0}{I}\\right) = \\epsilon \\cdot c \\cdot l",
+    "description": "$A$ = আলোকের শোষণ মাত্রা বা অ্যাবজর্বেন্স (Absorbance বা অপটিক্যাল ডেনসিটি), $I_0$ = আপতিত আলোর তীব্রতা, $I$ = নির্গত আলোর তীব্রতা, $\\epsilon$ = মোলার শোষণ সহগ ($\\text{L}\\cdot\\text{mol}^{-1}\\cdot\\text{cm}^{-1}$), $c$ = দ্রবণের মোলার ঘনমাত্রা ($\\text{mol/L}$), $l$ = কিউভেটের অভ্যন্তরীণ দৈর্ঘ্য বা আলোক পথ ($\\text{cm}$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি দ্রবণের ঘনমাত্রা দ্বিগুণ করা হলে বিয়ার-ল্যাম্বার্ট সূত্র অনুযায়ী এর শোষণমাত্রা ($A$) কেমন পরিবর্তিত হবে?",
+        "answer": "Ans: শোষণমাত্রা দ্বিগুণ হবে ($A \\propto c$)।"
+      }
+    ]
+  },
+  {
+    "title": "ট্রান্সমিট্যান্স ও অ্যাবজর্বেন্স সম্পর্ক (Transmittance & Absorbance)",
+    "latex": "T = \\frac{I}{I_0}, \\quad \\% T = \\frac{I}{I_0} \\times 100, \\quad A = -\\log T = 2 - \\log(\\% T)",
+    "description": "যদি কোনো দ্রবণ মধ্য দিয়ে $10\\%$ আলো স্থানান্তরিত হয় ($\\%T = 10$), তবে $A = 2 - \\log(10) = 2 - 1 = 1.0$। যদি $100\\%$ আলো স্থানান্তরিত হয়, তবে $A = 0$ (কোনো শোষণ নেই)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি নমুনা দ্রবণের ট্রান্সমিট্যান্স $1\\%$ হলে তার অ্যাবজর্বেন্স কত?",
+        "answer": "Ans: $A = 2 - \\log(1) = 2 - 0 = 2.0$"
+      }
+    ]
+  },
+  {
+    "title": "মোলার শোষণ সহগের একক ও তাৎপর্য (Molar Absorptivity Epsilon)",
+    "latex": "\\epsilon = \\frac{A}{c \\cdot l} \\quad [\\text{একক: } \\text{L}\\cdot\\text{mol}^{-1}\\cdot\\text{cm}^{-1} \\text{ বা } \\text{M}^{-1}\\text{cm}^{-1}]",
+    "description": "নির্দিষ্ট তরঙ্গদৈর্ঘ্যের আলোতে ১ মোলার ঘনমাত্রার এবং ১ সেমি দৈর্ঘ্যের কোষের মধ্য দিয়ে আলো চালনা করলে যে শোষণ ঘটে তাই হলো মোলার শোষণ সহগ $\\epsilon$। এটি পদার্থের একটি অনন্য বৈশিষ্ট্য।",
+    "practiceQuestions": [
+      {
+        "question": "এসআই/সিজিএস এককে মোলার শোষণ সহগ $\\epsilon$ এর একক কী?",
+        "answer": "Ans: $\\text{L}\\cdot\\text{mol}^{-1}\\cdot\\text{cm}^{-1}$ বা $\\text{M}^{-1}\\text{cm}^{-1}$"
+      }
+    ]
+  },
+  {
+    "title": "বিয়ার-ল্যাম্বার্ট সূত্রের সীমাবদ্ধতা (Limitations of Beer-Lambert Law)",
+    "latex": "\\text{কার্যকর ঘনমাত্রা: } c \\le 0.01\\text{ M} \\; (\\text{লঘু দ্রবণ}), \\quad \\text{একবর্ণী আলো আবশ্যক (Monochromatic light)}",
+    "description": "উচ্চ ঘনমাত্রায় ($c > 0.01\\text{ M}$) দ্রবণের কণাগুলোর মধ্যকার পারস্পরিক মিথস্ক্রিয়ার কারণে এবং প্রতিসরাঙ্ক পরিবর্তনের কারণে সূত্রটি বিচ্যুত হয়। এছাড়া দ্রবণে সংযোজন বা বিয়োজন ঘটলে বিচ্যুতি দেখা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "বিয়ার-ল্যাম্বার্ট সূত্র কোন ঘনমাত্রার দ্রবণের জন্য নিখুঁতভাবে প্রযোজ্য?",
+        "answer": "Ans: অত্যন্ত লঘু দ্রবণের জন্য (ঘনমাত্রা $\\le 0.01\\text{ M}$ বা $10^{-2}\\text{ M}$)।"
+      }
+    ]
+  },
+  {
+    "title": "লিমিটিং বিক্রিয়ক ও উৎপাদ গণনা (Limiting Reactant)",
+    "latex": "\\frac{n_A}{a} < \\frac{n_B}{b} \\implies A \\text{ হলো লিমিটিং বিক্রিয়ক}",
+    "description": "যে বিক্রিয়কটি বিক্রিয়ায় প্রথমে সম্পূর্ণরূপে নিঃশেষ হয়ে যায় তাকে লিমিটিং বিক্রিয়ক বলে। উৎপাদের সর্বোচ্চ পরিমাণ সর্বদা লিমিটিং বিক্রিয়কের মোল সংখ্যা দ্বারা নিয়ন্ত্রিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$4\\text{ g } \\text{H}_2$ ($2\\text{ mol}$) এবং $32\\text{ g } \\text{O}_2$ ($1\\text{ mol}$) এর বিক্রিয়ায় কোনটি লিমিটিং বিক্রিয়ক?",
+        "answer": "Ans: $2\\text{H}_2 + \\text{O}_2 \\to 2\\text{H}_2\\text{O}$; এখানে $\\frac{2}{2} = 1$ এবং $\\frac{1}{1} = 1$, তাই উভয় বিক্রিয়কই সমানুপাতিকভাবে শেষ হবে (কোনোটিই উদ্বৃত্ত থাকবে না)।"
+      }
+    ]
+  },
+  {
+    "title": "বিক্রিয়ার শতকরা ফলন (Percentage Yield)",
+    "latex": "\\% \\text{ Yield} = \\frac{\\text{প্রকৃত ফলন (Actual Yield)}}{\\text{তাত্ত্বিক ফলন (Theoretical Yield)}} \\times 100\\%",
+    "description": "স্টয়কিওমেট্রিক সমীকরণ থেকে প্রত্যাশিত সর্বোচ্চ পরিমাণ হলো তাত্ত্বিক ফলন এবং ল্যাবরেটরিতে বাস্তবে প্রাপ্ত পরিমাণ হলো প্রকৃত ফলন।",
+    "practiceQuestions": [
+      {
+        "question": "একটি বিক্রিয়ায় তাত্ত্বিকভাবে $50\\text{ g}$ উৎপাদ পাওয়ার কথা কিন্তু বাস্তবে $40\\text{ g}$ পাওয়া গেল। শতকরা ফলন কত?",
+        "answer": "Ans: $\\% \\text{ Yield} = \\frac{40}{50} \\times 100\\% = 80\\%$"
+      }
+    ]
+  },
+  {
+    "title": "স্থূল সংকেত ও আণবিক সংকেত সম্পর্ক (Empirical & Molecular Formula)",
+    "latex": "\\text{আণবিক সংকেত} = (\\text{স্থূল সংকেত})_n, \\quad n = \\frac{\\text{আণবিক ভর}}{\\text{স্থূল সংকেতের ভর}}",
+    "description": "শতকরা সংযুক্তি থেকে মৌলসমূহের আপেক্ষিক পরমাণু সংখ্যা নির্ণয় করে ক্ষুদ্রতম পূর্ণ সংখ্যার অনুপাতে স্থূল সংকেত পাওয়া যায়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি যৌগের স্থূল সংকেত $\\text{CH}_2\\text{O}$ এবং আণবিক ভর ১৮০ হলে আণবিক সংকেত কী?",
+        "answer": "Ans: স্থূল ভর $= 12 + 2 + 16 = 30$। $n = \\frac{180}{30} = 6$। আণবিক সংকেত $= (\\text{CH}_2\\text{O})_6 = \\text{C}_6\\text{H}_{12}\\text{O}_6$ (গ্লুকোজ)।"
+      }
+    ]
+  },
+  {
+    "title": "জারণ সংখ্যা নির্ণয়ের বিশেষ নিয়মাবলী (Special Oxidation Numbers)",
+    "latex": "\\text{CrO}_5 \\implies +6 (\\text{বাটারফ্লাই গঠন}), \\; \\text{H}_2\\text{SO}_5 \\implies +6 (\\text{ক্যারোস এসিড}), \\; \\text{Fe}_3\\text{O}_4 \\implies +\\frac{8}{3} (\\text{FeO}\\cdot\\text{Fe}_2\\text{O}_3)",
+    "description": "পারঅক্সাইড বন্ধনে ($-O-O-$) অক্সিজেনের জারণ সংখ্যা $-1$ এবং সুপারঅক্সাইডে ($KO_2$) $-1/2$ হয়। সংকেতের কাঠামোগত ব্যতিক্রম খেয়াল রাখা জরুরি।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CrO}_5$ এ ক্রোমিয়ামের প্রকৃত জারণ সংখ্যা কত?",
+        "answer": "Ans: $+6$ (কারণ এতে ২টি পারঅক্সাইড বলয় $-O-O-$ রয়েছে যাতে ৪টি অক্সিজেন $-1$ এবং ১টি অক্সিজেন $-2$)।"
+      }
+    ]
+  },
+  {
+    "title": "ব্যাক-টাইট্রেশন বা পরোক্ষ টাইট্রেশন (Back-Titration Method)",
+    "latex": "n_{\\text{নমুনায় বিক্রিয়াকৃত}} = n_{\\text{মোট অতিরিক্ত যোগকৃত}} - n_{\\text{অবশিষ্ট টাইট্রেশনে ব্যবহৃত}}",
+    "description": "অদ্রবণীয় বা ধীরগতির ক্ষার/এসিড (যেমন চকের গুঁড়া $\\text{CaCO}_3$, ডিমের খোসা, অ্যান্টাসিড ট্যাবলেট) এর পরিমাণ নির্ণয়ে অতিরিক্ত প্রমাণ এসিড যোগ করে অবশিষ্ট এসিডকে প্রমাণ ক্ষার দিয়ে টাইট্রেট করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি অ্যান্টাসিড ট্যাবলেটে অতিরিক্ত $50\\text{ mL } 0.1\\text{ M } \\text{HCl}$ যোগ করার পর অবশিষ্ট এসিডকে প্রশমিত করতে $15\\text{ mL } 0.1\\text{ M } \\text{NaOH}$ লাগলে অ্যান্টাসিড কর্তৃক কত মোল এসিড প্রশমিত হয়েছিল?",
+        "answer": "Ans: $n = (0.050 \\times 0.1) - (0.015 \\times 0.1) = 0.005 - 0.0015 = 0.0035\\text{ mol}$"
+      }
+    ]
+  },
+  {
+    "title": "প্রাইমারি ও সেকেন্ডারি স্ট্যান্ডার্ড পদার্থ (Primary & Secondary Standards)",
+    "latex": "\\text{Primary: } \\text{Na}_2\\text{CO}_3, \\; \\text{H}_2\\text{C}_2\\text{O}_4\\cdot 2\\text{H}_2\\text{O}, \\; \\text{K}_2\\text{Cr}_2\\text{O}_7, \\; \\text{KIO}_3; \\quad \\text{Secondary: } \\text{NaOH}, \\; \\text{HCl}, \\; \\text{H}_2\\text{SO}_4, \\; \\text{KMnO}_4, \\; \\text{Na}_2\\text{S}_2\\text{O}_3",
+    "description": "• প্রাইমারি স্ট্যান্ডার্ড: বায়ুর উপাদান ($CO_2, O_2$, জলীয় বাষ্প) দ্বারা আক্রান্ত হয় না, বিশুদ্ধ অবস্থায় পাওয়া যায় এবং দ্রবণের ঘনমাত্রা দীর্ঘদিন অপরিবর্তিত থাকে।\n• সেকেন্ডারি স্ট্যান্ডার্ড: জলাকর্ষী বা উদ্বায়ী হওয়ায় প্রমাণ দ্রবণ তৈরি করে প্রাইমারি দ্রবণ দিয়ে টাইট্রেশন করে প্রমাণীকরণ করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{KMnO}_4$ এবং $\\text{K}_2\\text{Cr}_2\\text{O}_7$ এর মধ্যে কোনটি প্রাইমারি স্ট্যান্ডার্ড পদার্থ?",
+        "answer": "Ans: $\\text{K}_2\\text{Cr}_2\\text{O}_7$ হলো প্রাইমারি স্ট্যান্ডার্ড (বায়ুর সংস্পর্শে অপরিবর্তিত থাকে), আর $\\text{KMnO}_4$ হলো সেকেন্ডারি স্ট্যান্ডার্ড।"
+      }
+    ]
+  },
+  {
+    "title": "মোলার দ্রবণ, সেমি-মোলার ও ডেসি-মোলার দ্রবণ (Standard Solutions Terms)",
+    "latex": "\\text{Molar: } 1.0\\text{ M}, \\; \\text{Semi-molar: } 0.5\\text{ M}, \\; \\text{Deci-molar: } 0.1\\text{ M}, \\; \\text{Centi-molar: } 0.01\\text{ M}, \\; \\text{Milli-molar: } 0.001\\text{ M}",
+    "description": "যে দ্রবণের ঘনমাত্রা সঠিকভাবে জানা থাকে তাকে প্রমাণ দ্রবণ (Standard Solution) বলে।",
+    "practiceQuestions": [
+      {
+        "question": "সেমি-মোলার ও ডেসি-মোলার দ্রবণের ঘনমাত্রা যথাক্রমে কত?",
+        "answer": "Ans: সেমি-মোলার $= 0.5\\text{ M}$ এবং ডেসি-মোলার $= 0.1\\text{ M}$"
+      }
+    ]
+  },
+  {
+    "title": "আয়ন-ইলেকট্রন পদ্ধতিতে সমতাকরণের নিয়মাবলী (Ion-Electron Balancing Method)",
+    "latex": "\\text{জারণ অর্ধ-বিক্রিয়া: } \\text{Fe}^{2+} \\to \\text{Fe}^{3+} + e^-; \\quad \\text{বিজারণ অর্ধ-বিক্রিয়া: } \\text{MnO}_4^- + 8\\text{H}^+ + 5e^- \\to \\text{Mn}^{2+} + 4\\text{H}_2\\text{O}",
+    "description": "ধাপসমূহ: (১) কেন্দ্রীয় পরমাণুর সমতা, (২) অক্সিজেন পরমাণুর সমতার জন্য বিপরীত পাশে সমসংখ্যক $\\text{H}_2\\text{O}$ যোগ, (৩) হাইড্রোজেন সমতার জন্য অম্লীয় মাধ্যমে $\\text{H}^+$ যোগ, (৪) চার্জ সমতার জন্য উপযুক্ত পাশে ইলেকট্রন ($e^-$) যোগ।",
+    "practiceQuestions": [
+      {
+        "question": "অম্লীয় মাধ্যমে পারম্যাঙ্গানেট আয়নের বিজারণ অর্ধ-বিক্রিয়ায় কতটি $\\text{H}^+$ আয়ন প্রয়োজন হয়?",
+        "answer": "Ans: ৮টি $\\text{H}^+$ আয়ন ($\\,\\text{MnO}_4^- + 8\\text{H}^+ + 5e^- \\to \\text{Mn}^{2+} + 4\\text{H}_2\\text{O}\\,\\,$)"
+      }
+    ]
+  },
+  {
+    "title": "হাইড্রোজেন পারঅক্সাইডের দ্বৈত চরিত্র ও টাইট্রেশন (H2O2 in Redox Titrations)",
+    "latex": "\\text{জারক হিসেবে: } \\text{H}_2\\text{O}_2 + 2\\text{H}^+ + 2e^- \\to 2\\text{H}_2\\text{O}; \\quad \\text{বিজারক হিসেবে: } \\text{H}_2\\text{O}_2 \\to \\text{O}_2 \\uparrow + 2\\text{H}^+ + 2e^- \\implies e = 2",
+    "description": "উভয় ক্ষেত্রেই $\\text{H}_2\\text{O}_2$ এর তুল্য সংখ্যা $e = 2$। $\\text{KMnO}_4$ এর সাথে বিক্রিয়ায় এটি বিজারক হিসেবে কাজ করে অক্সিজেন গ্যাস উৎপন্ন করে: $2\\text{KMnO}_4 + 5\\text{H}_2\\text{O}_2 + 3\\text{H}_2\\text{SO}_4 \\to \\text{K}_2\\text{SO}_4 + 2\\text{MnSO}_4 + 5\\text{O}_2 \\uparrow + 8\\text{H}_2\\text{O}$।",
+    "practiceQuestions": [
+      {
+        "question": "অম্লীয় $\\text{KMnO}_4$ দ্রবণে $\\text{H}_2\\text{O}_2$ যোগ করলে কোন গ্যাস বুদবুদ আকারে নির্গত হয়?",
+        "answer": "Ans: অক্সিজেন গ্যাস ($\\text{O}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "গ্যাসের আয়তনভিত্তিক টাইট্রেশন ও STP সমতুল্য (Gas Volume in Stoichiometry)",
+    "latex": "V_{\\text{STP (L)}} = n \\times 22.414, \\quad \\text{STP-তে } 1\\text{ mol } \\text{O}_2 = 32\\text{ g} = 22.414\\text{ L}",
+    "description": "বিক্রিয়ায় গ্যাস নির্গত হলে মোলার আয়তন $22.4\\text{ L}$ ব্যবহার করে উৎপন্ন গ্যাসের আয়তন সরাসরি গণনা করা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\text{ g } \\text{CaCO}_3$ কে তীব্র উত্তপ্ত করলে STP-তে কত লিটার $\\text{CO}_2$ গ্যাস পাওয়া যাবে?",
+        "answer": "Ans: $n = \\frac{10}{100} = 0.1\\text{ mol}$। $V_{\\text{CO}_2} = 0.1 \\times 22.4 = 2.24\\text{ L}$"
+      }
+    ]
+  },
+  {
+    "title": "পারম্যাঙ্গানোমিতিতে এসিড মাধ্যম নির্বাচন (Acid Selection in Permanganometry)",
+    "latex": "\\text{উপযুক্ত এসিড: লঘু } \\text{H}_2\\text{SO}_4; \\quad \\text{অনুপযুক্ত: } \\text{HCl (ক্লোরিন গ্যাস নির্গত করে)} \\text{ ও } \\text{HNO}_3 (\\text{নিজেই জারক})",
+    "description": "লঘু $\\text{H}_2\\text{SO}_4$ এসিড নিজে কোনো জারণ-বিজারণ বিক্রিয়ায় অংশ নেয় না। পক্ষান্তরে, $\\text{HCl}$ এসিড $\\text{KMnO}_4$ দ্বারা জারিত হয়ে $\\text{Cl}_2$ গ্যাসে পরিণত হয় এবং $\\text{HNO}_3$ তীব্র জারক হওয়ায় বিজারক পদার্থের জারণ ব্যাহত করে।",
+    "practiceQuestions": [
+      {
+        "question": "পারম্যাঙ্গানেট টাইট্রেশনে অম্লীয় মাধ্যম হিসেবে $\\text{HCl}$ কেন ব্যবহার করা যায় না?",
+        "answer": "Ans: কারণ $\\text{KMnO}_4$ শক্তিশালী জারক হওয়ায় $\\text{HCl}$ এর $\\text{Cl}^-$ আয়নকে জারিত করে বিষাক্ত $\\text{Cl}_2$ গ্যাসে রূপান্তর করে।"
+      }
+    ]
+  },
+  {
+    "title": "ডাইক্রোমেট টাইট্রেশনে ফসফরিক এসিডের ভূমিকা (Role of H3PO4 in Dichromatometry)",
+    "latex": "\\text{Fe}^{3+} + \\text{H}_3\\text{PO}_4 \\to [\\text{Fe(HPO}_4)]^+ (\\text{বর্ণহীন জটিল আয়ন})",
+    "description": "উৎপন্ন $\\text{Fe}^{3+}$ আয়নের হলুদ বর্ণের তীব্রতার কারণে সমাপ্তিবিন্দুতে ডাইফিনাইলঅ্যামিনের বেগুনী বর্ণ সহজে চোখে পড়ে না। $\\text{H}_3\\text{PO}_4$ এসিড $\\text{Fe}^{3+}$ এর সাথে বর্ণহীন জটিল আয়ন তৈরি করে এবং আয়রনের জারণ বিভব হ্রাস করে সমাপ্তিবিন্দু স্পষ্ট করে।",
+    "practiceQuestions": [
+      {
+        "question": "ডাইক্রোমেট দিয়ে আয়রন টাইট্রেশনে ফসফরিক এসিড ($\\,\\text{H}_3\\text{PO}_4\\,$) কেন যোগ করা হয়?",
+        "answer": "Ans: $\\text{Fe}^{3+}$ এর হলুদ বর্ণ দূর করে বর্ণহীন জটিল আয়ন গঠন করতে এবং নির্দেশকের তীক্ষ্ণ বর্ণ পরিবর্তন স্পষ্ট দেখতে।"
+      }
+    ]
+  },
+  {
+    "title": "সোডিয়াম থায়োসালফেট দ্রবণের স্থায়িত্ব ও প্রমাণীকরণ (Stability of Na2S2O3)",
+    "latex": "\\text{S}_2\\text{O}_3^{2-} + 2\\text{H}^+ \\xrightarrow{\\text{CO}_2 / \\text{জীবাণু}} \\text{SO}_2 \\uparrow + \\text{S} \\downarrow + \\text{H}_2\\text{O}, \\quad \\text{স্থায়িত্বে যোগ: } \\text{Na}_2\\text{CO}_3 (0.1\\text{ g/L})",
+    "description": "পানিতে থাকা $\\text{CO}_2$ ও থায়োব্যাসিলাস ব্যাক্টেরিয়ার কারণে থায়োসালফেট দ্রবণ ধীরে ধীরে সালফার ও সালফার ডাইঅক্সাইডে বিয়োজিত হয়। তাই সামান্য $\\text{Na}_2\\text{CO}_3$ এবং কয়েক ফোঁটা ক্লোরোফর্ম যোগ করে বাদামি রঙের বোতলে সংরক্ষণ করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "সোডিয়াম থায়োসালফেট দ্রবণের স্থায়িত্ব বাড়াতে কী যোগ করা হয়?",
+        "answer": "Ans: সোডিয়াম কার্বনেট ($\\,\\text{Na}_2\\text{CO}_3\\,$) এবং জীবাণুনাশক ক্লোরোফর্ম"
+      }
+    ]
+  },
+  {
+    "title": "পটাশিয়াম আয়োডেট দ্বারা থায়োসালফেটের প্রমাণীকরণ (Standardization using KIO3)",
+    "latex": "\\text{KIO}_3 + 5\\text{KI} + 6\\text{HCl} \\to 6\\text{KCl} + 3\\text{I}_2 + 3\\text{H}_2\\text{O} \\implies 1\\text{ mol } \\text{KIO}_3 \\equiv 3\\text{ mol } \\text{I}_2 \\equiv 6\\text{ mol } \\text{Na}_2\\text{S}_2\\text{O}_3",
+    "description": "$\\text{KIO}_3$ একটি আদর্শ প্রাইমারি স্ট্যান্ডার্ড পদার্থ। এর থেকে মুক্ত আয়োডিন দিয়ে সেকেন্ডারি স্ট্যান্ডার্ড $\\text{Na}_2\\text{S}_2\\text{O}_3$ দ্রবণের সঠিক মোলারিটি নির্ধারণ করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mol } \\text{KIO}_3$ কত মোল $\\text{Na}_2\\text{S}_2\\text{O}_3$ এর সমতুল্য?",
+        "answer": "Ans: ৬ মোল সোডিয়াম থায়োসালফেট"
+      }
+    ]
+  },
+  {
+    "title": "মিশ্র ক্ষারের পৃথক টাইট্রেশন (Titration of NaOH + Na2CO3 Mixture)",
+    "latex": "\\text{ফেনলফথ্যালিন: } \\text{সমগ্র } \\text{NaOH} + \\frac{1}{2} \\text{Na}_2\\text{CO}_3; \\quad \\text{মিথাইল অরেঞ্জ: } \\text{সমগ্র } \\text{NaOH} + \\text{সমগ্র } \\text{Na}_2\\text{CO}_3",
+    "description": "• ১ম ধাপে ফেনলফথ্যালিনের উপস্থিতিতে টাইট্রেট করলে প্রয়োজনীয় এসিড $V_1 = V_{\\text{NaOH}} + \\frac{1}{2}V_{\\text{Na}_2\\text{CO}_3}$\n• ২য় ধাপে মিথাইল অরেঞ্জ যোগ করে সমাপ্তিবিন্দু পর্যন্ত মোট এসিড $V_2 = V_{\\text{NaOH}} + V_{\\text{Na}_2\\text{CO}_3}$\n• অতএব, $\\text{Na}_2\\text{CO}_3$ এর জন্য এসিড $= 2(V_2 - V_1)$ এবং $\\text{NaOH}$ এর জন্য এসিড $= 2V_1 - V_2$।",
+    "practiceQuestions": [
+      {
+        "question": "ফেনলফথ্যালিন নির্দেশকের উপস্থিতিতে $\\text{Na}_2\\text{CO}_3$ এর কতটুকু প্রশমিত হয়?",
+        "answer": "Ans: অর্ধেক বা ৫০% (কারণ এটি শুধুমাত্র $\\text{NaHCO}_3$ এ পরিণত হয়, $pH \\approx 8.3$)"
+      }
+    ]
+  },
+  {
+    "title": "মিশ্র কার্বনেটের পৃথক টাইট্রেশন (Titration of Na2CO3 + NaHCO3 Mixture)",
+    "latex": "\\text{ফেনলফথ্যালিন: কেবল } \\frac{1}{2}\\text{Na}_2\\text{CO}_3; \\quad \\text{মিথাইল অরেঞ্জ: সমগ্র } \\text{Na}_2\\text{CO}_3 + \\text{সমগ্র } \\text{NaHCO}_3",
+    "description": "ফেনলফথ্যালিন নির্দেশকে $\\text{NaHCO}_3$ এসিডের সাথে কোনো বিক্রিয়া দেয় না। ফলে $V_1 = \\frac{1}{2}V_{\\text{Na}_2\\text{CO}_3} \\implies V_{\\text{Na}_2\\text{CO}_3} = 2V_1$ এবং $V_{\\text{NaHCO}_3} = V_2 - 2V_1$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{Na}_2\\text{CO}_3$ ও $\\text{NaHCO}_3$ এর মিশ্রণে ফেনলফথ্যালিন দিয়ে এসিডের খরচ $V_1$ হলে কার্বনেটের জন্য মোট এসিড কত?",
+        "answer": "Ans: $2 V_1$"
+      }
+    ]
+  },
+  {
+    "title": "এসিড-ক্ষার টাইট্রেশন লেখচিত্র ও সমতুল্য বিন্দু (Titration Curves & Equivalence Point)",
+    "latex": "\\text{Strong Acid + Strong Base: } pH = 7 \\; (\\text{খাড়া অংশ } pH \\; 3.5 - 10.5); \\quad \\text{Weak Acid + Strong Base: } pH > 7 \\; (pH \\; 7.5 - 10.5); \\quad \\text{Strong Acid + Weak Base: } pH < 7 \\; (pH \\; 3.5 - 6.5)",
+    "description": "টাইট্রেশন কার্ভে $pH$ এর উল্লম্ব উল্লম্ফন (Vertical jump) যে অঞ্চলে ঘটে সেই অঞ্চলের সাথে নির্দেশকের কার্যকাল $pH$ রেঞ্জ মিললেই তা সঠিক নির্দেশক হয়।",
+    "practiceQuestions": [
+      {
+        "question": "তীব্র এসিড ও তীব্র ক্ষার টাইট্রেশনের সমতুল্য বিন্দুতে $pH$ এর মান কত?",
+        "answer": "Ans: $pH = 7$ (নিরপেক্ষ)"
+      }
+    ]
+  },
+  {
+    "title": "ইউভি-ভিজ দৃশ্যমান স্পেকট্রোফোটোমেট্রি (UV-Vis Spectrophotometry)",
+    "latex": "\\text{UV Region: } 200 - 400\\text{ nm} \\; (\\text{কোয়ার্টজ কিউভেট}); \\quad \\text{Visible Region: } 400 - 800\\text{ nm} \\; (\\text{কাচের কিউভেট})",
+    "description": "কোনো রঙিন দ্রবণে আলোর নির্দিষ্ট তরঙ্গদৈর্ঘ্যের শোষণমাত্রা মেপে অজানা দ্রবণের ঘনমাত্রা নিখুঁতভাবে নির্ধারণ করা হয়। কাচ UV আলো শোষণ করে বলে UV অঞ্চলে কোয়ার্টজ কিউভেট ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "UV স্পেকট্রোফোটোমেট্রিতে কাচের পরিবর্তে কোয়ার্টজ কিউভেট কেন ব্যবহার করা হয়?",
+        "answer": "Ans: কারণ সাধারণ কাচ অতিবেগুনি (UV) আলো নিজে শোষণ করে ফেলে, কিন্তু কোয়ার্টজ UV আলোর জন্য সম্পূর্ণ স্বচ্ছ।"
+      }
+    ]
+  },
+  {
+    "title": "ক্যালিব্রেশন কার্ভ ও অজানা ঘনমাত্রা নির্ণয় (Calibration Curve Method)",
+    "latex": "A = m \\cdot c \\implies c_{\\text{unknown}} = \\frac{A_{\\text{sample}}}{m} \\quad (m = \\text{ঢাল} = \\epsilon \\cdot l)",
+    "description": "জানা ঘনমাত্রার একাধিক প্রমাণ দ্রবণের শোষণমাত্রা ($A$) মেপে $A$ বনাম $c$ লেখচিত্র আঁকলে মূলবিন্দুগামী সরলরেখা পাওয়া যায়। এর ঢাল থেকে অজানা নমুনার ঘনমাত্রা নির্ণয় করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ক্যালিব্রেশন লেখচিত্রে $A$ বনাম $c$ এর ঢাল কী প্রকাশ করে?",
+        "answer": "Ans: $\\epsilon \\cdot l$ (মোলার শোষণ সহগ $\\times$ কিউভেটের পথ দৈর্ঘ্য)"
+      }
+    ]
+  },
+  {
+    "title": "স্টয়কিওমেট্রিক অনুপাত ও ভর-আয়তন হিসাব (Stoichiometric Mass-Volume Relationship)",
+    "latex": "a A(s) + b B(aq) \\to c C(g) \\implies \\frac{W_A}{a M_A} = \\frac{V_B S_B}{b \\times 1000} = \\frac{V_{C(\\text{STP})}}{c \\times 22.414}",
+    "description": "রাসায়নিক বিক্রিয়ার সমতাকৃত সমীকরণ হতে কঠিন, জলীয় দ্রবণ এবং গ্যাসীয় উৎপাদের মধ্যে সরাসরি রূপান্তর ও নিখুঁত হিসাবের স্বর্ণসূত্র।",
+    "practiceQuestions": [
+      {
+        "question": "$5.4\\text{ g } \\text{Al}$ ($M=27$) অতিরিক্ত এসিডে দ্রবীভূত করলে STP-তে কত লিটার $\\text{H}_2$ গ্যাস নির্গত হবে?",
+        "answer": "Ans: $2\\text{Al} + 6\\text{HCl} \\to 2\\text{AlCl}_3 + 3\\text{H}_2$। $n_{\\text{Al}} = \\frac{5.4}{27} = 0.2\\text{ mol}$। $n_{\\text{H}_2} = 0.2 \\times \\frac{3}{2} = 0.3\\text{ mol}$। $V = 0.3 \\times 22.414 = 6.724\\text{ L}$"
+      }
+    ]
+  },
+  {
+    "title": "কেমিক্যাল অক্সিজেন ডিমান্ড গণনা সূত্র (COD Calculation by Redox Titration)",
+    "latex": "\\text{COD (mg/L)} = \\frac{(V_{\\text{blank}} - V_{\\text{sample}}) \\times M_{\\text{FAS}} \\times 8000}{V_{\\text{water sample (mL)}}}",
+    "description": "নমুনা পানিকে অতিরিক্ত প্রমাণ $\\text{K}_2\\text{Cr}_2\\text{O}_7$ ও $\\text{H}_2\\text{SO}_4$ সহ ২ ঘণ্টা রিফ্লাক্স করে অবিশ্লেষিত ডাইক্রোমেটকে প্রমাণ ফেরাস অ্যামোনিয়াম সালফেট (FAS) দ্রবণ দ্বারা টাইট্রেশন করে COD মাপা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "COD নির্ণয়ে জারক হিসেবে কী ব্যবহৃত হয়?",
+        "answer": "Ans: অম্লীয় পটাশিয়াম ডাইক্রোমেট দ্রবণ ($\\,\\text{K}_2\\text{Cr}_2\\text{O}_7 + \\text{গাঢ় } \\text{H}_2\\text{SO}_4\\,$)"
+      }
+    ]
+  }
+]

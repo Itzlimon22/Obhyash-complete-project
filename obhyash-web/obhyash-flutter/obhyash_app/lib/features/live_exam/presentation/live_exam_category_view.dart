@@ -20,32 +20,10 @@ class LiveExamCategoryView extends ConsumerStatefulWidget {
 
 class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(liveExamCategoryProvider.notifier)
-          .updateCategory(widget.category);
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant LiveExamCategoryView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.category != widget.category) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(liveExamCategoryProvider.notifier)
-            .updateCategory(widget.category);
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final filteredExams = ref.watch(filteredLiveExamsProvider);
-    final liveExamsAsync = ref.watch(liveExamsProvider);
+    final filteredExams = ref.watch(filteredLiveExamsCategoryProvider(widget.category));
+    final liveExamsAsync = ref.watch(liveExamsCategoryProvider(widget.category));
     final isLoading = liveExamsAsync.isLoading;
     final filter = ref.watch(liveExamFilterProvider);
 
@@ -55,9 +33,9 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
           : const Color(0xFFFAFAFA),
       body: AppRefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(liveExamsProvider);
+          ref.invalidate(liveExamsCategoryProvider(widget.category));
           try {
-            await ref.read(liveExamsProvider.future);
+            await ref.read(liveExamsCategoryProvider(widget.category).future);
           } catch (_) {}
         },
         child: SingleChildScrollView(
@@ -280,6 +258,11 @@ class _LiveExamCard extends StatelessWidget {
       statusIcon = LucideIcons.zap;
       statusColor = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
       bottomStripBg = isDark ? const Color(0xFF0C2419) : const Color(0xFFF0FDF4);
+    } else if (exam.isPast) {
+      statusText = 'সমাপ্ত';
+      statusIcon = LucideIcons.checkCircle;
+      statusColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+      bottomStripBg = isDark ? const Color(0xFF1E293B).withValues(alpha: 0.6) : const Color(0xFFF1F5F9);
     } else {
       statusText = 'Upcoming';
       statusIcon = LucideIcons.clock;

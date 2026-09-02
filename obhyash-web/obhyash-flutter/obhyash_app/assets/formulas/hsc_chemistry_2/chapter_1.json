@@ -1,17 +1,564 @@
 [
   {
-    "title": "pH সংজ্ঞা",
-    "latex": "pH = -\\log[H^+]",
-    "description": "H⁺ আয়নের মোলার ঘনমাত্রার ঋণাত্মক লগারিদম"
+    "title": "বয়েলের সূত্র (Boyle's Law)",
+    "latex": "V \\propto \\frac{1}{P} \\implies P_1 V_1 = P_2 V_2 = \\text{constant} \\quad (T, n \\text{ স্থির})",
+    "description": "স্থির তাপমাত্রায় নির্দিষ্ট ভরের যেকোনো গ্যাসের আয়তন তার উপর প্রযুক্ত চাপের ব্যস্তানুপাতিক। $P$ বনাম $V$ লেখ সমপরাবৃত্তাকার (Isotherm বা সমোষ্ণ রেখা), $PV$ বনাম $P$ লেখ অনুভূমিক সরলরেখা এবং $P$ বনাম $1/V$ লেখ মূলবিন্দুগামী সরলরেখা।",
+    "practiceQuestions": [
+      {
+        "question": "স্থির তাপমাত্রায় $1\\text{ atm}$ চাপে একটি গ্যাসের আয়তন $2\\text{ L}$। চাপ বৃদ্ধি করে $4\\text{ atm}$ করা হলে আয়তন কত হবে?",
+        "answer": "Ans: $V_2 = \\frac{P_1 V_1}{P_2} = \\frac{1 \\times 2}{4} = 0.5\\text{ L}$"
+      },
+      {
+        "question": "হ্রদের তলদেশ থেকে উপরিপৃষ্ঠে আসায় একটি বুদবুদের আয়তন ৫ গুণ হলে হ্রদের গভীরতা কত? (বায়ুমণ্ডলীয় চাপ $10^5\\text{ Pa}$, $g = 9.8\\text{ m/s}^2$)",
+        "answer": "Ans: $P_1 = P_0 + h\\rho g = 5 P_0 \\implies h\\rho g = 4 P_0 \\implies h = \\frac{4 \\times 10^5}{1000 \\times 9.8} \\approx 40.82\\text{ m}$"
+      }
+    ]
   },
   {
-    "title": "pOH সংজ্ঞা",
-    "latex": "pOH = -\\log[OH^-]",
-    "description": "OH⁻ আয়নের মোলার ঘনমাত্রার ঋণাত্মক লগারিদম"
+    "title": "চার্লসের সূত্র ও পরম শূন্য তাপমাত্রা (Charles's Law & Absolute Zero)",
+    "latex": "V \\propto T \\implies \\frac{V_1}{T_1} = \\frac{V_2}{T_2}, \\quad V_t = V_0\\left(1 + \\frac{t}{273.15}\\right), \\quad T = 0\\text{ K} = -273.15^\\circ\\text{C}",
+    "description": "স্থির চাপে নির্দিষ্ট ভরের গ্যাসের আয়তন পরম তাপমাত্রার সমানুপাতিক ($V$ বনাম $T$ লেখ Isobar বা সমচাপীয় রেখা)। $-273.15^\\circ\\text{C}$ তাপমাত্রায় গ্যাসের আয়তন তাত্ত্বিকভাবে শূন্য হয়ে যায়, একে পরম শূন্য তাপমাত্রা বলে।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ তাপমাত্রায় একটি গ্যাসের আয়তন $600\\text{ mL}$ হলে স্থির চাপে কত তাপমাত্রায় এর আয়তন দ্বিগুণ ($1200\\text{ mL}$) হবে?",
+        "answer": "Ans: $T_1 = 27 + 273 = 300\\text{ K}$। $T_2 = T_1 \\times \\frac{V_2}{V_1} = 300 \\times 2 = 600\\text{ K} = 327^\\circ\\text{C}$"
+      }
+    ]
   },
   {
-    "title": "pH ও pOH সম্পর্ক",
-    "latex": "pH + pOH = 14",
-    "description": "২৫°C তাপমাত্রায়"
+    "title": "গে-লুসাকের চাপের সূত্র (Gay-Lussac's Pressure Law)",
+    "latex": "P \\propto T \\implies \\frac{P_1}{T_1} = \\frac{P_2}{T_2} \\quad (V, n \\text{ স্থির}), \\quad P_t = P_0\\left(1 + \\frac{t}{273.15}\\right)",
+    "description": "স্থির আয়তনে নির্দিষ্ট ভরের কোনো গ্যাসের চাপ তার পরম তাপমাত্রার সমানুপাতিক ($P$ বনাম $T$ লেখ Isochore বা সমআয়তনীয় রেখা)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি সিলিন্ডারে $27^\\circ\\text{C}$ এ $2\\text{ atm}$ চাপে গ্যাস রাখা আছে। বিস্ফোরণ সীমা $5\\text{ atm}$ হলে সর্বোচ্চ কত তাপমাত্রায় সিলিন্ডারটি নিরাপদে থাকবে?",
+        "answer": "Ans: $T_2 = T_1 \\times \\frac{P_2}{P_1} = 300 \\times \\frac{5}{2} = 750\\text{ K} = 477^\\circ\\text{C}$"
+      }
+    ]
+  },
+  {
+    "title": "অ্যাভোগাড্রোর সূত্র (Avogadro's Law)",
+    "latex": "V \\propto n \\implies \\frac{V_1}{n_1} = \\frac{V_2}{n_2} \\quad (T, P \\text{ স্থির})",
+    "description": "একই তাপমাত্রা ও চাপে সমআয়তন সকল গ্যাসে সমান সংখ্যক অণু থাকে। প্রমাণ অবস্থায় (STP) যেকোনো গ্যাসের ১ মোলের আয়তন $22.414\\text{ L}$।",
+    "practiceQuestions": [
+      {
+        "question": "স্থির $T$ ও $P$-তে $2\\text{ g}$ $H_2$ ($1\\text{ mol}$) এর আয়তন $22.4\\text{ L}$ হলে $32\\text{ g}$ $O_2$ ($1\\text{ mol}$) এর আয়তন কত?",
+        "answer": "Ans: $22.4\\text{ L}$ (উভয়ের মোল সংখ্যা সমান)"
+      }
+    ]
+  },
+  {
+    "title": "সমন্বিত গ্যাস সূত্র (Combined Gas Law)",
+    "latex": "\\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}",
+    "description": "বয়েল ও চার্লসের সূত্রের সমন্বয়ে গঠিত রূপ, যেখানে চাপ, আয়তন ও তাপমাত্রা তিনটি চলকই একসাথে পরিবর্তিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ ও $750\\text{ mmHg}$ চাপে গ্যাসের আয়তন $500\\text{ mL}$ হলে STP-তে এর আয়তন কত?",
+        "answer": "Ans: $V_2 = \\frac{P_1 V_1 T_2}{T_1 P_2} = \\frac{750 \\times 500 \\times 273}{300 \\times 760} \\approx 449.01\\text{ mL}$"
+      }
+    ]
+  },
+  {
+    "title": "আদর্শ গ্যাস সমীকরণ (Ideal Gas Equation)",
+    "latex": "P V = n R T = \\frac{W}{M} R T = N k_B T",
+    "description": "$P$ = চাপ, $V$ = আয়তন, $n$ = মোল সংখ্যা, $W$ = ভর (গ্রাম), $M$ = মোলার ভর ($\\text{g/mol}$), $R$ = সর্বজনীন গ্যাস ধ্রুবক, $T$ = পরম তাপমাত্রা, $k_B$ = বোল্টজম্যান ধ্রুবক, $N$ = অণু সংখ্যা।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ তাপমাত্রায় $2\\text{ atm}$ চাপে $10\\text{ L}$ পাত্রে কত মোল গ্যাস থাকবে?",
+        "answer": "Ans: $n = \\frac{PV}{RT} = \\frac{2 \\times 10}{0.0821 \\times 300} = \\frac{20}{24.63} \\approx 0.812\\text{ mol}$"
+      }
+    ]
+  },
+  {
+    "title": "সর্বজনীন গ্যাস ধ্রুবক R এর বিভিন্ন এককে মান (Values of Gas Constant R)",
+    "latex": "R = 0.0821\\text{ L}\\cdot\\text{atm}\\cdot\\text{K}^{-1}\\text{mol}^{-1} = 8.314\\text{ J}\\cdot\\text{K}^{-1}\\text{mol}^{-1} = 1.987\\text{ cal}\\cdot\\text{K}^{-1}\\text{mol}^{-1} = 8.314 \\times 10^7\\text{ erg}\\cdot\\text{K}^{-1}\\text{mol}^{-1}",
+    "description": "$R$ হলো ১ মোল আদর্শ গ্যাসের তাপমাত্রা ১ কেলভিন বাড়াতে প্রসারণজনিত কাজের পরিমাণ (একক: কাজ/তাপমাত্রা $\\times$ মোল)।",
+    "practiceQuestions": [
+      {
+        "question": "এসআই (SI) এককে $R$ এর মান ও একক কী?",
+        "answer": "Ans: $8.314\\text{ J}\\cdot\\text{K}^{-1}\\text{mol}^{-1}$ (বা $\\text{N}\\cdot\\text{m}\\cdot\\text{K}^{-1}\\text{mol}^{-1}$ বা $\\text{Pa}\\cdot\\text{m}^3\\cdot\\text{K}^{-1}\\text{mol}^{-1}$)"
+      }
+    ]
+  },
+  {
+    "title": "বোল্টজম্যান ধ্রুবক (Boltzmann Constant)",
+    "latex": "k_B = \\frac{R}{N_A} = \\frac{8.314}{6.022 \\times 10^{23}} = 1.38 \\times 10^{-23}\\text{ J/K} = 1.38 \\times 10^{-16}\\text{ erg/K}",
+    "description": "প্রতিটি একক গ্যাসীয় অণুর গ্যাস ধ্রুবককে বোল্টজম্যান ধ্রুবক ($k_B$) বলে।",
+    "practiceQuestions": [
+      {
+        "question": "একটি একক অণুর জন্য আদর্শ গ্যাস সমীকরণটি কেমন হবে?",
+        "answer": "Ans: $PV = k_B T$"
+      }
+    ]
+  },
+  {
+    "title": "গ্যাসের ঘনত্ব ও আণবিক ভর নির্ণয় (Gas Density & Molar Mass)",
+    "latex": "P M = d R T \\implies d = \\frac{P M}{R T}, \\quad M = \\frac{d R T}{P} = \\frac{W R T}{P V}",
+    "description": "$d$ = গ্যাসের ঘনত্ব ($\\text{g/L}$ বা $\\text{kg/m}^3$), $M$ = আণবিক ভর। স্থির তাপমাত্রায় গ্যাসের ঘনত্ব চাপের সমানুপাতিক ($d \\propto P$)।",
+    "practiceQuestions": [
+      {
+        "question": "STP-তে $CO_2$ গ্যাসের ঘনত্ব কত? ($M = 44\\text{ g/mol}$)",
+        "answer": "Ans: $d = \\frac{PM}{RT} = \\frac{1 \\times 44}{0.0821 \\times 273.15} = \\frac{44}{22.414} \\approx 1.963\\text{ g/L}$"
+      }
+    ]
+  },
+  {
+    "title": "STP ও SATP এর পার্থক্য (STP vs SATP Standards)",
+    "latex": "\\text{STP: } 0^\\circ\\text{C} \\; (273.15\\text{ K}), \\; 1\\text{ atm} \\; (101.325\\text{ kPa}) \\implies V_m = 22.414\\text{ L}; \\quad \\text{SATP: } 25^\\circ\\text{C} \\; (298.15\\text{ K}), \\; 100\\text{ kPa} \\; (1\\text{ bar}) \\implies V_m = 24.789\\text{ L}",
+    "description": "• STP = Standard Temperature and Pressure\n• SATP = Standard Ambient Temperature and Pressure।",
+    "practiceQuestions": [
+      {
+        "question": "SATP-তে ১ মোল যেকোনো গ্যাসের মোলার আয়তন কত?",
+        "answer": "Ans: $24.789\\text{ L}$ (প্রায় $24.8\\text{ L}$)"
+      }
+    ]
+  },
+  {
+    "title": "ডাল্টনের আংশিক চাপ সূত্র (Dalton's Law of Partial Pressures)",
+    "latex": "P_{\\text{total}} = p_A + p_B + p_C + \\dots = \\sum_{i} p_i \\quad (T, V \\text{ স্থির})",
+    "description": "পরস্পর বিক্রিয়াহীন গ্যাস মিশ্রণের মোট চাপ প্রতিটি উপাদান গ্যাসের আংশিক চাপের সমষ্টির সমান।",
+    "practiceQuestions": [
+      {
+        "question": "একটি পাত্রে $2\\text{ atm}$ চাপে নাইট্রোজেন ও $3\\text{ atm}$ চাপে অক্সিজেন গ্যাস মিশ্রিত করলে মোট চাপ কত?",
+        "answer": "Ans: $P_{\\text{total}} = 2 + 3 = 5\\text{ atm}$"
+      }
+    ]
+  },
+  {
+    "title": "আংশিক চাপ ও মোল ভগ্নাংশের সম্পর্ক (Partial Pressure & Mole Fraction)",
+    "latex": "p_A = X_A \\times P_{\\text{total}} = \\left(\\frac{n_A}{n_{\\text{total}}}\\right) P_{\\text{total}}, \\quad p_A = \\frac{v_A}{V_{\\text{total}}} \\times P_{\\text{total}}",
+    "description": "যেকোনো উপাদান গ্যাসের আংশিক চাপ = ঐ গ্যাসের মোল ভগ্নাংশ $\\times$ মিশ্রণের মোট চাপ।",
+    "practiceQuestions": [
+      {
+        "question": "একটি পাত্রে $16\\text{ g}$ $O_2$ ($0.5\\text{ mol}$) এবং $28\\text{ g}$ $N_2$ ($1.0\\text{ mol}$) মিশ্রিত আছে। মোট চাপ $6\\text{ atm}$ হলে $O_2$ এর আংশিক চাপ কত?",
+        "answer": "Ans: $X_{O_2} = \\frac{0.5}{0.5 + 1.0} = \\frac{1}{3}$। $p_{O_2} = \\frac{1}{3} \\times 6 = 2\\text{ atm}$"
+      }
+    ]
+  },
+  {
+    "title": "জলীয় বাষ্পের উপস্থিতি ও শুষ্ক গ্যাসের চাপ (Aqueous Tension)",
+    "latex": "P_{\\text{dry gas}} = P_{\\text{moist gas}} - f \\quad (f = \\text{জলীয় বাষ্পচাপ বা জলীয় বাষ্পের টান})",
+    "description": "পানির উপর গ্যাস সংগ্রহ করলে গ্যাসটি আর্দ্র থাকে। ডাল্টনের সূত্র প্রয়োগের পূর্বে মোট চাপ হতে ঐ তাপমাত্রার জলীয় বাষ্পচাপ ($f$) বিয়োগ করে শুষ্ক গ্যাসের চাপ বের করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$25^\\circ\\text{C}$ এ পানির উপর সংগৃহীত আর্দ্র গ্যাসের চাপ $760\\text{ mmHg}$ এবং ঐ তাপমাত্রায় জলীয় বাষ্পচাপ $23.8\\text{ mmHg}$ হলে শুষ্ক গ্যাসের চাপ কত?",
+        "answer": "Ans: $P_{\\text{dry}} = 760 - 23.8 = 736.2\\text{ mmHg}$"
+      }
+    ]
+  },
+  {
+    "title": "গ্রাহামের গ্যাস ব্যাপন সূত্র (Graham's Law of Diffusion)",
+    "latex": "r \\propto \\frac{1}{\\sqrt{d}} \\propto \\frac{1}{\\sqrt{M}} \\implies \\frac{r_1}{r_2} = \\sqrt{\\frac{d_2}{d_1}} = \\sqrt{\\frac{M_2}{M_1}}",
+    "description": "$r$ = ব্যাপন বা নিঃসরণ হার, $d$ = ঘনত্ব, $M$ = আণবিক ভর। হালকা গ্যাসের ব্যাপন হার ভারী গ্যাস অপেক্ষা বেশি ($r_{H_2} > r_{CH_4} > r_{N_2} > r_{O_2} > r_{CO_2}$)।",
+    "practiceQuestions": [
+      {
+        "question": "$CH_4$ এবং $SO_2$ এর ব্যাপন হারের অনুপাত কত? ($M_{CH_4}=16, M_{SO_2}=64$)",
+        "answer": "Ans: $\\frac{r_{CH_4}}{r_{SO_2}} = \\sqrt{\\frac{64}{16}} = \\sqrt{4} = 2$ ($CH_4$ এর ব্যাপন হার $SO_2$ এর দ্বিগুণ)"
+      }
+    ]
+  },
+  {
+    "title": "ব্যাপন হার ও সময়/দূরত্বের সম্পর্ক (Diffusion Rate with Time & Distance)",
+    "latex": "r = \\frac{V}{t} = \\frac{L}{t} \\implies \\frac{r_1}{r_2} = \\frac{V_1 t_2}{V_2 t_1} = \\frac{L_1 t_2}{L_2 t_1} = \\sqrt{\\frac{M_2}{M_1}}",
+    "description": "নির্দিষ্ট আয়তন ($V_1 = V_2$) ব্যাপিত হতে প্রয়োজনীয় সময়ের অনুপাত: $\\frac{t_2}{t_1} = \\sqrt{\\frac{M_2}{M_1}}$। $L$ হলো নলের মধ্য দিয়ে অতিক্রান্ত দূরত্ব।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ছিদ্র দিয়ে সমআয়তনের $O_2$ গ্যাস ব্যাপিত হতে $20\\text{ s}$ লাগলে অজানা গ্যাসের $10\\text{ s}$ লাগে। অজানা গ্যাসের আণবিক ভর কত?",
+        "answer": "Ans: $\\frac{t_{O_2}}{t_x} = \\sqrt{\\frac{M_{O_2}}{M_x}} \\implies \\frac{20}{10} = \\sqrt{\\frac{32}{M_x}} \\implies 4 = \\frac{32}{M_x} \\implies M_x = 8\\text{ g/mol}$"
+      }
+    ]
+  },
+  {
+    "title": "চাপের ভিন্নতায় গ্রাহামের সূত্র (Graham's Law under Different Pressures)",
+    "latex": "\\frac{r_1}{r_2} = \\frac{P_1}{P_2}\\sqrt{\\frac{M_2}{M_1}}",
+    "description": "যদি দুটি গ্যাস ভিন্ন চাপে রক্ষিত থাকে, তবে তাদের নিঃসরণ হার চাপের সমানুপাতিক এবং আণবিক ভরের বর্গমূলের ব্যস্তানুপাতিক হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$2\\text{ atm}$ চাপে থাকা $He$ এবং $1\\text{ atm}$ চাপে থাকা $CH_4$ এর ব্যাপন হারের অনুপাত কত?",
+        "answer": "Ans: $\\frac{r_{He}}{r_{CH_4}} = \\frac{2}{1} \\times \\sqrt{\\frac{16}{4}} = 2 \\times 2 = 4$"
+      }
+    ]
+  },
+  {
+    "title": "গ্যাসের গতিতত্ত্বের মৌলিক সমীকরণ (Kinetic Gas Equation)",
+    "latex": "P V = \\frac{1}{3} m N c^2 = \\frac{1}{3} M_{\\text{total}} c^2",
+    "description": "$m$ = একটি অণুর ভর, $N$ = মোট অণু সংখ্যা, $mN = M_{\\text{total}}$ = মোট ভর, $c$ = বর্গমূল গড় বর্গবেগ (RMS Velocity)। ক্লসিয়াস কর্তৃক প্রতিপাদিত।",
+    "practiceQuestions": [
+      {
+        "question": "গ্যাসের গতিতত্ত্বের সমীকরণ থেকে প্রমাণ করো যে $P = \\frac{1}{3} d c^2$।",
+        "answer": "Ans: $PV = \\frac{1}{3} M c^2 \\implies P = \\frac{1}{3}\\left(\\frac{M}{V}\\right)c^2 = \\frac{1}{3} d c^2$"
+      }
+    ]
+  },
+  {
+    "title": "বর্গমূল গড় বর্গবেগ (RMS Velocity)",
+    "latex": "c_{\\text{rms}} = \\sqrt{\\frac{3 R T}{M}} = \\sqrt{\\frac{3 P V}{M}} = \\sqrt{\\frac{3 P}{d}} = \\sqrt{\\frac{3 k_B T}{m}}",
+    "description": "$R = 8.314\\text{ J/mol}\\cdot\\text{K}$, $M$ = মোলার ভর ($\\text{kg/mol}$ এককে বসাতে হবে! যেমন $O_2$ এর জন্য $0.032\\text{ kg/mol}$)। $c_{\\text{rms}} \\propto \\sqrt{T}$।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ তাপমাত্রায় নাইট্রোজেন ($N_2$) গ্যাসের RMS বেগ কত? ($M = 0.028\\text{ kg/mol}$)",
+        "answer": "Ans: $c = \\sqrt{\\frac{3 \\times 8.314 \\times 300}{0.028}} = \\sqrt{\\frac{7482.6}{0.028}} = \\sqrt{267235.7} \\approx 516.95\\text{ m/s}$"
+      },
+      {
+        "question": "কোন তাপমাত্রায় $O_2$ গ্যাসের RMS বেগ $0^\\circ\\text{C}$ এর বেগের দ্বিগুণ হবে?",
+        "answer": "Ans: $c \\propto \\sqrt{T} \\implies \\frac{c_2}{c_1} = 2 = \\sqrt{\\frac{T_2}{273}} \\implies T_2 = 4 \\times 273 = 1092\\text{ K} = 819^\\circ\\text{C}$"
+      }
+    ]
+  },
+  {
+    "title": "গড় বেগ ও সম্ভাব্যতম বেগ (Average & Most Probable Velocities)",
+    "latex": "\\bar{c} = \\sqrt{\\frac{8 R T}{\\pi M}} \\approx 0.9213 c_{\\text{rms}}, \\quad c_p = \\sqrt{\\frac{2 R T}{M}} \\approx 0.816 c_{\\text{rms}}",
+    "description": "ম্যাক্সওয়েলের বেগ বণ্টন অনুযায়ী বেগের অনুপাত: $c_p : \\bar{c} : c_{\\text{rms}} = \\sqrt{2} : \\sqrt{\\frac{8}{\\pi}} : \\sqrt{3} \\approx 1 : 1.128 : 1.224$ ($c_p < \\bar{c} < c_{\\text{rms}}$)।",
+    "practiceQuestions": [
+      {
+        "question": "গ্যাসের তিন ধরনের বেগের মধ্যে মানের দিক থেকে কোনটি বৃহত্তম?",
+        "answer": "Ans: বর্গমূল গড় বর্গবেগ ($c_{\\text{rms}} > \\bar{c} > c_p$)"
+      }
+    ]
+  },
+  {
+    "title": "গ্যাসের মোট গতিশক্তি (Total Kinetic Energy of Gas)",
+    "latex": "E_k = \\frac{3}{2} n R T = \\frac{3}{2} P V = \\frac{3}{2}\\left(\\frac{W}{M}\\right) R T",
+    "description": "$E_k$ = মোট গতিশক্তি (Joule), $n$ = মোল সংখ্যা, $R = 8.314\\text{ J/mol}\\cdot\\text{K}$, $T$ = পরম তাপমাত্রা। গ্যাসের গতিশক্তি কেবল তাপমাত্রার উপর নির্ভরশীল।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ তাপমাত্রায় $8\\text{ g}$ মিথেন ($CH_4$) গ্যাসের গতিশক্তি কত?",
+        "answer": "Ans: $n = \\frac{8}{16} = 0.5\\text{ mol}$। $E_k = \\frac{3}{2} \\times 0.5 \\times 8.314 \\times 300 = 1870.65\\text{ J}$"
+      }
+    ]
+  },
+  {
+    "title": "১টি অণুর গতিশক্তি ও ১ মোলের গতিশক্তি (Kinetic Energy per Molecule & per Mole)",
+    "latex": "E_{k(\\text{1 molecule})} = \\frac{3}{2} k_B T = \\frac{3 R T}{2 N_A}, \\quad E_{k(\\text{1 mole})} = \\frac{3}{2} R T",
+    "description": "একটি অণুর গতিশক্তি গ্যাসের প্রকৃতি বা আণবিক ভরের উপর নির্ভর করে না, শুধুমাত্র তাপমাত্রার উপর নির্ভর করে।",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ এ যেকোনো গ্যাসের একটি অণুর গড় গতিশক্তি কত?",
+        "answer": "Ans: $E_k = \\frac{3}{2} \\times (1.38 \\times 10^{-23}) \\times 300 = 6.21 \\times 10^{-21}\\text{ J}$"
+      }
+    ]
+  },
+  {
+    "title": "বাস্তব গ্যাস ও ভ্যান ডার ওয়ালস সমীকরণ (Van der Waals Equation for Real Gases)",
+    "latex": "\\left(P + \\frac{a n^2}{V^2}\\right)(V - n b) = n R T, \\quad \\left(P + \\frac{a}{V_m^2}\\right)(V_m - b) = R T \\; (n=1)",
+    "description": "আদর্শ আচরণ থেকে বিচ্যুতির ২টি কারণ:\n১. আন্তঃআণবিক আকর্ষণ বলজনিত চাপ ত্রুটি সংশোধন: $+ \\frac{a n^2}{V^2}$\n২. অণুসমূহের নিজস্ব কার্যকর আয়তনজনিত আয়তন ত্রুটি সংশোধন: $- n b$।",
+    "practiceQuestions": [
+      {
+        "question": "ভ্যান ডার ওয়ালস সমীকরণে $a$ এবং $b$ দ্বারা কী নির্দেশিত হয়?",
+        "answer": "Ans: $a$ নির্দেশ করে অণুসমূহের মধ্যকার আকর্ষণ বল এবং $b$ নির্দেশ করে অণুসমূহের নিজস্ব কার্যকর আয়তন।"
+      }
+    ]
+  },
+  {
+    "title": "ভ্যান ডার ওয়ালস ধ্রুবকদ্বয়ের একক ও ভৌত তাৎপর্য (Units of a and b)",
+    "latex": "\\text{Unit of } a = \\text{atm}\\cdot\\text{L}^2\\cdot\\text{mol}^{-2} = \\text{N}\\cdot\\text{m}^4\\cdot\\text{mol}^{-2}, \\quad \\text{Unit of } b = \\text{L}\\cdot\\text{mol}^{-1} = \\text{m}^3\\cdot\\text{mol}^{-1}, \\quad b = 4 N_A v",
+    "description": "$b$ হলো ১ মোল গ্যাস অণুর প্রকৃত আয়তনের ৪ গুণ ($b = 4 \\times N_A \\times \\frac{4}{3}\\pi r^3$)। $a$ এর মান বেশি হলে গ্যাসটি সহজে তরলীকৃত হয় (যেমন $NH_3 > CO_2 > O_2 > H_2$)।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mol}$ গ্যাসের অণুগুলোর প্রকৃত মোট আয়তন $v_0$ হলে ভ্যান ডার ওয়ালস ধ্রুবক $b$ এর মান কত?",
+        "answer": "Ans: $b = 4 v_0$"
+      }
+    ]
+  },
+  {
+    "title": "সংকোচনশীলতা গুণক Z ও বিচ্যুতির ব্যাখ্যা (Compressibility Factor Z)",
+    "latex": "Z = \\frac{P V}{n R T} = \\frac{V_{\\text{real}}}{V_{\\text{ideal}}}",
+    "description": "• আদর্শ গ্যাস: $Z = 1$\n• ঋণাত্মক বিচ্যুতি ($Z < 1$): নিম্ন চাপে আকর্ষণ বল প্রাধান্য পায়, গ্যাসটি আদর্শ অপেক্ষা অধিক সংকোচনশীল ($CH_4, CO_2$)\n• ধনাত্মক বিচ্যুতি ($Z > 1$): উচ্চ চাপে কার্যকর আয়তন প্রাধান্য পায় ($H_2, He$ এর ক্ষেত্রে সর্বদা $Z > 1$)।",
+    "practiceQuestions": [
+      {
+        "question": "$H_2$ এবং $He$ গ্যাসের ক্ষেত্রে সাধারণ তাপমাত্রায় $Z > 1$ হয় কেন?",
+        "answer": "Ans: কারণ এদের আণবিক ভর ও আকার অত্যন্ত ক্ষুদ্র হওয়ায় আন্তঃআণবিক আকর্ষণ বল ($a \\approx 0$) প্রায় নেই বললেই চলে, ফলে কার্যকর আয়তনজনিত ধনাত্মক বিচ্যুতি ঘটে ($PV = RT + Pb$)।"
+      }
+    ]
+  },
+  {
+    "title": "বয়েল তাপমাত্রা ও সংকট ধ্রুবকসমূহ (Boyle Temperature & Critical Constants)",
+    "latex": "T_B = \\frac{a}{R b}, \\quad T_c = \\frac{8a}{27 R b}, \\quad P_c = \\frac{a}{27 b^2}, \\quad V_c = 3b, \\quad Z_c = \\frac{P_c V_c}{R T_c} = \\frac{3}{8} = 0.375",
+    "description": "• বয়েলের তাপমাত্রা ($T_B$): যে তাপমাত্রায় বাস্তব গ্যাস বিস্তৃত চাপ পরিসরে আদর্শ গ্যাসের মতো আচরণ করে ($Z=1$)।\n• সংকট তাপমাত্রা ($T_c$): যে তাপমাত্রার উপরে কোনো গ্যাসকে কেবল চাপ প্রয়োগ করে তরল করা যায় না ($CO_2$ এর $T_c = 31.1^\\circ\\text{C}$)।",
+    "practiceQuestions": [
+      {
+        "question": "$CO_2$ এর সংকট তাপমাত্রা কত?",
+        "answer": "Ans: $31.1^\\circ\\text{C}$ (বা $304.25\\text{ K}$)"
+      }
+    ]
+  },
+  {
+    "title": "বায়ুমণ্ডলের স্তরবিন্যাস ও তাপমাত্রা পরিবর্তন (Atmospheric Layers & Lapse Rate)",
+    "latex": "\\text{Lapse Rate} = -6.5^\\circ\\text{C/km} \\; (\\text{ট্রপোস্ফিয়ারে উচ্চতা বৃদ্ধির সাথে তাপমাত্রা হ্রাস})",
+    "description": "১. ট্রপোস্ফিয়ার ($0-12\\text{ km}$): আবহাওয়া মন্ডল, প্রতি কিমিতে $6.5^\\circ\\text{C}$ কমে\n২. স্ট্রাটোস্ফিয়ার ($12-50\\text{ km}$): শান্ত মন্ডল, ওজোন স্তর ($20-30\\text{ km}$), বিমান চলাচল\n৩. মেসোস্ফিয়ার ($50-85\\text{ km}$): শীতলতম স্তর ($-90^\\circ\\text{C}$)\n৪. থার্মোস্ফিয়ার ($85-500\\text{ km}$): আয়নিত স্তর (রেডিও তরঙ্গ প্রতিফলিত হয়)।",
+    "practiceQuestions": [
+      {
+        "question": "বায়ুমণ্ডলের কোন স্তরে ওজোন স্তর অবস্থিত এবং জেট বিমান চলাচল করে?",
+        "answer": "Ans: স্ট্রাটোস্ফিয়ার (Stratosphere)"
+      }
+    ]
+  },
+  {
+    "title": "সিএফসি (CFC) এর নামকরণ সূত্র (CFC Nomenclature Formula)",
+    "latex": "\\text{CFC}-(C-1)(H+1)(F) \\iff \\text{Rule of 90: } \\text{Code} + 90 = C H F",
+    "description": "সংকেত হতে কোড বের করতে ৯০ যোগ করতে হয়। যেমন: $\\text{CF}_2\\text{Cl}_2 \\implies C=1, H=0, F=2 \\implies 102 - 90 = 12 \\implies \\text{CFC-12}$।\n• $\\text{CFCl}_3 \\implies \\text{CFC-11}$\n• $\\text{C}_2\\text{F}_3\\text{Cl}_3 \\implies \\text{CFC-113}$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CF}_2\\text{Cl}_2$ এর বাণিজ্যিক CFC নাম কী?",
+        "answer": "Ans: CFC-12 (Freon-12)"
+      },
+      {
+        "question": "CFC-11 এর রাসায়নিক সংকেত কী?",
+        "answer": "Ans: $11 + 90 = 101 \\implies C=1, H=0, F=1, Cl=3 \\implies \\text{CFCl}_3$"
+      }
+    ]
+  },
+  {
+    "title": "ওজোন স্তর ক্ষয় ও চেইন বিক্রিয়া (Ozone Depletion Mechanism)",
+    "latex": "\\text{CFCl}_3 \\xrightarrow{h\\nu} \\dot{\\text{C}}\\text{FCl}_2 + \\dot{\\text{Cl}}, \\quad \\dot{\\text{Cl}} + \\text{O}_3 \\to \\text{ClO}^\\bullet + \\text{O}_2, \\quad \\text{ClO}^\\bullet + \\text{O} \\to \\dot{\\text{Cl}} + \\text{O}_2",
+    "description": "একটি মাত্র সক্রিয় ক্লোরিন মুক্ত র‍্যাডিকেল ($\\,\\dot{\\text{Cl}}\\,\\,$) প্রায় ১,০০,০০০ (এক লক্ষ) ওজোন ($\\,\\text{O}_3\\,$) অণুকে ভেঙে অক্সিজেনে পরিণত করে ওজোন ছিদ্র তৈরি করে। ডবসন একক (Dobson Unit - DU) দ্বারা ওজোনের ঘনত্ব মাপা হয় ($1\\text{ DU} = 0.01\\text{ mm}$ বেধ)।",
+    "practiceQuestions": [
+      {
+        "question": "ওজোন স্তরের ঘনত্ব পরিমাপের একক কোনটি?",
+        "answer": "Ans: ডবসন ইউনিট (Dobson Unit - DU)"
+      }
+    ]
+  },
+  {
+    "title": "গ্রিনহাউস প্রভাব ও গ্যাসসমূহের অবদান (Greenhouse Gases Contribution)",
+    "latex": "\\text{CO}_2 (50\\%), \\quad \\text{CH}_4 (18\\%), \\quad \\text{CFC} (16\\%), \\quad \\text{O}_3 (8\\%), \\quad \\text{N}_2\\text{O} (6\\%), \\quad \\text{H}_2\\text{O বাষ্প}",
+    "description": "গ্লোবাল ওয়ার্মিং পটেনশিয়াল (GWP): $\\text{SF}_6 > \\text{CFC} > \\text{N}_2\\text{O} > \\text{CH}_4 > \\text{CO}_2$। মিথেনের তাপ ধারণ ক্ষমতা $\\text{CO}_2$ অপেক্ষা প্রায় ২৫ গুণ বেশি এবং CFC এর প্রায় ১৫,০০০ গুণ বেশি।",
+    "practiceQuestions": [
+      {
+        "question": "গ্রিনহাউস প্রভাবে সামগ্রিকভাবে সর্বাধিক অবদান রাখে কোন গ্যাস?",
+        "answer": "Ans: কার্বন ডাই অক্সাইড ($CO_2$, প্রায় ৫০% অবদান)"
+      }
+    ]
+  },
+  {
+    "title": "এসিড বৃষ্টি ও বিক্রিয়াসমূহ (Acid Rain Chemistry)",
+    "latex": "pH < 5.6, \\quad \\text{SO}_2 + \\text{H}_2\\text{O} \\to \\text{H}_2\\text{SO}_3, \\quad 2\\text{SO}_2 + \\text{O}_2 + 2\\text{H}_2\\text{O} \\to 2\\text{H}_2\\text{SO}_4, \\quad 4\\text{NO}_2 + \\text{O}_2 + 2\\text{H}_2\\text{O} \\to 4\\text{HNO}_3",
+    "description": "স্বাভাবিক বৃষ্টির পানিতে বায়ুমণ্ডলীয় $\\text{CO}_2$ দ্রবীভূত হয়ে লঘু কার্বনিক এসিড ($\\,\\text{H}_2\\text{CO}_3\\,$) থাকায় স্বাভাবিক $pH \\approx 5.6$ থাকে। $pH < 5.6$ হলে তাকে এসিড বৃষ্টি বলে। এসিড বৃষ্টির প্রধান উপাদান $\\text{H}_2\\text{SO}_4 (60-70\\%)$ ও $\\text{HNO}_3 (30-40\\%)$।",
+    "practiceQuestions": [
+      {
+        "question": "বৃষ্টির পানির $pH$ কত এর নিচে নামলে তাকে এসিড বৃষ্টি বলা হয়?",
+        "answer": "Ans: $5.6$ এর নিচে নামলে ($pH < 5.6$)"
+      }
+    ]
+  },
+  {
+    "title": "আলোক রাসায়নিক ধোঁয়াশা ও প্যান (Photochemical Smog & PAN)",
+    "latex": "\\text{NO}_2 \\xrightarrow{h\\nu} \\text{NO} + \\text{O}^\\bullet, \\quad \\text{O}^\\bullet + \\text{O}_2 \\to \\text{O}_3, \\quad \\text{হাইড্রোকার্বন} + \\text{NO}_x + \\text{O}_3 \\to \\text{PAN } (\\text{CH}_3\\text{COOONO}_2)",
+    "description": "সূর্যালোকের উপস্থিতিতে নাইট্রোজেনের অক্সাইডসমূহ ($\\,\\text{NO}_x\\,$) এবং অদগ্ধ উদ্বায়ী হাইড্রোকার্বনের বিক্রিয়ায় ওজোন ও পারঅক্সিঅ্যাসিটাইল নাইট্রেট (PAN) গঠিত হয়ে বাদামি রঙের বিষাক্ত আলোক রাসায়নিক ধোঁয়াশা সৃষ্টি করে। এটি চোখে জ্বালাপোড়া ও উদ্ভিদের ক্ষতি করে।",
+    "practiceQuestions": [
+      {
+        "question": "PAN এর পূর্ণরূপ কী?",
+        "answer": "Ans: পারঅক্সিঅ্যাসিটাইল নাইট্রেট (Peroxyacetyl Nitrate - $\\text{CH}_3\\text{CO-O-O-NO}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "পানির দ্রবীভূত অক্সিজেন (Dissolved Oxygen - DO)",
+    "latex": "\\text{Standard DO: } 4 - 6\\text{ mg/L (বা ppm)}, \\quad \\text{Optimal: } 7 - 8\\text{ mg/L}, \\quad DO < 3\\text{ mg/L } \\implies \\text{জলজ প্রাণী মৃত্যুর ঝুঁকিতে}",
+    "description": "তাপমাত্রা বাড়লে পানিতে গ্যাসের দ্রাব্যতা হ্রাস পাওয়ায় DO কমে যায়। জৈব বর্জ্য বেশি থাকলে অণুজীব তা জারিত করতে অধিক অক্সিজেন গ্রহণ করে DO কমায়। উইঙ্কলার পদ্ধতিতে DO মাপা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানিতে মাছ ও জলজ প্রাণী বেঁচে থাকার জন্য নূন্যতম কত DO থাকা প্রয়োজন?",
+        "answer": "Ans: $4\\text{ mg/L}$ (বা $4\\text{ ppm}$)"
+      }
+    ]
+  },
+  {
+    "title": "বায়োকেমিক্যাল অক্সিজেন ডিমান্ড (BOD Formula)",
+    "latex": "\\text{BOD}_5 = DO_1 - DO_5 = (\\text{১ম দিনের DO}) - (\\text{৫ম দিনের DO}) \\; [\\text{mg/L বা ppm}]",
+    "description": "$20^\\circ\\text{C}$ তাপমাত্রায় ৫ দিন অন্ধকারে রেখে পানিতে থাকা জৈব বর্জ্যকে অণুজীব দ্বারা বায়বীয় জারণ ঘটাতে যে পরিমাণ অক্সিজেন প্রয়োজন হয়। $\\text{BOD} < 2\\text{ ppm}$ বিশুদ্ধ পানি, $\\text{BOD} > 10\\text{ ppm}$ অত্যন্ত দূষিত পানি।",
+    "practiceQuestions": [
+      {
+        "question": "একটি নমুনা পানির আদি DO ছিল $8.5\\text{ mg/L}$ এবং ২০°C এ ৫ দিন পর DO পাওয়া গেল $3.5\\text{ mg/L}$। পানির $\\text{BOD}_5$ কত?",
+        "answer": "Ans: $\\text{BOD}_5 = 8.5 - 3.5 = 5.0\\text{ mg/L}$"
+      }
+    ]
+  },
+  {
+    "title": "কেমিক্যাল অক্সিজেন ডিমান্ড (COD)",
+    "latex": "\\text{COD} > \\text{BOD} > \\text{TOC}",
+    "description": "পানিতে উপস্থিত জৈব ও অজৈব উভয় প্রকার বিজারক পদার্থকে তীব্র রাসায়নিক জারক ($\\text{K}_2\\text{Cr}_2\\text{O}_7 + \\text{গাঢ় } \\text{H}_2\\text{SO}_4$) দ্বারা সম্পূর্ণরূপে জারিত করতে প্রয়োজনীয় অক্সিজেনের পরিমাণ। COD সর্বদা BOD অপেক্ষা বেশি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "BOD এবং COD এর মধ্যে কোনটির মান সর্বদা বেশি হয় এবং কেন?",
+        "answer": "Ans: COD এর মান বেশি হয়, কারণ এটি জৈব ও অজৈব উভয় প্রকার দূষকের সম্পূর্ণ জারণ পরিমাপ করে।"
+      }
+    ]
+  },
+  {
+    "title": "পানির মোট দ্রবীভূত কঠিন বস্তু (Total Dissolved Solids - TDS)",
+    "latex": "\\text{WHO Standard: } \\text{TDS} \\le 500\\text{ ppm (বা mg/L)}, \\quad \\text{EC: } 1\\,\\mu\\text{S/cm} \\approx 0.64\\text{ ppm TDS}",
+    "description": "পানিতে দ্রবীভূত খনিজ লবণ ($Ca^{2+}, Mg^{2+}, Na^+, Cl^-, SO_4^{2-}, HCO_3^-$) এর মোট পরিমাণ। $\\text{TDS} > 1000\\text{ ppm}$ হলে পানি পানের অনুপযোগী।",
+    "practiceQuestions": [
+      {
+        "question": "পানীয় জলের জন্য WHO অনুমোদিত সর্বোচ্চ TDS মান কত?",
+        "answer": "Ans: $500\\text{ ppm}$ (বা $500\\text{ mg/L}$)"
+      }
+    ]
+  },
+  {
+    "title": "আর্সেনিক দূষণ ও সহনশীল মাত্রা (Arsenic Pollution Limits)",
+    "latex": "\\text{WHO Limit: } 0.01\\text{ mg/L} = 0.01\\text{ ppm}, \\quad \\text{Bangladesh Standard: } 0.05\\text{ mg/L} = 0.05\\text{ ppm}",
+    "description": "আর্সেনাইট আয়ন ($\\,\\text{AsO}_3^{3-}, \\text{As}^{3+}\\,\\,$) আর্সিনেট ($\\,\\text{As}^{5+}\\,\\,$) অপেক্ষা বেশি বিষাক্ত। আর্সেনিকোসিসের কারণে হাতে ও পায়ে কালো ক্ষত বা ব্ল্যাক ফুট ডিজিজ (Black Foot Disease) এবং ত্বক ক্যান্সার হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানীয় জলে বাংলাদেশে আর্সেনিকের সর্বোচ্চ গ্রহণযোগ্য মাত্রা কত?",
+        "answer": "Ans: $0.05\\text{ mg/L}$ (বা $0.05\\text{ ppm}$)"
+      }
+    ]
+  },
+  {
+    "title": "ভারী ধাতুর বিষাক্ততা ও ক্ষতিকর প্রভাব (Heavy Metal Toxicity)",
+    "latex": "\\text{Pb: মস্তিস্ক ও কিডনি বিকল (প্লাম্বিজম)}; \\; \\text{Cd: ইতাই-ইতাই হাড় রোগ}; \\; \\text{Hg: মিনামাটা রোগ}; \\; \\text{Cr: কার্সিনোজেন ও আলসার}",
+    "description": "• লেড ($Pb$): রক্তে হিমোগ্লোবিন সংশ্লেষণ বাধা দেয় এবং শিশুদের বুদ্ধিমত্তা কমায়\n• ক্যাডমিয়াম ($Cd$): হাড় নরম ও ভঙ্গুর করে (ইতাই-ইতাই বা আউচ-আউচ রোগ)\n• পারদ ($Hg$): স্নায়ুতন্ত্র ধ্বংস করে (জাপানের মিনামাটা উপসাগরের রোগ)।",
+    "practiceQuestions": [
+      {
+        "question": "জাপানের মিনামাটা উপসাগরে কোন ধাতুর বিষাক্ততার কারণে মানুষ আক্রান্ত হয়েছিল?",
+        "answer": "Ans: পারদ বা মার্কারি (মিথাইল মার্কারি, $Hg$)"
+      }
+    ]
+  },
+  {
+    "title": "আরহেনিয়াস এসিড-ক্ষার তত্ত্ব (Arrhenius Acid-Base Theory)",
+    "latex": "\\text{Acid: } \\text{H}_2\\text{O-তে } \\text{H}^+ \\text{ আয়ন দাতা}; \\quad \\text{Base: } \\text{H}_2\\text{O-তে } \\text{OH}^- \\text{ আয়ন দাতা}",
+    "description": "সীমাবদ্ধতা: এটি কেবল জলীয় দ্রবণে প্রযোজ্য; গ্যাসীয় বা নির্জল মাধ্যমে এসিড-ক্ষারীয় আচরণ ব্যাখ্যা করতে পারে না।",
+    "practiceQuestions": [
+      {
+        "question": "আরহেনিয়াস তত্ত্বের মূল সীমাবদ্ধতা কী?",
+        "answer": "Ans: এটি শুধুমাত্র জলীয় দ্রবণের মধ্যে সীমাবদ্ধ, নির্জল মাধ্যমে প্রযোজ্য নয়।"
+      }
+    ]
+  },
+  {
+    "title": "ব্রনস্টেড-লাউরি এসিড-ক্ষার ও অনুবন্ধী যুগল (Bronsted-Lowry & Conjugate Pairs)",
+    "latex": "\\text{Acid} \\rightleftharpoons \\text{H}^+ + \\text{Conjugate Base}, \\quad \\text{Base} + \\text{H}^+ \\rightleftharpoons \\text{Conjugate Acid}",
+    "description": "• প্রোটন দাতা = ব্রনস্টেড এসিড; প্রোটন গ্রহীতা = ব্রনস্টেড ক্ষার।\n• তীব্র এসিডের অনুবন্ধী ক্ষার দুর্বল এবং দুর্বল এসিডের অনুবন্ধী ক্ষার তীব্র হয়।\n• উদাহরণ: $\\text{HCl} + \\text{H}_2\\text{O} \\rightleftharpoons \\text{H}_3\\text{O}^+ + \\text{Cl}^-$ (এখানে $\\text{Cl}^-$ হলো $\\text{HCl}$ এর দুর্বল অনুবন্ধী ক্ষার)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HSO}_4^-$ এর অনুবন্ধী এসিড এবং অনুবন্ধী ক্ষার কী?",
+        "answer": "Ans: অনুবন্ধী এসিড $= \\text{H}_2\\text{SO}_4$ ($H^+$ গ্রহণ করে); অনুবন্ধী ক্ষার $= \\text{SO}_4^{2-}$ ($H^+$ বর্জন করে)"
+      }
+    ]
+  },
+  {
+    "title": "উভধর্মী বা অ্যাম্ফিপ্রোটিক পদার্থ (Amphiprotic Substances)",
+    "latex": "\\text{Examples: } \\text{H}_2\\text{O}, \\; \\text{HCO}_3^-, \\; \\text{HSO}_4^-, \\; \\text{H}_2\\text{PO}_4^-, \\; \\text{HPO}_4^{2-}, \\; \\text{HS}^-",
+    "description": "যেসব পদার্থ প্রোটন দানও করতে পারে (এসিড হিসেবে) এবং প্রোটন গ্রহণও করতে পারে (ক্ষার হিসেবে) তাদের উভধর্মী বা অ্যাম্ফিপ্রোটিক পদার্থ বলে।",
+    "practiceQuestions": [
+      {
+        "question": "পানি ($\\text{H}_2\\text{O}$) কেন উভধর্মী পদার্থ?",
+        "answer": "Ans: এটি $\\text{NH}_3$ কে প্রোটন দিয়ে এসিড হিসেবে এবং $\\text{HCl}$ থেকে প্রোটন নিয়ে ক্ষার হিসেবে আচরণ করে।"
+      }
+    ]
+  },
+  {
+    "title": "লুইস এসিড ও ক্ষার তত্ত্ব (Lewis Acid-Base Theory)",
+    "latex": "\\text{Lewis Acid: } \\text{মুক্তজোড় ইলেকট্রন গ্রহীতা (অষ্টক অপূর্ণ/ক্যাটায়ন)}; \\quad \\text{Lewis Base: } \\text{মুক্তজোড় ইলেকট্রন দাতা (মুক্তজোড় বিশিষ্ট/অ্যানায়ন)}",
+    "description": "• লুইস এসিড: $\\text{BF}_3, \\text{AlCl}_3, \\text{FeCl}_3, \\text{CO}_2, \\text{SO}_3, \\text{H}^+, \\text{Cu}^{2+}$\n• লুইস ক্ষার: $\\text{NH}_3, \\text{H}_2\\text{O}, \\text{R-OH}, \\text{R-NH}_2, \\text{Cl}^-, \\text{CN}^-, \\text{OH}^-$।\nএদের বিক্রিয়ায় সন্নিবেশ সমযোজী বন্ধন গঠিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{BF}_3$ কেন লুইস এসিড?",
+        "answer": "Ans: বোরনের যোজ্যতান্তরে ৬টি ইলেকট্রন থাকায় অষ্টক অপূর্ণ এবং এটি ১ জোড়া মুক্তজোড় ইলেকট্রন গ্রহণ করতে পারে।"
+      }
+    ]
+  },
+  {
+    "title": "কঠিন ও নরম এসিড-ক্ষার তত্ত্ব (HSAB Principle)",
+    "latex": "\\text{Hard-Hard & Soft-Soft Interactions are most stable}",
+    "description": "• হার্ড এসিড/ক্ষার: ক্ষুদ্র আকার, উচ্চ চার্জ ঘনত্ব, সহজে পোলারাইজ হয় না ($H^+, Li^+, Na^+, Mg^{2+}, Al^{3+}, F^-, OH^-, NH_3$)\n• সফট এসিড/ক্ষার: বৃহৎ আকার, নিম্ন চার্জ ঘনত্ব, সহজে পোলারাইজ হয় ($Ag^+, Cu^+, Hg^{2+}, Cd^{2+}, I^-, S^{2-}, CN^-$)।",
+    "practiceQuestions": [
+      {
+        "question": "HSAB নীতি অনুসারে $Ag^+$ আয়ন $F^-$ এর চেয়ে $I^-$ এর সাথে কেন বেশি সুস্থিত যৌগ গঠন করে?",
+        "answer": "Ans: কারণ $Ag^+$ এবং $I^-$ উভয়েই সফট (Soft-Soft মিথস্ক্রিয়া অধিক সুস্থিত)।"
+      }
+    ]
+  },
+  {
+    "title": "পানির স্থায়ী ও অস্থায়ী খরতা (Hardness of Water)",
+    "latex": "\\text{Temporary: } \\text{Ca(HCO}_3)_2, \\text{Mg(HCO}_3)_2; \\quad \\text{Permanent: } \\text{CaCl}_2, \\text{CaSO}_4, \\text{MgCl}_2, \\text{MgSO}_4",
+    "description": "• অস্থায়ী খরতা: কেবল ফুটিয়ে দূর করা যায় ($\\text{Ca(HCO}_3)_2 \\xrightarrow{\\Delta} \\text{CaCO}_3 \\downarrow + \\text{H}_2\\text{O} + \\text{CO}_2$)\n• স্থায়ী খরতা: সোডা পদ্ধতি ($\\text{Na}_2\\text{CO}_3$) বা পারমিউটিট / আয়ন বিনিময় রেজিন দিয়ে দূর করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানির স্থায়ী খরতার জন্য দায়ী কোন কোন লবণ?",
+        "answer": "Ans: ক্যালসিয়াম ও ম্যাগনেসিয়ামের ক্লোরাইড ও সালফেট লবণ ($CaCl_2, MgCl_2, CaSO_4, MgSO_4$)"
+      }
+    ]
+  },
+  {
+    "title": "মাটির এসিডিটি ও ক্ষারত্ব নিয়ন্ত্রণ (Soil pH Management)",
+    "latex": "\\text{অম্লীয় মাটি (pH } < 6.0\\text{): } \\text{চুন (CaO, Ca(OH)}_2, \\text{CaCO}_3\\text{ বা ডলোমাইট)}; \\quad \\text{ক্ষারীয় মাটি (pH } > 8.0\\text{): } \\text{জিপসাম (CaSO}_4\\cdot 2\\text{H}_2\\text{O})",
+    "description": "উদ্ভিদের বৃদ্ধির জন্য মাটির অনুকূল $pH = 6.0 - 8.0$। অতিরিক্ত এসিডিটি কমাতে 'লাইমিং' বা চুন প্রয়োগ করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "মাটির অম্লত্ব দূর করতে কৃষক জমিতে কী ব্যবহার করে?",
+        "answer": "Ans: চুন (ক্যালসিয়াম কার্বনেট $\\text{CaCO}_3$ বা কলিচুন $\\text{Ca(OH)}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "জৈব রাসায়নিক নাইট্রিফিকেশন চক্র (Nitrification Reactions)",
+    "latex": "2\\text{NH}_4^+ + 3\\text{O}_2 \\xrightarrow{\\text{Nitrosomonas}} 2\\text{NO}_2^- + 4\\text{H}^+ + 2\\text{H}_2\\text{O}, \\quad 2\\text{NO}_2^- + \\text{O}_2 \\xrightarrow{\\text{Nitrobacter}} 2\\text{NO}_3^-",
+    "description": "মাটিতে নাইট্রোসোমোনাস ব্যাকটেরিয়ার উপস্থিতিতে অ্যামোনিয়া নাইট্রাইটে এবং নাইট্রোব্যাকটর দ্বারা নাইট্রেটে জারিত হয়ে উদ্ভিদের গ্রহণোপযোগী হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যামোনিয়াম আয়নকে নাইট্রাইট আয়নে জারিত করে কোন ব্যাকটেরিয়া?",
+        "answer": "Ans: নাইট্রোসোমোনাস (Nitrosomonas)"
+      }
+    ]
+  },
+  {
+    "title": "ডিনাইট্রিফিকেশন প্রক্রিয়া (Denitrification)",
+    "latex": "2\\text{NO}_3^- \\xrightarrow{\\text{Pseudomonas / Thiobacillus}} \\text{N}_2(g) \\uparrow + 3\\text{O}_2",
+    "description": "অ্যানেরোবিক ব্যাক্টেরিয়া দ্বারা মাটির নাইট্রেট বিজারিত হয়ে বায়ুমণ্ডলে আণবিক নাইট্রোজেন ($N_2$) গ্যাসে ফিরে যায়।",
+    "practiceQuestions": [
+      {
+        "question": "ডিনাইট্রিফিকেশন প্রক্রিয়ায় সাহায্যকারী ব্যাকটেরিয়া কোনটি?",
+        "answer": "Ans: সিউডোমোনাস (Pseudomonas) বা থায়োব্যাসিলাস"
+      }
+    ]
+  },
+  {
+    "title": "বায়ু দূষকসমূহের প্রাথমিক ও গৌণ শ্রেণিবিভাগ (Primary & Secondary Pollutants)",
+    "latex": "\\text{Primary: } \\text{CO}, \\text{SO}_2, \\text{NO}, \\text{অদগ্ধ হাইড্রোকার্বন}; \\quad \\text{Secondary: } \\text{SO}_3, \\text{H}_2\\text{SO}_4, \\text{HNO}_3, \\text{O}_3, \\text{PAN}",
+    "description": "উৎস থেকে সরাসরি নির্গত হলে প্রাথমিক দূষক এবং প্রাথমিক দূষকসমূহ বায়ুমণ্ডলে রাসায়নিক বিক্রিয়া করে নতুন বিষাক্ত উপাদান তৈরি করলে গৌণ দূষক বলে।",
+    "practiceQuestions": [
+      {
+        "question": "নিচের কোনটি গৌণ দূষক? (ক) CO (খ) SO₂ (গ) PAN (ঘ) NO",
+        "answer": "Ans: (গ) PAN (পারঅক্সিঅ্যাসিটাইল নাইট্রেট)"
+      }
+    ]
+  },
+  {
+    "title": "বায়ু দূষক CO এর বিষাক্ততা ও কার্বক্সি-হিমোগ্লোবিন (Toxicity of Carbon Monoxide)",
+    "latex": "\\text{Hb} + \\text{CO} \\to \\text{HbCO (কার্বক্সি-হিমোগ্লোবিন)}, \\quad \\text{Affinity: } \\text{CO এর আকর্ষণ O}_2 \\text{ অপেক্ষা ২০০-৩০০ গুণ বেশি}",
+    "description": "কার্বন মনোক্সাইড রক্তে অক্সিজেনের পরিবহন ক্ষমতা বন্ধ করে টিস্যুতে তীব্র হাইপোক্সিয়া সৃষ্টি করে শ্বাসরোধে মৃত্যু ঘটায়। একে নীরব ঘাতক (Silent Killer) বলা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "কার্বন মনোক্সাইডকে 'নীরব ঘাতক গ্যাস' বলা হয় কেন?",
+        "answer": "Ans: এটি বর্ণহীন, গন্ধহীন ও স্বাদহীন এবং রক্তের হিমোগ্লোবিনের সাথে অক্সিজেনের চেয়ে ২০০ গুণ বেশি দৃঢ় বন্ধন গঠন করে শ্বাসরোধে মৃত্যু ঘটায়।"
+      }
+    ]
+  },
+  {
+    "title": "সালফার অক্সাইডের প্রভাব ও স্টোন ক্যান্সার (Stone Cancer by SO2)",
+    "latex": "\\text{CaCO}_3 (\\text{মার্বেল পাথর}) + \\text{H}_2\\text{SO}_4 \\to \\text{CaSO}_4 \\cdot 2\\text{H}_2\\text{O (জিপসাম)} + \\text{CO}_2",
+    "description": "এসিড বৃষ্টির সালফিউরিক এসিড মার্বেল পাথরের তৈরি প্রাচীন ভাস্কর্য ও তাজমহলের ক্ষয়সাধন করে জিপসামে রূপান্তর করে, একে স্টোন ক্যান্সার (Stone Cancer) বা মার্বেল ক্যান্সার বলে।",
+    "practiceQuestions": [
+      {
+        "question": "তাজমহলের মার্বেল পাথরের ক্ষয়ক্ষতিকে কোন ধরনের রোগ বা প্রতিক্রিয়া বলা হয়?",
+        "answer": "Ans: স্টোন ক্যান্সার (Stone Cancer বা Marble Cancer)"
+      }
+    ]
+  },
+  {
+    "title": "ওজোন স্তরের পুরুত্ব ও ডবসন ইউনিট হিসাব (Dobson Unit Calculation)",
+    "latex": "1\\text{ DU} = 0.01\\text{ mm thickness at STP} = 2.69 \\times 10^{16} \\text{ molecules/cm}^2, \\quad \\text{স্বাভাবিক বেধ: } 300 - 400\\text{ DU}",
+    "description": "STP-তে বায়ুমণ্ডলের সম্পূর্ণ ওজোন গ্যাসকে সংকুচিত করলে যে পুরুত্ব পাওয়া যায় তা ডবসন এককে হিসাব করা হয়। ওজোনের পুরুত্ব $200\\text{ DU}$ এর নিচে নেমে গেলে তাকে ওজোন হোল (Ozone hole) বলে।",
+    "practiceQuestions": [
+      {
+        "question": "ওজোন স্তরের পুরুত্ব কত DU এর নিচে নামলে তাকে ওজোন ছিদ্র বলা হয়?",
+        "answer": "Ans: ২০০ ডবসন ইউনিট ($200\\text{ DU}$)"
+      }
+    ]
   }
 ]

@@ -103,7 +103,25 @@ export const ReferralView: React.FC = () => {
         return;
       }
 
-      // 1. Check if user has already redeemed a referral code
+      // 1. Check eligibility & used status via RPC
+      try {
+        const { data: eligRes } = await supabase.rpc('check_referral_eligibility', {
+          p_user_id: user.id,
+        });
+        if (eligRes && typeof eligRes === 'object') {
+          if ((eligRes as any).has_used_referral === true) {
+            setHasUsedReferral(true);
+          }
+          if (typeof (eligRes as any).remaining_attempts === 'number') {
+            setRemainingAttempts((eligRes as any).remaining_attempts);
+          }
+          if (typeof (eligRes as any).lock_seconds === 'number' && (eligRes as any).lock_seconds > 0) {
+            startLockoutTimer((eligRes as any).lock_seconds);
+          }
+        }
+      } catch (_) {}
+
+      // 2. Direct table fallback check
       try {
         const { data: usedCheck } = await supabase
           .from('referral_history')
@@ -111,26 +129,12 @@ export const ReferralView: React.FC = () => {
           .eq('redeemed_by', user.id)
           .maybeSingle();
 
-        setHasUsedReferral(!!usedCheck);
+        if (usedCheck) {
+          setHasUsedReferral(true);
+        }
       } catch (e) {
         console.warn('usedCheck error:', e);
       }
-
-      // 2. Check attempt status & lockout via RPC or direct log
-      try {
-        const { data: statusRes } = await supabase.rpc(
-          'get_referral_attempt_status',
-          { p_user_id: user.id }
-        );
-        if (statusRes && typeof statusRes === 'object') {
-          const rem = (statusRes.remaining_attempts as number) ?? 3;
-          setRemainingAttempts(rem);
-          const lockSec = (statusRes.lock_seconds as number) ?? 0;
-          if (lockSec > 0) {
-            startLockoutTimer(lockSec);
-          }
-        }
-      } catch (_) {}
 
       // 3. Fetch data from /api/referral/me
       const res = await fetch('/api/referral/me');
@@ -147,6 +151,9 @@ export const ReferralView: React.FC = () => {
         }
         if (json.scratchCards) {
           setScratchCards(json.scratchCards);
+        }
+        if (typeof json.hasUsedReferral === 'boolean') {
+          setHasUsedReferral(json.hasUsedReferral);
         }
       }
 

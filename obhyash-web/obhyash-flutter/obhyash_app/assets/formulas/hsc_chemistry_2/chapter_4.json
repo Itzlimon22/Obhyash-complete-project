@@ -1,1 +1,552 @@
-[]
+[
+  {
+    "title": "ফ্যারাডের তড়িৎ বিশ্লেষণের ১ম সূত্র (Faraday's 1st Law)",
+    "latex": "W = Z \\cdot Q = Z \\cdot I \\cdot t = \\frac{M \\cdot I \\cdot t}{e \\cdot F}",
+    "description": "$W$ = তড়িৎদ্বারে সঞ্চিত বা দ্রবীভূত পদার্থের ভর (গ্রাম), $Z$ = তড়িৎ রাসায়নিক তুল্যাঙ্ক ($\\text{g/C}$), $I$ = বিদ্যুৎ প্রবাহ (অ্যাম্পিয়ার), $t$ = সময় (সেকেন্ড), $M$ = আণবিক/পারমাণবিক ভর, $e$ = স্থানান্তরিত ইলেকট্রন সংখ্যা, $F = 96485\\text{ C} \\approx 96500\\text{ C}$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CuSO}_4$ দ্রবণের মধ্য দিয়ে $5\\text{ A}$ বিদ্যুৎ $1\\text{ hour}$ ধরে চালনা করলে ক্যাথোডে কত গ্রাম কপার জমা হবে? ($M_{\\text{Cu}} = 63.54, e = 2$)",
+        "answer": "Ans: $W = \\frac{63.54 \\times 5 \\times 3600}{2 \\times 96500} = \\frac{1143720}{193000} \\approx 5.926\\text{ g}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ রাসায়নিক তুল্যাঙ্ক Z এর সূত্র (Electrochemical Equivalent Z)",
+    "latex": "Z = \\frac{M}{e \\cdot F} = \\frac{E}{F} = \\frac{E}{96500} \\quad [\\text{g/C বা kg/C}]",
+    "description": "১ কুলম্ব চার্জ কোনো তড়িৎ বিশ্লেষ্যের মধ্য দিয়ে প্রবাহিত করলে তড়িৎদ্বারে যে পরিমাণ পদার্থ জমা বা দ্রবীভূত হয় তাকে ঐ পদার্থের তড়িৎ রাসায়নিক তুল্যাঙ্ক ($Z$) বলে।",
+    "practiceQuestions": [
+      {
+        "question": "সিলভারের ($\\text{Ag}^+$) তড়িৎ রাসায়নিক তুল্যাঙ্ক কত? ($M = 107.87, e = 1$)",
+        "answer": "Ans: $Z_{\\text{Ag}} = \\frac{107.87}{1 \\times 96500} \\approx 0.001118\\text{ g/C} = 1.118 \\times 10^{-3}\\text{ g/C}$"
+      }
+    ]
+  },
+  {
+    "title": "ফ্যারাডের ধ্রুবক ও ইলেকট্রনের চার্জ সম্পর্ক (Faraday Constant)",
+    "latex": "F = N_A \\cdot e^- = (6.022 \\times 10^{23}) \\times (1.602 \\times 10^{-19}\\text{ C}) = 96485\\text{ C/mol} \\approx 96500\\text{ C/mol}",
+    "description": "১ মোল ইলেকট্রনের মোট চার্জকে ১ ফ্যারাডে ($1\\text{ F}$) বলে। ১ মোল একক ধনাত্মক আয়নকে ($M^+$) মুক্ত করতে ১ ফ্যারাডে চার্জ লাগে।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mol } \\text{Al}^{3+}$ আয়নকে সম্পূর্ণরূপে অ্যালুমিনিয়াম ধাতুতে বিজারিত করতে কত ফ্যারাডে চার্জ প্রয়োজন?",
+        "answer": "Ans: ৩ ফ্যারাডে ($3\\text{ F} = 3 \\times 96500\\text{ C} = 289500\\text{ C}$)"
+      }
+    ]
+  },
+  {
+    "title": "ফ্যারাডের ২য় সূত্র ও তুল্য ভর সম্পর্ক (Faraday's 2nd Law)",
+    "latex": "\\frac{W_1}{E_1} = \\frac{W_2}{E_2} \\implies \\frac{W_1}{W_2} = \\frac{E_1}{E_2} = \\frac{Z_1}{Z_2} \\quad (Q \\text{ স্থির})",
+    "description": "ভিন্ন ভিন্ন তড়িৎ বিশ্লেষ্য দ্রবণের মধ্য দিয়ে একই পরিমাণ বিদ্যুৎ প্রবাহিত করলে তড়িৎদ্বারে সঞ্চিত পদার্থের ভরসমূহ তাদের নিজ নিজ রাসায়নিক তুল্য ভরের ($E$) সমানুপাতিক হয়।",
+    "practiceQuestions": [
+      {
+        "question": "শ্রেণিতে যুক্ত $\\text{AgNO}_3$ ও $\\text{CuSO}_4$ কোষে একই বিদ্যুৎ পাঠালে $1.08\\text{ g } \\text{Ag}$ জমা হলে কপার কতটুকু জমা হবে? ($E_{\\text{Ag}}=108, E_{\\text{Cu}}=31.75$)",
+        "answer": "Ans: $W_{\\text{Cu}} = W_{\\text{Ag}} \\times \\frac{E_{\\text{Cu}}}{E_{\\text{Ag}}} = 1.08 \\times \\frac{31.75}{108} = 0.3175\\text{ g}$"
+      }
+    ]
+  },
+  {
+    "title": "ইলেকট্রোপ্লেটিং এ সঞ্চিত প্রলেপের বেধ নির্ণয় (Thickness of Plating Layer)",
+    "latex": "W = A \\cdot d \\cdot \\rho = \\frac{M \\cdot I \\cdot t}{e \\cdot F} \\implies d = \\frac{W}{A \\cdot \\rho} = \\frac{M \\cdot I \\cdot t}{e \\cdot F \\cdot A \\cdot \\rho}",
+    "description": "$d$ = প্রলেপের বেধ ($\\text{cm}$), $A$ = তড়িৎদ্বারের ক্ষেত্রফল ($\\text{cm}^2$), $\\rho$ = সঞ্চিত ধাতুর ঘনত্ব ($\\text{g/cm}^3$)।",
+    "practiceQuestions": [
+      {
+        "question": "$100\\text{ cm}^2$ ক্ষেত্রফলের চামচে $0.01\\text{ cm}$ পুরু রূপার প্রলেপ দিতে কত গ্রাম রূপা জমা হতে হবে? (রূপার ঘনত্ব $\\rho = 10.5\\text{ g/cm}^3$)",
+        "answer": "Ans: $W = A \\cdot d \\cdot \\rho = 100 \\times 0.01 \\times 10.5 = 10.5\\text{ g}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ বিশ্লেষণে নির্গত গ্যাসের আয়তন (Volume of Liberated Gas at STP)",
+    "latex": "V_{\\text{STP (L)}} = \\frac{I \\cdot t \\cdot 22.414}{e \\cdot F} = \\frac{V_m \\cdot I \\cdot t}{e \\cdot F}",
+    "description": "• $\\text{H}_2(g)$ নির্গমন: $2\\text{H}^+ + 2e^- \\to \\text{H}_2 \\implies e = 2$\n• $\\text{O}_2(g)$ নির্গমন: $2\\text{O}^{2-} \\to \\text{O}_2 + 4e^- \\implies e = 4$\n• $\\text{Cl}_2(g)$ নির্গমন: $2\\text{Cl}^- \\to \\text{Cl}_2 + 2e^- \\implies e = 2$।",
+    "practiceQuestions": [
+      {
+        "question": "লঘু এসিড মিশ্রিত পানির মধ্য দিয়ে $9.65\\text{ A}$ বিদ্যুৎ $1000\\text{ s}$ ধরে পাঠালে STP-তে কত লিটার $\\text{H}_2$ গ্যাস নির্গত হবে?",
+        "answer": "Ans: $V = \\frac{9.65 \\times 1000 \\times 22.4}{2 \\times 96500} = \\frac{9650 \\times 22.4}{193000} = \\frac{22.4}{20} = 1.12\\text{ L}$"
+      }
+    ]
+  },
+  {
+    "title": "আপেক্ষিক রোধ ও পরিবাহিতা (Resistivity & Conductance)",
+    "latex": "R = \\rho \\frac{l}{A} \\implies \\rho = R \\frac{A}{l} \\; [\\Omega\\cdot\\text{m}], \\quad G = \\frac{1}{R} \\; [\\Omega^{-1} = \\text{Siemens (S)} = \\text{mho}]",
+    "description": "$R$ = রোধ, $G$ = তড়িৎ পরিবাহিতা (Conductance), $\\rho$ = আপেক্ষিক রোধ (Resistivity), $l$ = পরিবাহীর দৈর্ঘ্য, $A$ = প্রস্থচ্ছেদের ক্ষেত্রফল।",
+    "practiceQuestions": [
+      {
+        "question": "তড়িৎ পরিবাহিতার এসআই (SI) একক কী?",
+        "answer": "Ans: সিমেন্স (Siemens, S বা $\\Omega^{-1}$)"
+      }
+    ]
+  },
+  {
+    "title": "আপেক্ষিক পরিবাহিতা ও কোষ ধ্রুবক (Specific Conductivity & Cell Constant)",
+    "latex": "\\kappa = \\frac{1}{\\rho} = \\frac{l}{R \\cdot A} = G \\times K_{\\text{cell}} \\quad [\\text{S}\\cdot\\text{m}^{-1} \\text{ বা } \\text{S}\\cdot\\text{cm}^{-1}], \\quad K_{\\text{cell}} = \\frac{l}{A} = \\kappa \\cdot R",
+    "description": "$\\kappa$ (Kappa) = আপেক্ষিক পরিবাহিতা, $K_{\\text{cell}} = \\frac{l}{A}$ = কোষ ধ্রুবক (একক: $\\text{cm}^{-1}$ বা $\\text{m}^{-1}$)। কোষ ধ্রুবক কেবলমাত্র তড়িৎদ্বারদ্বয়ের মধ্যবর্তী দূরত্ব ও ক্ষেত্রফলের উপর নির্ভর করে।",
+    "practiceQuestions": [
+      {
+        "question": "একটি পরিবাহিতা কোষের রোধ $50\\,\\Omega$ এবং কোষ ধ্রুবক $0.5\\text{ cm}^{-1}$ হলে দ্রবণের আপেক্ষিক পরিবাহিতা কত?",
+        "answer": "Ans: $\\kappa = \\frac{K_{\\text{cell}}}{R} = \\frac{0.5}{50} = 0.01\\text{ S}\\cdot\\text{cm}^{-1}$"
+      }
+    ]
+  },
+  {
+    "title": "মোলার পরিবাহিতা (Molar Conductivity)",
+    "latex": "\\Lambda_m = \\frac{1000 \\times \\kappa}{C} \\quad [\\text{S}\\cdot\\text{cm}^2\\cdot\\text{mol}^{-1}], \\quad \\Lambda_m = \\frac{\\kappa}{C_{\\text{mol/m}^3}} \\quad [\\text{S}\\cdot\\text{m}^2\\cdot\\text{mol}^{-1}]",
+    "description": "১ মোল তড়িৎ বিশ্লেষ্য বিশিষ্ট দ্রবণের পরিবাহিতাকে মোলার পরিবাহিতা বলে। দ্রবণ লঘু করলে আয়নসমূহের আন্তঃআয়নিক আকর্ষণ কমে যাওয়ায় মোলার পরিবাহিতা ($\\,\\Lambda_m\\,$) বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "$0.05\\text{ M } \\text{KCl}$ দ্রবণের আপেক্ষিক পরিবাহিতা $0.007\\text{ S/cm}$ হলে মোলার পরিবাহিতা কত?",
+        "answer": "Ans: $\\Lambda_m = \\frac{1000 \\times 0.007}{0.05} = \\frac{7}{0.05} = 140\\text{ S}\\cdot\\text{cm}^2\\cdot\\text{mol}^{-1}$"
+      }
+    ]
+  },
+  {
+    "title": "কোলরাউশের আয়নসমূহের স্বাধীন সঞ্চারণের সূত্র (Kohlrausch's Law)",
+    "latex": "\\Lambda_m^\\circ = \\nu_+ \\lambda_+^\\circ + \\nu_- \\lambda_-^\\circ, \\quad \\Lambda_m^\\circ(\\text{CH}_3\\text{COOH}) = \\Lambda_m^\\circ(\\text{CH}_3\\text{COONa}) + \\Lambda_m^\\circ(\\text{HCl}) - \\Lambda_m^\\circ(\\text{NaCl})",
+    "description": "অসীম লঘু দ্রবণে যেকোনো তড়িৎ বিশ্লেষ্যের সীমাস্থ মোলার পরিবাহিতা তার ক্যাটায়ন ও অ্যানায়নের স্বতন্ত্র আয়নীয় পরিবাহিতার সমষ্টির সমান। এর সাহায্যে দুর্বল এসিডের $\\Lambda_m^\\circ$ নির্ণয় করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "কোলরাউশের সূত্র প্রয়োগ করে কোন ধরনের তড়িৎ বিশ্লেষ্যের সীমাস্থ মোলার পরিবাহিতা গণনা করা হয়?",
+        "answer": "Ans: দুর্বল তড়িৎ বিশ্লেষ্য (যেমন এসিটিক এসিড $\\text{CH}_3\\text{COOH}$, $\\text{NH}_4\\text{OH}$)।"
+      }
+    ]
+  },
+  {
+    "title": "বিয়োজন মাত্রা ও অস্টওয়াল্ডের লঘুকরণ সূত্র (Degree of Dissociation by Conductivity)",
+    "latex": "\\alpha = \\frac{\\Lambda_m}{\\Lambda_m^\\circ}, \\quad K_a = \\frac{C \\alpha^2}{1 - \\alpha} \\approx C \\alpha^2 = C \\left(\\frac{\\Lambda_m}{\\Lambda_m^\\circ}\\right)^2",
+    "description": "দুর্বল তড়িৎ বিশ্লেষ্যের নির্দিষ্ট ঘনমাত্রার মোলার পরিবাহিতা এবং অসীম লঘুতায় সীমাস্থ মোলার পরিবাহিতার অনুপাতই হলো বিয়োজন মাত্রা $\\alpha$।",
+    "practiceQuestions": [
+      {
+        "question": "$0.01\\text{ M}$ এসিটিক এসিডের $\\Lambda_m = 19.5$ এবং $\\Lambda_m^\\circ = 390\\text{ S}\\cdot\\text{cm}^2\\cdot\\text{mol}^{-1}$ হলে বিয়োজন মাত্রা কত?",
+        "answer": "Ans: $\\alpha = \\frac{19.5}{390} = 0.05 = 5\\%$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎদ্বার বিভব ও কোষের তড়িৎচালক বল (Cell EMF & Potential)",
+    "latex": "E_{\\text{cell}} = E_{\\text{ox(anode)}} + E_{\\text{red(cathode)}} = E_{\\text{red(cathode)}} - E_{\\text{red(anode)}}",
+    "description": "IUPAC নিয়ম অনুযায়ী সকল প্রমাণ বিভবকে বিজারণ বিভব ($E^\\circ_{\\text{red}}$) হিসেবে প্রকাশ করা হয়। বিজারণ বিভব যার বেশি সে ক্যাথোড হিসেবে বিজারিত হয়, এবং যার কম সে অ্যানোড হিসেবে জারিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$E^\\circ_{\\text{Zn}^{2+}/\\text{Zn}} = -0.76\\text{ V}$ এবং $E^\\circ_{\\text{Cu}^{2+}/\\text{Cu}} = +0.34\\text{ V}$ হলে ড্যানিয়েল কোষের প্রমাণ EMF কত?",
+        "answer": "Ans: $E^\\circ_{\\text{cell}} = E^\\circ_{\\text{cathode}} - E^\\circ_{\\text{anode}} = 0.34 - (-0.76) = +1.10\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "প্রমাণ হাইড্রোজেন তড়িৎদ্বার (Standard Hydrogen Electrode - SHE)",
+    "latex": "\\text{Pt}(s), \\text{H}_2(g, 1\\text{ atm}) \\mid \\text{H}^+(aq, 1\\text{ M}) \\implies E^\\circ = 0.00\\text{ V} \\; (\\text{সব তাপমাত্রায়})",
+    "description": "অন্যান্য তড়িৎদ্বারের প্রমাণ বিভব নির্ণয়ের জন্য প্রমাণ হাইড্রোজেন তড়িৎদ্বারকে আন্তর্জাতিক নির্দেশক তড়িৎদ্বার (Primary Reference Electrode) হিসেবে ব্যবহার করা হয় এবং এর বিভব ইচ্ছামাফিক $0.00\\text{ V}$ ধরা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রমাণ হাইড্রোজেন তড়িৎদ্বারের প্রমাণ বিজারণ বিভবের মান কত?",
+        "answer": "Ans: $0.00\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ রাসায়নিক সক্রিয়তা সারি (Electrochemical Activity Series)",
+    "latex": "\\text{Li} > \\text{K} > \\text{Ba} > \\text{Ca} > \\text{Na} > \\text{Mg} > \\text{Al} > \\text{Mn} > \\text{Zn} > \\text{Cr} > \\text{Fe} > \\text{Cd} > \\text{Co} > \\text{Ni} > \\text{Sn} > \\text{Pb} > [\\text{H}] > \\text{Cu} > \\text{Hg} > \\text{Ag} > \\text{Pt} > \\text{Au}",
+    "description": "সারির উপরে অবস্থিত ধাতুসমূহ শক্তিশালী বিজারক, ঋণাত্মক বিজারণ বিভবযুক্ত, সহজে জারিত হয়ে ক্যাটায়ন তৈরি করে এবং এসিড থেকে $\\text{H}_2$ গ্যাস প্রতিস্থাপন করতে পারে।",
+    "practiceQuestions": [
+      {
+        "question": "জিংক পাত্রে $\\text{CuSO}_4$ দ্রবণ রাখা যায় না কেন?",
+        "answer": "Ans: কারণ জিংকের বিজারণ বিভব ($-0.76\\text{ V}$) কপার ($+0.34\\text{ V}$) অপেক্ষা কম হওয়ায় জিংক স্বতঃস্ফূর্তভাবে কপারকে প্রতিস্থাপিত করে দ্রবীভূত হয়ে পাত্র ফুটো করে ফেলে ($E^\\circ_{\\text{cell}} = +1.10\\text{ V} > 0$)।"
+      }
+    ]
+  },
+  {
+    "title": "নার্নস্ট সমীকরণ (Nernst Equation for Full Cell)",
+    "latex": "E_{\\text{cell}} = E^\\circ_{\\text{cell}} - \\frac{R T}{n F} \\ln Q = E^\\circ_{\\text{cell}} - \\frac{0.0592}{n} \\log_{10} Q \\quad (T = 298.15\\text{ K})",
+    "description": "$Q$ = বিক্রিয়া কোশেন্ট ($Q = \\frac{[\\text{উৎপাদ}]}{[\\text{বিক্রিয়ক}]}$), $n$ = কোষ বিক্রিয়ায় স্থানান্তরিত ইলেকট্রন মোল সংখ্যা, $0.0592 = \\frac{2.303 \\times 8.314 \\times 298.15}{96485}$।",
+    "practiceQuestions": [
+      {
+        "question": "$25^\\circ\\text{C}$ তাপমাত্রায় নার্নস্ট সমীকরণের সরলীকৃত রূপটি কী?",
+        "answer": "Ans: $E_{\\text{cell}} = E^\\circ_{\\text{cell}} - \\frac{0.0592}{n} \\log Q$"
+      }
+    ]
+  },
+  {
+    "title": "অর্ধ-কোষের নার্নস্ট সমীকরণ (Nernst Equation for Half-cell)",
+    "latex": "M^{n+} + n e^- \\rightleftharpoons M(s) \\implies E_{\\text{red}} = E^\\circ_{\\text{red}} - \\frac{0.0592}{n}\\log \\frac{1}{[M^{n+}]} = E^\\circ_{\\text{red}} + \\frac{0.0592}{n}\\log [M^{n+}]",
+    "description": "ক্যাটায়নের ঘনমাত্রা $[M^{n+}]$ বৃদ্ধি পেলে তড়িৎদ্বারের বিজারণ বিভব বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "জিংক তড়িৎদ্বারের দ্রবণ ঘনমাত্রা $0.1\\text{ M}$ থেকে বাড়িয়ে $1.0\\text{ M}$ করা হলে এর বিজারণ বিভব বাড়বে না কমবে?",
+        "answer": "Ans: বিজারণ বিভব বৃদ্ধি পাবে।"
+      }
+    ]
+  },
+  {
+    "title": "ড্যানিয়েল কোষের নার্নস্ট সমীকরণ (Nernst Equation for Daniell Cell)",
+    "latex": "\\text{Zn}(s) + \\text{Cu}^{2+}(aq) \\rightleftharpoons \\text{Zn}^{2+}(aq) + \\text{Cu}(s) \\implies E_{\\text{cell}} = 1.10\\text{ V} - \\frac{0.0592}{2}\\log \\frac{[\\text{Zn}^{2+}]}{[\\text{Cu}^{2+}]}",
+    "description": "$[\\text{Cu}^{2+}]$ বাড়ালে বা $[\\text{Zn}^{2+}]$ কমালে কোষের EMF বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "ড্যানিয়েল কোষে $[\\text{Zn}^{2+}] = 0.1\\text{ M}$ এবং $[\\text{Cu}^{2+}] = 1.0\\text{ M}$ হলে কোষের EMF কত?",
+        "answer": "Ans: $E = 1.10 - \\frac{0.0592}{2}\\log\\left(\\frac{0.1}{1.0}\\right) = 1.10 - 0.0296(-1) = 1.10 + 0.0296 = 1.1296\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "মুক্ত শক্তি পরিবর্তন ও কোষ বিভব (Gibbs Free Energy & Cell EMF)",
+    "latex": "\\Delta G = -n F E_{\\text{cell}}, \\quad \\Delta G^\\circ = -n F E^\\circ_{\\text{cell}} \\quad [\\text{Joule}]",
+    "description": "• $E_{\\text{cell}} > 0 \\implies \\Delta G < 0$ (কোষ বিক্রিয়া স্বতঃস্ফূর্তভাবে ঘটবে)\n• $E_{\\text{cell}} < 0 \\implies \\Delta G > 0$ (বিক্রিয়া ঘটবে না)\n• $E_{\\text{cell}} = 0 \\implies \\Delta G = 0$ (কোষ সাম্যাবস্থায় রয়েছে / ব্যাটারি ডেড)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি কোষের $E^\\circ_{\\text{cell}} = +1.10\\text{ V}$ এবং $n = 2$ হলে প্রমাণ মুক্ত শক্তির পরিবর্তন ($\\,\\Delta G^\\circ\\,$) কত?",
+        "answer": "Ans: $\\Delta G^\\circ = -2 \\times 96500 \\times 1.10 = -212300\\text{ J} = -212.3\\text{ kJ}$"
+      }
+    ]
+  },
+  {
+    "title": "সাম্যধ্রুবক ও প্রমাণ কোষ বিভব সম্পর্ক (Equilibrium Constant & E°cell)",
+    "latex": "\\Delta G^\\circ = -R T \\ln K_c = -n F E^\\circ_{\\text{cell}} \\implies E^\\circ_{\\text{cell}} = \\frac{0.0592}{n} \\log_{10} K_c \\implies \\log K_c = \\frac{n E^\\circ_{\\text{cell}}}{0.0592}",
+    "description": "কোষ বিক্রিয়া সাম্যাবস্থায় পৌঁছালে $E_{\\text{cell}} = 0$ হয়ে যায় এবং $Q = K_c$ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ড্যানিয়েল কোষের ($n=2, E^\\circ = 1.10\\text{ V}$) সাম্যধ্রুবক $K_c$ এর মান কত?",
+        "answer": "Ans: $\\log K_c = \\frac{2 \\times 1.10}{0.0592} = \\frac{2.20}{0.0592} \\approx 37.16 \\implies K_c = 10^{37.16} \\approx 1.45 \\times 10^{37}$"
+      }
+    ]
+  },
+  {
+    "title": "লবণ সেতুর গঠন ও ভূমিকা (Salt Bridge Structure & Functions)",
+    "latex": "\\text{উপাদান: } \\text{KCl / KNO}_3 / \\text{NH}_4\\text{NO}_3 \\text{ in } 3\\% \\; \\text{Agar-Agar gel}, \\quad u_{\\text{cation}} \\approx u_{\\text{anion}}",
+    "description": "ভূমিকা: (১) উভয় অর্ধকোষের মধ্যে সংযোগ স্থাপন করে অভ্যন্তরীণ বর্তনী পূর্ণ করে, (২) উভয় দ্রবণের তড়িৎ নিরপেক্ষতা (Electrical neutrality) বজায় রাখে, (৩) তরল সংযোগ বিভব (Liquid Junction Potential) দূর করে। আয়নদ্বয়ের গতিবেগ ($u$) সমান হওয়া আবশ্যক।",
+    "practiceQuestions": [
+      {
+        "question": "লবণ সেতুতে $\\text{KCl}$ ব্যবহারের প্রধান কারণ কী?",
+        "answer": "Ans: কারণ $\\text{K}^+$ এবং $\\text{Cl}^-$ আয়নদ্বয়ের গতিশীলতা ও পরিবাহিতা প্রায় সমান।"
+      }
+    ]
+  },
+  {
+    "title": "লোহার ক্ষয় বা মরিচা গঠন (Corrosion of Iron & Rusting)",
+    "latex": "\\text{Anode: } \\text{Fe} \\to \\text{Fe}^{2+} + 2e^-; \\; \\text{Cathode: } \\text{O}_2 + 4\\text{H}^+ + 4e^- \\to 2\\text{H}_2\\text{O}; \\; \\text{মরিচা (Rust): } \\text{Fe}_2\\text{O}_3 \\cdot x\\text{H}_2\\text{O}",
+    "description": "মরিচা গঠনের জন্য পানি ($\\,\\text{H}_2\\text{O}\\,\\,$) এবং অক্সিজেন ($\\,\\text{O}_2\\,\\,$) উভয়ের উপস্থিতি অপরিহার্য। লবণাক্ত পানিতে মরিচা দ্রুত ধরে কারণ লবণের আয়ন তড়িৎ পরিবাহিতা বাড়ায়।",
+    "practiceQuestions": [
+      {
+        "question": "মরিচার রাসায়নিক সংকেত কী?",
+        "answer": "Ans: হাইড্রেটেড ফেরিক অক্সাইড ($\\text{Fe}_2\\text{O}_3 \\cdot x\\text{H}_2\\text{O}$)"
+      }
+    ]
+  },
+  {
+    "title": "ক্যাথোডিক প্রোটেকশন ও স্যাক্রিফিসিয়াল অ্যানোড (Cathodic Protection)",
+    "latex": "\\text{সংযুক্ত ধাতু: } \\text{Mg বা Zn ব্লক} \\implies \\text{Mg/Zn নিজে জারিত হয়ে Fe কে ক্যাথোড বানিয়ে রক্ষা করে}",
+    "description": "ভূগর্ভস্থ তেলের পাইপ বা জাহাজের তলদেশে লোহার চেয়ে অধিক সক্রিয় ধাতু (যেমন ম্যাগনেসিয়াম বা জিংক) যুক্ত করলে ম্যাগনেসিয়াম নিজে ক্ষয়প্রাপ্ত হয়ে লোহাকে অক্ষত রাখে।",
+    "practiceQuestions": [
+      {
+        "question": "লোহার জাহাজের তলদেশে ম্যাগনেসিয়াম বা জিংকের পাত লাগানো হয় কেন?",
+        "answer": "Ans: স্যাক্রিফিসিয়াল অ্যানোড হিসেবে কাজ করে লোহাকে মরিচা থেকে রক্ষা করতে (ক্যাথোডিক প্রোটেকশন)।"
+      }
+    ]
+  },
+  {
+    "title": "গ্যালভানাইজিং বনাম টিন প্লেটিং (Galvanizing vs Tin Plating)",
+    "latex": "\\text{Galvanizing: জিংকের (Zn) প্রলেপ}; \\quad \\text{Tin Plating: টিনের (Sn) প্রলেপ}",
+    "description": "• গ্যালভানাইজিং: জিংক অধিক সক্রিয় হওয়ায় আস্তরণ ফেটে গেলেও জিংক ক্ষয় হয়ে লোহাকে রক্ষা করে।\n• টিন প্লেটিং: খাদ্য ক্যানে ব্যবহৃত হয় কারণ টিন অবিষাক্ত; তবে আস্তরণ ফুটো হলে লোহা টিনের চেয়ে সক্রিয় হওয়ায় লোহা দ্রুত ক্ষয়প্রাপ্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "খাদ্য সংরক্ষণের ক্যানে জিংকের পরিবর্তে টিনের প্রলেপ দেওয়া হয় কেন?",
+        "answer": "Ans: কারণ জিংক বিষাক্ত এবং জৈব এসিডের সাথে বিষাক্ত লবণ তৈরি করে, কিন্তু টিন নিষ্ক্রিয় ও অবিষাক্ত।"
+      }
+    ]
+  },
+  {
+    "title": "শুষ্ক কোষ বা লেকল্যান্স সেল (Dry Cell Chemistry)",
+    "latex": "\\text{Anode: } \\text{Zn} \\to \\text{Zn}^{2+} + 2e^-; \\; \\text{Cathode: } 2\\text{MnO}_2 + 2\\text{NH}_4^+ + 2e^- \\to \\text{Mn}_2\\text{O}_3 + 2\\text{NH}_3 + \\text{H}_2\\text{O}; \\quad \\text{EMF} \\approx 1.5\\text{ V}",
+    "description": "অ্যানোড: জিংকের তৈরি চোঙ; ক্যাথোড: কার্বন দণ্ড; ইলেকট্রোলাইট পেস্ট: $\\text{NH}_4\\text{Cl} + \\text{ZnCl}_2 + \\text{MnO}_2$ + স্টার্চ। $\\text{MnO}_2$ পোলারায়ন রোধক (Depolarizer) হিসেবে কাজ করে।",
+    "practiceQuestions": [
+      {
+        "question": "ড্রাই সেলে ডিপোলারাইজার বা পোলারায়ন রোধক হিসেবে কোনটি কাজ করে?",
+        "answer": "Ans: ম্যাঙ্গানিজ ডাইঅক্সাইড ($\\text{MnO}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "লেড-এসিড ব্যাটারির ডিসচার্জিং বিক্রিয়া (Lead-Acid Battery Discharge)",
+    "latex": "\\text{Anode: } \\text{Pb} + \\text{SO}_4^{2-} \\to \\text{PbSO}_4 + 2e^-; \\; \\text{Cathode: } \\text{PbO}_2 + 4\\text{H}^+ + \\text{SO}_4^{2-} + 2e^- \\to \\text{PbSO}_4 + 2\\text{H}_2\\text{O} \\implies \\text{Overall: } \\text{Pb} + \\text{PbO}_2 + 2\\text{H}_2\\text{SO}_4 \\to 2\\text{PbSO}_4 + 2\\text{H}_2\\text{O}",
+    "description": "ডিসচার্জের সময় $\\text{H}_2\\text{SO}_4$ খরচ হওয়ায় অ্যাসিডের ঘনত্ব $1.28\\text{ g/cm}^3$ থেকে কমে $1.15\\text{ g/cm}^3$ এ নামে এবং উভয় তড়িৎদ্বারে সাদা $\\text{PbSO}_4$ জমা হয়। প্রতিটি কোষের EMF প্রায় $2.0\\text{ V}$ (১২ ভোল্ট ব্যাটারিতে ৬টি কোষ শ্রেণিতে থাকে)।",
+    "practiceQuestions": [
+      {
+        "question": "লেড-এসিড ব্যাটারি সম্পূর্ণ চার্জ থাকা অবস্থায় $\\text{H}_2\\text{SO}_4$ এর ঘনত্ব কত থাকে?",
+        "answer": "Ans: প্রায় $1.28\\text{ g/cm}^3$ (বা $1.25 - 1.28\\text{ g/cm}^3$)"
+      }
+    ]
+  },
+  {
+    "title": "লেড-এসিড ব্যাটারির রিচার্জিং বিক্রিয়া (Lead-Acid Battery Recharging)",
+    "latex": "2\\text{PbSO}_4 + 2\\text{H}_2\\text{O} \\xrightarrow{\\text{External DC}} \\text{Pb(Anode)} + \\text{PbO}_2(\\text{Cathode}) + 2\\text{H}_2\\text{SO}_4",
+    "description": "বাহ্যিক ডিসি বিদ্যুৎ প্রয়োগ করলে বিপরীতমুখী বিক্রিয়ার মাধ্যমে তড়িৎদ্বারসমূহ ও সালফিউরিক এসিডের ঘনত্ব পুনর্বহাল হয়।",
+    "practiceQuestions": [
+      {
+        "question": "লেড সঞ্চয়ী ব্যাটারি রিচার্জের সময় অ্যানোড ও ক্যাথোডে কী উৎপন্ন হয়?",
+        "answer": "Ans: অ্যানোডে লেড ($\\,\\text{Pb}\\,\\,$) এবং ক্যাথোডে লেড ডাইঅক্সাইড ($\\,\\text{PbO}_2\\,\\,$) পুনরুৎপন্ন হয়।"
+      }
+    ]
+  },
+  {
+    "title": "লিথিয়াম-আয়ন ব্যাটারি ও ইন্টারক্যালেশন (Lithium-ion Battery)",
+    "latex": "\\text{Anode: } \\text{Li}_x\\text{C}_6 \\rightleftharpoons x\\text{Li}^+ + x e^- + 6\\text{C}; \\quad \\text{Cathode: } \\text{Li}_{1-x}\\text{CoO}_2 + x\\text{Li}^+ + x e^- \\rightleftharpoons \\text{LiCoO}_2, \\quad \\text{EMF} \\approx 3.7\\text{ V}",
+    "description": "গ্রাফাইট অ্যানোড ও $\\text{LiCoO}_2$ ক্যাথোডের স্তরের মধ্যে $\\text{Li}^+$ আয়নের প্রবেশ ও নির্গমনকে ইন্টারক্যালেশন (Intercalation) বলে। মেমোরি ইফেক্ট নেই, অত্যন্ত হালকা ও উচ্চ শক্তি ঘনত্ব সম্পন্ন।",
+    "practiceQuestions": [
+      {
+        "question": "লিথিয়াম-আয়ন ব্যাটারির কার্যকৌশলকে কোন মেকানিজম বলা হয়?",
+        "answer": "Ans: ইন্টারক্যালেশন মেকানিজম (Intercalation mechanism)"
+      }
+    ]
+  },
+  {
+    "title": "হাইড্রোজেন-অক্সিজেন ফুয়েল সেল (H2-O2 Fuel Cell)",
+    "latex": "\\text{Anode: } 2\\text{H}_2 + 4\\text{OH}^- \\to 4\\text{H}_2\\text{O} + 4e^-; \\; \\text{Cathode: } \\text{O}_2 + 2\\text{H}_2\\text{O} + 4e^- \\to 4\\text{OH}^- \\implies \\text{Overall: } 2\\text{H}_2 + \\text{O}_2 \\to 2\\text{H}_2\\text{O}, \\; E^\\circ = 1.229\\text{ V}",
+    "description": "ইলেকট্রোলাইট: উত্তপ্ত ঘন $\\text{KOH}$ দ্রবণ; তড়িৎদ্বার: ছিদ্রযুক্ত কার্বন যাতে প্লাটিনাম বা প্যালাডিয়াম প্রভাবক থাকে। মহাশূন্যযানে বিদ্যুৎ ও বিশুদ্ধ খাবার পানি সরবরাহের জন্য এটি ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$H_2-O_2$ ফুয়েল সেলের একমাত্র উপজাত কোনটি যা পরিবেশের জন্য সম্পূর্ণ দূষণমুক্ত?",
+        "answer": "Ans: বিশুদ্ধ পানি ($\\text{H}_2\\text{O}$)"
+      }
+    ]
+  },
+  {
+    "title": "ফুয়েল সেলের তাত্ত্বিক কর্মদক্ষতা (Efficiency of Fuel Cell)",
+    "latex": "\\eta = \\frac{\\Delta G^\\circ}{\\Delta H^\\circ} \\times 100\\% = \\frac{-n F E^\\circ}{\\Delta H^\\circ} \\times 100\\% \\approx 70\\% - 83\\%",
+    "description": "প্রচলিত তাপবিদ্যুৎ কেন্দ্রের কর্মদক্ষতা যেখানে ৩০-৪০%, সেখানে ফুয়েল সেলের কর্মদক্ষতা প্রায় ৭০-৮০% কারণ এটি কার্নোর চক্রের সীমাবদ্ধতা মুক্ত।",
+    "practiceQuestions": [
+      {
+        "question": "ফুয়েল সেলের কর্মদক্ষতা তাপ ইঞ্জিনের চেয়ে অনেক বেশি কেন?",
+        "answer": "Ans: কারণ এটি রাসায়নিক শক্তিকে তাপে রূপান্তর না করে সরাসরি বিদ্যুৎ শক্তিতে রূপান্তর করে (কার্নো সাইকেলের তাপীয় অপচয় নেই)।"
+      }
+    ]
+  },
+  {
+    "title": "ঘনমাত্রা কোষ (Concentration Cell)",
+    "latex": "E_{\\text{cell}} = \\frac{0.0592}{n} \\log_{10} \\left(\\frac{C_2}{C_1}\\right) \\quad (C_2 > C_1)",
+    "description": "উভয় অর্ধকোষ একই ধাতুর তৈরি এবং একই দ্রবণে নিমজ্জিত, কিন্তু অর্ধকোষদ্বয়ের দ্রবণ ঘনমাত্রা ভিন্ন ($C_2$ ক্যাথোড দ্রবণ ও $C_1$ অ্যানোড দ্রবণ)। উভয় ঘনমাত্রা সমান ($C_1 = C_2$) হলে $E_{\\text{cell}} = 0$ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি জিংক ঘনমাত্রা কোষে $C_2 = 1.0\\text{ M}$ এবং $C_1 = 0.01\\text{ M}$ হলে কোষ বিভব কত?",
+        "answer": "Ans: $E = \\frac{0.0592}{2}\\log\\left(\\frac{1.0}{0.01}\\right) = 0.0296 \\times \\log(100) = 0.0296 \\times 2 = 0.0592\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "হাইড্রোজেন তড়িৎদ্বারের বিভব ও pH সম্পর্ক (SHE Potential & pH)",
+    "latex": "E_{\\text{H}^+/\\text{H}_2} = -0.0592 \\times pH \\quad (25^\\circ\\text{C} \\text{ এ})",
+    "description": "হাইড্রোজেন তড়িৎদ্বারের বিজারণ বিভব দ্রবণের $pH$ এর সাথে সরাসরি সম্পর্কিত। দ্রবণ অম্লীয় থেকে ক্ষারীয় হলে বিভব ঋণাত্মক দিকে বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "বিশুদ্ধ পানিতে ($pH = 7$) হাইড্রোজেন তড়িৎদ্বারের বিভব কত?",
+        "answer": "Ans: $E = -0.0592 \\times 7 = -0.4144\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "পানির তড়িৎ বিশ্লেষণ ও গ্যাসের আয়তন অনুপাত (Electrolysis of Water)",
+    "latex": "2\\text{H}_2\\text{O}(l) \\xrightarrow{\\text{Electrolysis}} 2\\text{H}_2(g) \\; [\\text{ক্যাথোড}] + \\text{O}_2(g) \\; [\\text{অ্যানোড}], \\quad V_{\\text{H}_2} : V_{\\text{O}_2} = 2 : 1",
+    "description": "ক্যাথোডে নির্গত হাইড্রোজেন গ্যাসের আয়তন অ্যানোডে নির্গত অক্সিজেন গ্যাসের আয়তনের ঠিক দ্বিগুণ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানির তড়িৎ বিশ্লেষণে ক্যাথোডে $50\\text{ mL } \\text{H}_2$ পাওয়া গেলে একই সময়ে অ্যানোডে কত $\\text{O}_2$ পাওয়া যাবে?",
+        "answer": "Ans: $25\\text{ mL } \\text{O}_2$ (হাইড্রোজেনের অর্ধেক)"
+      }
+    ]
+  },
+  {
+    "title": "ক্লোর-অ্যালকালি পদ্ধতি ও ব্রাইনের তড়িৎ বিশ্লেষণ (Chlor-Alkali Process)",
+    "latex": "2\\text{NaCl}(aq) + 2\\text{H}_2\\text{O} \\to 2\\text{NaOH} + \\text{Cl}_2(g) \\uparrow [\\text{অ্যানোড}] + \\text{H}_2(g) \\uparrow [\\text{ক্যাথোড}]",
+    "description": "গাঢ় খাদ্য লবণ দ্রবণের (ব্রাইন) তড়িৎ বিশ্লেষণে কস্টিক সোডা ($NaOH$), ক্লোরিন গ্যাস ও হাইড্রোজেন গ্যাস বাণিজ্যিকভাবে তৈরি করা হয় (মেমব্রেন সেল পদ্ধতি পরিবেশবান্ধব)।",
+    "practiceQuestions": [
+      {
+        "question": "মেমব্রেন সেলে ব্রাইনের তড়িৎ বিশ্লেষণে অ্যানোডে কোন গ্যাস নির্গত হয়?",
+        "answer": "Ans: ক্লোরিন গ্যাস ($\\text{Cl}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "কপার বিশোধনে তড়িৎ বিশ্লেষণ ও অ্যানোড মাড (Electro-refining of Copper)",
+    "latex": "\\text{Anode: } \\text{অশোধিত কপার (Impure Cu)}; \\quad \\text{Cathode: } \\text{বিশুদ্ধ কপার পাত}; \\quad \\text{Anode Mud: } \\text{Ag, Au, Pt}",
+    "description": "অ্যানোড থেকে কপার ক্ষয় হয়ে দ্রবণে যায় এবং ক্যাথোডে ৯৯.৯৯% বিশুদ্ধ কপার জমা হয়। অ্যানোডের নিচে দামি ধাতুগুলো (সোনা, রূপা, প্লাটিনাম) অ্যানোড মাড হিসেবে তলানি পড়ে।",
+    "practiceQuestions": [
+      {
+        "question": "কপার তড়িৎ পরিশোধনে অ্যানোড মাডে কোন মূল্যবান ধাতুগুলো জমা হয়?",
+        "answer": "Ans: সোনা ($Au$), রূপা ($Ag$) এবং প্লাটিনাম ($Pt$)"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ শক্তির খরচ ও বিদ্যুৎ বিলের ইউনিট হিসাব (Electrical Energy Consumption)",
+    "latex": "\\text{Energy} = V \\times I \\times t \\; [\\text{Joule}], \\quad \\text{Unit (kWh)} = \\frac{V \\times I \\times t_{\\text{hour}}}{1000} = \\frac{V \\times Q}{3.6 \\times 10^6}",
+    "description": "তড়িৎ বিশ্লেষণ কারখানায় ধাতু নিষ্কাশনে প্রয়োজনীয় তড়িৎ শক্তি ও বিদ্যুৎ বিলের হিসাব।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\text{ V}$ বিভব পার্থক্যে $20\\text{ A}$ বিদ্যুৎ ৫ ঘণ্টা চললে কত ইউনিট (kWh) বিদ্যুৎ খরচ হবে?",
+        "answer": "Ans: $\\text{Unit} = \\frac{10 \\times 20 \\times 5}{1000} = 1.0\\text{ kWh}$ (বা ১ ইউনিট)"
+      }
+    ]
+  },
+  {
+    "title": "ক্যাটায়ন ও অ্যানায়নের চার্জমুক্তির অগ্রাধিকার ক্রম (Discharge Priority Order)",
+    "latex": "\\text{ক্যাটায়ন: } \\text{Ag}^+ > \\text{Cu}^{2+} > \\text{H}^+ > \\text{Pb}^{2+} > \\text{Ni}^{2+} > \\text{Fe}^{2+} > \\text{Zn}^{2+} > \\text{Al}^{3+} > \\text{Mg}^{2+} > \\text{Na}^+; \\quad \\text{অ্যানায়ন: } \\text{I}^- > \\text{Br}^- > \\text{Cl}^- > \\text{OH}^- > \\text{NO}_3^- > \\text{SO}_4^{2-}",
+    "description": "যে আয়নের বিজারণ বিভব যত বেশি (ক্যাটায়ন) বা জারণ বিভব যত বেশি (অ্যানায়ন), সে তড়িৎদ্বারে তত সহজে আগে চার্জমুক্ত হয়। যেমন: জলীয় লঘু $\\text{NaCl}$ এ $\\text{Na}^+$ এর আগে $\\text{H}^+$ এবং $\\text{OH}^-$ চার্জমুক্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "লঘু $\\text{CuSO}_4$ দ্রবণে $\\text{Cu}^{2+}$ ও $\\text{H}^+$ এর মধ্যে কোনটি আগে ক্যাথোডে চার্জমুক্ত হবে?",
+        "answer": "Ans: $\\text{Cu}^{2+}$ (কারণ কপার হাইড্রোজেনের নিচে অবস্থিত এবং এর বিজারণ বিভব $+0.34\\text{ V} > 0.00\\text{ V}$)"
+      }
+    ]
+  },
+  {
+    "title": "লিথিয়াম পলিমার ব্যাটারি (Lithium Polymer - Li-Po Battery)",
+    "latex": "\\text{ইলেকট্রোলাইট: কঠিন / জেল পলিমার (Polyethylene Oxide - PEO)}, \\quad \\text{লিকপ্রুফ ও অত্যন্ত পাতলা}",
+    "description": "লি-আয়ন ব্যাটারির তরল জৈব দ্রাবক ভিত্তিক ইলেকট্রোলাইটের পরিবর্তে পলিমার জেল ব্যবহার করায় এটি সহজে ছিদ্র বা বিস্ফোরিত হয় না এবং যেকোনো পাতলা আকারে তৈরি করা যায় (স্মার্টফোনে ব্যবহৃত)।",
+    "practiceQuestions": [
+      {
+        "question": "লিথিয়াম পলিমার ব্যাটারির প্রধান সুবিধা কী?",
+        "answer": "Ans: কঠিন/জেল পলিমার ইলেকট্রোলাইট থাকায় কোনো তরল লিক করার ঝুঁকি নেই এবং অত্যন্ত পাতলা ও নমনীয় আকারে তৈরি করা যায়।"
+      }
+    ]
+  },
+  {
+    "title": "নিকেল-ক্যাডমিয়াম ব্যাটারি (Ni-Cd Rechargeable Battery)",
+    "latex": "\\text{Anode: } \\text{Cd} + 2\\text{OH}^- \\to \\text{Cd(OH)}_2 + 2e^-; \\; \\text{Cathode: } 2\\text{NiO(OH)} + 2\\text{H}_2\\text{O} + 2e^- \\to 2\\text{Ni(OH)}_2 + 2\\text{OH}^- \\implies \\text{EMF} \\approx 1.2\\text{ V}",
+    "description": "ক্ষারীয় ইলেকট্রোলাইট ($\\,\\text{KOH}\\,\\,$) বিশিষ্ট রিচার্জেবল ব্যাটারি। ক্যাডমিয়াম বিষাক্ত হওয়ায় বর্তমানে এর ব্যবহার সীমিত।",
+    "practiceQuestions": [
+      {
+        "question": "নিকেল-ক্যাডমিয়াম ব্যাটারিতে ক্ষারীয় ইলেকট্রোলাইট হিসেবে কী ব্যবহৃত হয়?",
+        "answer": "Ans: পটাশিয়াম হাইড্রক্সাইড দ্রবণ ($\\text{KOH}$)"
+      }
+    ]
+  },
+  {
+    "title": "ব্যাটারির মেমোরি ইফেক্ট (Memory Effect in Batteries)",
+    "latex": "\\text{Memory Effect: } \\text{সম্পূর্ণ ডিসচার্জ না করে পুনঃপুন চার্জ দিলে কার্যকর ধারণক্ষমতা স্থায়ীভাবে হ্রাস পায়}",
+    "description": "Ni-Cd ও Ni-MH ব্যাটারিতে ক্রিস্টালাইজেশনের কারণে মেমোরি ইফেক্ট দেখা যায়। আধুনিক লিথিয়াম-আয়ন ব্যাটারিতে কোনো মেমোরি ইফেক্ট নেই।",
+    "practiceQuestions": [
+      {
+        "question": "কোন ধরনের ব্যাটারিতে মেমোরি ইফেক্ট দেখা যায় না?",
+        "answer": "Ans: লিথিয়াম-আয়ন (Li-ion) ও লিথিয়াম পলিমার ব্যাটারিতে"
+      }
+    ]
+  },
+  {
+    "title": "ক্যালমেল রেফারেন্স তড়িৎদ্বার (Calomel Reference Electrode)",
+    "latex": "\\text{Hg}(l) \\mid \\text{Hg}_2\\text{Cl}_2(s) \\mid \\text{KCl}(aq) \\implies E = +0.28\\text{ V} \\; (\\text{সম্পৃক্ত } \\text{KCl} \\text{ দ্রবণে})",
+    "description": "ব্যবহারিক ল্যাবরেটরিতে হাইড্রোজেন তড়িৎদ্বারের তুলনায় ক্যালমেল তড়িৎদ্বার অত্যন্ত সুবিধাজনক এবং এর বিভব সুনির্দিষ্ট ও দীর্ঘস্থায়ীভাবে ধ্রুব থাকে (গৌণ নির্দেশক তড়িৎদ্বার)।",
+    "practiceQuestions": [
+      {
+        "question": "সম্পৃক্ত ক্যালমেল তড়িৎদ্বারের বিজারণ বিভবের মান কত?",
+        "answer": "Ans: $+0.28\\text{ V}$ (বা $0.244\\text{ V}$ লঘুভেদে)"
+      }
+    ]
+  },
+  {
+    "title": "গ্লাস তড়িৎদ্বার ও pH পরিমাপ (Glass Electrode for pH Meter)",
+    "latex": "E_{\\text{glass}} = E^\\circ_{\\text{glass}} - 0.0592 \\times pH \\implies pH = \\frac{E^\\circ_{\\text{glass}} - E_{\\text{glass}}}{0.0592}",
+    "description": "বিশেষ কাচের তৈরি পাতলা ঝিল্লি হাইড্রোজেন আয়নের প্রতি সংবেদনশীল হওয়ায় দ্রবণের $pH$ মাপার ডিজিটাল মিটারে গ্লাস ইলেকট্রোড ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ডিজিটাল $pH$ মিটারে হাইড্রোজেন আয়ন ঘনমাত্রা মাপতে কোন তড়িৎদ্বার ব্যবহৃত হয়?",
+        "answer": "Ans: গ্লাস তড়িৎদ্বার (Glass Electrode)"
+      }
+    ]
+  },
+  {
+    "title": "গ্যালভানিক বনাম তড়িৎ বিশ্লেষ্য কোষের তড়িৎদ্বার চিহ্নের তুলনা (Electrode Signs Comparison)",
+    "latex": "\\text{গ্যালভানিক কোষ: } \\text{অ্যানোড (-)} \\; [\\text{জারণ}], \\; \\text{ক্যাথোড (+)} \\; [\\text{বিজারণ}]; \\quad \\text{তড়িৎ বিশ্লেষ্য কোষ: } \\text{অ্যানোড (+)}, \\; \\text{ক্যাথোড (-)}",
+    "description": "উভয় কোষে সর্বদা অ্যানোডে জারণ এবং ক্যাথোডে বিজারণ ঘটে; কিন্তু বাহ্যিক উৎসের সংযোগের কারণে ব্যাটারির ধনাত্মক প্রান্তের সাথে যুক্ত তড়িৎ বিশ্লেষ্য অ্যানোড ধনাত্মক ($+$) হয়।",
+    "practiceQuestions": [
+      {
+        "question": "তড়িৎ বিশ্লেষ্য কোষে অ্যানোডের তড়িৎ আধান কী রূপ?",
+        "answer": "Ans: ধনাত্মক চার্জযুক্ত ($+$)"
+      }
+    ]
+  },
+  {
+    "title": "চার্জ থেকে পরমাণু বা অনুর সংখ্যা গণনা (Atoms Deposited from Charge)",
+    "latex": "N = \\frac{I \\cdot t}{e \\cdot 1.602 \\times 10^{-19}} = \\frac{n \\cdot N_A}{e}",
+    "description": "প্রবাহিত মোট চার্জকে প্রতিটি আয়নের প্রয়োজনীয় চার্জ ($e \\times 1.602 \\times 10^{-19}\\text{ C}$) দ্বারা ভাগ করে সঞ্চিত পরমাণুর সংখ্যা নিখুঁতভাবে পাওয়া যায়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{Ag}^+$ দ্রবণে $1.602\\text{ A}$ বিদ্যুৎ $100\\text{ s}$ ধরে পাঠালে কতটি রূপা পরমাণু জমা হবে?",
+        "answer": "Ans: $N = \\frac{1.602 \\times 100}{1 \\times 1.602 \\times 10^{-19}} = 10^{21}$ টি পরমাণু"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎদ্বারের ওভারভোল্টেজ বা অতিবিভব (Electrode Overpotential)",
+    "latex": "\\eta = E_{\\text{actual}} - E_{\\text{thermodynamic}}",
+    "description": "গ্যাস মুক্ত হওয়ার জন্য তাত্ত্বিক বিভবের চেয়ে অতিরিক্ত যে বিভব প্রয়োগ করতে হয় তাকে ওভারভোল্টেজ বলে। যেমন: ব্রাইনের তড়িৎ বিশ্লেষণে পানির $OH^-$ এর চেয়ে $Cl^-$ আয়ন আগে চার্জমুক্ত হওয়ার কারণ অক্সিজেনের উচ্চ ওভারভোল্টেজ।",
+    "practiceQuestions": [
+      {
+        "question": "ব্রাইনের তড়িৎ বিশ্লেষণে অক্সিজেনের পরিবর্তে ক্লোরিন আগে নির্গত হয় কেন?",
+        "answer": "Ans: তড়িৎদ্বারে অক্সিজেনের অতিবিভব বা ওভারভোল্টেজ অনেক বেশি হওয়ায় ক্লোরিন গ্যাস আগে নির্গত হয়।"
+      }
+    ]
+  },
+  {
+    "title": "জারণ বিভব ও বিজারণ বিভবের সম্পর্ক (Oxidation vs Reduction Potential)",
+    "latex": "E^\\circ_{\\text{ox}} = - E^\\circ_{\\text{red}} \\implies E^\\circ_{\\text{Zn}/\\text{Zn}^{2+}} = +0.76\\text{ V} \\iff E^\\circ_{\\text{Zn}^{2+}/\\text{Zn}} = -0.76\\text{ V}",
+    "description": "কোনো অর্ধকোষের জারণ বিভব এবং বিজারণ বিভবের মান সমান কিন্তু চিহ্ন বিপরীত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "কপারের প্রমাণ বিজারণ বিভব $+0.34\\text{ V}$ হলে এর প্রমাণ জারণ বিভব কত?",
+        "answer": "Ans: $-0.34\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "ধাতব পরিবাহী বনাম তড়িৎ বিশ্লেষ্য পরিবাহী (Metallic vs Electrolytic Conduction)",
+    "latex": "\\text{ধাতব পরিবাহী: } T \\uparrow \\implies \\text{রোধ } R \\uparrow, \\; \\text{পরিবাহিতা } G \\downarrow; \\quad \\text{তড়িৎ বিশ্লেষ্য: } T \\uparrow \\implies \\text{আয়ন গতিশীলতা } \\uparrow, \\; \\text{পরিবাহিতা } G \\uparrow",
+    "description": "ধাতুতে মুক্ত ইলেকট্রন পরিবাহী হিসেবে কাজ করে এবং তাপমাত্রা বাড়লে ল্যাটিস কম্পন বেড়ে রোধ বাড়ে। তড়িৎ বিশ্লেষ্যে আয়ন পরিবাহী হিসেবে কাজ করে এবং তাপমাত্রা বাড়লে আয়নসমূহের গতিশক্তি বৃদ্ধি পেয়ে পরিবাহিতা বাড়ে।",
+    "practiceQuestions": [
+      {
+        "question": "তাপমাত্রা বৃদ্ধি করলে তড়িৎ বিশ্লেষ্য দ্রবণের পরিবাহিতা বৃদ্ধি পায় কেন?",
+        "answer": "Ans: কারণ তাপমাত্রা বাড়লে দ্রবণের সান্দ্রতা কমে এবং আয়নসমূহের গতিশীলতা বৃদ্ধি পায়।"
+      }
+    ]
+  },
+  {
+    "title": "কোষের অভ্যন্তরীণ রোধ ও প্রান্তীয় বিভব (Internal Resistance of Cell)",
+    "latex": "V = E - I \\cdot r \\implies r = \\frac{E - V}{I}",
+    "description": "$E$ = তড়িৎচালক বল (EMF), $V$ = টার্মিনাল বিভব বা বহির্বর্তনীর ভোল্টেজ, $r$ = কোষের অভ্যন্তরীণ রোধ (Internal resistance), $I$ = প্রবাহিত তড়িৎ।",
+    "practiceQuestions": [
+      {
+        "question": "$1.5\\text{ V}$ EMF এর একটি কোষ থেকে $0.5\\text{ A}$ বিদ্যুৎ নিলে প্রান্তীয় বিভব $1.4\\text{ V}$ পাওয়া যায়। কোষের অভ্যন্তরীণ রোধ কত?",
+        "answer": "Ans: $r = \\frac{1.5 - 1.4}{0.5} = \\frac{0.1}{0.5} = 0.2\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "ডিরেক্ট মিথানল ফুয়েল সেল (Direct Methanol Fuel Cell - DMFC)",
+    "latex": "\\text{Anode: } \\text{CH}_3\\text{OH} + \\text{H}_2\\text{O} \\to \\text{CO}_2 + 6\\text{H}^+ + 6e^-; \\; \\text{Cathode: } \\frac{3}{2}\\text{O}_2 + 6\\text{H}^+ + 6e^- \\to 3\\text{H}_2\\text{O} \\implies \\text{Overall: } \\text{CH}_3\\text{OH} + \\frac{3}{2}\\text{O}_2 \\to \\text{CO}_2 + 2\\text{H}_2\\text{O}",
+    "description": "তরল মিথানল জ্বালানি হিসেবে ব্যবহার করায় গ্যাসীয় হাইড্রোজেনের তুলনায় এটি সহজে বহনযোগ্য ও নিরাপদে রিফুয়েলিং করা যায় (ল্যাপটপ ও সামরিক সরঞ্জামে ব্যবহৃত)।",
+    "practiceQuestions": [
+      {
+        "question": "ডিরেক্ট মিথানল ফুয়েল সেলে অ্যানোডে মিথানলের জারণে কত মোল ইলেকট্রন মুক্ত হয়?",
+        "answer": "Ans: ১ মোল মিথানল থেকে ৬ মোল ইলেকট্রন ($6e^-$) মুক্ত হয়।"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ রাসায়নিক শক্তি রূপান্তর ও ব্যাটারির ক্যাপাসিটি (Battery Capacity in Ah)",
+    "latex": "\\text{Capacity (Ah)} = I \\times t_{\\text{hours}} = \\frac{Q}{3600}, \\quad 1\\text{ Ah} = 3600\\text{ Coulombs}",
+    "description": "ব্যাটারি কত সময় ধরে নির্দিষ্ট পরিমাণ বিদ্যুৎ সরবরাহ করতে পারে তার পরিমাপ হলো অ্যাম্পিয়ার-আওয়ার ($Ah$) বা মিলিঅ্যাম্পিয়ার-আওয়ার ($mAh$)।",
+    "practiceQuestions": [
+      {
+        "question": "$5000\\text{ mAh}$ ব্যাটারি $500\\text{ mA}$ বিদ্যুৎ প্রবাহ দিলে কত ঘণ্টা চলবে?",
+        "answer": "Ans: $t = \\frac{5000\\text{ mAh}}{500\\text{ mA}} = 10\\text{ hours}$ (১০ ঘণ্টা)"
+      }
+    ]
+  },
+  {
+    "title": "কোষের তাপমাত্রা সহগ ও এনথালপি পরিবর্তন (Temperature Coefficient of Cell)",
+    "latex": "\\Delta S = n F \\left(\\frac{\\partial E}{\\partial T}\\right)_P, \\quad \\Delta H = -n F E + n F T \\left(\\frac{\\partial E}{\\partial T}\\right)_P",
+    "description": "$\\left(\\frac{\\partial E}{\\partial T}\\right)_P$ হলো স্থির চাপে কোষের EMF এর তাপমাত্রা সহগ। এর মান ধনাত্মক হলে তাপমাত্রা বাড়লে কোষের ভোল্টেজ বাড়ে এবং কোষটি কাজ করার সময় চারপাশ থেকে তাপ শোষণ করে।",
+    "practiceQuestions": [
+      {
+        "question": "কোনো কোষের তাপমাত্রা সহগ $\\left(\\frac{\\partial E}{\\partial T}\\right)_P > 0$ হলে কোষ বিক্রিয়ায় এন্ট্রপির পরিবর্তন ($\\,\\Delta S\\,$) কেমন হবে?",
+        "answer": "Ans: এন্ট্রপির পরিবর্তন ধনাত্মক হবে ($\\Delta S > 0$)"
+      }
+    ]
+  }
+]

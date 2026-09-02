@@ -1,1 +1,94 @@
-[]
+[
+  {
+    "title": "দশা পার্থক্য ও পথ পার্থক্য (Phase Difference & Path Difference)",
+    "latex": "\\Delta\\phi = \\frac{2\\pi}{\\lambda} \\Delta x, \\quad \\Delta t = \\frac{T}{2\\pi} \\Delta\\phi = \\frac{T}{\\lambda} \\Delta x, \\quad \\text{Optical Path} = \\mu d",
+    "description": "$\\Delta\\phi$ = দশা পার্থক্য (Radian), $\\Delta x$ = পথ পার্থক্য, $\\lambda$ = তরঙ্গদৈর্ঘ্য, $T$ = পর্যায়কাল। $\\mu$ প্রতিসরাঙ্কের মাধ্যমে $d$ দূরত্ব অতিক্রম করলে কার্যকর আলোক পথ হয় $\\mu d$ এবং প্রয়োজনীয় সময় $t = \\frac{\\mu d}{c}$।",
+    "practiceQuestions": [
+      {
+        "question": "$6000\\text{ \\AA}$ তরঙ্গদৈর্ঘ্যের আলোর দুটি তরঙ্গের মধ্যে পথ পার্থক্য $1.5\\,\\mu\\text{m}$ হলে দশা পার্থক্য কত?",
+        "answer": "Ans: $\\Delta\\phi = \\frac{2\\pi}{6 \\times 10^{-7}} \\times (1.5 \\times 10^{-6}) = 5\\pi\\text{ rad}$"
+      }
+    ]
+  },
+  {
+    "title": "ব্যতিচারের বিস্তার ও তীব্রতার সমীকরণ (Interference Amplitude & Intensity)",
+    "latex": "A = \\sqrt{a_1^2 + a_2^2 + 2a_1 a_2 \\cos\\phi}, \\quad I = I_1 + I_2 + 2\\sqrt{I_1 I_2}\\cos\\phi, \\quad \\frac{I_{\\text{max}}}{I_{\\text{min}}} = \\frac{(\\sqrt{I_1} + \\sqrt{I_2})^2}{(\\sqrt{I_1} - \\sqrt{I_2})^2} = \\frac{(a_1 + a_2)^2}{(a_1 - a_2)^2}",
+    "description": "$a_1, a_2$ = উৎসদ্বয়ের বিস্তার, $I_1, I_2$ = তীব্রতা ($I \\propto A^2$), $\\phi$ = দশা পার্থক্য। সুসঙ্গত উৎসদ্বয়ের বিস্তার সমান ($a_1 = a_2 = a_0$) হলে $I = 4 I_0 \\cos^2(\\phi / 2)$।",
+    "practiceQuestions": [
+      {
+        "question": "দুটি সুসঙ্গত উৎসের তীব্রতার অনুপাত $9:1$ হলে ব্যতিচারে সর্বোচ্চ ও সর্বনিম্ন তীব্রতার অনুপাত কত?",
+        "answer": "Ans: $\\frac{I_1}{I_2} = \\frac{9}{1} \\implies \\frac{\\sqrt{I_1}}{\\sqrt{I_2}} = 3$। $\\frac{I_{\\max}}{I_{\\min}} = \\frac{(3 + 1)^2}{(3 - 1)^2} = \\frac{16}{4} = 4 : 1$"
+      }
+    ]
+  },
+  {
+    "title": "গঠনমূলক ও ধ্বংসাত্মক ব্যতিচারের শর্ত (Constructive & Destructive Interference)",
+    "latex": "\\text{Constructive: } \\Delta x = n \\lambda, \\; \\phi = 2n\\pi \\; (n = 0, 1, 2, \\dots); \\quad \\text{Destructive: } \\Delta x = (2n - 1)\\frac{\\lambda}{2}, \\; \\phi = (2n - 1)\\pi \\; (n = 1, 2, \\dots)",
+    "description": "গঠনমূলক ব্যতিচারে উজ্জ্বল ডোরা এবং ধ্বংসাত্মক ব্যতিচারে অন্ধকার ডোরা তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পথ পার্থক্য $\\Delta x = \\frac{5}{2}\\lambda$ হলে ব্যতিচার প্যাটার্নে কোন ধরনের বিন্দু তৈরি হবে?",
+        "answer": "Ans: যেহেতু $\\Delta x = (2 \\times 3 - 1)\\frac{\\lambda}{2}$, তাই এটি ৩য় অন্ধকার ডোরা তৈরি করবে।"
+      }
+    ]
+  },
+  {
+    "title": "ইয়ং-এর দ্বি-চিড় পরীক্ষা: ডোরার অবস্থান (Young's Double Slit Positions)",
+    "latex": "x_n(\\text{Bright}) = \\frac{n \\lambda D}{d}, \\quad x_n(\\text{Dark}) = (2n - 1)\\frac{\\lambda D}{2d}",
+    "description": "$x_n$ = কেন্দ্রীয় উজ্জ্বল ডোরা থেকে $n$-তম ডোরার দূরত্ব, $\\lambda$ = তরঙ্গদৈর্ঘ্য, $D$ = চিড় থেকে পর্দার দূরত্ব, $d$ = দুটি চিড়ের মধ্যবর্তী দূরত্ব ($2a$)।",
+    "practiceQuestions": [
+      {
+        "question": "$d = 0.4\\text{ mm}, D = 1\\text{ m}$ এবং $\\lambda = 5000\\text{ \\AA}$ হলে কেন্দ্র হতে ৩য় উজ্জ্বল এবং ৩য় অন্ধকার ডোরার দূরত্ব কত?",
+        "answer": "Ans: ৩য় উজ্জ্বল ($n=3$): $x_3 = \\frac{3 \\times (5 \\times 10^{-7}) \\times 1}{0.4 \\times 10^{-3}} = 3.75\\text{ mm}$। ৩য় অন্ধকার ($n=3$): $x'_3 = 5 \\times \\frac{(5 \\times 10^{-7}) \\times 1}{2 \\times (0.4 \\times 10^{-3})} = 3.125\\text{ mm}$"
+      }
+    ]
+  },
+  {
+    "title": "ডোরার প্রস্থ, ব্যবধান ও মাধ্যমে প্রভাব (Fringe Width, Spacing & Medium Effect)",
+    "latex": "\\Delta x(\\text{প্রস্থ}) = \\frac{\\lambda D}{2d}, \\quad \\beta(\\text{ব্যবধান}) = \\frac{\\lambda D}{d} = 2 \\Delta x, \\quad \\theta = \\frac{\\lambda}{d}, \\quad \\beta_m = \\frac{\\beta}{\\mu}",
+    "description": "একটি উজ্জ্বল বা অন্ধকার ডোরার নিজস্ব বিস্তার হলো 'ডোরার প্রস্থ' ($\\Delta x$)। দুটি উজ্জ্বল বা দুটি অন্ধকার ডোরার মধ্যবর্তী দূরত্ব হলো 'ডোরার ব্যবধান' ($\\beta$) যা ডোরার প্রস্থের দ্বিগুণ। তরলে নিমজ্জিত করলে তরঙ্গদৈর্ঘ্য হ্রাসের কারণে ডোরার ব্যবধান $\\mu$ গুণ সংকুচিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "দ্বি-চিড় পরীক্ষায় চিড়দ্বয়ের দূরত্ব $0.2\\text{ mm}$, পর্দা $1.2\\text{ m}$ দূরে এবং $\\lambda = 600\\text{ nm}$ হলে ডোরার ব্যবধান কত এবং পানিতে ($\\mu = 4/3$) এটি কত হবে?",
+        "answer": "Ans: বায়ুতে $\\beta = \\frac{(600 \\times 10^{-9}) \\times 1.2}{0.2 \\times 10^{-3}} = 3.6\\text{ mm}$। পানিতে $\\beta_w = \\frac{3.6}{4/3} = 2.7\\text{ mm}$"
+      }
+    ]
+  },
+  {
+    "title": "একক চিড়ের দরুন অপবর্তন (Single Slit Diffraction)",
+    "latex": "a \\sin\\theta_n = n \\lambda \\text{ (অবম/অন্ধকার)}, \\quad a \\sin\\theta_n = (2n + 1)\\frac{\\lambda}{2} \\text{ (গৌণ চরম/উজ্জ্বল)}",
+    "description": "$a$ = একক চিড়ের প্রস্থ, $\\theta_n$ = অপবর্তন কোণ, $n = 1, 2, 3, \\dots$ ক্রম। কেন্দ্রীয় চরমের মোট রৈখিক বিস্তার: $2x = \\frac{2\\lambda D}{a}$, কৌণিক বিস্তার: $2\\theta = \\frac{2\\lambda}{a}$।",
+    "practiceQuestions": [
+      {
+        "question": "$0.1\\text{ mm}$ প্রস্থের একক চিড়ে $6000\\text{ \\AA}$ আলো ফেলা হলো। $2\\text{ m}$ দূরে পর্দায় কেন্দ্রীয় চরমের মোট রৈখিক বিস্তার কত?",
+        "answer": "Ans: $2x = \\frac{2 \\times (6 \\times 10^{-7}) \\times 2}{0.1 \\times 10^{-3}} = 2.4 \\times 10^{-2}\\text{ m} = 24\\text{ mm}$"
+      }
+    ]
+  },
+  {
+    "title": "অপবর্তন গ্রেটিং ও সর্বোচ্চ ক্রম (Diffraction Grating & Maximum Orders)",
+    "latex": "d = a + b = \\frac{1}{N}, \\quad d \\sin\\theta_n = n \\lambda \\iff \\frac{1}{N}\\sin\\theta_n = n \\lambda, \\quad n_{\\text{max}} = \\frac{d}{\\lambda} = \\frac{1}{N\\lambda}",
+    "description": "$d = a + b$ = গ্রেটিং ধ্রুবক, $N$ = প্রতি একক দৈর্ঘ্যে রেখার সংখ্যা (Lines per meter / cm), $n$ = অপবর্তন ক্রম, $n_{\\max}$ = দৃশ্যমান সর্বোচ্চ ক্রম সংখ্যা ($\\,\\sin\\theta \\le 1$)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রতি সেন্টিমিটারে $5000$ দাগবিশিষ্ট গ্রেটিংয়ে $5890\\text{ \\AA}$ আলো পড়লে ২য় ক্রমের অপবর্তন কোণ এবং সর্বোচ্চ ক্রম কত?",
+        "answer": "Ans: $d = \\frac{10^{-2}\\text{ m}}{5000} = 2 \\times 10^{-6}\\text{ m}$। $\\sin\\theta_2 = \\frac{2 \\times (5.89 \\times 10^{-7})}{2 \\times 10^{-6}} = 0.589 \\implies \\theta_2 \\approx 36.08^\\circ$। সর্বোচ্চ ক্রম $n_{\\max} = \\frac{2 \\times 10^{-6}}{5.89 \\times 10^{-7}} = 3.395 \\implies n_{\\max} = 3$"
+      }
+    ]
+  },
+  {
+    "title": "সমবর্তন: ব্রুস্টারের সূত্র ও ম্যালুসের সূত্র (Brewster's Law & Malus's Law)",
+    "latex": "\\mu = \\tan i_p \\iff i_p + r = 90^\\circ, \\quad I = I_0 \\cos^2\\theta",
+    "description": "$i_p$ = সমবর্তন কোণ (Brewster angle), $r$ = প্রতিসরণ কোণ। আপাতিত আলো সমবর্তন কোণে আপতিত হলে প্রতিফলিত ও প্রতিসরিত রশ্মি পরস্পর লম্ব থাকে। $I_0$ = সমবর্তিত আলোর আদি তীব্রতা, $\\theta$ = পোলারাইজার ও অ্যানালাইজারের অক্ষের অন্তর্ভুক্ত কোণ।",
+    "practiceQuestions": [
+      {
+        "question": "কাচের প্রতিসরাঙ্ক $1.55$ হলে সমবর্তন কোণ কত?",
+        "answer": "Ans: $\\tan i_p = 1.55 \\implies i_p = \\arctan(1.55) \\approx 57.17^\\circ$"
+      },
+      {
+        "question": "দুটি পোলারয়েড পরস্পর $60^\\circ$ কোণে থাকলে নির্গত আলোর তীব্রতা আদি তীব্রতার কত শতাংশ হবে?",
+        "answer": "Ans: $I = I_0 \\cos^2(60^\\circ) = I_0 \\times (0.5)^2 = 0.25 I_0 = 25\\%$"
+      }
+    ]
+  }
+]

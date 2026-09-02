@@ -1,1 +1,179 @@
-[]
+[
+  {
+    "title": "কুলম্বের সূত্র: শূন্য মাধ্যম ও অন্য মাধ্যমে বল (Coulomb's Law in Vacuum & Medium)",
+    "latex": "F_0 = \\frac{1}{4\\pi\\varepsilon_0} \\frac{|q_1 q_2|}{r^2} = k \\frac{|q_1 q_2|}{r^2}, \\quad F_m = \\frac{1}{4\\pi\\varepsilon_0 \\kappa} \\frac{|q_1 q_2|}{r^2} = \\frac{F_0}{\\kappa}",
+    "description": "শূন্য মাধ্যমে $k = \\frac{1}{4\\pi\\varepsilon_0} = 9 \\times 10^9\\text{ N}\\cdot\\text{m}^2\\text{/C}^2$। $\\varepsilon_0 = 8.854 \\times 10^{-12}\\text{ C}^2\\text{/N}\\cdot\\text{m}^2$। $\\kappa = \\varepsilon_r$ হলো মাধ্যমের পরাবৈদ্যুতিক ধ্রুবক (পানির জন্য $\\kappa = 80$, কাচের জন্য $\\kappa \\approx 5-10$)।",
+    "practiceQuestions": [
+      {
+        "question": "বায়ুতে পরস্পর থেকে $0.5\\text{ m}$ দূরত্বে রক্ষিত দুটি $+10\\,\\mu\\text{C}$ ও $+20\\,\\mu\\text{C}$ চার্জের মধ্যকার বিকর্ষণ বল কত?",
+        "answer": "Ans: $F = 9 \\times 10^9 \\times \\frac{(10 \\times 10^{-6}) \\times (20 \\times 10^{-6})}{(0.5)^2} = 7.2\\text{ N}$"
+      },
+      {
+        "question": "পানিতে দুটি আধানের মধ্যকার বল বায়ুর তুলনায় কত গুণ হবে? (পানির $\\kappa = 80$)",
+        "answer": "Ans: $F_{\\text{water}} = \\frac{F_{\\text{air}}}{\\kappa} = \\frac{F_{\\text{air}}}{80}$ (বল ৮০ গুণ হ্রাস পাবে)"
+      }
+    ]
+  },
+  {
+    "title": "কুলম্বের সূত্রের ভেক্টর রূপ (Vector Form of Coulomb's Law)",
+    "latex": "\\vec{F}_{12} = \\frac{1}{4\\pi\\varepsilon_0} \\frac{q_1 q_2}{|\\vec{r}_1 - \\vec{r}_2|^3} (\\vec{r}_1 - \\vec{r}_2) = -\\vec{F}_{21}",
+    "description": "আধানদ্বয় সমধর্মী হলে বল বিকর্ষণমূলক ($q_1q_2 > 0$), বিপরীতধর্মী হলে আকর্ষণমূলক ($q_1q_2 < 0$)। কুলম্বের বল নিউটনের ৩য় সূত্র মেনে চলে।",
+    "practiceQuestions": [
+      {
+        "question": "$q_1$ আধান $q_2$ এর উপর $5\\text{ N}$ বল প্রয়োগ করলে $q_2$ আধান $q_1$ এর উপর কত বল প্রয়োগ করবে?",
+        "answer": "Ans: সমান ও বিপরীতমুখী $5\\text{ N}$ বল প্রয়োগ করবে ($\\vec{F}_{21} = -\\vec{F}_{12}$)"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ প্রাবল্য ও তীব্রতা (Electric Field Intensity)",
+    "latex": "\\vec{E} = \\frac{\\vec{F}}{q_0} = \\frac{1}{4\\pi\\varepsilon_0 \\kappa} \\frac{q}{r^2}\\hat{r}, \\quad E = 9 \\times 10^9 \\frac{q}{\\kappa r^2}",
+    "description": "তড়িৎক্ষেত্রে $q_0$ ধনাত্মক পরীক্ষণ চার্জ স্থাপন করলে যে বল $F$ অনুভব করে, তার অনুপাতই হলো প্রাবল্য $E$ (একক: $\\text{N/C}$ বা $\\text{V/m}$)। ধনাত্মক আধানের জন্য প্রাবল্যের দিক বহির্মুখী, ঋণাত্মক আধানের জন্য অন্তর্মুখী।",
+    "practiceQuestions": [
+      {
+        "question": "$+50\\,\\mu\\text{C}$ আধান হতে $30\\text{ cm}$ দূরে শূন্য মাধ্যমে তড়িৎ প্রাবল্য কত?",
+        "answer": "Ans: $E = 9 \\times 10^9 \\times \\frac{50 \\times 10^{-6}}{(0.3)^2} = \\frac{4.5 \\times 10^5}{0.09} = 5 \\times 10^6\\text{ N/C}$"
+      },
+      {
+        "question": "$2000\\text{ V/m}$ প্রাবল্যের সুষম তড়িৎক্ষেত্রে একটি ইলেকট্রন কত বল অনুভব করবে?",
+        "answer": "Ans: $F = q E = (1.6 \\times 10^{-19}\\text{ C}) \\times 2000 = 3.2 \\times 10^{-16}\\text{ N}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ নিরপেক্ষ বিন্দু বা সাম্যাবস্থা (Neutral / Equilibrium Point)",
+    "latex": "E_1 = E_2 \\implies \\frac{q_1}{x^2} = \\frac{q_2}{(d - x)^2} \\implies x = \\frac{d}{\\sqrt{\\frac{q_2}{q_1}} + 1}",
+    "description": "দুটি সমধর্মী আধানের ক্ষেত্রে নিরপেক্ষ বিন্দু তাদের সংযোগ রেখার মাঝে অবস্থিত হয়। বিপরীতধর্মী আধানের ক্ষেত্রে নিরপেক্ষ বিন্দু ক্ষুদ্রতর আধানের বাইরের দিকে অবস্থিত হয়: $x = \\frac{d}{\\sqrt{q_2/q_1} - 1}$।",
+    "practiceQuestions": [
+      {
+        "question": "$+4\\,\\mu\\text{C}$ এবং $+16\\,\\mu\\text{C}$ এর দুটি আধান $30\\text{ cm}$ ব্যবধানে আছে। এদের সংযোগ রেখার কোথায় প্রাবল্য শূন্য হবে?",
+        "answer": "Ans: $x = \\frac{30}{\\sqrt{16/4} + 1} = \\frac{30}{2 + 1} = 10\\text{ cm}$ ($+4\\,\\mu\\text{C}$ চার্জ হতে $10\\text{ cm}$ দূরে)"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ বিভব ও আধান স্থানান্তরে কাজ (Electric Potential & Work Done)",
+    "latex": "V = \\frac{W}{q_0} = \\frac{1}{4\\pi\\varepsilon_0 \\kappa} \\frac{q}{r}, \\quad W = q_0 (V_B - V_A) = q_0 \\Delta V",
+    "description": "অসীম দূরত্ব থেকে একক ধনাত্মক আধানকে তড়িৎক্ষেত্রের কোনো বিন্দুতে আনতে সম্পন্ন কাজ হলো ঐ বিন্দুর বিভব $V$ (একক: Volt বা $\\text{J/C}$)। বিভব একটি স্কেলার রাশি।",
+    "practiceQuestions": [
+      {
+        "question": "$+8\\,\\mu\\text{C}$ আধান থেকে $20\\text{ cm}$ দূরে কোনো বিন্দুতে বিভব কত?",
+        "answer": "Ans: $V = 9 \\times 10^9 \\times \\frac{8 \\times 10^{-6}}{0.2} = 3.6 \\times 10^5\\text{ V}$"
+      },
+      {
+        "question": "$5\\,\\mu\\text{C}$ আধানকে $20\\text{ V}$ বিভবের বিন্দু থেকে $70\\text{ V}$ বিভবের বিন্দুতে স্থানান্তরে কৃতকাজ কত?",
+        "answer": "Ans: $W = q(V_B - V_A) = (5 \\times 10^{-6}) \\times (70 - 20) = 2.5 \\times 10^{-4}\\text{ J}$"
+      }
+    ]
+  },
+  {
+    "title": "বিভব ও প্রাবল্যের সম্পর্ক ও নতিমাত্রা (Relation between E and V)",
+    "latex": "E = -\\frac{dV}{dr} \\implies E = \\frac{V}{d} \\text{ (সুষম তড়িৎক্ষেত্রে)}",
+    "description": "তড়িৎ প্রাবল্য হলো দূরত্বের সাপেক্ষে বিভবের ঋণাত্মক নতিমাত্রা (Potential Gradient)। সুষম তড়িৎক্ষেত্রে $d$ ব্যবধানে থাকা পাতের বিভব পার্থক্য $V$ হলে $E = V/d$।",
+    "practiceQuestions": [
+      {
+        "question": "$0.02\\text{ m}$ ব্যবধানে থাকা দুটি সমান্তরাল ধাতব পাতের মধ্যে $200\\text{ V}$ বিভব পার্থক্য প্রযুক্ত হলে তাদের মধ্যবর্তী তড়িৎ প্রাবল্য কত?",
+        "answer": "Ans: $E = \\frac{V}{d} = \\frac{200}{0.02} = 10000\\text{ V/m}$"
+      }
+    ]
+  },
+  {
+    "title": "আধানের তলঘনত্ব ও গোলকাকার পরিবাহী (Surface Charge Density & Spherical Conductor)",
+    "latex": "\\sigma = \\frac{q}{A} = \\frac{q}{4\\pi R^2}, \\quad E_{\\text{surface}} = \\frac{\\sigma}{\\varepsilon_0} = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{R^2}",
+    "description": "গোলকাকার পরিবাহীর ক্ষেত্রে:\n• অভ্যন্তরে ($r < R$): $E = 0, \\quad V = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{R}$ (ধ্রুবক, পৃষ্ঠের বিভবের সমান)\n• পৃষ্ঠে ($r = R$): $E = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{R^2}, \\quad V = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{R}$\n• বাইরে ($r > R$): $E = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r^2}, \\quad V = \\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r}$",
+    "practiceQuestions": [
+      {
+        "question": "$10\\text{ cm}$ ব্যাসার্ধের ফাঁপা পরিবাহী গোলকে $+20\\,\\mu\\text{C}$ চার্জ দিলে কেন্দ্র হতে $5\\text{ cm}$ ও $20\\text{ cm}$ দূরে প্রাবল্য ও বিভব কত?",
+        "answer": "Ans: কেন্দ্রে ও অভ্যন্তরে ($5\\text{ cm}$): $E = 0, V = 9 \\times 10^9 \\times \\frac{20 \\times 10^{-6}}{0.1} = 1.8 \\times 10^6\\text{ V}$। বাইরে ($20\\text{ cm}$): $V = 9 \\times 10^9 \\times \\frac{20 \\times 10^{-6}}{0.2} = 9 \\times 10^5\\text{ V}$, $E = 9 \\times 10^9 \\times \\frac{20 \\times 10^{-6}}{(0.2)^2} = 4.5 \\times 10^6\\text{ N/C}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ দ্বিমেরু ভ্রামক ও দ্বিমেরুর প্রাবল্য-বিভব (Electric Dipole Moment & Fields)",
+    "latex": "p = q \\times 2l, \\quad E_{\\text{axial}} = \\frac{1}{4\\pi\\varepsilon_0}\\frac{2p}{r^3}, \\quad E_{\\text{equatorial}} = \\frac{1}{4\\pi\\varepsilon_0}\\frac{p}{r^3}, \\quad V = \\frac{1}{4\\pi\\varepsilon_0}\\frac{p\\cos\\theta}{r^2}",
+    "description": "$q$ = সমমানের বিপরীত আধানের মান, $2l$ = আধানদ্বয়ের ব্যবধান। দ্বিমেরুর অক্ষীয় প্রাবল্য বিষুবীয় প্রাবল্যের দ্বিগুণ ($E_{\\text{axial}} = 2 E_{\\text{equatorial}}$)। বিষুবীয় রেখায় বিভব সর্বদা শূন্য ($V = 0$)।",
+    "practiceQuestions": [
+      {
+        "question": "$4\\,\\mu\\text{C}$ এর দুটি বিপরীতধর্মী চার্জ $5\\text{ mm}$ ব্যবধানে অবস্থিত। দ্বিমেরু ভ্রামক কত?",
+        "answer": "Ans: $p = q \\times 2l = (4 \\times 10^{-6}\\text{ C}) \\times (5 \\times 10^{-3}\\text{ m}) = 2 \\times 10^{-8}\\text{ C}\\cdot\\text{m}$"
+      }
+    ]
+  },
+  {
+    "title": "দ্বিমেরুর উপর টর্ক ও স্থৈতিক শক্তি (Torque & Potential Energy of Dipole)",
+    "latex": "\\vec{\\tau} = \\vec{p} \\times \\vec{E} \\implies \\tau = p E \\sin\\theta, \\quad U = -\\vec{p}\\cdot\\vec{E} = -p E \\cos\\theta, \\quad W = pE(\\cos\\theta_1 - \\cos\\theta_2)",
+    "description": "$\\theta = 90^\\circ$ হলে টর্ক সর্বোচ্চ ($\\tau_{\\max} = pE$)। সাম্যাবস্থায় ($\\,\\theta = 0^\\circ\\,$) স্থৈতিক শক্তি সর্বনিম্ন ($U = -pE$); অস্থিতিশীল সাম্যাবস্থায় ($\\,\\theta = 180^\\circ\\,$) শক্তি সর্বোচ্চ ($U = +pE$)।",
+    "practiceQuestions": [
+      {
+        "question": "$2 \\times 10^{-8}\\text{ C}\\cdot\\text{m}$ ভ্রামকের একটি দ্বিমেরু $4 \\times 10^4\\text{ V/m}$ তড়িৎক্ষেত্রের সাথে $30^\\circ$ কোণে থাকলে টর্ক কত?",
+        "answer": "Ans: $\\tau = p E \\sin 30^\\circ = (2 \\times 10^{-8}) \\times (4 \\times 10^4) \\times 0.5 = 4 \\times 10^{-4}\\text{ N}\\cdot\\text{m}$"
+      }
+    ]
+  },
+  {
+    "title": "গাউসের সূত্র ও তড়িৎ ফ্লাক্স (Gauss's Law & Electric Flux)",
+    "latex": "\\Phi_E = \\oint \\vec{E} \\cdot d\\vec{A} = E A \\cos\\theta = \\frac{q_{\\text{enclosed}}}{\\varepsilon_0}",
+    "description": "যেকোনো আবদ্ধ কাল্পনিক তলের (Gaussian Surface) মধ্য দিয়ে অতিক্রান্ত মোট তড়িৎ ফ্লাক্স তলটির অভ্যন্তরে আবদ্ধ মোট চার্জের $1/\\varepsilon_0$ গুণের সমান।",
+    "practiceQuestions": [
+      {
+        "question": "একটি বদ্ধ ঘনকের কেন্দ্রে $8.854\\,\\mu\\text{C}$ চার্জ থাকলে ঘনকের প্রতিটি তলের মধ্য দিয়ে নির্গত ফ্লাক্স কত?",
+        "answer": "Ans: মোট ফ্লাক্স $\\Phi = \\frac{q}{\\varepsilon_0} = \\frac{8.854 \\times 10^{-6}}{8.854 \\times 10^{-12}} = 10^6\\text{ N}\\cdot\\text{m}^2\\text{/C}$। ১টি তলের মধ্য দিয়ে ফ্লাক্স $= \\frac{10^6}{6} \\approx 1.67 \\times 10^5\\text{ N}\\cdot\\text{m}^2\\text{/C}$"
+      }
+    ]
+  },
+  {
+    "title": "ধারকত্ব ও সমান্তরাল পাত ধারক (Capacitance & Parallel Plate Capacitor)",
+    "latex": "C = \\frac{Q}{V}, \\quad C = \\frac{\\kappa \\varepsilon_0 A}{d}, \\quad C_{\\text{slab}} = \\frac{\\varepsilon_0 A}{d - t + \\frac{t}{\\kappa}}",
+    "description": "$A$ = পাতের ক্ষেত্রফল, $d$ = পাতদ্বয়ের মধ্যবর্তী দূরত্ব, $t$ = ডাই-ইলেকট্রিক স্ল্যাবের পুরুত্ব, $\\kappa$ = পরাবৈদ্যুতিক ধ্রুবক। ডাই-ইলেকট্রিক প্রবেশ করালে ধারকত্ব $\\kappa$ গুণ বৃদ্ধি পায় ($C = \\kappa C_0$)।",
+    "practiceQuestions": [
+      {
+        "question": "বায়ু মাধ্যমে থাকা একটি সমান্তরাল পাত ধারকের ক্ষেত্রফল $0.04\\text{ m}^2$ এবং পাত ব্যবধান $2\\text{ mm}$ হলে এর ধারকত্ব কত?",
+        "answer": "Ans: $C = \\frac{8.854 \\times 10^{-12} \\times 0.04}{2 \\times 10^{-3}} = 1.77 \\times 10^{-10}\\text{ F} = 177\\text{ pF}$"
+      }
+    ]
+  },
+  {
+    "title": "গোলাকার পরিবাহীর ধারকত্ব (Capacitance of Spherical Conductor)",
+    "latex": "C = 4\\pi\\varepsilon_0 \\kappa R = \\frac{R}{9 \\times 10^9}\\text{ Farad}",
+    "description": "$R$ = গোলকের ব্যাসার্ধ (মিটার এককে)। পৃথিবীর ব্যাসার্ধ $R = 6.4 \\times 10^6\\text{ m}$ হলে পৃথিবীর ধারকত্ব $C = \\frac{6.4 \\times 10^6}{9 \\times 10^9} \\approx 711\\,\\mu\\text{F}$।",
+    "practiceQuestions": [
+      {
+        "question": "$9\\text{ cm}$ ব্যাসার্ধের একটি ধাতব গোলকের ধারকত্ব কত?",
+        "answer": "Ans: $C = \\frac{R}{9 \\times 10^9} = \\frac{0.09}{9 \\times 10^9} = 10^{-11}\\text{ F} = 10\\text{ pF}$"
+      }
+    ]
+  },
+  {
+    "title": "ধারকে সঞ্চিত শক্তি ও শক্তি ঘনত্ব (Stored Energy & Energy Density)",
+    "latex": "U = \\frac{1}{2} C V^2 = \\frac{1}{2} Q V = \\frac{Q^2}{2C}, \\quad u = \\frac{U}{\\text{Volume}} = \\frac{1}{2}\\kappa \\varepsilon_0 E^2",
+    "description": "$U$ = সঞ্চিত মোট স্থৈতিক শক্তি (Joule), $u$ = প্রতি একক আয়তনে তড়িৎক্ষেত্রের শক্তি ঘনত্ব ($\\text{J/m}^3$)।",
+    "practiceQuestions": [
+      {
+        "question": "একটি $20\\,\\mu\\text{F}$ ধারককে $100\\text{ V}$ ব্যাটারি দ্বারা পূর্ণ চার্জিত করলে এতে কী পরিমাণ শক্তি জমা হবে?",
+        "answer": "Ans: $U = \\frac{1}{2} C V^2 = 0.5 \\times (20 \\times 10^{-6}) \\times (100)^2 = 0.1\\text{ J}$"
+      }
+    ]
+  },
+  {
+    "title": "ধারকের শ্রেণি ও সমান্তরাল সমবায় (Combination of Capacitors)",
+    "latex": "\\text{Series: } \\frac{1}{C_s} = \\sum_{i=1}^n \\frac{1}{C_i}, \\quad \\text{Parallel: } C_p = \\sum_{i=1}^n C_i",
+    "description": "দুটি ধারকের ক্ষেত্রে: $C_s = \\frac{C_1 C_2}{C_1 + C_2}, C_p = C_1 + C_2$। শ্রেণিতে চার্জ $Q$ সমান এবং সমান্তরালে বিভব $V$ সমান থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "$3\\,\\mu\\text{F}, 6\\,\\mu\\text{F}$ এবং $9\\,\\mu\\text{F}$ এর তিনটি ধারক সমান্তরালে ও শ্রেণিতে যুক্ত করলে তুল্য ধারকত্ব কত?",
+        "answer": "Ans: সমান্তরাল: $C_p = 3 + 6 + 9 = 18\\,\\mu\\text{F}$। শ্রেণি: $\\frac{1}{C_s} = \\frac{1}{3} + \\frac{1}{6} + \\frac{1}{9} = \\frac{11}{18} \\implies C_s = \\frac{18}{11} \\approx 1.64\\,\\mu\\text{F}$"
+      }
+    ]
+  },
+  {
+    "title": "পরিবাহীর সংযোগে সাধারণ বিভব ও শক্তি ক্ষয় (Common Potential & Energy Loss)",
+    "latex": "V = \\frac{C_1 V_1 + C_2 V_2}{C_1 + C_2} = \\frac{Q_1 + Q_2}{C_1 + C_2}, \\quad \\Delta U = \\frac{C_1 C_2 (V_1 - V_2)^2}{2(C_1 + C_2)}",
+    "description": "$V$ = সংযোগের পর সাধারণ বিভব, $\\Delta U$ = আধান বণ্টনের সময় তাপ ও স্ফুলিঙ্গরূপে বিনষ্ট শক্তি।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\,\\mu\\text{F}$ ধারককে $100\\text{ V}$ এবং $20\\,\\mu\\text{F}$ ধারককে $50\\text{ V}$ এ চার্জ করে সমান্তরালে যুক্ত করলে সাধারণ বিভব এবং শক্তি ক্ষয় কত?",
+        "answer": "Ans: $V = \\frac{(10 \\times 100) + (20 \\times 50)}{10 + 20} = \\frac{2000}{30} = 66.67\\text{ V}$। শক্তি ক্ষয় $\\Delta U = \\frac{10 \\times 20 \\times 10^{-12} \\times (100 - 50)^2}{2(10 + 20) \\times 10^{-6}} = \\frac{200 \\times 10^{-6} \\times 2500}{60} \\approx 8.33 \\times 10^{-3}\\text{ J}$"
+      }
+    ]
+  }
+]

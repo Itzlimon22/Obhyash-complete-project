@@ -132,16 +132,28 @@ export const GET = async () => {
       if (sc) scratchCards = sc;
     } catch (_) {}
 
+    // 6. Check if user has already redeemed any referral code
+    let hasUsedReferral = false;
+    try {
+      const { count: redeemedCount } = await supabaseAdmin
+        .from('referral_history')
+        .select('id', { count: 'exact', head: true })
+        .eq('redeemed_by', user.id);
+
+      hasUsedReferral = (redeemedCount || 0) > 0;
+    } catch (_) {}
+
     return NextResponse.json({
       referral,
       history: enriched,
       totalApproved,
       scratchCards,
+      hasUsedReferral,
     });
   } catch (error: any) {
     console.error('Error in /api/referral/me:', error);
     return NextResponse.json(
-      { referral: null, history: [], totalApproved: 0, scratchCards: [] },
+      { referral: null, history: [], totalApproved: 0, scratchCards: [], hasUsedReferral: true },
       { status: 200 },
     );
   }

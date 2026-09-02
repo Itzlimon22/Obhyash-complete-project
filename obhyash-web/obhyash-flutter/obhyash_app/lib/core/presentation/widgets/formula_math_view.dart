@@ -104,12 +104,8 @@ class FormulaMathView extends StatelessWidget {
   /// Renders a single clause — checks whether it requires Bengali-aware rendering or pure KaTeX
   Widget _renderSingleClause(String clause, Color textColor) {
     final hasBengali = _bengaliRegex.hasMatch(clause);
-    final hasChemArrow = clause.contains(r'\xrightarrow') ||
-        clause.contains(r'\xleftarrow') ||
-        clause.contains(r'\xrightleftharpoons') ||
-        clause.contains(r'\overset');
 
-    if (!hasBengali && !hasChemArrow) {
+    if (!hasBengali) {
       return FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.center,
@@ -132,7 +128,7 @@ class FormulaMathView extends StatelessWidget {
       );
     }
 
-    // Mixed Bengali / Chemical Arrow + Math clause
+    // Mixed Bengali + Math clause
     return _BengaliMathClauseRenderer(
       clause: clause,
       fontSize: fontSize,
@@ -220,100 +216,102 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
         final cleanMath = token.content.trim();
         if (cleanMath.isEmpty) return const SizedBox(width: 2);
 
-        return Math.tex(
-          cleanMath,
-          mathStyle: MathStyle.display,
-          textStyle: TextStyle(
-            fontSize: fontSize + 1,
-            color: textColor,
-          ),
-          onErrorFallback: (_) => Text(
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Math.tex(
             cleanMath,
-            style: bengaliStyle,
+            mathStyle: MathStyle.display,
+            textStyle: TextStyle(
+              fontSize: fontSize + 1,
+              color: textColor,
+            ),
+            onErrorFallback: (_) => Text(
+              cleanMath,
+              style: bengaliStyle,
+            ),
           ),
         );
     }
   }
 
-  /// Tokenizes a mixed LaTeX clause with full brace-nesting awareness
+  /// Tokenizes a mixed LaTeX clause: ONLY extracts actual Bengali text/arrows, keeping pure chemistry/math intact.
   List<_ClauseToken> _tokenize(String input) {
     final List<_ClauseToken> tokens = [];
     int i = 0;
 
     while (i < input.length) {
-      // 1. Check for \xrightarrow, \xleftarrow, \xrightleftharpoons
-      final chemArrowMatch = RegExp(r'^\\(xrightarrow|xleftarrow|xrightleftharpoons)(?:\[([^\]]*)\])?\{([^}]*)\}').matchAsPrefix(input, i);
-      if (chemArrowMatch != null) {
-        final typeStr = chemArrowMatch.group(1)!;
-        final below = chemArrowMatch.group(2) ?? '';
-        final above = chemArrowMatch.group(3) ?? '';
-        final dir = typeStr == 'xleftarrow' ? 'left' : (typeStr == 'xrightleftharpoons' ? 'bi' : 'right');
-        tokens.add(_ClauseToken.arrow(above: above, below: below, direction: dir));
-        i = chemArrowMatch.end;
-        continue;
+      // 1. Check for chemical arrow WITH nested-brace matching
+      final chemArrow = _parseChemArrow(input, i);
+      if (chemArrow != null) {
+        if (chemArrow.hasBengali) {
+          final dir = chemArrow.arrowName == 'xleftarrow'
+              ? 'left'
+              : (chemArrow.arrowName == 'xrightleftharpoons' ? 'bi' : 'right');
+          tokens.add(_ClauseToken.arrow(
+            above: _cleanLatexText(chemArrow.above),
+            below: _cleanLatexText(chemArrow.below),
+            direction: dir,
+          ));
+          i = chemArrow.endIndex;
+          continue;
+        }
       }
 
-      // Check for \overset{...}{\longrightarrow}
-      final oversetMatch = RegExp(r'^\\overset\{([^}]*)\}\{(?:\\longrightarrow|\\rightarrow|\\to|\-\>|\=\>|→)\}').matchAsPrefix(input, i);
-      if (oversetMatch != null) {
-        final above = oversetMatch.group(1) ?? '';
-        tokens.add(_ClauseToken.arrow(above: above, below: '', direction: 'right'));
-        i = oversetMatch.end;
-        continue;
+      // Check for \overset{...}{\longrightarrow} WITH nested-brace matching
+      final overset = _parseOversetArrow(input, i);
+      if (overset != null) {
+        if (overset.hasBengali) {
+          tokens.add(_ClauseToken.arrow(
+            above: _cleanLatexText(overset.above),
+            below: '',
+            direction: 'right',
+          ));
+          i = overset.endIndex;
+          continue;
+        }
       }
 
-      // 2. Check for \frac{...}{...}
+      // 2. Check for \frac{...}{...} WITH Bengali
       if (input.startsWith(r'\frac', i)) {
-        int cursor = i + 5;
-        while (cursor < input.length && input[cursor].trim().isEmpty) {
-          cursor++;
-        }
-
-        if (cursor < input.length && input[cursor] == '{') {
+        final (hasBg, endIdx) = _checkFracHasBengali(input, i);
+        if (hasBg && endIdx != -1) {
+          int cursor = i + 5;
+          while (cursor < input.length && input[cursor].trim().isEmpty) cursor++;
           final numEnd = _findMatchingBrace(input, cursor);
-          if (numEnd != -1) {
-            final numContent = input.substring(cursor + 1, numEnd);
-            int denStart = numEnd + 1;
-            while (denStart < input.length && input[denStart].trim().isEmpty) {
-              denStart++;
-            }
+          final numContent = input.substring(cursor + 1, numEnd);
+          int denStart = numEnd + 1;
+          while (denStart < input.length && input[denStart].trim().isEmpty) denStart++;
+          final denEnd = _findMatchingBrace(input, denStart);
+          final denContent = input.substring(denStart + 1, denEnd);
 
-            if (denStart < input.length && input[denStart] == '{') {
-              final denEnd = _findMatchingBrace(input, denStart);
-              if (denEnd != -1) {
-                final denContent = input.substring(denStart + 1, denEnd);
-
-                if (_bengaliRegex.hasMatch(numContent) || _bengaliRegex.hasMatch(denContent)) {
-                  tokens.add(_ClauseToken.fraction(
-                    num: numContent,
-                    den: denContent,
-                  ));
-                  i = denEnd + 1;
-                  continue;
-                }
-              }
-            }
-          }
+          tokens.add(_ClauseToken.fraction(
+            num: numContent,
+            den: denContent,
+          ));
+          i = denEnd + 1;
+          continue;
         }
       }
 
-      // 3. Check for \text{...}, text{...}, \mathrm{...}, \textbf{...}, \textit{...}
-      final textCmdMatch = RegExp(r'^(?:\\)?(?:text|mathrm|textbf|textit|mbox)\{').matchAsPrefix(input, i);
+      // 3. Check for \text{...} WITH Bengali
+      final textCmdMatch = RegExp(r'(?:\\)?(?:text|mathrm|textbf|textit|mbox)\{').matchAsPrefix(input, i);
       if (textCmdMatch != null) {
         final braceStart = textCmdMatch.end - 1;
         final braceEnd = _findMatchingBrace(input, braceStart);
         if (braceEnd != -1) {
           final textInner = input.substring(braceStart + 1, braceEnd);
-          final cleanText = _cleanLatexText(textInner);
-          if (cleanText.isNotEmpty) {
-            tokens.add(_ClauseToken.text(cleanText));
+          if (_bengaliRegex.hasMatch(textInner)) {
+            final cleanText = _cleanLatexText(textInner);
+            if (cleanText.isNotEmpty) {
+              tokens.add(_ClauseToken.text(cleanText));
+            }
+            i = braceEnd + 1;
+            continue;
           }
-          i = braceEnd + 1;
-          continue;
         }
       }
 
-      // 4. Check for raw Bengali text block outside commands
+      // 4. Raw Bengali text block outside commands
       if (_bengaliRegex.hasMatch(input[i])) {
         int end = i;
         while (end < input.length &&
@@ -330,25 +328,39 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
         continue;
       }
 
-      // 5. Collect math chunk
+      // 5. Collect pure math chunk until the next Bengali element
       int mathEnd = i;
       while (mathEnd < input.length) {
+        // Stop if chemical arrow with Bengali
+        final chemCheck = _parseChemArrow(input, mathEnd);
+        if (chemCheck != null && chemCheck.hasBengali) break;
+
+        // Stop if overset arrow with Bengali
+        final oversetCheck = _parseOversetArrow(input, mathEnd);
+        if (oversetCheck != null && oversetCheck.hasBengali) break;
+
+        // Stop if frac with Bengali
         if (input.startsWith(r'\frac', mathEnd)) {
           final (hasBg, _) = _checkFracHasBengali(input, mathEnd);
           if (hasBg) break;
         }
-        if (input.startsWith(r'\xrightarrow', mathEnd) ||
-            input.startsWith(r'\xleftarrow', mathEnd) ||
-            input.startsWith(r'\xrightleftharpoons', mathEnd) ||
-            input.startsWith(r'\overset', mathEnd)) {
-          break;
+
+        // Stop if \text{...} with Bengali
+        final txtMatch = RegExp(r'(?:\\)?(?:text|mathrm|textbf|textit|mbox)\{').matchAsPrefix(input, mathEnd);
+        if (txtMatch != null) {
+          final bStart = txtMatch.end - 1;
+          final bEnd = _findMatchingBrace(input, bStart);
+          if (bEnd != -1) {
+            final tInner = input.substring(bStart + 1, bEnd);
+            if (_bengaliRegex.hasMatch(tInner)) break;
+          }
         }
-        if (RegExp(r'^\\(?:text|mathrm|textbf|textit)\{').hasMatch(input.substring(mathEnd))) {
-          break;
-        }
+
+        // Stop if raw Bengali
         if (_bengaliRegex.hasMatch(input[mathEnd])) {
           break;
         }
+
         mathEnd++;
       }
 
@@ -364,6 +376,75 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
     }
 
     return tokens;
+  }
+
+  _ArrowParseResult? _parseChemArrow(String input, int start) {
+    final match = RegExp(r'\\(xrightarrow|xleftarrow|xrightleftharpoons)').matchAsPrefix(input, start);
+    if (match == null) return null;
+    final arrowName = match.group(1)!;
+    int cursor = match.end;
+
+    String below = '';
+    if (cursor < input.length && input[cursor] == '[') {
+      int bracketEnd = input.indexOf(']', cursor);
+      if (bracketEnd != -1) {
+        below = input.substring(cursor + 1, bracketEnd);
+        cursor = bracketEnd + 1;
+      }
+    }
+
+    while (cursor < input.length && input[cursor].trim().isEmpty) cursor++;
+    if (cursor >= input.length || input[cursor] != '{') return null;
+
+    final braceEnd = _findMatchingBrace(input, cursor);
+    if (braceEnd == -1) return null;
+
+    final above = input.substring(cursor + 1, braceEnd);
+    final hasBengali = _bengaliRegex.hasMatch(above) || _bengaliRegex.hasMatch(below);
+
+    return _ArrowParseResult(
+      arrowName: arrowName,
+      above: above,
+      below: below,
+      hasBengali: hasBengali,
+      endIndex: braceEnd + 1,
+    );
+  }
+
+  _ArrowParseResult? _parseOversetArrow(String input, int start) {
+    if (!input.startsWith(r'\overset', start)) return null;
+    int cursor = start + 7;
+    while (cursor < input.length && input[cursor].trim().isEmpty) cursor++;
+    if (cursor >= input.length || input[cursor] != '{') return null;
+
+    final braceEnd = _findMatchingBrace(input, cursor);
+    if (braceEnd == -1) return null;
+    final above = input.substring(cursor + 1, braceEnd);
+
+    cursor = braceEnd + 1;
+    while (cursor < input.length && input[cursor].trim().isEmpty) cursor++;
+    if (cursor >= input.length || input[cursor] != '{') return null;
+
+    final arrowBraceEnd = _findMatchingBrace(input, cursor);
+    if (arrowBraceEnd == -1) return null;
+    final arrowBody = input.substring(cursor + 1, arrowBraceEnd).trim();
+
+    if (arrowBody.contains(r'\longrightarrow') ||
+        arrowBody.contains(r'\rightarrow') ||
+        arrowBody.contains(r'\to') ||
+        arrowBody == '->' ||
+        arrowBody == '=>' ||
+        arrowBody == '→') {
+      final hasBengali = _bengaliRegex.hasMatch(above);
+      return _ArrowParseResult(
+        arrowName: 'xrightarrow',
+        above: above,
+        below: '',
+        hasBengali: hasBengali,
+        endIndex: arrowBraceEnd + 1,
+      );
+    }
+    return null;
   }
 
   (bool, int) _checkFracHasBengali(String s, int start) {
@@ -420,6 +501,22 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
         .replaceAll(r'^\circ', '°')
         .trim();
   }
+}
+
+class _ArrowParseResult {
+  final String arrowName;
+  final String above;
+  final String below;
+  final bool hasBengali;
+  final int endIndex;
+
+  const _ArrowParseResult({
+    required this.arrowName,
+    required this.above,
+    required this.below,
+    required this.hasBengali,
+    required this.endIndex,
+  });
 }
 
 /// A native mathematical fraction widget for Bengali terms
@@ -570,21 +667,44 @@ class _FormulaChemicalArrowWidget extends StatelessWidget {
   }
 
   String _cleanArrowText(String raw) {
-    return raw
+    var text = raw
         .replaceAll(r'\text{', '')
         .replaceAll(r'\mathrm{', '')
         .replaceAll(r'\textbf{', '')
         .replaceAll(r'\textit{', '')
+        .replaceAll(r'\mbox{', '')
         .replaceAll('}', '')
         .replaceAll(r'\,', ' ')
         .replaceAll(r'\;', ' ')
         .replaceAll(r'\quad', ' ')
+        .replaceAll(r'\qquad', '  ')
         .replaceAll(r'\ ', ' ')
         .replaceAll(r'^\circ\text{C}', '°C')
         .replaceAll(r'^\circ C', '°C')
         .replaceAll(r'^\circ', '°')
         .replaceAll(r'\Delta', 'Δ')
-        .trim();
+        .replaceAll('~', ' ')
+        .replaceAll(r'\\', ' ');
+
+    const subscriptMap = {
+      '_0': '₀',
+      '_1': '₁',
+      '_2': '₂',
+      '_3': '₃',
+      '_4': '₄',
+      '_5': '₅',
+      '_6': '₆',
+      '_7': '₇',
+      '_8': '₈',
+      '_9': '₉',
+      '_n': 'ₙ',
+      '_m': 'ₘ',
+    };
+    for (final entry in subscriptMap.entries) {
+      text = text.replaceAll(entry.key, entry.value);
+    }
+
+    return text.trim();
   }
 }
 

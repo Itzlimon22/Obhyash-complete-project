@@ -137,9 +137,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     try {
       final profile = ref.read(userProfileProvider).value;
       _initTargetExamTypes(profile);
-      final level = profile?.level?.trim();
+      final stream = profile?.stream?.trim() ?? '';
+      final level = profile?.level?.trim() ?? '';
       final division = profile?.division?.trim();
       final optionalSubject = profile?.optionalSubject?.trim();
+      final isSSC = level.toUpperCase().contains('SSC') || stream.toUpperCase().contains('SSC');
 
       final supabase = Supabase.instance.client;
 
@@ -174,13 +176,14 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         final subLevel = (e['level'] ?? '').toString().toUpperCase();
 
         // Level safety check
-        if (level != null && level.toUpperCase() == 'SSC') {
+        if (isSSC) {
           if (subId.startsWith('hsc_') ||
               subName.contains('hsc') ||
               subLevel == 'HSC') {
             return false;
           }
-        } else if (level != null && level.toUpperCase() == 'HSC') {
+        } else {
+          // For all HSC & Admission users (default): NEVER show SSC subjects, and NEVER show plain 'গণিত' / general math!
           if (subId.startsWith('ssc_') ||
               subName.contains('ssc') ||
               subLevel == 'SSC' ||
@@ -188,8 +191,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               subId == 'general_math' ||
               subId == 'ssc_general_math' ||
               subId == 'ssc_math' ||
+              subId == 'general-math' ||
               subName == 'গণিত' ||
-              subName == 'সাধারণ গণিত') {
+              subName == 'সাধারণ গণিত' ||
+              subName == 'math' ||
+              subName == 'general math') {
             return false;
           }
         }
@@ -214,9 +220,27 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         return true;
       }).toList();
 
-      // If over-filtered to empty, fall back to raw list so subjects are always visible
+      // If over-filtered to empty, fall back to safe list excluding SSC/General Math for HSC
       if (filteredData.isEmpty) {
-        filteredData = rawList;
+        filteredData = rawList.where((e) {
+          final subName = (e['name'] ?? '').toString().toLowerCase();
+          final subId = e['id'].toString().toLowerCase();
+          final subLevel = (e['level'] ?? '').toString().toUpperCase();
+          if (!isSSC) {
+            if (subId.startsWith('ssc_') ||
+                subLevel == 'SSC' ||
+                subId == 'math' ||
+                subId == 'general_math' ||
+                subId == 'ssc_general_math' ||
+                subId == 'ssc_math' ||
+                subId == 'general-math' ||
+                subName == 'গণিত' ||
+                subName == 'সাধারণ গণিত') {
+              return false;
+            }
+          }
+          return true;
+        }).toList();
       }
 
       final seen = <String>{};
@@ -230,6 +254,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         );
 
         if (formattedName.isEmpty || seen.contains(formattedName)) continue;
+        if (!isSSC && (formattedName == 'গণিত' || formattedName == 'সাধারণ গণিত')) continue;
         seen.add(formattedName);
 
         list.add(
@@ -510,8 +535,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     // Engineering (engi)
     _PresetExamBadge(
       id: 'buet',
-      label: 'BUET',
-      fullName: 'বুয়েট মডেল টেস্ট',
+      label: 'BUET Preli',
+      fullName: 'বুয়েট প্রিলিমিনারি মডেল টেস্ট',
       category: 'engineering',
       defaultExamType: 'Engineering',
       durationMinutes: 60,
@@ -520,21 +545,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         PresetSubjectDistribution('উচ্চতর গণিত', 34),
         PresetSubjectDistribution('পদার্থবিজ্ঞান', 33),
         PresetSubjectDistribution('রসায়ন', 33),
-      ],
-    ),
-    _PresetExamBadge(
-      id: 'iut',
-      label: 'IUT',
-      fullName: 'আইইউটি (IUT) মডেল টেস্ট',
-      category: 'engineering',
-      defaultExamType: 'Engineering',
-      durationMinutes: 90,
-      negativeMarking: 0.25,
-      compulsorySubjects: [
-        PresetSubjectDistribution('উচ্চতর গণিত', 35),
-        PresetSubjectDistribution('পদার্থবিজ্ঞান', 35),
-        PresetSubjectDistribution('রসায়ন', 15),
-        PresetSubjectDistribution('English', 15),
       ],
     ),
     _PresetExamBadge(
@@ -550,6 +560,66 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
         PresetSubjectDistribution('রসায়ন', 25),
         PresetSubjectDistribution('English', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'cuet',
+      label: 'CUET',
+      fullName: 'চুয়েট (CUET) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 30),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'kuet',
+      label: 'KUET',
+      fullName: 'কুয়েট (KUET) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 30),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ruet',
+      label: 'RUET',
+      fullName: 'রুয়েট (RUET) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 30),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'iut',
+      label: 'IUT',
+      fullName: 'আইইউটি (IUT) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 35),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 35),
+        PresetSubjectDistribution('রসায়ন', 15),
+        PresetSubjectDistribution('English', 15),
       ],
     ),
     _PresetExamBadge(

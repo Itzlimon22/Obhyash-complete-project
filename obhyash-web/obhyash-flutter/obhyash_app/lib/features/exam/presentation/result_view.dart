@@ -336,7 +336,7 @@ class _ResultViewState extends State<ResultView> {
                   // Exam Details Scope Header / 2-Column Preset Info Card
                   if (distinctMainSubjects.length > 1 ||
                       (widget.result.subjectLabel != null &&
-                          ['BUET', 'CKRUET', 'Medical', 'DU Ka', 'JU D', 'GST', 'Agri'].any((p) =>
+                          ['BUET', 'CKRUET', 'CUET', 'KUET', 'RUET', 'IUT', 'MIST', 'BUTEX', 'Medical', 'DU Ka', 'JU D', 'GST', 'Agri'].any((p) =>
                               widget.result.subjectLabel!.toUpperCase().contains(p.toUpperCase()))))
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 12),

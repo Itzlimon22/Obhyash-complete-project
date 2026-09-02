@@ -1,17 +1,585 @@
 [
   {
-    "title": "অ্যালকেনের সাধারণ সূত্র",
-    "latex": "C_nH_{2n+2}",
-    "description": "n = কার্বন পরমাণুর সংখ্যা"
+    "title": "হাইড্রোকার্বন ও সমগোত্রীয় শ্রেণির সাধারণ সংকেত (General Formulas)",
+    "latex": "\\text{Alkane: } \\text{C}_n\\text{H}_{2n+2}, \\; \\text{Alkene: } \\text{C}_n\\text{H}_{2n}, \\; \\text{Alkyne: } \\text{C}_n\\text{H}_{2n-2}, \\; \\text{Alcohol: } \\text{C}_n\\text{H}_{2n+1}\\text{OH}, \\; \\text{Ether: } \\text{C}_n\\text{H}_{2n+2}\\text{O}",
+    "description": "সমগোত্রীয় শ্রেণির পাশাপাশি দুটি সদস্যের মধ্যে একটি মিথিলিন ($-\\text{CH}_2-$) মূলক বা ১৪ আণবিক ভরের পার্থক্য থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "৫ কার্বন বিশিষ্ট অ্যালকিনের আণবিক সংকেত কী?",
+        "answer": "Ans: $\\text{C}_5\\text{H}_{10}$ (পেন্টিন)"
+      }
+    ]
   },
   {
-    "title": "অ্যালকিনের সাধারণ সূত্র",
-    "latex": "C_nH_{2n}",
-    "description": "একটি দ্বিবন্ধন বিশিষ্ট"
+    "title": "কার্যকরী মূলকের অগ্রাধিকার ক্রম (IUPAC Priority Order)",
+    "latex": "-\\text{COOH} > -\\text{SO}_3\\text{H} > -\\text{COOR} > -\\text{COCl} > -\\text{CONH}_2 > -\\text{CN} > -\\text{CHO} > >\\text{C}=\\text{O} > -\\text{OH} > -\\text{SH} > -\\text{NH}_2 > -\\text{C}\\equiv\\text{C}- > -\\text{C}=\\text{C}- > -\\text{R} > -\\text{X} > -\\text{NO}_2",
+    "description": "একাধিক কার্যকরী মূলকযুক্ত জৈব যৌগে যে মূলকটি তালিকায় প্রথমে থাকে সেটিকে প্রধান কার্যকরী মূলক (Principal Group) ধরে যৌগের মূল নাম নির্ধারিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CH}_3-\\text{CH(OH)}-\\text{COOH}$ যৌগে প্রধান কার্যকরী মূলক কোনটি?",
+        "answer": "Ans: কার্বক্সিলিক এসিড মূলক ($-\\text{COOH}$)"
+      }
+    ]
   },
   {
-    "title": "অ্যালকাইনের সাধারণ সূত্র",
-    "latex": "C_nH_{2n-2}",
-    "description": "একটি ত্রিবন্ধন বিশিষ্ট"
+    "title": "জৈব যৌগের গাঠনিক সমাণুতা (Structural Isomerism)",
+    "latex": "\\text{প্রকারভেদ: } \\text{শিকল, অবস্থান, কার্যকরী মূলক, মেটামারিজম, টটোমারিজম}",
+    "description": "• শিকল সমাণুতা: কার্বন কাঠামোর ভিন্নতা (পেনটেন, আইসোপেনটেন, নিওপেনটেন)\n• অবস্থান সমাণুতা: কার্যকরী মূলকের অবস্থান ভিন্ন (বিউটানল-১ ও বিউটানল-২)\n• কার্যকরী মূলক সমাণুতা: আণবিক সংকেত এক কিন্তু কার্যকরী মূলক ভিন্ন (অ্যালকোহল ও ইথার: $\\text{C}_2\\text{H}_6\\text{O} \\to \\text{C}_2\\text{H}_5\\text{OH}$ ও $\\text{CH}_3-\\text{O}-\\text{CH}_3$; অ্যালডিহাইড ও কিটোন: $\\text{C}_3\\text{H}_6\\text{O} \\to \\text{CH}_3\\text{CH}_2\\text{CHO}$ ও $\\text{CH}_3\\text{COCH}_3$)।",
+    "practiceQuestions": [
+      {
+        "question": "ইথানল ($\\text{C}_2\\text{H}_5\\text{OH}$) এবং ডাইমিথাইল ইথার ($\\text{CH}_3\\text{OCH}_3$) পরস্পরের কোন ধরনের সমাণু?",
+        "answer": "Ans: কার্যকরী মূলক সমাণু (Functional Group Isomers)"
+      }
+    ]
+  },
+  {
+    "title": "টটোমারিজম বা কিটো-ইনোল সমাণুতা (Tautomerism)",
+    "latex": "\\text{CH}_3-\\overset{\\text{O}}{\\underset{||}{\\text{C}}}-\\text{CH}_3 \\; (\\text{কিটো ফর্ম } 99\\%) \\rightleftharpoons \\text{CH}_3-\\overset{\\text{OH}}{\\underset{|}{\\text{C}}}=\\text{CH}_2 \\; (\\text{ইনোল ফর্ম } 1\\%)",
+    "description": "যে গতিশীল কার্যকরী মূলক সমাণুতায় একটি প্রোটন ($H^+$) স্থানান্তর হয়ে কিটো গ্রুপ ($>C=O$) এবং ইনোল গ্রুপ ($-C(OH)=C<$) এর মধ্যে স্বয়ংক্রিয়ভাবে গতিশীল সাম্যাবস্থা তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রোপানোন কিটো-ইনোল সমাণুতায় কোন ইনোল সমাণু তৈরি করে?",
+        "answer": "Ans: প্রোপ-১-ইন-২-অল ($\\text{CH}_3-\\text{C(OH)}=\\text{CH}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "মেটামারিজম সমাণুতা (Metamerism)",
+    "latex": "\\text{CH}_3-\\text{O}-\\text{C}_3\\text{H}_7 \\quad \\text{ও} \\quad \\text{C}_2\\text{H}_5-\\text{O}-\\text{C}_2\\text{H}_5",
+    "description": "দ্বিযোজী বা বহুযোজী কার্যকরী মূলকের (যেমন ইথার $-O-$, কিটোন $-CO-$, ২য় ডিগ্রি অ্যামিন $-NH-$) উভয় পাশে অ্যালকাইল মূলকের কার্বন সংখ্যার ভিন্নতার কারণে সৃষ্ট সমাণুতা।",
+    "practiceQuestions": [
+      {
+        "question": "ডাইইথাইল ইথার ও মিথাইল প্রোপাইল ইথার পরস্পরের কোন ধরনের সমাণু?",
+        "answer": "Ans: মেটামার (Metamers)"
+      }
+    ]
+  },
+  {
+    "title": "জ্যামিতিক সমাণুতা বা সিস-ট্রান্স সমাণুতা (Geometrical Isomerism)",
+    "latex": "\\text{শর্ত: } ab\\text{C}=\\text{C}ab \\; (a \\ne b) \\implies \\text{Cis Form (একই গ্রুপ একপাশে)}, \\; \\text{Trans Form (একই গ্রুপ বিপরীত পাশে)}",
+    "description": "কার্বন-কার্বন দ্বিবন্ধনের অক্ষ বরাবর ঘূর্ণন মুক্ত না হওয়ার কারণে ত্রিমাত্রিক বিন্যাসের ভিন্নতা। সিস সমাণুর পোলারিটি ও স্ফুটনাঙ্ক বেশি, কিন্তু ট্রান্স সমাণু প্রতিসম হওয়ায় এর গলনাঙ্ক ও সুস্থিরতা বেশি।",
+    "practiceQuestions": [
+      {
+        "question": "বিউটিন-২ এর সিস ও ট্রান্স সমাণুর মধ্যে কার গলনাঙ্ক বেশি?",
+        "answer": "Ans: ট্রান্স-বিউটিন-২ (কারণ প্রতিসম ল্যাটিস কাঠামো অধিক সুদৃঢ়)"
+      }
+    ]
+  },
+  {
+    "title": "আলোক সমাণুতা ও কাইরাল কার্বন (Optical Isomerism & Chiral Carbon)",
+    "latex": "\\text{আলোক সমাণু সংখ্যা } = 2^n \\quad (n = \\text{কাইরাল কার্বন সংখ্যা}), \\quad [\\alpha] = \\frac{\\theta}{l \\cdot c}",
+    "description": "যে কার্বনের চার হাতে চারটি ভিন্ন পরমাণু বা মূলক যুক্ত থাকে তাকে কাইরাল বা অপ্রতিসম কার্বন ($C^*$) বলে। এনানশিওমাররা পরস্পরের অ-উপরিলেপনযোগ্য দর্পণ প্রতিবিম্ব (Non-superimposable mirror images)। সমমোলার $d$ ও $l$ সমাণুর রেসিমিক মিশ্রণ আলোক নিষ্ক্রিয় ($[\\alpha] = 0$) হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ল্যাকটিক এসিডে ($\\text{CH}_3-\\text{CH(OH)}-\\text{COOH}$) কাইরাল কার্বন কয়টি এবং মোট আলোক সমাণু কয়টি?",
+        "answer": "Ans: ১টি কাইরাল কার্বন এবং মোট আলোক সমাণু $= 2^1 = 2$ টি ($d$-ল্যাকটিক এসিড ও $l$-ল্যাকটিক এসিড)।"
+      }
+    ]
+  },
+  {
+    "title": "মেসো যৌগ ও ডায়াস্টেরিওমার (Meso Compounds & Diastereomers)",
+    "latex": "\\text{Meso Tartaric Acid: } \\text{অভ্যন্তরীণ ক্ষতিপূরণের কারণে আলোক নিষ্ক্রিয়}; \\quad \\text{Diastereomers: } \\text{দর্পণ প্রতিবিম্ব নয়}",
+    "description": "মেসো যৌগে প্রতিসাম্য তল (Plane of Symmetry) থাকায় অণুর এক অর্ধাংশের আলোক ঘূর্ণন অপর অর্ধাংশের সমান ও বিপরীত ঘূর্ণন দ্বারা প্রশমিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "মেসো-টারটারিক এসিডে ২টি কাইরাল কার্বন থাকা সত্ত্বেও আলোক নিষ্ক্রিয় কেন?",
+        "answer": "Ans: অণুতে প্রতিসাম্য তল থাকায় অভ্যন্তরীণ ক্ষতিপূরণ (Internal compensation) ঘটে।"
+      }
+    ]
+  },
+  {
+    "title": "কার্বোক্যাটায়ন ও মুক্ত র‍্যাডিকেলের স্থায়িত্বের ক্রম (Carbocation & Free Radical Stability)",
+    "latex": "\\text{কার্বোক্যাটায়ন (R}^+\\text{): } 3^\\circ > 2^\\circ > 1^\\circ > \\overset{+}{\\text{C}}\\text{H}_3; \\quad \\text{কার্বঅ্যানায়ন (R}^-\\text{): } \\overset{-}{\\text{C}}\\text{H}_3 > 1^\\circ > 2^\\circ > 3^\\circ",
+    "description": "+I প্রভাব বিশিষ্ট অ্যালকাইল মূলক ধনাত্মক কার্বনে ইলেকট্রন ঘনত্ব বাড়িয়ে কার্বোক্যাটায়নের স্থায়িত্ব বাড়ায় এবং হাইপারকনজুগেশন দ্বারা $3^\\circ$ কার্বোক্যাটায়ন সবচেয়ে বেশি সুস্থিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "টারশিয়ারি বিউটাইল কার্বোক্যাটায়ন $(CH_3)_3C^+$ কেন প্রাইমারি অপেক্ষা অধিক সুস্থিত?",
+        "answer": "Ans: ৩টি মিথাইল মূলকের +I প্রভাব এবং ৯টি $\\alpha$-হাইড্রোজেনের হাইপারকনজুগেশনের কারণে।"
+      }
+    ]
+  },
+  {
+    "title": "ইলেক্ট্রোফাইল ও নিউক্লিওফাইলের শ্রেণিবিভাগ (Electrophiles & Nucleophiles)",
+    "latex": "\\text{Electrophile (Lewis Acid): } \\text{H}^+, \\text{NO}_2^+, \\text{Cl}^+, \\text{BF}_3, \\text{AlCl}_3, \\text{FeCl}_3, \\text{SO}_3; \\quad \\text{Nucleophile (Lewis Base): } \\text{OH}^-, \\text{CN}^-, \\text{Cl}^-, \\text{NH}_3, \\text{H}_2\\text{O}, \\text{R-MgX}",
+    "description": "• ইলেকট্রোফাইল: ইলেকট্রন আকর্ষী বিকারক (ইলেকট্রন ঘাটতি যুক্ত ধনাত্মক বা প্রশম কণা)\n• নিউক্লিওফাইল: কেন্দ্রাকর্ষী বিকারক (ইলেকট্রন সমৃদ্ধ ঋণাত্মক বা মুক্তজোড়যুক্ত কণা)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{AlCl}_3$ এবং $\\text{NH}_3$ এর মধ্যে কোনটি ইলেক্ট্রোফাইল এবং কোনটি নিউক্লিওফাইল?",
+        "answer": "Ans: $\\text{AlCl}_3$ হলো ইলেক্ট্রোফাইল (লুইস এসিড) এবং $\\text{NH}_3$ হলো নিউক্লিওফাইল (লুইস ক্ষার)।"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালকেন প্রস্তুতি: ডিকার্বক্সিলেশন বিক্রিয়া (Decarboxylation)",
+    "latex": "\\text{R-COONa} + \\text{NaOH} \\xrightarrow{\\text{CaO}, \\Delta} \\text{R-H} + \\text{Na}_2\\text{CO}_3",
+    "description": "সোডালাইম ($\\,\\text{NaOH} + \\text{CaO}\\,\\,$) দিয়ে জৈব এসিডের সোডিয়াম লবণকে উত্তপ্ত করলে ১টি কার্বন পরমাণু হ্রাস পেয়ে অ্যালকেন তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "সোডিয়াম ইথানয়েট ($\\text{CH}_3\\text{COONa}$) কে সোডালাইম সহ উত্তপ্ত করলে কোন গ্যাস উৎপন্ন হয়?",
+        "answer": "Ans: মিথেন গ্যাস ($\\text{CH}_4$)"
+      }
+    ]
+  },
+  {
+    "title": "উর্টজ বিক্রিয়া (Wurtz Reaction)",
+    "latex": "2\\text{R-X} + 2\\text{Na} \\xrightarrow{\\text{Dry Ether}} \\text{R-R} (\\text{উচ্চতর প্রতিসম অ্যালকেন}) + 2\\text{NaX}",
+    "description": "শুষ্ক ইথারে সোডিয়াম ধাতুর সাথে অ্যালকাইল হ্যালাইডের বিক্রিয়ায় কার্বন সংখ্যা দ্বিগুণ হয়ে উচ্চতর জোড় কার্বনযুক্ত অ্যালকেন তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "মিথাইল আয়োডাইড ($\\text{CH}_3\\text{I}$) থেকে ইথেন তৈরির সর্বোত্তম পদ্ধতি কোনটি?",
+        "answer": "Ans: উর্টজ বিক্রিয়া ($2\\text{CH}_3\\text{I} + 2\\text{Na} \\xrightarrow{\\text{Dry Ether}} \\text{C}_2\\text{H}_6 + 2\\text{NaI}$)"
+      }
+    ]
+  },
+  {
+    "title": "গ্রিগনার্ড বিকারক প্রস্তুতি ও সংশ্লেষণ (Grignard Reagent)",
+    "latex": "\\text{R-X} + \\text{Mg} \\xrightarrow{\\text{Dry Ether}} \\text{R-MgX} \\xrightarrow{\\text{H}_2\\text{O}} \\text{R-H} + \\text{Mg(OH)X}",
+    "description": "অ্যালকাইল ম্যাগনেসিয়াম হ্যালাইডকে গ্রিগনার্ড বিকারক বলে। এটি পানি বা প্রোটন দাতার সাথে বিক্রিয়া করে অ্যালকেন উৎপন্ন করে।",
+    "practiceQuestions": [
+      {
+        "question": "মিথাইল ম্যাগনেসিয়াম আয়োডাইডের ($\\text{CH}_3\\text{MgI}$) সাথে পানি যোগ করলে কী উৎপন্ন হয়?",
+        "answer": "Ans: মিথেন ($\\text{CH}_4$) এবং $\\text{Mg(OH)I}$"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালকোহলের ডিহাইড্রেশন ও অ্যালকিন প্রস্তুতি (Dehydration of Alcohol)",
+    "latex": "\\text{C}_2\\text{H}_5\\text{OH} \\xrightarrow{\\text{গাঢ় } \\text{H}_2\\text{SO}_4, 165-170^\\circ\\text{C}} \\text{CH}_2=\\text{CH}_2 + \\text{H}_2\\text{O}, \\quad 2\\text{C}_2\\text{H}_5\\text{OH} \\xrightarrow{\\text{গাঢ় } \\text{H}_2\\text{SO}_4, 140^\\circ\\text{C}} \\text{C}_2\\text{H}_5-\\text{O}-\\text{C}_2\\text{H}_5",
+    "description": "তাপমাত্রা অত্যন্ত গুরুত্বপূর্ণ: $170^\\circ\\text{C}$ এ অ্যালকিন এবং $140^\\circ\\text{C}$ এ ইথার তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ইথানলকে গাঢ় $\\text{H}_2\\text{SO}_4$ সহ $170^\\circ\\text{C}$ এ উত্তপ্ত করলে কী উৎপন্ন হয়?",
+        "answer": "Ans: ইথিন ($\\text{CH}_2=\\text{CH}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "সায়জেফ নীতি ও ডিহাইড্রোহ্যালোজেনেশন (Saytzeff's Rule)",
+    "latex": "\\text{CH}_3-\\text{CH}_2-\\text{CH(Br)}-\\text{CH}_3 + \\text{Alc. KOH} \\xrightarrow{\\Delta} \\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CH}_3 \\; (80\\%) + \\text{CH}_3-\\text{CH}_2-\\text{CH}=\\text{CH}_2 \\; (20\\%)",
+    "description": "অ্যালকোহলীয় KOH দ্বারা $\\beta$-অপসারণে যে $\\beta$-কার্বনে কম সংখ্যক হাইড্রোজেন থাকে সেখান থেকে হাইড্রোজেন অপসারিত হয়ে অধিক প্রতিস্থাপিত অ্যালকিন প্রধান উৎপাদ হিসেবে তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "২-ব্রোমোবিউটেনকে অ্যালকোহলীয় KOH সহ উত্তপ্ত করলে প্রধান উৎপাদ কোনটি?",
+        "answer": "Ans: বিউটিন-২ (বা বিউট-২-ইন, প্রায় ৮০%)"
+      }
+    ]
+  },
+  {
+    "title": "মার্কনভ নীতি (Markovnikov's Rule)",
+    "latex": "\\text{CH}_3-\\text{CH}=\\text{CH}_2 + \\text{HBr} \\to \\text{CH}_3-\\text{CH(Br)}-\\text{CH}_3 \\; (\\text{২-ব্রোমোপ্রোপেন } 90\\%)",
+    "description": "অপ্রতিসম অ্যালকিনের সাথে অপ্রতিসম বিকারকের ($HBr, HCl, H_2O$) সংযোজন বিক্রিয়ায় বিকারকের ঋণাত্মক অংশটি ($Br^-$) দ্বিবন্ধনযুক্ত কম হাইড্রোজেন বিশিষ্ট কার্বনে যুক্ত হয়। (শর্টকাট: তেল মাথায় তেল দেওয়া)।",
+    "practiceQuestions": [
+      {
+        "question": "প্রোপিনে $HBr$ যোগ করলে প্রধান উৎপাদ কোনটি হবে?",
+        "answer": "Ans: ২-ব্রোমোপ্রোপেন ($\\text{CH}_3-\\text{CHBr}-\\text{CH}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "বিপরীত মার্কনভ নীতি বা খারাশ পারঅক্সাইড প্রভাব (Anti-Markovnikov's Peroxide Effect)",
+    "latex": "\\text{CH}_3-\\text{CH}=\\text{CH}_2 + \\text{HBr} \\xrightarrow{\\text{R}_2\\text{O}_2 (\\text{জৈব পারঅক্সাইড})} \\text{CH}_3-\\text{CH}_2-\\text{CH}_2\\text{Br} \\; (\\text{১-ব্রোমোপ্রোপেন } 99\\%)",
+    "description": "জৈব পারঅক্সাইডের উপস্থিতিতে মুক্ত র‍্যাডিকেল মেকানিজমের কারণে $Br$ বেশি হাইড্রোজেনযুক্ত প্রান্তীয় কার্বনে যুক্ত হয়। এটি শুধুমাত্র $\\text{HBr}$ এর ক্ষেত্রেই ঘটে ($HCl$ বা $HI$ এ ঘটে না)।",
+    "practiceQuestions": [
+      {
+        "question": "পারঅক্সাইড প্রভাব কেবল $HBr$ এর ক্ষেত্রে প্রযোজ্য হয় কেন?",
+        "answer": "Ans: কারণ $HBr$ এর ক্ষেত্রে মুক্ত র‍্যাডিকেল চেইন বিক্রিয়ার উভয় ধাপই তাপোৎপাদী ($HCl$ এর $H-Cl$ বন্ধন অতি দৃঢ় এবং $HI$ এর $I^\\bullet$ মুক্ত র‍্যাডিকেল নিজেদের মধ্যে যুক্ত হয়ে $I_2$ তৈরি করে)।"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালকিনের ওজোনোলাইসিস (Ozonolysis of Alkenes)",
+    "latex": ">\\text{C}=\\text{C}< + \\text{O}_3 \\to \\text{ওজোনাইড} \\xrightarrow{\\text{Zn/H}_2\\text{O}} >\\text{C}=\\text{O} + \\text{O}=\\text{C}< + \\text{ZnO}",
+    "description": "দ্বিবন্ধনের অবস্থান ও জৈব যৌগের গঠন নির্ণয়ে ওজোনোলাইসিস সর্বাধিক ব্যবহৃত হয়। $\\text{Zn}$ গুঁড়া উৎপন্ন $\\text{H}_2\\text{O}_2$ কে ধ্বংস করে অ্যালডিহাইডের জারণ রোধ করে।",
+    "practiceQuestions": [
+      {
+        "question": "একটি অ্যালকিন ওজোনোলাইসিস ও আর্দ্রবিশ্লেষণে কেবল প্রোপানোন ($CH_3COCH_3$) তৈরি করলে অ্যালকিনটির নাম কী?",
+        "answer": "Ans: ২,৩-ডাইমিথাইলবিউট-২-ইন ($(CH_3)_2C=C(CH_3)_2$)"
+      }
+    ]
+  },
+  {
+    "title": "বেয়ার পরীক্ষা ও ব্রোমিন দ্রবণ পরীক্ষা (Baeyer's & Bromine Unsaturation Tests)",
+    "latex": "\\text{CH}_2=\\text{CH}_2 + [\\text{O}] + \\text{H}_2\\text{O} \\xrightarrow{\\text{ক্ষারীয় } \\text{KMnO}_4} \\underset{\\text{ইথিলিন গ্লাইকল}}{\\text{CH}_2\\text{OH}-\\text{CH}_2\\text{OH}}, \\quad \\text{CH}_2=\\text{CH}_2 + \\text{Br}_2(\\text{লাল}) \\to \\underset{\\text{বর্ণহীন}}{\\text{CH}_2\\text{Br}-\\text{CH}_2\\text{Br}}",
+    "description": "দ্বিবন্ধন বা ত্রিবন্ধনের অসম্পৃক্ততা পরীক্ষায় ক্ষারীয় $\\text{KMnO}_4$ এর গোলাপী বর্ণ এবং $\\text{Br}_2$ দ্রবণের লাল বর্ণ দূরীকরণ ব্যবহৃত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "বেয়ার বিকারক কী?",
+        "answer": "Ans: ১% ক্ষারীয় পটাশিয়াম পারম্যাঙ্গানেট দ্রবণ ($1\\% \\text{ Alkaline } \\text{KMnO}_4$)"
+      }
+    ]
+  },
+  {
+    "title": "ক্যালসিয়াম কার্বাইড হতে ইথাইন প্রস্তুতি (Ethyne from Calcium Carbide)",
+    "latex": "\\text{CaC}_2 + 2\\text{H}_2\\text{O} \\to \\text{HC}\\equiv\\text{CH} + \\text{Ca(OH)}_2",
+    "description": "ক্যালসিয়াম কার্বাইডে সাধারণ তাপমাত্রায় পানি যোগ করলে তীব্র গতিতে অ্যাসিটিলিন (ইথাইন) গ্যাস উৎপন্ন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CaC}_2$ এর সাথে পানির বিক্রিয়ায় কোন হাইড্রোকার্বন গ্যাস তৈরি হয়?",
+        "answer": "Ans: ইথাইন বা অ্যাসিটিলিন ($\\text{C}_2\\text{H}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "প্রান্তীয় অ্যালকাইন শনাক্তকরণ ও অম্লধর্ম (Terminal Alkynes Acidic Nature)",
+    "latex": "\\text{R-C}\\equiv\\text{CH} + [\\text{Ag(NH}_3)_2]\\text{NO}_3 \\to \\text{R-C}\\equiv\\text{C-Ag} \\downarrow (\\text{সাদা}), \\quad \\text{R-C}\\equiv\\text{CH} + [\\text{Cu(NH}_3)_2]\\text{Cl} \\to \\text{R-C}\\equiv\\text{C-Cu} \\downarrow (\\text{লাল})",
+    "description": "$sp$ সংকরিত কার্বনের $s$-চরিত্র $50\\%$ থাকায় এর উচ্চ তড়িৎ ঋণাত্মকতার কারণে প্রান্তীয় হাইড্রোজেন ($-\\text{C}\\equiv\\text{C}-\\text{H}$) অম্লীয় প্রকৃতির হয় এবং ধাতু দ্বারা প্রতিস্থাপিত হয় (বিউট-১-আইন বিক্রিয়া দেয় কিন্তু বিউট-২-আইন দেয় না)।",
+    "practiceQuestions": [
+      {
+        "question": "বিউট-১-আইন এবং বিউট-২-আইন এর মধ্যে কীভাবে রাসায়নিক পার্থক্য করবে?",
+        "answer": "Ans: টলেন্স বিকারক বা ডাইঅ্যামিন কপার(I) ক্লোরাইড যোগ করলে বিউট-১-আইন অধঃক্ষেপ তৈরি করবে কিন্তু বিউট-২-আইন কোনো বিক্রিয়া করবে না।"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালকাইনের পলিমারাইজেশন ও বেনজিন সংশ্লেষণ (Polymerization of Ethyne)",
+    "latex": "3\\text{HC}\\equiv\\text{CH} \\xrightarrow{\\text{Fe নল}, 400-450^\\circ\\text{C}} \\text{C}_6\\text{H}_6 \\text{ (বেনজিন)}",
+    "description": "৩ অণু ইথাইন লোহিত তপ্ত লৌহ নলের মধ্য দিয়ে চালনা করলে পলিমারাইজেশনের মাধ্যমে ১ অণু অ্যারোমেটিক বেনজিন তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যাসিটিলিন থেকে বেনজিন রূপান্তরের শর্ত কী?",
+        "answer": "Ans: উত্তপ্ত আয়রন ($Fe$) নল এবং $400^\\circ\\text{C}-450^\\circ\\text{C}$ তাপমাত্রা।"
+      }
+    ]
+  },
+  {
+    "title": "হাকেল নীতি ও অ্যারোমেটিসিটি (Huckel's Rule of Aromaticity)",
+    "latex": "\\text{Huckel's Rule: } (4n + 2)\\pi \\text{ সঞ্চরণশীল ইলেকট্রন} \\quad (n = 0, 1, 2, 3 \\dots)",
+    "description": "অ্যারোমেটিক হওয়ার শর্ত: (১) চাক্রিক ও সমতলীয় হতে হবে, (২) পর্যায়ক্রমিক দ্বিবন্ধন থাকতে হবে, (৩) বলয়ে $(4n+2)$ সংখ্যক ডিলোকালাইজড $\\pi$-ইলেকট্রন থাকতে হবে।\n• $n=0 \\implies 2\\pi$ (সাইক্লোপ্রোপিনাইল ক্যাটায়ন)\n• $n=1 \\implies 6\\pi$ (বেনজিন, পিরিডিন, ফিউরান, থায়োফিন, পিরোল, সাইক্লোপেন্টাডাইইনাইড অ্যানায়ন)\n• $n=2 \\implies 10\\pi$ (ন্যাপথালিন)\n• $n=3 \\implies 14\\pi$ (অ্যানথ্রাসিন, ফেনানথ্রিন)।",
+    "practiceQuestions": [
+      {
+        "question": "ফিউরান এবং পিরিডিনে সঞ্চরণশীল $\\pi$-ইলেকট্রন কয়টি?",
+        "answer": "Ans: উভয় যৌগে ৬টি করে ($6\\pi$) সঞ্চরণশীল ইলেকট্রন রয়েছে ($n=1$)।"
+      }
+    ]
+  },
+  {
+    "title": "বেনজিনের নাইট্রেশন বিক্রিয়া (Nitration of Benzene)",
+    "latex": "\\text{C}_6\\text{H}_6 + \\text{HNO}_3 \\xrightarrow{\\text{গাঢ় } \\text{H}_2\\text{SO}_4, 55-60^\\circ\\text{C}} \\text{C}_6\\text{H}_5\\text{NO}_2 + \\text{H}_2\\text{O}, \\quad \\text{ইলেক্ট্রোফাইল: } \\text{NO}_2^+ (\\text{নাইট্রোনিয়াম আয়ন})",
+    "description": "গাঢ় $\\text{H}_2\\text{SO}_4$ এসিড এখানে প্রোটন দাতা প্রভাবক ও নিরুদক হিসেবে কাজ করে সক্রিয় ইলেক্ট্রোফাইল $\\text{NO}_2^+$ তৈরি করে।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজিনের নাইট্রেশন বিক্রিয়ায় সক্রিয় ইলেক্ট্রোফাইল কোনটি?",
+        "answer": "Ans: নাইট্রোনিয়াম আয়ন ($\\text{NO}_2^+$)"
+      }
+    ]
+  },
+  {
+    "title": "বেনজিনের হ্যালোজেনেশন বিক্রিয়া (Halogenation of Benzene)",
+    "latex": "\\text{C}_6\\text{H}_6 + \\text{Cl}_2 \\xrightarrow{\\text{অনুকূল } \\text{FeCl}_3 / \\text{AlCl}_3} \\text{C}_6\\text{H}_5\\text{Cl} + \\text{HCl}, \\quad \\text{ইলেক্ট্রোফাইল: } \\text{Cl}^+ (\\text{ক্লোরোনিয়াম আয়ন})",
+    "description": "লুইস এসিড লবণের প্রভাবে হ্যালোজেন অণু বিষমভাবে ভেঙে ধনাত্মক হ্যালোজোনিয়াম আয়নে পরিণত হয়। সুর্যালোকের উপস্থিতিতে সংযোজন বিক্রিয়ায় গ্যামাক্সিন ($\\,\\text{C}_6\\text{H}_6\\text{Cl}_6\\,$) তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "সূর্যালোকের উপস্থিতিতে বেনজিনের সাথে ক্লোরিনের বিক্রিয়ায় কী উৎপন্ন হয়?",
+        "answer": "Ans: গ্যামাক্সিন বা লিন্ডেন (বেনজিন হেক্সাক্লোরাইড - $\\text{C}_6\\text{H}_6\\text{Cl}_6$)"
+      }
+    ]
+  },
+  {
+    "title": "বেনজিনের সালফোনেশন বিক্রিয়া (Sulphonation of Benzene)",
+    "latex": "\\text{C}_6\\text{H}_6 + \\text{H}_2\\text{SO}_4 \\xrightarrow{\\text{SO}_3 / \\text{ধূমায়মান } \\text{H}_2\\text{SO}_4, 80^\\circ\\text{C}} \\text{C}_6\\text{H}_5\\text{SO}_3\\text{H} + \\text{H}_2\\text{O}, \\quad \\text{ইলেক্ট্রোফাইল: } \\text{SO}_3 (\\text{প্রশম})",
+    "description": "সালফার ট্রাইঅক্সাইড ($\\,\\text{SO}_3\\,$) একটি প্রশম কিন্তু অত্যন্ত শক্তিশালী ইলেক্ট্রোফাইল হিসেবে বেনজিন বলয় আক্রমণ করে।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজিনের সালফোনেশনে ইলেক্ট্রোফাইল কোনটি?",
+        "answer": "Ans: সালফার ট্রাইঅক্সাইড ($\\text{SO}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "ফ্রিডেল-ক্রাফটস অ্যালকাইলেশন (Friedel-Crafts Alkylation)",
+    "latex": "\\text{C}_6\\text{H}_6 + \\text{CH}_3\\text{Cl} \\xrightarrow{\\text{অনার্দ্র } \\text{AlCl}_3} \\text{C}_6\\text{H}_5\\text{CH}_3 (\\text{টলুইন}) + \\text{HCl}, \\quad \\text{ইলেক্ট্রোফাইল: } \\text{CH}_3^+",
+    "description": "অনুকূল লুইস এসিড $\\text{AlCl}_3$ এর উপস্থিতিতে অ্যালকাইল হ্যালাইডের বিক্রিয়ায় বেনজিন বলয়ে অ্যালকাইল মূলক যুক্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজিন থেকে ফ্রিডেল-ক্রাফটস বিক্রিয়ায় টলুইন প্রস্তুতিতে কোন প্রভাবক লাগে?",
+        "answer": "Ans: অনার্দ্র অ্যালুমিনিয়াম ক্লোরাইড ($\\text{Anhydrous } \\text{AlCl}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "ফ্রিডেল-ক্রাফটস অ্যাসাইলেশন (Friedel-Crafts Acylation)",
+    "latex": "\\text{C}_6\\text{H}_6 + \\text{CH}_3\\text{COCl} \\xrightarrow{\\text{অনার্দ্র } \\text{AlCl}_3} \\text{C}_6\\text{H}_5\\text{COCH}_3 (\\text{অ্যাসিটোফেনন}) + \\text{HCl}, \\quad \\text{ইলেক্ট্রোফাইল: } \\text{CH}_3\\text{CO}^+",
+    "description": "অ্যাসিটাইল ক্লোরাইড বা অ্যাসিড অ্যানহাইড্রাইডের সাথে বিক্রিয়ায় কিটোন (অ্যারোমেটিক কিটোন) উৎপন্ন হয়। এতে কোনো পুনর্বিন্যাস ঘটে না।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজিনের অ্যাসাইলেশনে উৎপন্ন প্রধান অ্যারোমেটিক কিটোনের নাম কী?",
+        "answer": "Ans: অ্যাসিটোফেনন বা মিথাইল ফিনাইল কিটোন ($\\text{C}_6\\text{H}_5\\text{COCH}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "অর্থো-প্যারা নির্দেশক ও বলয় সক্রিয়কারী মূলক (Ortho-Para Directing Groups)",
+    "latex": "\\text{Groups: } -\\text{OH}, -\\text{NH}_2, -\\text{NHR}, -\\text{OCH}_3, -\\text{CH}_3, -\\text{C}_2\\text{H}_5; \\quad \\text{ব্যতিক্রম: হ্যালোজেন } -\\text{X (বলয় নিষ্ক্রিয়কারী কিন্তু o,p-নির্দেশক)}",
+    "description": "যেসব মূলক বেনজিন বলয়ে রেজোন্যান্সের মাধ্যমে অর্থো ও প্যারা অবস্থানে ইলেকট্রন ঘনত্ব বৃদ্ধি করে এবং নতুন আগত ইলেক্ট্রোফাইলকে অর্থো/প্যারা অবস্থানে নির্দেশ করে।",
+    "practiceQuestions": [
+      {
+        "question": "ফেনলের $-OH$ মূলক অর্থো-প্যারা নির্দেশক কেন?",
+        "answer": "Ans: অক্সিজেনের মুক্তজোড় ইলেকট্রন বেনজিন বলয়ে রেজোন্যান্স ঘটিয়ে অর্থো ও প্যারা অবস্থানে ইলেকট্রন ঘনত্ব বাড়িয়ে দেয়।"
+      }
+    ]
+  },
+  {
+    "title": "মেটা নির্দেশক ও বলয় নিষ্ক্রিয়কারী মূলক (Meta Directing Groups)",
+    "latex": "\\text{Groups: } -\\text{NO}_2, -\\text{CHO}, -\\text{COOH}, -\\text{CN}, -\\text{SO}_3\\text{H}, -\\text{COR}, -\\text{CCl}_3, -\\text{NH}_3^+",
+    "description": "যেসব মূলক বেনজিন বলয় হতে ইলেকট্রন টেনে নেয় (-M ও -I প্রভাব) এবং অর্থো ও প্যারা অবস্থানে ইলেকট্রন ঘনত্ব হ্রাস করায় মেটা অবস্থানে অপেক্ষাকৃত বেশি ইলেকট্রন থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "নাইট্রোবেনজিনের ২য় নাইট্রেশনে প্রধান উৎপাদ কোনটি?",
+        "answer": "Ans: ১,৩-ডাইনাইট্রোবেনজিন বা মেটা-ডাইনাইট্রোবেনজিন (m-DNB)"
+      }
+    ]
+  },
+  {
+    "title": "টলুইনের জারণ ও বেনজোয়িক এসিড প্রস্তুতি (Oxidation of Toluene)",
+    "latex": "\\text{C}_6\\text{H}_5\\text{CH}_3 + 3[\\text{O}] \\xrightarrow{\\text{KMnO}_4 / \\text{H}_2\\text{SO}_4, \\Delta} \\text{C}_6\\text{H}_5\\text{COOH} (\\text{বেনজোয়িক এসিড}) + \\text{H}_2\\text{O}",
+    "description": "বেনজিন বলয়ে যুক্ত যেকোনো পার্শ্ব শিকল (মিথাইল, ইথাইল, প্রোপাইল) তীব্র জারক দ্বারা জারিত হয়ে সর্বদা ১ কার্বনের বেনজোয়িক এসিডে পরিণত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "টলুইনকে ক্ষারীয় $\\text{KMnO}_4$ দ্বারা ফুটালে কী এসিড তৈরি হয়?",
+        "answer": "Ans: বেনজোয়িক এসিড ($\\text{C}_6\\text{H}_5\\text{COOH}$)"
+      }
+    ]
+  },
+  {
+    "title": "SN1 নিউক্লিওফিলিক প্রতিস্থাপন কৌশল (SN1 Mechanism)",
+    "latex": "\\text{Rate} = k [\\text{R-X}], \\quad 2 \\text{ ধাপ}, \\quad \\text{সক্রিয়তা: } 3^\\circ > 2^\\circ > 1^\\circ > \\text{CH}_3\\text{X}, \\quad \\text{কার্বোক্যাটায়ন মধ্যবর্তী} \\implies \\text{রেসিমাইজেশন}",
+    "description": "১ম ধাপে ধীর গতিতে কার্বোক্যাটায়ন তৈরি হয় এবং ২য় ধাপে দ্রুত নিউক্লিওফাইল যুক্ত হয়। পোলার প্রোটিক দ্রাবকে (যেমন পানি, অ্যালকোহল) $S_N 1$ দ্রুত ঘটে।",
+    "practiceQuestions": [
+      {
+        "question": "টারশিয়ারি অ্যালকাইল হ্যালাইড কোন মেকানিজমে দ্রুত আর্দ্রবিশ্লেষিত হয়?",
+        "answer": "Ans: $S_N 1$ মেকানিজমে (কারণ $3^\\circ$ কার্বোক্যাটায়ন সবচেয়ে বেশি সুস্থিত)"
+      }
+    ]
+  },
+  {
+    "title": "SN2 নিউক্লিওফিলিক প্রতিস্থাপন কৌশল (SN2 Mechanism)",
+    "latex": "\\text{Rate} = k [\\text{R-X}][\\text{Nu}^-], \\quad 1 \\text{ ধাপ}, \\quad \\text{সক্রিয়তা: } \\text{CH}_3\\text{X} > 1^\\circ > 2^\\circ > 3^\\circ, \\quad \\text{ওয়ালডেন ইনভার্শন (Walden Inversion)}",
+    "description": "একক ধাপে পঞ্চযোজী ক্রান্তিকালীন অবস্থা (Transition State) দিয়ে সম্পন্ন হয়। পিছন দিক থেকে আক্রমণের কারণে ছাতার উল্টে যাওয়ার মতো ত্রিমাত্রিক কনফিগারেশন বিপরীত হয়ে যায় (Inversion of configuration)। পোলার অ্যাপ্রোটিক দ্রাবকে (অ্যাসিটোন, DMSO) ভালো ঘটে।",
+    "practiceQuestions": [
+      {
+        "question": "$S_N 2$ বিক্রিয়ার ক্ষেত্রে কোন অ্যালকাইল হ্যালাইড সর্বাধিক সক্রিয়?",
+        "answer": "Ans: মিথাইল হ্যালাইড ($\\text{CH}_3\\text{X}$) এবং প্রাইমারি ($1^\\circ$) অ্যালকাইল হ্যালাইড (কম স্টেরিক বাধার কারণে)।"
+      }
+    ]
+  },
+  {
+    "title": "লুকাস বিকারক ও অ্যালকোহল শনাক্তকরণ (Lucas Test for Alcohols)",
+    "latex": "\\text{লুকাস বিকারক} = \\text{অনার্দ্র } \\text{ZnCl}_2 + \\text{গাঢ় } \\text{HCl} \\implies 3^\\circ \\; (\\text{তাৎক্ষণিক ঘোলা}), \\; 2^\\circ \\; (5-10\\text{ মিনিটে ঘোলা}), \\; 1^\\circ \\; (\\text{তাপ ছাড়া বিক্রিয়া করে না})",
+    "description": "অ্যালকাইল ক্লোরাইডের অদ্রবণীয় সাদা তৈলাক্ত অধঃক্ষেপ/ঘোলাটে ভাব তৈরির সময়ের পার্থক্য দ্বারা $1^\\circ, 2^\\circ$ ও $3^\\circ$ অ্যালকোহলের পার্থক্য নির্ণয় করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "লুকাস বিকারকের সাথে কোন অ্যালকোহল তাৎক্ষণিকভাবে কক্ষ তাপমাত্রায় তৈলাক্ত অধঃক্ষেপ দেয়?",
+        "answer": "Ans: টারশিয়ারি ($3^\\circ$) অ্যালকোহল"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালকোহলের ডিহাইড্রোজেনেশন (Dehydrogenation by Cu at 300C)",
+    "latex": "1^\\circ \\text{ Alcohol} \\xrightarrow{\\text{Cu}, 300^\\circ\\text{C}} \\text{অ্যালডিহাইড}; \\quad 2^\\circ \\text{ Alcohol} \\xrightarrow{\\text{Cu}, 300^\\circ\\text{C}} \\text{কিটোন}; \\quad 3^\\circ \\text{ Alcohol} \\xrightarrow{\\text{Cu}, 300^\\circ\\text{C}} \\text{অ্যালকিন (নিরুদন)}",
+    "description": "উত্তপ্ত কপার নলের উপর দিয়ে অ্যালকোহল বাষ্প চালনা করলে প্রাইমারি অ্যালকোহল থেকে অ্যালডিহাইড, সেকেন্ডারি থেকে কিটোন এবং টারশিয়ারি থেকে নিরুদনের মাধ্যমে অ্যালকিন উৎপন্ন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "টারশিয়ারি বিউটাইল অ্যালকোহলকে $300^\\circ\\text{C}$ এ উত্তপ্ত কপারের উপর চালনা করলে কী তৈরি হয়?",
+        "answer": "Ans: আইসোবিউটিন ($\\text{CH}_3-\\text{C(CH}_3)=\\text{CH}_2$) অ্যালকিন"
+      }
+    ]
+  },
+  {
+    "title": "ডায়াজোটাইজেশন বিক্রিয়া (Diazotization Reaction)",
+    "latex": "\\text{C}_6\\text{H}_5\\text{NH}_2 + \\text{NaNO}_2 + 2\\text{HCl} \\xrightarrow{0-5^\\circ\\text{C}} \\text{C}_6\\text{H}_5\\text{N}_2^+\\text{Cl}^- (\\text{বেনজিন ডায়াজোনিয়াম ক্লোরাইড}) + \\text{NaCl} + 2\\text{H}_2\\text{O}",
+    "description": "অ্যানিলিনকে $0^\\circ\\text{C}-5^\\circ\\text{C}$ তাপমাত্রায় নাইট্রাস এসিডের সাথে বিক্রিয়া করালে অত্যন্ত গুরুত্বপূর্ণ মধ্যবর্তী যৌগ বেনজিন ডায়াজোনিয়াম লবণ তৈরি হয়। তাপমাত্রা $5^\\circ\\text{C}$ এর বেশি হলে আর্দ্রবিশ্লেষিত হয়ে ফেনল হয়ে যায়।",
+    "practiceQuestions": [
+      {
+        "question": "ডায়াজোটাইজেশন বিক্রিয়ার তাপমাত্রা কত রাখা আবশ্যক?",
+        "answer": "Ans: $0^\\circ\\text{C}$ থেকে $5^\\circ\\text{C}$"
+      }
+    ]
+  },
+  {
+    "title": "স্যান্ডমেয়ার ও গ্যাটারম্যান বিক্রিয়া (Sandmeyer & Gattermann Reactions)",
+    "latex": "\\text{Sandmeyer: } \\text{C}_6\\text{H}_5\\text{N}_2\\text{Cl} \\xrightarrow{\\text{Cu}_2\\text{Cl}_2 / \\text{HCl}} \\text{C}_6\\text{H}_5\\text{Cl} + \\text{N}_2; \\quad \\text{Gattermann: } \\text{C}_6\\text{H}_5\\text{N}_2\\text{Cl} \\xrightarrow{\\text{Cu গুঁড়া} / \\text{HCl}} \\text{C}_6\\text{H}_5\\text{Cl} + \\text{N}_2",
+    "description": "ডায়াজোনিয়াম লবণ থেকে ক্লোরোবেনজিন, ব্রোমোবেনজিন ও সায়ানোবেনজিন সংশ্লেষণের চমৎকার পদ্ধতি।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজিন ডায়াজোনিয়াম ক্লোরাইড থেকে স্যান্ডমেয়ার বিক্রিয়ায় ক্লোরোবেনজিন তৈরিতে কোন বিকারক লাগে?",
+        "answer": "Ans: কিউপ্রাস ক্লোরাইড ও হাইড্রোক্লোরিক এসিড ($\\text{Cu}_2\\text{Cl}_2 + \\text{HCl}$)"
+      }
+    ]
+  },
+  {
+    "title": "কার্বনিল মূলকের সক্রিয়তার ক্রম (Reactivity of Carbonyl Compounds)",
+    "latex": "\\text{HCHO} > \\text{CH}_3\\text{CHO} > \\text{CH}_3\\text{CH}_2\\text{CHO} > \\text{CH}_3\\text{COCH}_3 > \\text{C}_6\\text{H}_5\\text{CHO} > \\text{C}_6\\text{H}_5\\text{COCH}_3",
+    "description": "নিউক্লিওফিলিক সংযোজন বিক্রিয়ায় অ্যালকাইল মূলকের +I প্রভাব কার্বনিল কার্বনের ধনাত্মক আধান হ্রাস করে এবং স্টেরিক বাধা বাড়ায়, ফলে কিটোন অপেক্ষা অ্যালডিহাইড অধিক সক্রিয় হয়।",
+    "practiceQuestions": [
+      {
+        "question": "ফর্মালডিহাইড এবং অ্যাসিটোন এর মধ্যে কোনটি কেন্দ্রাকর্ষী সংযোজন বিক্রিয়ায় অধিক সক্রিয়?",
+        "answer": "Ans: ফর্মালডিহাইড ($HCHO$, কোনো অ্যালকাইল মূলক না থাকায় সর্বোচ্চ সক্রিয়)"
+      }
+    ]
+  },
+  {
+    "title": "ব্র্যাডির বিকারক ও কার্বনিল মূলক শনাক্তকরণ (Brady's 2,4-DNP Test)",
+    "latex": ">\\text{C}=\\text{O} + \\text{H}_2\\text{N-NH-C}_6\\text{H}_3(\\text{NO}_2)_2 \\to >\\text{C}=\\text{N-NH-C}_6\\text{H}_3(\\text{NO}_2)_2 \\downarrow (\\text{হলুদ/কমলা অধঃক্ষেপ}) + \\text{H}_2\\text{O}",
+    "description": "২,৪-ডাইনাইট্রোফিনাইল হাইড্রাজিন (2,4-DNP) দিয়ে অ্যালডিহাইড ও কিটোন উভয় কার্বনিল যৌগকেই সুনির্দিষ্টভাবে শনাক্ত করা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "কার্বনিল মূলক ($>C=O$) নিশ্চিতকরণে কোন বিকারক ব্যবহৃত হয় এবং কী রঙের অধঃক্ষেপ পড়ে?",
+        "answer": "Ans: ২,৪-ডিএনপি (ব্র্যাডির বিকারক); কমলা বা হলুদ বর্ণের কেলাসিত অধঃক্ষেপ পড়ে।"
+      }
+    ]
+  },
+  {
+    "title": "টলেন্স বিকারক ও সিলভার দর্পণ পরীক্ষা (Tollens' Test for Aldehydes)",
+    "latex": "\\text{R-CHO} + 2[\\text{Ag(NH}_3)_2]\\text{OH} \\xrightarrow{\\Delta} \\text{R-COONH}_4 + 2\\text{Ag} \\downarrow (\\text{সিলভার দর্পণ}) + 3\\text{NH}_3 + \\text{H}_2\\text{O}",
+    "description": "ক্ষারীয় অ্যামোনিয়াকাল সিলভার নাইট্রেট দ্রবণকে টলেন্স বিকারক বলে। এটি মৃদু জারক হওয়ায় অ্যালডিহাইড জারিত হয়ে ধাতব রূপার চকচকে দর্পণ দেয়, কিন্তু কিটোন বিক্রিয়া দেয় না।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যালডিহাইড ও কিটোনের মধ্যে পার্থক্যকারী প্রধান পরীক্ষা কোনটি?",
+        "answer": "Ans: টলেন্স বিকারক পরীক্ষা (অ্যালডিহাইড সিলভার দর্পণ দেয়, কিটোন দেয় না)"
+      }
+    ]
+  },
+  {
+    "title": "ফেহলিং দ্রবণ পরীক্ষা (Fehling's Solution Test)",
+    "latex": "\\text{R-CHO} + 2\\text{Cu(OH)}_2 + \\text{NaOH} \\xrightarrow{\\Delta} \\text{R-COONa} + \\text{Cu}_2\\text{O} \\downarrow (\\text{লাল অধঃক্ষেপ}) + 3\\text{H}_2\\text{O}",
+    "description": "ফেহলিং 'এ' ($\\,\\text{CuSO}_4\\,$ দ্রবণ) ও ফেহলিং 'বি' (সোডিয়াম পটাশিয়াম টারটারেট বা রোশেল লবণ $+$ $\\text{NaOH}$) এর সমআয়তন মিশ্রণ। এলিফ্যাটিক অ্যালডিহাইড লাল $\\text{Cu}_2\\text{O}$ অধঃক্ষেপ দেয় (বেনজালডিহাইড দেয় না)।",
+    "practiceQuestions": [
+      {
+        "question": "ফেহলিং দ্রবণের সাথে অ্যালডিহাইডের বিক্রিয়ায় কোন যৌগের লাল অধঃক্ষেপ পড়ে?",
+        "answer": "Ans: কিউপ্রাস অক্সাইড ($\\text{Cu}_2\\text{O}$)"
+      }
+    ]
+  },
+  {
+    "title": "আয়োডোফর্ম পরীক্ষা ও হ্যালোফর্ম বিক্রিয়া (Iodoform Test)",
+    "latex": "\\text{CH}_3\\text{CHO / CH}_3\\text{COCH}_3 / \\text{CH}_3\\text{CH(OH)R} + 3\\text{I}_2 + 4\\text{NaOH} \\xrightarrow{\\Delta} \\text{CHI}_3 \\downarrow (\\text{হলুদ কেলাস}) + \\text{R-COONa} + 3\\text{NaI} + 3\\text{H}_2\\text{O}",
+    "description": "যেসব যৌগে অ্যাসিটাইল গ্রুপ ($\\text{CH}_3\\text{CO}-$) বা মিথাইল কার্বিনল গ্রুপ ($\\text{CH}_3\\text{CH(OH)}-$) থাকে কেবল তারাই আয়োডোফর্ম পরীক্ষা দেয় (যেমন: ইথানল, প্রোপানন-২, অ্যাসিটালডিহাইড, ২-বিউটানল)। মিথানল বা প্রোপান্যাল দেয় না।",
+    "practiceQuestions": [
+      {
+        "question": "ইথানল ও মিথানলের মধ্যে পার্থক্য করতে কোন পরীক্ষাটি ব্যবহৃত হয়?",
+        "answer": "Ans: আয়োডোফর্ম পরীক্ষা (ইথানল হলুদ $\\text{CHI}_3$ অধঃক্ষেপ দেয়, মিথানল দেয় না)"
+      }
+    ]
+  },
+  {
+    "title": "অ্যালডল ঘনীভবন বিক্রিয়া (Aldol Condensation)",
+    "latex": "2\\text{CH}_3\\text{CHO} \\xrightarrow{\\text{লঘু } \\text{NaOH} (10\\%)} \\underset{\\text{অ্যালডল (৩-হাইড্রক্সিবিউটান্যাল)}}{\\text{CH}_3-\\text{CH(OH)}-\\text{CH}_2-\\text{CHO}} \\xrightarrow{\\Delta, -\\text{H}_2\\text{O}} \\underset{\\text{ক্রোটোনালডিহাইড}}{\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CHO}}",
+    "description": "যেসব অ্যালডিহাইড বা কিটোনে অন্তত একটি $\\alpha$-হাইড্রোজেন থাকে, তারা লঘু ক্ষারের উপস্থিতিতে যুক্ত হয়ে $\\beta$-হাইড্রক্সি অ্যালডিহাইড (অ্যালডল) গঠন করে।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যালডল ঘনীভবন বিক্রিয়া প্রদর্শন করার প্রধান শর্ত কী?",
+        "answer": "Ans: কার্বনিল যৌগে অন্তত একটি $\\alpha$-হাইড্রোজেন পরমাণু থাকতে হবে।"
+      }
+    ]
+  },
+  {
+    "title": "ক্যানিজারো বিক্রিয়া (Cannizzaro Reaction)",
+    "latex": "2\\text{HCHO} + \\text{গাঢ় } \\text{NaOH (50\\%)} \\to \\underset{\\text{মিথানল (বিজারিত)}}{\\text{CH}_3\\text{OH}} + \\underset{\\text{সোডিয়াম ফরমেট (জারিত)}}{\\text{HCOONa}}",
+    "description": "$\\alpha$-হাইড্রোজেনবিহীন অ্যালডিহাইডসমূহ (যেমন $\\text{HCHO}, \\text{C}_6\\text{H}_5\\text{CHO}, (\\text{CH}_3)_3\\text{C-CHO}$) গাঢ় ক্ষারের উপস্থিতিতে স্বতঃস্ফূর্ত স্ব-জারণ-বিজারণ (Disproportionation) ঘটায়।",
+    "practiceQuestions": [
+      {
+        "question": "বেনজালডিহাইড ($\\text{C}_6\\text{H}_5\\text{CHO}$) কেন ক্যানিজারো বিক্রিয়া দেয় কিন্তু অ্যালডল দেয় না?",
+        "answer": "Ans: কারণ বেনজালডিহাইডে কোনো $\\alpha$-হাইড্রোজেন নেই।"
+      }
+    ]
+  },
+  {
+    "title": "কার্বিলঅ্যামিন পরীক্ষা ও ক্লোরোফর্ম শনাক্তকরণ (Carbylamine Test)",
+    "latex": "\\text{R-NH}_2 / \\text{C}_6\\text{H}_5\\text{NH}_2 + \\text{CHCl}_3 + 3\\text{KOH (alc.)} \\xrightarrow{\\Delta} \\text{R-NC} (\\text{আইসোসায়ানাইড / তীব্র দুর্গন্ধ}) + 3\\text{KCl} + 3\\text{H}_2\\text{O}",
+    "description": "প্রাইমারি ($1^\\circ$) অ্যালিফ্যাটিক বা অ্যারোমেটিক অ্যামিন এবং ক্লোরোফর্ম শনাক্তকরণের সুনির্দিষ্ট পরীক্ষা। অত্যন্ত বিষাক্ত ও অসহ্য উগ্র দুর্গন্ধযুক্ত ফিনাইল বা অ্যালকাইল কার্বিলঅ্যামিন ($\\,\\text{R-NC}\\,\\,$) উৎপন্ন হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রাইমারি অ্যামিন ও ক্লোরোফর্ম শনাক্তকরণে কোন পরীক্ষাটি করা হয়?",
+        "answer": "Ans: কার্বিলঅ্যামিন পরীক্ষা বা আইসোসায়ানাইড পরীক্ষা"
+      }
+    ]
+  },
+  {
+    "title": "হফম্যান ক্ষুদ্রাংশকরণ বিক্রিয়া (Hofmann Bromamide Degradation)",
+    "latex": "\\text{R-CONH}_2 + \\text{Br}_2 + 4\\text{KOH} \\xrightarrow{\\Delta} \\text{R-NH}_2 (1^\\circ \\text{ অ্যামিন}) + \\text{K}_2\\text{CO}_3 + 2\\text{KBr} + 2\\text{H}_2\\text{O}",
+    "description": "এসিড অ্যামাইড থেকে ১টি কার্বন কম বিশিষ্ট প্রাইমারি অ্যামিন প্রস্তুত করার অত্যন্ত কার্যকর পদ্ধতি। যেমন: অ্যাসিটামাইড থেকে মিথাইলঅ্যামিন।",
+    "practiceQuestions": [
+      {
+        "question": "ইথানামাইড ($\\text{CH}_3\\text{CONH}_2$) হতে হফম্যান ডিগ্রেডেশন বিক্রিয়ায় কী তৈরি হয়?",
+        "answer": "Ans: মিথাইলঅ্যামিন ($\\text{CH}_3\\text{NH}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "উইলিয়ামসন ইথার সংশ্লেষণ (Williamson Ether Synthesis)",
+    "latex": "\\text{R-ONa} + \\text{R'-X} \\xrightarrow{\\Delta} \\text{R-O-R'} (\\text{ইথার}) + \\text{NaX} \\quad (S_N 2 \\text{ মেকানিজম})",
+    "description": "সোডিয়াম অ্যালকক্সাইডের সাথে প্রাইমারি অ্যালকাইল হ্যালাইডের বিক্রিয়ায় সরল ও মিশ্র উভয় প্রকার ইথার তৈরি করা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "সোডিয়াম ইথক্সাইড ($\\text{C}_2\\text{H}_5\\text{ONa}$) ও মিথাইল আয়োডাইডের ($\\text{CH}_3\\text{I}$) বিক্রিয়ায় কী উৎপন্ন হয়?",
+        "answer": "Ans: ইথাইল মিথাইল ইথার ($\\text{C}_2\\text{H}_5-\\text{O}-\\text{CH}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "রাইমার-টাইম্যান বিক্রিয়া (Reimer-Tiemann Reaction)",
+    "latex": "\\text{C}_6\\text{H}_5\\text{OH (ফেনল)} + \\text{CHCl}_3 + 3\\text{NaOH} \\xrightarrow{60-70^\\circ\\text{C}} \\underset{\\text{স্যালিসাইল অ্যালডিহাইড}}{\\text{C}_6\\text{H}_4(\\text{OH})(\\text{CHO})} + 3\\text{NaCl} + 2\\text{H}_2\\text{O}",
+    "description": "ফেনলকে ক্লোরোফর্ম ও জলীয় ক্ষার সহ উত্তপ্ত করলে অর্থো-হাইড্রক্সি বেনজালডিহাইড (স্যালিসাইল অ্যালডিহাইড) উৎপন্ন হয়। ইলেক্ট্রোফাইল: ডাইক্লোরোকার্বিন ($\\,:\\!\\text{CCl}_2\\,$)।",
+    "practiceQuestions": [
+      {
+        "question": "রাইমার-টাইম্যান বিক্রিয়ার মধ্যবর্তী সক্রিয় ইলেক্ট্রোফাইল কোনটি?",
+        "answer": "Ans: ডাইক্লোরোকার্বিন ($:\\text{CCl}_2$)"
+      }
+    ]
+  },
+  {
+    "title": "কোলবে-স্মিট বিক্রিয়া ও অ্যাসপিরিন প্রস্তুতি (Kolbe-Schmitt Reaction & Aspirin)",
+    "latex": "\\text{C}_6\\text{H}_5\\text{ONa} + \\text{CO}_2 \\xrightarrow{125^\\circ\\text{C}, 4-7\\text{ atm}} \\text{স্যালিসিলিক এসিড} \\xrightarrow{(\\text{CH}_3\\text{CO})_2\\text{O}} \\underset{\\text{অ্যাসপিরিন}}{\\text{C}_6\\text{H}_4(\\text{OCOCH}_3)\\text{COOH}}",
+    "description": "সোডিয়াম ফিনেটের সাথে কার্বন ডাই অক্সাইডের বিক্রিয়ায় স্যালিসিলিক এসিড এবং অ্যাসিটিক অ্যানহাইড্রাইডের সাথে অ্যাসিটাইলেশনের মাধ্যমে ব্যথানাশক ওষুধ অ্যাসপিরিন (অ্যাসিটাইল স্যালিসিলিক এসিড) তৈরি হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যাসপিরিনের রাসায়নিক নাম কী?",
+        "answer": "Ans: অ্যাসিটাইল স্যালিসিলিক এসিড (Acetylsalicylic Acid)"
+      }
+    ]
+  },
+  {
+    "title": "ক্লিমেনসেন বিজারণ (Clemmensen Reduction)",
+    "latex": ">\\text{C}=\\text{O} + 4[\\text{H}] \\xrightarrow{\\text{Zn-Hg} / \\text{গাঢ় } \\text{HCl}, \\Delta} >\\text{CH}_2 (\\text{মিথিলিন মূলক}) + \\text{H}_2\\text{O}",
+    "description": "জিংক অ্যামালগাম ($\\,\\text{Zn-Hg}\\,\\,$) ও গাঢ় $\\text{HCl}$ দ্বারা কার্বনিল মূলক ($>C=O$) সরাসরি মিথিলিন মূলকে ($-CH_2-$) বিজারিত হয়ে হাইড্রোকার্বনে পরিণত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যাসিটোনকে ক্লিমেনসেন বিজারণ করলে কোন অ্যালকেন উৎপন্ন হয়?",
+        "answer": "Ans: প্রোপেন ($\\text{CH}_3\\text{CH}_2\\text{CH}_3$)"
+      }
+    ]
+  },
+  {
+    "title": "উলফ-কিশনার বিজারণ (Wolff-Kishner Reduction)",
+    "latex": ">\\text{C}=\\text{O} + \\text{H}_2\\text{N-NH}_2 \\to >\\text{C}=\\text{N-NH}_2 \\xrightarrow{\\text{KOH / ইথিলিন গ্লাইকল}, 180^\\circ\\text{C}} >\\text{CH}_2 + \\text{N}_2 \\uparrow",
+    "description": "ক্ষারীয় মাধ্যমে হাইড্রাজিন ($\\,\\text{NH}_2\\text{NH}_2\\,$) ও $\\text{KOH}$ দ্বারা কার্বনিল যৌগকে হাইড্রোকার্বনে রূপান্তরের পদ্ধতি। এসিড সংবেদনশীল যৌগের জন্য এটি আদর্শ।",
+    "practiceQuestions": [
+      {
+        "question": "উলফ-কিশনার বিজারণে কোন বিকারক ব্যবহৃত হয়?",
+        "answer": "Ans: হাইড্রাজিন ও পটাসিয়াম হাইড্রক্সাইড ($\\,\\text{NH}_2\\text{NH}_2 + \\text{KOH}\\,\\,$)"
+      }
+    ]
+  },
+  {
+    "title": "অ্যামিনের ক্ষারধর্ম ও তীব্রতার ক্রম (Basicity Order of Amines)",
+    "latex": "\\text{জলীয় দ্রবণে: } (\\text{CH}_3)_2\\text{NH} (2^\\circ) > \\text{CH}_3\\text{NH}_2 (1^\\circ) > (\\text{CH}_3)_3\\text{N} (3^\\circ) > \\text{NH}_3 > \\text{C}_6\\text{H}_5\\text{NH}_2 (\\text{অ্যানিলিন})",
+    "description": "ইন্ডাক্টিভ প্রভাব (+I), হাইড্রেশন এনথালপি এবং স্টেরিক বাধার যৌথ প্রভাবে জলীয় দ্রবণে সেকেন্ডারি ($2^\\circ$) অ্যামিনের ক্ষারধর্ম সর্বাধিক হয়। অ্যানিলিনে নাইট্রোজেনের মুক্তজোড় বলয়ে রেজোন্যান্স করায় এর ক্ষারত্ব সবচেয়ে কম।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যামোনিয়া ও অ্যানিলিনের মধ্যে কোনটি অধিক শক্তিশালী ক্ষার?",
+        "answer": "Ans: অ্যামোনিয়া ($NH_3$), কারণ অ্যানিলিনের মুক্তজোড় বেনজিন বলয়ে ডিলোকালাইজড থাকে।"
+      }
+    ]
+  },
+  {
+    "title": "নাইট্রোগ্লিসারিন ও টিএনটি প্রস্তুতি (Nitroglycerin & TNT)",
+    "latex": "\\text{Glycerol} + 3\\text{HNO}_3 \\xrightarrow{\\text{গাঢ় } \\text{H}_2\\text{SO}_4} \\underset{\\text{নাইট্রোগ্লিসারিন}}{\\text{C}_3\\text{H}_5(\\text{ONO}_2)_3}, \\quad \\text{Toluene} + 3\\text{HNO}_3 \\xrightarrow{\\text{গাঢ় } \\text{H}_2\\text{SO}_4} \\underset{\\text{TNT (২,৪,৬-ট্রাইনাইট্রোটলুইন)}}{\\text{C}_6\\text{H}_2(\\text{NO}_2)_3\\text{CH}_3}",
+    "description": "• নাইট্রোগ্লিসারিন: হৃদরোগের চিকিৎসায় ভাসোডাইলেটর হিসেবে রক্তনালী প্রসারিত করে এবং ডায়নামাইট তৈরিতে ব্যবহৃত হয়।\n• টিএনটি: অত্যন্ত শক্তিশালী সামরিক বিস্ফোরক।",
+    "practiceQuestions": [
+      {
+        "question": "হৃদরোগে এনজাইনা পেক্টোরিসের ব্যথা উপশমে কোন জৈব যৌগ স্প্রে বা ট্যাবলেট হিসেবে ব্যবহৃত হয়?",
+        "answer": "Ans: নাইট্রোগ্লিসারিন (Glycerol trinitrate)"
+      }
+    ]
   }
 ]

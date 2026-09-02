@@ -1,1 +1,131 @@
-[]
+[
+  {
+    "title": "স্নেলের সূত্র ও প্রতিসরাঙ্ক (Snell's Law & Refractive Index)",
+    "latex": "\\frac{\\sin i}{\\sin r} = {_1}\\mu_2 = \\frac{\\mu_2}{\\mu_1} = \\frac{c_1}{c_2} = \\frac{\\lambda_1}{\\lambda_2}, \\quad {_a}\\mu_b \\times {_b}\\mu_c \\times {_c}\\mu_a = 1",
+    "description": "$i$ = আপাতন কোণ, $r$ = প্রতিসরণ কোণ, $\\mu_1, \\mu_2$ = ১ম ও ২য় মাধ্যমের পরম প্রতিসরাঙ্ক, $c_1, c_2$ = আলোর বেগ, $\\lambda_1, \\lambda_2$ = তরঙ্গদৈর্ঘ্য। শূন্য মাধ্যমে আলোর বেগ $c = 3 \\times 10^8\\text{ m/s}$।",
+    "practiceQuestions": [
+      {
+        "question": "বায়ু থেকে কাচে ($^a\\mu_g = 1.5$) আলো প্রবেশ করায় আপাতন কোণ $45^\\circ$ হলে প্রতিসরণ কোণ কত?",
+        "answer": "Ans: $\\sin r = \\frac{\\sin 45^\\circ}{1.5} = \\frac{0.7071}{1.5} \\approx 0.4714 \\implies r \\approx 28.13^\\circ$"
+      },
+      {
+        "question": "পানিতে আলোর বেগ কত? ($^a\\mu_w = 4/3$)",
+        "answer": "Ans: $c_w = \\frac{c}{\\mu_w} = \\frac{3 \\times 10^8}{4/3} = 2.25 \\times 10^8\\text{ m/s}$"
+      }
+    ]
+  },
+  {
+    "title": "সংকট কোণ ও পূর্ণ অভ্যন্তরীণ প্রতিফলন (Critical Angle & Total Internal Reflection)",
+    "latex": "\\sin\\theta_c = \\frac{\\mu_2}{\\mu_1} = \\frac{1}{_1\\mu_2} \\implies \\theta_c = \\arcsin\\left(\\frac{1}{\\mu}\\right) \\text{ (বায়ু সাপেক্ষে)}",
+    "description": "ঘন মাধ্যম হতে হালকা মাধ্যমে আলো প্রবেশের সময় যে আপাতন কোণে প্রতিসরণ কোণ $90^\\circ$ হয়, তাকে সংকট কোণ $\\theta_c$ বলে। আপাতন কোণ $i > \\theta_c$ হলে সম্পূর্ণ আলো প্রতিফলিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "কাচের পরম প্রতিসরাঙ্ক $1.5$ হলে বায়ুর সাপেক্ষে সংকট কোণ কত?",
+        "answer": "Ans: $\\theta_c = \\arcsin\\left(\\frac{1}{1.5}\\right) = \\arcsin(0.6667) \\approx 41.81^\\circ$"
+      },
+      {
+        "question": "হীরকের সংকট কোণ $24.4^\\circ$ হলে হীরকের প্রতিসরাঙ্ক কত?",
+        "answer": "Ans: $\\mu = \\frac{1}{\\sin 24.4^\\circ} = \\frac{1}{0.4131} \\approx 2.42$"
+      }
+    ]
+  },
+  {
+    "title": "পার্শ্ব সরণ ও আপাত গভীরতা (Lateral Shift & Apparent Depth)",
+    "latex": "x = \\frac{t \\sin(i - r)}{\\cos r}, \\quad d' = \\frac{d}{\\mu} \\implies \\text{আপাত উত্তোলন } \\Delta d = d\\left(1 - \\frac{1}{\\mu}\\right)",
+    "description": "$t$ = কাচ ফলকের বেধ, $x$ = পার্শ্ব সরণ, $d$ = প্রকৃত গভীরতা, $d'$ = আপাত গভীরতা, $\\Delta d$ = আপাত উত্তোলন (Apparent rise)।",
+    "practiceQuestions": [
+      {
+        "question": "পানিতে ($^a\\mu_w = 1.33$) নিমজ্জিত একটি ধাতব মুদ্রা $4\\text{ m}$ গভীরে থাকলে উপর থেকে দেখলে কত গভীরে মনে হবে?",
+        "answer": "Ans: $d' = \\frac{4}{1.33} \\approx 3.01\\text{ m}$। আপাত উত্তোলন $\\Delta d = 4 - 3.01 = 0.99\\text{ m}$"
+      }
+    ]
+  },
+  {
+    "title": "প্রিজমের প্রতিসরণ ও ন্যূনতম বিচ্যুতি (Prism Formula & Minimum Deviation)",
+    "latex": "A = r_1 + r_2, \\quad \\delta = i_1 + i_2 - A, \\quad \\mu = \\frac{\\sin\\left(\\frac{A + \\delta_m}{2}\\right)}{\\sin\\left(\\frac{A}{2}\\right)}",
+    "description": "$A$ = প্রিজম কোণ, $\\delta$ = বিচ্যুতি কোণ, $\\delta_m$ = ন্যূনতম বিচ্যুতি কোণ (যখন $i_1 = i_2$ এবং $r_1 = r_2 = A/2$)।",
+    "practiceQuestions": [
+      {
+        "question": "$60^\\circ$ কোণের সমবাহু প্রিজমের ন্যূনতম বিচ্যুতি $30^\\circ$ হলে প্রতিসরাঙ্ক কত?",
+        "answer": "Ans: $\\mu = \\frac{\\sin((60^\\circ + 30^\\circ)/2)}{\\sin(60^\\circ / 2)} = \\frac{\\sin 45^\\circ}{\\sin 30^\\circ} = \\frac{1/\\sqrt{2}}{1/2} = \\sqrt{2} \\approx 1.414$"
+      }
+    ]
+  },
+  {
+    "title": "সরু প্রিজম ও বিচ্ছুরণ ক্ষমতা (Thin Prism & Dispersive Power)",
+    "latex": "\\delta = (\\mu - 1) A, \\quad \\theta = \\delta_v - \\delta_r = (\\mu_v - \\mu_r) A, \\quad \\omega = \\frac{\\mu_v - \\mu_r}{\\mu_y - 1} = \\frac{\\theta}{\\delta_y}",
+    "description": "সরু প্রিজম ($A \\le 6^\\circ$)। $\\theta$ = কৌণিক বিচ্ছুরণ, $\\omega$ = বিচ্ছুরণ ক্ষমতা, $\\mu_y = \\frac{\\mu_v + \\mu_r}{2}$ = হলুদ বা গড় আলোর প্রতিসরাঙ্ক।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ক্রাউন কাচের সরু প্রিজমের কোণ $5^\\circ$ এবং $\\mu_v = 1.523, \\mu_r = 1.514$ হলে কৌণিক বিচ্ছুরণ কত?",
+        "answer": "Ans: $\\theta = (1.523 - 1.514) \\times 5^\\circ = 0.009 \\times 5^\\circ = 0.045^\\circ$"
+      }
+    ]
+  },
+  {
+    "title": "লেন্স প্রস্তুতকারকের সূত্র (Lens Maker's Formula)",
+    "latex": "\\frac{1}{f} = (\\mu - 1)\\left(\\frac{1}{R_1} - \\frac{1}{R_2}\\right), \\quad \\frac{f_l}{f_a} = \\frac{\\mu_g - 1}{\\frac{\\mu_g}{\\mu_l} - 1}",
+    "description": "$f$ = ফোকাস দূরত্ব, $R_1, R_2$ = বক্রতার ব্যাসার্ধ (চিহ্নের প্রথা মেনে: উত্তল পৃষ্ঠ $+R$, অবতল পৃষ্ঠ $-R$)। কাচের লেন্সকে পানিতে ডুবালে ফোকাস দূরত্ব প্রায় ৪ গুণ বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "উভ-উত্তল কাচের লেন্সের ($\\mu = 1.5$) উভয় পৃষ্ঠের বক্রতার ব্যাসার্ধ $20\\text{ cm}$ হলে বায়ুতে ও পানিতে ($^a\\mu_w = 4/3$) ফোকাস দূরত্ব কত?",
+        "answer": "Ans: বায়ুতে $\\frac{1}{f} = (1.5 - 1)\\left(\\frac{1}{20} - \\frac{1}{-20}\\right) = 0.5 \\times 0.1 = 0.05 \\implies f = 20\\text{ cm}$। পানিতে $f_w = 20 \\times \\frac{1.5 - 1}{\\frac{1.5}{4/3} - 1} = 20 \\times \\frac{0.5}{0.125} = 80\\text{ cm}$"
+      }
+    ]
+  },
+  {
+    "title": "পাতলা লেন্সের সমীকরণ ও ক্ষমতা (Thin Lens Formula & Power)",
+    "latex": "\\frac{1}{v} - \\frac{1}{u} = \\frac{1}{f}, \\quad P = \\frac{1}{f(\\text{m})} = \\frac{100}{f(\\text{cm})} \\text{ (Diopter - D)}",
+    "description": "$u$ = বস্তুর দূরত্ব (বাস্তব বস্তুর জন্য ঋণাত্মক), $v$ = বিম্বের দূরত্ব, $f$ = ফোকাস দূরত্ব (উত্তল লেন্স $f > 0, P > 0$; অবতল লেন্স $f < 0, P < 0$)।",
+    "practiceQuestions": [
+      {
+        "question": "$+20\\text{ cm}$ ফোকাস দূরত্বের উত্তল লেন্সের সামনে $30\\text{ cm}$ দূরে বস্তু রাখলে বিম্বের দূরত্ব ও ক্ষমতা কত?",
+        "answer": "Ans: $\\frac{1}{v} = \\frac{1}{20} + \\frac{1}{-30} = \\frac{1}{60} \\implies v = +60\\text{ cm}$। ক্ষমতা $P = \\frac{100}{20} = +5\\text{ D}$"
+      }
+    ]
+  },
+  {
+    "title": "রৈখিক বিবর্ধন ও লেন্সের সমবায় (Magnification & Lens Combination)",
+    "latex": "m = -\\frac{v}{u} = \\frac{f}{f + u}, \\quad P_{\\text{eq}} = P_1 + P_2 \\iff \\frac{1}{F} = \\frac{1}{f_1} + \\frac{1}{f_2} - \\frac{d}{f_1 f_2}",
+    "description": "$m$ = রৈখিক বিবর্ধন, $d$ = দুটি লেন্সের মধ্যকার দূরত্ব ($d = 0$ হলে সরাসরি সংস্পর্শে)।",
+    "practiceQuestions": [
+      {
+        "question": "$+4\\text{ D}$ এবং $-2\\text{ D}$ ক্ষমতার দুটি লেন্স স্পর্শে রাখা হলে তুল্য ক্ষমতা ও ফোকাস দূরত্ব কত?",
+        "answer": "Ans: $P_{\\text{eq}} = 4 - 2 = +2\\text{ D}$। তুল্য ফোকাস দূরত্ব $F = \\frac{100}{2} = +50\\text{ cm}$"
+      }
+    ]
+  },
+  {
+    "title": "সরল অণুবীক্ষণ যন্ত্রের বিবর্ধন (Simple Microscope Magnification)",
+    "latex": "M_{\\text{distinct}} = 1 + \\frac{D}{f}, \\quad M_{\\text{infinity}} = \\frac{D}{f} \\quad (D = 25\\text{ cm})",
+    "description": "$f$ = উত্তল লেন্সের ফোকাস দূরত্ব, $D = 25\\text{ cm}$ (স্পষ্ট দর্শনের নিকটতম দূরত্ব)। চোখ শান্ত অবস্থায় থাকলে ফোকাসিং অসীমে ($M = D/f$) করা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$5\\text{ cm}$ ফোকাস দূরত্বের একটি আতশী কাচের স্পষ্ট দর্শনের ও স্বাভাবিক দর্শনের বিবর্ধন কত?",
+        "answer": "Ans: স্পষ্ট দর্শনে $M = 1 + \\frac{25}{5} = 6$। অসীমে $M = \\frac{25}{5} = 5$"
+      }
+    ]
+  },
+  {
+    "title": "যৌগিক অণুবীক্ষণ যন্ত্রের বিবর্ধন ও দৈর্ঘ্য (Compound Microscope)",
+    "latex": "M_{\\text{distinct}} = -\\frac{v_o}{u_o}\\left(1 + \\frac{D}{f_e}\\right), \\quad L = v_o + u_e; \\quad M_{\\text{normal}} = -\\frac{v_o}{u_o}\\left(\\frac{D}{f_e}\\right), \\quad L = v_o + f_e",
+    "description": "$f_o, f_e$ = অভিলক্ষ্য ও অভিনেত্রের ফোকাস দূরত্ব, $u_o, v_o$ = অভিলক্ষ্যের বস্তু ও বিম্বের দূরত্ব, $L$ = নলের দৈর্ঘ্য।",
+    "practiceQuestions": [
+      {
+        "question": "একটি যৌগিক অণুবীক্ষণ যন্ত্রের $f_o = 1\\text{ cm}, f_e = 5\\text{ cm}$। অভিলক্ষ্য থেকে $1.1\\text{ cm}$ দূরে বস্তু রাখলে স্পষ্ট দর্শনে বিবর্ধন কত?",
+        "answer": "Ans: $\\frac{1}{v_o} = \\frac{1}{1} - \\frac{1}{1.1} \\implies v_o = 11\\text{ cm}$। বিবর্ধন $M = \\frac{11}{1.1}\\left(1 + \\frac{25}{5}\\right) = 10 \\times 6 = 60$"
+      }
+    ]
+  },
+  {
+    "title": "নভোদূরবীক্ষণ যন্ত্রের বিবর্ধন ও দৈর্ঘ্য (Astronomical Telescope)",
+    "latex": "M_{\\text{normal}} = \\frac{f_o}{f_e}, \\quad L = f_o + f_e; \\quad M_{\\text{distinct}} = \\frac{f_o}{f_e}\\left(1 + \\frac{f_e}{D}\\right), \\quad L = f_o + u_e",
+    "description": "$f_o$ = অভিলক্ষ্যের বৃহৎ ফোকাস দূরত্ব, $f_e$ = অভিনেত্রের ক্ষুদ্র ফোকাস দূরত্ব। স্বাভাবিক ফোকাসিংয়ে বিবর্ধন $M = f_o / f_e$ এবং নলের দৈর্ঘ্য $L = f_o + f_e$।",
+    "practiceQuestions": [
+      {
+        "question": "একটি দূরবীক্ষণ যন্ত্রের অভিলক্ষ্য ও অভিনেত্রের ফোকাস দূরত্ব যথাক্রমে $100\\text{ cm}$ ও $5\\text{ cm}$। স্বাভাবিক ফোকাসিংয়ে বিবর্ধন ও নলের দৈর্ঘ্য কত?",
+        "answer": "Ans: $M = \\frac{100}{5} = 20$। নলের দৈর্ঘ্য $L = 100 + 5 = 105\\text{ cm}$"
+      }
+    ]
+  }
+]

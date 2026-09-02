@@ -1,1 +1,160 @@
-[]
+[
+  {
+    "title": "তড়িৎ প্রবাহ ও ইলেকট্রনের তাড়ন বেগ (Current & Drift Velocity)",
+    "latex": "I = \\frac{q}{t} = \\frac{N e}{t} = n A e v_d, \\quad j = \\frac{I}{A} = n e v_d = \\sigma E = \\frac{E}{\\rho}",
+    "description": "$I$ = তড়িৎ প্রবাহ (Ampere), $N$ = প্রবাহিত ইলেকট্রন সংখ্যা, $n$ = প্রতি একক আয়তনে মুক্ত ইলেকট্রন ঘনত্ব, $A$ = প্রস্থচ্ছেদ, $v_d$ = তাড়ন বেগ, $j$ = প্রবাহ ঘনত্ব ($\\text{A/m}^2$), $E$ = তড়িৎ প্রাবল্য, $\\rho$ = আপেক্ষিক রোধ।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ mm}^2$ প্রস্থচ্ছেদের তামার তারের মধ্য দিয়ে $2\\text{ A}$ প্রবাহ চলছে। তামার ইলেকট্রন ঘনত্ব $8.5 \\times 10^{28}\\text{ m}^{-3}$ হলে ইলেকট্রনের তাড়ন বেগ কত?",
+        "answer": "Ans: $v_d = \\frac{I}{n A e} = \\frac{2}{(8.5 \\times 10^{28}) \\times (10^{-6}) \\times (1.6 \\times 10^{-19})} = \\frac{2}{1.36 \\times 10^4} \\approx 1.47 \\times 10^{-4}\\text{ m/s}$"
+      }
+    ]
+  },
+  {
+    "title": "ওহমের সূত্র, রোধ ও পরিবাহিতাঙ্ক (Ohm's Law, Resistance & Conductivity)",
+    "latex": "V = I R, \\quad R = \\rho \\frac{L}{A} = \\frac{1}{\\sigma}\\frac{L}{A}, \\quad G = \\frac{1}{R} \\text{ (Siemens - S)}, \\quad \\sigma = \\frac{1}{\\rho}",
+    "description": "$R$ = রোধ ($\\Omega$), $\\rho$ = আপেক্ষিক রোধ ($\\Omega\\cdot\\text{m}$), $G$ = তড়িৎ পরিবাহিতা, $\\sigma$ = তড়িৎ পরিবাহিতাঙ্ক ($\\text{S/m}$ বা $\\Omega^{-1}\\text{m}^{-1}$), $L$ = দৈর্ঘ্য, $A = \\pi r^2$ = প্রস্থচ্ছেদ।",
+    "practiceQuestions": [
+      {
+        "question": "$2\\text{ m}$ দীর্ঘ এবং $0.5\\text{ mm}$ ব্যাসার্ধের একটি তারের রোধ $4\\,\\Omega$ হলে এর উপাদানের আপেক্ষিক রোধ $\\rho$ কত?",
+        "answer": "Ans: $A = \\pi (0.5 \\times 10^{-3})^2 = 7.854 \\times 10^{-7}\\text{ m}^2$। $\\rho = \\frac{R A}{L} = \\frac{4 \\times (7.854 \\times 10^{-7})}{2} = 1.57 \\times 10^{-6}\\,\\Omega\\cdot\\text{m}$"
+      }
+    ]
+  },
+  {
+    "title": "তার টেনে লম্বা বা সংকুচিত করলে রোধের পরিবর্তন (Stretching a Wire)",
+    "latex": "R \\propto L^2 \\propto \\frac{1}{A^2} \\propto \\frac{1}{r^4} \\implies R' = n^2 R \\; (\\text{দৈর্ঘ্য } n \\text{ গুণ হলে})",
+    "description": "তারের আয়তন স্থির থাকলে ($V = A \\times L = \\text{constant}$), দৈর্ঘ্য $n$ গুণ বাড়ালে রোধ $n^2$ গুণ হয়। ব্যাসার্ধ অর্ধেক ($1/2$) করলে রোধ $16$ গুণ হয়। ক্ষুদ্র পরিবর্তনের ক্ষেত্রে $\\frac{\\Delta R}{R} \\approx 2 \\frac{\\Delta L}{L}$।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\,\\Omega$ রোধের একটি তারকে টেনে দৈর্ঘ্য আদি দৈর্ঘ্যের ৩ গুণ করা হলে বর্তমান রোধ কত?",
+        "answer": "Ans: $R' = n^2 R = 3^2 \\times 10 = 90\\,\\Omega$"
+      },
+      {
+        "question": "একটি তারের দৈর্ঘ্য টেনে $2\\%$ বৃদ্ধি করলে রোধ শতকরা কত বৃদ্ধি পাবে?",
+        "answer": "Ans: $\\frac{\\Delta R}{R} \\approx 2 \\left(\\frac{\\Delta L}{L}\\right) = 2 \\times 2\\% = 4\\%$"
+      }
+    ]
+  },
+  {
+    "title": "রোধের উষ্ণতা সহগ (Temperature Coefficient of Resistance)",
+    "latex": "R_\\theta = R_0 (1 + \\alpha \\theta) \\implies \\alpha = \\frac{R_2 - R_1}{R_1(\\theta_2 - \\theta_1)}",
+    "description": "$R_0$ = $0^\\circ\\text{C}$ এ রোধ, $R_\\theta$ = $\\theta^\\circ\\text{C}$ এ রোধ, $\\alpha$ = রোধের উষ্ণতা সহগ ($\\text{K}^{-1}$ বা $^\\circ\\text{C}^{-1}$)। পরিবাহীর তাপমাত্রা বাড়লে রোধ বাড়ে ($\\alpha > 0$), সেমিকন্ডাক্টরে রোধ কমে ($\\alpha < 0$)।",
+    "practiceQuestions": [
+      {
+        "question": "$0^\\circ\\text{C}$-এ একটি তারের রোধ $20\\,\\Omega$ এবং $100^\\circ\\text{C}$-এ রোধ $28\\,\\Omega$ হলে উষ্ণতা সহগ কত?",
+        "answer": "Ans: $\\alpha = \\frac{28 - 20}{20 \\times 100} = \\frac{8}{2000} = 4 \\times 10^{-3\\, \\circ}\\text{C}^{-1}$"
+      }
+    ]
+  },
+  {
+    "title": "সমান্তরাল বর্তনীতে কারেন্ট বিভাজন (Current Divider Rule)",
+    "latex": "I_1 = I \\left(\\frac{R_2}{R_1 + R_2}\\right), \\quad I_2 = I \\left(\\frac{R_1}{R_1 + R_2}\\right), \\quad \\frac{1}{R_p} = \\frac{1}{R_1} + \\frac{1}{R_2}",
+    "description": "সমান্তরাল বর্তনীতে মোট কারেন্ট $I$ রোধের ব্যস্তানুপাতে শাখাগুলোর মধ্যে বিভক্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$6\\,\\Omega$ ও $3\\,\\Omega$ রোধের দুটি সমান্তরাল শাখায় মোট $9\\text{ A}$ কারেন্ট প্রবেশ করলে $3\\,\\Omega$ রোধের মধ্য দিয়ে কত কারেন্ট যাবে?",
+        "answer": "Ans: $I_2 = 9 \\times \\left(\\frac{6}{6 + 3}\\right) = 9 \\times \\frac{6}{9} = 6\\text{ A}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎচালক বল, অভ্যন্তরীণ রোধ ও হারানো ভোল্ট (EMF & Internal Resistance)",
+    "latex": "E = I(R + r) \\implies I = \\frac{E}{R + r}, \\quad V = E - I r, \\quad v_{\\text{lost}} = I r, \\quad \\eta = \\frac{V}{E} = \\frac{R}{R + r} \\times 100\\%",
+    "description": "$E$ = কোষের তড়িৎচালক বল (EMF), $V$ = প্রান্তীয় বিভব পার্থক্য, $r$ = অভ্যন্তরীণ রোধ, $R$ = বহিস্থ বর্তনীর রোধ, $Ir$ = অভ্যন্তরীণ বিভব পতন বা হারানো ভোল্ট, $\\eta$ = কোষের কর্মদক্ষতা।",
+    "practiceQuestions": [
+      {
+        "question": "$12\\text{ V}$ তড়িৎচালক বল এবং $1\\,\\Omega$ অভ্যন্তরীণ রোধের ব্যাটারির সাথে $5\\,\\Omega$ রোধ যুক্ত করলে প্রবাহ ও প্রান্তীয় বিভব কত?",
+        "answer": "Ans: $I = \\frac{12}{5 + 1} = 2\\text{ A}$। প্রান্তীয় বিভব $V = E - I r = 12 - (2 \\times 1) = 10\\text{ V}$"
+      }
+    ]
+  },
+  {
+    "title": "কোষের সমবায়সমূহ (Combination of Cells)",
+    "latex": "\\text{Series: } I = \\frac{n E}{R + n r}, \\quad \\text{Parallel: } I = \\frac{m E}{m R + r}, \\quad \\text{Mixed: } I = \\frac{m n E}{m R + n r}",
+    "description": "$n$ = প্রতি সারিতে কোষ সংখ্যা, $m$ = সমান্তরাল শাখার সংখ্যা। মিশ্র সমবায়ে বহিস্থ রোধে সর্বোচ্চ প্রবাহ পাওয়ার শর্ত: $R = \\frac{n r}{m}$।",
+    "practiceQuestions": [
+      {
+        "question": "$1.5\\text{ V}$ তড়িৎচালক বল ও $0.5\\,\\Omega$ অভ্যন্তরীণ রোধের ৪টি কোষ শ্রেণিতে যুক্ত করে $4\\,\\Omega$ রোধের সাথে যুক্ত করলে প্রবাহ কত?",
+        "answer": "Ans: $I = \\frac{4 \\times 1.5}{4 + (4 \\times 0.5)} = \\frac{6}{6} = 1\\text{ A}$"
+      }
+    ]
+  },
+  {
+    "title": "জুলের তাপীয় ক্রিয়া ও শক্তি (Joule's Heating Law)",
+    "latex": "H = \\frac{I^2 R t}{J} = \\frac{V I t}{J} = \\frac{V^2 t}{R J} \\text{ (Calorie)}, \\quad W = I^2 R t = V I t = \\frac{V^2}{R} t \\text{ (Joule)}",
+    "description": "$H$ = উৎপন্ন তাপ (Calorie), $W$ = তড়িৎ শক্তি (Joule), $J = 4.2\\text{ J/cal}$। জুলের সূত্র: $H \\propto I^2$ ($R, t$ স্থির), $H \\propto R$ ($I, t$ স্থির), $H \\propto t$ ($I, R$ স্থির)।",
+    "practiceQuestions": [
+      {
+        "question": "$10\\,\\Omega$ রোধের নিমজ্জক উত্তাপক (হিটার) দিয়ে $5\\text{ A}$ কারেন্ট $10$ মিনিট চালনা করলে কত তাপ (ক্যালরি) উৎপন্ন হবে?",
+        "answer": "Ans: $W = I^2 R t = 5^2 \\times 10 \\times (10 \\times 60) = 25 \\times 10 \\times 600 = 150000\\text{ J}$। ক্যালরিতে $H = \\frac{150000}{4.2} \\approx 35714\\text{ cal}$"
+      }
+    ]
+  },
+  {
+    "title": "তড়িৎ ক্ষমতা ও ইউনিট বিলিং হিসাব (Electric Power & Billing)",
+    "latex": "P = V I = I^2 R = \\frac{V^2}{R}, \\quad \\text{Units (kWh)} = \\frac{P(\\text{Watt}) \\times t(\\text{Hour})}{1000}, \\quad \\text{Cost} = \\text{Units} \\times \\text{Rate}",
+    "description": "$P$ = বৈদ্যুতিক ক্ষমতা (Watt), ১ ইউনিট = $1\\text{ Board of Trade Unit (BOT)} = 1\\text{ kWh} = 3.6 \\times 10^6\\text{ J}$।",
+    "practiceQuestions": [
+      {
+        "question": "$220\\text{ V} - 100\\text{ W}$ এর একটি বাল্ব প্রতিদিন ৬ ঘণ্টা করে ৩০ দিন জ্বললে মোট কত ইউনিট বিদ্যুৎ খরচ হবে?",
+        "answer": "Ans: $\\text{Units} = \\frac{100 \\times (6 \\times 30)}{1000} = 18\\text{ kWh (Unit)}$"
+      }
+    ]
+  },
+  {
+    "title": "কার্শফের সূত্রসমূহ (Kirchhoff's Current & Voltage Laws)",
+    "latex": "\\text{KCL: } \\sum I = 0 \\iff \\sum I_{\\text{in}} = \\sum I_{\\text{out}}, \\quad \\text{KVL: } \\sum E = \\sum I R \\iff \\sum \\Delta V = 0",
+    "description": "KCL (১ম সূত্র): সংযোগ বিন্দুতে আধানের নিত্যতা সূত্র। KVL (২য় সূত্র): যেকোনো বদ্ধ লুপে শক্তির নিত্যতা সূত্র।",
+    "practiceQuestions": [
+      {
+        "question": "একটি জংশনে $3\\text{ A}$ এবং $4\\text{ A}$ প্রবাহ প্রবেশ করছে এবং একটি শাখা দিয়ে $2\\text{ A}$ বের হচ্ছে। অপর শাখা দিয়ে কত প্রবাহ বের হবে?",
+        "answer": "Ans: $\\sum I_{\\text{in}} = \\sum I_{\\text{out}} \\implies 3 + 4 = 2 + I_x \\implies I_x = 5\\text{ A}$ (বহির্মুখী)"
+      }
+    ]
+  },
+  {
+    "title": "হুইটস্টোন ব্রিজ নীতি ও মিটার ব্রিজ (Wheatstone Bridge & Meter Bridge)",
+    "latex": "\\frac{P}{Q} = \\frac{R}{S} \\text{ (সাম্যাবস্থা)}, \\quad \\frac{P}{Q} = \\frac{l}{100 - l} \\implies P = Q \\left(\\frac{l}{100 - l}\\right)",
+    "description": "$P, Q, R, S$ যথাক্রমে ১ম, ২য়, ৩য় ও ৪র্থ বাহুর রোধ। গ্যালভানোমিটার প্রবাহ $I_g = 0$ হলে ব্রিজ সাম্যাবস্থায় থাকে। $l$ = মিটার ব্রিজের বাম প্রান্ত হতে নিরপেক্ষ বিন্দুর দূরত্ব (cm)।",
+    "practiceQuestions": [
+      {
+        "question": "হুইটস্টোন ব্রিজের চার বাহুর রোধ যথাক্রমে $6\\,\\Omega, 12\\,\\Omega, 18\\,\\Omega$ এবং $40\\,\\Omega$। চতুর্থ বাহুতে কত মানের রোধ কীভাবে যুক্ত করলে ব্রিজটি সাম্যাবস্থায় আসবে?",
+        "answer": "Ans: সাম্যাবস্থায় $S' = \\frac{Q R}{P} = \\frac{12 \\times 18}{6} = 36\\,\\Omega$। সমান্তরালে $x$ রোধ যোগ করতে হবে: $\\frac{1}{40} + \\frac{1}{x} = \\frac{1}{36} \\implies x = 360\\,\\Omega$ সমান্তরালে।"
+      }
+    ]
+  },
+  {
+    "title": "পোটেনশিওমিটারের সমীকরণ (Potentiometer Equations)",
+    "latex": "\\frac{E_1}{E_2} = \\frac{l_1}{l_2}, \\quad r = R\\left(\\frac{l_1 - l_2}{l_2}\\right)",
+    "description": "$l_1$ = মুক্ত বর্তনীতে (বা ১ম কোষের জন্য) সাম্যাবস্থার দৈর্ঘ্য, $l_2$ = বদ্ধ বর্তনীতে (বা ২য় কোষের জন্য) সাম্যাবস্থার দৈর্ঘ্য, $R$ = জানা বহিস্থ রোধ, $r$ = কোষের অভ্যন্তরীণ রোধ।",
+    "practiceQuestions": [
+      {
+        "question": "পোটেনশিওমিটারে একটি কোষের জন্য মুক্ত অবস্থায় সাম্যবিন্দু $75\\text{ cm}$ এবং $10\\,\\Omega$ শান্ট যুক্ত অবস্থায় সাম্যবিন্দু $60\\text{ cm}$ এ পাওয়া গেল। কোষের অভ্যন্তরীণ রোধ কত?",
+        "answer": "Ans: $r = R\\left(\\frac{l_1 - l_2}{l_2}\\right) = 10 \\times \\left(\\frac{75 - 60}{60}\\right) = 10 \\times \\frac{15}{60} = 2.5\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "শান্টের নীতি ও গ্যালভানোমিটার প্রবাহ (Shunt Principle)",
+    "latex": "I_g = I \\left(\\frac{S}{G + S}\\right), \\quad I_s = I \\left(\\frac{G}{G + S}\\right), \\quad S = \\frac{G}{n - 1} \\quad \\left(n = \\frac{I}{I_g}\\right)",
+    "description": "$G$ = গ্যালভানোমিটার রোধ, $S$ = শান্টের ক্ষুদ্র সমান্তরাল রোধ, $I$ = মূল বর্তনীর মোট প্রবাহ, $I_g$ = গ্যালভানোমিটারের মধ্য দিয়ে প্রবাহ, $n = I / I_g$ = শান্ট গুণক।",
+    "practiceQuestions": [
+      {
+        "question": "$99\\,\\Omega$ রোধের একটি গ্যালভানোমিটারের সাথে কত মানের শান্ট যুক্ত করলে মূল প্রবাহের মাত্র $1\\%$ গ্যালভানোমিটারের মধ্য দিয়ে যাবে?",
+        "answer": "Ans: $I_g = 0.01 I \\implies n = 100$। $S = \\frac{G}{n - 1} = \\frac{99}{100 - 1} = \\frac{99}{99} = 1\\,\\Omega$"
+      }
+    ]
+  },
+  {
+    "title": "অ্যামিটার ও ভোল্টমিটারের পাল্লা বৃদ্ধি (Range Extension of Meters)",
+    "latex": "\\text{Ammeter: } S = \\frac{R_A}{n - 1} \\;\\left(n = \\frac{I_{\\text{new}}}{I_{\\text{max}}}\\right), \\quad \\text{Voltmeter: } R_s = (n - 1) R_V \\;\\left(n = \\frac{V_{\\text{new}}}{V_{\\text{max}}}\\right)",
+    "description": "অ্যামিটারের পাল্লা $n$ গুণ বাড়াতে সমান্তরালে $S$ রোধ যুক্ত করতে হয়। ভোল্টমিটারের পাল্লা $n$ গুণ বাড়াতে শ্রেণিতে $R_s$ উচ্চ রোধ (Multiplier) যুক্ত করতে হয়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ভোল্টমিটারের রোধ $1000\\,\\Omega$ এবং এটি সর্বোচ্চ $10\\text{ V}$ মাপতে পারে। একে $100\\text{ V}$ মাপার উপযোগী করতে শ্রেণিতে কত রোধ লাগবে?",
+        "answer": "Ans: $n = \\frac{100}{10} = 10$। $R_s = (n - 1) R_V = (10 - 1) \\times 1000 = 9000\\,\\Omega$"
+      }
+    ]
+  }
+]

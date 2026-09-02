@@ -66,7 +66,7 @@ class FormulaSubjectsView extends ConsumerWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.42,
+                childAspectRatio: 1.15,
               ),
               itemCount: subjects.length,
               itemBuilder: (context, index) {
@@ -148,57 +148,59 @@ class _SubjectCardState extends State<_SubjectCard>
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.subject.svgIcon != null)
                 SizedBox(
-                  width: 36,
-                  height: 36,
+                  width: 56,
+                  height: 56,
                   child: SvgPicture.asset(
                     widget.subject.svgIcon!,
                     fit: BoxFit.contain,
                     placeholderBuilder: (_) => Container(
-                      width: 34,
-                      height: 34,
+                      width: 52,
+                      height: 52,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         widget.subject.emoji,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 26),
                       ),
                     ),
                   ),
                 )
               else
                 Container(
-                  width: 34,
-                  height: 34,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     widget.subject.emoji,
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 26),
                   ),
                 ),
+              const SizedBox(height: 12),
               Text(
                 widget.subject.subjectName,
+                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 14,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
-                  height: 1.2,
+                  height: 1.25,
                 ),
               ),
             ],

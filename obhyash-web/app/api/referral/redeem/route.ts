@@ -61,30 +61,21 @@ export const POST = async (req: Request) => {
     );
   }
 
-  // 2. Check if user already claimed a referral in the last 30 days (1 month limit per account)
+  // 2. Check if user already claimed a referral (1-time lifetime claim per account)
   const { data: recentClaims } = await supabaseAdmin
     .from('referral_history')
-    .select('redeemed_at')
+    .select('id')
     .eq('redeemed_by', targetUserId)
-    .order('redeemed_at', { ascending: false })
     .limit(1);
 
   if (recentClaims && recentClaims.length > 0) {
-    const lastRedeemedAt = new Date(recentClaims[0].redeemed_at);
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-    if (lastRedeemedAt > thirtyDaysAgo) {
-      const daysPassed = Math.floor(
-        (now.getTime() - lastRedeemedAt.getTime()) / (24 * 60 * 60 * 1000),
-      );
-      const daysRemaining = Math.max(1, 30 - daysPassed);
-      return NextResponse.json(
-        {
-          error: `তুমি গত ৩০ দিনে একটি রেফারেল কোড ব্যবহার করেছো। আগামী ${daysRemaining} দিন পর আবার কোড ব্যবহার করতে পারবে।`,
-        },
-        { status: 400 },
-      );
-    }
+    return NextResponse.json(
+      {
+        error: 'তুমি ইতিমধ্যে একটি রেফারেল কোড ক্লেইম করেছ। এটি শুধুমাত্র একবার ব্যবহারযোগ্য।',
+        hasUsedReferral: true,
+      },
+      { status: 400 },
+    );
   }
 
   // 3. DEVICE LOCK: Check if this device has claimed in the last 30 days (1 claim per device per 30 days)

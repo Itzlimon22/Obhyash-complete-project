@@ -31,10 +31,10 @@ final liveExamSearchProvider = NotifierProvider<LiveExamSearchNotifier, String>(
   () => LiveExamSearchNotifier(),
 );
 
-// The category being viewed (e.g., BCS, Bank, Primary)
+// The category being viewed (e.g., engineering, medical, varsity, hsc, all)
 class LiveExamCategoryNotifier extends Notifier<String> {
   @override
-  String build() => '';
+  String build() => 'all';
 
   void updateCategory(String newCategory) {
     state = newCategory;
@@ -46,35 +46,89 @@ final liveExamCategoryProvider =
       () => LiveExamCategoryNotifier(),
     );
 
-// Fetches the live exams from Supabase based on the category
-final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
-  ref,
-) async {
-  final rawCategory = ref.watch(liveExamCategoryProvider).trim();
+/// Checks if an exam belongs to the target category
+bool matchesLiveExamCategory(LiveExam exam, String targetCategory) {
+  final target = targetCategory.toLowerCase().trim();
+  if (target.isEmpty || target == 'all') return true;
 
+  final examCat = (exam.category).toLowerCase().trim();
+  final title = exam.title.toLowerCase().trim();
+
+  if (target == 'engineering') {
+    if (examCat == 'engineering' || examCat == 'buet' || examCat == 'ckruet') return true;
+    if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
+      if (title.contains('medical') || title.contains('মেডিকেল') || title.contains('dermatology') || title.contains('mbbs')) return false;
+      if (title.contains('varsity') || title.contains('ভার্সিটি') || title.contains('গুচ্ছ')) return false;
+      if (title.contains('hsc') || title.contains('এইচএসসি')) return false;
+      if (title.contains('engineering') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('buet') || title.contains('ruet') || title.contains('kuet') || title.contains('cuet')) return true;
+    }
+    return false;
+  }
+
+  if (target == 'medical') {
+    if (examCat == 'medical' || examCat == 'dental' || examCat == 'afmc') return true;
+    if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
+      if (title.contains('engineering') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('buet')) return false;
+      if (title.contains('varsity') || title.contains('ভার্সিটি')) return false;
+      if (title.contains('hsc') || title.contains('এইচএসসি')) return false;
+      if (title.contains('medical') || title.contains('মেডিকেল') || title.contains('dermatology') || title.contains('mbbs') || title.contains('dental')) return true;
+    }
+    return false;
+  }
+
+  if (target == 'varsity' || target == 'varsity_a') {
+    if (examCat == 'varsity' || examCat == 'varsity_a' || examCat == 'du' || examCat == 'gst') return true;
+    if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
+      if (title.contains('engineering') || title.contains('medical') || title.contains('মেডিকেল') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('ইঞ্জিনিয়ারিং')) return false;
+      if (title.contains('varsity') || title.contains('ভার্সিটি') || title.contains('গুচ্ছ') || title.contains('ক-ইউনিট') || title.contains('a-unit')) return true;
+    }
+    return false;
+  }
+
+  if (target == 'hsc') {
+    if (examCat == 'hsc' || examCat == 'hsc_science') return true;
+    if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
+      if (title.contains('engineering') || title.contains('medical') || title.contains('varsity') || title.contains('মেডিকেল') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('ভার্সিটি')) return false;
+      if (title.contains('hsc') || title.contains('এইচএসসি') || title.contains('১ম পত্র') || title.contains('২য় পত্র') || title.contains('অধ্যায়')) return true;
+    }
+    return false;
+  }
+
+  return examCat == target;
+}
+
+// Fetches live exams from Supabase based on category parameter
+final liveExamsCategoryProvider = FutureProvider.autoDispose.family<List<LiveExam>, String>((
+  ref,
+  category,
+) async {
+  final rawCategory = category.trim().toLowerCase();
   final supabase = Supabase.instance.client;
   final user = supabase.auth.currentUser;
 
-  // 1. Fetch exams from Supabase
   var filterBuilder = supabase
       .from('live_exams')
       .select()
       .inFilter('status', ['published', 'active', 'ongoing', 'upcoming', 'Published']);
 
-  if (rawCategory.isEmpty || rawCategory.toLowerCase() == 'all') {
-    // Show all HSC & Admission tracks (HSC Science, Medical, Engineering, Varsity A-Unit, All)
-    filterBuilder = filterBuilder.or('category.ilike.hsc,category.ilike.medical,category.ilike.engineering,category.ilike.varsity_a,category.ilike.varsity,category.ilike.all,category.ilike.general');
-  } else if (rawCategory.toLowerCase() == 'varsity' || rawCategory.toLowerCase() == 'varsity_a') {
-    filterBuilder = filterBuilder.or('category.ilike.varsity,category.ilike.varsity_a,category.ilike.all,category.ilike.general');
-  } else {
-    filterBuilder = filterBuilder.or('category.ilike.$rawCategory,category.ilike.all,category.ilike.general');
+  if (rawCategory.isNotEmpty && rawCategory != 'all') {
+    if (rawCategory == 'varsity' || rawCategory == 'varsity_a') {
+      filterBuilder = filterBuilder.or('category.ilike.varsity,category.ilike.varsity_a,category.ilike.all,category.ilike.general');
+    } else {
+      filterBuilder = filterBuilder.or('category.ilike.$rawCategory,category.ilike.all,category.ilike.general');
+    }
   }
 
   final examsResponse = await filterBuilder.order('start_time', ascending: false);
 
-  final List<LiveExam> exams = (examsResponse as List)
+  final List<LiveExam> allExams = (examsResponse as List)
       .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
       .toList();
+
+  // Strict category isolation
+  final exams = rawCategory.isEmpty || rawCategory == 'all'
+      ? allExams
+      : allExams.where((e) => matchesLiveExamCategory(e, rawCategory)).toList();
 
   // 2. Fetch attempts for the current user if logged in
   if (user != null && exams.isNotEmpty) {
@@ -87,13 +141,11 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
 
     final attempts = (attemptsResponse as List).cast<Map<String, dynamic>>();
 
-    // Map status back to the exams
     for (int i = 0; i < exams.length; i++) {
       final attempt = attempts
           .where((a) => a['live_exam_id'] == exams[i].id)
           .firstOrNull;
       if (attempt != null) {
-        // Recreate the model with userAttemptStatus
         exams[i] = LiveExam(
           id: exams[i].id,
           title: exams[i].title,
@@ -115,9 +167,12 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
   return exams;
 });
 
-// Provides the filtered list of exams based on search query and active filter
-final filteredLiveExamsProvider = Provider.autoDispose<List<LiveExam>>((ref) {
-  final examsAsync = ref.watch(liveExamsProvider);
+// Category-aware filtered exams provider
+final filteredLiveExamsCategoryProvider = Provider.autoDispose.family<List<LiveExam>, String>((
+  ref,
+  category,
+) {
+  final examsAsync = ref.watch(liveExamsCategoryProvider(category));
   final filter = ref.watch(liveExamFilterProvider);
   final search = ref.watch(liveExamSearchProvider).toLowerCase();
 
@@ -139,6 +194,17 @@ final filteredLiveExamsProvider = Provider.autoDispose<List<LiveExam>>((ref) {
     loading: () => [],
     error: (_, _) => [],
   );
+});
+
+// Legacy providers for backward compatibility
+final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((ref) {
+  final cat = ref.watch(liveExamCategoryProvider);
+  return ref.watch(liveExamsCategoryProvider(cat).future);
+});
+
+final filteredLiveExamsProvider = Provider.autoDispose<List<LiveExam>>((ref) {
+  final cat = ref.watch(liveExamCategoryProvider);
+  return ref.watch(filteredLiveExamsCategoryProvider(cat));
 });
 
 // Single Exam Details Provider

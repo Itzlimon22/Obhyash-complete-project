@@ -1,1 +1,556 @@
-[]
+[
+  {
+    "title": "গ্রিন কেমিস্ট্রি: অ্যাটম ইকোনমি ও ই-ফ্যাক্টর (Atom Economy & E-Factor)",
+    "latex": "\\% \\text{Atom Economy} = \\frac{\\text{কাঙ্ক্ষিত উৎপাদের মোলার ভর}}{\\text{মোট বিক্রিয়কসমূহের মোলার ভর}} \\times 100\\%, \\quad E\\text{-Factor} = \\frac{\\text{বর্জ্যের মোট ভর}}{\\text{কাঙ্ক্ষিত উৎপাদের ভর}}",
+    "description": "গ্রিন কেমিস্ট্রির ১২টি নীতির মধ্যে অ্যাটম ইকোনমি অন্যতম। সংযোজন বিক্রিয়ায় অ্যাটম ইকোনমি $100\\%$ হয়, প্রতিস্থাপন ও অপসারণ বিক্রিয়ায় এর মান কম হয়। $E$-ফ্যাক্টরের মান যত কম হয় পরিবেশদূষণ তত কম।",
+    "practiceQuestions": [
+      {
+        "question": "ইথিনের ব্রোমিনেশন বিক্রিয়ায় ($\\text{CH}_2=\\text{CH}_2 + \\text{Br}_2 \\to \\text{CH}_2\\text{Br}-\\text{CH}_2\\text{Br}$) অ্যাটম ইকোনমি কত?",
+        "answer": "Ans: যেহেতু এটি একটি সংযোজন বিক্রিয়া এবং কোনো উপজাত বা বর্জ্য তৈরি হয়নি, তাই অ্যাটম ইকোনমি $100\\%$।"
+      }
+    ]
+  },
+  {
+    "title": "বিক্রিয়ার হার ও গাণিতিক রাশিমালা (Reaction Rate)",
+    "latex": "r = -\\frac{1}{a}\\frac{d[A]}{dt} = +\\frac{1}{b}\\frac{d[B]}{dt} \\quad (aA \\to bB), \\quad \\text{Unit: } \\text{mol}\\cdot\\text{L}^{-1}\\text{s}^{-1}",
+    "description": "সময়ের সাথে বিক্রিয়কের ঘনমাত্রার হ্রাসের হার বা উৎপাদের ঘনমাত্রার বৃদ্ধির হারকে বিক্রিয়ার হার বলে। বিক্রিয়কের ক্ষেত্রে ঋণাত্মক চিহ্ন ঘনমাত্রার হ্রাস নির্দেশ করে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{N}_2 + 3\\text{H}_2 \\to 2\\text{NH}_3$ বিক্রিয়ায় $\\text{NH}_3$ তৈরির হার $0.04\\text{ mol/L}\\cdot\\text{s}$ হলে $\\text{H}_2$ হ্রাসের হার কত?",
+        "answer": "Ans: $-\\frac{1}{3}\\frac{d[\\text{H}_2]}{dt} = +\\frac{1}{2}\\frac{d[\\text{NH}_3]}{dt} \\implies -\\frac{d[\\text{H}_2]}{dt} = \\frac{3}{2} \\times 0.04 = 0.06\\text{ mol/L}\\cdot\\text{s}$"
+      }
+    ]
+  },
+  {
+    "title": "বিক্রিয়ার ক্রম ও হার ধ্রুবকের একক (Reaction Order & Rate Constant Units)",
+    "latex": "r = k [A]^m [B]^n \\implies \\text{ক্রম } = m + n, \\quad \\text{Unit of } k = (\\text{mol}\\cdot\\text{L}^{-1})^{1-n} \\text{s}^{-1}",
+    "description": "• শূন্য ক্রম ($n = 0$): $\\text{mol}\\cdot\\text{L}^{-1}\\text{s}^{-1}$\n• ১ম ক্রম ($n = 1$): $\\text{s}^{-1}$\n• ২য় ক্রম ($n = 2$): $\\text{L}\\cdot\\text{mol}^{-1}\\text{s}^{-1}$\n• ৩য় ক্রম ($n = 3$): $\\text{L}^2\\cdot\\text{mol}^{-2}\\text{s}^{-1}$",
+    "practiceQuestions": [
+      {
+        "question": "একটি বিক্রিয়ার হার ধ্রুবকের মান $2.5 \\times 10^{-2}\\text{ s}^{-1}$ হলে বিক্রিয়াটি কোন ক্রমের?",
+        "answer": "Ans: প্রথম ক্রম বিক্রিয়া (First Order Reaction)"
+      }
+    ]
+  },
+  {
+    "title": "প্রথম ক্রম বিক্রিয়ার সমাকলিত রূপ ও অর্ধায়ু (First Order Kinetics & Half-Life)",
+    "latex": "k = \\frac{2.303}{t} \\log_{10}\\left(\\frac{a}{a - x}\\right), \\quad t_{1/2} = \\frac{\\ln 2}{k} = \\frac{0.693}{k}",
+    "description": "$a$ = প্রারম্ভিক ঘনমাত্রা, $(a-x)$ = $t$ সময় পর অবশিষ্ট ঘনমাত্রা, $t_{1/2}$ = অর্ধায়ু। ১ম ক্রম বিক্রিয়ার অর্ধায়ু বিক্রিয়কের প্রারম্ভিক ঘনমাত্রার উপর নির্ভর করে না।",
+    "practiceQuestions": [
+      {
+        "question": "একটি ১ম ক্রম বিক্রিয়ার হার ধ্রুবক $k = 0.0693\\text{ min}^{-1}$ হলে বিক্রিয়াটির অর্ধায়ু কত?",
+        "answer": "Ans: $t_{1/2} = \\frac{0.693}{0.0693} = 10\\text{ মিনিট}$"
+      }
+    ]
+  },
+  {
+    "title": "আরহেনিয়াসের সমীকরণ ও সক্রিয়ণ শক্তি (Arrhenius Equation & Activation Energy)",
+    "latex": "k = A e^{-\\frac{E_a}{R T}} \\implies \\ln\\left(\\frac{k_2}{k_1}\\right) = \\frac{E_a}{R}\\left(\\frac{1}{T_1} - \\frac{1}{T_2}\\right) = \\frac{E_a}{R}\\left(\\frac{T_2 - T_1}{T_1 T_2}\\right)",
+    "description": "$k$ = বিক্রিয়ার বেগ ধ্রুবক, $A$ = আরহেনিয়াস ফ্যাক্টর, $E_a$ = সক্রিয়ণ শক্তি ($\\text{J/mol}$), $R = 8.314\\text{ J/mol}\\cdot\\text{K}$, $T$ = পরম তাপমাত্রা। $\\ln k$ বনাম $1/T$ লেখচিত্রের ঢাল $= -\\frac{E_a}{R}$।",
+    "practiceQuestions": [
+      {
+        "question": "তাপমাত্রা $300\\text{ K}$ থেকে $310\\text{ K}$ এ উন্নীত করায় বিক্রিয়ার হার দ্বিগুণ হলে সক্রিয়ণ শক্তি $E_a$ কত?",
+        "answer": "Ans: $\\ln 2 = \\frac{E_a}{8.314}\\left(\\frac{10}{300 \\times 310}\\right) \\implies 0.693 = \\frac{E_a}{8.314} \\times 1.075 \\times 10^{-4} \\implies E_a \\approx 53.6\\text{ kJ/mol}$"
+      }
+    ]
+  },
+  {
+    "title": "বিক্রিয়া এনথালপি ও সক্রিয়ণ শক্তি সম্পর্ক (Enthalpy & Activation Energy)",
+    "latex": "\\Delta H = E_{a(\\text{forward})} - E_{a(\\text{backward})}",
+    "description": "• তাপোৎপাদী বিক্রিয়া: $\\Delta H < 0 \\implies E_{af} < E_{ab}$\n• তাপহারী বিক্রিয়া: $\\Delta H > 0 \\implies E_{af} > E_{ab}$\n• প্রভাবক অগ্র ও পশ্চাৎ উভয় বিক্রিয়ার সক্রিয়ণ শক্তি সমপরিমাণ হ্রাস করে কিন্তু $\\Delta H$ বা সাম্যাবস্থার কোনো পরিবর্তন করে না।",
+    "practiceQuestions": [
+      {
+        "question": "একটি বিক্রিয়ার সম্মুখমুখী সক্রিয়ণ শক্তি $40\\text{ kJ/mol}$ এবং $\\Delta H = -20\\text{ kJ/mol}$ হলে পশ্চাৎমুখী সক্রিয়ণ শক্তি কত?",
+        "answer": "Ans: $-20 = 40 - E_{ab} \\implies E_{ab} = 40 + 20 = 60\\text{ kJ/mol}$"
+      }
+    ]
+  },
+  {
+    "title": "লা-শাতেলিয়ারের নীতি: তাপমাত্রার প্রভাব (Le Chatelier: Temperature Effect)",
+    "latex": "\\text{Exothermic (}\\Delta H < 0\\text{): } T \\downarrow \\implies \\text{সম্মুখমুখী}; \\quad \\text{Endothermic (}\\Delta H > 0\\text{): } T \\uparrow \\implies \\text{সম্মুখমুখী}",
+    "description": "তাপোৎপাদী বিক্রিয়ায় তাপমাত্রা হ্রাস করলে উৎপাদের পরিমাণ বৃদ্ধি পায়। তাপহারী বিক্রিয়ায় তাপমাত্রা বৃদ্ধি করলে উৎপাদের পরিমাণ বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{N}_2 + 3\\text{H}_2 \\rightleftharpoons 2\\text{NH}_3 \\; (\\Delta H = -92.4\\text{ kJ})$ বিক্রিয়ায় অ্যামোনিয়ার উৎপাদন বাড়াতে তাপমাত্রা কেমন রাখা উচিত?",
+        "answer": "Ans: কম তাপমাত্রা রাখা উচিত (অনুকূল তাপমাত্রা প্রায় $450^\\circ\\text{C}-550^\\circ\\text{C}$)"
+      }
+    ]
+  },
+  {
+    "title": "লা-শাতেলিয়ারের নীতি: চাপের প্রভাব (Le Chatelier: Pressure Effect)",
+    "latex": "\\Delta n < 0 \\implies P \\uparrow \\; (\\text{সম্মুখমুখী}); \\quad \\Delta n > 0 \\implies P \\downarrow \\; (\\text{সম্মুখমুখী}); \\quad \\Delta n = 0 \\implies \\text{চাপের প্রভাব নেই}",
+    "description": "চাপ বৃদ্ধি করলে বিক্রিয়াটি যেদিকে গ্যাসীয় অণুর সংখ্যা বা মোল সংখ্যা কম সেদিকে ধাবিত হয়। $\\Delta n = 0$ হলে চাপের কোনো প্রভাব নেই।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{N}_2(g) + 3\\text{H}_2(g) \\rightleftharpoons 2\\text{NH}_3(g)$ বিক্রিয়ায় চাপ বাড়ালে কী ঘটবে?",
+        "answer": "Ans: বিক্রিয়া সম্মুখমুখী হবে এবং $\\text{NH}_3$ এর উৎপাদন বৃদ্ধি পাবে (কারণ বিক্রিয়ক ৪ মোল $\\to$ উৎপাদ ২ মোল)।"
+      }
+    ]
+  },
+  {
+    "title": "হেবার-বশ ও স্পর্শ পদ্ধতির অনুকূল শর্ত (Haber-Bosch & Contact Process)",
+    "latex": "\\text{Haber (NH}_3\\text{): } 450-550^\\circ\\text{C}, \\; 200\\text{ atm}, \\; \\text{Fe (প্রভাবক)}, \\; \\text{K}_2\\text{O/Al}_2\\text{O}_3 \\text{ (প্রমোটর)}; \\quad \\text{Contact (SO}_3\\text{): } 450-500^\\circ\\text{C}, \\; 1.5-2\\text{ atm}, \\; \\text{V}_2\\text{O}_5",
+    "description": "শিল্পক্ষেত্রে সর্বোচ্চ উৎপাদ পাওয়ার জন্য লা-শাতেলিয়ারের নীতি অনুযায়ী নির্ধারিত অনুকূল বা পরিমিত তাপমাত্রা ও চাপ।",
+    "practiceQuestions": [
+      {
+        "question": "হেবার-বশ পদ্ধতিতে অ্যামোনিয়া তৈরিতে প্রভাবক ও প্রমোটর হিসেবে কী ব্যবহার করা হয়?",
+        "answer": "Ans: প্রভাবক: আয়রন চূর্ণ (Fe); প্রমোটর: $\\text{Al}_2\\text{O}_3$ বা $\\text{K}_2\\text{O}$"
+      }
+    ]
+  },
+  {
+    "title": "সাম্যধ্রুবক Kp ও Kc এর সম্পর্ক (Relation between Kp and Kc)",
+    "latex": "K_p = K_c (R T)^{\\Delta n}, \\quad \\Delta n = n_{\\text{products}}(\\text{gas}) - n_{\\text{reactants}}(\\text{gas})",
+    "description": "$R = 0.0821\\text{ L}\\cdot\\text{atm}\\cdot\\text{mol}^{-1}\\text{K}^{-1}$, $T$ = পরম তাপমাত্রা (Kelvin)।\n• $\\Delta n = 0 \\implies K_p = K_c$ (যেমন: $\\text{H}_2 + \\text{I}_2 \\rightleftharpoons 2\\text{HI}$)\n• $\\Delta n > 0 \\implies K_p > K_c$ (যেমন: $\\text{PCl}_5 \\rightleftharpoons \\text{PCl}_3 + \\text{Cl}_2$)\n• $\\Delta n < 0 \\implies K_p < K_c$ (যেমন: $\\text{N}_2 + 3\\text{H}_2 \\rightleftharpoons 2\\text{NH}_3$)",
+    "practiceQuestions": [
+      {
+        "question": "$27^\\circ\\text{C}$ তাপমাত্রায় $\\text{N}_2(g) + 3\\text{H}_2(g) \\rightleftharpoons 2\\text{NH}_3(g)$ বিক্রিয়ার $K_c = 0.5\\text{ M}^{-2}$ হলে $K_p$ কত?",
+        "answer": "Ans: $\\Delta n = 2 - 4 = -2$। $T = 300\\text{ K}$। $K_p = 0.5 \\times (0.0821 \\times 300)^{-2} = \\frac{0.5}{(24.63)^2} \\approx 8.24 \\times 10^{-4}\\text{ atm}^{-2}$"
+      }
+    ]
+  },
+  {
+    "title": "বিক্রিয়া কোশেন্ট ও সাম্যাবস্থার দিক (Reaction Quotient Q vs K)",
+    "latex": "Q < K \\implies \\text{সম্মুখমুখী}; \\quad Q = K \\implies \\text{সাম্যাবস্থা}; \\quad Q > K \\implies \\text{পশ্চাৎমুখী}",
+    "description": "$Q$ হলো সাম্যাবস্থা ব্যতীত যেকোনো মুহূর্তের উৎপাদ ও বিক্রিয়কের ঘনমাত্রার অনুপাত।",
+    "practiceQuestions": [
+      {
+        "question": "যদি কোনো বিক্রিয়ার $Q_c = 100$ এবং $K_c = 20$ হয়, তবে বিক্রিয়া কোন দিকে অগ্রসর হবে?",
+        "answer": "Ans: যেহেতু $Q_c > K_c$, তাই সাম্যাবস্থায় পৌঁছাতে বিক্রিয়া পশ্চাৎমুখী হবে।"
+      }
+    ]
+  },
+  {
+    "title": "ভ্যান্ট হফের সমীকরণ (Van't Hoff Equation)",
+    "latex": "\\ln\\left(\\frac{K_2}{K_1}\\right) = \\frac{\\Delta H}{R}\\left(\\frac{1}{T_1} - \\frac{1}{T_2}\\right) = \\frac{\\Delta H}{R}\\left(\\frac{T_2 - T_1}{T_1 T_2}\\right)",
+    "description": "তাপমাত্রার পরিবর্তনের সাথে সাম্যধ্রুবকের ($K_p$ বা $K_c$) পরিবর্তন নির্দেশ করে। $\\ln K$ বনাম $1/T$ লেখের ঢাল $= -\\frac{\\Delta H}{R}$।",
+    "practiceQuestions": [
+      {
+        "question": "তাপোৎপাদী বিক্রিয়ায় ($\\Delta H < 0$) তাপমাত্রা বাড়ালে $K_p$ এর মান কেমন পরিবর্তিত হয়?",
+        "answer": "Ans: ভ্যান্ট হফের সমীকরণ অনুযায়ী তাপমাত্রা বাড়ালে $K_p$ এর মান হ্রাস পায়।"
+      }
+    ]
+  },
+  {
+    "title": "PCl5 এর বিয়োজনে Kp ও Kc (Dissociation of PCl5)",
+    "latex": "\\text{PCl}_5(g) \\rightleftharpoons \\text{PCl}_3(g) + \\text{Cl}_2(g) \\implies K_c = \\frac{\\alpha^2}{(1 - \\alpha)V}, \\quad K_p = \\frac{\\alpha^2 P}{1 - \\alpha^2}",
+    "description": "$\\alpha$ = বিয়োজন মাত্রা, $V$ = পাত্রের আয়তন (L), $P$ = মোট সাম্যচাপ (atm)। $\\alpha \\ll 1$ হলে $K_p \\approx \\alpha^2 P \\implies \\alpha \\propto 1/\\sqrt{P}$ (চাপ বাড়ালে বিয়োজন কমে)।",
+    "practiceQuestions": [
+      {
+        "question": "$1\\text{ atm}$ চাপে $\\text{PCl}_5$ এর $20\\%$ বিয়োজিত হলে $K_p$ কত?",
+        "answer": "Ans: $\\alpha = 0.2, P = 1\\text{ atm}$। $K_p = \\frac{(0.2)^2 \\times 1}{1 - (0.2)^2} = \\frac{0.04}{0.96} = \\frac{1}{24} \\approx 0.0417\\text{ atm}$"
+      }
+    ]
+  },
+  {
+    "title": "N2O4 এর বিয়োজনে Kp (Dissociation of N2O4)",
+    "latex": "\\text{N}_2\\text{O}_4(g) \\rightleftharpoons 2\\text{NO}_2(g) \\implies K_p = \\frac{4\\alpha^2 P}{1 - \\alpha^2}",
+    "description": "$\\alpha$ = $\\text{N}_2\\text{O}_4$ এর বিয়োজন মাত্রা, $P$ = সাম্যাবস্থায় মোট চাপ।",
+    "practiceQuestions": [
+      {
+        "question": "$2\\text{ atm}$ চাপে $\\text{N}_2\\text{O}_4$ এর $25\\%$ বিয়োজিত হলে $K_p$ কত?",
+        "answer": "Ans: $K_p = \\frac{4 \\times (0.25)^2 \\times 2}{1 - (0.25)^2} = \\frac{0.5}{0.9375} \\approx 0.533\\text{ atm}$"
+      }
+    ]
+  },
+  {
+    "title": "HI এর বিয়োজনে Kp ও Kc (Dissociation of HI)",
+    "latex": "2\\text{HI}(g) \\rightleftharpoons \\text{H}_2(g) + \\text{I}_2(g) \\implies K_p = K_c = \\frac{\\alpha^2}{4(1 - \\alpha)^2}",
+    "description": "যেহেতু $\\Delta n = (1+1) - 2 = 0$, তাই এ বিক্রিয়ায় $K_p = K_c$ এবং সাম্যাবস্থার উপর চাপ বা আয়তনের কোনো প্রভাব নেই।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HI}$ এর বিয়োজন মাত্রা $20\\%$ হলে $K_c$ কত?",
+        "answer": "Ans: $\\alpha = 0.2$। $K_c = \\frac{(0.2)^2}{4(1 - 0.2)^2} = \\frac{0.04}{4 \\times 0.64} = \\frac{0.04}{2.56} = 0.015625 = \\frac{1}{64}$"
+      }
+    ]
+  },
+  {
+    "title": "পানির আয়নিক গুণফল ও pH স্কেল (Ionic Product of Water & pH)",
+    "latex": "K_w = [\\text{H}^+][\\text{OH}^-] = 1.0 \\times 10^{-14} \\; (25^\\circ\\text{C}), \\quad pH = -\\log_{10}[\\text{H}^+], \\quad pH + pOH = 14",
+    "description": "$25^\\circ\\text{C}$ তাপমাত্রায় বিশুদ্ধ পানিতে $[\\text{H}^+] = [\\text{OH}^-] = 10^{-7}\\text{ M} \\implies pH = 7$ (নিরপেক্ষ)। তাপমাত্রা বাড়ালে $K_w$ বাড়ে এবং নিরপেক্ষ পানির $pH$ কিছুটা কমে (যেমন $60^\\circ\\text{C}$ এ নিরপেক্ষ $pH \\approx 6.5$)।",
+    "practiceQuestions": [
+      {
+        "question": "$0.005\\text{ M}$ $\\text{H}_2\\text{SO}_4$ দ্রবণের $pH$ কত?",
+        "answer": "Ans: $\\text{H}_2\\text{SO}_4$ দ্বি-ক্ষারকীয় $\\implies [\\text{H}^+] = 2 \\times 0.005 = 0.01 = 10^{-2}\\text{ M}$। $pH = -\\log(10^{-2}) = 2$"
+      },
+      {
+        "question": "$0.01\\text{ M}$ $\\text{NaOH}$ দ্রবণের $pH$ কত?",
+        "answer": "Ans: $[\\text{OH}^-] = 10^{-2}\\text{ M} \\implies pOH = 2$। $pH = 14 - 2 = 12$"
+      }
+    ]
+  },
+  {
+    "title": "দুর্বল এসিডের বিয়োজন ও অস্টওয়াল্ডের সূত্র (Weak Acids & Ostwald's Dilution Law)",
+    "latex": "\\alpha = \\sqrt{\\frac{K_a}{C}}, \\quad [\\text{H}^+] = \\sqrt{K_a C} = C\\alpha, \\quad pH = \\frac{1}{2}(pK_a - \\log C)",
+    "description": "$K_a$ = এসিডের বিয়োজন ধ্রুবক, $C$ = মোলার ঘনমাত্রা, $\\alpha$ = বিয়োজন মাত্রা। $K_a$ বেশি হলে বা $pK_a$ কম হলে এসিডের তীব্রতা বেশি হয় ($pK_a = -\\log K_a$)।",
+    "practiceQuestions": [
+      {
+        "question": "$0.1\\text{ M}$ $\\text{CH}_3\\text{COOH}$ দ্রবণের $pH$ কত? ($K_a = 1.8 \\times 10^{-5}$)",
+        "answer": "Ans: $[\\text{H}^+] = \\sqrt{(1.8 \\times 10^{-5}) \\times 0.1} = \\sqrt{1.8 \\times 10^{-6}} \\approx 1.34 \\times 10^{-3}\\text{ M}$। $pH = -\\log(1.34 \\times 10^{-3}) \\approx 2.87$"
+      }
+    ]
+  },
+  {
+    "title": "দুর্বল ক্ষারের বিয়োজন ধ্রুবক ও pOH (Weak Bases & Kb)",
+    "latex": "\\alpha = \\sqrt{\\frac{K_b}{C}}, \\quad [\\text{OH}^-] = \\sqrt{K_b C} = C\\alpha, \\quad pOH = \\frac{1}{2}(pK_b - \\log C), \\quad pH = 14 - pOH",
+    "description": "$K_b$ = ক্ষারের বিয়োজন ধ্রুবক, $pK_b = -\\log K_b$। অনুবন্ধী এসিড-ক্ষার যুগলের জন্য: $K_a \\times K_b = K_w = 10^{-14} \\implies pK_a + pK_b = 14$।",
+    "practiceQuestions": [
+      {
+        "question": "$0.1\\text{ M}$ $\\text{NH}_4\\text{OH}$ দ্রবণের $pH$ কত? ($K_b = 1.8 \\times 10^{-5}$)",
+        "answer": "Ans: $[\\text{OH}^-] = \\sqrt{(1.8 \\times 10^{-5}) \\times 0.1} \\approx 1.34 \\times 10^{-3}\\text{ M} \\implies pOH \\approx 2.87$। $pH = 14 - 2.87 = 11.13$"
+      }
+    ]
+  },
+  {
+    "title": "বাফার দ্রবণ ও হেন্ডারসন-হ্যাসেলবালখ সমীকরণ (Buffer & Henderson-Hasselbalch)",
+    "latex": "\\text{Acidic Buffer: } pH = pK_a + \\log_{10}\\left(\\frac{[\\text{Salt}]}{[\\text{Acid}]}\\right), \\quad \\text{Basic Buffer: } pOH = pK_b + \\log_{10}\\left(\\frac{[\\text{Salt}]}{[\\text{Base}]}\\right)",
+    "description": "• অম্লীয় বাফার: $\\text{CH}_3\\text{COOH} + \\text{CH}_3\\text{COONa}$\n• ক্ষারীয় বাফার: $\\text{NH}_4\\text{OH} + \\text{NH}_4\\text{Cl}$\n• বাফার ধারণ ক্ষমতা সর্বোচ্চ হয় যখন $[\text{Salt}] = [\text{Acid}] \\implies pH = pK_a$। কার্যকর রেঞ্জ: $pH = pK_a \\pm 1$।",
+    "practiceQuestions": [
+      {
+        "question": "$0.1\\text{ M}$ $\\text{CH}_3\\text{COOH}$ ও $0.2\\text{ M}$ $\\text{CH}_3\\text{COONa}$ এর মিশ্রণের $pH$ কত? ($pK_a = 4.74$)",
+        "answer": "Ans: $pH = 4.74 + \\log(0.2 / 0.1) = 4.74 + \\log 2 = 4.74 + 0.301 = 5.041$"
+      }
+    ]
+  },
+  {
+    "title": "মানবদেহের রক্তের বাফার সিস্টেম (Blood Buffer Systems)",
+    "latex": "\\text{রক্তের স্বাভাবিক } pH = 7.35 - 7.45 \\approx 7.4, \\quad \\frac{[\\text{HCO}_3^-]}{[\\text{H}_2\\text{CO}_3]} = \\frac{20}{1}",
+    "description": "রক্তের প্রধান বাফার হলো বাইকার্বনেট বাফার ($\\text{H}_2\\text{CO}_3 / \\text{NaHCO}_3$)। এছাড়া ফসফেট বাফার ($\\text{H}_2\\text{PO}_4^- / \\text{HPO}_4^{2-}$) এবং প্রোটিন/হিমোগ্লোবিন বাফার কাজ করে। $pH$ এর পরিবর্তন $0.5$ এর বেশি হলে মৃত্যু হতে পারে (Acidosis / Alkalosis)।",
+    "practiceQuestions": [
+      {
+        "question": "রক্তের বাইকার্বনেট বাফারে $[\text{HCO}_3^-]$ ও $[\text{H}_2\\text{CO}_3]$ এর অনুপাত কত?",
+        "answer": "Ans: ২০ : ১ ($20 : 1$)"
+      }
+    ]
+  },
+  {
+    "title": "প্রসমন তাপ ও ব্যতিক্রমসমূহ (Heat of Neutralization)",
+    "latex": "\\text{Strong Acid + Strong Base: } \\Delta H = -57.34\\text{ kJ/mol} = -13.7\\text{ kcal/mol}; \\quad \\text{HF + NaOH: } -68.6\\text{ kJ/mol}; \\quad \\text{CH}_3\\text{COOH + NaOH: } -55.14\\text{ kJ/mol}",
+    "description": "• $HF$ এর ব্যতিক্রমী উচ্চ প্রসমন তাপ ($-68.6\\text{ kJ}$): ক্ষুদ্র $F^-$ এর উচ্চ হাইড্রেশন তাপের কারণে অতিরিক্ত তাপ নির্গত হয়।\n• $CH_3COOH$ এর কম প্রসমন তাপ ($-55.14\\text{ kJ}$): দুর্বল এসিডের বিয়োজনে $2.2\\text{ kJ}$ তাপ শোষিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$HF$ এবং $NaOH$ এর প্রসমন তাপ স্বাভাবিকের চেয়ে বেশি ($-68.6\\text{ kJ/mol}$) হয় কেন?",
+        "answer": "Ans: $F^-$ আয়নের আকার ক্ষুদ্র হওয়ায় এর চার্জ ঘনত্ব অতি উচ্চ এবং এর হাইড্রেশন এনথালপির মান অত্যন্ত বেশি হওয়ায় অতিরিক্ত তাপ নির্গত হয়।"
+      }
+    ]
+  },
+  {
+    "title": "বন্ধন শক্তি দিয়ে বিক্রিয়া তাপ নির্ণয় (Enthalpy from Bond Energies)",
+    "latex": "\\Delta H = \\sum BE_{\\text{reactants (ভেঙে যাওয়া)}} - \\sum BE_{\\text{products (গড়ে ওঠা)}}",
+    "description": "বিক্রিয়ক অণুর বন্ধন ভাঙতে শক্তি শোষিত হয় ($+BE$) এবং উৎপাদের নতুন বন্ধন তৈরিতে শক্তি নির্গত হয় ($-BE$)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{H}_2(g) + \\text{Cl}_2(g) \\to 2\\text{HCl}(g)$ বিক্রিয়ায় $\\Delta H$ কত? ($BE_{\\text{H-H}} = 436, BE_{\\text{Cl-Cl}} = 242, BE_{\\text{H-Cl}} = 431\\text{ kJ/mol}$)",
+        "answer": "Ans: $\\Delta H = (436 + 242) - 2(431) = 678 - 862 = -184\\text{ kJ}$"
+      }
+    ]
+  },
+  {
+    "title": "হেসের তাপ সমাকলন সূত্র (Hess's Law of Constant Heat Summation)",
+    "latex": "\\Delta H_{\\text{total}} = \\Delta H_1 + \\Delta H_2 + \\Delta H_3 + \\dots",
+    "description": "কোনো রাসায়নিক বিক্রিয়া এক ধাপে ঘটুক বা একাধিক ধাপে ঘটুক, আদি ও শেষ অবস্থা একই থাকলে সামগ্রিক এনথালপির পরিবর্তন ($\\Delta H$) সর্বদা সমান ও ধ্রুব থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "হেসের সূত্র মূলত পদার্থবিজ্ঞানের কোন সংরক্ষণশীলতা নীতির রূপ?",
+        "answer": "Ans: শক্তির নিত্যতা সূত্র (Law of Conservation of Energy)"
+      }
+    ]
+  },
+  {
+    "title": "সংঘর্ষ তত্ত্ব ও স্টেরিক ফ্যাক্টর (Collision Theory & Steric Factor)",
+    "latex": "k = P \\cdot Z \\cdot e^{-\\frac{E_a}{R T}}",
+    "description": "$Z$ = প্রতি সেকেন্ডে প্রতি একক আয়তনে অণুসমূহের মোট সংঘর্ষ সংখ্যা, $P$ = ত্রিমাত্রিক দিকবিন্যাস সম্ভাব্যতা গুণক (Steric Factor), $e^{-E_a/RT}$ = সক্রিয়ণ শক্তি সম্পন্ন কার্যকর সংঘর্ষের ভগ্নাংশ।",
+    "practiceQuestions": [
+      {
+        "question": "সংঘর্ষ তত্ত্ব অনুসারে রাসায়নিক বিক্রিয়া সম্পন্ন হওয়ার জন্য দুটি প্রধান শর্ত কী কী?",
+        "answer": "Ans: (১) অণুগুলোর নূন্যতম সক্রিয়ণ শক্তি ($E_a$) থাকা এবং (২) সঠিক ত্রিমাত্রিক দিকবিন্যাসে সংঘর্ষ ঘটা।"
+      }
+    ]
+  },
+  {
+    "title": "প্রভাবকের প্রকারভেদ ও স্ব-প্রভাবন (Types of Catalysts & Auto-catalysis)",
+    "latex": "2\\text{KMnO}_4 + 5\\text{H}_2\\text{C}_2\\text{O}_4 + 3\\text{H}_2\\text{SO}_4 \\to \\text{K}_2\\text{SO}_4 + 2\\text{MnSO}_4 (\\text{স্ব-প্রভাবক}) + 8\\text{H}_2\\text{O} + 10\\text{CO}_2",
+    "description": "• ধনাত্মক প্রভাবক: বেগ বাড়ায় ($MnO_2$)\n• ঋণাত্মক প্রভাবক: বেগ কমায় (গ্লিসারিন $H_2O_2$ এর বিয়োজন রোধ করে)\n• স্ব-প্রভাবক: বিক্রিয়ায় উৎপন্ন কোনো উৎপাদ নিজেই প্রভাবক হিসেবে কাজ করে (যেমন $Mn^{2+}$ আয়ন)\n• আবিষ্ট প্রভাবক: একটি বিক্রিয়া অপর একটি স্বতঃস্ফূর্ত না ঘটা বিক্রিয়াকে প্রভাবিত করে।",
+    "practiceQuestions": [
+      {
+        "question": "অক্সালিক এসিড ও পারম্যাঙ্গানেট টাইট্রেশনে কোন আয়নটি স্ব-প্রভাবক হিসেবে কাজ করে?",
+        "answer": "Ans: ম্যাঙ্গানিজ আয়ন ($\\text{Mn}^{2+}$)"
+      }
+    ]
+  },
+  {
+    "title": "সাম্যধ্রুবকের গাণিতিক রূপান্তর সূত্রসমূহ (Manipulating Equilibrium Constants)",
+    "latex": "\\text{Reverse: } K' = \\frac{1}{K}; \\quad \\text{Multiplied by } n: K' = K^n; \\quad \\text{Sum of reactions: } K' = K_1 \\times K_2",
+    "description": "• সমীকরণ উল্টে দিলে সাম্যধ্রুবক ব্যস্তানুপাতিক হয় ($1/K$)\n• সহগ $n$ দিয়ে গুণ করলে সাম্যধ্রুবকের ঘাত $n$ হয় ($K^n$)\n• দুটি বিক্রিয়া যোগ করলে তাদের সাম্যধ্রুবকগুলো গুণ হয় ($K_1 \\times K_2$)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{N}_2 + 3\\text{H}_2 \\rightleftharpoons 2\\text{NH}_3$ বিক্রিয়ার $K_c = 100$ হলে $\\frac{1}{2}\\text{N}_2 + \\frac{3}{2}\\text{H}_2 \\rightleftharpoons \\text{NH}_3$ এর $K_c'$ কত?",
+        "answer": "Ans: সমীকরণকে $1/2$ দিয়ে গুণ করায় $K_c' = (K_c)^{1/2} = \\sqrt{100} = 10$"
+      }
+    ]
+  },
+  {
+    "title": "2SO2 + O2 <-> 2SO3 বিক্রিয়ার Kp ও Kc (Equilibrium of SO3 Synthesis)",
+    "latex": "2\\text{SO}_2(g) + \\text{O}_2(g) \\rightleftharpoons 2\\text{SO}_3(g) \\implies K_c = \\frac{[\\text{SO}_3]^2}{[\\text{SO}_2]^2 [\\text{O}_2]}, \\quad K_p = \\frac{P_{\\text{SO}_3}^2}{P_{\\text{SO}_2}^2 \\cdot P_{\\text{O}_2}} = K_c(RT)^{-1}",
+    "description": "এখানে $\\Delta n = 2 - (2+1) = -1$। তাপমাত্রা বৃদ্ধি করলে তাপোৎপাদী হওয়ায় $K_p$ কমে এবং চাপ বৃদ্ধি করলে $\\text{SO}_3$ এর উৎপাদন বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "$2\\text{SO}_2(g) + \\text{O}_2(g) \\rightleftharpoons 2\\text{SO}_3(g)$ বিক্রিয়ায় $K_p$ ও $K_c$ এর সম্পর্ক কী?",
+        "answer": "Ans: $K_p = K_c(RT)^{-1} = \\frac{K_c}{RT}$"
+      }
+    ]
+  },
+  {
+    "title": "টাইট্রেশনে নির্দেশক নির্বাচন ও pH রেঞ্জ (Indicators & pH Range)",
+    "latex": "\\text{Strong Acid + Strong Base: } \\text{যেকোনো নির্দেশক (pH 3-10)}; \\; \\text{Strong Acid + Weak Base: } \\text{মিথাইল অরেঞ্জ/রেড (pH 3.1-4.4)}; \\; \\text{Weak Acid + Strong Base: } \\text{ফেনলফথ্যালিন (pH 8.2-10.0)}",
+    "description": "দুর্বল এসিড ও দুর্বল ক্ষারের টাইট্রেশনে $pH$ এর খাড়া পরিবর্তন না থাকায় কোনো উপযুক্ত নির্দেশক পাওয়া যায় না।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CH}_3\\text{COOH}$ ও $\\text{NaOH}$ টাইট্রেশনে কোন নির্দেশক উপযুক্ত?",
+        "answer": "Ans: ফেনলফথ্যালিন (Phenolphthalein, এর কার্যকর $pH$ রেঞ্জ ৮.২ - ১০.০)"
+      }
+    ]
+  },
+  {
+    "title": "লবণ আর্দ্রবিশ্লেষণ ও দ্রবণের pH (Salt Hydrolysis & pH)",
+    "latex": "\\text{Strong Acid + Weak Base (NH}_4\\text{Cl): } pH = 7 - \\frac{1}{2}(pK_b + \\log C); \\quad \\text{Weak Acid + Strong Base (CH}_3\\text{COONa): } pH = 7 + \\frac{1}{2}(pK_a + \\log C)",
+    "description": "• তীব্র এসিড ও মৃদু ক্ষারের লবণ জলীয় দ্রবণে অম্লীয় ($pH < 7$)\n• মৃদু এসিড ও তীব্র ক্ষারের লবণ ক্ষারীয় ($pH > 7$)\n• তীব্র এসিড ও তীব্র ক্ষারের লবণ আর্দ্রবিশ্লেষিত হয় না ($pH = 7$ নিরপেক্ষ)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{CH}_3\\text{COONa}$ এর জলীয় দ্রবণ ক্ষারীয় কেন?",
+        "answer": "Ans: দুর্বল এসিডের অ্যানায়ন $\\text{CH}_3\\text{COO}^-$ পানির সাথে আর্দ্রবিশ্লেষিত হয়ে $\\text{OH}^-$ আয়ন তৈরি করে, ফলে দ্রবণ ক্ষারীয় হয়।"
+      }
+    ]
+  },
+  {
+    "title": "বাফার ধারণ ক্ষমতা ও বাফার রেঞ্জ (Buffer Capacity & Range)",
+    "latex": "\\beta = \\frac{d B}{d(pH)} \\quad (\\text{বাফার ধারণ ক্ষমতা}), \\quad \\text{কার্যকর রেঞ্জ} = pK_a \\pm 1",
+    "description": "১ লিটার বাফার দ্রবণের $pH$ ১ একক পরিবর্তন করতে যে পরিমাণ তীব্র এসিড বা ক্ষার (মোল এককে) যোগ করতে হয় তাকে বাফার ক্ষমতা বলে। $[\text{লবণ}] = [\text{এসিড}]$ হলে বাফার ক্ষমতা সর্বোচ্চ হয়।",
+    "practiceQuestions": [
+      {
+        "question": "কোনো এসিডিক বাফারের $pK_a = 4.74$ হলে এর কার্যকর বাফার রেঞ্জ কত?",
+        "answer": "Ans: $3.74$ থেকে $5.74$ ($4.74 \\pm 1$)"
+      }
+    ]
+  },
+  {
+    "title": "আরহেনিয়াস সমীকরণের সূচকীয় রূপ ও সংঘাত তত্ত্ব (Arrhenius Exponential Form)",
+    "latex": "k = A e^{-\\frac{E_a}{R T}} = P \\cdot Z \\cdot e^{-\\frac{E_a}{R T}}",
+    "description": "• $A$ = কম্পাঙ্ক গুণক বা প্রি-এক্সপোনেনশিয়াল ফ্যাক্টর\n• $P$ = স্টেরিক ফ্যাক্টর বা সঠিক ত্রিমাত্রিক বিন্যাস সম্ভাবনা\n• $Z$ = সংঘাত সংখ্যা\n• $e^{-E_a/RT}$ = প্রয়োজনীয় সক্রিয়ণ শক্তিসম্পন্ন কার্যকর অণুর ভগ্নাংশ।",
+    "practiceQuestions": [
+      {
+        "question": "বিক্রিয়া হারের ওপর তাপমাত্রার প্রভাব ব্যাখ্যার ভিত্তি সমীকরণ কোনটি?",
+        "answer": "Ans: আরহেনিয়াস সমীকরণ ($k = A e^{-E_a/RT}$)"
+      }
+    ]
+  },
+  {
+    "title": "অনুঘটকের প্রভাবে সক্রিয়ণ শক্তি হ্রাস ও হার বৃদ্ধি (Catalyst Effect on Activation Energy)",
+    "latex": "\\ln\\left(\\frac{k_{\\text{cat}}}{k_{\\text{uncat}}}\\right) = \\frac{E_a - E_a'}{R T} = \\frac{\\Delta E_a}{R T}",
+    "description": "প্রভাবক বিক্রিয়ার জন্য বিকল্প কম সক্রিয়ণ শক্তিসম্পন্ন ($E_a' < E_a$) পথ তৈরি করে। ফলে কার্যকর সংঘাতের সংখ্যা দ্রুত বৃদ্ধি পায় এবং সম্মুখ ও বিপরীত উভয় বিক্রিয়ার হার সমানুপাতিকভাবে বেড়ে সাম্যাবস্থা দ্রুত অর্জিত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রভাবক উপস্থিত থাকলে বিক্রিয়ার এনথালপি পরিবর্তন ($\\Delta H$) এর কী ঘটে?",
+        "answer": "Ans: $\\Delta H$ সম্পূর্ণ অপরিবর্তিত থাকে (প্রভাবক কেবল $E_a$ হ্রাস করে)।"
+      }
+    ]
+  },
+  {
+    "title": "শূন্য ক্রম বিক্রিয়ার সমীকরণ ও অর্ধায়ু (Zero Order Reaction & Half-life)",
+    "latex": "[A]_0 - [A] = k t, \\quad t_{1/2} = \\frac{[A]_0}{2 k} \\propto [A]_0",
+    "description": "শূন্য ক্রম বিক্রিয়ার ক্ষেত্রে বিক্রিয়ার হার প্রারম্ভিক ঘনমাত্রার ওপর নির্ভরশীল নয় ($Rate = k$)। কিন্তু এর অর্ধায়ু প্রারম্ভিক ঘনমাত্রার সমানুপাতিক ($t_{1/2} \\propto [A]_0$)। যেমন: উত্তপ্ত ধাতব তলে অ্যামোনিয়ার বিয়োজন।",
+    "practiceQuestions": [
+      {
+        "question": "কোন ক্রমের বিক্রিয়ার ক্ষেত্রে বিক্রিয়া হারের একক এবং হার ধ্রুবকের ($k$) একক একই?",
+        "answer": "Ans: শূন্য ক্রম বিক্রিয়া (একক: $\\text{mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$)"
+      }
+    ]
+  },
+  {
+    "title": "দ্বিতীয় ক্রম বিক্রিয়ার সমীকরণ ও অর্ধায়ু (Second Order Reaction & Half-life)",
+    "latex": "\\frac{1}{[A]} - \\frac{1}{[A]_0} = k t, \\quad t_{1/2} = \\frac{1}{k [A]_0} \\propto \\frac{1}{[A]_0}",
+    "description": "দ্বিতীয় ক্রম বিক্রিয়ার অর্ধায়ু প্রারম্ভিক ঘনমাত্রার ব্যস্তানুপাতিক। $k$ এর একক: $\\text{L}\\cdot\\text{mol}^{-1}\\cdot\\text{s}^{-1}$।",
+    "practiceQuestions": [
+      {
+        "question": "দ্বিতীয় ক্রম বিক্রিয়ায় প্রারম্ভিক ঘনমাত্রা দ্বিগুণ করলে অর্ধায়ুর কী পরিবর্তন হবে?",
+        "answer": "Ans: অর্ধায়ু অর্ধেক ($1/2$) হয়ে যাবে।"
+      }
+    ]
+  },
+  {
+    "title": "ছদ্ম-প্রথম ক্রম বিক্রিয়া (Pseudo First Order Reaction)",
+    "latex": "\\text{CH}_3\\text{COOC}_2\\text{H}_5 + \\text{H}_2\\text{O} \\xrightarrow{\\text{H}^+} \\text{CH}_3\\text{COOH} + \\text{C}_2\\text{H}_5\\text{OH}, \\quad \\text{Rate} = k' [\\text{এস্টার}]",
+    "description": "বিক্রিয়ায় একাধিক বিক্রিয়ক উপস্থিত থাকলেও যদি কোনো একটি বিক্রিয়ক (যেমন দ্রাবক পানি) বিপুল পরিমাণে থাকে, তবে তার ঘনমাত্রার পরিবর্তন নগণ্য হওয়ায় সামগ্রিক বিক্রিয়াটি ১ম ক্রমের মতো আচরণ করে।",
+    "practiceQuestions": [
+      {
+        "question": "এসিড মাধ্যমে এস্টারের আর্দ্রবিশ্লেষণ কোন ধরনের বিক্রিয়া?",
+        "answer": "Ans: ছদ্ম-প্রথম ক্রম বিক্রিয়া (Pseudo First Order Reaction)"
+      }
+    ]
+  },
+  {
+    "title": "ভ্যান্ট হফ সমীকরণ ও তাপমাত্রা বৃদ্ধি (Van 't Hoff Equation for Equilibrium)",
+    "latex": "\\ln\\left(\\frac{K_2}{K_1}\\right) = \\frac{\\Delta H^\\circ}{R} \\left(\\frac{1}{T_1} - \\frac{1}{T_2}\\right) = \\frac{\\Delta H^\\circ}{R} \\left(\\frac{T_2 - T_1}{T_1 T_2}\\right)",
+    "description": "• তাপোৎপাদী বিক্রিয়ায় ($\\,\\Delta H < 0\\,$): তাপমাত্রা বাড়ালে $K_p$ বা $K_c$ এর মান হ্রাস পায়।\n• তাপহারী বিক্রিয়ায় ($\\,\\Delta H > 0\\,$): তাপমাত্রা বাড়ালে $K_p$ বা $K_c$ এর মান বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "হেবার পদ্ধতিতে অ্যামোনিয়া উৎপাদনে ($\\,\\Delta H = -92.4\\text{ kJ}\\,$) তাপমাত্রা বাড়ালে সাম্যধ্রুবক $K_p$ এর মান কেমন হবে?",
+        "answer": "Ans: $K_p$ এর মান হ্রাস পাবে (যেহেতু বিক্রিয়াটি তাপোৎপাদী)।"
+      }
+    ]
+  },
+  {
+    "title": "তাপমাত্রার গুণাঙ্ক সূত্র (Temperature Coefficient of Rate)",
+    "latex": "\\mu = \\frac{k_{T + 10}}{k_T} \\approx 2 - 3",
+    "description": "প্রতি $10^\\circ\\text{C}$ তাপমাত্রা বৃদ্ধির জন্য যেকোনো রাসায়নিক বিক্রিয়ার গতি বা হার ধ্রুবক দ্বিগুণ থেকে তিনগুণ বৃদ্ধি পায়।",
+    "practiceQuestions": [
+      {
+        "question": "একটি বিক্রিয়ার তাপমাত্রার গুণাঙ্ক ২ হলে তাপমাত্রা $20^\\circ\\text{C}$ থেকে $50^\\circ\\text{C}$ এ উন্নীত করলে গতি কতগুণ বাড়বে?",
+        "answer": "Ans: $\\Delta T = 30^\\circ\\text{C} \\implies n = 3$। বিক্রিয়ার হার $2^3 = 8$ গুণ বৃদ্ধি পাবে।"
+      }
+    ]
+  },
+  {
+    "title": "পানির আয়নিক গুণফল ও তাপমাত্রার প্রভাব (Kw & Temperature Effect)",
+    "latex": "25^\\circ\\text{C}: K_w = 1.0 \\times 10^{-14} \\implies pH = 7.0; \\quad 100^\\circ\\text{C}: K_w \\approx 5.13 \\times 10^{-13} \\implies pH \\approx 6.14",
+    "description": "পানির স্বতঃআয়নকরণ একটি তাপহারী বিক্রিয়া ($\\,\\text{H}_2\\text{O} \\rightleftharpoons \\text{H}^+ + \\text{OH}^-, \\Delta H > 0\\,$)। ফলে তাপমাত্রা বাড়ালে $K_w$ বৃদ্ধি পায় এবং বিশুদ্ধ পানির $pH$ ৭ এর নিচে নেমে আসে, কিন্তু দ্রবণটি তখনও নিরপেক্ষ থাকে কারণ $[\text{H}^+] = [\text{OH}^-]$।",
+    "practiceQuestions": [
+      {
+        "question": "$100^\\circ\\text{C}$ তাপমাত্রায় ফুটন্ত বিশুদ্ধ পানির $pH$ কত এবং পানি কি অম্লীয় নাকি নিরপেক্ষ?",
+        "answer": "Ans: $pH \\approx 6.14$ এবং পানি সম্পূর্ণ নিরপেক্ষ (কারণ $[\\text{H}^+] = [\\text{OH}^-]$)।"
+      }
+    ]
+  },
+  {
+    "title": "তীব্র এসিড ও তীব্র ক্ষারের ধ্রুবক প্রশমন তাপ (Neutralization Enthalpy of Strong Acid-Base)",
+    "latex": "\\text{H}^+(aq) + \\text{OH}^-(aq) \\to \\text{H}_2\\text{O}(l), \\quad \\Delta H_{\\text{neut}} = -57.34\\text{ kJ/mol} \\; (-13.7\\text{ kcal/mol})",
+    "description": "সকল তীব্র এসিড ও তীব্র ক্ষার জলীয় দ্রবণে সম্পূর্ণ বিয়োজিত থাকে। ফলে প্রশমন বিক্রিয়াটি মূলত $\\text{H}^+$ ও $\\text{OH}^-$ যুক্ত হয়ে পানি গঠনের বিক্রিয়া, যার এনথালপি সর্বদা ধ্রুবক $-57.34\\text{ kJ/mol}$।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HCl} + \\text{NaOH}$ এবং $\\text{HNO}_3 + \\text{KOH}$ এর প্রশমন তাপ সমান হওয়ার কারণ কী?",
+        "answer": "Ans: কারণ উভয় ক্ষেত্রেই প্রকৃতপক্ষে $1\\text{ mol } \\text{H}^+$ ও $1\\text{ mol } \\text{OH}^-$ যুক্ত হয়ে পানি উৎপন্ন করে।"
+      }
+    ]
+  },
+  {
+    "title": "দুর্বল এসিডের প্রশমন তাপের বিচ্যুতি (Weak Acid Neutralization Enthalpy)",
+    "latex": "\\text{CH}_3\\text{COOH} + \\text{NaOH} \\to \\text{CH}_3\\text{COONa} + \\text{H}_2\\text{O}, \\quad \\Delta H = -55.14\\text{ kJ/mol} \\; (\\Delta H_{\\text{ion}} = +2.2\\text{ kJ})",
+    "description": "দুর্বল এসিডকে সম্পূর্ণ বিয়োজিত করতে কিছু তাপ ব্যয় হয় (আয়নীকরণ তাপ), তাই উৎপন্ন মোট তাপ $-57.34\\text{ kJ/mol}$ অপেক্ষা কিছুটা কম হয়।",
+    "practiceQuestions": [
+      {
+        "question": "অ্যাসিটিক এসিডের আয়নীকরণ এনথালপি কত?",
+        "answer": "Ans: $+2.2\\text{ kJ/mol}$ ($57.34 - 55.14 = 2.2\\text{ kJ}$)"
+      }
+    ]
+  },
+  {
+    "title": "HF ও NaOH এর ব্যতিক্রমী প্রশমন তাপ (Exceptional Neutralization of HF)",
+    "latex": "\\text{HF}(aq) + \\text{NaOH}(aq) \\to \\text{NaF}(aq) + \\text{H}_2\\text{O}(l), \\quad \\Delta H = -68.6\\text{ kJ/mol}",
+    "description": "ফ্লোরাইড ($\\,\\text{F}^-\\,\\,$) আয়নের আকার অতি ক্ষুদ্র ও চার্জ ঘনত্ব অত্যন্ত বেশি হওয়ায় এর হাইড্রেশন এনথালপি অনেক বেশি। ফলে অতিরিক্ত হাইড্রেশন তাপ নির্গত হয়ে মোট প্রশমন তাপ $-68.6\\text{ kJ/mol}$ এ উন্নীত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{HF}$ দুর্বল এসিড হওয়া সত্ত্বেও এর প্রশমন তাপ ধ্রুবক মান ($-57.34\\text{ kJ}$) অপেক্ষা অনেক বেশি কেন?",
+        "answer": "Ans: ক্ষুদ্রাকার ফ্লোরাইড ($\\,\\text{F}^-\\,\\,$) আয়নের উচ্চ হাইড্রেশন এনথালপির কারণে।"
+      }
+    ]
+  },
+  {
+    "title": "হেসের তাপ সমষ্টিকরণ সূত্র (Hess's Law of Constant Heat Summation)",
+    "latex": "\\Delta H_{\\text{total}} = \\Delta H_1 + \\Delta H_2 + \\Delta H_3 + \\dots",
+    "description": "একটি রাসায়নিক বিক্রিয়া এক ধাপে বা একাধিক ধাপে সম্পন্ন হোক না কেন, বিক্রিয়ক ও উৎপাদের প্রাথমিক ও চূড়ান্ত অবস্থা একই থাকলে বিক্রিয়ার মোট এনথালপি পরিবর্তন সর্বদা ধ্রুবক থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "কার্বন থেকে সরাসরি $\\text{CO}_2$ তৈরির এনথালপি $-393.5\\text{ kJ}$ এবং $\\text{CO}$ তৈরির এনথালপি $-110.5\\text{ kJ}$ হলে $\\text{CO} + \\frac{1}{2}\\text{O}_2 \\to \\text{CO}_2$ এর $\\Delta H$ কত?",
+        "answer": "Ans: $\\Delta H = -393.5 - (-110.5) = -283.0\\text{ kJ/mol}$"
+      }
+    ]
+  },
+  {
+    "title": "ল্যাভয়সিয়ে ও লাপ্লাসের সূত্র (Lavoisier-Laplace Law)",
+    "latex": "\\Delta H_{\\text{forward}} = - \\Delta H_{\\text{backward}}",
+    "description": "যেকোনো রাসায়নিক পরিবর্তনের সম্মুখমুখী বিক্রিয়ার এনথালপি এবং বিপরীতমুখী বিক্রিয়ার এনথালপির মান সমান কিন্তু বিপরীত চিহ্নযুক্ত হয়।",
+    "practiceQuestions": [
+      {
+        "question": "পানির গঠন এনথালপি $-286\\text{ kJ/mol}$ হলে পানির বিয়োজন এনথালপি কত?",
+        "answer": "Ans: $+286\\text{ kJ/mol}$"
+      }
+    ]
+  },
+  {
+    "title": "বন্ধন শক্তি থেকে বিক্রিয়া তাপ নির্ণয় (Reaction Enthalpy from Bond Energy)",
+    "latex": "\\Delta H = \\sum BE_{\\text{reactants (ভাঙা বন্ধন)}} - \\sum BE_{\\text{products (গড়া বন্ধন)}}",
+    "description": "বিক্রিয়ক অণুর বন্ধন ভাঙতে শক্তি শোষিত হয় ($+BE$) এবং উৎপাদের নতুন বন্ধন গঠিত হলে শক্তি নির্গত হয় ($-BE$)।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{H}_2 + \\text{Cl}_2 \\to 2\\text{HCl}$ বিক্রিয়ায় $BE(\\text{H-H})=436, BE(\\text{Cl-Cl})=242, BE(\\text{H-Cl})=431\\text{ kJ}$ হলে $\\Delta H$ কত?",
+        "answer": "Ans: $\\Delta H = (436 + 242) - 2(431) = 678 - 862 = -184\\text{ kJ}$"
+      }
+    ]
+  },
+  {
+    "title": "প্রমাণ গঠন তাপ থেকে বিক্রিয়া তাপ নির্ণয় (Reaction Enthalpy from Formation Enthalpies)",
+    "latex": "\\Delta H^\\circ_{\\text{rxn}} = \\sum \\Delta H_f^\\circ (\\text{Products}) - \\sum \\Delta H_f^\\circ (\\text{Reactants})",
+    "description": "সকল প্রমাণ অবস্থায় থাকা মৌলিক পদার্থের (যেমন $\\text{O}_2(g), \\text{N}_2(g), \\text{C}(\\text{graphite}), \\text{Fe}(s)$) প্রমাণ গঠন এনথালপি শূন্য ($\\,\\Delta H_f^\\circ = 0\\,$) ধরা হয়।",
+    "practiceQuestions": [
+      {
+        "question": "প্রমাণ অবস্থায় $\\text{O}_2$ গ্যাসের প্রমাণ গঠন এনথালপি কত?",
+        "answer": "Ans: শূন্য ($0\\text{ kJ/mol}$)"
+      }
+    ]
+  },
+  {
+    "title": "দহন তাপ থেকে বিক্রিয়া তাপ নির্ণয় (Reaction Enthalpy from Combustion Enthalpies)",
+    "latex": "\\Delta H^\\circ_{\\text{rxn}} = \\sum \\Delta H_c^\\circ (\\text{Reactants}) - \\sum \\Delta H_c^\\circ (\\text{Products})",
+    "description": "বিক্রিয়ক ও উৎপাদের দহন তাপ জানা থাকলে এই সূত্রের সাহায্যে সরাসরি বিক্রিয়া তাপ বা গঠন তাপ নির্ণয় করা যায়।",
+    "practiceQuestions": [
+      {
+        "question": "দহন বিক্রিয়ায় এনথালপির পরিবর্তন ($\\Delta H$) সর্বদা কোন চিহ্নের হয়?",
+        "answer": "Ans: সর্বদা ঋণাত্মক ($\\,\\Delta H < 0\\,$, কারণ দহন সর্বদা তাপোৎপাদী)।"
+      }
+    ]
+  },
+  {
+    "title": "রক্তের বাইকার্বনেট বাফার সিস্টেম (Bicarbonate Buffer in Blood)",
+    "latex": "pH = pK_a + \\log\\frac{[\\text{HCO}_3^-]}{[\\text{H}_2\\text{CO}_3]} = 6.1 + \\log\\left(\\frac{20}{1}\\right) = 6.1 + 1.3 = 7.4",
+    "description": "মানবদেহের রক্তের স্বাভাবিক $pH = 7.4$ (পরিসীমা: $7.35 - 7.45$)। রক্তে বাইকার্বনেট আয়ন ও কার্বনিক এসিডের অনুপাত $20 : 1$ থাকে। এ অনুপাত ব্যাহত হলে অ্যাসিডোসিস ($pH < 7.35$) বা অ্যালক্যালোসিস ($pH > 7.45$) ঘটে।",
+    "practiceQuestions": [
+      {
+        "question": "মানবদেহের রক্তে বাইকার্বনেট ও কার্বনিক এসিডের অনুপাত কত থাকে?",
+        "answer": "Ans: ২০ : ১ ($20 : 1$)"
+      }
+    ]
+  },
+  {
+    "title": "রক্তের ফসফেট ও প্রোটিন বাফার (Phosphate & Protein Buffer in Blood)",
+    "latex": "\\text{Phosphate Buffer: } \\text{H}_2\\text{PO}_4^- \\rightleftharpoons \\text{H}^+ + \\text{HPO}_4^{2-} \\quad (pK_a = 6.8)",
+    "description": "ফসফেট বাফার মূলত কোষের অভ্যন্তরীণ তরলের (Intracellular fluid) $pH$ নিয়ন্ত্রণে প্রধান ভূমিকা পালন করে। রক্তরসে হিমোগ্লোবিনের হিস্টিডিন অ্যামিনো এসিড অবশিষ্ট প্রোটিন বাফার হিসেবে কাজ করে।",
+    "practiceQuestions": [
+      {
+        "question": "কোষের অভ্যন্তরীণ তরলের $pH$ নিয়ন্ত্রণে কোন বাফার প্রধান ভূমিকা রাখে?",
+        "answer": "Ans: ফসফেট বাফার ($\\,\\text{H}_2\\text{PO}_4^- / \\text{HPO}_4^{2-}\\,\\,$)"
+      }
+    ]
+  },
+  {
+    "title": "সাম্যাবস্থার ওপর নিষ্ক্রিয় গ্যাস যোগের প্রভাব (Effect of Inert Gas Addition)",
+    "latex": "\\text{Constant Volume: কোনো প্রভাব নেই}; \\quad \\text{Constant Pressure: সাম্যবস্থা যেদিকে মোল সংখ্যা বেশি সেদিকে সরে যায় } (\\Delta n > 0)",
+    "description": "স্থির চাপে নিষ্ক্রিয় গ্যাস যোগ করলে মোট আয়তন বাড়ে এবং আংশিক চাপ কমে, ফলে লা-শাতেলিয়ার নীতি অনুযায়ী সাম্যাবস্থা অধিক মোল সংখ্যার দিকে স্থানান্তরিত হয়। স্থির আয়তনে আংশিক চাপের কোনো পরিবর্তন হয় না বলে সাম্যাবস্থা অপরিবর্তিত থাকে।",
+    "practiceQuestions": [
+      {
+        "question": "$\\text{PCl}_5(g) \\rightleftharpoons \\text{PCl}_3(g) + \\text{Cl}_2(g)$ বিক্রিয়ায় স্থির চাপে আর্গন গ্যাস যোগ করলে কী ঘটবে?",
+        "answer": "Ans: $\\Delta n = 2 - 1 = +1 > 0$ হওয়ায় বিক্রিয়াটি সম্মুখমুখী হবে এবং $\\text{PCl}_5$ এর বিয়োজন বৃদ্ধি পাবে।"
+      }
+    ]
+  },
+  {
+    "title": "এনজাইম প্রভাবন ও লক অ্যান্ড কি মডেল (Enzyme Catalysis & Lock-Key Model)",
+    "latex": "E + S \\rightleftharpoons ES \\to E + P, \\quad \\text{Optimum Temp: } 37^\\circ\\text{C}, \\quad \\text{Optimum } pH = 6-8",
+    "description": "এনজাইম হলো উচ্চ আণবিক ভরবিশিষ্ট প্রোটিন যা জৈব রাসায়নিক বিক্রিয়ার গতি মিলিয়ন গুণ বৃদ্ধি করে। এটি নির্দিষ্ট সাবস্ট্রেটের জন্য অত্যন্ত সুনির্দিষ্ট (Lock and Key mechanism) এবং উচ্চ তাপে প্রোটিনের বিকৃতকরণ (Denaturation) ঘটে কার্যকারিতা হারায়।",
+    "practiceQuestions": [
+      {
+        "question": "মানবদেহে এনজাইমের সর্বোত্তম কার্যকর তাপমাত্রা কত?",
+        "answer": "Ans: প্রায় $37^\\circ\\text{C}$ (স্বাভাবিক শরীরের তাপমাত্রা)।"
+      }
+    ]
+  }
+]
