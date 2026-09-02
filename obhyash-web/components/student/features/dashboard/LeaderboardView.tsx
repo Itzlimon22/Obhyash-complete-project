@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { UserProfile } from "@/lib/types";
+import { isUserPro } from "@/lib/subscription-utils";
 import UserAvatar from "../../ui/common/UserAvatar";
 import { LeaderboardSkeleton } from "../../ui/common/Skeletons";
 
@@ -285,7 +286,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         try {
           let query = supabase
             .from("users")
-            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status");
+            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role");
 
           if (currentLevelInfo.minXP > 0) {
             query = query.gte(sortColumn, currentLevelInfo.minXP);
@@ -315,7 +316,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
           if (data && data.length > 0) {
             mapped = data.map((u: any, idx: number) => {
-              const isPro = Boolean(u.is_subscribed || u.subscription_status === "active" || u.is_pro);
+              const isPro = isUserPro(u);
               const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
 
               return {
@@ -398,7 +399,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
         let query = supabase
           .from("users")
-          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status")
+          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role")
           .eq("institute", currentUser.institute);
 
         if (timeframe === "monthly") {
@@ -413,7 +414,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         if (error) throw error;
 
         mapped = (data || []).map((u: any, idx: number) => {
-          const isPro = Boolean(u.is_subscribed || u.subscription_status === "active" || u.is_pro);
+          const isPro = isUserPro(u);
           const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
 
           return {

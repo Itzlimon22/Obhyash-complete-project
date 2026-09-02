@@ -318,11 +318,18 @@ export interface User {
   avatarColor?: string; // Tailwind color class
 
   // Subscription System
-  subscription: {
-    plan: "Free" | "Pro" | "Enterprise";
-    expiry: string;
-    status: "Active" | "Past Due" | "Canceled";
+  subscription?: {
+    plan?: string;
+    expiry?: string;
+    status?: string;
+    source?: string;
+    referral_code?: string;
   };
+  is_subscribed?: boolean;
+  subscription_status?: string;
+  subscription_expires_at?: string;
+  plan?: string;
+  is_pro?: boolean;
 
   // Usage Stats
   enrolledExams: number;

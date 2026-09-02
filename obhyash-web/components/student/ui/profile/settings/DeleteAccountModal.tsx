@@ -5,6 +5,7 @@ import { AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface DeleteAccountModalProps {
   user: UserProfile;
@@ -21,9 +22,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const isPro =
-    Boolean(user?.level?.toLowerCase().includes('pro')) ||
-    Boolean((user as any)?.is_pro);
+  const isPro = isUserPro(user);
 
   const handleDelete = async () => {
     if (confirmText.trim() !== 'DELETE') {

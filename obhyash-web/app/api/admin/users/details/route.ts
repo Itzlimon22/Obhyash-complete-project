@@ -105,47 +105,57 @@ export async function GET(request: NextRequest) {
     }
 
     // ── Fetch Full User Data with isolated fallbacks ──
-    const userPromise = supabaseAdmin
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
+    const userPromise = Promise.resolve(
+      supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle()
+    )
       .then((res) => res.data)
       .catch(() => null);
 
-    const examsPromise = supabaseAdmin
-      .from('exam_results')
-      .select('id, subject, exam_type, score, total_marks, total_questions, correct_count, wrong_count, date, time_taken, created_at, status')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(20)
+    const examsPromise = Promise.resolve(
+      supabaseAdmin
+        .from('exam_results')
+        .select('id, subject, exam_type, score, total_marks, total_questions, correct_count, wrong_count, date, time_taken, created_at, status')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20)
+    )
       .then((res) => res.data || [])
       .catch(() => []);
 
-    const paymentsPromise = supabaseAdmin
-      .from('payment_requests')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(20)
+    const paymentsPromise = Promise.resolve(
+      supabaseAdmin
+        .from('payment_requests')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20)
+    )
       .then((res) => res.data || [])
       .catch(() => []);
 
-    const devicesPromise = supabaseAdmin
-      .from('user_devices')
-      .select('*')
-      .eq('user_id', userId)
-      .order('last_active', { ascending: false })
-      .limit(10)
+    const devicesPromise = Promise.resolve(
+      supabaseAdmin
+        .from('user_devices')
+        .select('*')
+        .eq('user_id', userId)
+        .order('last_active', { ascending: false })
+        .limit(10)
+    )
       .then((res) => res.data || [])
       .catch(() => []);
 
-    const notesPromise = supabaseAdmin
-      .from('user_activity_log')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(30)
+    const notesPromise = Promise.resolve(
+      supabaseAdmin
+        .from('user_activity_log')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(30)
+    )
       .then((res) => res.data || [])
       .catch(() => []);
 
@@ -203,10 +213,39 @@ export async function GET(request: NextRequest) {
         metadata: n.metadata || {},
       }));
 
+    // Normalize user subscription status based on actual expiration
+    let normalizedUser = userData;
+    if (userData) {
+      const now = new Date();
+      const rawExp = userData.subscription_expires_at || userData.subscription?.expiry || userData.subscription?.expires_at;
+      const expDate = rawExp ? new Date(rawExp) : null;
+      const hasValidExpiry = !!expDate && !isNaN(expDate.getTime());
+      const isNotExpired = hasValidExpiry && expDate > now;
+
+      const rawStatus = (userData.subscription?.status || userData.subscription_status || '').toString().toLowerCase();
+      const isSubActive = (userData.is_subscribed === true || rawStatus === 'active') && isNotExpired;
+
+      const rawPlan = (userData.subscription?.plan || userData.plan || '').toString().toLowerCase().trim();
+      const isFree = !rawPlan || rawPlan === 'free' || rawPlan === 'inactive';
+
+      const computedPlan = isSubActive && !isFree ? (userData.subscription?.plan || userData.plan || 'Pro') : 'Free';
+      const computedStatus = isSubActive && !isFree ? 'Active' : (hasValidExpiry && expDate <= now ? 'Expired' : 'Free');
+
+      normalizedUser = {
+        ...userData,
+        subscription: {
+          ...(typeof userData.subscription === 'object' ? userData.subscription : {}),
+          plan: computedPlan,
+          status: computedStatus,
+          expiry: rawExp || '',
+        },
+      };
+    }
+
     return NextResponse.json({
       success: true,
       data: {
-        user: userData || null,
+        user: normalizedUser || null,
         exams,
         payments,
         devices,

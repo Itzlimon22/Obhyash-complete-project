@@ -236,7 +236,6 @@ export const POST = async (req: Request) => {
         subscription_status: 'active',
         subscription_expires_at: redeemerExpiry.toISOString(),
         plan: 'Pro',
-        level: 'Pro',
         subscription: {
           plan: 'Pro',
           status: 'Active',

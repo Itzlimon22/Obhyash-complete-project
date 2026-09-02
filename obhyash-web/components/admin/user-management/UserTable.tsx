@@ -21,6 +21,7 @@ import {
 import { User } from '@/lib/types'; // Assuming User type is in types.ts
 import { useUserManagement } from '@/hooks/use-user-management';
 import { toast } from 'sonner';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface UserTableProps {
   users: User[];
@@ -384,10 +385,10 @@ const UserTable: React.FC<UserTableProps> = ({
                             </span>
                           </div>
                           <p className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                            {user.subscription?.plan === 'Pro' && (
+                            {isUserPro(user) && (
                               <Crown className="w-3 h-3 text-red-500" />
                             )}
-                            {user.subscription?.plan || 'Free'} Plan
+                            {isUserPro(user) ? (user.subscription?.plan || 'Pro') : 'Free'} Plan
                           </p>
                         </div>
                       </div>

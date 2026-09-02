@@ -94,9 +94,10 @@ export const POST = async (req: Request) => {
       await supabaseAdmin
         .from('users')
         .update({
+          plan: 'Pro',
           subscription: {
             ...sub,
-            plan: 'Premium',
+            plan: 'Pro',
             status: 'Active',
             expiry: currentExpiry.toISOString(),
           },

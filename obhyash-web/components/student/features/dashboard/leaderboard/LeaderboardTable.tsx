@@ -9,6 +9,7 @@ import LeaderboardPodium from "./LeaderboardPodium";
 import { motion } from "framer-motion";
 import { Trophy, Loader2, CheckCircle2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isUserPro } from "@/lib/subscription-utils";
 
 interface LeaderboardTableProps {
   users: UserProfile[];
@@ -145,7 +146,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 remainingUsers.map((user, idx) => {
                   const isMe = user.isCurrentUser;
                   const actualRank = !hidePodium && users.length >= 3 ? idx + 4 : idx + 1;
-                  const isPro = (user as any).is_pro || (user as any).is_subscribed || (user as any).plan === "pro";
+                  const isPro = (user as any).is_pro !== undefined ? (user as any).is_pro : isUserPro(user);
 
                   return (
                     <motion.tr

@@ -8,6 +8,7 @@ import { toggleBookmark, getUserBookmarks } from "@/services/bookmark-service";
 import LatexText from "@/components/student/ui/common/LatexText";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import ProUpgradeModal from "@/components/common/ProUpgradeModal";
+import { isUserPro } from "@/lib/subscription-utils";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { 
   ArrowLeft, 
@@ -49,15 +50,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
 
-  const isPro = Boolean(
-    (profile as any)?.isPro ||
-    (profile as any)?.is_pro ||
-    (profile as any)?.is_subscribed ||
-    (profile as any)?.subscription_status === "active" ||
-    (profile as any)?.plan === "pro" ||
-    profile?.subscription?.plan === "Pro" ||
-    (profile?.role as string)?.toLowerCase() === "admin"
-  );
+  const isPro = isUserPro(profile);
 
   useEffect(() => {
     fetchSolutions();

@@ -13,6 +13,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface DeleteAccountPanelProps {
   user: UserProfile;
@@ -28,7 +29,7 @@ export const DeleteAccountPanel: React.FC<DeleteAccountPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const isPro = user.level?.toLowerCase().includes('pro') ?? false;
+  const isPro = isUserPro(user);
 
   const handleDelete = async () => {
     if (confirmationText.trim() !== 'DELETE') {

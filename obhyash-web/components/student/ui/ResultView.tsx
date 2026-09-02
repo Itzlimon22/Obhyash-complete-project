@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { isUserPro } from '@/lib/subscription-utils';
 
 export interface ResultViewProps {
   questions: Question[];
@@ -102,15 +103,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
     }
   }, [propBookmarks]);
 
-  const isPro = Boolean(
-    (currentUser as any)?.isPro ||
-    (currentUser as any)?.is_pro ||
-    (currentUser as any)?.is_subscribed ||
-    (currentUser as any)?.subscription_status === 'active' ||
-    (currentUser as any)?.plan === 'pro' ||
-    currentUser?.subscription?.plan === 'Pro' ||
-    (currentUser?.role as string)?.toLowerCase() === 'admin'
-  );
+  const isPro = isUserPro(currentUser);
 
   // Toggle Bookmark Handler
   const handleToggleBookmark = async (qId: string | number) => {

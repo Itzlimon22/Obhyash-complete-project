@@ -130,46 +130,46 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
           DateTime? parsedExp;
           if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
 
-          final isPro = userRes['is_subscribed'] == true ||
+          final bool isStatusActive = userRes['is_subscribed'] == true ||
               rawStatus == 'active' ||
-              (userRes['plan'] as String?)?.toLowerCase() == 'pro' ||
-              (userRes['level'] as String?)?.toLowerCase() == 'pro' ||
-              (subJson?['plan'] as String?)?.toLowerCase() == 'pro';
+              (subJson?['status']?.toString().toLowerCase() == 'active');
 
-          if (isPro) {
-            if (parsedExp == null || parsedExp.isBefore(DateTime.now())) {
-              parsedExp = DateTime.now().add(const Duration(days: 15));
-            }
+          final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? '').toString().toLowerCase().trim();
+          final bool isNotFree = rawPlan.isNotEmpty && rawPlan != 'free' && rawPlan != 'inactive';
 
-            if (activePlan == null) {
-              expiresAt = parsedExp;
-              final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
-              final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
-              final planTitle = rawPlan == 'Pro' || rawPlan == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlan;
-              final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
-                  ? 'Yearly Plan'
-                  : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
-                      ? 'Quarterly Plan'
-                      : 'Monthly Plan';
+          final bool isValidActive = isStatusActive &&
+              isNotFree &&
+              parsedExp != null &&
+              parsedExp.isAfter(DateTime.now());
 
-              activePlan = SubscriptionPlan(
-                id: 'user_active_plan',
-                name: planTitle,
-                price: 0,
-                billingCycle: cycle,
-                durationDays: days,
-                currency: '৳',
-                features: const [
-                  'সকল প্রিমিয়াম ফিচার আনলকড',
-                  'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
-                  'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
-                ],
-                colorTheme: 'emerald',
-                expiresAt: parsedExp.toIso8601String().length >= 10
-                    ? parsedExp.toIso8601String().substring(0, 10)
-                    : null,
-              );
-            }
+          if (isValidActive && activePlan == null) {
+            expiresAt = parsedExp;
+            final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
+            final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+            final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
+            final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                ? 'Yearly Plan'
+                : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                    ? 'Quarterly Plan'
+                    : 'Monthly Plan';
+
+            activePlan = SubscriptionPlan(
+              id: 'user_active_plan',
+              name: planTitle,
+              price: 0,
+              billingCycle: cycle,
+              durationDays: days,
+              currency: '৳',
+              features: const [
+                'সকল প্রিমিয়াম ফিচার আনলকড',
+                'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+              ],
+              colorTheme: 'emerald',
+              expiresAt: parsedExp.toIso8601String().length >= 10
+                  ? parsedExp.toIso8601String().substring(0, 10)
+                  : null,
+            );
           }
         }
       } catch (e) {

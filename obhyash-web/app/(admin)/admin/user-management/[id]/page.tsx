@@ -41,6 +41,7 @@ import ResetPasswordModal from '@/components/admin/user-management/ResetPassword
 import ManageSubscriptionModal from '@/components/admin/user-management/ManageSubscriptionModal';
 import SuspendUserModal from '@/components/admin/user-management/SuspendUserModal';
 import { createClient } from '@/utils/supabase/client';
+import { isUserPro, getUserSubscriptionDetails } from '@/lib/subscription-utils';
 
 type DetailTab = 'overview' | 'exams' | 'payments' | 'devices' | 'notes';
 
@@ -324,7 +325,8 @@ export default function UserDetailsPage() {
     );
   }
 
-  const isPro = userData.subscription?.plan && userData.subscription.plan !== 'Free';
+  const isPro = isUserPro(userData);
+  const subDetails = getUserSubscriptionDetails(userData);
 
   return (
     <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 p-4 md:p-8 space-y-6 animate-in fade-in duration-200">
@@ -540,7 +542,7 @@ export default function UserDetailsPage() {
                 <p className="text-[10px] font-bold uppercase text-neutral-500 tracking-wider">Plan</p>
                 <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center justify-center gap-1">
                   <Crown size={15} />
-                  {userData.subscription?.plan || 'Free'}
+                  {subDetails.planName}
                 </p>
               </div>
             </div>
@@ -559,15 +561,15 @@ export default function UserDetailsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-500">Subscription Status:</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                  {userData.subscription?.status || 'Active'}
+                <span className={`font-bold ${subDetails.isPro ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                  {subDetails.status}
                 </span>
               </div>
-              {userData.subscription?.expiry && (
+              {subDetails.expiresAt && (
                 <div className="flex justify-between">
                   <span className="text-neutral-500">Subscription Expiry:</span>
                   <span className="font-mono font-semibold text-neutral-700 dark:text-neutral-300">
-                    {new Date(userData.subscription.expiry).toLocaleDateString()}
+                    {new Date(subDetails.expiresAt).toLocaleDateString()} ({subDetails.daysLeft}d left)
                   </span>
                 </div>
               )}

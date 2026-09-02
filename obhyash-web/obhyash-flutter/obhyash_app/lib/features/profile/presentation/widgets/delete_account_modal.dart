@@ -117,7 +117,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
     final bg = isDark ? const Color(0xFF13151F) : const Color(0xFFFFFFFF);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final isPro = widget.user.level?.toLowerCase().contains('pro') == true;
+    final isPro = widget.user.isPro;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),

@@ -31,6 +31,7 @@ import {
 import { User as UserType } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface DetailsModalProps {
   user: UserType;
@@ -330,7 +331,7 @@ export default function DetailsModal({
 
   if (!isOpen) return null;
 
-  const isPro = userData.subscription?.plan && userData.subscription.plan !== 'Free';
+  const isPro = isUserPro(userData);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-in fade-in duration-200">

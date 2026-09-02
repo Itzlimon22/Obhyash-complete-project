@@ -521,30 +521,19 @@ export const getUserActiveSubscription =
         const isSub =
           userProfile.is_subscribed === true ||
           status === 'active' ||
-          userProfile.plan === 'Pro' ||
-          userProfile.plan === 'pro' ||
-          userProfile.plan === 'Premium' ||
-          userProfile.level === 'Pro' ||
-          sub?.plan === 'Pro' ||
-          sub?.plan === 'pro' ||
-          sub?.plan === 'Premium';
+          (sub?.status?.toString().toLowerCase() === 'active');
 
-        let expDate = expiry ? new Date(expiry) : null;
-        if (!expDate || isNaN(expDate.getTime())) {
-          if (isSub) {
-            // Default 15 days from now if date not parsed
-            expDate = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
-          }
-        }
+        const rawPlanName = (sub?.plan || userProfile.plan || '').toString().toLowerCase().trim();
+        const isFreePlan = rawPlanName === 'free' || rawPlanName === 'inactive';
 
-        const isNotExpired = !!expDate && expDate > now;
+        const expDate = expiry ? new Date(expiry) : null;
+        const isNotExpired = !!expDate && !isNaN(expDate.getTime()) && expDate > now;
 
-        if (isSub && isNotExpired && expDate) {
-          const rawPlanName = (sub?.plan || userProfile.plan || '').toString();
+        if (isSub && !isFreePlan && isNotExpired && expDate) {
           const planName =
-            !rawPlanName || rawPlanName.toLowerCase() === 'free' || rawPlanName.toLowerCase() === 'pro' || rawPlanName.toLowerCase() === 'premium'
+            !rawPlanName || rawPlanName === 'free' || rawPlanName === 'pro' || rawPlanName === 'premium'
               ? 'প্রো সাবস্ক্রিপশন'
-              : rawPlanName;
+              : (sub?.plan || userProfile.plan);
 
           const daysLeft = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
           const cycle =

@@ -199,47 +199,47 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
             DateTime? parsedExp;
             if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
 
-            final isPro = userRes['is_subscribed'] == true ||
+            final bool isStatusActive = userRes['is_subscribed'] == true ||
                 rawStatus == 'active' ||
-                (userRes['plan'] as String?)?.toLowerCase() == 'pro' ||
-                (userRes['level'] as String?)?.toLowerCase() == 'pro' ||
-                (subJson?['plan'] as String?)?.toLowerCase() == 'pro';
+                (subJson?['status']?.toString().toLowerCase() == 'active');
 
-            if (isPro) {
-              if (parsedExp == null || parsedExp.isBefore(DateTime.now())) {
-                parsedExp = DateTime.now().add(const Duration(days: 15));
-              }
+            final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? '').toString().toLowerCase().trim();
+            final bool isNotFree = rawPlan.isNotEmpty && rawPlan != 'free' && rawPlan != 'inactive';
 
-              if (activeSub == null) {
-                expiresAt = parsedExp;
-                final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
-                final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
-                final planTitle = rawPlan == 'Pro' || rawPlan == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlan;
-                final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
-                    ? 'Yearly'
-                    : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
-                        ? 'Quarterly'
-                        : 'Monthly';
+            final bool isValidActive = isStatusActive &&
+                isNotFree &&
+                parsedExp != null &&
+                parsedExp.isAfter(DateTime.now());
 
-                activeSub = SubscriptionPlan(
-                  id: 'user_active_plan',
-                  name: planTitle,
-                  price: 0,
-                  billingCycle: cycle,
-                  durationDays: days,
-                  currency: '৳',
-                  features: const [
-                    'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                    'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                    'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
-                  ],
-                  colorTheme: 'emerald',
-                  expiresAt: parsedExp.toIso8601String().length >= 10
-                      ? parsedExp.toIso8601String().substring(0, 10)
-                      : null,
-                );
-                currentPlanId = activeSub.id;
-              }
+            if (isValidActive && activeSub == null) {
+              expiresAt = parsedExp;
+              final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
+              final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
+              final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
+              final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                  ? 'Yearly'
+                  : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                      ? 'Quarterly'
+                      : 'Monthly';
+
+              activeSub = SubscriptionPlan(
+                id: 'user_active_plan',
+                name: planTitle,
+                price: 0,
+                billingCycle: cycle,
+                durationDays: days,
+                currency: '৳',
+                features: const [
+                  'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                  'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                  'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+                ],
+                colorTheme: 'emerald',
+                expiresAt: parsedExp.toIso8601String().length >= 10
+                    ? parsedExp.toIso8601String().substring(0, 10)
+                    : null,
+              );
+              currentPlanId = activeSub.id;
             }
           }
         } catch (userSubErr) {

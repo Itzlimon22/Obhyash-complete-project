@@ -13,6 +13,7 @@ import {
   Flame,
   Award,
 } from 'lucide-react';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface UserRecord {
   id: string;
@@ -22,6 +23,9 @@ interface UserRecord {
   role: string;
   plan?: string;
   is_subscribed?: boolean;
+  subscription_status?: string;
+  subscription_expires_at?: string;
+  subscription?: any;
   status?: string;
   exams_taken?: number;
   xp?: number;
@@ -150,7 +154,7 @@ export function UserSpotlightSearchBar() {
               খুঁজে পাওয়া শিক্ষার্থী ({results.length})
             </div>
             {results.map((user) => {
-              const isPro = user.plan === 'pro' || user.is_subscribed;
+              const isPro = isUserPro(user);
               return (
                 <button
                   key={user.id}
@@ -204,7 +208,7 @@ export function UserSpotlightSearchBar() {
                 <div>
                   <h3 className="text-base font-extrabold text-neutral-900 dark:text-white flex items-center gap-2">
                     {selectedUser.name || 'Unnamed User'}
-                    {selectedUser.plan === 'pro' && (
+                    {isUserPro(selectedUser) && (
                       <Crown size={14} className="text-amber-500" />
                     )}
                   </h3>
@@ -268,18 +272,18 @@ export function UserSpotlightSearchBar() {
                   onClick={() =>
                     handleAction(
                       'toggle_plan',
-                      selectedUser.plan === 'pro' ? 'free' : 'pro',
+                      isUserPro(selectedUser) ? 'free' : 'pro',
                     )
                   }
                   className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                    selectedUser.plan === 'pro'
+                    isUserPro(selectedUser)
                       ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
                       : 'bg-neutral-100 dark:bg-zinc-800 text-neutral-800 dark:text-zinc-200 hover:bg-amber-50 dark:hover:bg-amber-950/30'
                   }`}
                 >
                   <Crown size={14} />
                   <span>
-                    {selectedUser.plan === 'pro'
+                    {isUserPro(selectedUser)
                       ? 'Remove Pro (Make Free)'
                       : 'Upgrade to PRO'}
                   </span>

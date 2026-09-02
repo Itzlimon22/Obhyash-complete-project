@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   Zap,
 } from 'lucide-react';
+import { isUserPro } from '@/lib/subscription-utils';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
 import AvatarPickerModal from './dashboard/AvatarPickerModal';
 
@@ -138,10 +139,7 @@ export default function MyProfileView({
   if (!user) return null;
 
   const levelInfo = getLevelInfo(user.xp || 0);
-  const isPro =
-    (user as any).is_pro ||
-    (user as any).is_subscribed ||
-    (user as any).plan === 'pro';
+  const isPro = isUserPro(user);
 
   return (
     <div className="max-w-5xl mx-auto space-y-5 animate-fade-in pb-24 pt-2 font-['HindSiliguri']">

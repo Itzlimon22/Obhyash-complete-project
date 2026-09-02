@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { UserProfile } from '@/lib/types';
 import { getRandomAvatar } from '@/lib/avatar-utils';
+import { isUserPro } from '@/lib/subscription-utils';
 
 interface UserAvatarProps {
   user?: (Partial<UserProfile> & {
@@ -10,6 +11,7 @@ interface UserAvatarProps {
     plan?: string;
     is_pro?: boolean;
     subscription_status?: string;
+    subscription_expires_at?: string;
   }) | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
@@ -35,13 +37,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     );
   }
 
-  const isPro =
-    isProProp ??
-    (user.isPro ||
-      user.is_pro ||
-      user.is_subscribed ||
-      (user.plan && user.plan.toLowerCase() !== 'free') ||
-      user.subscription_status === 'Active');
+  const isPro = isProProp ?? isUserPro(user);
 
   const initials = user.name ? user.name.charAt(0).toUpperCase() : '?';
 

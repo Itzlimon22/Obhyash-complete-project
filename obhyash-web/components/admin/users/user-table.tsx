@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, MoreHorizontal, Edit2, Trash2 } from 'lucide-react';
 
 import { User, UserRole } from '@/lib/types';
+import { isUserPro } from '@/lib/subscription-utils';
 import { StatusBadge, RoleBadge } from './shared';
 
 interface UserTableProps {
@@ -99,7 +100,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                   <StatusBadge status={user.status} />
                 </td>
                 <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
-                  {user.subscription.plan}
+                  {isUserPro(user) ? (user.subscription?.plan || 'Pro') : 'Free'}
                 </td>
                 <td className="px-6 py-4 text-right relative">
                   <button

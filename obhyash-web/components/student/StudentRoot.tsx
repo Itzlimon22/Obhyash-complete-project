@@ -90,6 +90,7 @@ interface StudentRootProps {
 }
 
 import { useAuth } from "@/components/auth/AuthProvider";
+import { isUserPro } from "@/lib/subscription-utils";
 import InitialLoader from "@/components/student/ui/InitialLoader";
 
 export default function StudentRoot({
@@ -281,15 +282,7 @@ export default function StudentRoot({
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
 
   const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
-  const isPro = Boolean(
-    (currentUser as any)?.isPro ||
-    (currentUser as any)?.is_pro ||
-    (currentUser as any)?.is_subscribed ||
-    (currentUser as any)?.subscription_status === "active" ||
-    (currentUser as any)?.plan === "pro" ||
-    currentUser?.subscription?.plan === "Pro" ||
-    (currentUser?.role as string)?.toLowerCase() === "admin"
-  );
+  const isPro = isUserPro(currentUser || effectiveUser);
 
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
 

@@ -25,6 +25,7 @@ import { supabase } from "@/services/core";
 import { ExamConfig, UserProfile } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { BanglaNameHelper, SubjectCategoryType } from "@/lib/bangla-name-helper";
+import { isUserPro } from "@/lib/subscription-utils";
 import { MathRenderer } from "@/components/common/MathRenderer";
 import ProUpgradeModal from "@/components/common/ProUpgradeModal";
 
@@ -104,12 +105,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const effectiveDivision = userDivision || currentUser?.division;
   const effectiveLevel = userStream || currentUser?.stream || currentUser?.level;
   const effectiveOptional = userOptionalSubject || currentUser?.optional_subject;
-  const isPro = Boolean(
-    (currentUser as any)?.isPro ||
-    currentUser?.subscription?.plan === "Pro" ||
-    (currentUser?.role as string) === "Admin" ||
-    (currentUser?.role as string) === "admin"
-  );
+  const isPro = isUserPro(currentUser);
 
   // Initialize Exam Types based on user profile
   useEffect(() => {

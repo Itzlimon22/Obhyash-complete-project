@@ -32,6 +32,7 @@ import FlashcardMode, { FlashcardResult } from "./FlashcardMode";
 import PracticeSummary from "./PracticeSummary";
 import LatexText from "@/components/student/ui/common/LatexText";
 import ProUpgradeModal from "@/components/common/ProUpgradeModal";
+import { isUserPro } from "@/lib/subscription-utils";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -87,15 +88,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   const effectiveUser = currentUser || authProfile;
   const userId = effectiveUser?.id || authUser?.id || "";
 
-  const isPro = Boolean(
-    (effectiveUser as any)?.isPro ||
-    (effectiveUser as any)?.is_pro ||
-    (effectiveUser as any)?.is_subscribed ||
-    (effectiveUser as any)?.subscription_status === "active" ||
-    (effectiveUser as any)?.plan === "pro" ||
-    effectiveUser?.subscription?.plan === "Pro" ||
-    (effectiveUser?.role as string)?.toLowerCase() === "admin"
-  );
+  const isPro = isUserPro(effectiveUser);
 
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
