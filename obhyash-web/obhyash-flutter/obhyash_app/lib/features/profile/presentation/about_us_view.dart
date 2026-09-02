@@ -78,8 +78,8 @@ class AboutUsView extends StatelessWidget {
                   Text(
                     'Obhyash (অভ্যাস)',
                     style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
@@ -88,8 +88,8 @@ class AboutUsView extends StatelessWidget {
                   const Text(
                     'স্মার্ট প্রস্তুতি, নিশ্চিত সাফল্য',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      fontWeight: FontWeight.normal,
                       fontFamily: 'HindSiliguri',
                       color: Color(0xFF10B981),
                     ),
@@ -107,8 +107,8 @@ class AboutUsView extends StatelessWidget {
                     child: Text(
                       '📱 App Version: 1.0.0 (Official)',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.normal,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                       ),
@@ -190,8 +190,8 @@ class AboutUsView extends StatelessWidget {
                       Text(
                         'অ্যাপের বিশেষত্বসমূহ',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
@@ -340,8 +340,8 @@ class _StatBadge extends StatelessWidget {
             Text(
               count,
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
+                fontSize: 14.5,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: color,
               ),
@@ -350,8 +350,8 @@ class _StatBadge extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+                fontSize: 11.5,
+                fontWeight: FontWeight.normal,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               ),

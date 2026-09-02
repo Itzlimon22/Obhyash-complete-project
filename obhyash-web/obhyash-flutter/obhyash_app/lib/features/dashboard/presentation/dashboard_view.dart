@@ -89,15 +89,15 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         // 2. Main Content inside SliverToBoxAdapter
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Actions Grid
                 GridView.count(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
                   childAspectRatio: 1.14,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -106,54 +106,54 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                       title: 'পরীক্ষা',
                       icon: Icons.quiz_rounded,
                       svgAsset: 'assets/dashboard-icons/exam_pencil.svg',
-                      primaryColor: const Color(0xFF059669),
-                      lightColor: const Color(0xFFECFDF5),
+                      primaryColor: const Color(0xFF12544F),
+                      lightColor: const Color(0xFFE6F0EC),
                       onTap: () => context.go('/setup'),
                     ),
                     DashboardActionCard(
                       title: 'ফর্মুলা',
                       icon: Icons.functions_rounded,
                       svgAsset: 'assets/dashboard-icons/formulas.svg',
-                      primaryColor: const Color(0xFF6366F1),
-                      lightColor: const Color(0xFFEEF2FF),
+                      primaryColor: const Color(0xFF601D49),
+                      lightColor: const Color(0xFFFDF2F8),
                       onTap: () => context.push('/formulas'),
                     ),
                     DashboardActionCard(
                       title: 'ইতিহাস',
                       icon: Icons.history_rounded,
                       svgAsset: 'assets/dashboard-icons/history_clock.svg',
-                      primaryColor: const Color(0xFF0284C7),
-                      lightColor: const Color(0xFFF0F9FF),
+                      primaryColor: const Color(0xFF12544F),
+                      lightColor: const Color(0xFFE6F0EC),
                       onTap: () => context.go('/history'),
                     ),
                     DashboardActionCard(
                       title: 'লিডারবোর্ড',
                       icon: Icons.emoji_events_rounded,
                       svgAsset: 'assets/dashboard-icons/leaderboard_trophy.svg',
-                      primaryColor: const Color(0xFFD97706),
-                      lightColor: const Color(0xFFFFFBEB),
+                      primaryColor: const Color(0xFF601D49),
+                      lightColor: const Color(0xFFFDF2F8),
                       onTap: () => context.go('/leaderboard'),
                     ),
                     DashboardActionCard(
                       title: 'এনালাইসিস',
                       icon: Icons.insights_rounded,
                       svgAsset: 'assets/dashboard-icons/analytics.svg',
-                      primaryColor: const Color(0xFF9333EA),
-                      lightColor: const Color(0xFFFAF5FF),
+                      primaryColor: const Color(0xFF12544F),
+                      lightColor: const Color(0xFFE6F0EC),
                       onTap: () => context.go('/analysis'),
                     ),
                     DashboardActionCard(
                       title: 'লাইভ পরীক্ষা',
                       icon: LucideIcons.radio,
                       svgAsset: 'assets/dashboard-icons/live_exam.svg',
-                      primaryColor: const Color(0xFFE11D48),
-                      lightColor: const Color(0xFFFFF1F2),
+                      primaryColor: const Color(0xFF740A03),
+                      lightColor: const Color(0xFFFEF2F2),
                       onTap: () => context.go('/live_exam'),
                     ),
                   ],
                 ),
                 
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
                 DailyStreakCard(userStreak: userProfile?.streakCount ?? 0)
                     .animate(delay: 150.ms)
@@ -164,7 +164,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                       curve: Curves.easeOut,
                     ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
                 const DailyQuestsCard()
                     .animate(delay: 180.ms)
@@ -175,7 +175,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                       curve: Curves.easeOut,
                     ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 26),
 
                 // Subject Stats List
                 SubjectStatCard(

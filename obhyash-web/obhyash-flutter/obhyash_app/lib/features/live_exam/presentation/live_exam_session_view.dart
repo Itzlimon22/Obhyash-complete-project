@@ -627,7 +627,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                         _submitExam();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF004633),
+                        backgroundColor: const Color(0xFF12544F), // Solid #12544F
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -638,7 +638,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                               'হ্যাঁ, জমা দাও',
                               style: TextStyle(
                                 fontFamily: 'HindSiliguri',
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                     ),
@@ -657,9 +657,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF141416) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold)),
+        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w600)),
         content: const Text(
           'এখন বের হয়ে গেলে তোমার উত্তরপত্র জমা হবে না।',
           style: TextStyle(fontFamily: 'HindSiliguri'),
@@ -671,7 +671,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
+              backgroundColor: const Color(0xFF740A03), // Solid #740A03
               foregroundColor: Colors.white,
             ),
             onPressed: () {
@@ -1027,21 +1027,21 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004633), // Deep signature emerald green
+                      backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      minimumSize: const Size(0, 35),
+                      minimumSize: const Size(0, 38),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: const EdgeInsets.symmetric(vertical: 6.5, horizontal: 22),
+                      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 24),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text(
                       'জমা দাও',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14.5,
                         fontFamily: 'HindSiliguri',
                       ),
                     ),

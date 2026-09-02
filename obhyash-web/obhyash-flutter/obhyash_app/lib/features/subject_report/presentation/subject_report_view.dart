@@ -411,14 +411,14 @@ class _SRKpi extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           Text(
             label,
-            style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+            style: const TextStyle(fontSize: 11.5, color: Color(0xFFA3A3A3)),
             textAlign: TextAlign.center,
           ),
         ],
@@ -473,7 +473,7 @@ class _SRDonut extends StatelessWidget {
             'ফলাফল বিশ্লেষণ',
             style: TextStyle(
               fontSize: 15.5,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
@@ -499,8 +499,8 @@ class _SRDonut extends StatelessWidget {
                         Text(
                           '${stats.accuracy}%',
                           style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                             fontFamily: 'Anek Bangla',
                             color: isDark
                                 ? Colors.white
@@ -510,9 +510,9 @@ class _SRDonut extends StatelessWidget {
                         const Text(
                           'সঠিকতা',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 11.5,
                             fontFamily: 'Anek Bangla',
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.normal,
                             color: Color(0xFFA3A3A3),
                           ),
                         ),

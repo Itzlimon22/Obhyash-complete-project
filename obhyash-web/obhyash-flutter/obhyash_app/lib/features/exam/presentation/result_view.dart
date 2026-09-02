@@ -191,6 +191,11 @@ class _ResultViewState extends State<ResultView> {
       }
     }
 
+    final distinctMainSubjects = widget.result.questions
+        .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel))
+        .toSet()
+        .toList();
+
     final filteredQuestions = widget.result.questions.where((q) {
       final ua = widget.result.userAnswers[q.id];
       final isSkipped = ua == null;
@@ -208,11 +213,15 @@ class _ResultViewState extends State<ResultView> {
       appBar: AppBar(
         title: const Text(
           'পরীক্ষার ফলাফল',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'HindSiliguri',
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(widget.isHistoryMode ? Icons.arrow_back : Icons.close),
+          icon: Icon(widget.isHistoryMode ? Icons.arrow_back : Icons.close, size: 20),
           onPressed: () {
             if (widget.isHistoryMode) {
               if (Navigator.of(context).canPop()) {
@@ -236,7 +245,7 @@ class _ResultViewState extends State<ResultView> {
           // ── Top Summary & Stats Section ──
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 16, 10, 0),
               child: Column(
                 children: [
 
@@ -257,23 +266,24 @@ class _ResultViewState extends State<ResultView> {
                               await PdfDownloadService.downloadQuestionPaper(
                                   widget.result, context);
                             },
-                            icon: const Icon(Icons.download_rounded, size: 16),
+                            icon: const Icon(Icons.download_rounded, size: 15),
                             label: const Text(
                               'প্রশ্নপত্র',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
                                 fontFamily: 'HindSiliguri',
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
-                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+                              foregroundColor: isDark ? Colors.white : const Color(0xFF12544F),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               side: BorderSide(
-                                color: isDark ? const Color(0xFF27272A) : const Color(0xFF004633),
+                                color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFF12544F),
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
@@ -293,27 +303,28 @@ class _ResultViewState extends State<ResultView> {
                               await PdfDownloadService.downloadResultWithExplanations(
                                   widget.result, context);
                             },
-                            icon: const Icon(Icons.download_done_rounded, size: 16),
+                            icon: const Icon(Icons.download_done_rounded, size: 15),
                             label: const Text(
                               'ফলাফল ও ব্যাখ্যা',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
                                 fontFamily: 'HindSiliguri',
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isDark
-                                  ? const Color(0xFF059669).withValues(alpha: 0.18)
-                                  : const Color(0xFF004633).withValues(alpha: 0.1),
-                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ? const Color(0xFF12544F).withValues(alpha: 0.22)
+                                  : const Color(0xFF12544F).withValues(alpha: 0.1),
+                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF12544F),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               side: BorderSide(
                                 color: isDark
-                                    ? const Color(0xFF059669).withValues(alpha: 0.4)
-                                    : const Color(0xFF004633),
+                                    ? const Color(0xFF12544F).withValues(alpha: 0.4)
+                                    : const Color(0xFF12544F),
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
@@ -322,27 +333,109 @@ class _ResultViewState extends State<ResultView> {
                     ],
                   ),
 
-                  // Exam Details Scope Header
-                  ExamScopeHeader(
-                    subjectName: BanglaNameHelper.formatSubject(
-                      widget.result.subject,
-                      widget.result.subjectLabel,
+                  // Exam Details Scope Header / 2-Column Preset Info Card
+                  if (distinctMainSubjects.length > 1 ||
+                      (widget.result.subjectLabel != null &&
+                          ['BUET', 'CKRUET', 'Medical', 'DU Ka', 'JU D', 'GST', 'Agri'].any((p) =>
+                              widget.result.subjectLabel!.toUpperCase().contains(p.toUpperCase()))))
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF18181B) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Column 1: Exam Name
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'পরীক্ষা',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  widget.result.subjectLabel?.isNotEmpty == true
+                                      ? widget.result.subjectLabel!
+                                      : BanglaNameHelper.formatSubject(widget.result.subject),
+                                  style: TextStyle(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 36,
+                            width: 1,
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                          ),
+                          const SizedBox(width: 14),
+                          // Column 2: Subjects Name
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'বিষয়সমূহ (${BanglaNameHelper.toBanglaNumeral(distinctMainSubjects.length)}টি)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  distinctMainSubjects.join(' • '),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ExamScopeHeader(
+                      subjectName: BanglaNameHelper.formatSubject(
+                        widget.result.subject,
+                        widget.result.subjectLabel,
+                      ),
+                      chapters: widget.result.questions
+                          .map((q) => q.chapter.trim())
+                          .where((c) => c.isNotEmpty)
+                          .toSet()
+                          .toList()
+                        ..sort(),
+                      topics: widget.result.questions
+                          .map((q) => (q.institutes.isNotEmpty ? '' : ''))
+                          .where((t) => t.isNotEmpty)
+                          .toSet()
+                          .toList()
+                        ..sort(),
+                      isDark: isDark,
+                      margin: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    chapters: widget.result.questions
-                        .map((q) => q.chapter.trim())
-                        .where((c) => c.isNotEmpty)
-                        .toSet()
-                        .toList()
-                      ..sort(),
-                    topics: widget.result.questions
-                        .map((q) => (q.institutes.isNotEmpty ? '' : ''))
-                        .where((t) => t.isNotEmpty)
-                        .toSet()
-                        .toList()
-                      ..sort(),
-                    isDark: isDark,
-                    margin: const EdgeInsets.symmetric(vertical: 12),
-                  ),
 
                   ResultStats(
                     percentage: percentage,
@@ -355,6 +448,8 @@ class _ResultViewState extends State<ResultView> {
                     skippedCount: skippedCount,
                     negativeMarking: widget.result.negativeMarking,
                     negativeMarksDeduction: negativeMarksDeduction,
+                    questions: widget.result.questions,
+                    userAnswers: widget.result.userAnswers,
                   ),
                 ],
               ),
@@ -364,12 +459,12 @@ class _ResultViewState extends State<ResultView> {
           // ── Section Title ──
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 28, 10, 8),
+              padding: const EdgeInsets.fromLTRB(10, 24, 10, 8),
               child: Text(
                 'উত্তরপত্র পর্যালোচনা',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
@@ -440,23 +535,111 @@ class _ResultViewState extends State<ResultView> {
               itemBuilder: (context, index) {
                 final q = filteredQuestions[index];
                 final originalIndex = widget.result.questions.indexOf(q);
+
+                final hasMultipleSubjects = distinctMainSubjects.length > 1;
+                final currentSubjectName =
+                    BanglaNameHelper.getMainSubjectName(q.subject, q.subject);
+
+                final isFirstOfSubject = index == 0 ||
+                    BanglaNameHelper.getMainSubjectName(
+                          filteredQuestions[index - 1].subject,
+                          filteredQuestions[index - 1].subject,
+                        ) !=
+                        currentSubjectName;
+
+                int subjectTotalInFilter = 0;
+                if (isFirstOfSubject) {
+                  subjectTotalInFilter = filteredQuestions
+                      .where((item) =>
+                          BanglaNameHelper.getMainSubjectName(
+                            item.subject,
+                            item.subject,
+                          ) ==
+                          currentSubjectName)
+                      .length;
+                }
+
                 return RepaintBoundary(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: QuestionCard(
-                      key: ValueKey(q.id),
-                      question: q,
-                      serialNumber: originalIndex + 1,
-                      selectedOptionIndex: widget.result.userAnswers[q.id],
-                      isFlagged: false,
-                      isBookmarked: _bookmarkedIds.contains(q.id),
-                      onToggleBookmark: () => _toggleBookmark(q.id),
-                      onReport: () => _showReportModal(q.id),
-                      onSelectOption: (_) {},
-                      onToggleFlag: () {},
-                      showFeedback: true,
-                      readOnly: true,
-                      initiallyExpanded: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (hasMultipleSubjects && isFirstOfSubject)
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: index == 0 ? 4 : 20,
+                              bottom: 12,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    color: isDark
+                                        ? const Color(0xFF27272A)
+                                        : const Color(0xFFE2E8F0),
+                                    thickness: 1,
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 14),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        currentSubjectName,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'HindSiliguri',
+                                          color: isDark
+                                              ? const Color(0xFFE4E4E7)
+                                              : const Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '(${BanglaNameHelper.toBanglaNumeral(subjectTotalInFilter)}টি প্রশ্ন)',
+                                        style: TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'HindSiliguri',
+                                          color: isDark
+                                              ? const Color(0xFF34D399)
+                                              : const Color(0xFF047857),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    color: isDark
+                                        ? const Color(0xFF27272A)
+                                        : const Color(0xFFE2E8F0),
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        QuestionCard(
+                          key: ValueKey(q.id),
+                          question: q,
+                          serialNumber: originalIndex + 1,
+                          selectedOptionIndex: widget.result.userAnswers[q.id],
+                          isFlagged: false,
+                          isBookmarked: _bookmarkedIds.contains(q.id),
+                          onToggleBookmark: () => _toggleBookmark(q.id),
+                          onReport: () => _showReportModal(q.id),
+                          onSelectOption: (_) {},
+                          onToggleFlag: () {},
+                          showFeedback: true,
+                          readOnly: true,
+                          initiallyExpanded: false,
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -495,7 +678,7 @@ class _ResultViewState extends State<ResultView> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004633),
+                      backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(

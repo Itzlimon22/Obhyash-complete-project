@@ -11,15 +11,24 @@ class QuestionFormatter {
 
     String text = raw;
 
-    // 0. Convert HTML line breaks to standard newlines
+    // 0. Convert HTML line breaks to standard newlines (use actual escape characters, NOT raw string r'\r')
     text = text
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(r'\r\n', '\n')
-        .replaceAll(r'\r', '\n')
-        .replaceAll(r'\n', '\n');
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n');
 
-    // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols (e.g. ightleftharpoons, \rightleftharpoons)
-    text = text.replaceAll(RegExp(r'\\?r?ightleftharpoons', caseSensitive: false), ' ⇌ ');
+    // Auto-heal corrupted LaTeX commands where \r was previously stripped (e.g. \left( ... ight) -> \left( ... \right))
+    text = text.replaceAllMapped(
+      RegExp(r'(\\left\s*[(\[{|.]\s*[^\\)]*?)(?:\\?r?ight|\bight)\s*([)\]}|.])'),
+      (m) => '${m.group(1)}\\right${m.group(2)}',
+    );
+    text = text.replaceAll(RegExp(r'(?<=\s|\(|\{|^)ight\b'), r'\right');
+    text = text.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
+    text = text.replaceAll(RegExp(r'(?<!\\)\bightarrow\b'), r'\rightarrow');
+    text = text.replaceAll(RegExp(r'(?<!\\)\bightleftharpoons\b'), r'\rightleftharpoons');
+
+    // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols (e.g. \rightleftharpoons, \leftrightharpoons)
+    text = text.replaceAll(RegExp(r'\\?rightleftharpoons', caseSensitive: false), ' ⇌ ');
     text = text.replaceAll(RegExp(r'\\?leftrightharpoons', caseSensitive: false), ' ⇌ ');
     text = text.replaceAll(RegExp(r'\\?leftrightarrow', caseSensitive: false), ' ⇌ ');
 
@@ -166,20 +175,36 @@ class QuestionFormatter {
     return buffer.toString().replaceAll(placeholder, '\n\n');
   }
 
-  /// Automatically wraps raw unescaped LaTeX expressions (like \epsilon_0\mu_0 or \vec{A}) in $...$
+  /// Automatically wraps raw unescaped LaTeX expressions (like \frac{...}{...} or \epsilon_0\mu_0 or \vec{A}) in $...$
   static String _wrapUnescapedLatexMath(String text) {
-    // If the text has no backslashes, skip
     if (!text.contains(r'\')) return text;
 
-    // Pattern for common physics/chemistry/math symbols
-    final latexRegex = RegExp(
-      r'(\\(?:epsilon|mu|alpha|beta|gamma|theta|lambda|pi|rho|sigma|tau|phi|psi|omega|Delta|Omega|times|frac|sqrt|pm|cdot|vec|sum|int|infty|approx|le|ge|neq|sim|propto|degree)\b(?:_\{?[^}\s]+\}?|\^\{?[^}\s]+\}?)*|\\[a-zA-Z]+(?:_\{?[0-9a-zA-Z\+\-]+\}?|\^\{?[0-9a-zA-Z\+\-]+\}?)+)',
-    );
+    final trimmed = text.trim();
+    // If the whole string is a pure LaTeX formula without dollar signs
+    if (!trimmed.contains(r'$') &&
+        !RegExp(r'[\u0980-\u09FF]').hasMatch(trimmed) &&
+        (trimmed.contains(r'\frac') ||
+            trimmed.contains(r'\sqrt') ||
+            trimmed.contains(r'\left') ||
+            trimmed.contains(r'\right') ||
+            trimmed.contains(r'\Delta') ||
+            trimmed.contains(r'\vec') ||
+            trimmed.contains(r'\pm') ||
+            trimmed.contains(r'\times') ||
+            trimmed.contains(r'\sum') ||
+            trimmed.contains(r'\int') ||
+            trimmed.contains(r'\alpha') ||
+            trimmed.contains(r'\beta') ||
+            trimmed.contains(r'\theta') ||
+            trimmed.contains(r'\pi') ||
+            trimmed.contains(r'\omega') ||
+            trimmed.contains(r'\mu') ||
+            trimmed.contains(r'\sigma') ||
+            trimmed.contains('^') ||
+            trimmed.contains('_'))) {
+      return '\$$trimmed\$';
+    }
 
-    return text.replaceAllMapped(latexRegex, (m) {
-      final match = m.group(0)!;
-      // If already inside $...$, don't wrap again
-      return match;
-    });
+    return text;
   }
 }

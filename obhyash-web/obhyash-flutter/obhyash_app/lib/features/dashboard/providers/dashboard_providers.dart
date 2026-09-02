@@ -274,7 +274,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (profile == null) return [];
 
     final prefs = ref.watch(sharedPreferencesProvider);
-    final cacheKey = 'subject_stats_v2_${profile.id}';
+    final cacheKey = 'subject_stats_v3_${profile.id}';
     final cacheTimeKey = '${cacheKey}_time';
 
     // 1. Cache-first with TTL check (15 min)
@@ -302,9 +302,28 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
       optionalSubject: profile.optionalSubject,
     );
 
+    final isHSC = profile.stream?.toUpperCase().contains('HSC') == true ||
+        profile.level?.toUpperCase().contains('HSC') == true ||
+        (profile.stream?.toUpperCase().contains('SSC') != true &&
+            profile.level?.toUpperCase().contains('SSC') != true);
+
     final history = await repository.getUserHistory(profile.id);
 
-    final fresh = subjects.map((sub) {
+    final fresh = subjects.where((sub) {
+      if (isHSC) {
+        final subName = sub.name.toLowerCase();
+        final subId = sub.id.toLowerCase();
+        if (subId == 'math' ||
+            subId == 'general_math' ||
+            subId == 'ssc_general_math' ||
+            subId == 'ssc_math' ||
+            subName == 'গণিত' ||
+            subName == 'সাধারণ গণিত') {
+          return false;
+        }
+      }
+      return true;
+    }).map((sub) {
       final subName = sub.name.toLowerCase();
       final subId = sub.id.toLowerCase();
 

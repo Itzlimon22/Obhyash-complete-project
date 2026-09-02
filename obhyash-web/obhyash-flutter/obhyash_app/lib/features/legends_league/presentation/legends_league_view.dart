@@ -59,33 +59,14 @@ class LegendsLeagueView extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? const [
-                  Color(0xFF0F172A), // Deep platinum slate
-                  Color(0xFF1E293B),
-                  Color(0xFF182232),
-                ]
-              : const [
-                  Color(0xFFF8FAFC),
-                  Color(0xFFF1F5F9),
-                  Color(0xFFE2E8F0),
-                ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isDark
+            ? const Color(0xFF092328) // Solid #092328
+            : Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+          color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE2E8F0),
           width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,19 +114,18 @@ class LegendsLeagueView extends ConsumerWidget {
           Text(
             'লেজেন্ডস চ্যাম্পিয়নশিপ ২০২৬',
             style: TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
               fontFamily: 'Anek Bangla',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
-              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             '১লা তারিখ সিলেবাস ঘোষণা ও প্রস্তুতি ➔ ২য় সপ্তাহ নকআউট মেধা যুদ্ধ ➔ ১৫ই তারিখ গ্র্যান্ড রেজাল্ট ও সেলিব্রেশন।',
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+              fontSize: 12.5,
+              fontWeight: FontWeight.normal,
               fontFamily: 'Anek Bangla',
               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
               height: 1.4,
@@ -805,13 +785,9 @@ class LegendsLeagueView extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: cardBgGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1.2),
+        border: Border.all(color: isDark ? const Color(0xFF2C2C2C) : borderColor, width: 1.2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -823,19 +799,8 @@ class LegendsLeagueView extends ConsumerWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: badgeGradient,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: badgeGradient.first,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: badgeGradient.first.withValues(alpha: 0.35),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: Center(
                   child: Text(badgeEmoji, style: const TextStyle(fontSize: 18)),

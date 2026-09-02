@@ -334,8 +334,8 @@ class SettingsView extends ConsumerWidget {
                           user.name,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                             fontFamily: 'HindSiliguri',
                           ),
@@ -346,7 +346,7 @@ class SettingsView extends ConsumerWidget {
                             user.email!,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12.5,
                               fontFamily: 'HindSiliguri',
                               color: Colors.white.withValues(alpha: 0.8),
                             ),
@@ -579,8 +579,8 @@ class _NavItem extends StatelessWidget {
                   child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: labelColor,
                       fontFamily: 'HindSiliguri',
                     ),
@@ -640,7 +640,7 @@ class _InfoChip extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 13)),
+          Text(emoji, style: const TextStyle(fontSize: 12)),
           const SizedBox(width: 5),
           Flexible(
             child: Text(
@@ -648,8 +648,8 @@ class _InfoChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151),
               ),
@@ -706,13 +706,13 @@ class _ActionBtn extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icon, size: 17, color: fg),
+              Icon(icon, size: 16, color: fg),
               const SizedBox(height: 3),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                   fontFamily: 'HindSiliguri',
                   color: fg,
                 ),

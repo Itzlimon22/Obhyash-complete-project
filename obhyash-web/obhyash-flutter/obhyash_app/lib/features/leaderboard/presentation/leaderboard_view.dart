@@ -1312,8 +1312,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: 'Anek Bangla',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         color: isDark
                             ? Colors.white
                             : const Color(0xFF1C1C1E),
@@ -1333,7 +1333,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
                           fontSize: 10,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w600,
                           color: isDark ? const Color(0xFFE5E7EB) : const Color(0xFF374151),
                         ),
                       ),
@@ -1346,8 +1346,8 @@ class _InstituteRankingsBody extends StatelessWidget {
             // Points
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 7,
+                horizontal: 10,
+                vertical: 6,
               ),
               decoration: BoxDecoration(
                 color: isMe
@@ -1363,8 +1363,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                 '${_numFmt.format(entry.points)} pts',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
                   color: isDark
                       ? Colors.white
                       : const Color(0xFF1C1C1E),
@@ -1651,33 +1651,12 @@ class _UserProgressCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [const Color(0xFF1F1F23), const Color(0xFF141416)]
-              : [const Color(0xFFFFFFFF), const Color(0xFFF3F4F6)],
-        ),
+        color: isDark ? const Color(0xFF092328) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE5E7EB),
           width: 1,
         ),
-        boxShadow: isDark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: const Color(0xFF000000).withValues(alpha: 0.05),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
       ),
       child: Column(
         children: [
@@ -2125,8 +2104,8 @@ class _LeaderboardTable extends StatelessWidget {
                               _numFmt.format(u.xp),
                               textAlign: TextAlign.right,
                               style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.5,
                                 color: isMe
                                     ? const Color(0xFFEF4444)
                                     : (isDark
@@ -2153,24 +2132,24 @@ class _LeaderboardTable extends StatelessWidget {
     child: Column(
       children: [
         Container(
-          width: 72,
-          height: 72,
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             LucideIcons.users,
-            size: 36,
+            size: 28,
             color: Color(0xFFA3A3A3),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         const Text(
           'এই লেভেলে এখনও কোনো শিক্ষার্থী নেই।',
           style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
             color: Color(0xFFA3A3A3),
           ),
         ),

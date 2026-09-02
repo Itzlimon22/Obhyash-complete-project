@@ -141,10 +141,10 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     final currentStreak = _streakCount > 0 ? _streakCount : widget.userStreak;
 
     final Color surfaceColor =
-        isDark ? const Color(0xFF1C1C1E) : Colors.white;
+        isDark ? const Color(0xFF18181B) : Colors.white;
     final Color borderColor =
-        isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
-    const Color primaryAccent = Color(0xFFEF4444); // Red
+        isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
+    const Color primaryAccent = Color(0xFF12544F); // Viridian Forest #12544F
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -153,12 +153,11 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor),
         boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -170,14 +169,14 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
               const Icon(
                 LucideIcons.calendar,
                 size: 20,
-                color: Color(0xFF059669),
+                color: Color(0xFF12544F),
               ),
               const SizedBox(width: 8),
               Text(
                 'গত ৩০ দিনের অ্যাক্টিভিটি',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'Anek Bangla',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
@@ -188,21 +187,25 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                  color: const Color(0xFF601D49).withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF601D49).withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔥', style: TextStyle(fontSize: 13)),
+                    const Text('🔥', style: TextStyle(fontSize: 12.5)),
                     const SizedBox(width: 4),
                     Text(
                       '${BanglaNameHelper.toBanglaNumeral(currentStreak)} দিন',
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Anek Bangla',
-                        color: Color(0xFFEF4444),
+                        color: Color(0xFF601D49),
                       ),
                     ),
                   ],
@@ -221,7 +224,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
 
   Widget _buildHeatmap(bool isDark, Color primaryAccent) {
     final emptyBoxColor =
-        isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF1F5F9);
+        isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9);
 
     return LayoutBuilder(
       builder: (context, constraints) {

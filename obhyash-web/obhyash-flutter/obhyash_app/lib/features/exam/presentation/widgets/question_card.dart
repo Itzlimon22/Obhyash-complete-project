@@ -157,13 +157,13 @@ class _QuestionCardState extends State<QuestionCard>
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'HindSiliguri',
                     color: isDark
                         ? const Color(0xFFF5F5F5)
                         : const Color(0xFF111827),
-                    height: 1.5,
+                    height: 1.45,
                   ),
                 ),
 
@@ -188,8 +188,8 @@ class _QuestionCardState extends State<QuestionCard>
 
                         return Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 9,
-                            vertical: 3.5,
+                            horizontal: 8,
+                            vertical: 2.5,
                           ),
                           decoration: BoxDecoration(
                             color: isDark
@@ -207,7 +207,7 @@ class _QuestionCardState extends State<QuestionCard>
                             sourceText,
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA5F3FC)
@@ -225,7 +225,7 @@ class _QuestionCardState extends State<QuestionCard>
                     if (widget.isFlagged) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
+                          horizontal: 7,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
@@ -237,8 +237,8 @@ class _QuestionCardState extends State<QuestionCard>
                         child: Text(
                           'চিহ্নিত',
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
                             color: isDark
                                 ? const Color(0xFFFBBF24)
                                 : const Color(0xFFD97706),
@@ -501,8 +501,8 @@ class _QuestionCardState extends State<QuestionCard>
                                     banglaIndex,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
                                       fontFamily: 'HindSiliguri',
                                       color: bulletText,
                                       height: 1.1,
@@ -514,10 +514,10 @@ class _QuestionCardState extends State<QuestionCard>
                                   child: LatexText(
                                     text: option,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 13.5,
                                       fontFamily: 'HindSiliguri',
                                       fontWeight: boldText
-                                          ? FontWeight.bold
+                                          ? FontWeight.w600
                                           : FontWeight.normal,
                                       color: optionTextColor,
                                       height: 1.35,
@@ -621,7 +621,7 @@ class _ExplanationPanel extends StatelessWidget {
             onTap: onToggle,
             behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8.5),
               decoration: BoxDecoration(
                 color: headerBg,
                 borderRadius: isOpen
@@ -632,15 +632,15 @@ class _ExplanationPanel extends StatelessWidget {
                 children: [
                   Icon(
                     LucideIcons.bookOpen,
-                    size: 16,
+                    size: 15,
                     color: headerTextColor,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'ব্যাখ্যা',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: headerTextColor,
                     ),
@@ -661,7 +661,7 @@ class _ExplanationPanel extends StatelessWidget {
                       turns: arrowTurns,
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        size: 17,
+                        size: 16,
                         color: headerTextColor,
                       ),
                     ),
@@ -692,9 +692,9 @@ class _ExplanationPanel extends StatelessWidget {
                   LatexText(
                     text: question.explanation!,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 13.5,
                       fontFamily: 'HindSiliguri',
-                      height: 1.6,
+                      height: 1.55,
                       color: bodyTextColor,
                     ),
                   ),

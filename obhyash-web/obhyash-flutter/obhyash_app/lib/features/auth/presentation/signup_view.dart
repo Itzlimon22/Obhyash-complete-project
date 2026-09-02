@@ -315,8 +315,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                   'রেজিস্ট্রেশন',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'Anek Bangla',
                     color: textColor,
                   ),

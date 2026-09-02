@@ -440,8 +440,8 @@ class _BlogViewState extends ConsumerState<BlogView> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontFamily: 'HindSiliguri',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
@@ -450,8 +450,8 @@ class _BlogViewState extends ConsumerState<BlogView> {
                   'অভ্যাস ব্লগ',
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.normal,
                     color: isDark
                         ? const Color(0xFF9CA3AF)
                         : const Color(0xFF6B7280),

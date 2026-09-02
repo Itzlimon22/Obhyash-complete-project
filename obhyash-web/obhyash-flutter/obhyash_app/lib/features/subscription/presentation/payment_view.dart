@@ -461,8 +461,9 @@ class _PaymentViewState extends State<PaymentView>
                   Text(
                     'পেমেন্ট প্রসেসিং',
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
@@ -477,40 +478,42 @@ class _PaymentViewState extends State<PaymentView>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: const Color(0xFF059669).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           LucideIcons.checkCircle2,
-                          size: 64,
+                          size: 54,
                           color: Color(0xFF059669),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Text(
                         'পেমেন্ট সফলভাবে জমা হয়েছে',
                         style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF000000),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
                           'আমাদের টিম যাচাই করার পর দ্রুত তোমার প্ল্যানটি চালু করে দিবে।',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 13,
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
-                            height: 1.5,
+                            height: 1.45,
                           ),
                         ),
                       ),

@@ -79,8 +79,8 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                 Text(
                   'নোটিফিকেশন',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),

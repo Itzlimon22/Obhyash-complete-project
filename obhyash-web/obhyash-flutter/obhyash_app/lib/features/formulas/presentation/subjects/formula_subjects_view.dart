@@ -41,8 +41,8 @@ class FormulaSubjectsView extends ConsumerWidget {
           'ফর্মুলা ব্যাংক',
           style: TextStyle(
             fontFamily: 'Anek Bangla',
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),
@@ -195,8 +195,8 @@ class _SubjectCardState extends State<_SubjectCard>
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                   height: 1.2,
                 ),

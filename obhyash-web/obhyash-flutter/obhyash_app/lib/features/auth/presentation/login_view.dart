@@ -177,11 +177,10 @@ class _LoginViewState extends ConsumerState<LoginView>
                           'তোমার অ্যাকাউন্টে লগইন করো',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             fontFamily: 'Anek Bangla',
                             color: Colors.white,
-                            letterSpacing: -0.2,
                           ),
                         ),
                         const SizedBox(height: 28),

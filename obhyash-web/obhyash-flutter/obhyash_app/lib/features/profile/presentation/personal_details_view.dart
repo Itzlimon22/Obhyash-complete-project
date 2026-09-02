@@ -228,8 +228,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -249,8 +249,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
             ),
@@ -350,7 +350,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           onTap: onTap,
           validator: validator,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontFamily: 'HindSiliguri',
             color: readOnly
                 ? (isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3))
@@ -359,7 +359,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
             ),
@@ -445,9 +445,10 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           title: const Text(
             'ব্যক্তিগত তথ্য',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 16,
+              fontFamily: 'HindSiliguri',
             ),
           ),
           centerTitle: true,
@@ -495,8 +496,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             Text(
                               'প্রোফাইল ছবি',
                               style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w600,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
@@ -505,7 +506,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             Text(
                               'ছবি আপলোড করো বা কার্টুন ছবি বেছে নাও',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 12.5,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
                                 height: 1.35,
@@ -518,8 +519,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               label: const Text(
                                 'ছবি পরিবর্তন করো',
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                   fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),

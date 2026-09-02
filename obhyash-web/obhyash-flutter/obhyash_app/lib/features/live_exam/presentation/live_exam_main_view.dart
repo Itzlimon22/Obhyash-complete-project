@@ -259,7 +259,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
                                   "LIVE NOW",
                                   style: TextStyle(
                                     fontSize: 10,
-                                    fontWeight: FontWeight.w900,
+                                    fontWeight: FontWeight.w600,
                                     color: cat.gradientColors.first,
                                     letterSpacing: 0.6,
                                   ),
@@ -304,8 +304,8 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
                         Text(
                           cat.title,
                           style: const TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                             fontFamily: "HindSiliguri",
                             letterSpacing: -0.3,
@@ -315,8 +315,8 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
                         Text(
                           "• ${cat.subtitle}",
                           style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
                             color: Colors.white.withValues(alpha: 0.85),
                             fontFamily: "HindSiliguri",
                           ),

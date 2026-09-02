@@ -95,22 +95,22 @@ class AccountInfoModal extends StatelessWidget {
               Text(
                 'অ্যাকাউন্ট ইনফো',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 'সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontFamily: 'HindSiliguri',
                   color: textSecondary,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Item 1: User Name
               _buildInfoRow(
@@ -181,7 +181,7 @@ class AccountInfoModal extends StatelessWidget {
               // Copy All Button
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 48,
                 child: ElevatedButton(
                   onPressed: () => _copyAll(context),
                   style: ElevatedButton.styleFrom(
@@ -189,7 +189,7 @@ class AccountInfoModal extends StatelessWidget {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Row(
@@ -198,13 +198,13 @@ class AccountInfoModal extends StatelessWidget {
                       Text(
                         'Copy',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),
                       SizedBox(width: 8),
-                      Icon(LucideIcons.copy, size: 18),
+                      Icon(LucideIcons.copy, size: 16),
                     ],
                   ),
                 ),

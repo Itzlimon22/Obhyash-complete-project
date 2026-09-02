@@ -27,6 +27,7 @@ import '../../features/notifications/presentation/widgets/in_app_notification_ba
 import '../../features/notifications/services/notification_service.dart';
 import '../../features/notifications/services/notification_permission_manager.dart';
 import '../../features/history/presentation/exam_history_view.dart';
+import '../../features/exam/providers/exam_provider.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -162,9 +163,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return true;
       }
 
-      // 3. Detail sub-routes and setup form that hide bottom nav
-      if (location.startsWith('/setup') || location.contains('/setup'))
-        return false;
+      // 3. Detail sub-routes that hide bottom nav
       if (location.startsWith('/notifications')) return false;
       if (location.startsWith('/bookmarks') || location.contains('/bookmarks'))
         return false;
@@ -187,7 +186,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return location == '/' ||
           location.isEmpty ||
           location == '/history' ||
-          location == '/practice' ||
+          location == '/setup' ||
           location == '/leaderboard' ||
           location == '/profile' ||
           location == '/settings';
@@ -602,15 +601,55 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                     currentLoc.startsWith('/notifications');
 
                                 final showBackButton =
-                                    isSettingsSubPage ||
-                                    activeTab == 'legends-league' ||
-                                    activeTab == 'setup' ||
-                                    activeTab == 'practice' ||
-                                    activeTab == 'analysis' ||
-                                    activeTab == 'live_exam' ||
-                                    activeTab.startsWith('subject_') ||
-                                    isSubRoute ||
-                                    context.canPop();
+                                    activeTab != 'setup' &&
+                                    (isSettingsSubPage ||
+                                        activeTab == 'legends-league' ||
+                                        activeTab == 'practice' ||
+                                        activeTab == 'analysis' ||
+                                        activeTab == 'live_exam' ||
+                                        activeTab.startsWith('subject_') ||
+                                        isSubRoute ||
+                                        context.canPop());
+
+                                if (activeTab == 'setup') {
+                                  final currentSetupTab = ref.watch(
+                                    examSetupTabProvider,
+                                  );
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _HeaderUnderlineTab(
+                                        label: 'মক পরীক্ষা',
+                                        isActive: currentSetupTab == 'mock',
+                                        isDark: isDark,
+                                        fontSize: 15,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                examSetupTabProvider.notifier,
+                                              )
+                                              .setTab('mock');
+                                        },
+                                      ),
+                                      const SizedBox(width: 24),
+                                      _HeaderUnderlineTab(
+                                        label: 'প্রিসেট পরীক্ষা',
+                                        isActive: currentSetupTab == 'preset',
+                                        isDark: isDark,
+                                        fontSize: 15,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                examSetupTabProvider.notifier,
+                                              )
+                                              .setTab('preset');
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
 
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -879,7 +918,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       gender: user?.gender,
                                       id: user?.id,
                                       size: 40,
-                                      showBorder: true,
+                                      isPro: user?.isPro ?? false,
+                                      showBorder: !(user?.isPro ?? false),
                                       borderColor: isDark
                                           ? const Color(0xFF1C1C1E)
                                           : Colors.white,
@@ -975,12 +1015,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
-                                                  .read(
-                                                    examHistoryActiveTabProvider
-                                                        .notifier,
-                                                  )
-                                                  .state =
-                                              0;
+                                              .read(
+                                                examHistoryActiveTabProvider
+                                                    .notifier,
+                                              )
+                                              .setTab(0);
                                         },
                                       ),
                                       _HeaderTabBtn(
@@ -990,12 +1029,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
-                                                  .read(
-                                                    examHistoryActiveTabProvider
-                                                        .notifier,
-                                                  )
-                                                  .state =
-                                              1;
+                                              .read(
+                                                examHistoryActiveTabProvider
+                                                    .notifier,
+                                              )
+                                              .setTab(1);
                                         },
                                       ),
                                     ],
@@ -1484,34 +1522,75 @@ class _HeaderTabBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          gradient: active
-              ? const LinearGradient(
-                  colors: [Color(0xFF004633), Color(0xFF00664B)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          color: active ? const Color(0xFF12544F) : Colors.transparent,
           borderRadius: BorderRadius.circular(9),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'HindSiliguri',
             color: active
                 ? Colors.white
-                : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280)),
+                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
+            fontSize: 12.5,
+            fontWeight: active ? FontWeight.w600 : FontWeight.normal,
+            fontFamily: 'HindSiliguri',
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderUnderlineTab extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final bool isDark;
+  final double fontSize;
+  final VoidCallback onTap;
+
+  const _HeaderUnderlineTab({
+    required this.label,
+    required this.isActive,
+    required this.isDark,
+    this.fontSize = 15,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final inactiveColor =
+        isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
+    final indicatorColor =
+        isDark ? const Color(0xFF10B981) : const Color(0xFF004633);
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                fontFamily: 'Anek Bangla',
+                letterSpacing: -0.2,
+                color: isActive ? activeColor : inactiveColor,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Container(
+              height: 3,
+              decoration: BoxDecoration(
+                color: isActive ? indicatorColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ],
         ),
       ),
     );

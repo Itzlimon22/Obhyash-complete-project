@@ -5,60 +5,251 @@ import 'package:printing/printing.dart';
 import 'package:open_filex/open_filex.dart';
 import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
 
 class PdfDownloadService {
   static String _toBanglaDigits(dynamic number) {
-    const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    String s = number.toString();
-    for (int i = 0; i < 10; i++) {
-      s = s.replaceAll(en[i], bn[i]);
-    }
-    return s;
+    return BanglaNameHelper.toBanglaNumeral(number);
   }
 
-  static String _cleanMathAndMarkdown(String text) {
-    if (text.isEmpty) return '';
+  static String _toSuperscript(String s) {
+    const normal = '0123456789+-=()nNtTyYxX';
+    const superChars = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿᴺᵗᵀʸʸˣˣ';
+    var res = '';
+    for (int i = 0; i < s.length; i++) {
+      final idx = normal.indexOf(s[i]);
+      if (idx != -1) {
+        res += superChars[idx];
+      } else if (s[i] == '-') {
+        res += '⁻';
+      } else {
+        res += s[i];
+      }
+    }
+    return res;
+  }
 
-    return text
-        .replaceAll(r'\^2', '²')
-        .replaceAll(r'\^3', '³')
-        .replaceAll(r'\^-1', '⁻¹')
-        .replaceAll(r'\^-2', '⁻²')
-        .replaceAll(r'^2', '²')
-        .replaceAll(r'^3', '³')
-        .replaceAll(r'^-1', '⁻¹')
-        .replaceAll(r'^-2', '⁻²')
-        .replaceAll(r'\times', '×')
-        .replaceAll(r'\div', '÷')
-        .replaceAll(r'\pm', '±')
-        .replaceAll(r'\degree', '°')
-        .replaceAll(r'\alpha', 'α')
-        .replaceAll(r'\beta', 'β')
-        .replaceAll(r'\gamma', 'γ')
-        .replaceAll(r'\theta', 'θ')
-        .replaceAll(r'\pi', 'π')
-        .replaceAll(r'\lambda', 'λ')
-        .replaceAll(r'\mu', 'µ')
-        .replaceAll(r'\le', '≤')
-        .replaceAll(r'\ge', '≥')
-        .replaceAll(r'\ne', '≠')
-        .replaceAll(r'\approx', '≈')
-        .replaceAll(r'\infty', '∞')
-        .replaceAll(r'\rightarrow', '→')
-        .replaceAll(r'\leftarrow', '←')
-        .replaceAll(r'\Delta', 'Δ')
-        .replaceAll(r'\Omega', 'Ω')
-        .replaceAll(r'\text', '')
-        .replaceAll(r'\frac', '')
-        .replaceAll(r'\sqrt', '√')
+  static String _toSubscript(String s) {
+    const normal = '0123456789+-=()aehijklmnoprstuvx';
+    const subChars = '₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ';
+    var res = '';
+    for (int i = 0; i < s.length; i++) {
+      final idx = normal.indexOf(s[i]);
+      if (idx != -1) {
+        res += subChars[idx];
+      } else {
+        res += s[i];
+      }
+    }
+    return res;
+  }
+
+  /// Converts LaTeX, math formulas, units, and markdown into clean, professional Unicode for PDF printing.
+  static String _formatMathForPdf(String raw) {
+    if (raw.trim().isEmpty) return '';
+
+    var t = raw;
+
+    // 0. Normalize newlines & HTML breaks
+    t = t
+        .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll(r'\r\n', '\n')
+        .replaceAll(r'\r', '\n');
+
+    // 1. Matrices: \begin{matrix} a & b \\ c & d \end{matrix} -> [ a  b ; c  d ]
+    t = t.replaceAllMapped(
+      RegExp(r'\\begin\{(?:matrix|bmatrix|pmatrix|vmatrix|Vmatrix)\}([\s\S]*?)\\end\{(?:matrix|bmatrix|pmatrix|vmatrix|Vmatrix)\}'),
+      (m) {
+        final inner = m.group(1) ?? '';
+        final rows = inner.split(RegExp(r'\\\\|\n')).map((r) => r.trim()).where((r) => r.isNotEmpty).toList();
+        final formattedRows = rows.map((r) {
+          final cells = r.split('&').map((c) => _formatMathForPdf(c.trim())).join('   ');
+          return cells;
+        }).join('  ;  ');
+        return '[ $formattedRows ]';
+      },
+    );
+
+    // 2. Inverse trigonometric functions: \tan^{-1} -> tan⁻¹
+    t = t.replaceAllMapped(
+      RegExp(r'\\?(tan|sin|cos|cot|sec|csc)\^\{?-1\}?', caseSensitive: false),
+      (m) => '${m.group(1)}⁻¹',
+    );
+
+    // 3. Greek letters & mathematical constants
+    final greekMap = {
+      r'\alpha': 'α',
+      r'\beta': 'β',
+      r'\gamma': 'γ',
+      r'\Gamma': 'Γ',
+      r'\delta': 'δ',
+      r'\Delta': 'Δ',
+      r'\epsilon': 'ε',
+      r'\varepsilon': 'ε',
+      r'\zeta': 'ζ',
+      r'\eta': 'η',
+      r'\theta': 'θ',
+      r'\Theta': 'Θ',
+      r'\iota': 'ι',
+      r'\kappa': 'κ',
+      r'\lambda': 'λ',
+      r'\Lambda': 'Λ',
+      r'\mu': 'µ',
+      r'\nu': 'ν',
+      r'\xi': 'ξ',
+      r'\pi': 'π',
+      r'\Pi': 'Π',
+      r'\rho': 'ρ',
+      r'\sigma': 'σ',
+      r'\Sigma': 'Σ',
+      r'\tau': 'τ',
+      r'\upsilon': 'υ',
+      r'\phi': 'φ',
+      r'\Phi': 'Φ',
+      r'\varphi': 'φ',
+      r'\chi': 'χ',
+      r'\psi': 'ψ',
+      r'\Psi': 'Ψ',
+      r'\omega': 'ω',
+      r'\Omega': 'Ω',
+    };
+
+    greekMap.forEach((k, v) {
+      t = t.replaceAll(k, v);
+      final bare = k.replaceFirst(r'\', '');
+      t = t.replaceAll(RegExp('\\b$bare\\b'), v);
+    });
+
+    // 4. Mathematical operators & relations
+    final opMap = {
+      r'\times': '×',
+      r'\div': '÷',
+      r'\pm': '±',
+      r'\mp': '∓',
+      r'\cdot': '·',
+      r'\bullet': '•',
+      r'\circ': '°',
+      r'\degree': '°',
+      r'\infty': '∞',
+      r'\approx': '≈',
+      r'\ne': '≠',
+      r'\neq': '≠',
+      r'\equiv': '≡',
+      r'\le': '≤',
+      r'\leq': '≤',
+      r'\ge': '≥',
+      r'\geq': '≥',
+      r'\ll': '≪',
+      r'\gg': '≫',
+      r'\propto': '∝',
+      r'\subset': '⊂',
+      r'\supset': '⊃',
+      r'\subseteq': '⊆',
+      r'\supseteq': '⊇',
+      r'\in': '∈',
+      r'\notin': '∉',
+      r'\cup': '∪',
+      r'\cap': '∩',
+      r'\forall': '∀',
+      r'\exists': '∃',
+      r'\nabla': '∇',
+      r'\partial': '∂',
+      r'\int': '∫',
+      r'\sum': '∑',
+      r'\prod': '∏',
+      r'\angle': '∠',
+      r'\perp': '⊥',
+      r'\parallel': '∥',
+      r'\rightarrow': '→',
+      r'\to': '→',
+      r'\longrightarrow': '→',
+      r'\leftarrow': '←',
+      r'\longleftarrow': '←',
+      r'\leftrightarrow': '↔',
+      r'\Rightarrow': '⇒',
+      r'\Leftarrow': '⇐',
+      r'\Leftrightarrow': '⇔',
+      r'\rightleftharpoons': '⇌',
+      r'\leftrightharpoons': '⇌',
+      '@@CHEM_ARROW': '→',
+    };
+
+    opMap.forEach((k, v) {
+      t = t.replaceAll(k, v);
+    });
+
+    // 5. Fractions: \frac{a}{b} -> (a / b)
+    t = t.replaceAllMapped(
+      RegExp(r'\\frac\{([^{}]*)\}\{([^{}]*)\}'),
+      (m) => '(${m.group(1)} / ${m.group(2)})',
+    );
+
+    // 6. Square root: \sqrt{a} -> √(a), \sqrt[n]{a} -> ⁿ√(a)
+    t = t.replaceAllMapped(
+      RegExp(r'\\sqrt\[([^\]]*)\]\{([^{}]*)\}'),
+      (m) => '${_toSuperscript(m.group(1)!)}√(${m.group(2)})',
+    );
+    t = t.replaceAllMapped(
+      RegExp(r'\\sqrt\{([^{}]*)\}'),
+      (m) => '√(${m.group(1)})',
+    );
+
+    // 7. Unit vectors & vector arrows: \hat{i} -> î, \vec{A} -> A⃗
+    t = t
+        .replaceAll(r'\hat{i}', 'î')
+        .replaceAll(r'\hat{j}', 'ĵ')
+        .replaceAll(r'\hat{k}', 'k̂')
+        .replaceAll(r'\hat i', 'î')
+        .replaceAll(r'\hat j', 'ĵ')
+        .replaceAll(r'\hat k', 'k̂');
+
+    t = t.replaceAllMapped(
+      RegExp(r'\\vec\{?([a-zA-Z])\}?'),
+      (m) => '${m.group(1)}⃗',
+    );
+
+    // 8. Superscripts & powers: x^{2} -> x², 10^{-5} -> 10⁻⁵
+    t = t.replaceAllMapped(
+      RegExp(r'\^\{?([0-9\+\-nNxXtyT]+)\}?'),
+      (m) => _toSuperscript(m.group(1)!),
+    );
+
+    // 9. Subscripts: z_{1} -> z₁, H_2O -> H₂O
+    t = t.replaceAllMapped(
+      RegExp(r'\_\{?([0-9\+\-a-zA-Z]+)\}?'),
+      (m) => _toSubscript(m.group(1)!),
+    );
+
+    // 10. Clean \text{...}, \mathrm{...}, \mathbf{...}, \left, \right
+    t = t.replaceAllMapped(
+      RegExp(r'\\(?:text|mathrm|mathbf|mathit|textnormal)\{([^{}]*)\}'),
+      (m) => m.group(1)!,
+    );
+    t = t
+        .replaceAll(r'\left(', '(')
+        .replaceAll(r'\right)', ')')
+        .replaceAll(r'\left[', '[')
+        .replaceAll(r'\right]', ']')
+        .replaceAll(r'\left\{', '{')
+        .replaceAll(r'\right\}', '}')
+        .replaceAll(r'\left|', '|')
+        .replaceAll(r'\right|', '|')
+        .replaceAll(r'\left.', '')
+        .replaceAll(r'\right.', '')
+        .replaceAll(r'\left', '')
+        .replaceAll(r'\right', '');
+
+    // 11. Clean remaining dollar signs, backticks, asterisks
+    t = t
         .replaceAll(RegExp(r'\$\$|\$'), '')
-        .replaceAll(RegExp(r'\*\*|\*'), '')
+        .replaceAll(RegExp(r'\*\*'), '')
         .replaceAll(RegExp(r'`'), '')
-        .replaceAll(RegExp(r'[{}]'), '')
-        .replaceAll(RegExp(r'\\'), ' ')
+        .replaceAll(RegExp(r'\\'), '')
         .trim();
+
+    return t;
   }
 
   static String _renderQuestionMeta(Question q) {
@@ -84,270 +275,349 @@ class PdfDownloadService {
     return '[${parts.join(' - ')}]';
   }
 
-  /// Directly generates and downloads the Question Paper as a high-quality PDF
+  /// Directly generates and downloads the Question Paper as a standard 2-Column Print-Ready PDF
   static Future<void> downloadQuestionPaper(
     ExamResult result,
     BuildContext context,
   ) async {
-    final subjectName = result.subjectLabel ?? result.subject;
-    final filename = '${subjectName}_Question_Paper_${DateTime.now().millisecondsSinceEpoch}';
+    final examTitle = result.subjectLabel?.isNotEmpty == true
+        ? result.subjectLabel!
+        : BanglaNameHelper.formatSubject(result.subject);
+    final filename = '${examTitle}_Question_Paper_${DateTime.now().millisecondsSinceEpoch}';
 
     try {
-      final banglaRegular = await PdfGoogleFonts.notoSerifBengaliRegular();
-      final banglaBold = await PdfGoogleFonts.notoSerifBengaliBold();
-      final timesRegular = await PdfGoogleFonts.tinosRegular();
-      final timesBold = await PdfGoogleFonts.tinosBold();
+      final banglaRegular = await PdfGoogleFonts.hindSiliguriRegular();
+      final banglaBold = await PdfGoogleFonts.hindSiliguriBold();
+      final notoSansBn = await PdfGoogleFonts.notoSansBengaliRegular();
+      final notoSansBnBold = await PdfGoogleFonts.notoSansBengaliBold();
+      final roboto = await PdfGoogleFonts.robotoRegular();
+      final robotoBold = await PdfGoogleFonts.robotoBold();
 
       final theme = pw.ThemeData.withFont(
         base: banglaRegular,
         bold: banglaBold,
-        fontFallback: [banglaRegular, banglaBold, timesRegular, timesBold],
+        fontFallback: [banglaRegular, banglaBold, notoSansBn, notoSansBnBold, roboto, robotoBold],
       );
 
       final pdf = pw.Document(theme: theme);
       const optionLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
 
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          theme: theme,
-          build: (pw.Context ctx) {
-            return [
-              // Header Top Bar
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('004633'),
-                  borderRadius: const pw.BorderRadius.vertical(top: pw.Radius.circular(6)),
-                ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'অভ্যাস (Obhyash)',
-                      style: pw.TextStyle(
-                        color: PdfColors.white,
-                        fontSize: 14,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.Text(
-                      'EXAM PLATFORM · obhyash.com',
-                      style: const pw.TextStyle(
-                        color: PdfColors.white,
-                        fontSize: 8.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      final questions = result.questions;
+      final totalQ = questions.length;
+      final durationMins = result.timeTaken > 0
+          ? (result.timeTaken / 60).ceil()
+          : totalQ;
 
-              // Header Metadata Body
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('F8FAF9'),
-                  border: pw.Border.all(color: PdfColor.fromHex('004633'), width: 1.2),
-                  borderRadius: const pw.BorderRadius.vertical(bottom: pw.Radius.circular(6)),
-                ),
-                child: pw.Column(
-                  children: [
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          subjectName,
-                          style: pw.TextStyle(
-                            fontSize: 14,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColor.fromHex('004633'),
-                          ),
-                        ),
-                        pw.Container(
-                          padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: pw.BoxDecoration(
-                            color: PdfColor.fromHex('E8F5E9'),
-                            borderRadius: pw.BorderRadius.circular(4),
-                            border: pw.Border.all(color: PdfColor.fromHex('A5D6A7')),
-                          ),
-                          child: pw.Text(
-                            result.examType ?? 'মডেল টেস্ট',
-                            style: pw.TextStyle(
-                              fontSize: 9,
-                              fontWeight: pw.FontWeight.bold,
-                              color: PdfColor.fromHex('004633'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 6),
-                    pw.Divider(color: PdfColor.fromHex('D1D5DB'), thickness: 0.8),
-                    pw.SizedBox(height: 4),
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          '⏱️ সময়: ${_toBanglaDigits((result.timeTaken > 0 ? (result.timeTaken / 60).ceil() : result.totalQuestions))} মিনিট',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-                        ),
-                        pw.Text(
-                          '📄 মোট প্রশ্ন: ${_toBanglaDigits(result.totalQuestions)} টি',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-                        ),
-                        pw.Text(
-                          '✍️ পূর্ণমান: ${_toBanglaDigits(result.totalMarks.toInt())}',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 14),
+      // Calculate distinct main subjects for multi-subject section dividers
+      final distinctMainSubjects = questions
+          .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel))
+          .toSet();
+      final hasMultipleSubjects = distinctMainSubjects.length > 1;
 
-              // Questions List (Strict 2-Column Format)
-              ...() {
-                final entries = result.questions.asMap().entries.toList();
-                final List<List<MapEntry<int, dynamic>>> chunks = [];
-                for (var i = 0; i < entries.length; i += 2) {
-                  chunks.add(entries.sublist(i, i + 2 > entries.length ? entries.length : i + 2));
+      // Chunk questions per page (Page 1 fits ~14 questions in 2 columns of 7; Page 2+ fits ~16 questions in 2 columns of 8)
+      final List<List<Question>> pages = [];
+      int currentIdx = 0;
+
+      while (currentIdx < totalQ) {
+        final isFirstPage = pages.isEmpty;
+        final countForThisPage = isFirstPage ? 14 : 16;
+        final endIdx = (currentIdx + countForThisPage > totalQ)
+            ? totalQ
+            : currentIdx + countForThisPage;
+        pages.add(questions.sublist(currentIdx, endIdx));
+        currentIdx = endIdx;
+      }
+
+      int globalQuestionNumber = 1;
+      String lastSubjectName = '';
+
+      for (int pageIdx = 0; pageIdx < pages.length; pageIdx++) {
+        final pageQuestions = pages[pageIdx];
+        final isFirstPage = pageIdx == 0;
+
+        // Split this page's questions into Left Column & Right Column serially
+        final halfCount = (pageQuestions.length / 2).ceil();
+        final leftList = pageQuestions.sublist(0, halfCount);
+        final rightList = pageQuestions.sublist(halfCount);
+
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            theme: theme,
+            build: (pw.Context ctx) {
+              pw.Widget buildQuestionItem(Question q, int number) {
+                final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
+                final showSubjectHeader = hasMultipleSubjects && currentSub != lastSubjectName;
+                if (showSubjectHeader) {
+                  lastSubjectName = currentSub;
                 }
 
-                return chunks.map((pair) {
-                  pw.Widget buildCard(MapEntry<int, dynamic> entry) {
-                    final idx = entry.key + 1;
-                    final q = entry.value;
-                    final meta = _renderQuestionMeta(q);
+                final meta = _renderQuestionMeta(q);
+                final formattedStem = _formatMathForPdf(q.question);
 
-                    return pw.Container(
-                      margin: const pw.EdgeInsets.only(bottom: 8),
-                      padding: const pw.EdgeInsets.all(6),
-                      decoration: pw.BoxDecoration(
-                        color: PdfColors.white,
-                        border: pw.Border.all(color: PdfColor.fromHex('E5E7EB'), width: 0.7),
-                        borderRadius: pw.BorderRadius.circular(4),
-                      ),
-                      child: pw.Column(
+                return pw.Padding(
+                  padding: const pw.EdgeInsets.only(bottom: 8),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      if (showSubjectHeader) ...[
+                        pw.Container(
+                          margin: const pw.EdgeInsets.only(top: 4, bottom: 6),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(
+                            '— $currentSub —',
+                            style: pw.TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('1F2937'),
+                            ),
+                          ),
+                        ),
+                      ],
+                      // Question Stem (No card border)
+                      pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Row(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Container(
-                                width: 18,
-                                child: pw.Text(
-                                  '${_toBanglaDigits(idx)}.',
-                                  style: pw.TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: PdfColor.fromHex('004633'),
-                                  ),
-                                ),
-                              ),
-                              pw.Expanded(
-                                child: pw.Text(
-                                  _cleanMathAndMarkdown(q.question),
-                                  style: pw.TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: pw.FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (meta.isNotEmpty)
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.only(left: 18, top: 2, bottom: 2),
-                              child: pw.Text(
-                                meta,
-                                style: pw.TextStyle(
-                                  fontSize: 7,
-                                  color: PdfColors.grey700,
-                                  fontStyle: pw.FontStyle.italic,
-                                ),
-                              ),
+                          pw.Text(
+                            '${_toBanglaDigits(number)}. ',
+                            style: pw.TextStyle(
+                              fontSize: 8.5,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('111827'),
                             ),
-                          pw.SizedBox(height: 3),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.only(left: 18),
-                            child: pw.Column(
-                              children: [
-                                pw.Row(
-                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                  children: [
-                                    if (q.options.isNotEmpty)
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                    if (q.options.length > 1)
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                if (q.options.length > 2) ...[
-                                  pw.SizedBox(height: 2),
-                                  pw.Row(
-                                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                    children: [
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                      if (q.options.length > 3)
-                                        pw.Expanded(
-                                          child: pw.Text(
-                                            '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
-                                            style: const pw.TextStyle(fontSize: 8),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ],
+                          ),
+                          pw.Expanded(
+                            child: pw.Text(
+                              formattedStem,
+                              style: pw.TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColor.fromHex('111827'),
+                                lineSpacing: 1.4,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }
-
-                  return pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Expanded(child: buildCard(pair[0])),
-                      pw.SizedBox(width: 8),
-                      if (pair.length > 1)
-                        pw.Expanded(child: buildCard(pair[1]))
-                      else
-                        pw.Expanded(child: pw.Container()),
+                      if (meta.isNotEmpty)
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(left: 12, top: 1, bottom: 2),
+                          child: pw.Text(
+                            meta,
+                            style: pw.TextStyle(
+                              fontSize: 6.5,
+                              color: PdfColor.fromHex('6B7280'),
+                              fontStyle: pw.FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      pw.SizedBox(height: 2.5),
+                      // Options in 2x2 grid
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.only(left: 12),
+                        child: pw.Column(
+                          children: [
+                            pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                if (q.options.isNotEmpty)
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[0]} ${_formatMathForPdf(q.options[0])}',
+                                      style: const pw.TextStyle(fontSize: 7.8),
+                                    ),
+                                  ),
+                                if (q.options.length > 1)
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[1]} ${_formatMathForPdf(q.options[1])}',
+                                      style: const pw.TextStyle(fontSize: 7.8),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (q.options.length > 2) ...[
+                              pw.SizedBox(height: 1.5),
+                              pw.Row(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[2]} ${_formatMathForPdf(q.options[2])}',
+                                      style: const pw.TextStyle(fontSize: 7.8),
+                                    ),
+                                  ),
+                                  if (q.options.length > 3)
+                                    pw.Expanded(
+                                      child: pw.Text(
+                                        '${optionLetters[3]} ${_formatMathForPdf(q.options[3])}',
+                                        style: const pw.TextStyle(fontSize: 7.8),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ],
-                  );
-                });
-              }(),
-            ];
-          },
-        ),
-      );
+                  ),
+                );
+              }
+
+              // Build Left Column Items
+              final leftWidgets = <pw.Widget>[];
+              int leftStartNumber = globalQuestionNumber;
+              for (final q in leftList) {
+                leftWidgets.add(buildQuestionItem(q, leftStartNumber++));
+              }
+
+              // Build Right Column Items
+              final rightWidgets = <pw.Widget>[];
+              int rightStartNumber = leftStartNumber;
+              for (final q in rightList) {
+                rightWidgets.add(buildQuestionItem(q, rightStartNumber++));
+              }
+
+              // Advance global number for next page
+              globalQuestionNumber = rightStartNumber;
+
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+                children: [
+                  if (isFirstPage) ...[
+                    // Clean Grey Exam Header (Middle Aligned)
+                    pw.Container(
+                      alignment: pw.Alignment.center,
+                      child: pw.Column(
+                        children: [
+                          pw.Text(
+                            'অভ্যাস — $examTitle',
+                            style: pw.TextStyle(
+                              fontSize: 15,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('1F2937'),
+                            ),
+                          ),
+                          pw.SizedBox(height: 2),
+                          pw.Text(
+                            'EXAM PLATFORM · obhyash.com',
+                            style: pw.TextStyle(
+                              fontSize: 8,
+                              color: PdfColor.fromHex('4B5563'),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          pw.SizedBox(height: 6),
+                          // Grey Bordered Metadata Bar
+                          pw.Container(
+                            padding: const pw.EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                            decoration: pw.BoxDecoration(
+                              color: PdfColor.fromHex('F9FAFB'),
+                              border: pw.Border.all(color: PdfColor.fromHex('D1D5DB'), width: 0.8),
+                              borderRadius: pw.BorderRadius.circular(4),
+                            ),
+                            child: pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                              children: [
+                                pw.Text(
+                                  'সময়: ${_toBanglaDigits(durationMins)} মিনিট',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('374151')),
+                                ),
+                                pw.Text(
+                                  'মোট প্রশ্ন: ${_toBanglaDigits(totalQ)}টি',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('374151')),
+                                ),
+                                pw.Text(
+                                  'পূর্ণমান: ${_toBanglaDigits(result.totalMarks.toInt())}',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('374151')),
+                                ),
+                                pw.Text(
+                                  'নেগেটিভ: ${_toBanglaDigits(result.negativeMarking)}x',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('374151')),
+                                ),
+                              ],
+                            ),
+                          ),
+                          pw.SizedBox(height: 10),
+                          pw.Divider(color: PdfColor.fromHex('9CA3AF'), thickness: 0.8),
+                          pw.SizedBox(height: 6),
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    // Running Minimal Top Header on subsequent pages
+                    pw.Container(
+                      padding: const pw.EdgeInsets.only(bottom: 6),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            '$examTitle — প্রশ্নপত্র',
+                            style: pw.TextStyle(fontSize: 8, color: PdfColor.fromHex('6B7280')),
+                          ),
+                          pw.Text(
+                            'পৃষ্ঠা ${_toBanglaDigits(pageIdx + 1)} / ${_toBanglaDigits(pages.length)}',
+                            style: pw.TextStyle(fontSize: 8, color: PdfColor.fromHex('6B7280')),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.Divider(color: PdfColor.fromHex('E5E7EB'), thickness: 0.6),
+                    pw.SizedBox(height: 6),
+                  ],
+
+                  // 2-Column Body: Left Column then Right Column serially
+                  pw.Expanded(
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: leftWidgets,
+                          ),
+                        ),
+                        pw.SizedBox(width: 12),
+                        // Middle Vertical Divider Line
+                        pw.Container(
+                          width: 0.6,
+                          color: PdfColor.fromHex('E5E7EB'),
+                        ),
+                        pw.SizedBox(width: 12),
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: rightWidgets,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Minimal Page Footer
+                  pw.Container(
+                    padding: const pw.EdgeInsets.only(top: 4),
+                    alignment: pw.Alignment.center,
+                    child: pw.Text(
+                      'obhyash.com · পৃষ্ঠা ${_toBanglaDigits(pageIdx + 1)}',
+                      style: pw.TextStyle(fontSize: 7.5, color: PdfColor.fromHex('9CA3AF')),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
 
       final bytes = await pdf.save();
 
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$subjectName প্রশ্নপত্র PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
+        notificationTitle: '$examTitle প্রশ্নপত্র PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
         context: context.mounted ? context : null,
       );
 
@@ -369,367 +639,427 @@ class PdfDownloadService {
     }
   }
 
-  /// Directly generates and downloads Question Paper with Correct Answers & Explanations
+  /// Directly generates and downloads Question Paper with Correct Answers & Detailed Explanations
   static Future<void> downloadResultWithExplanations(
     ExamResult result,
     BuildContext context,
   ) async {
-    final subjectName = result.subjectLabel ?? result.subject;
-    final filename = '${subjectName}_Solution_Explanation_${DateTime.now().millisecondsSinceEpoch}';
+    final examTitle = result.subjectLabel?.isNotEmpty == true
+        ? result.subjectLabel!
+        : BanglaNameHelper.formatSubject(result.subject);
+    final filename = '${examTitle}_Solution_Explanation_${DateTime.now().millisecondsSinceEpoch}';
 
     try {
-      final banglaRegular = await PdfGoogleFonts.notoSerifBengaliRegular();
-      final banglaBold = await PdfGoogleFonts.notoSerifBengaliBold();
-      final timesRegular = await PdfGoogleFonts.tinosRegular();
-      final timesBold = await PdfGoogleFonts.tinosBold();
+      final banglaRegular = await PdfGoogleFonts.hindSiliguriRegular();
+      final banglaBold = await PdfGoogleFonts.hindSiliguriBold();
+      final notoSansBn = await PdfGoogleFonts.notoSansBengaliRegular();
+      final notoSansBnBold = await PdfGoogleFonts.notoSansBengaliBold();
+      final roboto = await PdfGoogleFonts.robotoRegular();
+      final robotoBold = await PdfGoogleFonts.robotoBold();
 
       final theme = pw.ThemeData.withFont(
         base: banglaRegular,
         bold: banglaBold,
-        fontFallback: [banglaRegular, banglaBold, timesRegular, timesBold],
+        fontFallback: [banglaRegular, banglaBold, notoSansBn, notoSansBnBold, roboto, robotoBold],
       );
 
       final pdf = pw.Document(theme: theme);
       const optionLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
 
-      final unattemptedCount = result.totalQuestions - result.correctCount - result.wrongCount;
+      final questions = result.questions;
+      final totalQ = questions.length;
+      final unattemptedCount = totalQ - result.correctCount - result.wrongCount;
 
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          theme: theme,
-          build: (pw.Context ctx) {
-            return [
-              // Header Top Bar
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('004633'),
-                  borderRadius: const pw.BorderRadius.vertical(top: pw.Radius.circular(6)),
-                ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'অভ্যাস (Obhyash)',
-                      style: pw.TextStyle(
-                        color: PdfColors.white,
-                        fontSize: 14,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.Text(
-                      'সমাধান ও বিস্তারিত ব্যাখ্যা · obhyash.com',
-                      style: const pw.TextStyle(
-                        color: PdfColors.white,
-                        fontSize: 8.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      // Calculate distinct main subjects
+      final distinctMainSubjects = questions
+          .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel))
+          .toSet();
+      final hasMultipleSubjects = distinctMainSubjects.length > 1;
 
-              // Header Metadata Body
-              pw.Container(
-                width: double.infinity,
-                padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: pw.BoxDecoration(
-                  color: PdfColor.fromHex('F8FAF9'),
-                  border: pw.Border.all(color: PdfColor.fromHex('004633'), width: 1.2),
-                  borderRadius: const pw.BorderRadius.vertical(bottom: pw.Radius.circular(6)),
-                ),
-                child: pw.Column(
-                  children: [
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          '$subjectName — সমাধান ও ব্যাখ্যা',
-                          style: pw.TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColor.fromHex('004633'),
-                          ),
-                        ),
-                        pw.Container(
-                          padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: pw.BoxDecoration(
-                            color: PdfColor.fromHex('E8F5E9'),
-                            borderRadius: pw.BorderRadius.circular(4),
-                            border: pw.Border.all(color: PdfColor.fromHex('A5D6A7')),
-                          ),
-                          child: pw.Text(
-                            result.examType ?? 'ফলাফল শিট',
-                            style: pw.TextStyle(
-                              fontSize: 9,
-                              fontWeight: pw.FontWeight.bold,
-                              color: PdfColor.fromHex('004633'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.SizedBox(height: 6),
-                    pw.Divider(color: PdfColor.fromHex('D1D5DB'), thickness: 0.8),
-                    pw.SizedBox(height: 4),
+      // Solution pages chunking: Page 1 holds ~8 questions (2 cols of 4), Page 2+ holds ~10 questions (2 cols of 5)
+      final List<List<Question>> pages = [];
+      int currentIdx = 0;
 
-                    // Results Summary Bar
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          '🎯 প্রাপ্ত নম্বর: ${_toBanglaDigits(result.score)} / ${_toBanglaDigits(result.totalMarks.toInt())}',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('004633')),
-                        ),
-                        pw.Text(
-                          '✅ সঠিক: ${_toBanglaDigits(result.correctCount)}',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('15803D')),
-                        ),
-                        pw.Text(
-                          '❌ ভুল: ${_toBanglaDigits(result.wrongCount)}',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('B91C1C')),
-                        ),
-                        pw.Text(
-                          '⚪ অনুত্তরিত: ${_toBanglaDigits(unattemptedCount > 0 ? unattemptedCount : 0)}',
-                          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('4B5563')),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 14),
+      while (currentIdx < totalQ) {
+        final isFirstPage = pages.isEmpty;
+        final countForThisPage = isFirstPage ? 8 : 10;
+        final endIdx = (currentIdx + countForThisPage > totalQ)
+            ? totalQ
+            : currentIdx + countForThisPage;
+        pages.add(questions.sublist(currentIdx, endIdx));
+        currentIdx = endIdx;
+      }
 
-              // Questions with Solutions (Strict 2-Column Format)
-              ...() {
-                final entries = result.questions.asMap().entries.toList();
-                final List<List<MapEntry<int, dynamic>>> chunks = [];
-                for (var i = 0; i < entries.length; i += 2) {
-                  chunks.add(entries.sublist(i, i + 2 > entries.length ? entries.length : i + 2));
+      int globalQuestionNumber = 1;
+      String lastSubjectName = '';
+
+      for (int pageIdx = 0; pageIdx < pages.length; pageIdx++) {
+        final pageQuestions = pages[pageIdx];
+        final isFirstPage = pageIdx == 0;
+
+        // Split this page's questions into Left Column & Right Column serially
+        final halfCount = (pageQuestions.length / 2).ceil();
+        final leftList = pageQuestions.sublist(0, halfCount);
+        final rightList = pageQuestions.sublist(halfCount);
+
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            theme: theme,
+            build: (pw.Context ctx) {
+              pw.Widget buildSolutionItem(Question q, int number) {
+                final currentSub = BanglaNameHelper.getMainSubjectName(q.subject, q.subjectLabel);
+                final showSubjectHeader = hasMultipleSubjects && currentSub != lastSubjectName;
+                if (showSubjectHeader) {
+                  lastSubjectName = currentSub;
                 }
 
-                return chunks.map((pair) {
-                  pw.Widget buildSolutionCard(MapEntry<int, dynamic> entry) {
-                    final idx = entry.key + 1;
-                    final q = entry.value;
-                    final userAnsIdx = result.userAnswers[q.id];
-                    final isCorrect = userAnsIdx == q.correctAnswerIndex;
-                    final isSkipped = userAnsIdx == null;
-                    final meta = _renderQuestionMeta(q);
+                final userAnsIdx = result.userAnswers[q.id];
+                final isCorrect = userAnsIdx == q.correctAnswerIndex;
+                final isSkipped = userAnsIdx == null;
+                final meta = _renderQuestionMeta(q);
 
-                    final correctLetter = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < optionLetters.length)
-                        ? optionLetters[q.correctAnswerIndex]
-                        : '';
-                    final correctText = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < q.options.length)
-                        ? q.options[q.correctAnswerIndex]
-                        : '';
+                final correctLetter = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < optionLetters.length)
+                    ? optionLetters[q.correctAnswerIndex]
+                    : '';
+                final correctText = (q.correctAnswerIndex >= 0 && q.correctAnswerIndex < q.options.length)
+                    ? q.options[q.correctAnswerIndex]
+                    : '';
 
-                    return pw.Container(
-                      margin: const pw.EdgeInsets.only(bottom: 8),
-                      padding: const pw.EdgeInsets.all(6),
-                      decoration: pw.BoxDecoration(
-                        color: PdfColors.white,
-                        border: pw.Border.all(color: PdfColor.fromHex('E5E7EB'), width: 0.7),
-                        borderRadius: pw.BorderRadius.circular(4),
-                      ),
-                      child: pw.Column(
+                return pw.Padding(
+                  padding: const pw.EdgeInsets.only(bottom: 10),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      if (showSubjectHeader) ...[
+                        pw.Container(
+                          margin: const pw.EdgeInsets.only(top: 4, bottom: 6),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(
+                            '— $currentSub —',
+                            style: pw.TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('1F2937'),
+                            ),
+                          ),
+                        ),
+                      ],
+                      // Question Stem
+                      pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          // Question Title
-                          pw.Row(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Container(
-                                width: 18,
-                                child: pw.Text(
-                                  '${_toBanglaDigits(idx)}.',
-                                  style: pw.TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: PdfColor.fromHex('004633'),
-                                  ),
-                                ),
-                              ),
-                              pw.Expanded(
-                                child: pw.Text(
-                                  _cleanMathAndMarkdown(q.question),
-                                  style: pw.TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: pw.FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          if (meta.isNotEmpty)
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.only(left: 18, top: 2, bottom: 2),
-                              child: pw.Text(
-                                meta,
-                                style: pw.TextStyle(
-                                  fontSize: 7,
-                                  color: PdfColors.grey700,
-                                  fontStyle: pw.FontStyle.italic,
-                                ),
-                              ),
-                            ),
-
-                          pw.SizedBox(height: 3),
-
-                          // Options List
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.only(left: 18),
-                            child: pw.Column(
-                              children: [
-                                pw.Row(
-                                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                  children: [
-                                    if (q.options.isNotEmpty)
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[0]} ${_cleanMathAndMarkdown(q.options[0])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                    if (q.options.length > 1)
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[1]} ${_cleanMathAndMarkdown(q.options[1])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                if (q.options.length > 2) ...[
-                                  pw.SizedBox(height: 2),
-                                  pw.Row(
-                                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                    children: [
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[2]} ${_cleanMathAndMarkdown(q.options[2])}',
-                                          style: const pw.TextStyle(fontSize: 8),
-                                        ),
-                                      ),
-                                      if (q.options.length > 3)
-                                        pw.Expanded(
-                                          child: pw.Text(
-                                            '${optionLetters[3]} ${_cleanMathAndMarkdown(q.options[3])}',
-                                            style: const pw.TextStyle(fontSize: 8),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ],
+                          pw.Text(
+                            '${_toBanglaDigits(number)}. ',
+                            style: pw.TextStyle(
+                              fontSize: 8.5,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('111827'),
                             ),
                           ),
-
-                          pw.SizedBox(height: 4),
-
-                          // Solution Box
-                          pw.Container(
-                            width: double.infinity,
-                            padding: const pw.EdgeInsets.all(5),
-                            margin: const pw.EdgeInsets.only(left: 14),
-                            decoration: pw.BoxDecoration(
-                              color: PdfColor.fromHex('F9FAFB'),
-                              border: pw.Border(
-                                left: pw.BorderSide(color: PdfColor.fromHex('004633'), width: 2),
+                          pw.Expanded(
+                            child: pw.Text(
+                              _formatMathForPdf(q.question),
+                              style: pw.TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColor.fromHex('111827'),
+                                lineSpacing: 1.4,
                               ),
-                              borderRadius: const pw.BorderRadius.horizontal(
-                                right: pw.Radius.circular(3),
-                              ),
-                            ),
-                            child: pw.Column(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                pw.Row(
-                                  children: [
-                                    pw.Text(
-                                      'সঠিক: ',
-                                      style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold),
-                                    ),
-                                    pw.Expanded(
-                                      child: pw.Text(
-                                        '$correctLetter ${_cleanMathAndMarkdown(correctText)}',
-                                        style: pw.TextStyle(
-                                          fontSize: 7.5,
-                                          fontWeight: pw.FontWeight.bold,
-                                          color: PdfColor.fromHex('15803D'),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (!isSkipped) ...[
-                                  pw.SizedBox(height: 2),
-                                  pw.Row(
-                                    children: [
-                                      pw.Text(
-                                        'তোমার: ',
-                                        style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold),
-                                      ),
-                                      pw.Expanded(
-                                        child: pw.Text(
-                                          '${optionLetters[userAnsIdx]} ${isCorrect ? "[সঠিক]" : "[ভুল]"}',
-                                          style: pw.TextStyle(
-                                            fontSize: 7.5,
-                                            fontWeight: pw.FontWeight.bold,
-                                            color: isCorrect
-                                                ? PdfColor.fromHex('15803D')
-                                                : PdfColor.fromHex('B91C1C'),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                                if (q.explanation != null && q.explanation!.trim().isNotEmpty) ...[
-                                  pw.SizedBox(height: 2),
-                                  pw.Text(
-                                    'ব্যাখ্যা: ${_cleanMathAndMarkdown(q.explanation!)}',
-                                    style: const pw.TextStyle(
-                                      fontSize: 7.5,
-                                      color: PdfColors.grey800,
-                                    ),
-                                  ),
-                                ],
-                              ],
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }
-
-                  return pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Expanded(child: buildSolutionCard(pair[0])),
-                      pw.SizedBox(width: 8),
-                      if (pair.length > 1)
-                        pw.Expanded(child: buildSolutionCard(pair[1]))
-                      else
-                        pw.Expanded(child: pw.Container()),
+                      if (meta.isNotEmpty)
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(left: 12, top: 1, bottom: 2),
+                          child: pw.Text(
+                            meta,
+                            style: pw.TextStyle(
+                              fontSize: 6.5,
+                              color: PdfColor.fromHex('6B7280'),
+                              fontStyle: pw.FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      pw.SizedBox(height: 2),
+                      // Options List
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.only(left: 12),
+                        child: pw.Column(
+                          children: [
+                            pw.Row(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                if (q.options.isNotEmpty)
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[0]} ${_formatMathForPdf(q.options[0])}',
+                                      style: const pw.TextStyle(fontSize: 7.5),
+                                    ),
+                                  ),
+                                if (q.options.length > 1)
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[1]} ${_formatMathForPdf(q.options[1])}',
+                                      style: const pw.TextStyle(fontSize: 7.5),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (q.options.length > 2) ...[
+                              pw.SizedBox(height: 1.5),
+                              pw.Row(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Expanded(
+                                    child: pw.Text(
+                                      '${optionLetters[2]} ${_formatMathForPdf(q.options[2])}',
+                                      style: const pw.TextStyle(fontSize: 7.5),
+                                    ),
+                                  ),
+                                  if (q.options.length > 3)
+                                    pw.Expanded(
+                                      child: pw.Text(
+                                        '${optionLetters[3]} ${_formatMathForPdf(q.options[3])}',
+                                        style: const pw.TextStyle(fontSize: 7.5),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      pw.SizedBox(height: 3),
+                      // Solution & Explanation Box (Clean Grey Theme)
+                      pw.Container(
+                        width: double.infinity,
+                        margin: const pw.EdgeInsets.only(left: 10),
+                        padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        decoration: pw.BoxDecoration(
+                          color: PdfColor.fromHex('F9FAFB'),
+                          border: pw.Border(
+                            left: pw.BorderSide(color: PdfColor.fromHex('4B5563'), width: 1.5),
+                          ),
+                          borderRadius: const pw.BorderRadius.horizontal(
+                            right: pw.Radius.circular(3),
+                          ),
+                        ),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Row(
+                              children: [
+                                pw.Text(
+                                  'সঠিক উত্তর: ',
+                                  style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('374151')),
+                                ),
+                                pw.Expanded(
+                                  child: pw.Text(
+                                    '$correctLetter ${_formatMathForPdf(correctText)}',
+                                    style: pw.TextStyle(
+                                      fontSize: 7.5,
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: PdfColor.fromHex('15803D'),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (!isSkipped) ...[
+                              pw.SizedBox(height: 1.5),
+                              pw.Row(
+                                children: [
+                                  pw.Text(
+                                    'তোমার উত্তর: ',
+                                    style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('4B5563')),
+                                  ),
+                                  pw.Text(
+                                    '${optionLetters[userAnsIdx]} ${isCorrect ? "✓ (সঠিক)" : "✗ (ভুল)"}',
+                                    style: pw.TextStyle(
+                                      fontSize: 7.5,
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: isCorrect
+                                          ? PdfColor.fromHex('15803D')
+                                          : PdfColor.fromHex('DC2626'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                            if (q.explanation != null && q.explanation!.trim().isNotEmpty) ...[
+                              pw.SizedBox(height: 2),
+                              pw.Text(
+                                'ব্যাখ্যা: ${_formatMathForPdf(q.explanation!)}',
+                                style: pw.TextStyle(
+                                  fontSize: 7.2,
+                                  color: PdfColor.fromHex('374151'),
+                                  lineSpacing: 1.3,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ],
-                  );
-                });
-              }(),
-            ];
-          },
-        ),
-      );
+                  ),
+                );
+              }
+
+              // Build Left Column Items
+              final leftWidgets = <pw.Widget>[];
+              int leftStartNumber = globalQuestionNumber;
+              for (final q in leftList) {
+                leftWidgets.add(buildSolutionItem(q, leftStartNumber++));
+              }
+
+              // Build Right Column Items
+              final rightWidgets = <pw.Widget>[];
+              int rightStartNumber = leftStartNumber;
+              for (final q in rightList) {
+                rightWidgets.add(buildSolutionItem(q, rightStartNumber++));
+              }
+
+              // Advance global number for next page
+              globalQuestionNumber = rightStartNumber;
+
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+                children: [
+                  if (isFirstPage) ...[
+                    // Clean Grey Solution Header (Middle Aligned)
+                    pw.Container(
+                      alignment: pw.Alignment.center,
+                      child: pw.Column(
+                        children: [
+                          pw.Text(
+                            '$examTitle — সমাধান ও ব্যাখ্যা',
+                            style: pw.TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('1F2937'),
+                            ),
+                          ),
+                          pw.SizedBox(height: 2),
+                          pw.Text(
+                            'EXAM PLATFORM · obhyash.com',
+                            style: pw.TextStyle(
+                              fontSize: 8,
+                              color: PdfColor.fromHex('4B5563'),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          pw.SizedBox(height: 6),
+                          // Results Summary Bar (Grey)
+                          pw.Container(
+                            padding: const pw.EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                            decoration: pw.BoxDecoration(
+                              color: PdfColor.fromHex('F9FAFB'),
+                              border: pw.Border.all(color: PdfColor.fromHex('D1D5DB'), width: 0.8),
+                              borderRadius: pw.BorderRadius.circular(4),
+                            ),
+                            child: pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                              children: [
+                                pw.Text(
+                                  '🎯 প্রাপ্ত নম্বর: ${_toBanglaDigits(result.score.toStringAsFixed(2))} / ${_toBanglaDigits(result.totalMarks.toInt())}',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('1F2937')),
+                                ),
+                                pw.Text(
+                                  '✓ সঠিক: ${_toBanglaDigits(result.correctCount)}',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('15803D')),
+                                ),
+                                pw.Text(
+                                  '✗ ভুল: ${_toBanglaDigits(result.wrongCount)}',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('DC2626')),
+                                ),
+                                pw.Text(
+                                  '⚪ অনুত্তর: ${_toBanglaDigits(unattemptedCount > 0 ? unattemptedCount : 0)}',
+                                  style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('4B5563')),
+                                ),
+                              ],
+                            ),
+                          ),
+                          pw.SizedBox(height: 10),
+                          pw.Divider(color: PdfColor.fromHex('9CA3AF'), thickness: 0.8),
+                          pw.SizedBox(height: 6),
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    // Running Minimal Top Header
+                    pw.Container(
+                      padding: const pw.EdgeInsets.only(bottom: 6),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            '$examTitle — সমাধান ও ব্যাখ্যা',
+                            style: pw.TextStyle(fontSize: 8, color: PdfColor.fromHex('6B7280')),
+                          ),
+                          pw.Text(
+                            'পৃষ্ঠা ${_toBanglaDigits(pageIdx + 1)} / ${_toBanglaDigits(pages.length)}',
+                            style: pw.TextStyle(fontSize: 8, color: PdfColor.fromHex('6B7280')),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.Divider(color: PdfColor.fromHex('E5E7EB'), thickness: 0.6),
+                    pw.SizedBox(height: 6),
+                  ],
+
+                  // 2-Column Body: Left Column then Right Column serially
+                  pw.Expanded(
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: leftWidgets,
+                          ),
+                        ),
+                        pw.SizedBox(width: 12),
+                        // Middle Vertical Line
+                        pw.Container(
+                          width: 0.6,
+                          color: PdfColor.fromHex('E5E7EB'),
+                        ),
+                        pw.SizedBox(width: 12),
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: rightWidgets,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Minimal Page Footer
+                  pw.Container(
+                    padding: const pw.EdgeInsets.only(top: 4),
+                    alignment: pw.Alignment.center,
+                    child: pw.Text(
+                      'obhyash.com · পৃষ্ঠা ${_toBanglaDigits(pageIdx + 1)}',
+                      style: pw.TextStyle(fontSize: 7.5, color: PdfColor.fromHex('9CA3AF')),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
 
       final bytes = await pdf.save();
 
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$subjectName ফলাফল ও ব্যাখ্যা PDF ডাউনলোড সম্পন্ন ✅',
+        notificationTitle: '$examTitle ফলাফল ও ব্যাখ্যা PDF ডাউনলোড সম্পন্ন ✅',
         context: context.mounted ? context : null,
       );
 

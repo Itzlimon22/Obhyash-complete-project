@@ -162,31 +162,33 @@ class UserAvatar extends StatelessWidget {
     if (!isPro) return baseAvatar;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final ringPad = size >= 60 ? 3.0 : 2.2;
+    final ringPad = size >= 60 ? 3.5 : 2.5;
+    final gapPad = size >= 60 ? 2.0 : 1.5;
 
     return Container(
-      width: size + ringPad * 2 + 3,
-      height: size + ringPad * 2 + 3,
+      width: size + (ringPad + gapPad) * 2,
+      height: size + (ringPad + gapPad) * 2,
       padding: EdgeInsets.all(ringPad),
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: SweepGradient(
           colors: [
-            Color(0xFF4285F4), // Google Blue
-            Color(0xFF9B72CB), // Gemini Purple
-            Color(0xFFD96570), // Google Coral / Pink
-            Color(0xFFF4B400), // Google Amber
-            Color(0xFF34A853), // Google Green
-            Color(0xFF4285F4), // Loop
+            Color(0xFFD4AF37), // Gold
+            Color(0xFFE8843A), // Orange
+            Color(0xFFD94F7E), // Rose
+            Color(0xFF9B72CB), // Purple
+            Color(0xFF12544F), // Teal (app primary)
+            Color(0xFF34D399), // Emerald
+            Color(0xFFD4AF37), // Loop back to Gold
           ],
         ),
       ),
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isDark ? const Color(0xFF141414) : Colors.white,
+          color: isDark ? const Color(0xFF0C0C0C) : Colors.white,
         ),
-        padding: const EdgeInsets.all(1.5),
+        padding: EdgeInsets.all(gapPad),
         child: baseAvatar,
       ),
     );

@@ -3,10 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../providers/dashboard_providers.dart';
-import '../../../gamification/presentation/widgets/xp_guide_bottom_sheet.dart';
 
 /// ─── Master Daily Mission Template ───────────────────────────────────────────
 class MasterDailyMission {
@@ -40,7 +38,7 @@ class MasterMissionsPool {
       metricType: 'exams_count',
       target: 1,
       xpReward: 30,
-      deepColor: Color(0xFF004633), // Signature Deep Emerald Green
+      deepColor: Color(0xFF12544F), // Viridian Forest
     ),
     // 2. 15 Correct Answers
     MasterDailyMission(
@@ -50,7 +48,7 @@ class MasterMissionsPool {
       metricType: 'correct_answers',
       target: 15,
       xpReward: 25,
-      deepColor: Color(0xFFB91C1C), // Deep Crimson Red
+      deepColor: Color(0xFF740A03), // Deep Crimson
     ),
     // 3. 30 Correct Answers Pro Challenge
     MasterDailyMission(
@@ -60,7 +58,7 @@ class MasterMissionsPool {
       metricType: 'correct_answers',
       target: 30,
       xpReward: 40,
-      deepColor: Color(0xFF4F46E5), // Indigo
+      deepColor: Color(0xFF601D49), // Royal Mulberry
     ),
     // 4. Daily Streak
     MasterDailyMission(
@@ -70,7 +68,7 @@ class MasterMissionsPool {
       metricType: 'streak',
       target: 1,
       xpReward: 20,
-      deepColor: Color(0xFFD97706), // Amber Flame
+      deepColor: Color(0xFF601D49), // Royal Mulberry
     ),
     // 5. Double Exam Challenge
     MasterDailyMission(
@@ -80,7 +78,7 @@ class MasterMissionsPool {
       metricType: 'exams_count',
       target: 2,
       xpReward: 45,
-      deepColor: Color(0xFF0F766E), // Teal
+      deepColor: Color(0xFF12544F), // Viridian Forest
     ),
     // 6. 80%+ Accuracy Exam
     MasterDailyMission(
@@ -90,7 +88,7 @@ class MasterMissionsPool {
       metricType: 'accuracy_80',
       target: 1,
       xpReward: 35,
-      deepColor: Color(0xFF7C3AED), // Violet
+      deepColor: Color(0xFF601D49), // Royal Mulberry
     ),
     // 7. Live / Practice Exam Participation
     MasterDailyMission(
@@ -100,7 +98,7 @@ class MasterMissionsPool {
       metricType: 'live_or_practice',
       target: 1,
       xpReward: 30,
-      deepColor: Color(0xFFE11D48), // Rose
+      deepColor: Color(0xFF740A03), // Deep Crimson
     ),
     // 8. 10 Correct Answers Sprint
     MasterDailyMission(
@@ -110,7 +108,7 @@ class MasterMissionsPool {
       metricType: 'correct_answers',
       target: 10,
       xpReward: 20,
-      deepColor: Color(0xFF059669), // Emerald
+      deepColor: Color(0xFF12544F), // Viridian Forest
     ),
     // 9. Solve 40 MCQs
     MasterDailyMission(
@@ -120,7 +118,7 @@ class MasterMissionsPool {
       metricType: 'total_mcqs',
       target: 40,
       xpReward: 40,
-      deepColor: Color(0xFFEA580C), // Orange
+      deepColor: Color(0xFF12544F), // Viridian Forest
     ),
     // 10. 20 Correct Answers Goal
     MasterDailyMission(
@@ -130,7 +128,7 @@ class MasterMissionsPool {
       metricType: 'correct_answers',
       target: 20,
       xpReward: 30,
-      deepColor: Color(0xFF2563EB), // Blue
+      deepColor: Color(0xFF601D49), // Royal Mulberry
     ),
   ];
 
@@ -523,8 +521,8 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF131316) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF26262B) : const Color(0xFFE5E7EB);
+    final surfaceColor = isDark ? const Color(0xFF18181B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB);
 
     final completedCount = _quests.where((q) => q.isCompleted).length;
     final isAllCompleted = _quests.isNotEmpty && completedCount == _quests.length;
@@ -536,12 +534,11 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -555,8 +552,8 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
                 'আজকের মিশন',
                 style: TextStyle(
                   fontFamily: 'HindSiliguri',
-                  fontSize: 16.5,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                   letterSpacing: -0.2,
                 ),
@@ -579,8 +576,8 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
                   '${_toBanglaDigits(completedCount)}/${_toBanglaDigits(_quests.length)} সম্পন্ন',
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
                     color: isAllCompleted
                         ? const Color(0xFF004633)
                         : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563)),
@@ -632,12 +629,16 @@ class _QuestItemRow extends StatelessWidget {
     final canClaim = quest.isCompleted && !quest.isClaimed;
 
     final itemBg = isDark
-        ? (canClaim ? quest.deepColor.withValues(alpha: 0.08) : const Color(0xFF19191D))
-        : (canClaim ? quest.deepColor.withValues(alpha: 0.03) : const Color(0xFFFAFAFA));
+        ? (canClaim
+            ? const Color(0xFF12544F).withValues(alpha: 0.15)
+            : const Color(0xFF202024))
+        : (canClaim ? const Color(0xFF12544F).withValues(alpha: 0.05) : const Color(0xFFFAFAFA));
 
     final itemBorder = isDark
-        ? (canClaim ? quest.deepColor.withValues(alpha: 0.4) : const Color(0xFF26262B))
-        : (canClaim ? quest.deepColor.withValues(alpha: 0.25) : const Color(0xFFEAEAEA));
+        ? (canClaim
+            ? const Color(0xFF34D399).withValues(alpha: 0.3)
+            : const Color(0xFF2E2E33))
+        : (canClaim ? const Color(0xFF12544F).withValues(alpha: 0.25) : const Color(0xFFEAEAEA));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
@@ -660,7 +661,7 @@ class _QuestItemRow extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.normal,
                     color: isDark ? const Color(0xFFF3F4F6) : const Color(0xFF1E293B),
                     height: 1.25,
                   ),
@@ -673,25 +674,25 @@ class _QuestItemRow extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF004633).withValues(alpha: 0.1),
+                    color: const Color(0xFF12544F).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFF004633).withValues(alpha: 0.25),
+                      color: const Color(0xFF12544F).withValues(alpha: 0.3),
                       width: 0.8,
                     ),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_rounded, size: 13, color: Color(0xFF004633)),
+                      Icon(Icons.check_rounded, size: 13, color: Color(0xFF12544F)),
                       SizedBox(width: 3),
                       Text(
                         'ক্লেইমড',
                         style: TextStyle(
                           fontFamily: 'HindSiliguri',
                           fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF004633),
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF12544F),
                         ),
                       ),
                     ],
@@ -721,8 +722,8 @@ class _QuestItemRow extends StatelessWidget {
                           '+${_toBanglaDigits(quest.xpReward)} XP ক্লেইম',
                           style: const TextStyle(
                             fontFamily: 'HindSiliguri',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
@@ -742,7 +743,7 @@ class _QuestItemRow extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'HindSiliguri',
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     ),
                   ),

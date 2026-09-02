@@ -133,8 +133,8 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                 Text(
                   'কুপন কোড প্রয়োগ করো',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: textColor,
                   ),
@@ -165,8 +165,8 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                           widget.appliedCoupon!.code,
                           style: TextStyle(
                             fontFamily: 'monospace',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.5,
                             color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF004633),
                             letterSpacing: 1.2,
                           ),
@@ -182,7 +182,7 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                             'সক্রিয়',
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: Colors.white,
                             ),

@@ -1035,7 +1035,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         }
       }),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF18181B) : Colors.white,
           borderRadius: BorderRadius.circular(14),
@@ -1113,50 +1113,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 height: 1.45,
               ),
             ),
-            if (q.options.isNotEmpty &&
-                q.correctAnswerIndex < q.options.length) ...[
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF064E3B).withValues(alpha: 0.3)
-                      : const Color(0xFFECFDF5),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF059669).withValues(alpha: 0.35)
-                        : const Color(0xFFA7F3D0),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      size: 15,
-                      color: isDark
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFF059669),
-                    ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: LatexText(
-                        text: q.options[q.correctAnswerIndex],
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFF34D399)
-                              : const Color(0xFF065F46),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+
           ],
         ),
       ),
@@ -1191,31 +1148,31 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             Text(
               'কোনো তথ্য পাওয়া যায়নি',
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               _activeTab == 'mistakes'
                   ? 'তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।'
                   : 'তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 12.5,
                 fontFamily: 'HindSiliguri',
                 color: Color(0xFFA3A3A3),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             GestureDetector(
               onTap: () => context.go('/setup'),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10,
+                  horizontal: 20,
+                  vertical: 9,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF059669),
@@ -1224,8 +1181,8 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 child: const Text(
                   'নতুন পরীক্ষা দাও',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: Colors.white,
                   ),
@@ -1301,8 +1258,8 @@ class _StatBox extends StatelessWidget {
             Text(
               '$value',
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
@@ -1311,9 +1268,9 @@ class _StatBox extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11.5,
                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ],

@@ -747,8 +747,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   a.masteryTier,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: Colors.white,
                     letterSpacing: 0.4,
@@ -764,8 +764,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   '${BanglaNameHelper.toBanglaNumeral(a.totalExams)}টি পরীক্ষা সম্পন্ন',
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: AppColors.mint,
                   ),
@@ -783,8 +783,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 BanglaNameHelper.toBanglaNumeral(a.masteryIndex.round()),
                 style: const TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: Colors.white,
                   height: 1,
@@ -794,8 +794,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               const Text(
                 '/১০০',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w500,
                   fontFamily: 'HindSiliguri',
                   color: Colors.white70,
                 ),
@@ -808,7 +808,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             'মাস্টারি সূচক · ${a.masterySubtitle}',
             style: TextStyle(
               fontSize: 12.5,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.normal,
               fontFamily: 'HindSiliguri',
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.35,
@@ -911,7 +911,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.normal,
               fontFamily: 'HindSiliguri',
               color: textSub,
             ),
@@ -921,8 +921,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             value,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: textPrimary,
               height: 1.1,
@@ -933,8 +933,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w500,
+              fontSize: 11,
+              fontWeight: FontWeight.normal,
               fontFamily: 'HindSiliguri',
               color: textSub,
             ),
@@ -957,8 +957,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       title,
       textAlign: textAlign,
       style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w800,
+        fontSize: 15.5,
+        fontWeight: FontWeight.w600,
         fontFamily: 'HindSiliguri',
         color: textPrimary,
       ),

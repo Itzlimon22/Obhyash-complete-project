@@ -454,48 +454,50 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     Text(
                       'অভ্যাস',
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Anek Bangla',
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     Text(
                       'পেমেন্ট রিসিট',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 13,
+                        fontFamily: 'HindSiliguri',
                         color: isDark
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF737373),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
                     Divider(
                       color: isDark
                           ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _receiptRow(
                       isDark,
                       label: 'ইনভয়েস আইডি',
                       value: '#${shortId.toUpperCase()}',
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _receiptRow(
                       isDark,
                       label: 'প্ল্যান',
                       value: invoice.planName,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _receiptRow(isDark, label: 'তারিখ', value: invoice.date),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _receiptRow(
                       isDark,
                       label: 'স্ট্যাটাস',
                       value: _statusLabel(invoice.status),
                       valueColor: _statusColor(invoice.status),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Divider(
                       color: isDark
                           ? const Color(0xFF1C1C1E)
@@ -508,8 +510,9 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                         Text(
                           'মোট পরিশোধ',
                           style: TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -518,8 +521,8 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                         Text(
                           '${invoice.currency} ${invoice.amount}.00',
                           style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF166534),
                           ),
                         ),
@@ -726,8 +729,8 @@ class _OverviewTab extends StatelessWidget {
                           activePlan!.name,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -735,7 +738,7 @@ class _OverviewTab extends StatelessWidget {
                           '${activePlan!.currency} ${activePlan!.price} / ${activePlan!.billingCycle}',
                           style: const TextStyle(
                             color: Colors.white70,
-                            fontSize: 16,
+                            fontSize: 13,
                           ),
                         ),
                       ],
@@ -1173,18 +1176,18 @@ class _SummaryChip extends StatelessWidget {
               value,
               style: TextStyle(
                 color: accentColor,
-                fontWeight: FontWeight.w900,
-                fontSize: 26,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
                 height: 1,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+                fontSize: 11.5,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ],

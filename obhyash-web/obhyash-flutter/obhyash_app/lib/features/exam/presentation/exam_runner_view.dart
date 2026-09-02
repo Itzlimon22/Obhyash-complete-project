@@ -7,7 +7,6 @@ import '../services/pdf_download_service.dart';
 import '../domain/exam_models.dart';
 import 'exam_celebration_view.dart';
 import 'widgets/question_card.dart';
-import 'widgets/exam_scope_header.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
@@ -606,8 +605,8 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                         child: Text(
                           '$answeredCount / $totalCount',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
                             color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
                           ),
                         ),
@@ -654,8 +653,8 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             Text(
                               _formatTime(state.timeLeft),
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                                 fontFamily: 'monospace',
                                 color: state.timeLeft < 60
                                     ? Colors.white
@@ -756,44 +755,147 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
         body: ListView.builder(
           padding: const EdgeInsets.fromLTRB(
             16,
-            24,
+            16,
             16,
             120,
-          ), // Exra padding for bottom bar
+          ), // Extra padding for bottom bar
           itemCount: state.questions.length,
           itemBuilder: (context, index) {
             final q = state.questions[index];
-            return QuestionCard(
-              question: q,
-              serialNumber: index + 1,
-              selectedOptionIndex: state.userAnswers[q.id],
-              isFlagged: state.flaggedQuestions.contains(q.id),
-              onSelectOption: (optIndex) {
-                ref.read(examEngineProvider.notifier).setAnswer(q.id, optIndex);
-              },
-              onToggleFlag: () {
-                ref.read(examEngineProvider.notifier).toggleFlag(q.id);
-              },
-              onReport: () {
-                AppPopups.show(
-                  context,
-                  message: 'Report generated.',
-                  isError: false,
-                );
-              },
-              isBookmarked: state.bookmarkedQuestions.contains(q.id),
-              onToggleBookmark: () {
-                final isPro = ref.read(userProfileProvider).value?.isPro ?? false;
-                final isBookmarked = state.bookmarkedQuestions.contains(q.id);
-                if (!isBookmarked && !isPro && state.bookmarkedQuestions.length >= 25) {
-                  AppPopups.warning(
-                    context,
-                    message: 'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
-                  );
-                  return;
-                }
-                ref.read(examEngineProvider.notifier).toggleBookmark(q.id, isPro: isPro);
-              },
+
+            final distinctSubjects = state.questions
+                .map((item) => BanglaNameHelper.getMainSubjectName(
+                    item.subject, item.subject))
+                .toSet();
+            final hasMultipleSubjects = distinctSubjects.length > 1;
+
+            final currentSubjectName =
+                BanglaNameHelper.getMainSubjectName(q.subject, q.subject);
+
+            final isFirstOfSubject = index == 0 ||
+                BanglaNameHelper.getMainSubjectName(
+                        state.questions[index - 1].subject,
+                        state.questions[index - 1].subject) !=
+                    currentSubjectName;
+
+            int subjectTotalCount = 0;
+            if (isFirstOfSubject) {
+              subjectTotalCount = state.questions
+                  .where((item) =>
+                      BanglaNameHelper.getMainSubjectName(
+                        item.subject,
+                        item.subject,
+                      ) ==
+                      currentSubjectName)
+                  .length;
+            }
+
+            final subjectHeader = (hasMultipleSubjects && isFirstOfSubject)
+                ? Container(
+                    margin: EdgeInsets.only(
+                      top: index == 0 ? 4 : 20,
+                      bottom: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
+                            thickness: 1,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                currentSubjectName,
+                                style: TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark
+                                      ? const Color(0xFFE4E4E7)
+                                      : const Color(0xFF0F172A),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '(${BanglaNameHelper.toBanglaNumeral(subjectTotalCount)}টি প্রশ্ন)',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
+                            thickness: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : null;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ?subjectHeader,
+                QuestionCard(
+                  question: q,
+                  serialNumber: index + 1,
+                  selectedOptionIndex: state.userAnswers[q.id],
+                  isFlagged: state.flaggedQuestions.contains(q.id),
+                  onSelectOption: (optIndex) {
+                    ref
+                        .read(examEngineProvider.notifier)
+                        .setAnswer(q.id, optIndex);
+                  },
+                  onToggleFlag: () {
+                    ref.read(examEngineProvider.notifier).toggleFlag(q.id);
+                  },
+                  onReport: () {
+                    AppPopups.show(
+                      context,
+                      message: 'Report generated.',
+                      isError: false,
+                    );
+                  },
+                  isBookmarked: state.bookmarkedQuestions.contains(q.id),
+                  onToggleBookmark: () {
+                    final isPro =
+                        ref.read(userProfileProvider).value?.isPro ?? false;
+                    final isBookmarked =
+                        state.bookmarkedQuestions.contains(q.id);
+                    if (!isBookmarked &&
+                        !isPro &&
+                        state.bookmarkedQuestions.length >= 25) {
+                      AppPopups.warning(
+                        context,
+                        message:
+                            'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
+                      );
+                      return;
+                    }
+                    ref
+                        .read(examEngineProvider.notifier)
+                        .toggleBookmark(q.id, isPro: isPro);
+                  },
+                ),
+              ],
             );
           },
         ),
@@ -801,25 +903,18 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
         // Bottom Action Bar
         bottomNavigationBar: SafeArea(
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF000000).withValues(alpha: 0.95)
-                  : Colors.white.withValues(alpha: 0.95),
+                  ? const Color(0xFF000000) // OLED Pure Black
+                  : Colors.white,
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? const Color(0xFF1C1C1E)
-                      : const Color(0xFFE5E5E5),
+                      ? const Color(0xFF2C2C2C)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 6,
-                  offset: const Offset(0, -2),
-                ),
-              ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -833,21 +928,21 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633), // Deep signature emerald green
+                    backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    minimumSize: const Size(0, 35),
+                    minimumSize: const Size(0, 38),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: const EdgeInsets.symmetric(vertical: 6.5, horizontal: 22),
+                    padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 24),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
                     'জমা দাও',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.5,
                       fontFamily: 'HindSiliguri',
                     ),
                   ),
@@ -913,38 +1008,10 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
     final totalQ = details?.totalQuestions ?? widget.state.questions.length;
     final negMark = details?.negativeMarking ?? 0.0;
 
-    final rawChapters = (details?.chapters != null &&
-            details!.chapters!.trim().isNotEmpty &&
-            details.chapters != 'All')
-        ? details.chapters!
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList()
-        : widget.state.questions
-            .map((q) => q.chapter.trim())
-            .where((c) => c.isNotEmpty && c != 'All')
-            .toSet()
-            .toList();
-
-    // Sort chapters in canonical academic order (১ম অধ্যায় -> ২য় অধ্যায় -> ৩য় অধ্যায়)
-    rawChapters.sort((a, b) {
-      final idxA = BanglaNameHelper.getChapterSortIndex(a, a);
-      final idxB = BanglaNameHelper.getChapterSortIndex(b, b);
-      if (idxA != idxB) return idxA.compareTo(idxB);
-      return a.compareTo(b);
-    });
-    final chaptersList = rawChapters;
-
-    final topicsList = (details?.topics != null &&
-            details!.topics!.trim().isNotEmpty &&
-            details.topics != 'All')
-        ? details.topics!
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList()
-        : <String>[];
+    final distinctSubjects = widget.state.questions
+        .map((q) => BanglaNameHelper.getMainSubjectName(q.subject, q.subject))
+        .toSet()
+        .toList();
 
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFF4F6FA);
     final cardBg = isDark ? const Color(0xFF111113) : Colors.white;
@@ -960,14 +1027,14 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: textPrimary, size: 20),
+          icon: Icon(LucideIcons.arrowLeft, color: textPrimary, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'পরীক্ষার নির্দেশাবলী',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
             fontFamily: 'HindSiliguri',
             color: textPrimary,
           ),
@@ -978,41 +1045,159 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── 1. Single Unified Scope, Subjects & Stat Card ───────────
+              Container(
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.25 : 0.04,
+                      ),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
-                    // ── 1. Clean Scope Header Row ──────────────────────────────
-                    ExamScopeHeader(
-                      subjectName: subjectTitle,
-                      chapters: chaptersList,
-                      topics: topicsList,
-                      isDark: isDark,
-                      margin: const EdgeInsets.only(bottom: 14),
-                    ),
-
-                    // ── 2. Stat Ribbon ────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: border),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                                alpha: isDark ? 0.25 : 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
+                    // Header Row: Emoji/Icon + Title + Subject Count Badge
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF1F1F24)
+                                  : const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFF2E2E33)
+                                    : const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            child: Text(
+                              BanglaNameHelper.getSubjectEmoji(
+                                subjectTitle,
+                                subjectTitle,
+                              ),
+                              style: const TextStyle(fontSize: 15),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              subjectTitle,
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'HindSiliguri',
+                                color: textPrimary,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF004633).withValues(
+                                alpha: isDark ? 0.3 : 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              distinctSubjects.length > 1
+                                  ? '${BanglaNameHelper.toBanglaNumeral(distinctSubjects.length)}টি বিষয়'
+                                  : 'মডেল টেস্ট',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark
+                                    ? const Color(0xFF4ADE80)
+                                    : const Color(0xFF004633),
+                              ),
+                            ),
                           ),
                         ],
+                      ),
+                    ),
+
+                    // Subject distribution list (if multi-subject preset)
+                    if (distinctSubjects.length > 1) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Divider(color: border, height: 1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Wrap(
+                          spacing: 14,
+                          runSpacing: 4,
+                          children: distinctSubjects.map((subName) {
+                            final count = widget.state.questions
+                                .where((q) =>
+                                    BanglaNameHelper.getMainSubjectName(
+                                      q.subject,
+                                      q.subject,
+                                    ) ==
+                                    subName)
+                                .length;
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                    color: accent,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '$subName — ${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark
+                                        ? const Color(0xFFD4D4D8)
+                                        : const Color(0xFF334155),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(color: border, height: 1),
+                    ),
+
+                    // 4-column Stats Ribbon inside the same card
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 6,
                       ),
                       child: Row(
                         children: [
@@ -1047,117 +1232,107 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // ── 3. Rules Card — Timeline Style ────────────────────
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: border),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                                alpha: isDark ? 0.25 : 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Section header
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(7),
-                                decoration: BoxDecoration(
-                                  color: accent.withValues(
-                                      alpha: isDark ? 0.18 : 0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(LucideIcons.shieldAlert,
-                                    size: 15, color: accent),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'গুরুত্বপূর্ণ নির্দেশনাবলী',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'HindSiliguri',
-                                  color: textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          _RuleItem(
-                            icon: LucideIcons.checkCircle2,
-                            iconColor: const Color(0xFF10B981),
-                            title: 'সঠিক উত্তর নির্বাচন',
-                            desc: 'প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর দাও। একবার অপশন সিলেক্ট করলে তা লক হয়ে যাবে।',
-                            isDark: isDark,
-                            isLast: false,
-                          ),
-                          _RuleItem(
-                            icon: LucideIcons.timer,
-                            iconColor: const Color(0xFF3B82F6),
-                            title: 'টাইমার ও স্বয়ংক্রিয় সাবমিট',
-                            desc: 'স্ক্রিনের শীর্ষে কাউন্টডাউন থাকবে। সময় শেষ হলে পরীক্ষা নিজেই সাবমিট হয়ে রেজাল্ট দেখাবে।',
-                            isDark: isDark,
-                            isLast: false,
-                          ),
-                          _RuleItem(
-                            icon: LucideIcons.layoutGrid,
-                            iconColor: const Color(0xFF8B5CF6),
-                            title: 'প্রশ্ন প্যালেট জাম্প',
-                            desc: 'উপরের প্রশ্ন নম্বরে ট্যাপ করে সরাসরি যেকোনো প্রশ্নে চলে যাও।',
-                            isDark: isDark,
-                            isLast: false,
-                          ),
-                          _RuleItem(
-                            icon: LucideIcons.alertTriangle,
-                            iconColor: const Color(0xFFEF4444),
-                            title: 'অ্যাপ ত্যাগ সতর্কতা',
-                            desc: 'পরীক্ষা চলাকালে অ্যাপ থেকে বের বা ব্যাকগ্রাউন্ডে গেলে পরীক্ষা অকার্যকর হতে পারে।',
-                            isDark: isDark,
-                            isLast: true,
-                            isWarning: true,
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
-            ),
 
-            // ── 4. Bottom Glow CTA ────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF09090B) : Colors.white,
-                border: Border(
-                  top: BorderSide(color: border, width: 1),
+              const SizedBox(height: 12),
+
+              // ── 3. Rules Card ────────────────────
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  decoration: BoxDecoration(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                          .withValues(alpha: isDark ? 0.25 : 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(
+                                  alpha: isDark ? 0.18 : 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(LucideIcons.shieldAlert,
+                                size: 13, color: accent),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'গুরুত্বপূর্ণ নির্দেশনাবলী',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'HindSiliguri',
+                              color: textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      _RuleItem(
+                        icon: LucideIcons.checkCircle2,
+                        iconColor: const Color(0xFF10B981),
+                        title: 'সঠিক উত্তর নির্বাচন',
+                        desc:
+                            'প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর দাও। একবার অপশন সিলেক্ট করলে তা লক হয়ে যাবে।',
+                        isDark: isDark,
+                        isLast: false,
+                      ),
+                      _RuleItem(
+                        icon: LucideIcons.timer,
+                        iconColor: const Color(0xFF3B82F6),
+                        title: 'টাইমার ও স্বয়ংক্রিয় সাবমিট',
+                        desc:
+                            'স্ক্রিনের শীর্ষে কাউন্টডাউন থাকবে। সময় শেষ হলে পরীক্ষা নিজেই সাবমিট হয়ে রেজাল্ট দেখাবে।',
+                        isDark: isDark,
+                        isLast: false,
+                      ),
+                      _RuleItem(
+                        icon: LucideIcons.alertTriangle,
+                        iconColor: const Color(0xFFEF4444),
+                        title: 'অ্যাপ ত্যাগ সতর্কতা',
+                        desc:
+                            'পরীক্ষা চলাকালে অ্যাপ থেকে বের বা ব্যাকগ্রাউন্ডে গেলে পরীক্ষা অকার্যকর হতে পারে।',
+                        isDark: isDark,
+                        isLast: true,
+                        isWarning: true,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: AnimatedBuilder(
+
+              const SizedBox(height: 12),
+
+              // ── 4. Bottom CTA Button ──────────────────────────────────────
+              AnimatedBuilder(
                 animation: _pulseAnim,
                 builder: (context, child) {
                   final glowOpacity = 0.22 + (_pulseAnim.value * 0.22);
                   return Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF059669).withValues(alpha: glowOpacity),
-                          blurRadius: 20 + (_pulseAnim.value * 12),
+                          color: const Color(0xFF004633)
+                              .withValues(alpha: glowOpacity),
+                          blurRadius: 16 + (_pulseAnim.value * 8),
                           spreadRadius: 0,
-                          offset: const Offset(0, 4),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -1166,41 +1341,28 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                 },
                 child: SizedBox(
                   width: double.infinity,
-                  height: 54,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: widget.onStart,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004633),
+                      backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       elevation: 0,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
+                      children: const [
+                        Icon(LucideIcons.play, size: 16),
+                        SizedBox(width: 8),
+                        Text(
                           'পরীক্ষা শুরু করো',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
                             fontFamily: 'HindSiliguri',
-                            color: Colors.white,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            LucideIcons.arrowRight,
-                            color: Colors.white,
-                            size: 16,
                           ),
                         ),
                       ],
@@ -1208,8 +1370,8 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1241,8 +1403,8 @@ class _StatCell extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: subColor,
               height: 1.2,
@@ -1251,12 +1413,12 @@ class _StatCell extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: textColor,
               height: 1.1,
@@ -1279,7 +1441,7 @@ class _StatDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 1,
-      height: 44,
+      height: 38,
       color: isDark ? const Color(0xFF27272A) : const Color(0xFFE9EFF6),
     );
   }
@@ -1322,22 +1484,22 @@ class _RuleItem extends StatelessWidget {
           Column(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: isDark ? 0.18 : 0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: iconColor.withValues(alpha: isDark ? 0.25 : 0.15),
                   ),
                 ),
-                child: Icon(icon, size: 16, color: iconColor),
+                child: Icon(icon, size: 15, color: iconColor),
               ),
               if (!isLast)
                 Expanded(
                   child: Container(
                     width: 1.5,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    margin: const EdgeInsets.symmetric(vertical: 3),
                     decoration: BoxDecoration(
                       color: lineColor,
                       borderRadius: BorderRadius.circular(2),
@@ -1347,35 +1509,35 @@ class _RuleItem extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
 
           // Content
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 18),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     title,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: isWarning
                           ? const Color(0xFFEF4444)
                           : textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 2),
                   Text(
                     desc,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.5,
                       fontFamily: 'HindSiliguri',
                       color: textSub,
-                      height: 1.45,
+                      height: 1.4,
                     ),
                   ),
                 ],

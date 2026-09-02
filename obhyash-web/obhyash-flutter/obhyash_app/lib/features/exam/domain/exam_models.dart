@@ -66,6 +66,7 @@ class Question {
   final List<String> institutes;
   final List<int> years;
   final String? examType;
+  final String difficulty; // 'easy', 'medium', 'hard'
 
   const Question({
     required this.id,
@@ -81,6 +82,7 @@ class Question {
     this.institutes = const [],
     this.years = const [],
     this.examType,
+    this.difficulty = 'medium',
   });
 
   factory Question.fromJson(Map<String, dynamic> j) {
@@ -188,6 +190,9 @@ class Question {
       institutes: validInstitutes,
       years: validYears,
       examType: j['exam_type']?.toString() ?? j['examType']?.toString(),
+      difficulty: j['difficulty']?.toString().toLowerCase() ??
+          j['difficulty_level']?.toString().toLowerCase() ??
+          'medium',
     );
   }
 
@@ -205,6 +210,7 @@ class Question {
     'institutes': institutes,
     'years': years,
     'exam_type': examType,
+    'difficulty': difficulty,
   };
 
   Question copyWith({
@@ -221,6 +227,7 @@ class Question {
     List<String>? institutes,
     List<int>? years,
     String? examType,
+    String? difficulty,
   }) {
     return Question(
       id: id ?? this.id,
@@ -236,6 +243,7 @@ class Question {
       institutes: institutes ?? this.institutes,
       years: years ?? this.years,
       examType: examType ?? this.examType,
+      difficulty: difficulty ?? this.difficulty,
     );
   }
 
@@ -275,6 +283,50 @@ class Question {
 
     return true;
   }
+
+  /// Returns true if this question is a Board-style multiple-completion MCQ (বহুপদী সমাপ্তিসূচক)
+  /// e.g. stem with i, ii, iii statements and options like "i ও ii", "ii ও iii", "i, ii ও iii".
+  bool get isMultipleCompletionMcq {
+    final qLower = question.toLowerCase();
+
+    // 1. Check if stem contains roman numeral statements + "নিচের কোনটি সঠিক?"
+    final hasRomanNumerals = RegExp(
+      r'(?:^|\s|\n)(?:i|ii|iii|\(i\)|\(ii\)|\(iii\))[\.\)]\s+',
+      caseSensitive: false,
+    ).hasMatch(question);
+    final hasConclusion = qLower.contains('কোনটি সঠিক') ||
+        qLower.contains('নিচের কোনটি') ||
+        qLower.contains('কোনটি সত্য') ||
+        qLower.contains('কোন তথ্যটি');
+
+    if (hasRomanNumerals && hasConclusion) return true;
+
+    // 2. Check if options are combinations of roman numerals (e.g. "i ও ii", "i, ii ও iii")
+    int romanComboCount = 0;
+    for (final opt in options) {
+      final optTrim = opt.trim().toLowerCase();
+      if (RegExp(
+            r'^(?:\(?i\)?|\(?ii\)?|\(?iii\)?|\(?iv\)?)\s*(?:ও|এবং|,|\&|\+)\s*(?:\(?i\)?|\(?ii\)?|\(?iii\)?|\(?iv\)?)(?:\s*(?:ও|এবং|,|\&|\+)\s*(?:\(?i\)?|\(?ii\)?|\(?iii\)?|\(?iv\)?))?$',
+          ).hasMatch(optTrim) ||
+          (RegExp(r'^[ivx123\s,ওএবং\(\)\.\-]+$', caseSensitive: false)
+                  .hasMatch(optTrim) &&
+              (optTrim.contains('ও') ||
+                  optTrim.contains('এবং') ||
+                  optTrim.contains(',')))) {
+        romanComboCount++;
+      }
+    }
+
+    if (romanComboCount >= 2) return true;
+
+    return false;
+  }
+
+  /// Returns true if this question is a direct standard admission MCQ
+  /// (strictly excludes Board-style বহুপদী সমাপ্তিসূচক / multiple-completion questions).
+  bool get isAdmissionStandardMcq {
+    return isStrictMcq && !isMultipleCompletionMcq;
+  }
 }
 
 class ExamConfig {
@@ -299,6 +351,13 @@ class ExamConfig {
     required this.durationMinutes,
     required this.negativeMarking,
   });
+}
+
+class PresetSubjectDistribution {
+  final String subject;
+  final int count;
+
+  const PresetSubjectDistribution(this.subject, this.count);
 }
 
 class ExamResult {

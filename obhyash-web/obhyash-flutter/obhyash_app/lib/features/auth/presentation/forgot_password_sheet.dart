@@ -94,17 +94,17 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                 'পাসওয়ার্ড ভুলে গেছেন?',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               const Text(
                 'তোমার ইমেইল ঠিকানা দাও। আমরা একটি পাসওয়ার্ড রিসেট লিংক পাঠাবো।',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 16,
+                  fontSize: 13,
                   color: Color(0xFFA1A1AA),
                 ),
               ),

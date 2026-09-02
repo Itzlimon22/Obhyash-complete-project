@@ -55,10 +55,23 @@ class DashboardRepository {
         final subId = sub.id.toLowerCase();
 
         // Level / Stream safety check (HSC vs SSC)
-        if (streamUpper.contains('SSC')) {
+        final isHSC = streamUpper.contains('HSC') ||
+            (streamUpper.isEmpty && !streamUpper.contains('SSC'));
+        final isSSC = streamUpper.contains('SSC');
+
+        if (isSSC) {
           if (subId.startsWith('hsc_') || subName.contains('hsc')) return false;
-        } else if (streamUpper.contains('HSC')) {
+        } else if (isHSC) {
           if (subId.startsWith('ssc_') || subName.contains('ssc')) return false;
+          // For HSC, General Math ('math', 'general_math', 'গণিত', 'সাধারণ গণিত') is SSC-only and duplicates Higher Math
+          if (subId == 'math' ||
+              subId == 'general_math' ||
+              subId == 'ssc_general_math' ||
+              subId == 'ssc_math' ||
+              subName == 'গণিত' ||
+              subName == 'সাধারণ গণিত') {
+            return false;
+          }
         }
 
         final isBiology =

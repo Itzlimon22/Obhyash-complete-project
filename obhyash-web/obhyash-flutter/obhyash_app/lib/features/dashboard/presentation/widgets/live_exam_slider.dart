@@ -59,7 +59,7 @@ class LiveExamSlider extends ConsumerWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.only(top: 2, bottom: 2),
+          padding: const EdgeInsets.only(top: 14, bottom: 6),
           child: CarouselSlider(
             options: CarouselOptions(
               height: 100.0,
@@ -88,8 +88,8 @@ class LiveExamSlider extends ConsumerWidget {
     final isOngoing = exam.isOngoing;
     final isTaken = exam.userAttemptStatus == 'submitted';
 
-    Color cardBg = isDark ? const Color(0xFF13151F) : Colors.white;
-    Color borderColor = isDark ? const Color(0xFF232738) : const Color(0xFFE2E8F0);
+    Color cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
+    Color borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
     Color bottomStripBg;
     Color statusColor;
     String statusText;
@@ -99,17 +99,17 @@ class LiveExamSlider extends ConsumerWidget {
       statusText = 'অংশগ্রহণকৃত';
       statusIcon = LucideIcons.checkCircle2;
       statusColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
-      bottomStripBg = isDark ? const Color(0xFF0E1A2E) : const Color(0xFFEFF6FF);
+      bottomStripBg = isDark ? const Color(0xFF27272A) : const Color(0xFFEFF6FF);
     } else if (isOngoing) {
       statusText = 'Ongoing';
       statusIcon = LucideIcons.zap;
-      statusColor = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
-      bottomStripBg = isDark ? const Color(0xFF0C2419) : const Color(0xFFF0FDF4);
+      statusColor = isDark ? const Color(0xFF34D399) : const Color(0xFF12544F);
+      bottomStripBg = isDark ? const Color(0xFF12544F).withValues(alpha: 0.25) : const Color(0xFFE6F0EC);
     } else {
       statusText = 'Upcoming';
       statusIcon = LucideIcons.clock;
-      statusColor = isDark ? const Color(0xFFF87171) : const Color(0xFFB91C1C);
-      bottomStripBg = isDark ? const Color(0xFF260C0E) : const Color(0xFFFEF2F2);
+      statusColor = const Color(0xFF740A03);
+      bottomStripBg = isDark ? const Color(0xFF740A03).withValues(alpha: 0.18) : const Color(0xFFFEF2F2);
     }
 
     final timeRemainingText = _formatTimeRemaining(exam);
@@ -131,13 +131,11 @@ class LiveExamSlider extends ConsumerWidget {
           decoration: BoxDecoration(
             color: cardBg,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor, width: 1.2),
+            border: Border.all(color: borderColor, width: 1.0),
             boxShadow: [
               BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.25)
-                    : const Color(0xFF64748B).withValues(alpha: 0.06),
-                blurRadius: 7,
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+                blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -157,8 +155,8 @@ class LiveExamSlider extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Anek Bangla',
                         letterSpacing: -0.2,
                       ),

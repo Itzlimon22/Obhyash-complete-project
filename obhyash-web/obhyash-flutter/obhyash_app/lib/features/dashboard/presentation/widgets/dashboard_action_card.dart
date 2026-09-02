@@ -65,25 +65,16 @@ class _DashboardActionCardState extends State<DashboardActionCard>
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E7EB),
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : const Color(0xFFE4E4E7),
-                blurRadius: 0,
-                offset: const Offset(0, 2),
-              ),
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.15)
-                    : const Color(0x0A000000),
-                blurRadius: 6,
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+                blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -137,7 +128,7 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                   fontFamily: 'Anek Bangla',
                 ),

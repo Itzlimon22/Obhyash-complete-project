@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   User,
@@ -82,13 +82,13 @@ interface SupportNoteItem {
   metadata?: Record<string, any>;
 }
 
-export default function UserDetailsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const resolvedParams = use(params);
-  const userId = resolvedParams.id;
+export default function UserDetailsPage() {
+  const urlParams = useParams();
+  const userId = typeof urlParams?.id === 'string'
+    ? urlParams.id
+    : Array.isArray(urlParams?.id)
+    ? urlParams.id[0]
+    : '';
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');

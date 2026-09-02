@@ -72,8 +72,8 @@ class PrivacyPolicyView extends StatelessWidget {
                     'গোপনীয়তা ও নিরাপত্তা নীতি',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
@@ -83,7 +83,7 @@ class PrivacyPolicyView extends StatelessWidget {
                     'তোমার ব্যক্তিগত ও একাডেমিক তথ্যের শতভাগ নিরাপত্তা আমাদের সর্বোচ্চ অগ্রাধিকার।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       height: 1.45,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
@@ -100,7 +100,7 @@ class PrivacyPolicyView extends StatelessWidget {
                       'সর্বশেষ হালনাগাদ: ১৫ আগস্ট, ২০২৬',
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.normal,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                       ),
@@ -257,8 +257,8 @@ class _PolicyCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
@@ -286,7 +286,7 @@ class _PolicyCard extends StatelessWidget {
                     child: Text(
                       item,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         height: 1.45,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),

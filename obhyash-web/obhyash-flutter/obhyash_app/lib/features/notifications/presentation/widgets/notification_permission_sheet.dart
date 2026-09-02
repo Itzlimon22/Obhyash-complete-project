@@ -78,8 +78,8 @@ class NotificationPermissionSheet extends StatelessWidget {
               'পড়াশোনা ও স্ট্রিক যাতে মিস না হয়',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'Anek Bangla',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),

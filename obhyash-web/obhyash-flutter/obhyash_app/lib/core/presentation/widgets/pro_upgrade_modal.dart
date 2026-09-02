@@ -198,14 +198,13 @@ class ProUpgradeModal extends StatelessWidget {
                 context.push('/profile/subscription');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF059669),
+                backgroundColor: const Color(0xFF12544F),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
-                elevation: 3,
-                shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
+                elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -215,8 +214,8 @@ class ProUpgradeModal extends StatelessWidget {
                   Text(
                     'প্রো প্ল্যানগুলো দেখো',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                     ),
                   ),

@@ -215,24 +215,12 @@ String _cleanIntraSentenceNewlines(String text) {
   return buffer.toString().replaceAll(placeholder, '\n\n');
 }
 
-String _cleanPipesAndDelimiters(String text) {
-  final lines = text.split('\n');
-  final cleaned = lines.map((line) {
-    final trimmed = line.trim();
-    if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.split('|').length > 2) {
-      return line;
-    }
-    return line.replaceAll(RegExp(r'\s*\|\s*'), '\n\n');
-  });
-  return cleaned.join('\n');
-}
-
 String _separateTransitionSteps(String text) {
   var t = text;
 
   t = t.replaceAllMapped(
     RegExp(
-      r'([।\?\!\:\;\|])\s*(ধরি|মনে করি|প্রদত্ত মানসমূহ|প্রদত্ত তথ্য|দেওয়া আছে|দেয়া আছে|আমরা জানি|জানা আছে|প্রশ্নমতে|শর্তমতে|অর্থাৎ|সুতরাং|অতএব|মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|গণনা করে পাই|সঠিক উত্তর|উত্তর|নোট|টিপস)[\s:\-–—\.]*',
+      r'([।\?\!\:\;])\s*(ধরি|মনে করি|প্রদত্ত মানসমূহ|প্রদত্ত তথ্য|দেওয়া আছে|দেয়া আছে|আমরা জানি|জানা আছে|প্রশ্নমতে|শর্তমতে|অর্থাৎ|সুতরাং|অতএব|মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|গণনা করে পাই|সঠিক উত্তর|উত্তর|নোট|টিপস)[\s:\-–—\.]*',
     ),
     (m) => '${m.group(1)}\n\n${m.group(2)}: ',
   );
@@ -250,7 +238,6 @@ String _separateTransitionSteps(String text) {
 
 String _preprocess(String text) {
   var processedText = QuestionFormatter.format(text);
-  processedText = _cleanPipesAndDelimiters(processedText);
   processedText = _separateTransitionSteps(processedText);
 
   // Single dollar balancing per line
@@ -285,7 +272,17 @@ String _preprocess(String text) {
       }
     }
 
-    if (!l.contains(r'$') && !RegExp(r'[\u0980-\u09FF]').hasMatch(l) && (l.contains(r'\') || l.contains('='))) {
+    // Auto-heal corrupted LaTeX commands (e.g. \left( ... ight) -> \left( ... \right))
+    l = l.replaceAllMapped(
+      RegExp(r'(\\left\s*[(\[{|.]\s*[^\\)]*?)(?:\\?r?ight|\bight)\s*([)\]}|.])'),
+      (m) => '${m.group(1)}\\right${m.group(2)}',
+    );
+    l = l.replaceAll(RegExp(r'(?<=\s|\(|\{|^)ight\b'), r'\right');
+    l = l.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
+
+    if (!l.contains(r'$') &&
+        !RegExp(r'[\u0980-\u09FF]').hasMatch(l) &&
+        (l.contains(r'\') || l.contains('='))) {
       l = '\$$l\$';
     }
 

@@ -269,8 +269,8 @@ class _FaqViewState extends State<FaqView> {
                 Text(
                   'ক্যাটাগরি:',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                   ),
@@ -289,8 +289,8 @@ class _FaqViewState extends State<FaqView> {
                             label: Text(
                               cat,
                               style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                fontSize: 12.5,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                 fontFamily: 'HindSiliguri',
                                 color: isSelected
                                     ? Colors.white
@@ -334,7 +334,7 @@ class _FaqViewState extends State<FaqView> {
                 child: Text(
                   'কোনো প্রশ্ন পাওয়া যায়নি!',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                   ),
@@ -382,8 +382,8 @@ class _FaqViewState extends State<FaqView> {
                         child: Text(
                           '?',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             color: const Color(0xFF10B981),
                           ),
                         ),
@@ -391,8 +391,8 @@ class _FaqViewState extends State<FaqView> {
                       title: Text(
                         item.question,
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
@@ -412,7 +412,7 @@ class _FaqViewState extends State<FaqView> {
                             child: Text(
                               item.answer,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 height: 1.5,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),

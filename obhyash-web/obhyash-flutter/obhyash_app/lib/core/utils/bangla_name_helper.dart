@@ -102,6 +102,24 @@ class BanglaNameHelper {
         .join(' ');
   }
 
+  /// Returns the base canonical main subject name (merging 1st & 2nd papers)
+  /// e.g. "রসায়ন ১ম পত্র" -> "রসায়ন", "physics_2nd" -> "পদার্থবিজ্ঞান"
+  static String getMainSubjectName(String? subject, [String? subjectLabel]) {
+    final formatted = formatSubject(subject, subjectLabel);
+    if (formatted.contains('পদার্থবিজ্ঞান')) return 'পদার্থবিজ্ঞান';
+    if (formatted.contains('রসায়ন')) return 'রসায়ন';
+    if (formatted.contains('উচ্চতর গণিত') || formatted.contains('গণিত')) {
+      if (formatted.contains('সাধারণ গণিত')) return 'সাধারণ গণিত';
+      return 'উচ্চতর গণিত';
+    }
+    if (formatted.contains('জীববিজ্ঞান') || formatted.contains('উদ্ভিদ') || formatted.contains('প্রাণি')) return 'জীববিজ্ঞান';
+    if (formatted.contains('বাংলা')) return 'বাংলা';
+    if (formatted.contains('ইংরেজি') || formatted.contains('English')) return 'ইংরেজি';
+    if (formatted.contains('আইসিটি') || formatted.contains('তথ্য ও যোগাযোগ') || formatted.contains('ict')) return 'তথ্য ও যোগাযোগ প্রযুক্তি';
+    if (formatted.contains('সাধারণ জ্ঞান') || formatted.contains('GK')) return 'সাধারণ জ্ঞান';
+    return formatted.replaceAll(RegExp(r'\s*(?:১ম|২য়|১ম পত্র|২য় পত্র|১ম খণ্ড|২য় খণ্ড)\b'), '').trim();
+  }
+
   /// Converts chapter strings into clean Bengali text.
   /// Translates common chapter formats like "Chapter 1", "Ch-1", and converts English digits to Bengali.
   static String formatChapter(String? chapter) {
@@ -782,6 +800,93 @@ class BanglaNameHelper {
     variants.addAll(extra);
 
     return variants.where((s) => s.trim().isNotEmpty).toList();
+  }
+
+  /// Returns separate variant lists for Paper 1 and Paper 2 for uniform paper-balanced sampling
+  static ({List<String> paper1, List<String> paper2, List<String> general}) getSubjectPaperSplitVariants(String subjectKey, [String? banglaName]) {
+    final lowerKey = subjectKey.trim().toLowerCase();
+    final lowerBangla = (banglaName ?? '').trim().toLowerCase();
+
+    if (lowerKey.contains('physics') || lowerBangla.contains('পদার্থ')) {
+      return (
+        paper1: [
+          'hsc_physics_1', 'physics_1', 'physics1', 'physics 1',
+          'Physics 1st Paper', 'পদার্থবিজ্ঞান ১ম পত্র', 'পদার্থবিজ্ঞান ১', 'পদার্থবিজ্ঞান ১ম',
+        ],
+        paper2: [
+          'hsc_physics_2', 'physics_2', 'physics2', 'physics 2',
+          'Physics 2nd Paper', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২',
+        ],
+        general: ['ssc_physics', 'physics', 'পদার্থবিজ্ঞান'],
+      );
+    } else if (lowerKey.contains('chem') || lowerBangla.contains('রসায়ন') || lowerBangla.contains('রসায়ন')) {
+      return (
+        paper1: [
+          'hsc_chemistry_1', 'chemistry_1', 'chemistry1', 'chemistry 1',
+          'Chemistry 1st Paper', 'রসায়ন ১ম পত্র', 'রসায়ন ১ম পত্র', 'রসায়ন ১', 'রসায়ন ১',
+        ],
+        paper2: [
+          'hsc_chemistry_2', 'chemistry_2', 'chemistry2', 'chemistry 2',
+          'Chemistry 2nd Paper', 'রসায়ন ২য় পত্র', 'রসায়ন ২য় পত্র', 'রসায়ন ২', 'রসায়ন ২',
+        ],
+        general: ['ssc_chemistry', 'chemistry', 'রসায়ন', 'রসায়ন'],
+      );
+    } else if (lowerKey.contains('higher_math') || lowerBangla.contains('উচ্চতর গণিত')) {
+      return (
+        paper1: [
+          'hsc_higher_math_1', 'higher_math_1', 'higher_math1', 'higher_math 1',
+          'math_1', 'math1', 'Higher Math 1st Paper', 'উচ্চতর গণিত ১ম পত্র', 'উচ্চতর গণিত ১',
+        ],
+        paper2: [
+          'hsc_higher_math_2', 'higher_math_2', 'higher_math2', 'higher_math 2',
+          'math_2', 'math2', 'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২',
+        ],
+        general: ['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত'],
+      );
+    } else if (lowerKey.contains('bio') || lowerKey.contains('botany') || lowerKey.contains('zoology') || lowerBangla.contains('জীববিজ্ঞান') || lowerBangla.contains('উদ্ভিদ') || lowerBangla.contains('প্রাণি')) {
+      return (
+        paper1: [
+          'hsc_biology_1', 'biology_1', 'biology1', 'botany', 'hsc_botany',
+          'Biology 1st Paper', 'জীববিজ্ঞান ১ম পত্র', 'জীববিজ্ঞান ১', 'উদ্ভিদবিজ্ঞান', 'উদ্ভিদ বিজ্ঞান',
+        ],
+        paper2: [
+          'hsc_biology_2', 'biology_2', 'biology2', 'zoology', 'hsc_zoology',
+          'Biology 2nd Paper', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২', 'প্রাণিবিজ্ঞান', 'প্রাণীবিজ্ঞান',
+        ],
+        general: ['ssc_biology', 'biology', 'জীববিজ্ঞান'],
+      );
+    } else if (lowerKey.contains('bangla') || lowerBangla.contains('বাংলা')) {
+      return (
+        paper1: [
+          'hsc_bangla_1', 'bangla_1', 'bangla1', 'bangla 1',
+          'Bangla 1st Paper', 'বাংলা ১ম পত্র', 'বাংলা ১',
+        ],
+        paper2: [
+          'hsc_bangla_2', 'bangla_2', 'bangla2', 'bangla 2',
+          'Bangla 2nd Paper', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র', 'বাংলা ২',
+        ],
+        general: ['ssc_bangla', 'bangla', 'বাংলা'],
+      );
+    } else if (lowerKey.contains('english') || lowerBangla.contains('ইংরেজি')) {
+      return (
+        paper1: [
+          'hsc_english_1', 'english_1', 'english1', 'english 1',
+          'English 1st Paper', 'ইংরেজি ১ম পত্র', 'ইংরেজি ১',
+        ],
+        paper2: [
+          'hsc_english_2', 'english_2', 'english2', 'english 2',
+          'English 2nd Paper', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২',
+        ],
+        general: ['ssc_english', 'english', 'ইংরেজি'],
+      );
+    }
+
+    final allVariants = getSubjectSearchVariants(subjectKey, banglaName);
+    return (
+      paper1: allVariants,
+      paper2: const <String>[],
+      general: allVariants,
+    );
   }
 
   /// Returns canonical academic sorting priority (10..200) for standard subject hierarchy.

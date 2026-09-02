@@ -37,15 +37,15 @@ class MainBottomNav extends StatelessWidget {
     ];
 
     final activeColor = isDark
-        ? const Color(0xFF10B981)
-        : const Color(0xFF004633);
+        ? const Color(0xFF34D399) // Clean readable vibrant teal on OLED black
+        : const Color(0xFF12544F); // Viridian Forest #12544F
     final inactiveColor = isDark
-        ? const Color(0xFF737373)
-        : const Color(0xFF9CA3AF);
-    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
+        ? const Color(0xFFA1A1AA)
+        : const Color(0xFF737373);
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white; // OLED Pure Black
     final borderColor = isDark
-        ? const Color(0xFF1C1C1E)
-        : const Color(0xFFE5E5E5);
+        ? const Color(0xFF2C2C2C) // Solid #2C2C2C
+        : const Color(0xFFE5E7EB);
 
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -65,15 +65,6 @@ class MainBottomNav extends StatelessWidget {
               decoration: BoxDecoration(
                 color: bgColor,
                 border: Border(top: BorderSide(color: borderColor, width: 1)),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? const Color(0x40000000)
-                        : const Color(0x10000000),
-                    blurRadius: 16,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
               ),
             ),
 
@@ -117,50 +108,29 @@ class MainBottomNav extends StatelessWidget {
                               // The FAB itself (sticks out of the bar)
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                width: 52,
-                                height: 52,
+                                width: 50,
+                                height: 50,
                                 decoration: BoxDecoration(
-                                  color: isActive
-                                      ? activeColor
-                                      : (isDark
-                                            ? Colors.white
-                                            : const Color(0xFF000000)),
-                                  borderRadius: BorderRadius.circular(
-                                    16,
-                                  ), // Web uses rounded-2xl
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: isActive
-                                          ? activeColor.withValues(alpha: 0.3)
-                                          : (isDark
-                                                ? Colors.white.withValues(
-                                                    alpha: 0.1,
-                                                  )
-                                                : Colors.black.withValues(
-                                                    alpha: 0.2,
-                                                  )),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                  color: const Color(0xFF12544F), // Solid #12544F
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF2C2C2C) : Colors.transparent,
+                                    width: 1,
+                                  ),
                                 ),
                                 child: Icon(
                                   icon,
                                   size: 22,
-                                  color: isActive
-                                      ? Colors.white
-                                      : (isDark
-                                            ? const Color(0xFF000000)
-                                            : Colors.white),
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 5),
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12.5,
                                   fontFamily: 'Anek Bangla',
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: isActive ? activeColor : inactiveColor,
                                 ),
                               ),
@@ -184,7 +154,7 @@ class MainBottomNav extends StatelessWidget {
                               // Active indicator pill at top
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                width: isRealActive ? 32 : 0,
+                                width: isRealActive ? 28 : 0,
                                 height: 2.5,
                                 decoration: BoxDecoration(
                                   color: activeColor,
@@ -197,20 +167,20 @@ class MainBottomNav extends StatelessWidget {
                               const Spacer(),
                               Icon(
                                 icon,
-                                size: 22,
+                                size: 20,
                                 color: isRealActive
                                     ? activeColor
                                     : inactiveColor,
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 3),
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: isRealActive
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                                   color: isRealActive
                                       ? activeColor
                                       : inactiveColor,

@@ -27,25 +27,17 @@ class SubjectStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
         ),
         boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-              spreadRadius: -2,
-            ),
-          if (isDark)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -57,16 +49,14 @@ class SubjectStatCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF059669).withOpacity(0.25)
-                      : const Color(0xFFECFDF5),
+                      ? const Color(0xFF12544F).withValues(alpha: 0.25)
+                      : const Color(0xFFE6F0EC),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   LucideIcons.barChart2,
                   size: 16,
-                  color: isDark
-                      ? const Color(0xFF059669)
-                      : const Color(0xFF059669),
+                  color: const Color(0xFF12544F),
                 ),
               ),
               const SizedBox(width: 10),
@@ -74,8 +64,8 @@ class SubjectStatCard extends StatelessWidget {
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontWeight: FontWeight.w900,
-                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15.5,
                   color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                 ),
               ),
@@ -88,13 +78,13 @@ class SubjectStatCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF1C1C1E).withOpacity(0.5)
+                    ? const Color(0xFF2C2C2C)
                     : const Color(0xFFFAFAFA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFE5E5E5),
+                      ? const Color(0xFF2C2C2C)
+                      : const Color(0xFFE5E7EB),
                   style: BorderStyle.solid,
                 ),
               ),
@@ -244,7 +234,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                               fontFamily: 'Anek Bangla',
                               fontWeight:
                                   FontWeight.w600, // Medium weight like webapp
-                              fontSize: 16, // Smaller font like webapp
+                              fontSize: 14.5, // Sleek font scale
                               color: _isOpen
                                   ? (isDark
                                         ? const Color(0xFF059669)
@@ -281,8 +271,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF4B5563),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12.5,
                           ),
                         ),
                       ),
@@ -419,7 +409,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                       Text(
                         'বিস্তারিত রিপোর্ট',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Anek Bangla',
                           color: isDark
@@ -471,8 +461,8 @@ class _StatBox extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: 'Anek Bangla',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
                 color: isDark
                     ? const Color(0xFFA3A3A3)
                     : const Color(0xFF6B7280),
@@ -482,9 +472,8 @@ class _StatBox extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight
-                    .bold, // Replaced w900 which can fail on some fonts
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: color,
               ),
             ),

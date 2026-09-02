@@ -195,8 +195,8 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
           _chapter?.chapterName ?? 'সূত্র তালিকা',
           style: TextStyle(
             fontFamily: 'Anek Bangla',
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),

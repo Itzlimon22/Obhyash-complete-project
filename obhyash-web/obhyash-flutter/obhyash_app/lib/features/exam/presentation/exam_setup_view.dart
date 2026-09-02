@@ -183,7 +183,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         } else if (level != null && level.toUpperCase() == 'HSC') {
           if (subId.startsWith('ssc_') ||
               subName.contains('ssc') ||
-              subLevel == 'SSC') {
+              subLevel == 'SSC' ||
+              subId == 'math' ||
+              subId == 'general_math' ||
+              subId == 'ssc_general_math' ||
+              subId == 'ssc_math' ||
+              subName == 'গণিত' ||
+              subName == 'সাধারণ গণিত') {
             return false;
           }
         }
@@ -499,6 +505,586 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     }
   }
 
+
+  static const List<_PresetExamBadge> _allPresetBadges = [
+    // Engineering (engi)
+    _PresetExamBadge(
+      id: 'buet',
+      label: 'BUET',
+      fullName: 'বুয়েট মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 34),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 33),
+        PresetSubjectDistribution('রসায়ন', 33),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'iut',
+      label: 'IUT',
+      fullName: 'আইইউটি (IUT) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 35),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 35),
+        PresetSubjectDistribution('রসায়ন', 15),
+        PresetSubjectDistribution('English', 15),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ckruet',
+      label: 'CKRUET',
+      fullName: 'চুয়েট-কুয়েট-রুয়েট গুচ্ছ',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('English', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'mist',
+      label: 'MIST',
+      fullName: 'এমআইএসটি (MIST) মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 30),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'butex',
+      label: 'BUTEX',
+      fullName: 'বুটেক্স মডেল টেস্ট',
+      category: 'engineering',
+      defaultExamType: 'Engineering',
+      durationMinutes: 80,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 30),
+        PresetSubjectDistribution('উচ্চতর গণিত', 30),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+
+    // Medical (medi)
+    _PresetExamBadge(
+      id: 'medical_dental',
+      label: 'মেডিকেল+ডেন্টাল',
+      fullName: 'মেডিকেল ও ডেন্টাল ভর্তি পরীক্ষা',
+      category: 'medical',
+      defaultExamType: 'Medical',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 15),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('জীববিজ্ঞান', 30),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 10),
+        PresetSubjectDistribution('English', 15),
+        PresetSubjectDistribution('মানবিক গুণাবলি medi admission special', 5),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'mbbs',
+      label: 'মেডিকেল (MBBS)',
+      fullName: 'সরকারি মেডিকেল কলেজ (MBBS)',
+      category: 'medical',
+      defaultExamType: 'Medical',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 20),
+        PresetSubjectDistribution('English', 15),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'bds',
+      label: 'ডেন্টাল (BDS)',
+      fullName: 'সরকারি ডেন্টাল কলেজ (BDS)',
+      category: 'medical',
+      defaultExamType: 'Medical',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 20),
+        PresetSubjectDistribution('English', 15),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'afmc',
+      label: 'AFMC / AMC',
+      fullName: 'আর্মড ফোর্সেস মেডিকেল কলেজ',
+      category: 'medical',
+      defaultExamType: 'Medical',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 20),
+        PresetSubjectDistribution('English', 15),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 10),
+      ],
+    ),
+
+    // Varsity (varsity)
+    _PresetExamBadge(
+      id: 'du_ka',
+      label: "ঢাবি 'ক'",
+      fullName: "ঢাকা বিশ্ববিদ্যালয় 'ক' ইউনিট (বিজ্ঞান)",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 45,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 15),
+        PresetSubjectDistribution('রসায়ন', 15),
+        PresetSubjectDistribution('উচ্চতর গণিত', 15),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'বাংলা', 'English'],
+      optionalQuestionsCount: 15,
+    ),
+    _PresetExamBadge(
+      id: 'cou_a',
+      label: "CoU 'A'",
+      fullName: "কুমিল্লা বিশ্ববিদ্যালয় 'এ' ইউনিট",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'English'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'sust_a',
+      label: 'SUST A',
+      fullName: 'শাহজালাল বিজ্ঞান ও প্রযুক্তি (এ ইউনিট)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 20),
+        PresetSubjectDistribution('রসায়ন', 20),
+        PresetSubjectDistribution('উচ্চতর গণিত', 20),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'English'],
+      optionalQuestionsCount: 20,
+    ),
+    _PresetExamBadge(
+      id: 'ju_a',
+      label: 'জাবি এ',
+      fullName:
+          "জাহাঙ্গীরনগর বিশ্ববিদ্যালয় 'এ' ইউনিট (গাণিতিক ও পদার্থবিজ্ঞান)",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 55,
+      negativeMarking: 0.20,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 22),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 22),
+        PresetSubjectDistribution('রসায়ন', 22),
+        PresetSubjectDistribution('আইসিটি', 8),
+        PresetSubjectDistribution('বাংলা ও ইংরেজি', 6),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'bup_fsss',
+      label: 'BUP FSSS/FASS',
+      fullName: 'বিইউপি এফএসএসএস / এফএএসএস',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('English', 35),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 30),
+        PresetSubjectDistribution('বাংলা', 15),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ru_a',
+      label: 'RU A',
+      fullName: "রাজশাহী বিশ্ববিদ্যালয় 'এ' ইউনিট",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলা', 30),
+        PresetSubjectDistribution('English', 30),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 20),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'agri_cluster',
+      label: 'কৃষি গুচ্ছ',
+      fullName: 'সমন্বিত কৃষি গুচ্ছ (৯ বিশ্ববিদ্যালয়)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 30),
+        PresetSubjectDistribution('রসায়ন', 20),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 20),
+        PresetSubjectDistribution('উচ্চতর গণিত', 20),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'iba',
+      label: 'IBA',
+      fullName: 'আইবিএ (IBA) ভর্তি পরীক্ষা',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 90,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('English', 30),
+        PresetSubjectDistribution('Mathematics', 30),
+        PresetSubjectDistribution('Analytical Ability', 15),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'bup_fbs',
+      label: 'BUP FBS',
+      fullName: 'বিইউপি ব্যবসায় শিক্ষা অনুষদ (বিজ্ঞান শাখা)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('English', 30),
+        PresetSubjectDistribution('সাধারণ গণিত', 35),
+        PresetSubjectDistribution('সাধারণ জ্ঞান', 15),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'cu_science',
+      label: 'চবি বিজ্ঞান',
+      fullName: "চট্টগ্রাম বিশ্ববিদ্যালয় 'এ' ইউনিট (বিজ্ঞান)",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'বাংলা', 'English'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'ru_ga',
+      label: 'রাবি গ (বিজ্ঞান)',
+      fullName: "রাজশাহী বিশ্ববিদ্যালয় 'গ' ইউনিট (বিজ্ঞান)",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.20,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('আইসিটি', 5),
+      ],
+      optionalChoices: ['উচ্চতর গণিত', 'জীববিজ্ঞান'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'bup_fst',
+      label: 'BUP FST',
+      fullName: 'বিইউপি বিজ্ঞান ও প্রযুক্তি অনুষদ',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 20),
+        PresetSubjectDistribution('English', 10),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'gst_ka',
+      label: 'গুচ্ছ ক (বিজ্ঞান)',
+      fullName: 'জিএসটি সমন্বিত সাধারণ ও বিজ্ঞান প্রযুক্তি (ক ইউনিট)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'বাংলা', 'English', 'আইসিটি'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'ju_d',
+      label: 'জাবি ডি',
+      fullName: "জাহাঙ্গীরনগর বিশ্ববিদ্যালয় 'ডি' ইউনিট (জীববিজ্ঞান)",
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 55,
+      negativeMarking: 0.20,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উদ্ভিদবিজ্ঞান', 22),
+        PresetSubjectDistribution('প্রাণিবিজ্ঞান', 22),
+        PresetSubjectDistribution('রসায়ন', 24),
+        PresetSubjectDistribution('বাংলা ও ইংরেজি', 8),
+        PresetSubjectDistribution('সাধারণ জ্ঞান ও বুদ্ধিমত্তা', 4),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'hstu_a',
+      label: 'HSTU A',
+      fullName: 'হাজী মোহাম্মদ দানেশ বিজ্ঞান ও প্রযুক্তি (এ ইউনিট)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+      ],
+      optionalChoices: ['জীববিজ্ঞান', 'English'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'hstu_b',
+      label: 'HSTU B',
+      fullName: 'হাজী মোহাম্মদ দানেশ বিজ্ঞান ও প্রযুক্তি (বি ইউনিট)',
+      category: 'varsity',
+      defaultExamType: 'Varsity',
+      durationMinutes: 60,
+      negativeMarking: 0.25,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 35),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('English', 15),
+      ],
+    ),
+  ];
+
+  List<_PresetExamBadge> _getFilteredPresetBadges(UserProfile? profile) {
+    final rawTarget = [
+      profile?.target,
+      profile?.examTarget,
+      profile?.level,
+      profile?.stream,
+      profile?.division,
+    ]
+        .whereType<String>()
+        .where((s) => s.trim().isNotEmpty)
+        .join(' ')
+        .toLowerCase()
+        .trim();
+
+    final bool isMedical = rawTarget.contains('mbbs') ||
+        rawTarget.contains('medical') ||
+        rawTarget.contains('মেডিকেল') ||
+        rawTarget.contains('mat') ||
+        rawTarget.contains('dental');
+
+    final bool isEngineering = rawTarget.contains('eng') ||
+        rawTarget.contains('buet') ||
+        rawTarget.contains('engineering') ||
+        rawTarget.contains('ckruet') ||
+        rawTarget.contains('kuet') ||
+        rawTarget.contains('ruet') ||
+        rawTarget.contains('cuet') ||
+        rawTarget.contains('butex') ||
+        rawTarget.contains('mist') ||
+        rawTarget.contains('iut') ||
+        rawTarget.contains('ইঞ্জিনিয়ারিং');
+
+    final bool isVarsityOnly = !isMedical &&
+        !isEngineering &&
+        (rawTarget.contains('varsity') ||
+            rawTarget.contains('university') ||
+            rawTarget.contains('ভার্সিটি') ||
+            rawTarget.contains('gst') ||
+            rawTarget.contains('du') ||
+            rawTarget.contains('ju') ||
+            rawTarget.contains('ru') ||
+            rawTarget.contains('cu'));
+
+    List<_PresetExamBadge> list;
+    if (isMedical) {
+      // Medical + Varsity
+      list = _allPresetBadges
+          .where((p) => p.category == 'medical' || p.category == 'varsity')
+          .toList();
+    } else if (isEngineering) {
+      // Engineering + Varsity
+      list = _allPresetBadges
+          .where((p) => p.category == 'engineering' || p.category == 'varsity')
+          .toList();
+    } else if (isVarsityOnly) {
+      // Varsity only
+      list = _allPresetBadges.where((p) => p.category == 'varsity').toList();
+    } else {
+      // Default: All Science Presets
+      list = List.of(_allPresetBadges);
+    }
+
+    return list;
+  }
+
+  void _startPresetExamWithBadge(
+    _PresetExamBadge badge,
+    List<PresetSubjectDistribution> activeDistribution,
+  ) async {
+    final profile = ref.read(userProfileProvider).value;
+    final isPro = profile?.isPro ?? false;
+    final totalQuestions =
+        activeDistribution.fold(0, (sum, item) => sum + item.count);
+
+    if (totalQuestions > 50 && !isPro) {
+      ProUpgradeModal.show(
+        context,
+        title: '৫০+ প্রশ্ন আনলক করো ⚡',
+        message:
+            'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ৭৫ বা ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।',
+        featurePill: 'প্রো ফিচার',
+      );
+      return;
+    }
+
+    if (!isPro) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        final now = DateTime.now().toUtc();
+        final startOfDay =
+            DateTime.utc(now.year, now.month, now.day).toIso8601String();
+        try {
+          final List res = await Supabase.instance.client
+              .from('exam_results')
+              .select('id')
+              .eq('user_id', user.id)
+              .gte('created_at', startOfDay);
+          if (res.length >= 2) {
+            if (mounted) {
+              ProUpgradeModal.show(
+                context,
+                title: 'আজকের ফ্রি কোটা শেষ 🎯',
+                message:
+                    'তুমি আজকের ২টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
+                featurePill: 'দৈনিক ফ্রি কোটা: ২/২',
+                icon: LucideIcons.calendarCheck,
+              );
+            }
+            return;
+          }
+        } catch (e) {
+          debugPrint('[ExamSetupView] Quota check error: $e');
+        }
+      }
+    }
+
+    setState(() => _isStarting = true);
+
+    final success = await ref
+        .read(examEngineProvider.notifier)
+        .startMultiSubjectPresetExam(
+          examTitle: badge.fullName,
+          examLabel: badge.label,
+          examType: badge.defaultExamType,
+          durationMinutes: badge.durationMinutes,
+          negativeMarking: badge.negativeMarking,
+          subjectDistribution: activeDistribution,
+        );
+
+    if (mounted) {
+      setState(() => _isStarting = false);
+      if (success) {
+        context.push('/exam');
+      } else {
+        final err = ref.read(examEngineProvider).errorDetails;
+        AppPopups.error(
+          context,
+          message: err.isNotEmpty
+              ? err
+              : 'এই প্রিসেট পরীক্ষার প্রশ্ন লোড করা সম্ভব হয়নি। পুনরায় চেষ্টা করো।',
+        );
+      }
+    }
+  }
+
+  void _showPresetDetailsModal(_PresetExamBadge badge) {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _PresetExamSelectionModal(
+        badge: badge,
+        onStart: (dist) => _startPresetExamWithBadge(badge, dist),
+      ),
+    );
+  }
+
+  Widget _buildPresetExamsTab(bool isDark, UserProfile? profile) {
+    final filteredBadges = _getFilteredPresetBadges(profile);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
+      physics: const BouncingScrollPhysics(),
+      child: Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 12,
+          runSpacing: 14,
+          children: filteredBadges.map((badge) {
+            return _PresetBadgePill(
+              badge: badge,
+              isDark: isDark,
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _showPresetDetailsModal(badge);
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
   void _showSubjectDropdown() {
     showModalBottomSheet(
       context: context,
@@ -547,20 +1133,20 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               decoration: BoxDecoration(
                 color: isDark
                     ? (value.isNotEmpty
-                          ? const Color(0xFF2E1A0D).withValues(alpha: 0.35)
-                          : const Color(0xFF161619))
+                        ? const Color(0xFF2E1A0D).withValues(alpha: 0.35)
+                        : const Color(0xFF161619))
                     : (value.isNotEmpty
-                          ? const Color(0xFFFFFBEB)
-                          : const Color(0xFFF8FAFC)),
+                        ? const Color(0xFFFFFBEB)
+                        : const Color(0xFFF8FAFC)),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
                       ? (value.isNotEmpty
-                            ? const Color(0xFFD97706).withValues(alpha: 0.5)
-                            : const Color(0xFF27272A))
+                          ? const Color(0xFFD97706).withValues(alpha: 0.5)
+                          : const Color(0xFF27272A))
                       : (value.isNotEmpty
-                            ? const Color(0xFFF59E0B).withValues(alpha: 0.6)
-                            : const Color(0xFFE2E8F0)),
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.6)
+                          : const Color(0xFFE2E8F0)),
                   width: value.isNotEmpty ? 1.2 : 1.0,
                 ),
               ),
@@ -577,8 +1163,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                             : FontWeight.bold,
                         color: value.isEmpty
                             ? (isDark
-                                  ? const Color(0xFF71717A)
-                                  : const Color(0xFF94A3B8))
+                                ? const Color(0xFF71717A)
+                                : const Color(0xFF94A3B8))
                             : (isDark ? Colors.white : const Color(0xFF0F172A)),
                       ),
                     ),
@@ -599,6 +1185,20 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     );
   }
 
+  // Maps English internal value → display Bangla label
+  static String _examTypeLabel(String type) {
+    switch (type) {
+      case 'Engineering': return 'ইঞ্জিনিয়ারিং';
+      case 'Varsity': return 'ভার্সিটি';
+      case 'Board': return 'বোর্ড';
+      case 'Academic': return 'একাডেমিক';
+      case 'Easy': return 'সহজ';
+      case 'Medium': return 'মধ্যম';
+      case 'Hard': return 'কঠিন';
+      default: return type;
+    }
+  }
+
   Widget _buildSegmentedGroup({
     required List<String> items,
     required Iterable<String> selectedItems,
@@ -608,10 +1208,10 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161619) : const Color(0xFFF1F5F9),
+        color: isDark ? const Color(0xFF000000) : const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+          color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE2E8F0),
         ),
       ),
       child: Row(
@@ -629,52 +1229,33 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? (isDark
-                              ? const Color(0xFF3B2314)
-                              : const Color(0xFFB45309))
+                        ? const Color(0xFF12544F)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isSelected
-                          ? (isDark
-                                ? const Color(0xFFD97706).withValues(alpha: 0.6)
-                                : const Color(0xFFB45309))
+                          ? const Color(0xFF12544F)
                           : Colors.transparent,
                       width: 1.0,
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: isDark
-                                  ? const Color(
-                                      0xFFD97706,
-                                    ).withValues(alpha: 0.2)
-                                  : const Color(0x1AB45309),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [],
                   ),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: Text(
-                        item,
+                        _examTypeLabel(item),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: isSelected
-                              ? FontWeight.w900
-                              : FontWeight.w600,
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           fontFamily: 'HindSiliguri',
                           color: isSelected
-                              ? (isDark
-                                    ? const Color(0xFFFEF3C7)
-                                    : Colors.white)
+                              ? Colors.white
                               : (isDark
-                                    ? const Color(0xFFA1A1AA)
-                                    : const Color(0xFF64748B)),
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF64748B)),
                         ),
                       ),
                     ),
@@ -711,7 +1292,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           IconButton(
             onPressed: value > min ? () => onChanged(value - step) : null,
             icon: const Icon(LucideIcons.minus, size: 16),
-            color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFFB45309),
+            color: isDark ? Colors.white : const Color(0xFF12544F),
             disabledColor: isDark
                 ? const Color(0xFF3F3F46)
                 : const Color(0xFFCBD5E1),
@@ -723,19 +1304,19 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             child: Text(
               '$value $unit',
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark
-                    ? const Color(0xFFFBBF24)
-                    : const Color(0xFFB45309),
+                    ? Colors.white
+                    : const Color(0xFF12544F),
               ),
             ),
           ),
           IconButton(
             onPressed: value < max ? () => onChanged(value + step) : null,
             icon: const Icon(LucideIcons.plus, size: 16),
-            color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFFB45309),
+            color: isDark ? Colors.white : const Color(0xFF12544F),
             disabledColor: isDark
                 ? const Color(0xFF3F3F46)
                 : const Color(0xFFCBD5E1),
@@ -761,28 +1342,15 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? const Color(0xFF3B2314) : const Color(0xFFB45309))
+              ? const Color(0xFF12544F) // Solid Viridian Forest
               : (isDark ? const Color(0xFF161619) : const Color(0xFFF8FAFC)),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected
-                ? (isDark
-                      ? const Color(0xFFD97706).withValues(alpha: 0.6)
-                      : const Color(0xFFB45309))
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                ? const Color(0xFF12544F)
+                : (isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE2E8F0)),
             width: isSelected ? 1.2 : 1.0,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: isDark
-                        ? const Color(0xFFD97706).withValues(alpha: 0.2)
-                        : const Color(0x1AB45309),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
         ),
         child: FittedBox(
           fit: BoxFit.scaleDown,
@@ -792,10 +1360,10 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 fontFamily: 'HindSiliguri',
                 color: isSelected
-                    ? (isDark ? const Color(0xFFFEF3C7) : Colors.white)
+                    ? Colors.white
                     : (isDark
                           ? const Color(0xFFA1A1AA)
                           : const Color(0xFF64748B)),
@@ -811,21 +1379,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF22160E) : const Color(0xFFFFFBEB),
+        color: isDark ? const Color(0xFF092328) : const Color(0xFFF0FDF4),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? const Color(0xFFD97706).withValues(alpha: 0.35)
-              : const Color(0xFFFDE68A),
+              ? const Color(0xFF2C2C2C)
+              : const Color(0xFF12544F).withValues(alpha: 0.25),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: (isDark ? const Color(0xFFD97706) : const Color(0xFFB45309))
-                .withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -916,14 +1476,18 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       }
     });
 
+    final currentSetupTab = ref.watch(examSetupTabProvider);
+
     return Container(
       color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 32),
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: currentSetupTab == 'preset'
+          ? _buildPresetExamsTab(isDark, profile)
+          : SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 32),
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
             const SizedBox(height: 8),
 
             // 1. Subject Selector
@@ -1308,34 +1872,15 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? (isDark
-                                            ? const Color(0xFF3B2314)
-                                            : const Color(0xFFB45309))
+                                      ? const Color(0xFF12544F)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: isSelected
-                                        ? (isDark
-                                              ? const Color(
-                                                  0xFFD97706,
-                                                ).withValues(alpha: 0.6)
-                                              : const Color(0xFFB45309))
+                                        ? const Color(0xFF12544F)
                                         : Colors.transparent,
                                     width: 1.0,
                                   ),
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                            color: isDark
-                                                ? const Color(
-                                                    0xFFD97706,
-                                                  ).withValues(alpha: 0.2)
-                                                : const Color(0x1AB45309),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ]
-                                      : [],
                                 ),
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
@@ -1348,13 +1893,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: isSelected
-                                            ? FontWeight.w900
-                                            : FontWeight.w600,
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
                                         fontFamily: 'HindSiliguri',
                                         color: isSelected
-                                            ? (isDark
-                                                  ? const Color(0xFFFEF3C7)
-                                                  : Colors.white)
+                                            ? Colors.white
                                             : (isDark
                                                   ? const Color(0xFFA1A1AA)
                                                   : const Color(0xFF64748B)),
@@ -1376,7 +1919,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             _buildLiveConfigBlueprint(isDark),
             const SizedBox(height: 16),
 
-            // Start Button - Deep Green Theme Color
+            // Start Button - Viridian Forest
             ElevatedButton(
               onPressed: _isStarting
                   ? null
@@ -1385,16 +1928,15 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       _startExam();
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF004633),
+                backgroundColor: const Color(0xFF12544F),
                 disabledBackgroundColor: const Color(
-                  0xFF004633,
+                  0xFF12544F,
                 ).withValues(alpha: 0.6),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                elevation: isDark ? 0 : 2,
-                shadowColor: const Color(0xFF004633).withValues(alpha: 0.4),
+                elevation: 0,
               ),
               child: _isStarting
                   ? const SizedBox(
@@ -1409,8 +1951,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       'শুরু করো',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                       ),
                     ),
@@ -1466,8 +2008,8 @@ class _CardContainer extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
@@ -1476,7 +2018,7 @@ class _CardContainer extends StatelessWidget {
                 const SizedBox(width: 6),
                 ObhyashTooltipIcon(
                   message: tooltip!,
-                  size: 16,
+                  size: 15,
                   preferredPosition: TooltipPosition.bottom,
                   color: isDark
                       ? const Color(0xFF71717A)
@@ -1485,7 +2027,7 @@ class _CardContainer extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           child,
         ],
       ),
@@ -1546,8 +2088,8 @@ class _SubjectDropdownModal extends StatelessWidget {
                     Text(
                       'বিষয় নির্বাচন করো',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
@@ -1565,7 +2107,7 @@ class _SubjectDropdownModal extends StatelessWidget {
 
               const Divider(height: 1, thickness: 0.8),
 
-              // List of Subjects with 3-Tier Chorcha Categorization
+              // List of Subjects with 3-Tier Categorization
               Expanded(
                 child: subjects.isEmpty
                     ? Center(
@@ -1575,7 +2117,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
                                 : const Color(0xFF64748B),
-                            fontSize: 16,
+                            fontSize: 14,
                             fontFamily: 'HindSiliguri',
                           ),
                         ),
@@ -1681,8 +2223,8 @@ class _SubjectDropdownModal extends StatelessWidget {
                                         Text(
                                           title,
                                           style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w600,
                                             fontFamily: 'HindSiliguri',
                                             color: isDark
                                                 ? const Color(0xFFA1A1AA)
@@ -1697,27 +2239,19 @@ class _SubjectDropdownModal extends StatelessWidget {
                                     final isSelected = subject.id == selectedId;
 
                                     final bg = isSelected
-                                        ? (isDark
-                                              ? const Color(0xFF3B2314)
-                                              : const Color(0xFFB45309))
+                                        ? const Color(0xFF12544F)
                                         : (isDark
-                                              ? const Color(0xFF141416)
+                                              ? const Color(0xFF092328)
                                               : const Color(0xFFFAFAFA));
 
                                     final border = isSelected
-                                        ? (isDark
-                                              ? const Color(
-                                                  0xFFD97706,
-                                                ).withValues(alpha: 0.6)
-                                              : const Color(0xFFB45309))
+                                        ? const Color(0xFF12544F)
                                         : (isDark
-                                              ? const Color(0xFF27272A)
+                                              ? const Color(0xFF2C2C2C)
                                               : const Color(0xFFE2E8F0));
 
                                     final textColor = isSelected
-                                        ? (isDark
-                                              ? const Color(0xFFFEF3C7)
-                                              : Colors.white)
+                                        ? Colors.white
                                         : (isDark
                                               ? const Color(0xFFD4D4D8)
                                               : const Color(0xFF334155));
@@ -1730,7 +2264,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 16,
-                                            vertical: 13,
+                                            vertical: 12,
                                           ),
                                           decoration: BoxDecoration(
                                             color: bg,
@@ -1748,10 +2282,10 @@ class _SubjectDropdownModal extends StatelessWidget {
                                                 child: Text(
                                                   subject.label,
                                                   style: TextStyle(
-                                                    fontSize: 16,
+                                                    fontSize: 14.5,
                                                     fontWeight: isSelected
-                                                        ? FontWeight.w900
-                                                        : FontWeight.w600,
+                                                        ? FontWeight.w600
+                                                        : FontWeight.normal,
                                                     fontFamily: 'HindSiliguri',
                                                     color: textColor,
                                                   ),
@@ -1763,7 +2297,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                                                   color: isDark
                                                       ? const Color(0xFFFBBF24)
                                                       : Colors.white,
-                                                  size: 20,
+                                                  size: 18,
                                                 ),
                                             ],
                                           ),
@@ -1887,8 +2421,8 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     child: Text(
                       widget.title,
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
@@ -1947,7 +2481,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                             isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isAllSelected
                                   ? (isDark
@@ -1968,7 +2502,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                   // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(LucideIcons.x, size: 20),
+                    icon: const Icon(LucideIcons.x, size: 18),
                     visualDensity: VisualDensity.compact,
                     color: isDark
                         ? const Color(0xFFA1A1AA)
@@ -1996,7 +2530,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                           color: isDark
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
-                          fontSize: 16,
+                          fontSize: 14,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),
@@ -2019,7 +2553,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
-                                vertical: 11,
+                                vertical: 10,
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
@@ -2044,8 +2578,8 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 22,
-                                    height: 22,
+                                    width: 20,
+                                    height: 20,
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? (isDark
@@ -2060,14 +2594,14 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                             : (isDark
                                                 ? const Color(0xFF52525B)
                                                 : const Color(0xFFCBD5E1)),
-                                        width: 1.8,
+                                        width: 1.6,
                                       ),
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: isSelected
                                         ? Icon(
                                             LucideIcons.check,
-                                            size: 13,
+                                            size: 12,
                                             color: isDark
                                                 ? Colors.black
                                                 : const Color(0xFF004633),
@@ -2079,11 +2613,11 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                     child: LatexText(
                                       text: name,
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14.5,
                                         fontFamily: 'HindSiliguri',
                                         fontWeight: isSelected
-                                            ? FontWeight.bold
-                                            : FontWeight.w600,
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
                                         color: isSelected
                                             ? (isDark
                                                 ? const Color(0xFFE6FFFA)
@@ -2116,9 +2650,9 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB45309),
+                      backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -2127,8 +2661,8 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     child: Text(
                       'সংরক্ষণ করো (${_currentSelected.length})',
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                       ),
                     ),
@@ -2279,8 +2813,8 @@ class _TopicCollapsibleSelectionModalState
                     child: Text(
                       'টপিক নির্বাচন করো',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
@@ -2339,7 +2873,7 @@ class _TopicCollapsibleSelectionModalState
                             isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isAllSelected
                                   ? (isDark
@@ -2360,7 +2894,7 @@ class _TopicCollapsibleSelectionModalState
                   // Close Button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(LucideIcons.x, size: 20),
+                    icon: const Icon(LucideIcons.x, size: 18),
                     visualDensity: VisualDensity.compact,
                     color: isDark
                         ? const Color(0xFFA1A1AA)
@@ -2388,7 +2922,7 @@ class _TopicCollapsibleSelectionModalState
                           color: isDark
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
-                          fontSize: 16,
+                          fontSize: 14,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),
@@ -2447,8 +2981,8 @@ class _TopicCollapsibleSelectionModalState
                                           chapterTopics,
                                         ),
                                         child: Container(
-                                          width: 22,
-                                          height: 22,
+                                          width: 20,
+                                          height: 20,
                                           decoration: BoxDecoration(
                                             color: isAllInChapterSelected
                                                 ? (isDark
@@ -2480,13 +3014,13 @@ class _TopicCollapsibleSelectionModalState
                                               width: 1.6,
                                             ),
                                             borderRadius: BorderRadius.circular(
-                                              6,
+                                              5,
                                             ),
                                           ),
                                           child: isAllInChapterSelected
                                               ? Icon(
                                                   LucideIcons.check,
-                                                  size: 13,
+                                                  size: 12,
                                                   color: isDark
                                                       ? const Color(0xFF000000)
                                                       : Colors.white,
@@ -2515,8 +3049,8 @@ class _TopicCollapsibleSelectionModalState
                                             LatexText(
                                               text: chapter.name,
                                               style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w800,
+                                                fontSize: 14.5,
+                                                fontWeight: FontWeight.w600,
                                                 fontFamily: 'HindSiliguri',
                                                 color: isDark
                                                     ? Colors.white
@@ -2527,9 +3061,9 @@ class _TopicCollapsibleSelectionModalState
                                             Text(
                                               '$selectedInChapterCount/${chapterTopics.length}টি টপিক নির্বাচিত',
                                               style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 11.5,
                                                 fontFamily: 'HindSiliguri',
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.normal,
                                                 color:
                                                     selectedInChapterCount > 0
                                                     ? (isDark
@@ -2555,7 +3089,7 @@ class _TopicCollapsibleSelectionModalState
                                         isExpanded
                                             ? LucideIcons.chevronUp
                                             : LucideIcons.chevronDown,
-                                        size: 18,
+                                        size: 16,
                                         color: isDark
                                             ? const Color(0xFFA1A1AA)
                                             : const Color(0xFF64748B),
@@ -2597,7 +3131,7 @@ class _TopicCollapsibleSelectionModalState
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
-                                          vertical: 10,
+                                          vertical: 9,
                                         ),
                                         decoration: BoxDecoration(
                                           color: isSelected
@@ -2628,8 +3162,8 @@ class _TopicCollapsibleSelectionModalState
                                         child: Row(
                                           children: [
                                             Container(
-                                              width: 20,
-                                              height: 20,
+                                              width: 18,
+                                              height: 18,
                                               decoration: BoxDecoration(
                                                 color: isSelected
                                                     ? (isDark
@@ -2652,15 +3186,15 @@ class _TopicCollapsibleSelectionModalState
                                                             : const Color(
                                                                 0xFFCBD5E1,
                                                               )),
-                                                  width: 1.6,
+                                                  width: 1.5,
                                                 ),
                                                 borderRadius:
-                                                    BorderRadius.circular(5),
+                                                    BorderRadius.circular(4),
                                               ),
                                               child: isSelected
                                                   ? Icon(
                                                       LucideIcons.check,
-                                                      size: 12,
+                                                      size: 11,
                                                       color: isDark
                                                           ? Colors.black
                                                           : const Color(
@@ -2674,11 +3208,11 @@ class _TopicCollapsibleSelectionModalState
                                               child: LatexText(
                                                 text: topic.name,
                                                 style: TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 13.5,
                                                   fontFamily: 'HindSiliguri',
                                                   fontWeight: isSelected
-                                                      ? FontWeight.bold
-                                                      : FontWeight.w600,
+                                                      ? FontWeight.w500
+                                                      : FontWeight.normal,
                                                   color: isSelected
                                                       ? (isDark
                                                             ? const Color(
@@ -2712,7 +3246,7 @@ class _TopicCollapsibleSelectionModalState
             // Footer Save Button
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -2722,19 +3256,19 @@ class _TopicCollapsibleSelectionModalState
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFB45309),
+                      backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: Text(
                       'সংরক্ষণ করো (${_currentSelected.length}টি টপিক)',
                       style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                       ),
                     ),
@@ -2744,6 +3278,378 @@ class _TopicCollapsibleSelectionModalState
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PresetExamBadge {
+  final String id;
+  final String label;
+  final String fullName;
+  final String category; // 'engineering', 'medical', 'varsity'
+  final String defaultExamType;
+  final int durationMinutes;
+  final double negativeMarking;
+  final List<PresetSubjectDistribution> compulsorySubjects;
+  final List<String> optionalChoices;
+  final int optionalQuestionsCount;
+
+  const _PresetExamBadge({
+    required this.id,
+    required this.label,
+    required this.fullName,
+    required this.category,
+    required this.defaultExamType,
+    required this.durationMinutes,
+    this.negativeMarking = 0.25,
+    required this.compulsorySubjects,
+    this.optionalChoices = const [],
+    this.optionalQuestionsCount = 0,
+  });
+
+  int get totalQuestions =>
+      compulsorySubjects.fold(0, (sum, item) => sum + item.count) +
+      (optionalChoices.isNotEmpty ? optionalQuestionsCount : 0);
+}
+
+class _PresetBadgePill extends StatelessWidget {
+  final _PresetExamBadge badge;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _PresetBadgePill({
+    required this.badge,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(28),
+        splashColor: (isDark ? Colors.white12 : Colors.black12),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color:
+                  isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              width: 1.2,
+            ),
+            boxShadow: isDark
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+          ),
+          child: Text(
+            badge.label,
+            style: TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Anek Bangla',
+              letterSpacing: -0.2,
+              color: isDark ? Colors.white : const Color(0xFF111827),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PresetExamSelectionModal extends StatefulWidget {
+  final _PresetExamBadge badge;
+  final void Function(List<PresetSubjectDistribution> distribution) onStart;
+
+  const _PresetExamSelectionModal({
+    required this.badge,
+    required this.onStart,
+  });
+
+  @override
+  State<_PresetExamSelectionModal> createState() =>
+      _PresetExamSelectionModalState();
+}
+
+class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
+  late String? _selectedOptional;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.badge.optionalChoices.isNotEmpty) {
+      _selectedOptional = widget.badge.optionalChoices.first;
+    } else {
+      _selectedOptional = null;
+    }
+  }
+
+  List<PresetSubjectDistribution> get _currentDistribution {
+    final list = List<PresetSubjectDistribution>.from(
+      widget.badge.compulsorySubjects,
+    );
+    if (widget.badge.optionalChoices.isNotEmpty && _selectedOptional != null) {
+      list.add(PresetSubjectDistribution(
+        _selectedOptional!,
+        widget.badge.optionalQuestionsCount,
+      ));
+    }
+    return list;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E1E22) : Colors.white;
+    final cardBorder =
+        isDark ? const Color(0xFF2E2E34) : const Color(0xFFE2E8F0);
+    final textDark = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSub = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
+
+    final distribution = _currentDistribution;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF121214) : const Color(0xFFF8FAFC),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.of(context).padding.bottom + 20,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color:
+                    isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Header with Title & Close Icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${widget.badge.label} প্রিসেট',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'HindSiliguri',
+                  color: textDark,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 18,
+                    color: textSub,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Card 1: Question Distribution (প্রশ্ন বণ্টন)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: cardBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'প্রশ্ন বণ্টন',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'HindSiliguri',
+                    color: textDark,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Compulsory subjects list
+                ...widget.badge.compulsorySubjects.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      '${item.subject} - ${BanglaNameHelper.toBanglaNumeral(item.count)}টি',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.normal,
+                        fontFamily: 'HindSiliguri',
+                        color: textDark,
+                      ),
+                    ),
+                  );
+                }),
+
+                // Optional Subject Checkbox row (if available)
+                if (widget.badge.optionalChoices.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'ঐচ্ছিক ( যেকোনো ১টি )',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 20,
+                    runSpacing: 8,
+                    children: widget.badge.optionalChoices.map((choice) {
+                      final isSelected = _selectedOptional == choice;
+                      return InkWell(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _selectedOptional = choice);
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 3,
+                            horizontal: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFF006644)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: const Color(0xFF006644),
+                                    width: 1.6,
+                                  ),
+                                ),
+                                child: isSelected
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 14,
+                                        color: Colors.white,
+                                      )
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                choice,
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.normal,
+                                  fontFamily: 'HindSiliguri',
+                                  color: textDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Card 2: Duration (সময়)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: cardBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'সময়',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'HindSiliguri',
+                    color: textDark,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${BanglaNameHelper.toBanglaNumeral(widget.badge.durationMinutes)} মিনিট',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.normal,
+                    fontFamily: 'HindSiliguri',
+                    color: textDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Action Button: পরীক্ষা শুরু করো
+          ElevatedButton(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              Navigator.pop(context);
+              widget.onStart(distribution);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF12544F),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              'পরীক্ষা শুরু করো',
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'HindSiliguri',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

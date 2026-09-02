@@ -473,8 +473,8 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'Anek Bangla',
                           height: 1.35,
                         ),
@@ -1212,8 +1212,8 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 'স্ক্র্যাচ কার্ড প্রগ্রেস',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
@@ -1268,8 +1268,8 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           'আপনার স্ক্র্যাচ কার্ডসমূহ',
           style: TextStyle(
             fontFamily: 'Anek Bangla',
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 15.5,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : Colors.black87,
           ),
         ),
@@ -1398,14 +1398,14 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.emoji_events, color: Color(0xFFFDE047), size: 28),
+                    Icon(Icons.emoji_events, color: Color(0xFFFDE047), size: 24),
                     SizedBox(width: 8),
                     Text(
                       'এই মাসের সেরা রেফারার',
                       style: TextStyle(
                         fontFamily: 'Anek Bangla',
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
@@ -1416,7 +1416,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                   'সবচেয়ে বেশি বন্ধুদের ইনভাইট করুন এবং জিতে নিন দারুণ সব পুরস্কার!',
                   style: TextStyle(
                     fontFamily: 'Anek Bangla',
-                    fontSize: 13,
+                    fontSize: 12.5,
                     color: Color(0xFFFFE4E6),
                   ),
                   textAlign: TextAlign.center,

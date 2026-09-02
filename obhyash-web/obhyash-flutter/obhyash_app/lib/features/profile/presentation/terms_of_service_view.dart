@@ -218,16 +218,16 @@ class _AboutUsViewState extends State<AboutUsView> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                              horizontal: 14,
+                              vertical: 8,
                             ),
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? const Color(0xFF059669) // emerald-600
+                                  ? const Color(0xFF059669)
                                   : (isDark
                                         ? const Color(0xFF1C1C1E)
                                         : Colors.white),
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isActive
                                     ? const Color(0xFF059669)
@@ -235,34 +235,25 @@ class _AboutUsViewState extends State<AboutUsView> {
                                           ? const Color(0xFF27272A)
                                           : const Color(0xFFF5F5F5)),
                               ),
-                              boxShadow: isActive
-                                  ? [
-                                      const BoxShadow(
-                                        color: Color(0x66A7F3D0),
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ), // shadow-emerald-200
-                                    ]
-                                  : [],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   policy.icon,
-                                  size: 16,
+                                  size: 14,
                                   color: isActive
                                       ? Colors.white
                                       : (isDark
                                             ? Colors.white
                                             : policy.iconColor),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 Text(
                                   policy.title,
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                                    fontSize: 13,
                                     color: isActive
                                         ? Colors.white
                                         : (isDark
@@ -288,71 +279,61 @@ class _AboutUsViewState extends State<AboutUsView> {
                       children: [
                         // Header Card
                         Container(
-                          padding: const EdgeInsets.all(32),
+                          padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF000000)
                                 : Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: isDark
                                   ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5),
                             ),
-                            boxShadow: [
-                              if (!isDark)
-                                const BoxShadow(
-                                  color: Color(0x33000000),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 1),
-                                ),
-                            ],
                           ),
                           child: Column(
                             children: [
                               Container(
-                                width: 80,
-                                height: 80,
+                                width: 64,
+                                height: 64,
                                 decoration: BoxDecoration(
                                   color: isDark
                                       ? const Color(0x4D064E3B)
-                                      : const Color(
-                                          0xFFECFDF5,
-                                        ), // emerald-950/30 : emerald-50
-                                  borderRadius: BorderRadius.circular(24),
+                                      : const Color(0xFFECFDF5),
+                                  borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: const Color(0x33047857),
-                                    width: 2,
-                                  ), // emerald-600/20
+                                    width: 1.5,
+                                  ),
                                 ),
                                 child: Center(
                                   child: Icon(
                                     activePolicy.icon,
-                                    size: 40,
+                                    size: 32,
                                     color: activePolicy.iconColor,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
                               Text(
                                 activePolicy.title,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 26, // text-3xl
-                                  fontWeight: FontWeight.w900, // font-black
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: isDark
                                       ? Colors.white
                                       : const Color(0xFF000000),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 6),
                               Text(
                                 activePolicy.subtitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 18, // text-lg
+                                  fontSize: 13,
                                   fontStyle: FontStyle.italic,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.normal,
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
                                       : const Color(0xFF737373),
@@ -362,36 +343,28 @@ class _AboutUsViewState extends State<AboutUsView> {
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
 
                         // Description Section
                         Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF000000)
                                 : Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: isDark
                                   ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5),
                             ),
-                            boxShadow: [
-                              if (!isDark)
-                                const BoxShadow(
-                                  color: Color(0x33000000),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 1),
-                                ),
-                            ],
                           ),
                           child: Text(
                             activePolicy.description,
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 13,
                               height: 1.5,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.normal,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)
                                   : const Color(0xFF525252),
@@ -399,7 +372,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
 
                         // Policy Sections list
                         ...activePolicy.sections.asMap().entries.map((entry) {
@@ -408,25 +381,17 @@ class _AboutUsViewState extends State<AboutUsView> {
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: isDark
                                   ? const Color(0xFF000000)
                                   : Colors.white,
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isDark
                                     ? const Color(0xFF1C1C1E)
                                     : const Color(0xFFF5F5F5),
                               ),
-                              boxShadow: [
-                                if (!isDark)
-                                  const BoxShadow(
-                                    color: Color(0x33000000),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 1),
-                                  ),
-                              ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,32 +400,32 @@ class _AboutUsViewState extends State<AboutUsView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: 48,
-                                      height: 48,
+                                      width: 40,
+                                      height: 40,
                                       decoration: BoxDecoration(
                                         color: isDark
                                             ? const Color(0x4D064E3B)
                                             : const Color(0xFFECFDF5),
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Center(
                                         child: section.icon != null
                                             ? Icon(
                                                 section.icon,
-                                                size: 24,
+                                                size: 20,
                                                 color: section.iconColor,
                                               )
                                             : Text(
                                                 '${section.id ?? idx + 1}',
                                                 style: const TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 14.5,
+                                                  fontWeight: FontWeight.w600,
                                                   color: Color(0xFF059669),
                                                 ),
                                               ),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
+                                    const SizedBox(width: 14),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -469,19 +434,19 @@ class _AboutUsViewState extends State<AboutUsView> {
                                           Text(
                                             section.title,
                                             style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w900,
+                                              fontSize: 14.5,
+                                              fontWeight: FontWeight.w600,
                                               color: isDark
                                                   ? Colors.white
                                                   : const Color(0xFF000000),
                                             ),
                                           ),
-                                          const SizedBox(height: 16),
+                                          const SizedBox(height: 10),
                                           if (section.content is String)
                                             Text(
                                               section.content,
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 13,
                                                 height: 1.5,
                                                 color: isDark
                                                     ? const Color(0xFFA3A3A3)
@@ -495,7 +460,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                     (val) => Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                            bottom: 12,
+                                                            bottom: 8,
                                                           ),
                                                       child: Row(
                                                         crossAxisAlignment:
@@ -507,8 +472,8 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                                 const EdgeInsets.only(
                                                                   top: 6,
                                                                 ),
-                                                            width: 6,
-                                                            height: 6,
+                                                            width: 5,
+                                                            height: 5,
                                                             decoration:
                                                                 const BoxDecoration(
                                                                   color: Color(
@@ -516,16 +481,16 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                                   ),
                                                                   shape: BoxShape
                                                                       .circle,
-                                                                ), // emerald-400
+                                                                ),
                                                           ),
                                                           const SizedBox(
-                                                            width: 12,
+                                                            width: 10,
                                                           ),
                                                           Expanded(
                                                             child: Text(
                                                               val,
                                                               style: TextStyle(
-                                                                fontSize: 16,
+                                                                fontSize: 13,
                                                                 height: 1.5,
                                                                 color: isDark
                                                                     ? const Color(
@@ -535,7 +500,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                                         0xFF525252,
                                                                       ),
                                                               ),
-                                                             maxLines: 1, overflow: TextOverflow.ellipsis),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
@@ -545,29 +510,27 @@ class _AboutUsViewState extends State<AboutUsView> {
                                             ),
 
                                           if (section.warning != null) ...[
-                                            const SizedBox(height: 16),
+                                            const SizedBox(height: 14),
                                             Container(
-                                              padding: const EdgeInsets.all(16),
+                                              padding: const EdgeInsets.all(14),
                                               decoration: BoxDecoration(
                                                 color: isDark
                                                     ? const Color(0x33064E3B)
-                                                    : const Color(
-                                                        0xFFECFDF5,
-                                                      ), // emerald-900/20 : emerald-50
+                                                    : const Color(0xFFECFDF5),
                                                 borderRadius:
-                                                    BorderRadius.circular(16),
+                                                    BorderRadius.circular(14),
                                                 border: Border.all(
                                                   color: isDark
                                                       ? const Color(0x80064E3B)
                                                       : const Color(0xFFECFDF5),
-                                                ), // emerald-900/50 : emerald-100
+                                                ),
                                               ),
                                               child: Row(
                                                 children: [
                                                   const Text(
                                                     '⚠️',
                                                     style: TextStyle(
-                                                      fontSize: 20,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
                                                   const SizedBox(width: 8),

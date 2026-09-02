@@ -976,8 +976,8 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             Text(
               'প্রস্তাব সফলভাবে জমা হয়েছে!',
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
@@ -987,7 +987,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               'আমাদের টিম তোমার আইডিয়াটি পর্যালোচনা করে অ্যাপে যুক্ত করার ব্যবস্থা করবে।',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.5,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
               ),
@@ -1001,13 +1001,13 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'আরেকটি প্রস্তাব দাও',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                 ),
               ),

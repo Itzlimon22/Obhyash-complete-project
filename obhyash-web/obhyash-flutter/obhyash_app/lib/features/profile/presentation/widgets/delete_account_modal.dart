@@ -187,8 +187,8 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                           Text(
                             'অ্যাকাউন্ট মুছে ফেলো (Delete Account)',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
                             ),
@@ -229,7 +229,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                             'সতর্কতা: তোমার অ্যাকাউন্টে প্রো সাবস্ক্রিপশন সক্রিয় আছে। অ্যাকাউন্ট মুছে ফেললে সাবস্ক্রিপশন চিরতরে বাতিল হবে এবং এর জন্য কোনো রিফান্ড প্রযোজ্য হবে না।',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                               height: 1.4,
@@ -247,7 +247,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                   'অ্যাকাউন্ট মুছে ফেললে যা ঘটবে:',
                   style: TextStyle(
                     fontSize: 13.5,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: textPrimary,
                   ),
@@ -263,7 +263,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                   'নিশ্চিত করতে নিচে "DELETE" লিখো:',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: textPrimary,
                   ),
@@ -320,13 +320,14 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          side: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                          side: BorderSide(color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE5E7EB)),
                         ),
                         child: Text(
                           'বাতিল করো',
                           style: TextStyle(
                             fontFamily: 'HindSiliguri',
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.5,
                             color: textPrimary,
                           ),
                         ),
@@ -337,7 +338,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleDelete,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFDC2626),
+                          backgroundColor: const Color(0xFF740A03), // Solid Deep Crimson #740A03
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

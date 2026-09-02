@@ -283,7 +283,8 @@ class _BookmarksViewState extends State<BookmarksView> {
                   hint: Text(
                     'বিষয়',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 13.5,
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -297,7 +298,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব বিষয়', style: TextStyle(fontSize: 16, fontFamily: 'HindSiliguri')),
+                      child: Text('সব বিষয়', style: TextStyle(fontSize: 13.5, fontFamily: 'HindSiliguri')),
                     ),
                     ...subjects.map(
                       (s) {
@@ -308,7 +309,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                           child: Text(
                             '$emoji $name',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 13.5,
                               fontFamily: 'HindSiliguri',
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -347,7 +348,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                   hint: Text(
                     'অধ্যায়',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 13.5,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
@@ -362,14 +363,14 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 16, fontFamily: 'HindSiliguri')),
+                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 13.5, fontFamily: 'HindSiliguri')),
                     ),
                     ...chapters.map(
                       (c) => DropdownMenuItem<String>(
                         value: c,
                         child: Text(
                           BanglaNameHelper.formatChapter(c),
-                          style: const TextStyle(fontSize: 16, fontFamily: 'HindSiliguri'),
+                          style: const TextStyle(fontSize: 13.5, fontFamily: 'HindSiliguri'),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -482,8 +483,8 @@ class _BookmarksViewState extends State<BookmarksView> {
             Text(
               'ডাটা লোড করতে সমস্যা হয়েছে!',
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
               ),
@@ -495,7 +496,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -504,8 +505,8 @@ class _BookmarksViewState extends State<BookmarksView> {
                 'আবার চেষ্টা করো',
                 style: TextStyle(
                   fontFamily: 'HindSiliguri',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13.5,
                 ),
               ),
             ),
@@ -521,20 +522,23 @@ class _BookmarksViewState extends State<BookmarksView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.bookmark, size: 64, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
-            const SizedBox(height: 16),
+            Icon(LucideIcons.bookmark, size: 54, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+            const SizedBox(height: 14),
             Text(
               'কোনো বুকমার্ক করা প্রশ্ন নেই!',
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               'এক্সাম দেওয়ার সময় গুরুত্বপূর্ণ প্রশ্নগুলো বুকমার্ক করে রাখো।',
               style: TextStyle(
+                fontSize: 12.5,
+                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
               ),
               textAlign: TextAlign.center,

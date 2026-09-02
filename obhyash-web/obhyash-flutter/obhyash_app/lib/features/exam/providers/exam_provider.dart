@@ -423,6 +423,402 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     }
   }
 
+  Future<bool> startMultiSubjectPresetExam({
+    required String examTitle,
+    required String examLabel,
+    required String examType,
+    required int durationMinutes,
+    required double negativeMarking,
+    required List<PresetSubjectDistribution> subjectDistribution,
+  }) async {
+    state = state.copyWith(
+      appState: AppState.loading,
+      errorDetails: '',
+    );
+    try {
+      final supabase = Supabase.instance.client;
+      List<Question> allPresetQuestions = [];
+
+      // 1. Fetch each subject in parallel with 1st/2nd paper & chapter/difficulty balancing
+      final subjectFutures = subjectDistribution.map((item) async {
+        final split = BanglaNameHelper.getSubjectPaperSplitVariants(
+          item.subject,
+          item.subject,
+        );
+
+        List<Question> subQuestions = [];
+        final hasPapers = split.paper2.isNotEmpty;
+
+        // Helper to query question pool for given variants
+        Future<List<Question>> fetchCandidatePool(List<String> variants, int countNeeded) async {
+          if (variants.isEmpty || countNeeded <= 0) return [];
+          final candidates = <Question>[];
+
+          // 1. Target examType priority
+          try {
+            var query = supabase
+                .from('questions')
+                .select('*')
+                .inFilter('subject', variants)
+                .not('options', 'is', null);
+
+            if (examType.isNotEmpty && examType != 'All' && examType != 'Mixed') {
+              query = query.ilike('exam_type', '%$examType%');
+            }
+
+            final List<dynamic> res = await query.limit(countNeeded * 8);
+            if (res.isNotEmpty) {
+              final parsed = res
+                  .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                  .where((q) => q.isAdmissionStandardMcq)
+                  .toList();
+              candidates.addAll(parsed);
+            }
+          } catch (e) {
+            debugPrint('[ExamProvider] Query pool error for $variants: $e');
+          }
+
+          // 2. Fallback general pool for these variants if needed
+          if (candidates.length < countNeeded * 2) {
+            try {
+              final List<dynamic> res = await supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', variants)
+                  .not('options', 'is', null)
+                  .limit(countNeeded * 8);
+
+              if (res.isNotEmpty) {
+                final parsed = res
+                    .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                    .where((q) => q.isAdmissionStandardMcq)
+                    .toList();
+                for (final q in parsed) {
+                  if (!candidates.any((c) => c.id == q.id)) {
+                    candidates.add(q);
+                  }
+                }
+              }
+            } catch (_) {}
+          }
+
+          // 3. Fallback: all search variants of THIS subject (strictly within this subject)
+          if (candidates.length < countNeeded * 2) {
+            try {
+              final allSubjectSlugs = BanglaNameHelper.getSubjectSearchVariants(
+                item.subject,
+                item.subject,
+              );
+              final List<dynamic> res = await supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', allSubjectSlugs)
+                  .not('options', 'is', null)
+                  .limit(countNeeded * 8);
+
+              if (res.isNotEmpty) {
+                final parsed = res
+                    .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                    .where((q) => q.isAdmissionStandardMcq)
+                    .toList();
+                for (final q in parsed) {
+                  if (!candidates.any((c) => c.id == q.id)) {
+                    candidates.add(q);
+                  }
+                }
+              }
+            } catch (_) {}
+          }
+
+          return candidates;
+        }
+
+        if (hasPapers) {
+          // Equal 50/50 target between Paper 1 and Paper 2
+          final p1Target = (item.count / 2).ceil();
+          final p2Target = item.count - p1Target;
+
+          final p1PoolFuture = fetchCandidatePool(split.paper1, p1Target);
+          final p2PoolFuture = fetchCandidatePool(split.paper2, p2Target);
+          final poolResults = await Future.wait([p1PoolFuture, p2PoolFuture]);
+
+          final p1Candidates = poolResults[0];
+          final p2Candidates = poolResults[1];
+
+          final p1Sampled = _sampleUniformByChapterAndDifficulty(p1Candidates, p1Target);
+          final p2Sampled = _sampleUniformByChapterAndDifficulty(p2Candidates, p2Target);
+
+          subQuestions.addAll(p1Sampled);
+          subQuestions.addAll(p2Sampled);
+
+          // If Paper 1 or Paper 2 fell short, let the other paper fill the gap
+          if (subQuestions.length < item.count) {
+            final remainingNeeded = item.count - subQuestions.length;
+            final combinedExtraPool = [...p1Candidates, ...p2Candidates]
+                .where((q) => !subQuestions.any((sq) => sq.id == q.id))
+                .toList();
+            final extraSampled = _sampleUniformByChapterAndDifficulty(
+              combinedExtraPool,
+              remainingNeeded,
+            );
+            subQuestions.addAll(extraSampled);
+          }
+        } else {
+          // Single paper subject (e.g. ICT, General Math, GK)
+          final candidates = await fetchCandidatePool(split.paper1, item.count);
+          subQuestions = _sampleUniformByChapterAndDifficulty(candidates, item.count);
+        }
+
+        // Try RPC if direct query gave fewer questions
+        if (subQuestions.length < item.count) {
+          final allVariants = BanglaNameHelper.getSubjectSearchVariants(item.subject, item.subject);
+          for (final sVar in allVariants) {
+            if (subQuestions.length >= item.count) break;
+            try {
+              final data = await supabase.rpc(
+                'get_adaptive_mock_exam_questions',
+                params: {
+                  'p_user_id': supabase.auth.currentUser?.id,
+                  'p_subject': sVar,
+                  'p_subject_name': sVar,
+                  'p_total': item.count,
+                },
+              );
+              if (data is List && data.isNotEmpty) {
+                final parsed = data
+                    .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                    .where((q) => q.isAdmissionStandardMcq)
+                    .toList();
+                for (final q in parsed) {
+                  if (subQuestions.length >= item.count) break;
+                  if (!subQuestions.any((existing) => existing.id == q.id)) {
+                    subQuestions.add(q);
+                  }
+                }
+              }
+            } catch (_) {}
+          }
+        }
+
+        // Fallback to offline/cached question bank for this subject only
+        if (subQuestions.length < item.count) {
+          try {
+            final offline = await OfflineQuestionBankService.getQuestions(
+              subject: item.subject,
+              count: item.count - subQuestions.length,
+            );
+            for (final q in offline) {
+              if (!q.isMultipleCompletionMcq && !subQuestions.any((existing) => existing.id == q.id)) {
+                subQuestions.add(q);
+              }
+            }
+          } catch (_) {}
+        }
+
+        // Normalize subject name to main subject name (e.g. "রসায়ন") and shuffle 1st and 2nd paper questions within this subject
+        final mainSubjectName = BanglaNameHelper.getMainSubjectName(item.subject, item.subject);
+        subQuestions = subQuestions
+            .map((q) => q.copyWith(subject: mainSubjectName))
+            .toList()
+          ..shuffle();
+
+        return subQuestions;
+      }).toList();
+
+      final results = await Future.wait(subjectFutures);
+      for (final subList in results) {
+        allPresetQuestions.addAll(subList);
+      }
+
+      // Cache all fetched questions for offline availability
+      if (allPresetQuestions.isNotEmpty) {
+        OfflineQuestionBankService.cacheQuestions(allPresetQuestions);
+      }
+
+      if (allPresetQuestions.isEmpty) {
+        state = state.copyWith(appState: AppState.idle);
+        throw Exception('কোনো প্রশ্ন লোড করা সম্ভব হয়নি। ইন্টারনেট সংযোগ চেক করো।');
+      }
+
+      final details = ExamDetails(
+        subject: examTitle,
+        subjectLabel: examLabel,
+        examType: examType,
+        chapters: 'All',
+        topics: 'All',
+        totalQuestions: allPresetQuestions.length,
+        durationMinutes: durationMinutes,
+        totalMarks: allPresetQuestions.fold(0, (sum, q) => sum + q.points),
+        negativeMarking: negativeMarking,
+      );
+
+      final authId = supabase.auth.currentUser?.id;
+      String? sessionId;
+      if (authId != null) {
+        try {
+          final sessionRes = await supabase
+              .from('exam_sessions')
+              .insert({
+                'user_id': authId,
+                'status': 'active',
+                'subject': examTitle,
+              })
+              .select('id')
+              .maybeSingle();
+          if (sessionRes != null) sessionId = sessionRes['id'].toString();
+        } catch (sessionErr) {
+          debugPrint(
+            '[ExamProvider] exam_sessions insert error (non-fatal): $sessionErr',
+          );
+        }
+      }
+
+      Set<String> initialBookmarks = {};
+      if (authId != null && allPresetQuestions.isNotEmpty) {
+        try {
+          final bRes = await supabase
+              .from('bookmarks')
+              .select('question_id')
+              .eq('user_id', authId)
+              .inFilter(
+                'question_id',
+                allPresetQuestions.map((q) => q.id).toList(),
+              );
+          initialBookmarks = (bRes as List)
+              .map((row) => row['question_id'].toString())
+              .toSet();
+        } catch (e) {
+          debugPrint('[ExamProvider] Bookmark fetch error: $e');
+        }
+      }
+
+      state = state.copyWith(
+        appState: AppState.instructions,
+        questions: allPresetQuestions,
+        examDetails: details,
+        userAnswers: {},
+        flaggedQuestions: {},
+        bookmarkedQuestions: initialBookmarks,
+        dbSessionId: sessionId,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        appState: AppState.error,
+        errorDetails: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Uniformly samples questions across all available chapters and difficulty buckets (easy, medium, hard).
+  static List<Question> _sampleUniformByChapterAndDifficulty(
+    List<Question> pool,
+    int targetCount,
+  ) {
+    if (pool.isEmpty || targetCount <= 0) return [];
+    if (pool.length <= targetCount) {
+      final res = List<Question>.from(pool)..shuffle();
+      return res;
+    }
+
+    // 1. Group questions by Chapter
+    final Map<String, List<Question>> byChapter = {};
+    for (final q in pool) {
+      final ch = q.chapter.trim().isEmpty ? 'General' : q.chapter.trim();
+      byChapter.putIfAbsent(ch, () => []).add(q);
+    }
+
+    // 2. Separate each chapter into difficulty buckets
+    final Map<String, Map<String, List<Question>>> chapterDiffMap = {};
+    for (final entry in byChapter.entries) {
+      final ch = entry.key;
+      final qList = List<Question>.from(entry.value)..shuffle();
+      chapterDiffMap[ch] = {
+        'easy': qList.where((q) => q.difficulty == 'easy').toList(),
+        'medium': qList.where((q) => q.difficulty == 'medium').toList(),
+        'hard': qList.where((q) => q.difficulty == 'hard').toList(),
+        'other': qList
+            .where((q) =>
+                q.difficulty != 'easy' &&
+                q.difficulty != 'medium' &&
+                q.difficulty != 'hard')
+            .toList(),
+      };
+    }
+
+    final selected = <Question>[];
+    final selectedIds = <String>{};
+    final chapters = chapterDiffMap.keys.toList()..shuffle();
+
+    // Priority difficulty sequence for balanced admission distribution (approx 35% easy, 45% medium, 20% hard)
+    final diffSequence = [
+      'medium',
+      'easy',
+      'medium',
+      'hard',
+      'easy',
+      'medium',
+      'easy',
+      'hard',
+      'medium',
+      'medium',
+    ];
+    int step = 0;
+
+    // Round-robin selection across chapters to guarantee uniform coverage
+    while (selected.length < targetCount && chapters.isNotEmpty) {
+      bool addedInThisRound = false;
+      for (final ch in List<String>.from(chapters)) {
+        if (selected.length >= targetCount) break;
+        final diffBuckets = chapterDiffMap[ch]!;
+        final desiredDiff = diffSequence[step % diffSequence.length];
+
+        Question? chosen;
+        if (diffBuckets[desiredDiff] != null &&
+            diffBuckets[desiredDiff]!.isNotEmpty) {
+          chosen = diffBuckets[desiredDiff]!.removeLast();
+        } else {
+          // Fallback to any available question in this chapter
+          for (final bucket in diffBuckets.values) {
+            if (bucket.isNotEmpty) {
+              chosen = bucket.removeLast();
+              break;
+            }
+          }
+        }
+
+        if (chosen != null && !selectedIds.contains(chosen.id)) {
+          selected.add(chosen);
+          selectedIds.add(chosen.id);
+          addedInThisRound = true;
+          step++;
+        }
+
+        if (diffBuckets.values.every((b) => b.isEmpty)) {
+          chapters.remove(ch);
+        }
+      }
+
+      if (!addedInThisRound) break;
+    }
+
+    // Fallback fill if still under target count
+    if (selected.length < targetCount) {
+      final remainingPool = List<Question>.from(pool)..shuffle();
+      for (final q in remainingPool) {
+        if (selected.length >= targetCount) break;
+        if (!selectedIds.contains(q.id)) {
+          selected.add(q);
+          selectedIds.add(q.id);
+        }
+      }
+    }
+
+    selected.shuffle();
+    return selected;
+  }
+
   void beginTimer([int? durationOverride]) {
     final duration =
         durationOverride ?? (state.examDetails?.durationMinutes ?? 0) * 60;
@@ -842,3 +1238,15 @@ final examEngineProvider =
     NotifierProvider<ExamEngineNotifier, ExamEngineState>(() {
       return ExamEngineNotifier();
     });
+
+class ExamSetupTabNotifier extends Notifier<String> {
+  @override
+  String build() => 'mock';
+
+  void setTab(String tab) {
+    state = tab;
+  }
+}
+
+final examSetupTabProvider =
+    NotifierProvider<ExamSetupTabNotifier, String>(ExamSetupTabNotifier.new);

@@ -9,6 +9,7 @@ class ExamScopeHeader extends StatefulWidget {
   final String subjectName;
   final List<String> chapters;
   final List<String> topics;
+  final List<String> subjects;
   final bool isDark;
   final EdgeInsetsGeometry? margin;
   final bool initiallyExpanded;
@@ -18,6 +19,7 @@ class ExamScopeHeader extends StatefulWidget {
     required this.subjectName,
     this.chapters = const [],
     this.topics = const [],
+    this.subjects = const [],
     required this.isDark,
     this.margin,
     this.initiallyExpanded = false,
@@ -88,10 +90,13 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
         .where((t) => t.trim().isNotEmpty && t.toLowerCase() != 'all')
         .toList();
 
+    final hasMultipleSubjects = widget.subjects.length > 1;
     final hasSpecificChapters = cleanChapters.isNotEmpty;
-    final chapterCountLabel = hasSpecificChapters
-        ? '${_toBengaliNumber(cleanChapters.length)}টি অধ্যায়'
-        : 'সম্পূর্ণ সিলেবাস';
+    final chapterCountLabel = hasMultipleSubjects
+        ? '${_toBengaliNumber(widget.subjects.length)}টি বিষয়'
+        : (hasSpecificChapters
+            ? '${_toBengaliNumber(cleanChapters.length)}টি অধ্যায়'
+            : 'সম্পূর্ণ সিলেবাস');
 
     final emoji = BanglaNameHelper.getSubjectEmoji(
       widget.subjectName,

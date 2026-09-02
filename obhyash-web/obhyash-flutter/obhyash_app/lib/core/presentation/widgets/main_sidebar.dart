@@ -88,8 +88,8 @@ class MainSidebar extends StatelessWidget {
     return Drawer(
       width: 250,
       backgroundColor: isDark
-          ? const Color(0xFF0C0A09)
-          : Colors.white, // neutral-900 : white
+          ? const Color(0xFF000000) // OLED Black
+          : Colors.white,
       elevation: 16,
       child: SafeArea(
         child: Column(
@@ -107,10 +107,8 @@ class MainSidebar extends StatelessWidget {
                   border: Border(
                     bottom: BorderSide(
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(
-                              0xFFF5F5F5,
-                            ), // neutral-800 : neutral-100
+                          ? const Color(0xFF2C2C2C)
+                          : const Color(0xFFE5E7EB),
                     ),
                   ),
                 ),
@@ -149,21 +147,21 @@ class MainSidebar extends StatelessWidget {
                         Text(
                           'OBHYASH',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                             color: isDark
                                 ? const Color(0xFF737373)
                                 : const Color(
                                     0xFFA3A3A3,
-                                  ), // neutral-500 : neutral-400
-                            letterSpacing: 2,
+                                  ),
+                            letterSpacing: 1.8,
                           ),
                         ),
                         Text(
                           'অভ্যাস',
                           style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -211,13 +209,15 @@ class MainSidebar extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isActive
                               ? (isDark
-                                  ? const Color(0xFF059669).withValues(alpha: 0.25)
-                                  : const Color(0xFF059669).withValues(alpha: 0.12))
+                                  ? const Color(0xFF092328) // Deep Midnight Teal
+                                  : const Color(0xFF12544F)) // Viridian Forest
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           border: isActive
                               ? Border.all(
-                                  color: const Color(0xFF059669).withValues(alpha: 0.4),
+                                  color: isDark
+                                      ? const Color(0xFF2C2C2C)
+                                      : const Color(0xFF12544F),
                                   width: 1,
                                 )
                               : null,
@@ -235,7 +235,7 @@ class MainSidebar extends StatelessWidget {
                                     icon,
                                     size: 20,
                                     color: isActive
-                                        ? const Color(0xFF059669)
+                                        ? Colors.white
                                         : (isDark
                                             ? const Color(0xFFA3A3A3)
                                             : const Color(0xFF525252)),
@@ -247,7 +247,7 @@ class MainSidebar extends StatelessWidget {
                                 icon,
                                 size: 20,
                                 color: isActive
-                                    ? const Color(0xFF059669)
+                                    ? Colors.white
                                     : (isDark
                                         ? const Color(0xFFA3A3A3)
                                         : const Color(0xFF525252)),
@@ -257,16 +257,14 @@ class MainSidebar extends StatelessWidget {
                               child: Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 15.5,
+                                  fontSize: 14,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: isActive
-                                      ? FontWeight.w700
-                                      : FontWeight.w600,
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                                   letterSpacing: 0.2,
                                   color: isActive
-                                      ? (isDark
-                                          ? const Color(0xFF34D399)
-                                          : const Color(0xFF047857))
+                                      ? Colors.white
                                       : (isDark
                                           ? const Color(0xFFE5E5E5)
                                           : const Color(0xFF525252)),
@@ -287,14 +285,14 @@ class MainSidebar extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0x80171717)
-                    : const Color(0x80FAFAFA), // neutral-900/50 : neutral-50/50
+                    ? const Color(0xFF000000)
+                    : const Color(0xFFFAFAFA),
                 border: Border(
                   top: BorderSide(
                     color: isDark
-                        ? const Color(0xFF1C1C1E)
-                        : const Color(0xFFF5F5F5),
-                  ), // neutral-800 : neutral-100
+                        ? const Color(0xFF2C2C2C)
+                        : const Color(0xFFE5E7EB),
+                  ),
                 ),
               ),
               child: Column(
@@ -310,21 +308,14 @@ class MainSidebar extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF1C1C1E)
-                            : Colors.white, // neutral-800
+                            ? const Color(0xFF092328)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFF27272A)
-                              : const Color(0xFFE5E5E5),
-                        ), // neutral-700 : neutral-200
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0a000000),
-                            blurRadius: 2,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
+                              ? const Color(0xFF2C2C2C)
+                              : const Color(0xFFE5E7EB),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -344,8 +335,8 @@ class MainSidebar extends StatelessWidget {
                                 Text(
                                   userName,
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
                                     color: isDark
                                         ? Colors.white
                                         : const Color(0xFF000000),
@@ -356,8 +347,8 @@ class MainSidebar extends StatelessWidget {
                                 Text(
                                   'Settings & Profile',
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.normal,
                                     color: isDark
                                         ? const Color(0xFFA3A3A3)
                                         : const Color(0xFF737373),

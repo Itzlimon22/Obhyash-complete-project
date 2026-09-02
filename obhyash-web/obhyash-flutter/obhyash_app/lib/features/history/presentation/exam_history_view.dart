@@ -110,6 +110,10 @@ enum _SortMode { date, scoreDesc, scoreAsc }
 class _ActiveTabNotifier extends Notifier<int> {
   @override
   int build() => 0;
+
+  void setTab(int index) {
+    state = index;
+  }
 }
 
 final examHistoryActiveTabProvider = NotifierProvider<_ActiveTabNotifier, int>(
@@ -164,8 +168,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     _tab = TabController(length: 2, vsync: this, initialIndex: initialTab);
     _tab.addListener(() {
       if (!_tab.indexIsChanging &&
+          mounted &&
           _tab.index != ref.read(examHistoryActiveTabProvider)) {
-        ref.read(examHistoryActiveTabProvider.notifier).state = _tab.index;
+        ref.read(examHistoryActiveTabProvider.notifier).setTab(_tab.index);
       }
       if (!_tab.indexIsChanging) {
         setState(() {});
@@ -235,7 +240,13 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         } else if (level != null && level.toUpperCase().contains('HSC')) {
           if (subId.startsWith('ssc_') ||
               subName.contains('ssc') ||
-              subLevel == 'SSC') {
+              subLevel == 'SSC' ||
+              subId == 'math' ||
+              subId == 'general_math' ||
+              subId == 'ssc_general_math' ||
+              subId == 'ssc_math' ||
+              subName == 'গণিত' ||
+              subName == 'সাধারণ গণিত') {
             return false;
           }
         }
@@ -1906,8 +1917,8 @@ class _ExamCardState extends State<_ExamCard> {
                         child: Text(
                           '${record.score.round()}%',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
                             fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
@@ -1929,7 +1940,7 @@ class _ExamCardState extends State<_ExamCard> {
                       Text(
                         label,
                         style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           fontSize: 14,
                           fontFamily: 'HindSiliguri',
                           color: isDark
@@ -1955,7 +1966,7 @@ class _ExamCardState extends State<_ExamCard> {
                             dateStr,
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.normal,
                               fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
@@ -1981,8 +1992,8 @@ class _ExamCardState extends State<_ExamCard> {
                             child: Text(
                               '${record.correctCount} সঠিক, ${record.wrongCount} ভুল',
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFFE4E4E7)
@@ -2016,8 +2027,8 @@ class _ExamCardState extends State<_ExamCard> {
                                 Text(
                                   timeStr,
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFFE4E4E7)
@@ -2178,8 +2189,8 @@ class _QuestionsTab extends StatelessWidget {
                           ? 'লোড হচ্ছে...'
                           : 'আরও ২০টি প্রশ্ন লোড করো',
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
                         fontFamily: 'HindSiliguri',
                       ),
                     ),
@@ -2226,20 +2237,9 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF34D399), Color(0xFF10B981)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+            decoration: const BoxDecoration(
+              color: Color(0xFF12544F), // Solid #12544F
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             child: const Icon(
               LucideIcons.flaskConical,
@@ -2252,7 +2252,7 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
             title,
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -2283,20 +2283,9 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFF87171), Color(0xFFEF4444)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+            decoration: const BoxDecoration(
+              color: Color(0xFF740A03), // Solid #740A03
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFEF4444).withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             child: const Icon(
               LucideIcons.wifiOff,
@@ -2309,7 +2298,7 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
             'ডেটা লোড হয়নি',
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -2330,23 +2319,14 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF004633), Color(0xFF00664B)],
-                ),
+                color: const Color(0xFF12544F),
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: const Text(
                 'আবার চেষ্টা করুন',
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: Colors.white,
                 ),

@@ -72,8 +72,8 @@ class TermsConditionsView extends StatelessWidget {
                     'ব্যবহারের শর্তাবলী',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
@@ -83,7 +83,7 @@ class TermsConditionsView extends StatelessWidget {
                     'Obhyash প্ল্যাটফর্ম ও মোবাইল অ্যাপ ব্যবহারের সার্বিক নীতিমালা ও নিয়মাবলী।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       height: 1.45,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
@@ -286,8 +286,8 @@ class _TermsCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
@@ -315,7 +315,7 @@ class _TermsCard extends StatelessWidget {
                     child: Text(
                       item,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         height: 1.45,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),

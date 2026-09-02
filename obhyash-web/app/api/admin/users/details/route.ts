@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse, connection } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
-    await connection();
-
     if (!supabaseServiceKey) {
       return NextResponse.json(
         { success: false, error: 'Service role key not configured on server' },
@@ -104,37 +104,61 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ── Fetch Full User Data in Parallel ──
-    const [userRes, examsRes, paymentsRes, devicesRes, notesRes] = await Promise.all([
-      supabaseAdmin.from('users').select('*').eq('id', userId).maybeSingle(),
-      supabaseAdmin
-        .from('exam_results')
-        .select('id, subject, exam_type, score, total_marks, total_questions, correct_count, wrong_count, date, time_taken, created_at, status')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20),
-      supabaseAdmin
-        .from('payment_requests')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20),
-      supabaseAdmin
-        .from('user_devices')
-        .select('*')
-        .eq('user_id', userId)
-        .order('last_active', { ascending: false })
-        .limit(10),
-      supabaseAdmin
-        .from('user_activity_log')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(30),
+    // ── Fetch Full User Data with isolated fallbacks ──
+    const userPromise = supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle()
+      .then((res) => res.data)
+      .catch(() => null);
+
+    const examsPromise = supabaseAdmin
+      .from('exam_results')
+      .select('id, subject, exam_type, score, total_marks, total_questions, correct_count, wrong_count, date, time_taken, created_at, status')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then((res) => res.data || [])
+      .catch(() => []);
+
+    const paymentsPromise = supabaseAdmin
+      .from('payment_requests')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then((res) => res.data || [])
+      .catch(() => []);
+
+    const devicesPromise = supabaseAdmin
+      .from('user_devices')
+      .select('*')
+      .eq('user_id', userId)
+      .order('last_active', { ascending: false })
+      .limit(10)
+      .then((res) => res.data || [])
+      .catch(() => []);
+
+    const notesPromise = supabaseAdmin
+      .from('user_activity_log')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(30)
+      .then((res) => res.data || [])
+      .catch(() => []);
+
+    const [userData, rawExams, rawPayments, rawDevices, rawNotes] = await Promise.all([
+      userPromise,
+      examsPromise,
+      paymentsPromise,
+      devicesPromise,
+      notesPromise,
     ]);
 
     // Map payments safely
-    const payments = (paymentsRes.data || []).map((p: any) => ({
+    const payments = rawPayments.map((p: any) => ({
       id: p.id,
       plan_name: p.plan_name || 'Premium Plan',
       amount: Number(p.amount || 0),
@@ -146,7 +170,7 @@ export async function GET(request: NextRequest) {
     }));
 
     // Map exams safely
-    const exams = (examsRes.data || []).map((e: any) => ({
+    const exams = rawExams.map((e: any) => ({
       id: e.id,
       subject: e.subject || 'Practice Exam',
       score: Number(e.score || 0),
@@ -158,7 +182,7 @@ export async function GET(request: NextRequest) {
     }));
 
     // Map devices safely
-    const devices = (devicesRes.data || []).map((d: any) => ({
+    const devices = rawDevices.map((d: any) => ({
       id: d.id,
       device_name: d.device_name || 'Active Session',
       device_type: d.device_type || 'web',
@@ -167,7 +191,7 @@ export async function GET(request: NextRequest) {
     }));
 
     // Filter notes to relevant admin notes / support logs
-    const notes = (notesRes.data || [])
+    const notes = rawNotes
       .filter((n: any) => {
         const type = (n.activity_type || n.action_type || '').toUpperCase();
         return type.includes('NOTE') || type.includes('ADMIN') || type.includes('SUPPORT');
@@ -182,7 +206,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        user: userRes.data || null,
+        user: userData || null,
         exams,
         payments,
         devices,

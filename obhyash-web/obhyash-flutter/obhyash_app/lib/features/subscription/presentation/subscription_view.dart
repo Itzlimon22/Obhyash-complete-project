@@ -3,8 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
-import 'payment_view.dart';
-import 'widgets/coupon_bottom_sheet.dart';
+import 'plan_selection_view.dart';
 
 class SubscriptionView extends StatefulWidget {
   const SubscriptionView({super.key});
@@ -17,11 +16,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   bool _isLoading = true;
   List<SubscriptionPlan> _plans = [];
   SubscriptionPlan? _activeSubscription;
-  String _currentPlanId = 'free';
   DateTime? _expiresAt;
-  int _selectedPlanIndex = 1;
-
-  // ── Coupon state ──────────────────────────────────────────────────────
   AppliedCoupon? _appliedCoupon;
 
   int get _daysRemaining {
@@ -112,7 +107,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
       // 2. Fetch active subscription
       SubscriptionPlan? activeSub;
-      String currentPlanId = 'free';
       DateTime? expiresAt;
 
       if (userId != null) {
@@ -152,7 +146,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                       colorTheme: 'emerald',
                       expiresAt: rawExpires.length >= 10 ? rawExpires.substring(0, 10) : rawExpires,
                     );
-                    currentPlanId = activeSub.id;
                   }
                 }
               }
@@ -216,7 +209,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                       ? parsedExp.toIso8601String().substring(0, 10)
                       : null,
                 );
-                currentPlanId = activeSub.id;
               }
             }
           }
@@ -226,18 +218,10 @@ class _SubscriptionViewState extends State<SubscriptionView> {
       }
 
       if (mounted) {
-        final premium = plans.where((p) => p.price > 0).toList();
-        int defaultIdx = 0;
-        if (premium.length >= 2) {
-          defaultIdx = 1;
-        }
-
         setState(() {
           _plans = plans;
           _activeSubscription = activeSub;
-          _currentPlanId = currentPlanId;
           _expiresAt = expiresAt;
-          _selectedPlanIndex = defaultIdx;
           _isLoading = false;
         });
       }
@@ -247,103 +231,22 @@ class _SubscriptionViewState extends State<SubscriptionView> {
     }
   }
 
-  void _handlePlanSelect(SubscriptionPlan plan) {
-    if (plan.id == _currentPlanId || plan.id == 'free') return;
-
-    // Apply coupon discount if active
-    SubscriptionPlan effectivePlan = plan;
-    if (_appliedCoupon != null && plan.price > 0) {
-      final discountedPrice = CouponService.effectivePrice(plan.price, _appliedCoupon);
-      if (discountedPrice != plan.price) {
-        effectivePlan = SubscriptionPlan(
-          id: plan.id,
-          name: plan.name,
-          price: discountedPrice,
-          billingCycle: plan.billingCycle,
-          durationDays: plan.durationDays,
-          currency: plan.currency,
-          features: plan.features,
-          colorTheme: plan.colorTheme,
-          expiresAt: plan.expiresAt,
-        );
-      }
-    }
-
+  void _navigateToPlanSelection() {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (_) => PaymentView(
-          plan: effectivePlan,
-          appliedCouponCode: _appliedCoupon?.code,
+        builder: (_) => PlanSelectionView(
+          initialPlans: _plans,
+          activeSubscription: _activeSubscription,
+          expiresAt: _expiresAt,
+          initialCoupon: _appliedCoupon,
         ),
       ),
-    );
-  }
-
-  /// Opens a bottom sheet for coupon entry.
-  void _openCouponSheet([int? planPrice]) {
-    final premiumPlans = _plans.where((p) => p.price > 0).toList();
-    final selectedPlan = (premiumPlans.isNotEmpty && _selectedPlanIndex < premiumPlans.length)
-        ? premiumPlans[_selectedPlanIndex]
-        : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
-    final refPrice = planPrice ?? selectedPlan?.price ?? 149;
-
-    CouponBottomSheet.show(
-      context: context,
-      appliedCoupon: _appliedCoupon,
-      planPrice: refPrice,
-      onApply: (code) {
-        final result = CouponService.validate(code, refPrice);
-        if (result.isValid && result.appliedCoupon != null) {
-          setState(() => _appliedCoupon = result.appliedCoupon);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "🎉 '${result.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
-                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
-              ),
-              backgroundColor: const Color(0xFF004633),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                result.errorMessage ?? 'অকার্যকর কুপন কোড!',
-                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
-              ),
-              backgroundColor: const Color(0xFF991B1B),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-          );
-        }
-      },
-      onRemove: () {
-        setState(() => _appliedCoupon = null);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'কুপন মুছে ফেলা হয়েছে',
-              style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
-            ),
-            backgroundColor: Colors.grey[700],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-        );
-      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final premiumPlans = _plans.where((p) => p.price > 0).toList();
-    final selectedPlan = (premiumPlans.isNotEmpty && _selectedPlanIndex < premiumPlans.length)
-        ? premiumPlans[_selectedPlanIndex]
-        : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
 
     return RefreshIndicator(
       color: const Color(0xFF004633),
@@ -352,401 +255,307 @@ class _SubscriptionViewState extends State<SubscriptionView> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(10, 20, 10, 48),
+        padding: const EdgeInsets.fromLTRB(14, 18, 14, 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-          // ACTIVE SUBSCRIPTION BANNER
-          if (!_isLoading && _activeSubscription != null) ...[
-            _ActiveSubscriptionBanner(
-              planName: _activeSubscription!.name,
-              daysRemaining: _daysRemaining,
-              expiresAt: _activeSubscription!.expiresAt,
-            ),
-            const SizedBox(height: 28),
-          ],
-
-          // MASTER PRICING & PLAN CARD
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF141417) : Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                width: 1.0,
-              ),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // PRICING HEADER
-                Text(
-                  'তোমার প্ল্যান বেছে নাও',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                    fontFamily: 'HindSiliguri',
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 18),
-
-                // COMPACT PLAN SELECTOR CARDS
-                if (_isLoading)
-                  ...[1, 2, 3].map(
-                    (i) => Container(
-                      height: 84,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  )
-                else if (premiumPlans.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।',
-                        style: TextStyle(fontFamily: 'HindSiliguri'),
-                      ),
-                    ),
-                  )
-                else ...[
-                  // Compact Interactive Selectable Cards
-                  ...premiumPlans.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final plan = entry.value;
-                    final isSelected = _selectedPlanIndex == index;
-                    final isCurrent = _currentPlanId == plan.id ||
-                        (_activeSubscription != null &&
-                            (_activeSubscription!.id == plan.id ||
-                                _activeSubscription!.name.toLowerCase().trim() ==
-                                    plan.name.toLowerCase().trim()));
-
-                    return _CompactPlanCard(
-                      plan: plan,
-                      isSelected: isSelected,
-                      isCurrent: isCurrent,
-                      isDark: isDark,
-                      appliedCoupon: _appliedCoupon,
-                      onTap: () {
-                        setState(() {
-                          _selectedPlanIndex = index;
-                        });
-                      },
-                    );
-                  }),
-
-                  const SizedBox(height: 4),
-
-                  // ── Coupon prompt / remove coupon text link (no box) ──────────
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (_appliedCoupon != null) {
-                          setState(() => _appliedCoupon = null);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                'কুপন মুছে ফেলা হয়েছে',
-                                style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
-                              ),
-                              backgroundColor: Colors.grey[700],
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
-                          );
-                        } else {
-                          _openCouponSheet();
-                        }
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: Text(
-                          _appliedCoupon != null ? 'কুপন রিমুভ করুন' : 'কুপন আছে?',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
-                            color: _appliedCoupon != null
-                                ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
-                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                            decoration: TextDecoration.underline,
-                            decorationColor: _appliedCoupon != null
-                                ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
-                                : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // VALIDITY STACKING NOTIFICATION
-                  if (_daysRemaining > 0 && selectedPlan != null)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF062319) : const Color(0xFFF0FDF4),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.3) : const Color(0xFF86EFAC),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            LucideIcons.sparkles,
-                            color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: 'HindSiliguri',
-                                  color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
-                                  height: 1.35,
-                                ),
-                                children: [
-                                  const TextSpan(
-                                    text: 'পূর্বের মেয়াদের সাথে দিন যোগ হবে: ',
-                                    style: TextStyle(fontWeight: FontWeight.w800),
-                                  ),
-                                  TextSpan(text: 'বর্তমান $_daysRemaining দিনের সাথে নতুন ${selectedPlan.durationDays} দিন যোগ হয়ে মোট '),
-                                  TextSpan(
-                                    text: '${_daysRemaining + selectedPlan.durationDays} দিন ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                  const TextSpan(text: 'সক্রিয় থাকবে।'),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  // PRIMARY CTA BUTTON FOR SELECTED PLAN
-                  if (selectedPlan != null)
-                    Builder(builder: (ctx) {
-                      final effectivePrice = CouponService.effectivePrice(selectedPlan.price, _appliedCoupon);
-                      final hasDiscount = effectivePrice != selectedPlan.price;
-                      return SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF004633),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            elevation: 3,
-                            shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
-                          ),
-                          onPressed: () => _handlePlanSelect(selectedPlan),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'পেমেন্ট করতে এগিয়ে যান',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'HindSiliguri',
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (hasDiscount) ...[
-                                      Text(
-                                        '৳${selectedPlan.price}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: 'HindSiliguri',
-                                          color: Colors.white60,
-                                          decoration: TextDecoration.lineThrough,
-                                          decorationColor: Colors.white60,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                    ],
-                                    Text(
-                                      '৳$effectivePrice',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        fontFamily: 'HindSiliguri',
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(LucideIcons.arrowRight, size: 18),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                ],
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE (SHOWN ONCE)
-          _UnifiedFeaturesShowcase(isDark: isDark),
-
-          const SizedBox(height: 16),
-
-          // TRUST BADGES
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 2.2,
-            children: [
-              _TrustBadge(
-                icon: LucideIcons.headphones,
-                label: '২৪/৭ সাপোর্ট',
-                iconColor: const Color(0xFFB91C1C),
-                bgColor: isDark
-                    ? const Color(0xFF1A0505)
-                    : const Color(0xFFFFF0F0),
+            // 1. CURRENT SUBSCRIPTION STATUS CARD (TOP)
+            if (!_isLoading) ...[
+              _CurrentSubscriptionCard(
+                activeSubscription: _activeSubscription,
+                daysRemaining: _daysRemaining,
+                expiresAt: _activeSubscription?.expiresAt,
                 isDark: isDark,
               ),
-              _TrustBadge(
-                icon: LucideIcons.clock,
-                label: 'তাৎক্ষণিক অ্যাক্সেস',
-                iconColor: const Color(0xFF16A34A),
-                bgColor: isDark
-                    ? const Color(0xFF051A0A)
-                    : const Color(0xFFF0FFF4),
-                isDark: isDark,
-              ),
-              _TrustBadge(
-                icon: LucideIcons.shieldCheck,
-                label: 'নিরাপদ পেমেন্ট',
-                iconColor: const Color(0xFF000000),
-                bgColor: isDark
-                    ? const Color(0xFF050B1A)
-                    : const Color(0xFFF0F4FF),
-                isDark: isDark,
-              ),
-              _TrustBadge(
-                icon: LucideIcons.refreshCw,
-                label: 'রিনিউ সহজ',
-                iconColor: const Color(0xFF9333EA),
-                bgColor: isDark
-                    ? const Color(0xFF10051A)
-                    : const Color(0xFFF8F0FF),
-                isDark: isDark,
-              ),
+              const SizedBox(height: 16),
             ],
-          ),
 
-          const SizedBox(height: 28),
+            // 2. UPGRADE CTA HERO CARD (OPENS PLAN SELECTION PAGE)
+            _UpgradeHeroCtaCard(
+              isDark: isDark,
+              onUpgradeTap: _navigateToPlanSelection,
+            ),
 
-          // COMPARISON TABLE
-          _ComparisonTable(isDark: isDark),
+            const SizedBox(height: 24),
 
-          const SizedBox(height: 48),
-        ],
-      ),
+            // 3. UNIFIED WHAT'S INCLUDED FEATURE SHOWCASE
+            _UnifiedFeaturesShowcase(isDark: isDark),
+
+            const SizedBox(height: 18),
+
+            // 4. TRUST BADGES
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 2.2,
+              children: [
+                _TrustBadge(
+                  icon: LucideIcons.headphones,
+                  label: '২৪/৭ সাপোর্ট',
+                  iconColor: const Color(0xFFEF4444),
+                  isDark: isDark,
+                ),
+                _TrustBadge(
+                  icon: LucideIcons.clock,
+                  label: 'তাৎক্ষণিক অ্যাক্সেস',
+                  iconColor: const Color(0xFF10B981),
+                  isDark: isDark,
+                ),
+                _TrustBadge(
+                  icon: LucideIcons.shieldCheck,
+                  label: 'নিরাপদ পেমেন্ট',
+                  iconColor: const Color(0xFF3B82F6),
+                  isDark: isDark,
+                ),
+                _TrustBadge(
+                  icon: LucideIcons.refreshCw,
+                  label: 'রিনিউ সহজ',
+                  iconColor: const Color(0xFFA855F7),
+                  isDark: isDark,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 28),
+
+            // 5. COMPARISON TABLE
+            _ComparisonTable(isDark: isDark),
+
+            const SizedBox(height: 28),
+
+            // 6. BOTTOM CTA UPGRADE BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF004633),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  elevation: 3,
+                  shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
+                ),
+                onPressed: _navigateToPlanSelection,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.crown, size: 20, color: Color(0xFFFBBF24)),
+                    SizedBox(width: 10),
+                    Text(
+                      'আপগ্রেড করুন',
+                      style: TextStyle(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(LucideIcons.arrowRight, size: 18),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ActiveSubscriptionBanner extends StatelessWidget {
-  final String planName;
-  final int daysRemaining;
-  final String? expiresAt;
+class _UpgradeHeroCtaCard extends StatelessWidget {
+  final bool isDark;
+  final VoidCallback onUpgradeTap;
 
-  const _ActiveSubscriptionBanner({
-    required this.planName,
-    required this.daysRemaining,
-    this.expiresAt,
+  const _UpgradeHeroCtaCard({
+    required this.isDark,
+    required this.onUpgradeTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF141417) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+          width: 1.0,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Crown badge icon
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF004633), Color(0xFF059669)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF059669).withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Icon(LucideIcons.crown, color: Color(0xFFFDE68A), size: 26),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Title
+          Text(
+            'প্রো মেম্বারশিপে আপগ্রেড করুন',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+
+          // Subtitle
+          Text(
+            'আনলিমিটেড পরীক্ষা, বিস্তারিত সমাধান ও সম্পূর্ণ প্রশ্নব্যাংক অ্যাক্সেস করতে আজই আপগ্রেড করুন।',
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+              fontFamily: 'HindSiliguri',
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 18),
+
+          // Primary Upgrade Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF004633),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 3,
+                shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
+              ),
+              onPressed: onUpgradeTap,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(LucideIcons.zap, size: 18, color: Color(0xFFFDE68A)),
+                  SizedBox(width: 8),
+                  Text(
+                    'আপগ্রেড করুন',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'HindSiliguri',
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(LucideIcons.arrowRight, size: 18),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CurrentSubscriptionCard extends StatelessWidget {
+  final SubscriptionPlan? activeSubscription;
+  final int daysRemaining;
+  final String? expiresAt;
+  final bool isDark;
+
+  const _CurrentSubscriptionCard({
+    required this.activeSubscription,
+    required this.daysRemaining,
+    this.expiresAt,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isPro = activeSubscription != null;
+    final planTitle = isPro ? activeSubscription!.name : 'ফ্রি মেম্বারশিপ';
+    final subTitle = isPro
+        ? 'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}'
+        : 'সীমিত অ্যাক্সেস • সকল ফিচার আনলক করতে আপগ্রেড করুন';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(18),
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
-              borderRadius: BorderRadius.circular(12),
+              gradient: isPro
+                  ? const LinearGradient(
+                      colors: [Color(0xFF004633), Color(0xFF059669)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color: isPro
+                  ? null
+                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
               child: Icon(
-                LucideIcons.crown,
-                color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
-                size: 20,
+                isPro ? LucideIcons.crown : LucideIcons.user,
+                color: isPro
+                    ? const Color(0xFFFDE68A)
+                    : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                size: 22,
               ),
             ),
           ),
@@ -755,203 +564,66 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  planName,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'বর্তমান প্ল্যান: ',
+                      style: TextStyle(
+                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        fontSize: 12.5,
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        planTitle,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w800,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}',
+                  subTitle,
                   style: TextStyle(
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontFamily: 'HindSiliguri',
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF064E3B) : const Color(0xFFE6F4EA),
+              color: isPro
+                  ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFE6F4EA))
+                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9)),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'সক্রিয়',
+              isPro ? 'সক্রিয়' : 'ফ্রি',
               style: TextStyle(
-                color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
-                fontSize: 12.5,
+                color: isPro
+                    ? (isDark ? const Color(0xFF34D399) : const Color(0xFF004633))
+                    : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                fontSize: 12,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'HindSiliguri',
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CompactPlanCard extends StatelessWidget {
-  final SubscriptionPlan plan;
-  final bool isSelected;
-  final bool isCurrent;
-  final bool isDark;
-  final VoidCallback onTap;
-  final AppliedCoupon? appliedCoupon;
-
-  const _CompactPlanCard({
-    required this.plan,
-    required this.isSelected,
-    required this.isCurrent,
-    required this.isDark,
-    required this.onTap,
-    this.appliedCoupon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isMasterPro = plan.durationDays >= 180;
-
-    final activeBorderColor = isSelected
-        ? (isMasterPro
-            ? (isDark ? const Color(0xFFF59E0B) : const Color(0xFFD97706))
-            : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669)))
-        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
-
-    final accentBrandColor = isMasterPro
-        ? const Color(0xFFD97706)
-        : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669));
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        decoration: BoxDecoration(
-          color: isDark
-              ? (isSelected
-                  ? (isMasterPro ? const Color(0xFF271A0A) : const Color(0xFF062319))
-                  : const Color(0xFF1C1C20))
-              : (isSelected
-                  ? (isMasterPro ? const Color(0xFFFFFBEB) : const Color(0xFFF0FDF4))
-                  : const Color(0xFFF8FAFC)),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: activeBorderColor,
-            width: isSelected ? 2.0 : 1.0,
-          ),
-          boxShadow: [
-            if (isSelected)
-              BoxShadow(
-                color: (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF059669))
-                    .withValues(alpha: isDark ? 0.25 : 0.12),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
-              ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Radio selection icon
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? accentBrandColor
-                      : (isDark ? Colors.white38 : Colors.black26),
-                  width: 2,
-                ),
-                color: isSelected
-                    ? accentBrandColor
-                    : Colors.transparent,
-              ),
-              child: isSelected
-                  ? const Center(
-                      child: Icon(LucideIcons.check, size: 13, color: Colors.white),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 14),
-
-            // Plan Title (Heading only)
-            Expanded(
-              child: Text(
-                plan.name,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'HindSiliguri',
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-
-            // Price Column (with coupon discount if applicable)
-            Builder(builder: (context) {
-              final effectivePrice = CouponService.effectivePrice(plan.price, appliedCoupon);
-              final hasDiscount = plan.price > 0 && effectivePrice != plan.price;
-              final priceColor = isDark
-                  ? (isSelected
-                      ? (isMasterPro ? const Color(0xFFFDE68A) : const Color(0xFF6EE7B7))
-                      : Colors.white)
-                  : (isSelected
-                      ? (isMasterPro ? const Color(0xFFD97706) : const Color(0xFF047857))
-                      : const Color(0xFF0F172A));
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (hasDiscount)
-                    Text(
-                      '৳${plan.price}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
-                        decoration: TextDecoration.lineThrough,
-                        decorationColor: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
-                      ),
-                    ),
-                  Text(
-                    '৳$effectivePrice',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: hasDiscount
-                          ? (isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A))
-                          : priceColor,
-                    ),
-                  ),
-                  Text(
-                    '/${plan.durationDays} দিন',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark
-                          ? (isSelected ? const Color(0xFFA7F3D0) : const Color(0xFFA1A1AA))
-                          : (isSelected ? const Color(0xFF065F46) : const Color(0xFF64748B)),
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ],
-        ),
       ),
     );
   }
@@ -1081,14 +753,12 @@ class _TrustBadge extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color iconColor;
-  final Color bgColor;
   final bool isDark;
 
   const _TrustBadge({
     required this.icon,
     required this.label,
     required this.iconColor,
-    required this.bgColor,
     required this.isDark,
   });
 
@@ -1097,26 +767,26 @@ class _TrustBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? bgColor.withValues(alpha: 0.5) : bgColor,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: iconColor.withValues(alpha: isDark ? 0.2 : 0.1),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+          width: 1.0,
         ),
         boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: iconColor.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
+              color: iconColor.withValues(alpha: isDark ? 0.16 : 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 16),
@@ -1126,11 +796,10 @@ class _TrustBadge extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                color: isDark
-                    ? const Color(0xFFE5E5E5)
-                    : const Color(0xFF171717),
+                fontFamily: 'HindSiliguri',
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1162,12 +831,12 @@ class _ComparisonTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = isDark ? const Color(0xFF141416) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
     final borderColor = isDark
         ? const Color(0xFF27272A)
         : const Color(0xFFE2E8F0);
     final headerBg = isDark
-        ? const Color(0xFF1E1E22)
+        ? const Color(0xFF202024)
         : const Color(0xFFF8FAFC);
     final textMain = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A);
     final textSub = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
@@ -1347,4 +1016,3 @@ class _ComparisonTable extends StatelessWidget {
     );
   }
 }
-

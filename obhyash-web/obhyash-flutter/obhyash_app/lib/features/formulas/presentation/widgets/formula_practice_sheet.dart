@@ -261,14 +261,14 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                           'উত্তর দেখুন (Show Answer)',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontFamily: 'HindSiliguri',
-                            color: Color(0xFF059669),
+                            color: Color(0xFF12544F),
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: Color(0xFF059669), width: 1.5),
+                          side: const BorderSide(color: Color(0xFF12544F), width: 1.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -282,10 +282,10 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF059669).withValues(alpha: isDark ? 0.15 : 0.08),
+                        color: const Color(0xFF12544F).withValues(alpha: isDark ? 0.18 : 0.08),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF059669).withValues(alpha: 0.4),
+                          color: const Color(0xFF12544F).withValues(alpha: 0.4),
                           width: 1.5,
                         ),
                       ),
@@ -297,16 +297,16 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                               const Icon(
                                 LucideIcons.checkCircle2,
                                 size: 18,
-                                color: Color(0xFF059669),
+                                color: Color(0xFF12544F),
                               ),
                               const SizedBox(width: 8),
                               const Text(
                                 'চূড়ান্ত উত্তর (Final Answer):',
                                 style: TextStyle(
                                   fontSize: 13.5,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   fontFamily: 'HindSiliguri',
-                                  color: Color(0xFF059669),
+                                  color: Color(0xFF12544F),
                                 ),
                               ),
                               const Spacer(),
@@ -320,7 +320,7 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                                   'লুকান',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w600,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark ? Colors.white60 : Colors.black54,
                                   ),
@@ -332,8 +332,8 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                           LatexText(
                             text: practice.answer,
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
@@ -351,7 +351,7 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
+                        backgroundColor: const Color(0xFF12544F),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -362,7 +362,7 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                         'সম্পন্ন (Close)',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),

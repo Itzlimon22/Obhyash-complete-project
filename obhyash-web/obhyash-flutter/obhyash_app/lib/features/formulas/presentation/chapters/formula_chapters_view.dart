@@ -103,8 +103,8 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
           _subject!.subjectName,
           style: TextStyle(
             fontFamily: 'Anek Bangla',
-            fontSize: 19,
-            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
         ),

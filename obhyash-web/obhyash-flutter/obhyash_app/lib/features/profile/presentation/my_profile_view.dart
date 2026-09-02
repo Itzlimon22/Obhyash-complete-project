@@ -219,8 +219,8 @@ class MyProfileView extends ConsumerWidget {
                                       Text(
                                         levelInfo.currentRank,
                                         style: const TextStyle(
-                                          fontSize: 13.5,
-                                          fontWeight: FontWeight.w800,
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w600,
                                           color: Colors.white,
                                           fontFamily: 'HindSiliguri',
                                           letterSpacing: 0.5,
@@ -235,8 +235,8 @@ class MyProfileView extends ConsumerWidget {
                                     const Text(
                                       'পরবর্তী লেভেল প্রগ্রেস',
                                       style: TextStyle(
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.normal,
                                         color: Colors.white70,
                                         fontFamily: 'HindSiliguri',
                                       ),
@@ -259,8 +259,8 @@ class MyProfileView extends ConsumerWidget {
                               Text(
                                 '${BanglaNameHelper.toBanglaNumeral(levelInfo.percent)}%',
                                 style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                   fontFamily: 'HindSiliguri',
                                   height: 1,
@@ -283,8 +283,8 @@ class MyProfileView extends ConsumerWidget {
                                 child: Text(
                                   levelInfo.xpText,
                                   style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
                                     color: Color(0xFFFDE047),
                                     fontFamily: 'HindSiliguri',
                                   ),
@@ -461,10 +461,12 @@ class _UserProfileCard extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
-                      width: 2,
-                    ),
+                    border: user.isPro
+                        ? null
+                        : Border.all(
+                            color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+                            width: 2,
+                          ),
                   ),
                   child: ClipOval(
                     child: UserAvatar(
@@ -474,6 +476,7 @@ class _UserProfileCard extends StatelessWidget {
                       gender: user.gender,
                       size: 64,
                       showBorder: false,
+                      isPro: user.isPro,
                     ),
                   ),
                 ),
@@ -483,7 +486,7 @@ class _UserProfileCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF059669),
+                      color: const Color(0xFF12544F),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? const Color(0xFF18181B) : Colors.white,

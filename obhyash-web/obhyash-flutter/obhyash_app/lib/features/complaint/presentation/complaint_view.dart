@@ -192,11 +192,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     });
   }
 
-  int get _pendingCount =>
-      _myComplaints.where((c) => c.status == 'Pending' || c.status == 'In Progress').length;
+  int get _pendingCount => _myComplaints
+      .where((c) => c.status == 'Pending' || c.status == 'In Progress')
+      .length;
 
-  int get _dailyCount =>
-      _myComplaints.where((c) => DateTime.now().difference(c.createdAt).inHours < 24).length;
+  int get _dailyCount => _myComplaints
+      .where((c) => DateTime.now().difference(c.createdAt).inHours < 24)
+      .length;
 
   bool get _isPendingLimitReached => _pendingCount >= 3;
   bool get _isDailyLimitReached => _dailyCount >= 5;
@@ -240,7 +242,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     if (_isPendingLimitReached) {
       AppPopups.warning(
         context,
-        message: 'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।',
+        message:
+            'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।',
       );
       return;
     }
@@ -249,7 +252,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     if (_isDailyLimitReached) {
       AppPopups.warning(
         context,
-        message: 'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
+        message:
+            'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
       );
       return;
     }
@@ -260,7 +264,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       final sec = _cooldownSeconds % 60;
       AppPopups.warning(
         context,
-        message: 'পরবর্তী বার্তা পাঠানোর জন্য আর $min মিনিট $sec সেকেন্ড অপেক্ষা করুন।',
+        message:
+            'পরবর্তী বার্তা পাঠানোর জন্য আর $min মিনিট $sec সেকেন্ড অপেক্ষা করুন।',
       );
       return;
     }
@@ -300,7 +305,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     if (isDuplicate) {
       AppPopups.warning(
         context,
-        message: 'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।',
+        message:
+            'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।',
       );
       return;
     }
@@ -321,7 +327,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       // Save cooldown timestamp in preferences
       try {
         final prefs = ref.read(sharedPreferencesProvider);
-        await prefs.setInt('last_complaint_submit_time', DateTime.now().millisecondsSinceEpoch);
+        await prefs.setInt(
+          'last_complaint_submit_time',
+          DateTime.now().millisecondsSinceEpoch,
+        );
         _startCooldownTimer(180);
       } catch (_) {}
 
@@ -338,8 +347,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       if (mounted) {
         final errMsg = e.toString();
         // Check if database trigger exception message is returned
-        if (errMsg.contains('অপেক্ষা') || errMsg.contains('সীমা') || errMsg.contains('প্রক্রিয়াধীন')) {
-          AppPopups.warning(context, message: errMsg.replaceAll('Exception:', '').trim());
+        if (errMsg.contains('অপেক্ষা') ||
+            errMsg.contains('সীমা') ||
+            errMsg.contains('প্রক্রিয়াধীন')) {
+          AppPopups.warning(
+            context,
+            message: errMsg.replaceAll('Exception:', '').trim(),
+          );
         } else {
           AppPopups.error(
             context,
@@ -370,13 +384,17 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
     if (_isSuccess) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
+        backgroundColor: isDark
+            ? const Color(0xFF09090B)
+            : const Color(0xFFFAFAFA),
         body: _buildSuccessState(isDark),
       );
     }
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF09090B)
+          : const Color(0xFFFAFAFA),
       body: RefreshIndicator(
         onRefresh: _fetchMyComplaints,
         color: const Color(0xFF059669),
@@ -460,7 +478,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
   Widget _buildNewComplaintForm(bool isDark) {
     final charCount = _descriptionController.text.trim().length;
-    final isBlocked = _isPendingLimitReached || _isDailyLimitReached || _cooldownSeconds > 0;
+    final isBlocked =
+        _isPendingLimitReached || _isDailyLimitReached || _cooldownSeconds > 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -470,15 +489,23 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.4) : const Color(0xFFFFFBEB),
+              color: isDark
+                  ? const Color(0xFF451A03).withValues(alpha: 0.4)
+                  : const Color(0xFFFFFBEB),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+                color: isDark
+                    ? const Color(0xFFD97706).withValues(alpha: 0.4)
+                    : const Color(0xFFFDE68A),
               ),
             ),
             child: Row(
               children: [
-                const Icon(LucideIcons.alertTriangle, size: 18, color: Color(0xFFD97706)),
+                const Icon(
+                  LucideIcons.alertTriangle,
+                  size: 18,
+                  color: Color(0xFFD97706),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -487,7 +514,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                      color: isDark
+                          ? const Color(0xFFFDE68A)
+                          : const Color(0xFF92400E),
                     ),
                   ),
                 ),
@@ -499,15 +528,23 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.4) : const Color(0xFFFFFBEB),
+              color: isDark
+                  ? const Color(0xFF451A03).withValues(alpha: 0.4)
+                  : const Color(0xFFFFFBEB),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+                color: isDark
+                    ? const Color(0xFFD97706).withValues(alpha: 0.4)
+                    : const Color(0xFFFDE68A),
               ),
             ),
             child: Row(
               children: [
-                const Icon(LucideIcons.shieldAlert, size: 18, color: Color(0xFFD97706)),
+                const Icon(
+                  LucideIcons.shieldAlert,
+                  size: 18,
+                  color: Color(0xFFD97706),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -516,7 +553,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                      color: isDark
+                          ? const Color(0xFFFDE68A)
+                          : const Color(0xFF92400E),
                     ),
                   ),
                 ),
@@ -528,15 +567,23 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E1B4B).withValues(alpha: 0.4) : const Color(0xFFEEF2FF),
+              color: isDark
+                  ? const Color(0xFF1E1B4B).withValues(alpha: 0.4)
+                  : const Color(0xFFEEF2FF),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.4) : const Color(0xFFC7D2FE),
+                color: isDark
+                    ? const Color(0xFF6366F1).withValues(alpha: 0.4)
+                    : const Color(0xFFC7D2FE),
               ),
             ),
             child: Row(
               children: [
-                const Icon(LucideIcons.clock, size: 18, color: Color(0xFF6366F1)),
+                const Icon(
+                  LucideIcons.clock,
+                  size: 18,
+                  color: Color(0xFF6366F1),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -545,7 +592,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFF3730A3),
+                      color: isDark
+                          ? const Color(0xFFC7D2FE)
+                          : const Color(0xFF3730A3),
                     ),
                   ),
                 ),
@@ -566,7 +615,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           final isSelected = _selectedType == cat['id'] as String;
 
           return Padding(
-            padding: EdgeInsets.only(bottom: index < _complaintTypes.length - 1 ? 8 : 0),
+            padding: EdgeInsets.only(
+              bottom: index < _complaintTypes.length - 1 ? 8 : 0,
+            ),
             child: GestureDetector(
               onTap: isBlocked
                   ? null
@@ -580,27 +631,33 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? (isDark
-                          ? const Color(0xFF064E3B).withValues(alpha: 0.3)
-                          : const Color(0xFFF0FDF4))
+                            ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                            : const Color(0xFFF0FDF4))
                       : (isDark ? const Color(0xFF18181B) : Colors.white),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected
                         ? const Color(0xFF059669)
-                        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB)),
+                        : (isDark
+                              ? const Color(0xFF27272A)
+                              : const Color(0xFFE5E7EB)),
                     width: isSelected ? 1.5 : 1.0,
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFF059669).withValues(alpha: 0.12),
+                            color: const Color(
+                              0xFF059669,
+                            ).withValues(alpha: 0.12),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
                         ]
                       : [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.12 : 0.04),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.12 : 0.04,
+                            ),
                             blurRadius: 4,
                             offset: const Offset(0, 1),
                           ),
@@ -614,7 +671,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         duration: const Duration(milliseconds: 200),
                         width: 4,
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF059669) : Colors.transparent,
+                          color: isSelected
+                              ? const Color(0xFF059669)
+                              : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(14),
                             bottomLeft: Radius.circular(14),
@@ -623,7 +682,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 13,
+                          ),
                           child: Row(
                             children: [
                               AnimatedContainer(
@@ -633,8 +695,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                   color: isSelected
                                       ? const Color(0xFF059669)
                                       : (isDark
-                                          ? const Color(0xFF27272A)
-                                          : const Color(0xFFF3F4F6)),
+                                            ? const Color(0xFF27272A)
+                                            : const Color(0xFFF3F4F6)),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
@@ -643,8 +705,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                   color: isSelected
                                       ? Colors.white
                                       : (isDark
-                                          ? const Color(0xFF71717A)
-                                          : const Color(0xFF6B7280)),
+                                            ? const Color(0xFF71717A)
+                                            : const Color(0xFF6B7280)),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -656,11 +718,17 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                       cat['label'] as String,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w600,
                                         fontFamily: 'HindSiliguri',
                                         color: isSelected
-                                            ? (isDark ? Colors.white : const Color(0xFF065F46))
-                                            : (isDark ? Colors.white : const Color(0xFF111827)),
+                                            ? (isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF065F46))
+                                            : (isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF111827)),
                                       ),
                                     ),
                                     const SizedBox(height: 2),
@@ -671,11 +739,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                         fontFamily: 'HindSiliguri',
                                         color: isSelected
                                             ? (isDark
-                                                ? const Color(0xFF6EE7B7)
-                                                : const Color(0xFF047857))
+                                                  ? const Color(0xFF6EE7B7)
+                                                  : const Color(0xFF047857))
                                             : (isDark
-                                                ? const Color(0xFF71717A)
-                                                : const Color(0xFF9CA3AF)),
+                                                  ? const Color(0xFF71717A)
+                                                  : const Color(0xFF9CA3AF)),
                                       ),
                                     ),
                                   ],
@@ -688,18 +756,24 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                 height: 20,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isSelected ? const Color(0xFF059669) : Colors.transparent,
+                                  color: isSelected
+                                      ? const Color(0xFF059669)
+                                      : Colors.transparent,
                                   border: Border.all(
                                     color: isSelected
                                         ? const Color(0xFF059669)
                                         : (isDark
-                                            ? const Color(0xFF3F3F46)
-                                            : const Color(0xFFD1D5DB)),
+                                              ? const Color(0xFF3F3F46)
+                                              : const Color(0xFFD1D5DB)),
                                     width: 1.5,
                                   ),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check_rounded, size: 13, color: Colors.white)
+                                    ? const Icon(
+                                        Icons.check_rounded,
+                                        size: 13,
+                                        color: Colors.white,
+                                      )
                                     : null,
                               ),
                             ],
@@ -728,12 +802,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: charCount == 0
-                    ? (isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF))
+                    ? (isDark
+                          ? const Color(0xFF71717A)
+                          : const Color(0xFF9CA3AF))
                     : (charCount < 15
-                        ? const Color(0xFFD97706)
-                        : (charCount <= 1000
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFEF4444))),
+                          ? const Color(0xFFD97706)
+                          : (charCount <= 1000
+                                ? const Color(0xFF059669)
+                                : const Color(0xFFEF4444))),
               ),
             ),
           ],
@@ -759,7 +835,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             controller: _descriptionController,
             maxLines: 5,
             maxLength: 1000,
-            buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
+            buildCounter:
+                (_, {required currentLength, required isFocused, maxLength}) =>
+                    null,
             enabled: !isBlocked,
             style: TextStyle(
               fontSize: 14,
@@ -768,11 +846,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               color: isDark ? Colors.white : Colors.black87,
             ),
             decoration: InputDecoration(
-              hintText: 'সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো (কমপক্ষে ১৫ অক্ষর)…',
+              hintText:
+                  'সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো (কমপক্ষে ১৫ অক্ষর)…',
               hintStyle: TextStyle(
                 fontSize: 13,
                 fontFamily: 'HindSiliguri',
-                color: isDark ? const Color(0xFF52525B) : const Color(0xFFBBBBBB),
+                color: isDark
+                    ? const Color(0xFF52525B)
+                    : const Color(0xFFBBBBBB),
               ),
               contentPadding: const EdgeInsets.all(16),
               filled: true,
@@ -802,8 +883,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             onPressed: (_isLoading || isBlocked) ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
               backgroundColor: isBlocked
-                  ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
-                  : const Color(0xFF059669),
+                  ? (isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE2E8F0))
+                  : const Color(0xFF12544F),
               foregroundColor: isBlocked
                   ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                   : Colors.white,
@@ -834,10 +915,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         _isPendingLimitReached
                             ? 'আগের ৩টি আবেদনের সমাধানের অপেক্ষা করো'
                             : (_isDailyLimitReached
-                                ? 'আজকের সাবমিশন সীমা পূর্ণ (৫/৫)'
-                                : (_cooldownSeconds > 0
-                                    ? 'অপেক্ষা করুন (${_cooldownSeconds ~/ 60}:${(_cooldownSeconds % 60).toString().padLeft(2, '0')})'
-                                    : 'সাপোর্ট টিকেট জমা দাও')),
+                                  ? 'আজকের সাবমিশন সীমা পূর্ণ (৫/৫)'
+                                  : (_cooldownSeconds > 0
+                                        ? 'অপেক্ষা করুন (${_cooldownSeconds ~/ 60}:${(_cooldownSeconds % 60).toString().padLeft(2, '0')})'
+                                        : 'সাপোর্ট টিকেট জমা দাও')),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -886,7 +967,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     );
   }
 
-
   // ─── My Complaints List ─────────────────────────────────────────────────────
 
   Widget _buildMyComplaintsList(bool isDark) {
@@ -930,18 +1010,18 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             Text(
               'কোনো অভিযোগ জমা নেই',
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 15.5,
+                fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             const Text(
               'তুমি এখনো কোনো অভিযোগ বা ফিডব্যাক জমা দাওনি।',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.5,
                 fontFamily: 'HindSiliguri',
                 color: Color(0xFFA3A3A3),
               ),
@@ -1035,12 +1115,15 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'HindSiliguri',
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF0F172A),
                             ),
                           ),
                           Text(
-                            DateFormat('dd MMM yyyy, hh:mm a')
-                                .format(complaint.createdAt),
+                            DateFormat(
+                              'dd MMM yyyy, hh:mm a',
+                            ).format(complaint.createdAt),
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xFFA3A3A3),
@@ -1051,8 +1134,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     ],
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? (statusInfo['darkColor'] as Color)
@@ -1090,68 +1175,12 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontFamily: 'HindSiliguri',
-                  color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
+                  color: isDark
+                      ? const Color(0xFFD1D5DB)
+                      : const Color(0xFF475569),
                   height: 1.5,
                 ),
               ),
-
-              // Admin Feedback (if present)
-              if (complaint.adminFeedback != null &&
-                  complaint.adminFeedback!.trim().isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF064E3B).withValues(alpha: 0.3)
-                        : const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF059669).withValues(alpha: 0.35)
-                          : const Color(0xFFA7F3D0),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            LucideIcons.checkCircle2,
-                            size: 15,
-                            color: Color(0xFF059669),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'অ্যাডমিন উত্তর:',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
-                              color: isDark
-                                  ? const Color(0xFF34D399)
-                                  : const Color(0xFF065F46),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        complaint.adminFeedback!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFFE2E8F0)
-                              : const Color(0xFF0F172A),
-                          height: 1.45,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         );
@@ -1163,121 +1192,105 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
   Widget _buildSuccessState(bool isDark) {
     return Center(
-      child: Container(
-        margin: const EdgeInsets.all(24),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF18181B) : Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF059669).withValues(alpha: 0.2)
+                  : const Color(0xFFECFDF5),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              LucideIcons.checkCircle2,
+              size: 42,
+              color: Color(0xFF059669),
+            ),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+          const SizedBox(height: 20),
+          Text(
+            'বার্তা গৃহীত হয়েছে!',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF059669).withValues(alpha: 0.2)
-                    : const Color(0xFFECFDF5),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                LucideIcons.checkCircle2,
-                size: 42,
-                color: Color(0xFF059669),
-              ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'আমাদের টিম বিষয়টি গুরুত্ব সহকারে দেখছে। তোমার মতামতের জন্য ধন্যবাদ।',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: 'HindSiliguri',
+              color: Color(0xFFA3A3A3),
+              height: 1.45,
             ),
-            const SizedBox(height: 20),
-            Text(
-              'বার্তা গৃহীত হয়েছে!',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'HindSiliguri',
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'আমাদের টিম বিষয়টি গুরুত্ব সহকারে দেখছে। তোমার মতামতের জন্য ধন্যবাদ।',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.5,
-                fontFamily: 'HindSiliguri',
-                color: Color(0xFFA3A3A3),
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _handleReset,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(
-                        color: isDark
-                            ? const Color(0xFF3F3F46)
-                            : const Color(0xFFCBD5E1),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _handleReset,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF2C2C2C)
+                          : const Color(0xFFCBD5E1),
                     ),
-                    child: Text(
-                      'আরেকটি পাঠাও',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'আরেকটি পাঠাও',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _handleReset();
-                      setState(() {
-                        _activeTab = 'my';
-                        _fetchMyComplaints();
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: const Color(0xFF059669),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    _handleReset();
+                    setState(() {
+                      _activeTab = 'my';
+                      _fetchMyComplaints();
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: const Color(0xFF12544F),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text(
-                      'তালিকা দেখো',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                  ),
+                  child: const Text(
+                    'তালিকা দেখো',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
+                      fontFamily: 'HindSiliguri',
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
