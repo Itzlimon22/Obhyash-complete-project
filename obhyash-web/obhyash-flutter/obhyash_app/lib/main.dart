@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,6 +18,41 @@ import 'features/notifications/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Global Production Crash Guard ──
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('[GlobalFlutterError] ${details.exceptionAsString()}');
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('[GlobalPlatformError] $error');
+    // Return true to mark error as handled and avoid crashing app process in production
+    return true;
+  };
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 36),
+              const SizedBox(height: 8),
+              const Text(
+                'একটি অপ্রত্যাশিত ত্রুটি হয়েছে। পেজটি পুনরায় লোড করুন।',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  };
 
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -52,7 +88,7 @@ class ObhyashApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    NotificationService.onNotificationTapped = (route) {
+    NotificationService.onNotificationTapped ??= (route) {
       router.push(route);
     };
     final themeMode = ref.watch(themeModeProvider);

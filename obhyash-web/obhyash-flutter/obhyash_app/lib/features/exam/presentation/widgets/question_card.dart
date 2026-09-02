@@ -314,7 +314,7 @@ class _QuestionCardState extends State<QuestionCard>
               children: List.generate(widget.question.options.length, (idx) {
                 final option = widget.question.options[idx];
                 final isSelected = widget.selectedOptionIndex == idx;
-                final isCorrect = idx == widget.question.correctAnswerIndex;
+                final isCorrect = widget.question.isCorrectAnswer(idx);
                 final banglaIndex = _banglaIndices.length > idx
                     ? _banglaIndices[idx]
                     : (idx + 1).toString();

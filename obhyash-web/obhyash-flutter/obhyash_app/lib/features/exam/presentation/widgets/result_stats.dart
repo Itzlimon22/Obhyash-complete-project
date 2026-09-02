@@ -95,7 +95,7 @@ class ResultStats extends StatelessWidget {
         final ua = uAnswers[q.id];
         if (ua == null) {
           skipped++;
-        } else if (ua == q.correctAnswerIndex) {
+        } else if (q.isCorrectAnswer(ua)) {
           correct++;
         } else {
           wrong++;

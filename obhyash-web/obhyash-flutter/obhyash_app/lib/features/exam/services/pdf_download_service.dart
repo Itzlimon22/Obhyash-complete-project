@@ -716,7 +716,7 @@ class PdfDownloadService {
                 }
 
                 final userAnsIdx = result.userAnswers[q.id];
-                final isCorrect = userAnsIdx == q.correctAnswerIndex;
+                final isCorrect = q.isCorrectAnswer(userAnsIdx);
                 final isSkipped = userAnsIdx == null;
                 final meta = _renderQuestionMeta(q);
 

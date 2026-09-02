@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 
 class OfflineQuestionBankService {
-  static const String _kOfflineBankKey = 'obhyash_offline_question_bank_v1';
+  static const String _kOfflineBankKey = 'obhyash_offline_question_bank_v2';
   static const int _kMaxQuestionsPerSubject = 200; // ~200 KB per subject
 
   static String _normalizeKey(String s) {

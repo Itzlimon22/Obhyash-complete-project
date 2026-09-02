@@ -61,6 +61,7 @@ class Question {
   final String? explanation;
   final List<String> options;
   final int correctAnswerIndex;
+  final List<int> correctAnswerIndices;
   final int points;
   final List<ExamHistory> examHistory;
   final List<String> institutes;
@@ -77,6 +78,7 @@ class Question {
     this.explanation,
     required this.options,
     required this.correctAnswerIndex,
+    this.correctAnswerIndices = const [],
     required this.points,
     this.examHistory = const [],
     this.institutes = const [],
@@ -84,6 +86,15 @@ class Question {
     this.examType,
     this.difficulty = 'medium',
   });
+
+  /// Check whether a selected index is correct (supports single & multiple correct answers)
+  bool isCorrectAnswer(int? index) {
+    if (index == null) return false;
+    if (correctAnswerIndices.isNotEmpty) {
+      return correctAnswerIndices.contains(index);
+    }
+    return index == correctAnswerIndex;
+  }
 
   factory Question.fromJson(Map<String, dynamic> j) {
     List<String> validOptions = [];
@@ -174,6 +185,54 @@ class Question {
       }
     }
 
+    // 4. Robust Correct Answer Parsing (Supabase stores 'correct_answer_indices' as INTEGER[])
+    int resolvedCorrectAnswerIndex = 0;
+    List<int> resolvedCorrectAnswerIndices = [];
+
+    final rawIndices = j['correct_answer_indices'] ?? j['correctAnswerIndices'];
+    if (rawIndices is List && rawIndices.isNotEmpty) {
+      for (final item in rawIndices) {
+        if (item is num) {
+          resolvedCorrectAnswerIndices.add(item.toInt());
+        } else if (item != null) {
+          final p = int.tryParse(item.toString());
+          if (p != null) resolvedCorrectAnswerIndices.add(p);
+        }
+      }
+      if (resolvedCorrectAnswerIndices.isNotEmpty) {
+        resolvedCorrectAnswerIndex = resolvedCorrectAnswerIndices.first;
+      }
+    } else if (j['correct_answer_index'] != null || j['correctAnswerIndex'] != null) {
+      resolvedCorrectAnswerIndex =
+          ((j['correct_answer_index'] ?? j['correctAnswerIndex']) as num?)?.toInt() ?? 0;
+      resolvedCorrectAnswerIndices = [resolvedCorrectAnswerIndex];
+    } else if (j['correct_answer'] != null || j['correctAnswer'] != null) {
+      final raw = (j['correct_answer'] ?? j['correctAnswer']).toString().trim();
+      final asInt = int.tryParse(raw);
+      if (asInt != null) {
+        resolvedCorrectAnswerIndex = asInt;
+      } else if (raw.length == 1) {
+        final upper = raw.toUpperCase();
+        if (upper == 'A') {
+          resolvedCorrectAnswerIndex = 0;
+        } else if (upper == 'B') {
+          resolvedCorrectAnswerIndex = 1;
+        } else if (upper == 'C') {
+          resolvedCorrectAnswerIndex = 2;
+        } else if (upper == 'D') {
+          resolvedCorrectAnswerIndex = 3;
+        }
+      } else {
+        final idx = validOptions.indexOf(raw);
+        if (idx != -1) resolvedCorrectAnswerIndex = idx;
+      }
+      resolvedCorrectAnswerIndices = [resolvedCorrectAnswerIndex];
+    }
+
+    if (resolvedCorrectAnswerIndices.isEmpty) {
+      resolvedCorrectAnswerIndices = [resolvedCorrectAnswerIndex];
+    }
+
     return Question(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
@@ -184,7 +243,8 @@ class Question {
           ? QuestionFormatter.format(j['explanation'].toString())
           : null,
       options: validOptions,
-      correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
+      correctAnswerIndex: resolvedCorrectAnswerIndex,
+      correctAnswerIndices: resolvedCorrectAnswerIndices,
       points: (j['points'] as num?)?.toInt() ?? 1,
       examHistory: validExamHistory,
       institutes: validInstitutes,
@@ -205,6 +265,7 @@ class Question {
     'explanation': explanation,
     'options': options,
     'correct_answer_index': correctAnswerIndex,
+    'correct_answer_indices': correctAnswerIndices,
     'points': points,
     'exam_history': examHistory.map((e) => e.toJson()).toList(),
     'institutes': institutes,
@@ -222,6 +283,7 @@ class Question {
     String? explanation,
     List<String>? options,
     int? correctAnswerIndex,
+    List<int>? correctAnswerIndices,
     int? points,
     List<ExamHistory>? examHistory,
     List<String>? institutes,
@@ -238,6 +300,7 @@ class Question {
       explanation: explanation ?? this.explanation,
       options: options ?? this.options,
       correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
+      correctAnswerIndices: correctAnswerIndices ?? this.correctAnswerIndices,
       points: points ?? this.points,
       examHistory: examHistory ?? this.examHistory,
       institutes: institutes ?? this.institutes,

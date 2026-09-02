@@ -1044,7 +1044,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     for (final q in state.questions) {
       final ua = state.userAnswers[q.id];
       if (ua != null) {
-        if (ua == q.correctAnswerIndex) {
+        if (q.isCorrectAnswer(ua)) {
           correct++;
           rawScore += q.points;
         } else {
@@ -1098,6 +1098,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 'question': q.question,
                 'options': q.options,
                 'correct_answer_index': q.correctAnswerIndex,
+                'correct_answer_indices': q.correctAnswerIndices,
                 'subject': q.subject,
                 'subject_label': q.subjectLabel,
                 'explanation': q.explanation,
@@ -1172,10 +1173,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             }
           }
 
-          if (!rpcSuccess) {
-            debugPrint(
-              '[ExamProvider] Atomic XP update failed after retries. Will sync on next connection.',
-            );
+          if (rpcSuccess) {
+            ref.read(userProfileProvider.notifier).addXpLocally(xpEarned);
           }
         }
 
@@ -1184,7 +1183,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           final answeredQuestions = state.questions.where((q) => state.userAnswers.containsKey(q.id)).toList();
           if (answeredQuestions.isNotEmpty) {
             final qIds = answeredQuestions.map((q) => q.id).toList();
-            final areCorrect = answeredQuestions.map((q) => state.userAnswers[q.id] == q.correctAnswerIndex).toList();
+            final areCorrect = answeredQuestions.map((q) => q.isCorrectAnswer(state.userAnswers[q.id])).toList();
             await supabase.rpc('record_exam_spaced_repetition', params: {
               'p_user_id': authId,
               'p_question_ids': qIds,

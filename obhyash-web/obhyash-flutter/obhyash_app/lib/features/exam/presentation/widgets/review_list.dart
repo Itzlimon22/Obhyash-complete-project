@@ -38,7 +38,7 @@ class _ReviewListState extends State<ReviewList> {
       final ua = widget.userAnswers[q.id];
       if (ua == null) {
         skippedCount++;
-      } else if (ua == q.correctAnswerIndex) {
+      } else if (q.isCorrectAnswer(ua)) {
         correctCount++;
       } else {
         wrongCount++;
@@ -48,7 +48,7 @@ class _ReviewListState extends State<ReviewList> {
     final filteredQuestions = widget.questions.where((q) {
       final ua = widget.userAnswers[q.id];
       final isSkipped = ua == null;
-      final isCorrect = !isSkipped && (ua == q.correctAnswerIndex);
+      final isCorrect = !isSkipped && q.isCorrectAnswer(ua);
       final isWrong = !isSkipped && !isCorrect;
 
       if (_reviewFilter == 'correct' && !isCorrect) return false;

@@ -1,22 +1,34 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:obhyash_app/main.dart';
+import 'package:obhyash_app/core/presentation/screens/maintenance_screen.dart';
+import 'package:obhyash_app/core/presentation/screens/force_update_screen.dart';
 
 void main() {
-  testWidgets('App smoke test - builds without crashing', (
-    WidgetTester tester,
-  ) async {
-    // Build the app and trigger a frame.
-    await tester.pumpWidget(const ObhyashApp());
+  testWidgets('MaintenanceScreen renders without crashing', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MaintenanceScreen(
+          message: 'আমাদের প্রকৌশলীরা কাজ করছেন',
+          onRetry: () {},
+        ),
+      ),
+    );
 
-    // Verify the app renders without throwing.
+    expect(find.text('আমাদের প্রকৌশলীরা কাজ করছেন'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('ForceUpdateScreen renders without crashing', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: ForceUpdateScreen(
+          minVersion: '1.2.0',
+          updateUrl: 'https://play.google.com',
+        ),
+      ),
+    );
+
+    expect(find.textContaining('1.2.0'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

@@ -192,6 +192,14 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
       }
     } catch (_) {}
   }
+
+  void addXpLocally(int xpToAdd) {
+    final current = state.value;
+    if (current != null) {
+      final updatedXp = current.xp + xpToAdd;
+      updateStreak(current.streakCount, newXp: updatedXp);
+    }
+  }
 }
 
 final userProfileProvider =

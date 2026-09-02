@@ -184,7 +184,7 @@ class _ResultViewState extends State<ResultView> {
       final ua = widget.result.userAnswers[q.id];
       if (ua == null) {
         skipCount++;
-      } else if (ua == q.correctAnswerIndex) {
+      } else if (q.isCorrectAnswer(ua)) {
         correctCount++;
       } else {
         wrongCount++;
@@ -199,7 +199,7 @@ class _ResultViewState extends State<ResultView> {
     final filteredQuestions = widget.result.questions.where((q) {
       final ua = widget.result.userAnswers[q.id];
       final isSkipped = ua == null;
-      final isCorrect = !isSkipped && (ua == q.correctAnswerIndex);
+      final isCorrect = !isSkipped && q.isCorrectAnswer(ua);
       final isWrong = !isSkipped && !isCorrect;
 
       if (_reviewFilter == 'correct' && !isCorrect) return false;
