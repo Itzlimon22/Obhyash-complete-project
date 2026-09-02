@@ -83,14 +83,35 @@ interface SupportNoteItem {
   metadata?: Record<string, any>;
 }
 
-export default function UserDetailsPage() {
+interface UserDetailsPageProps {
+  params?: Promise<{ id: string }> | { id: string };
+}
+
+export default function UserDetailsPage({ params }: UserDetailsPageProps) {
   const urlParams = useParams();
-  const userId = typeof urlParams?.id === 'string'
-    ? urlParams.id
-    : Array.isArray(urlParams?.id)
-    ? urlParams.id[0]
-    : '';
   const router = useRouter();
+
+  // Support both Next.js 15+ Promise params and client-side useParams
+  const [resolvedId, setResolvedId] = useState<string>(() => {
+    if (typeof urlParams?.id === 'string') return urlParams.id;
+    if (Array.isArray(urlParams?.id)) return urlParams.id[0];
+    return '';
+  });
+
+  useEffect(() => {
+    if (params) {
+      if (typeof (params as any).then === 'function') {
+        (params as Promise<{ id: string }>).then((p) => {
+          if (p?.id) setResolvedId(p.id);
+        });
+      } else if ((params as any)?.id) {
+        setResolvedId((params as any).id);
+      }
+    } else if (urlParams?.id) {
+      const id = typeof urlParams.id === 'string' ? urlParams.id : urlParams.id[0];
+      if (id) setResolvedId(id);
+    }
+  }, [params, urlParams]);
 
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [userData, setUserData] = useState<UserType | null>(null);
@@ -116,12 +137,25 @@ export default function UserDetailsPage() {
   const [showSuspendModal, setShowSuspendModal] = useState(false);
 
   useEffect(() => {
-    if (userId) {
-      fetchUserData();
+    if (resolvedId) {
+      fetchUserData({ targetId: resolvedId });
+    } else {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
     }
-  }, [userId]);
+  }, [resolvedId]);
 
-  const fetchUserData = async (isManualRefresh = false) => {
+  const fetchUserData = async (options?: { targetId?: string; isManualRefresh?: boolean } | boolean) => {
+    const isManualRefresh = typeof options === 'boolean' ? options : (options?.isManualRefresh ?? false);
+    const targetId = (typeof options === 'object' && options?.targetId) ? options.targetId : resolvedId;
+
+    if (!targetId) {
+      setIsLoading(false);
+      return;
+    }
+
     if (isManualRefresh) setIsRefreshing(true);
     else setIsLoading(true);
 
@@ -135,59 +169,60 @@ export default function UserDetailsPage() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`/api/admin/users/details?userId=${userId}`, {
+      const res = await fetch(`/api/admin/users/details?userId=${encodeURIComponent(targetId)}`, {
         headers,
+        credentials: 'include',
       });
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to fetch user details');
+        throw new Error(json.error || `Failed to fetch user details (Status ${res.status})`);
       }
 
-      if (json.data) {
-        if (json.data.user) {
-          const raw = json.data.user;
-          const mapped: UserType = {
-            id: raw.id,
-            name: raw.name || 'Unnamed User',
-            email: raw.email || '',
-            phone: raw.phone || '',
-            role: (raw.role || 'Student') as any,
-            status: (raw.status || 'Active') as any,
-            lastActive: raw.last_active || raw.created_at || new Date().toISOString(),
-            institute: raw.institute || 'N/A',
-            enrolledExams: raw.exams_taken || 0,
-            xp: raw.xp || 0,
-            streakCount: raw.streak || 0,
-            batch: raw.batch || raw.academic_batch || 'N/A',
-            division: raw.division || raw.academic_group || 'N/A',
-            stream: raw.stream || 'N/A',
-            target: raw.target || '',
-            gender: raw.gender || 'N/A',
-            dob: raw.dob || '',
-            address: raw.address || 'N/A',
-            ssc_roll: raw.ssc_roll || '',
-            ssc_reg: raw.ssc_reg || '',
-            ssc_board: raw.ssc_board || '',
-            ssc_passing_year: raw.ssc_passing_year || '',
-            student_id: raw.student_id || `OBH-${raw.id.replace(/-/g, '').slice(0, 5).toUpperCase()}`,
-            recentExams: [],
-            subscription: raw.subscription && typeof raw.subscription === 'object'
-              ? raw.subscription
-              : {
-                  plan: raw.plan || (raw.is_subscribed ? 'Pro' : 'Free'),
-                  status: raw.is_subscribed ? 'Active' : 'Inactive',
-                  expiry: raw.subscription_expires_at || '',
-                },
-          };
-          setUserData(mapped);
-        }
-
-        if (json.data.exams) setExams(json.data.exams);
-        if (json.data.devices) setDevices(json.data.devices);
-        if (json.data.payments) setPayments(json.data.payments);
-        if (json.data.notes) setNotes(json.data.notes);
+      if (json.data?.user) {
+        const raw = json.data.user;
+        const mapped: UserType = {
+          id: raw.id || targetId,
+          name: raw.name || 'Unnamed User',
+          email: raw.email || '',
+          phone: raw.phone || '',
+          role: (raw.role || 'Student') as any,
+          status: (raw.status || 'Active') as any,
+          lastActive: raw.last_active || raw.created_at || new Date().toISOString(),
+          institute: raw.institute || 'N/A',
+          enrolledExams: raw.exams_taken || 0,
+          xp: raw.xp || 0,
+          streakCount: raw.streak || 0,
+          batch: raw.batch || raw.academic_batch || 'N/A',
+          division: raw.division || raw.academic_group || 'N/A',
+          stream: raw.stream || 'N/A',
+          target: raw.target || '',
+          gender: raw.gender || 'N/A',
+          dob: raw.dob || '',
+          address: raw.address || 'N/A',
+          ssc_roll: raw.ssc_roll || '',
+          ssc_reg: raw.ssc_reg || '',
+          ssc_board: raw.ssc_board || '',
+          ssc_passing_year: raw.ssc_passing_year || '',
+          student_id: raw.student_id || (raw.id ? `OBH-${String(raw.id).replace(/-/g, '').slice(0, 5).toUpperCase()}` : 'OBH-USER'),
+          recentExams: [],
+          subscription: raw.subscription && typeof raw.subscription === 'object'
+            ? raw.subscription
+            : {
+                plan: raw.plan || (raw.is_subscribed ? 'Pro' : 'Free'),
+                status: raw.is_subscribed ? 'Active' : 'Inactive',
+                expiry: raw.subscription_expires_at || '',
+              },
+        };
+        setUserData(mapped);
+      } else {
+        throw new Error('User profile record not found');
       }
+
+      if (json.data.exams) setExams(json.data.exams);
+      if (json.data.devices) setDevices(json.data.devices);
+      if (json.data.payments) setPayments(json.data.payments);
+      if (json.data.notes) setNotes(json.data.notes);
     } catch (err: any) {
       console.error('User fetch error:', err);
       toast.error(err.message || 'User not found or database error');
