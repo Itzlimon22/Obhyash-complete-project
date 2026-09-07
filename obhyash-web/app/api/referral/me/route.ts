@@ -18,6 +18,19 @@ export const GET = async () => {
 
     const supabaseAdmin = createSupabaseAdminClient(supabaseUrl, supabaseServiceKey);
 
+    // 0. Check global referral switch
+    let isReferralSystemEnabled = true;
+    try {
+      const { data: cfg } = await supabaseAdmin
+        .from('app_config')
+        .select('referral_system_enabled')
+        .eq('id', 'global_config')
+        .maybeSingle();
+      if (cfg && cfg.referral_system_enabled !== undefined && cfg.referral_system_enabled !== null) {
+        isReferralSystemEnabled = cfg.referral_system_enabled;
+      }
+    } catch (_) {}
+
     // 1. Get or auto-create referral code for user
     let referral: any = null;
     try {
@@ -149,11 +162,12 @@ export const GET = async () => {
       totalApproved,
       scratchCards,
       hasUsedReferral,
+      is_enabled: isReferralSystemEnabled,
     });
   } catch (error: any) {
     console.error('Error in /api/referral/me:', error);
     return NextResponse.json(
-      { referral: null, history: [], totalApproved: 0, scratchCards: [], hasUsedReferral: true },
+      { referral: null, history: [], totalApproved: 0, scratchCards: [], hasUsedReferral: true, is_enabled: true },
       { status: 200 },
     );
   }

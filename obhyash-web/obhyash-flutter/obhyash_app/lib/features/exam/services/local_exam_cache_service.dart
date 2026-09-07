@@ -95,6 +95,23 @@ class LocalExamCacheService {
     }
   }
 
+  /// Retrieve all locally cached exam results
+  static Future<List<ExamResult>> getAllCachedExamResults() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      final List<ExamResult> results = [];
+      for (final id in ids) {
+        final res = await getExamResult(id);
+        if (res != null) results.add(res);
+      }
+      return results;
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] getAllCachedExamResults error: $e');
+      return [];
+    }
+  }
+
   /// Check if an exam result is stored in local storage
   static Future<bool> isExamCached(String id) async {
     try {

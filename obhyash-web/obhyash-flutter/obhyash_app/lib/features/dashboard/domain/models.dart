@@ -178,6 +178,7 @@ class UserProfile {
   final bool isSubscribed;
   final String? subscriptionStatus;
   final String? subscriptionExpiresAt;
+  final String status;
 
   UserProfile({
     required this.id,
@@ -214,6 +215,7 @@ class UserProfile {
     this.isSubscribed = false,
     this.subscriptionStatus,
     this.subscriptionExpiresAt,
+    this.status = 'Active',
   });
 
   bool get isBatchLocked =>
@@ -230,6 +232,11 @@ class UserProfile {
       !requiresEmailVerification;
 
   int get batchChangesRemaining => isBatchLocked ? 0 : 1;
+
+  bool get isBlocked {
+    final s = status.trim().toLowerCase();
+    return s == 'blocked' || s == 'suspended' || s == 'banned';
+  }
 
   bool get isPro {
     if (subscriptionExpiresAt == null || subscriptionExpiresAt!.isEmpty) {
@@ -285,6 +292,7 @@ class UserProfile {
     bool? isSubscribed,
     String? subscriptionStatus,
     String? subscriptionExpiresAt,
+    String? status,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -318,6 +326,7 @@ class UserProfile {
       isSubscribed: isSubscribed ?? this.isSubscribed,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      status: status ?? this.status,
     );
   }
 
@@ -376,6 +385,7 @@ class UserProfile {
       isSubscribed: isSub,
       subscriptionStatus: subJson?['status'] as String? ?? json['subscription_status'] as String?,
       subscriptionExpiresAt: rawExp,
+      status: json['status'] as String? ?? 'Active',
     );
   }
 }

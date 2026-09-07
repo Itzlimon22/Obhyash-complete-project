@@ -58,13 +58,15 @@ class _ResultViewState extends ConsumerState<ResultView> {
               ? ((widget.result.correctCount / total) * 100).round()
               : 0;
           final subjectName = widget.result.subjectLabel ?? widget.result.subject;
-
-          NotificationManager.notifyExamCompleted(
-            context: context,
-            ref: ref,
-            examTitle: subjectName,
-            scorePercentage: scorePct,
-          );
+          // Intelligent Notification: Only notify for rare 100% perfect score milestones
+          if (scorePct == 100 && total >= 5) {
+            NotificationManager.notifyExamCompleted(
+              context: context,
+              ref: ref,
+              examTitle: subjectName,
+              scorePercentage: scorePct,
+            );
+          }
 
           if (uid != null) {
             GamificationService.checkAndUnlockBadges(
@@ -151,11 +153,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
         _bookmarkedIds.remove(id);
       } else {
         _bookmarkedIds.add(id);
-        NotificationManager.notifyBookmarkSaved(
-          context: context,
-          ref: ref,
-          subject: widget.result.subjectLabel ?? widget.result.subject,
-        );
+        AppHaptics.selection();
       }
     });
     // Persist to Supabase bookmarks table

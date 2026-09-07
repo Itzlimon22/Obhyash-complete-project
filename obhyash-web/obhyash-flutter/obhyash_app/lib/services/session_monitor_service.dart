@@ -1,32 +1,16 @@
 // lib/services/session_monitor_service.dart
 //
-// Detects when the user's account is signed in on another device and
-// forces the current device to sign out automatically.
+// Single Device Session Lock:
+// Detects when the user signs in on another device and automatically & silently
+// logs out any previous devices.
 //
-// How it works:
-//   1. On login, inserts a row to `user_sessions` table with device info.
-//   2. Subscribes to Supabase Realtime changes on that table for this user.
-//   3. When a *newer* session row appears, triggers forced sign-out.
-//
-// Required Supabase table:
-//   -- Run this SQL in the Supabase dashboard once:
-//   CREATE TABLE IF NOT EXISTS user_sessions (
-//     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-//     user_id     uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-//     session_id  text NOT NULL,
-//     device_info text,
-//     created_at  timestamptz DEFAULT now()
-//   );
-//   ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
-//   CREATE POLICY "Users read own sessions" ON user_sessions
-//     FOR SELECT USING (auth.uid() = user_id);
-//   CREATE POLICY "Users insert own sessions" ON user_sessions
-//     FOR INSERT WITH CHECK (auth.uid() = user_id);
-//   CREATE POLICY "Users delete own sessions" ON user_sessions
-//     FOR DELETE USING (auth.uid() = user_id);
+// Works via:
+//   1. Unique session ID per device stored locally.
+//   2. Supabase Realtime listener on `public.users.current_session_id`.
+//   3. Lifecycle resume check to handle background/sleeping apps.
 
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'secure_storage_service.dart';
@@ -38,128 +22,176 @@ class SessionMonitorService {
 
   static final _supabase = Supabase.instance.client;
 
-  /// Active Realtime channel (kept alive while user is logged in).
+  /// Active Realtime channel for session changes.
   static RealtimeChannel? _channel;
 
-  /// The session ID for the current device login.
+  /// The active session ID on this local device.
   static String? _currentSessionId;
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  /// Generates a cryptographically unique session ID.
+  static String generateSessionId(String userId) {
+    final random = Random.secure();
+    final values = List<int>.generate(12, (i) => random.nextInt(256));
+    final hex = values.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return '${DateTime.now().millisecondsSinceEpoch}_$hex';
+  }
 
-  /// Register this device's session and start monitoring for new logins.
-  ///
-  /// [userId] — current auth user ID.
-  /// [onForcedSignOut] — callback invoked when a new device logs in.
-  ///   Typically calls `AuthController.logout()` + navigation to LoginScreen.
+  /// Checks whether single device login restriction is enabled by admin in app_config.
+  static Future<bool> isLockEnabled() async {
+    try {
+      final res = await _supabase
+          .from('app_config')
+          .select('single_device_login_enabled')
+          .eq('id', 'global_config')
+          .maybeSingle();
+      if (res != null && res['single_device_login_enabled'] != null) {
+        return res['single_device_login_enabled'] as bool;
+      }
+    } catch (_) {}
+    return true; // Default to true if not configured
+  }
+
+  /// Sets the active session ID in Supabase.
+  static Future<void> registerActiveSession(String userId, String sessionId) async {
+    _currentSessionId = sessionId;
+    await SecureStorageService.saveSessionId(sessionId);
+
+    try {
+      await _supabase.rpc('set_active_user_session', params: {
+        'p_session_id': sessionId,
+      });
+    } catch (_) {
+      try {
+        await _supabase.from('users').update({
+          'current_session_id': sessionId,
+        }).eq('id', userId);
+      } catch (e) {
+        debugPrint('[SessionMonitor] Error registering active session: $e');
+      }
+    }
+  }
+
+  /// Starts real-time monitoring of the user's active session.
+  /// If a newer session appears in Supabase, silently invokes [onForcedSignOut].
   static Future<void> start({
     required String userId,
     required ForceSignOutCallback onForcedSignOut,
   }) async {
-    // Read the stored session ID (set during login via SecureStorageService)
-    final sessionId = await SecureStorageService.getSessionId();
-    if (sessionId == null || sessionId.isEmpty) return;
-
+    // 1. Retrieve local session ID
+    var sessionId = await SecureStorageService.getSessionId();
+    if (sessionId == null || sessionId.isEmpty) {
+      sessionId = generateSessionId(userId);
+      await registerActiveSession(userId, sessionId);
+    }
     _currentSessionId = sessionId;
 
-    // Write this session to the DB (upsert — handles reconnects gracefully)
-    await _upsertSession(userId: userId, sessionId: sessionId);
+    // 2. Initial synchronization check with DB
+    try {
+      final lockActive = await isLockEnabled();
+      if (lockActive) {
+        final res = await _supabase
+            .from('users')
+            .select('current_session_id')
+            .eq('id', userId)
+            .maybeSingle();
 
-    // Subscribe to Realtime inserts on user_sessions for this user
+        final dbSessionId = res?['current_session_id'] as String?;
+        if (dbSessionId != null &&
+            dbSessionId.isNotEmpty &&
+            dbSessionId != _currentSessionId) {
+          debugPrint('[SessionMonitor] ⚠️ Stale session detected on startup. Silent auto-logout.');
+          await onForcedSignOut();
+          return;
+        } else if (dbSessionId == null || dbSessionId.isEmpty) {
+          await registerActiveSession(userId, _currentSessionId!);
+        }
+      }
+    } catch (e) {
+      debugPrint('[SessionMonitor] Startup sync check warning: $e');
+    }
+
+    // 3. Clean previous channel if active
+    if (_channel != null) {
+      try {
+        await _supabase.removeChannel(_channel!);
+      } catch (_) {}
+      _channel = null;
+    }
+
+    // 4. Subscribe to Realtime UPDATE events on public.users for this user
     _channel = _supabase
-        .channel('session_monitor:$userId')
+        .channel('user_session_lock:$userId')
         .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
+          event: PostgresChangeEvent.update,
           schema: 'public',
-          table: 'user_sessions',
+          table: 'users',
           filter: PostgresChangeFilter(
             type: PostgresChangeFilterType.eq,
-            column: 'user_id',
+            column: 'id',
             value: userId,
           ),
-          callback: (payload) => _handleNewSession(
-            payload: payload,
-            onForcedSignOut: onForcedSignOut,
-          ),
+          callback: (payload) async {
+            final newRecord = payload.newRecord;
+            final incomingSessionId = newRecord['current_session_id'] as String?;
+
+            if (incomingSessionId != null &&
+                incomingSessionId.isNotEmpty &&
+                incomingSessionId != _currentSessionId) {
+              final lockActive = await isLockEnabled();
+              if (!lockActive) {
+                debugPrint('[SessionMonitor] Single device lock disabled by admin. Allowing concurrent sessions.');
+                return;
+              }
+
+              debugPrint(
+                '[SessionMonitor] ⚠️ Account signed in on another device ($incomingSessionId). Silent logout triggered.',
+              );
+              onForcedSignOut();
+            }
+          },
         )
         .subscribe();
   }
 
-  /// Unsubscribe and clean up. Call on sign-out and app dispose.
+  /// Verifies whether the local session is still the active session in DB.
+  /// Call this when the app returns to foreground from sleep/background.
+  static Future<void> checkSessionSync(
+    String userId,
+    ForceSignOutCallback onForcedSignOut,
+  ) async {
+    final lockActive = await isLockEnabled();
+    if (!lockActive) return;
+
+    final localId = _currentSessionId ?? await SecureStorageService.getSessionId();
+    if (localId == null || localId.isEmpty) return;
+
+    try {
+      final res = await _supabase
+          .from('users')
+          .select('current_session_id')
+          .eq('id', userId)
+          .maybeSingle();
+
+      final dbSessionId = res?['current_session_id'] as String?;
+      if (dbSessionId != null && dbSessionId.isNotEmpty && dbSessionId != localId) {
+        debugPrint('[SessionMonitor] ⚠️ Session replaced while app was inactive. Silent auto-logout.');
+        await onForcedSignOut();
+      }
+    } catch (_) {}
+  }
+
+  /// Stops Realtime subscription on logout or dispose.
   static Future<void> stop({required String userId}) async {
     try {
       final ch = _channel;
       _channel = null;
       if (ch != null) {
-        unawaited(_supabase.removeChannel(ch).catchError((_) => ''));
+        await _supabase.removeChannel(ch);
       }
-
-      final sessId = _currentSessionId;
       _currentSessionId = null;
-      if (sessId != null && sessId.isNotEmpty) {
-        unawaited(
-          _supabase
-              .from('user_sessions')
-              .delete()
-              .eq('user_id', userId)
-              .eq('session_id', sessId)
-              .timeout(const Duration(seconds: 3))
-              .then((_) {})
-              .catchError((e) {
-                debugPrint('[SessionMonitor] Error deleting session row: $e');
-              }),
-        );
-      }
     } catch (e) {
       debugPrint('[SessionMonitor] stop error: $e');
     }
   }
-
-  // ── Private helpers ────────────────────────────────────────────────────────
-
-  static Future<void> _upsertSession({
-    required String userId,
-    required String sessionId,
-  }) async {
-    try {
-      final deviceInfo = _getDeviceInfo();
-      await _supabase.from('user_sessions').upsert({
-        'user_id': userId,
-        'session_id': sessionId,
-        'device_info': deviceInfo,
-        'created_at': DateTime.now().toUtc().toIso8601String(),
-      });
-    } catch (e) {
-      // Non-fatal — monitoring degrades gracefully if insert fails
-      debugPrint('[SessionMonitor] Failed to upsert session: $e');
-    }
-  }
-
-  static void _handleNewSession({
-    required PostgresChangePayload payload,
-    required ForceSignOutCallback onForcedSignOut,
-  }) {
-    final newRecord = payload.newRecord;
-    final incomingSessionId = newRecord['session_id'] as String?;
-
-    // Ignore if the new session is the same as ours (e.g. reconnect)
-    if (incomingSessionId == null || incomingSessionId == _currentSessionId) {
-      return;
-    }
-
-    debugPrint(
-      '[SessionMonitor] New session detected: $incomingSessionId — forcing sign-out.',
-    );
-
-    // Trigger forced sign-out (caller handles UI toast + navigation)
-    onForcedSignOut();
-  }
-
-  static String _getDeviceInfo() {
-    try {
-      if (kIsWeb) return 'web';
-      if (Platform.isAndroid) return 'android';
-      if (Platform.isIOS) return 'ios';
-    } catch (_) {}
-    return 'unknown';
-  }
 }
+

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/services/offline_question_bank_service.dart';
 import '../presentation/institute_question_bank_detail_view.dart';
@@ -63,11 +64,35 @@ class QuestionBankService {
     return years.toList();
   }
 
+  /// Sorts questions serially subject-wise (Physics -> Chemistry -> Higher Math -> Biology -> etc.)
+  /// Preserves relative order within the same subject.
+  static List<Question> sortSeriallySubjectwise(List<Question> list) {
+    final indexed = list.asMap().entries.toList();
+    indexed.sort((a, b) {
+      final pA = BanglaNameHelper.getWrittenSubjectSortPriority(
+        a.value.subject,
+        a.value.subjectLabel,
+      );
+      final pB = BanglaNameHelper.getWrittenSubjectSortPriority(
+        b.value.subject,
+        b.value.subjectLabel,
+      );
+      if (pA != pB) return pA.compareTo(pB);
+      return a.key.compareTo(b.key);
+    });
+    return indexed.map((e) => e.value).toList();
+  }
+
   /// Fetch authentic questions for an institute and exam set
   static Future<List<Question>> fetchExamSetQuestions({
     required String instituteId,
     required InstituteExamSet examSet,
   }) async {
+    final isWritten = examSet.type == 'written' ||
+        examSet.id.toLowerCase().contains('written') ||
+        examSet.title.toLowerCase().contains('written') ||
+        examSet.title.contains('লিখিত');
+
     final targetCount = examSet.questionCount > 0 ? examSet.questionCount : 25;
     final tags = getInstituteSearchTags(instituteId);
     final years = extractYearsFromSession(examSet.year);
@@ -78,6 +103,118 @@ class QuestionBankService {
     try {
       final supabase = Supabase.instance.client;
 
+      // ======================================================================
+      // 1. WRITTEN EXAM PIPELINE (BUET / QB Written Exams)
+      // Strictly filter type == 'written' FIRST, then apply other filters.
+      // NO MCQs allowed under any circumstances.
+      // Serially grouped subject-wise (Physics -> Chemistry -> Math).
+      // If a subject has fewer questions, keep as is without mixing.
+      // ======================================================================
+      if (isWritten) {
+        final writtenTypes = ['written', 'Written', 'WRITTEN', 'লিখিত'];
+
+        // Tier 1: type == 'written' FIRST, then institute tags + exact years
+        if (years.isNotEmpty) {
+          try {
+            final res = await supabase
+                .from('questions')
+                .select('*')
+                .inFilter('type', writtenTypes)
+                .overlaps('institutes', tags)
+                .overlaps('years', years)
+                .limit(targetCount * 2);
+
+            if (res.isNotEmpty) {
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (q.isStrictWritten && !seenIds.contains(q.id)) {
+                  seenIds.add(q.id);
+                  collected.add(q);
+                }
+              }
+            }
+          } catch (e) {
+            debugPrint('[QuestionBankService] Written Tier 1 error: $e');
+          }
+        }
+
+        // Tier 2: type == 'written' FIRST, then general institute questions
+        if (collected.length < targetCount) {
+          final needed = targetCount - collected.length;
+          try {
+            final res = await supabase
+                .from('questions')
+                .select('*')
+                .inFilter('type', writtenTypes)
+                .overlaps('institutes', tags)
+                .limit(needed * 3);
+
+            if (res.isNotEmpty) {
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (q.isStrictWritten && !seenIds.contains(q.id)) {
+                  seenIds.add(q.id);
+                  collected.add(q);
+                }
+                if (collected.length >= targetCount) break;
+              }
+            }
+          } catch (e) {
+            debugPrint('[QuestionBankService] Written Tier 2 error: $e');
+          }
+        }
+
+        // Tier 2b: Search questions where type is written in general engineering pool if institute empty
+        if (collected.length < targetCount) {
+          final needed = targetCount - collected.length;
+          try {
+            final res = await supabase
+                .from('questions')
+                .select('*')
+                .inFilter('type', writtenTypes)
+                .ilike('exam_type', '%Engineering%')
+                .limit(needed * 2);
+
+            if (res.isNotEmpty) {
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (q.isStrictWritten && !seenIds.contains(q.id)) {
+                  seenIds.add(q.id);
+                  collected.add(q);
+                }
+                if (collected.length >= targetCount) break;
+              }
+            }
+          } catch (e) {
+            debugPrint('[QuestionBankService] Written Tier 2b error: $e');
+          }
+        }
+
+        // STRICT SAFETY CHECK: Discard ANY question that has MCQ options or is an MCQ
+        final strictlyWritten = collected.where((q) {
+          if (!q.isStrictWritten) return false;
+          if (q.isAdmissionStandardMcq || q.isStrictMcq) return false;
+          final nonEmptyOptions = q.options.where((opt) => opt.trim().isNotEmpty).toList();
+          if (nonEmptyOptions.length >= 2) return false;
+          return true;
+        }).toList();
+
+        // Sort serially subject-wise (Physics -> Chemistry -> Higher Math -> Biology -> etc.)
+        final sortedWritten = sortSeriallySubjectwise(strictlyWritten);
+
+        // Cache for offline use
+        if (sortedWritten.isNotEmpty) {
+          OfflineQuestionBankService.cacheQuestions(sortedWritten);
+        }
+
+        // Return strictly written questions sorted serially subject-wise.
+        // No mixing of other subjects or MCQs even if count is less than target.
+        return sortedWritten.take(targetCount).toList();
+      }
+
+      // ======================================================================
+      // 2. MCQ / ADMISSION EXAM PIPELINE
+      // ======================================================================
       // 1. Tier 1: Institute tags + exact years
       if (years.isNotEmpty) {
         try {
@@ -91,7 +228,7 @@ class QuestionBankService {
           if (res.isNotEmpty) {
             for (final row in res) {
               final q = Question.fromJson(row);
-              if (!seenIds.contains(q.id)) {
+              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
                 seenIds.add(q.id);
                 collected.add(q);
               }
@@ -115,7 +252,7 @@ class QuestionBankService {
           if (res.isNotEmpty) {
             for (final row in res) {
               final q = Question.fromJson(row);
-              if (!seenIds.contains(q.id)) {
+              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
                 seenIds.add(q.id);
                 collected.add(q);
               }
@@ -140,7 +277,7 @@ class QuestionBankService {
           if (res.isNotEmpty) {
             for (final row in res) {
               final q = Question.fromJson(row);
-              if (!seenIds.contains(q.id)) {
+              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
                 seenIds.add(q.id);
                 collected.add(q);
               }
@@ -162,7 +299,7 @@ class QuestionBankService {
             count: needed,
           );
           for (final q in offlineQs) {
-            if (!seenIds.contains(q.id)) {
+            if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
               seenIds.add(q.id);
               collected.add(q);
             }

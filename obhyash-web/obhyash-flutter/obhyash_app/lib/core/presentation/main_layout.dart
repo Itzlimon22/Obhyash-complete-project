@@ -10,6 +10,8 @@ import 'widgets/main_sidebar.dart';
 import 'widgets/app_icon.dart';
 import '../constants/app_icons.dart';
 import '../utils/global_refresh.dart';
+import '../utils/app_popups.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'widgets/main_bottom_nav.dart';
 import 'widgets/user_avatar.dart';
 import '../../features/dashboard/services/streak_service.dart';
@@ -180,8 +182,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return false;
       if (location.startsWith('/subject') || location.contains('/subject/'))
         return false;
-      if (location.startsWith('/my-reports') ||
-          location.startsWith('/analysis'))
+      if (location.startsWith('/my-reports'))
+        return false;
+      if (location.startsWith('/analysis/') && location != '/analysis')
         return false;
       if (location.startsWith('/profile/') && location != '/profile')
         return false;
@@ -197,6 +200,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return location == '/' ||
           location.isEmpty ||
           location == '/history' ||
+          location == '/analysis' ||
           location == '/setup' ||
           location == '/leaderboard' ||
           location == '/profile' ||
@@ -336,12 +340,24 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     }
 
     if (tab == 'history') {
-      widget.navigationShell.goBranch(0);
-      context.push('/history');
+      final currentLoc = GoRouterState.of(context).uri.toString();
+      if (currentLoc != '/history') {
+        widget.navigationShell.goBranch(0);
+        context.go('/history');
+      }
       return;
     }
 
-    if (tab == 'practice' || tab == 'analysis' || tab == 'my-reports') {
+    if (tab == 'analysis' || tab == 'progress') {
+      final currentLoc = GoRouterState.of(context).uri.toString();
+      if (currentLoc != '/analysis') {
+        widget.navigationShell.goBranch(0);
+        context.go('/analysis');
+      }
+      return;
+    }
+
+    if (tab == 'practice' || tab == 'my-reports') {
       widget.navigationShell.goBranch(0);
       context.push('/$tab');
       return;
@@ -427,12 +443,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('🎯', style: TextStyle(fontSize: 13)),
+          const Text('🎯', style: TextStyle(fontSize: 13.5)),
           const SizedBox(width: 3),
           Text(
             '$days দিন',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.5,
               fontWeight: FontWeight.bold,
               color: textColor,
               fontFamily: 'HindSiliguri',
@@ -503,6 +519,26 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     ref.listen(userProfileProvider, (prev, next) {
       final u = next.value;
       if (u != null) {
+        // ── Instant Administrative Kickout for Blocked/Suspended Users ──
+        if (u.isBlocked) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (mounted) {
+              try {
+                await Supabase.instance.client.auth.signOut();
+              } catch (_) {}
+              if (mounted) {
+                AppPopups.show(
+                  context,
+                  message: 'আপনার অ্যাকাউন্টটি সাময়িকভাবে স্থগিত (Suspended) করা হয়েছে। সহায়তার জন্য সাপোর্টে যোগাযোগ করুন।',
+                  isError: true,
+                );
+                context.go('/login');
+              }
+            }
+          });
+          return;
+        }
+
         NotificationService().scheduleDailyStreakReminders(
           userName: u.name,
           currentStreak: u.streakCount,
@@ -650,7 +686,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         label: 'মক পরীক্ষা',
                                         isActive: currentSetupTab == 'mock',
                                         isDark: isDark,
-                                        fontSize: 15,
+                                        fontSize: 15.5,
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
@@ -665,7 +701,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         label: 'প্রিসেট পরীক্ষা',
                                         isActive: currentSetupTab == 'preset',
                                         isDark: isDark,
-                                        fontSize: 15,
+                                        fontSize: 15.5,
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
@@ -691,7 +727,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         isActive: currentQbTab ==
                                             QuestionBankTab.institution,
                                         isDark: isDark,
-                                        fontSize: 15,
+                                        fontSize: 15.5,
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
@@ -710,7 +746,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         isActive: currentQbTab ==
                                             QuestionBankTab.subject,
                                         isDark: isDark,
-                                        fontSize: 15,
+                                        fontSize: 15.5,
                                         onTap: () {
                                           HapticFeedback.lightImpact();
                                           ref
@@ -744,8 +780,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                           } else {
                                             widget.navigationShell.goBranch(0);
                                             context.go('/');
-                                            }
-                                          },
+                                          }
+                                        },
                                         behavior: HitTestBehavior.opaque,
                                         child: Padding(
                                           padding: const EdgeInsets.only(
@@ -771,7 +807,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                           titleText,
                                           maxLines: 1,
                                           style: TextStyle(
-                                            fontSize: isSubRoute ? 18 : 21,
+                                            fontSize: isSubRoute ? 16.5 : 19.5,
                                             fontWeight: FontWeight.w700,
                                             fontFamily: 'HindSiliguri',
                                             letterSpacing: -0.2,
@@ -872,7 +908,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                                 child: Text(
                                                   streak.toString(),
                                                   style: const TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 18.5,
                                                     fontWeight: FontWeight.bold,
                                                     color: Color(0xFFDC2626),
                                                   ),
@@ -942,7 +978,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                                         : unread.toString(),
                                                     style: const TextStyle(
                                                       color: Colors.white,
-                                                      fontSize: 12,
+                                                      fontSize: 12.5,
                                                       fontWeight:
                                                           FontWeight.w900,
                                                     ),
@@ -1139,7 +1175,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         'লেজেন্ডস লিগ',
                                         style: TextStyle(
                                           fontFamily: 'HindSiliguri',
-                                          fontSize: 15,
+                                          fontSize: 15.5,
                                           fontWeight: FontWeight.w900,
                                           color: Color(0xFFEF4444),
                                           letterSpacing: -0.2,
@@ -1183,13 +1219,18 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                         activeTab == 'question-bank' ||
                         activeTab == 'history' ||
                         activeTab == 'setup' ||
+                        activeTab == 'analysis' ||
                         activeTab == 'leaderboard' ||
                         activeTab == 'settings')
                     ? activeTab
                     : 'dashboard',
                 onTabChange: _onTabChange,
                 onMenuClick: () {
-                  _scaffoldKey.currentState?.openDrawer();
+                  if (_scaffoldKey.currentState?.isDrawerOpen == true) {
+                    _scaffoldKey.currentState?.closeDrawer();
+                  } else {
+                    _scaffoldKey.currentState?.openDrawer();
+                  }
                 },
               )
             : null,
@@ -1313,7 +1354,7 @@ class _ProfileSheet extends StatelessWidget {
                         userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 22.5,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1329,7 +1370,7 @@ class _ProfileSheet extends StatelessWidget {
                               ? userName
                               : '\u09b2\u09cb\u09a1 \u09b9\u099a\u09cd\u099b\u09c7...',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.5,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'HindSiliguri',
                             color: textPrimary,
@@ -1342,7 +1383,7 @@ class _ProfileSheet extends StatelessWidget {
                           Text(
                             userEmail,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 16.5,
                               color: textSecondary,
                             ),
                             maxLines: 1,
@@ -1354,7 +1395,7 @@ class _ProfileSheet extends StatelessWidget {
                           Text(
                             userInstitute,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.5,
                               color: textSecondary,
                               fontFamily: 'HindSiliguri',
                             ),
@@ -1379,7 +1420,7 @@ class _ProfileSheet extends StatelessWidget {
                     child: Text(
                       '$xp XP',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.5,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF059669),
                       ),
@@ -1423,7 +1464,7 @@ class _ProfileSheet extends StatelessWidget {
                       Text(
                         item['label'] as String,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.5,
                           fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.w600,
                           color: textPrimary,
@@ -1471,7 +1512,7 @@ class _ProfileSheet extends StatelessWidget {
                           ? '\u09b2\u09be\u0987\u099f \u09ae\u09cb\u09a1'
                           : '\u09a1\u09be\u09b0\u09cd\u0995 \u09ae\u09cb\u09a1',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.5,
                         fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
@@ -1545,7 +1586,7 @@ class _ProfileSheet extends StatelessWidget {
                     const Text(
                       '\u09b2\u0997\u0986\u0989\u099f',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.5,
                         fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                         color: Color(0xFFB91C1C),
@@ -1595,7 +1636,7 @@ class _HeaderTabBtn extends StatelessWidget {
             color: active
                 ? Colors.white
                 : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
-            fontSize: 12.5,
+            fontSize: 13.0,
             fontWeight: active ? FontWeight.w600 : FontWeight.normal,
             fontFamily: 'HindSiliguri',
           ),
@@ -1616,7 +1657,7 @@ class _HeaderUnderlineTab extends StatelessWidget {
     required this.label,
     required this.isActive,
     required this.isDark,
-    this.fontSize = 15,
+    this.fontSize = 15.5,
     required this.onTap,
   });
 

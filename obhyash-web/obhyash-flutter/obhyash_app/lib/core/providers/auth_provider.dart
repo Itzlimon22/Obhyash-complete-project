@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/secure_storage_service.dart';
+import '../../services/session_monitor_service.dart';
 import '../router.dart';
 import '../utils/app_popups.dart';
 
@@ -36,7 +37,7 @@ class AuthNotifier extends Notifier<User?> {
         case AuthChangeEvent.initialSession:
         case AuthChangeEvent.tokenRefreshed:
           if (session != null) {
-            await _handleSessionEstablished(session);
+            await _handleSessionEstablished(session, event: event);
           }
           break;
 
@@ -53,7 +54,10 @@ class AuthNotifier extends Notifier<User?> {
   /// Verifies that the authenticated session corresponds to an existing registered user.
   /// If the account does not match any registered student, it immediately rejects the login,
   /// signs out, returns to the login screen, and shows a descriptive toast message.
-  Future<void> _handleSessionEstablished(Session session) async {
+  Future<void> _handleSessionEstablished(
+    Session session, {
+    AuthChangeEvent? event,
+  }) async {
     final user = session.user;
     final email = user.email?.trim();
     final supabase = Supabase.instance.client;
@@ -125,18 +129,46 @@ class AuthNotifier extends Notifier<User?> {
 
     state = session.user;
 
+    // 4. Single Device Session Lock:
+    // On fresh login, generate a new unique session and set it in DB.
+    // Previous devices will receive the Realtime event and auto-logout silently.
+    var sessionId = await SecureStorageService.getSessionId();
+    if (event == AuthChangeEvent.signedIn || sessionId == null || sessionId.isEmpty) {
+      sessionId = SessionMonitorService.generateSessionId(session.user.id);
+      await SessionMonitorService.registerActiveSession(session.user.id, sessionId);
+    }
+
     // Keep secure storage up to date whenever tokens rotate
-    final sessionId = '${session.user.id}:${session.accessToken.hashCode}';
-    SecureStorageService.saveSession(
+    await SecureStorageService.saveSession(
       accessToken: session.accessToken,
       refreshToken: session.refreshToken ?? '',
       userId: session.user.id,
       sessionId: sessionId,
     );
+
+    // 5. Start Realtime Single Device Monitor
+    unawaited(
+      SessionMonitorService.start(
+        userId: session.user.id,
+        onForcedSignOut: () async {
+          debugPrint('[AuthNotifier] Newer session on another device. Silent auto-logout.');
+          await signOut();
+        },
+      ),
+    );
   }
 
-  /// Convenience sign-out that delegates to the controller.
+  /// Convenience sign-out that cleans up and delegates to Supabase.
   Future<void> signOut() async {
+    final uid = state?.id ?? Supabase.instance.client.auth.currentUser?.id;
+    if (uid != null) {
+      unawaited(SessionMonitorService.stop(userId: uid));
+    }
+    state = null;
+    await Future.wait([
+      SecureStorageService.clearSession().catchError((_) {}),
+      SecureStorageService.clearUserMeta().catchError((_) {}),
+    ]);
     try {
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
     } catch (_) {}

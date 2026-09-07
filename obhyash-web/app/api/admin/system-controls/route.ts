@@ -24,6 +24,7 @@ export async function GET() {
         live_exams_enabled: true,
         registration_enabled: true,
         free_trial_enabled: true,
+        referral_system_enabled: true,
         min_app_version: '1.0.0',
         latest_app_version: '1.0.0',
         force_update: false,
@@ -53,11 +54,26 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from('app_config')
       .upsert(payload, { onConflict: 'id' })
       .select()
       .single();
+
+    // Graceful fallback if database column referral_system_enabled hasn't been migrated yet
+    if (error && error.message?.includes('referral_system_enabled')) {
+      const fallbackPayload = { ...payload };
+      delete (fallbackPayload as any).referral_system_enabled;
+      const retry = await supabaseAdmin
+        .from('app_config')
+        .upsert(fallbackPayload, { onConflict: 'id' })
+        .select()
+        .single();
+      if (!retry.error) {
+        data = { ...retry.data, referral_system_enabled: body.referral_system_enabled ?? true };
+        error = null;
+      }
+    }
 
     if (error) throw error;
 

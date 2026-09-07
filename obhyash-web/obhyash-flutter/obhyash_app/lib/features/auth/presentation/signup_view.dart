@@ -777,13 +777,25 @@ class _SignupViewState extends ConsumerState<SignupView>
                   _buildDropdown(
                     icon: LucideIcons.graduationCap,
                     value: _group,
-                    options: const [
-                      'Science',
-                      'Business Studies',
-                      'Humanities',
+                    customOptions: const [
+                      AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                      AppDropdownOption(
+                        value: 'Business Studies',
+                        label: 'Business Studies (ব্যবসায় শিক্ষা)',
+                        isEnabled: false,
+                        disabledBadge: 'শীঘ্রই আসছে',
+                      ),
+                      AppDropdownOption(
+                        value: 'Humanities',
+                        label: 'Humanities (মানবিক)',
+                        isEnabled: false,
+                        disabledBadge: 'শীঘ্রই আসছে',
+                      ),
                     ],
                     isDark: isDark,
-                    onChanged: (val) => setState(() => _group = val!),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _group = val);
+                    },
                   ),
                 ],
               ),
@@ -1006,14 +1018,15 @@ class _SignupViewState extends ConsumerState<SignupView>
   Widget _buildDropdown({
     required IconData icon,
     required String? value,
-    required List<String> options,
+    List<String> options = const [],
+    List<AppDropdownOption<String>>? customOptions,
     required Function(String?) onChanged,
     required bool isDark,
   }) {
     return AppDropdown<String>(
       value: value,
       icon: icon,
-      options: options.map((opt) => AppDropdownOption(value: opt, label: opt)).toList(),
+      options: customOptions ?? options.map((opt) => AppDropdownOption(value: opt, label: opt)).toList(),
       onChanged: onChanged,
     );
   }

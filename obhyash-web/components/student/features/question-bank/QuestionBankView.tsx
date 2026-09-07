@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import {
   BookOpen,
@@ -367,7 +367,26 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
   const [selectedSubjectModal, setSelectedSubjectModal] = useState<SubjectCardItem | null>(null);
   const [selectedInstModal, setSelectedInstModal] = useState<InstituteCardItem | null>(null);
 
-  const filteredSubjects = SUBJECT_LIST;
+  const optionalSubject = (user?.optional_subject || "").trim().toLowerCase();
+
+  const filteredSubjects = useMemo(() => {
+    return SUBJECT_LIST.filter((subject) => {
+      const id = subject.id.toLowerCase();
+      const name = subject.name.toLowerCase();
+      const isBiology = id.includes("biology") || name.includes("জীববিজ্ঞান");
+      const isStatistics = id.includes("statistics") || name.includes("পরিসংখ্যান");
+
+      if (optionalSubject) {
+        if (optionalSubject.includes("stat")) {
+          if (isBiology) return false;
+        } else if (optionalSubject.includes("bio")) {
+          if (isStatistics) return false;
+        }
+      }
+      return true;
+    });
+  }, [optionalSubject]);
+
   const filteredInstitutes = ADMISSION_INSTITUTES;
 
   if (selectedSubjectDetail) {

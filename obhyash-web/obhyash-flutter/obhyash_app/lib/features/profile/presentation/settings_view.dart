@@ -306,13 +306,15 @@ class SettingsView extends ConsumerWidget {
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
-                  // Green gradient header
+                  // Deep green gradient header
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF166534), Color(0xFF14532D)],
+                        colors: isDark
+                            ? const [Color(0xFF064E3B), Color(0xFF022C22)]
+                            : const [Color(0xFF064E3B), Color(0xFF047857)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),

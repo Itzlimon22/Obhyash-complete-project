@@ -89,6 +89,15 @@ class SecureStorageService {
   /// Get just the current session ID (used by session monitor).
   static Future<String?> getSessionId() => _storage.read(key: _kSessionId);
 
+  /// Save just the active session ID.
+  static Future<void> saveSessionId(String sessionId) async {
+    try {
+      await _storage.write(key: _kSessionId, value: sessionId);
+    } catch (e) {
+      debugPrint('[SecureStorageService] saveSessionId error: $e');
+    }
+  }
+
   /// Remove all auth tokens from encrypted storage.
   /// Call this on explicit sign-out.
   static Future<void> clearSession() async {

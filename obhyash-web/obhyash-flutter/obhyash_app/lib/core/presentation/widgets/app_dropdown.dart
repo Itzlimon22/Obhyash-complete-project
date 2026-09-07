@@ -1,11 +1,19 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class AppDropdownOption<T> {
   final T value;
   final String label;
+  final bool isEnabled;
+  final String? disabledBadge;
 
-  const AppDropdownOption({required this.value, required this.label});
+  const AppDropdownOption({
+    required this.value,
+    required this.label,
+    this.isEnabled = true,
+    this.disabledBadge,
+  });
 }
 
 class AppDropdown<T> extends StatelessWidget {
@@ -97,45 +105,96 @@ class AppDropdown<T> extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final option = options[index];
                       final isSelected = option.value == value;
+                      final isEnabled = option.isEnabled;
+
+                      final content = Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                        decoration: BoxDecoration(
+                          color: isSelected && isEnabled
+                              ? (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5))
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      option.label,
+                                      style: TextStyle(
+                                        fontFamily: 'HindSiliguri',
+                                        fontSize: 15,
+                                        fontWeight: isSelected && isEnabled ? FontWeight.w700 : FontWeight.w500,
+                                        color: isEnabled
+                                            ? (isSelected 
+                                                ? (isDark ? Colors.white : Colors.black)
+                                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B)))
+                                            : (isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA)),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (!isEnabled) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        option.disabledBadge ?? 'শীঘ্রই আসছে',
+                                        style: TextStyle(
+                                          fontFamily: 'HindSiliguri',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            if (isSelected && isEnabled)
+                              Icon(
+                                LucideIcons.check,
+                                color: isDark ? Colors.white : Colors.black,
+                                size: 18,
+                              )
+                            else if (!isEnabled)
+                              Icon(
+                                LucideIcons.lock,
+                                color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                                size: 15,
+                              ),
+                          ],
+                        ),
+                      );
+
+                      if (!isEnabled) {
+                        return Opacity(
+                          opacity: 0.45,
+                          child: ImageFiltered(
+                            imageFilter: ui.ImageFilter.blur(sigmaX: 0.6, sigmaY: 0.6),
+                            child: content,
+                          ),
+                        );
+                      }
+
                       return InkWell(
                         onTap: () {
                           Navigator.pop(ctx);
                           onChanged!(option.value);
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-                          decoration: BoxDecoration(
-                            color: isSelected 
-                                ? (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5))
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  option.label,
-                                  style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
-                                    fontSize: 15,
-                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                    color: isSelected 
-                                        ? (isDark ? Colors.white : Colors.black)
-                                        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B)),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (isSelected)
-                                Icon(
-                                  LucideIcons.check,
-                                  color: isDark ? Colors.white : Colors.black,
-                                  size: 18,
-                                ),
-                            ],
-                          ),
-                        ),
+                        child: content,
                       );
                     },
                   ),

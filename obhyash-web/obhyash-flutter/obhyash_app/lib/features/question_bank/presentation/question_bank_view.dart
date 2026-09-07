@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import 'question_bank_tab_provider.dart';
 
 class QuestionBankView extends ConsumerStatefulWidget {
@@ -326,7 +327,25 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
 
   // ── SUBJECT-WISE GRID (2 PER ROW) ──
   Widget _buildSubjectGrid(bool isDark) {
-    final items = _subjects;
+    final user = ref.watch(userProfileProvider).value;
+    final optionalSubject = user?.optionalSubject?.trim().toLowerCase();
+
+    final items = _subjects.where((subject) {
+      final id = (subject['id'] ?? '').toString().toLowerCase();
+      final name = (subject['name'] ?? '').toString().toLowerCase();
+
+      final isBiology = id.contains('biology') || name.contains('জীববিজ্ঞান');
+      final isStatistics = id.contains('statistics') || name.contains('পরিসংখ্যান');
+
+      if (optionalSubject != null && optionalSubject.isNotEmpty) {
+        if (optionalSubject.contains('stat')) {
+          if (isBiology) return false;
+        } else if (optionalSubject.contains('bio')) {
+          if (isStatistics) return false;
+        }
+      }
+      return true;
+    }).toList();
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -13,6 +13,7 @@ import '../../../core/presentation/widgets/user_avatar.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/providers/app_config_provider.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -523,6 +524,65 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final leaderboardEnabled = ref.watch(isLeaderboardEnabledProvider);
+
+    if (!leaderboardEnabled) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF18181B) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(LucideIcons.trophy, color: Colors.amber, size: 40),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'মেধা তালিকা সাময়িকভাবে স্থগিত',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'ফলাফল পুনঃনিরীক্ষণ বা আপডেটের কাজের জন্য মেধা তালিকা সাময়িকভাবে বন্ধ রাখা হয়েছে। খুব শীঘ্রই মেধা তালিকা পুনরায় সবার জন্য উন্মুক্ত হবে।',
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.45,
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final currentUserAsync = ref.watch(userProfileProvider);
     final myProfile = currentUserAsync.whenOrNull(data: (u) => u);
     final effectiveUserXp = _timeframe == 'monthly' ? (myProfile?.monthlyXp ?? 0) : (myProfile?.xp ?? 0);

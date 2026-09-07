@@ -70,6 +70,7 @@ dependencies:
   firebase_messaging: ^15.2.4
   http: ^1.2.0
   share_plus: ^13.3.0
+  bangla_pdf: ^1.2.0
 
 dev_dependencies:
   flutter_test:

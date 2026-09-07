@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
+import '../../../core/presentation/widgets/app_refresh_indicator.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _Chapter {
@@ -47,15 +49,162 @@ class _SRStats {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-String _srSubjName(String key) {
-  return BanglaNameHelper.formatSubject(key);
+enum _SubjectDomain {
+  physics,
+  chemistry,
+  higherMath,
+  generalMath,
+  biology,
+  bangla,
+  english,
+  ict,
+  generalKnowledge,
+  generalScience,
+  accounting,
+  finance,
+  management,
+  unknown,
 }
 
-bool _srSubjMatches(String stored, String target) {
-  if (stored.toLowerCase() == target.toLowerCase()) return true;
-  final s = _srSubjName(stored).toLowerCase();
-  final t = _srSubjName(target).toLowerCase();
-  return s == t || s.contains(t) || t.contains(s);
+_SubjectDomain _extractDomain(String text) {
+  final s = text.toLowerCase().replaceAll('-', '_').replaceAll(' ', '_');
+  if (s.contains('physics') || s.contains('পদার্থ') || s.contains('phys')) {
+    return _SubjectDomain.physics;
+  }
+  if (s.contains('chem') || s.contains('রসায়ন') || s.contains('রসায়ন')) {
+    return _SubjectDomain.chemistry;
+  }
+  if (s.contains('higher_math') ||
+      s.contains('highermath') ||
+      s.contains('h_math') ||
+      s.contains('উচ্চতর_গণিত') ||
+      s.contains('উচ্চতর')) {
+    return _SubjectDomain.higherMath;
+  }
+  if (s.contains('general_math') ||
+      s.contains('সাধারণ_গণিত') ||
+      s.contains('ssc_math')) {
+    return _SubjectDomain.generalMath;
+  }
+  if (s.contains('math') || s.contains('গণিত')) {
+    return _SubjectDomain.higherMath;
+  }
+  if (s.contains('bio') ||
+      s.contains('উদ্ভিদ') ||
+      s.contains('প্রাণি') ||
+      s.contains('botany') ||
+      s.contains('zoology') ||
+      s.contains('জীববিজ্ঞান') ||
+      s.contains('জীব')) {
+    return _SubjectDomain.biology;
+  }
+  if (s.contains('bangla') || s.contains('বাংলা') || s.contains('bengali')) {
+    return _SubjectDomain.bangla;
+  }
+  if (s.contains('english') || s.contains('ইংরেজি') || s.contains('ইংরেজী')) {
+    return _SubjectDomain.english;
+  }
+  if (s.contains('ict') ||
+      s.contains('তথ্য') ||
+      s.contains('যোগাযোগ') ||
+      s.contains('আইসিটি')) {
+    return _SubjectDomain.ict;
+  }
+  if (s.contains('gk') || s.contains('সাধারণ_জ্ঞান')) {
+    return _SubjectDomain.generalKnowledge;
+  }
+  if (s.contains('accounting') || s.contains('হিসাব')) {
+    return _SubjectDomain.accounting;
+  }
+  if (s.contains('finance') || s.contains('ফিন্যান্স')) {
+    return _SubjectDomain.finance;
+  }
+  if (s.contains('management') || s.contains('ব্যবস্থাপনা')) {
+    return _SubjectDomain.management;
+  }
+  if (s.contains('general_science') || s == 'science') {
+    return _SubjectDomain.generalScience;
+  }
+  return _SubjectDomain.unknown;
+}
+
+int? _extractPaper(String text) {
+  final s = text.toLowerCase().replaceAll('-', '_');
+  if (s.contains('1st') ||
+      s.contains('১ম') ||
+      s.contains('প্রথম') ||
+      s.contains('_1') ||
+      s.contains(' 1') ||
+      s.endsWith('1') ||
+      s.contains('botany') ||
+      s.contains('উদ্ভিদ')) {
+    return 1;
+  }
+  if (s.contains('2nd') ||
+      s.contains('২য়') ||
+      s.contains('২য়') ||
+      s.contains('দ্বিতীয়') ||
+      s.contains('দ্বিতীয়') ||
+      s.contains('_2') ||
+      s.contains(' 2') ||
+      s.endsWith('2') ||
+      s.contains('zoology') ||
+      s.contains('প্রাণি')) {
+    return 2;
+  }
+  return null;
+}
+
+bool _matchesSubject({
+  String? candidateSub,
+  String? candidateSubLabel,
+  required String target,
+}) {
+  final cSub = (candidateSub ?? '').trim();
+  final cLabel = (candidateSubLabel ?? '').trim();
+  final t = target.trim();
+  if (t.isEmpty) return false;
+
+  // 1. Exact or lowercase match
+  if (cSub.toLowerCase() == t.toLowerCase() ||
+      cLabel.toLowerCase() == t.toLowerCase()) {
+    return true;
+  }
+
+  // 2. BanglaNameHelper formatted match
+  final tBangla = BanglaNameHelper.formatSubject(t).toLowerCase();
+  if (cSub.isNotEmpty &&
+      BanglaNameHelper.formatSubject(cSub).toLowerCase() == tBangla) {
+    return true;
+  }
+  if (cLabel.isNotEmpty &&
+      BanglaNameHelper.formatSubject(cLabel).toLowerCase() == tBangla) {
+    return true;
+  }
+
+  // 3. Substring check
+  if (cSub.isNotEmpty &&
+      (cSub.toLowerCase().contains(t.toLowerCase()) ||
+          t.toLowerCase().contains(cSub.toLowerCase()))) {
+    return true;
+  }
+
+  // 4. Domain & Paper match
+  final targetDomain = _extractDomain(t);
+  if (targetDomain != _SubjectDomain.unknown) {
+    final candidateDomain = _extractDomain('$cSub $cLabel');
+    if (candidateDomain == targetDomain) {
+      final targetPaper = _extractPaper(t);
+      final candidatePaper = _extractPaper('$cSub $cLabel');
+      if (targetPaper == null ||
+          candidatePaper == null ||
+          targetPaper == candidatePaper) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // ─── View ──────────────────────────────────────────────────────────────────────
@@ -78,12 +227,93 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
     _fetch();
   }
 
+  @override
+  void didUpdateWidget(covariant SubjectReportView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.subject != widget.subject) {
+      _fetch();
+    }
+  }
+
   Future<void> _fetch() async {
     setState(() => _isLoading = true);
     try {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
-      if (userId == null) {
+
+      // 1. Fetch from LocalExamCacheService for immediate zero-latency offline support
+      final localResults = await LocalExamCacheService.getAllCachedExamResults();
+      final List<Map<String, dynamic>> combined = [];
+      final Set<String> seenIds = {};
+
+      for (final res in localResults) {
+        if (res.id.isNotEmpty) {
+          seenIds.add(res.id);
+        }
+        combined.add({
+          'id': res.id,
+          'subject': res.subject,
+          'subject_label': res.subjectLabel,
+          'total_questions': res.totalQuestions,
+          'correct_count': res.correctCount,
+          'wrong_count': res.wrongCount,
+          'time_taken': res.timeTaken,
+          'date': res.date,
+          'created_at': res.date,
+          'chapters': res.questions
+              .map((q) => q.chapter)
+              .where((c) => c.isNotEmpty)
+              .toSet()
+              .join(', '),
+          'questions': res.questions
+              .map(
+                (q) => {
+                  'id': q.id,
+                  'subject': q.subject,
+                  'subject_label': q.subjectLabel,
+                  'chapter': q.chapter,
+                  'topic': q.topic,
+                  'correct_answer_index': q.correctAnswerIndex,
+                  'correct_answer_indices': q.correctAnswerIndices,
+                },
+              )
+              .toList(),
+          'user_answers': res.userAnswers,
+          'status': res.status,
+        });
+      }
+
+      // 2. Fetch from Supabase (if online & authenticated)
+      if (userId != null) {
+        try {
+          final query = supabase
+              .from('exam_results')
+              .select(
+                'id, total_questions, correct_count, wrong_count, time_taken, subject, subject_label, date, created_at, chapters, questions, user_answers, status',
+              )
+              .eq('user_id', userId)
+              .neq('status', 'cancelled')
+              .order('created_at', ascending: false)
+              .limit(100);
+
+          final raw = (await query) as List;
+          for (final item in raw) {
+            if (item is Map) {
+              final row = Map<String, dynamic>.from(item);
+              final id = row['id']?.toString() ?? '';
+              if (id.isNotEmpty && seenIds.contains(id)) {
+                continue;
+              }
+              if (id.isNotEmpty) seenIds.add(id);
+              combined.add(row);
+            }
+          }
+        } catch (dbErr) {
+          debugPrint('[SubjectReportView] Remote fetch warning: $dbErr');
+        }
+      }
+
+      if (combined.isEmpty) {
         if (mounted) {
           setState(() {
             _stats = _SRStats.empty;
@@ -93,92 +323,134 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
         return;
       }
 
-      var query = supabase
-          .from('exam_results')
-          .select(
-            'total_questions, correct_count, wrong_count, time_taken, subject, date, chapters, questions, user_answers',
-          )
-          .eq('user_id', userId)
-          .eq('status', 'evaluated');
-
-      if (_filter == 'week') {
-        final ago = DateTime.now().subtract(const Duration(days: 7));
-        query = query.gte('date', ago.toIso8601String());
-      } else if (_filter == 'month') {
-        final ago = DateTime.now().subtract(const Duration(days: 30));
-        query = query.gte('date', ago.toIso8601String());
-      }
-
-      final raw = (await query) as List;
-      final rows = raw
-          .where(
-            (r) =>
-                _srSubjMatches((r['subject'] as String?) ?? '', widget.subject),
-          )
-          .toList();
-
-      if (rows.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _stats = _SRStats.empty;
-            _isLoading = false;
-          });
-        }
-        return;
-      }
+      final now = DateTime.now();
+      final weekAgo = now.subtract(const Duration(days: 7));
+      final monthAgo = now.subtract(const Duration(days: 30));
 
       int totalQ = 0, correct = 0, wrong = 0, totalTime = 0;
       final Map<String, ({int total, int correct})> chapMap = {};
 
-      for (final row in rows) {
-        final total = (row['total_questions'] as num?)?.toInt() ?? 0;
-        final c = (row['correct_count'] as num?)?.toInt() ?? 0;
-        final w = (row['wrong_count'] as num?)?.toInt() ?? 0;
-        final time = (row['time_taken'] as num?)?.toInt() ?? 0;
-        totalQ += total;
-        correct += c;
-        wrong += w;
-        totalTime += time;
+      for (final row in combined) {
+        // Date filter
+        final dateStr = (row['date'] ?? row['created_at'])?.toString();
+        if (dateStr != null) {
+          final examDate = DateTime.tryParse(dateStr);
+          if (examDate != null) {
+            if (_filter == 'week' && examDate.isBefore(weekAgo)) continue;
+            if (_filter == 'month' && examDate.isBefore(monthAgo)) continue;
+          }
+        }
+
+        final examSub = (row['subject'] as String?) ?? '';
+        final examSubLabel = (row['subject_label'] as String?) ?? '';
+        final isDedicatedExam = _matchesSubject(
+          candidateSub: examSub,
+          candidateSubLabel: examSubLabel,
+          target: widget.subject,
+        );
 
         final questions = row['questions'];
         final userAnswers = row['user_answers'];
+        final answersMap = userAnswers is Map
+            ? Map<String, dynamic>.from(userAnswers)
+            : <String, dynamic>{};
+
         if (questions is List && questions.isNotEmpty) {
-          final answersMap = userAnswers is Map
-              ? Map<String, dynamic>.from(userAnswers)
-              : <String, dynamic>{};
+          int matchedQInExam = 0;
+          int examCorrectInSubject = 0;
+          int examWrongInSubject = 0;
+
           for (final q in questions) {
             if (q is! Map) continue;
-            final raw = q['chapter'] ?? q['topic'];
-            final cName = (raw != null && raw.toString().trim().isNotEmpty)
-                ? raw.toString().trim()
-                : 'General';
-            final prev = chapMap[cName];
+            final qSub = (q['subject'] ?? '').toString();
+            final qSubLabel = (q['subject_label'] ?? '').toString();
+
+            final bool qMatches = isDedicatedExam ||
+                _matchesSubject(
+                  candidateSub: qSub,
+                  candidateSubLabel: qSubLabel,
+                  target: widget.subject,
+                );
+
+            if (!qMatches) continue;
+
+            matchedQInExam++;
             final qId = q['id']?.toString() ?? '';
             final userAns = answersMap[qId];
             final correctAns =
                 (q['correct_answer_index'] ?? q['correctAnswerIndex'])
                     ?.toString();
-            final isCorrect =
-                userAns != null &&
-                correctAns != null &&
-                userAns.toString() == correctAns.toString();
+            final correctIndices =
+                (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
+
+            final isAnswered =
+                userAns != null && userAns.toString().trim().isNotEmpty;
+            bool isCorrect = false;
+
+            if (isAnswered) {
+              if (correctIndices is List && correctIndices.isNotEmpty) {
+                isCorrect = correctIndices
+                    .map((e) => e.toString())
+                    .contains(userAns.toString());
+              } else if (correctAns != null) {
+                isCorrect = userAns.toString() == correctAns.toString();
+              }
+            }
+            final isWrong = isAnswered && !isCorrect;
+
+            if (isCorrect) {
+              examCorrectInSubject++;
+            } else if (isWrong) {
+              examWrongInSubject++;
+            }
+
+            // Chapter aggregation
+            final rawChap = q['chapter'] ?? q['topic'];
+            final cName =
+                (rawChap != null && rawChap.toString().trim().isNotEmpty)
+                    ? rawChap.toString().trim()
+                    : 'General';
+            final prev = chapMap[cName];
             chapMap[cName] = (
               total: (prev?.total ?? 0) + 1,
               correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
             );
           }
-        } else {
-          // Fallback: derive chapter breakdown from the 'chapters' text column (legacy exams)
+
+          if (matchedQInExam > 0) {
+            totalQ += matchedQInExam;
+            correct += examCorrectInSubject;
+            wrong += examWrongInSubject;
+
+            final examTime = (row['time_taken'] as num?)?.toInt() ?? 0;
+            final examTotalQ =
+                (row['total_questions'] as num?)?.toInt() ?? questions.length;
+            if (examTotalQ > 0) {
+              totalTime += (examTime * (matchedQInExam / examTotalQ)).round();
+            } else {
+              totalTime += examTime;
+            }
+          }
+        } else if (isDedicatedExam) {
+          // Fallback when question details are not preserved
+          final total = (row['total_questions'] as num?)?.toInt() ?? 0;
+          final c = (row['correct_count'] as num?)?.toInt() ?? 0;
+          final w = (row['wrong_count'] as num?)?.toInt() ?? 0;
+          final time = (row['time_taken'] as num?)?.toInt() ?? 0;
+          totalQ += total;
+          correct += c;
+          wrong += w;
+          totalTime += time;
+
           final chapText = (row['chapters'] as String?) ?? 'General';
-          for (final ch
-              in chapText
-                  .split(',')
-                  .map((s) => s.trim())
-                  .where((s) => s.isNotEmpty)) {
+          for (final ch in chapText
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)) {
             final prev = chapMap[ch];
             chapMap[ch] = (
               total: (prev?.total ?? 0) + (total > 0 ? 1 : 0),
-              correct: prev?.correct ?? 0,
+              correct: (prev?.correct ?? 0) + (c > 0 ? 1 : 0),
             );
           }
         }
@@ -308,60 +580,63 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
         Expanded(
           child: _isLoading
               ? const ExamHistorySkeleton()
-              : SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (_stats == null || _stats!.totalQuestions == 0)
-                        _SREmpty(isDark: isDark)
-                      else ...[
-                        // ── KPI Cards ──────────────────────────────────────
-                        Row(
-                          children: [
-                            _SRKpi(
-                              label: 'মোট প্রশ্ন',
-                              value: _stats!.totalQuestions.toString(),
-                              icon: LucideIcons.clipboardList,
-                              color: const Color(0xFFB91C1C),
-                              isDark: isDark,
-                            ),
-                            _SRKpi(
-                              label: 'নির্ভুলতা',
-                              value: '${_stats!.accuracy}%',
-                              icon: LucideIcons.checkCircle2,
-                              color: const Color(0xFF059669),
-                              isDark: isDark,
-                            ),
-                            _SRKpi(
-                              label: 'গড় সময়',
-                              value: '${_stats!.averageTime}s',
-                              icon: LucideIcons.clock,
-                              color: const Color(0xFFB91C1C),
-                              isDark: isDark,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-
-                        // ── Donut Chart ────────────────────────────────────
-                        _SRDonut(stats: _stats!, isDark: isDark),
-                        const SizedBox(height: 14),
-
-                        // ── Chapters ───────────────────────────────────────
-                        if (_stats!.chapters.isNotEmpty) ...[
-                          _SRChapterList(
-                            chapters: _stats!.chapters,
-                            isDark: isDark,
+              : AppRefreshIndicator(
+                  onRefresh: _fetch,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (_stats == null || _stats!.totalQuestions == 0)
+                          _SREmpty(isDark: isDark)
+                        else ...[
+                          // ── KPI Cards ──────────────────────────────────────
+                          Row(
+                            children: [
+                              _SRKpi(
+                                label: 'মোট প্রশ্ন',
+                                value: _stats!.totalQuestions.toString(),
+                                icon: LucideIcons.clipboardList,
+                                color: const Color(0xFFB91C1C),
+                                isDark: isDark,
+                              ),
+                              _SRKpi(
+                                label: 'নির্ভুলতা',
+                                value: '${_stats!.accuracy}%',
+                                icon: LucideIcons.checkCircle2,
+                                color: const Color(0xFF059669),
+                                isDark: isDark,
+                              ),
+                              _SRKpi(
+                                label: 'গড় সময়',
+                                value: '${_stats!.averageTime}s',
+                                icon: LucideIcons.clock,
+                                color: const Color(0xFFB91C1C),
+                                isDark: isDark,
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 14),
-                        ],
 
-                        // ── Weakness ───────────────────────────────────────
-                        _SRWeakness(stats: _stats!, isDark: isDark),
+                          // ── Donut Chart ────────────────────────────────────
+                          _SRDonut(stats: _stats!, isDark: isDark),
+                          const SizedBox(height: 14),
+
+                          // ── Chapters ───────────────────────────────────────
+                          if (_stats!.chapters.isNotEmpty) ...[
+                            _SRChapterList(
+                              chapters: _stats!.chapters,
+                              isDark: isDark,
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+
+                          // ── Weakness ───────────────────────────────────────
+                          _SRWeakness(stats: _stats!, isDark: isDark),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
         ),

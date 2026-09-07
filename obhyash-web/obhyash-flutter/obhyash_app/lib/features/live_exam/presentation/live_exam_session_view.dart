@@ -17,6 +17,7 @@ import '../../exam/presentation/result_view.dart';
 import '../../dashboard/services/streak_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../gamification/services/exam_xp_calculator.dart';
+import '../../../core/providers/app_config_provider.dart';
 
 class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
@@ -32,7 +33,8 @@ class LiveExamSessionView extends ConsumerStatefulWidget {
   ConsumerState<LiveExamSessionView> createState() => _LiveExamSessionViewState();
 }
 
-class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
+class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
+    with WidgetsBindingObserver {
   final Map<String, int> _userAnswers = {};
   final Set<String> _flaggedIds = {};
   final Set<String> _bookmarkedIds = {};
@@ -44,9 +46,14 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
   int _secondsRemaining = 0;
   bool _isSubmitting = false;
 
+  // Anti-Cheat: Tab switch / focus loss tracking
+  int _tabSwitchCount = 0;
+  bool _wasBackgrounded = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _sessionStartTime = DateTime.now().toUtc();
     final durationMins = widget.exam?.durationMinutes ?? 45;
     _secondsRemaining = durationMins * 60;
@@ -164,9 +171,187 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final antiCheatEnabled = ref.read(isExamAntiCheatEnabledProvider);
+    if (!antiCheatEnabled) return;
+
+    // Only strictly monitor official live competitive exams
+    final isOfficialLive = !widget.examId.startsWith('mock-');
+    if (!isOfficialLive || _isSubmitting) return;
+
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _wasBackgrounded = true;
+    } else if (state == AppLifecycleState.resumed && _wasBackgrounded) {
+      _wasBackgrounded = false;
+      _handleTabSwitchDetected();
+    }
+  }
+
+  void _handleTabSwitchDetected() {
+    if (!mounted || _isSubmitting) return;
+
+    final maxAllowed = ref.read(maxTabSwitchesAllowedProvider);
+    setState(() {
+      _tabSwitchCount++;
+    });
+
+    if (_tabSwitchCount > maxAllowed) {
+      _autoSubmitCheatDetected();
+    } else {
+      final remaining = (maxAllowed - _tabSwitchCount + 1).clamp(0, maxAllowed);
+      _showTabSwitchWarningDialog(remaining);
+    }
+  }
+
+  void _showTabSwitchWarningDialog(int remainingWarnings) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          backgroundColor: isDark ? const Color(0xFF1E1E24) : Colors.white,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.alertTriangle, color: Colors.amber, size: 24),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'সতর্কবার্তা: অ্যাপ মিনিমাইজ!',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'লাইভ পরীক্ষা চলাকালীন অ্যাপ থেকে বের হওয়া বা অন্য অ্যাপে যাওয়া সম্পূর্ণ নিষিদ্ধ।',
+                style: TextStyle(fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.shieldAlert, size: 18, color: Colors.amber),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'আর মাত্র $remainingWarnings বার সুযোগ আছে। এরপর স্বয়ংক্রিয়ভাবে পরীক্ষা জমা হয়ে যাবে!',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('আমি বুঝেছি, পরীক্ষা চালিয়ে যান'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _autoSubmitCheatDetected() async {
+    if (_isSubmitting) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          backgroundColor: isDark ? const Color(0xFF1E1E24) : Colors.white,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.shieldAlert, color: Colors.red, size: 24),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'নকল রোধ: পরীক্ষা সাবমিট!',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'আপনি অনুমোদিত সীমার চেয়ে বেশিবার অ্যাপ মিনিমাইজ করেছেন। পরীক্ষার সততা রক্ষার্থে আপনার উত্তরপত্র স্বয়ংক্রিয়ভাবে জমা করা হচ্ছে।',
+            style: TextStyle(fontSize: 13, height: 1.4),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                _submitExam();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('ঠিক আছে'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Auto submit after 2.5 seconds if user doesn't press button
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted && !_isSubmitting) {
+        _submitExam();
+      }
+    });
   }
 
   String _formatTime(int totalSeconds) {
@@ -251,9 +436,34 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'user_answers': _userAnswers,
               'start_time': _sessionStartTime.toIso8601String(),
               'submit_time': submitTime.toIso8601String(),
+              'tab_switches_count': _tabSwitchCount,
             });
             final streakData = await StreakService.syncStreak(user.id);
             ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
+
+            // Also record in exam_results so it appears in history, subject reports, and analysis
+            try {
+              final nowIso = submitTime.toIso8601String();
+              await supabase.from('exam_results').insert({
+                'user_id': user.id,
+                'subject': widget.exam?.title ?? 'লাইভ এক্সাম',
+                'subject_label': widget.exam?.category ?? 'live',
+                'exam_type': 'live',
+                'date': nowIso,
+                'created_at': nowIso,
+                'score': finalScore.toDouble(),
+                'total_marks': widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
+                'correct_count': correctCount,
+                'wrong_count': wrongCount,
+                'time_taken': timeTakenSeconds,
+                'total_questions': questions.length,
+                'questions': questions.map((q) => q.toJson()).toList(),
+                'user_answers': _userAnswers,
+                'status': 'evaluated',
+              });
+            } catch (liveInsertErr) {
+              debugPrint('[LiveExamSessionView] exam_results live attempt insert error: $liveInsertErr');
+            }
           } else {
             // 2. Practice Re-attempt -> Preserves official leaderboard rank, records in practice history
             isPracticeMode = true;
@@ -313,6 +523,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
               'wrong_count': wrongCount,
               'time_taken': timeTakenSeconds,
               'total_questions': questions.length,
+              'questions': questions.map((q) => q.toJson()).toList(),
+              'user_answers': _userAnswers,
               'status': 'evaluated',
             });
             final streakData = await StreakService.syncStreak(user.id);

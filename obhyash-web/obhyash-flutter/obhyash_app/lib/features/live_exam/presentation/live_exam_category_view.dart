@@ -7,6 +7,7 @@ import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../domain/models.dart';
 import 'widgets/live_exam_routine_sheet.dart';
+import '../../../../core/providers/app_config_provider.dart';
 
 class LiveExamCategoryView extends ConsumerStatefulWidget {
   final String category;
@@ -26,6 +27,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
     final liveExamsAsync = ref.watch(liveExamsCategoryProvider(widget.category));
     final isLoading = liveExamsAsync.isLoading;
     final filter = ref.watch(liveExamFilterProvider);
+    final isLiveExamsEnabled = ref.watch(isLiveExamsEnabledProvider);
 
     return Scaffold(
       backgroundColor: isDark
@@ -46,6 +48,39 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (!isLiveExamsEnabled) ...[
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF3B1E08) : const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFFD97706).withValues(alpha: 0.6)
+                          : const Color(0xFFFDE68A),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.alertTriangle, size: 20, color: Color(0xFFD97706)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু না করা পর্যন্ত নতুন লাইভ পরীক্ষা দেওয়া যাবে না।',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'HindSiliguri',
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               // Filters & Routine Action Bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

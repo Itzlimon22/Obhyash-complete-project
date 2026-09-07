@@ -12,6 +12,14 @@ class AppConfigModel {
   final String globalAnnouncementText;
   final String globalAnnouncementType;
   final String globalAnnouncementTarget;
+  final bool singleDeviceLoginEnabled;
+  final bool screenshotProtectionEnabled;
+  final bool examAntiCheatEnabled;
+  final int maxTabSwitchesAllowed;
+  final bool paymentsEnabled;
+  final bool leaderboardEnabled;
+  final int maxFreeExamsPerDay;
+  final bool referralSystemEnabled;
 
   const AppConfigModel({
     this.maintenanceMode = false,
@@ -29,6 +37,14 @@ class AppConfigModel {
     this.globalAnnouncementText = '',
     this.globalAnnouncementType = 'info',
     this.globalAnnouncementTarget = 'all',
+    this.singleDeviceLoginEnabled = true,
+    this.screenshotProtectionEnabled = true,
+    this.examAntiCheatEnabled = true,
+    this.maxTabSwitchesAllowed = 2,
+    this.paymentsEnabled = true,
+    this.leaderboardEnabled = true,
+    this.maxFreeExamsPerDay = 5,
+    this.referralSystemEnabled = true,
   });
 
   factory AppConfigModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +68,22 @@ class AppConfigModel {
           json['global_announcement_type'] as String? ?? 'info',
       globalAnnouncementTarget:
           json['global_announcement_target'] as String? ?? 'all',
+      singleDeviceLoginEnabled:
+          json['single_device_login_enabled'] as bool? ?? true,
+      screenshotProtectionEnabled:
+          json['screenshot_protection_enabled'] as bool? ?? true,
+      examAntiCheatEnabled:
+          json['exam_anti_cheat_enabled'] as bool? ?? true,
+      maxTabSwitchesAllowed:
+          json['max_tab_switches_allowed'] as int? ?? 2,
+      paymentsEnabled:
+          json['payments_enabled'] as bool? ?? true,
+      leaderboardEnabled:
+          json['leaderboard_enabled'] as bool? ?? true,
+      maxFreeExamsPerDay:
+          json['max_free_exams_per_day'] as int? ?? 5,
+      referralSystemEnabled:
+          json['referral_system_enabled'] as bool? ?? true,
     );
   }
 
@@ -69,5 +101,13 @@ class AppConfigModel {
         'global_announcement_text': globalAnnouncementText,
         'global_announcement_type': globalAnnouncementType,
         'global_announcement_target': globalAnnouncementTarget,
+        'single_device_login_enabled': singleDeviceLoginEnabled,
+        'screenshot_protection_enabled': screenshotProtectionEnabled,
+        'exam_anti_cheat_enabled': examAntiCheatEnabled,
+        'max_tab_switches_allowed': maxTabSwitchesAllowed,
+        'payments_enabled': paymentsEnabled,
+        'leaderboard_enabled': leaderboardEnabled,
+        'max_free_exams_per_day': maxFreeExamsPerDay,
+        'referral_system_enabled': referralSystemEnabled,
       };
 }

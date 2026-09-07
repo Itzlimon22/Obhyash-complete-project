@@ -13,6 +13,7 @@ import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/providers/app_config_provider.dart';
 
 // --- Domain Models ---
 class SubjectItem {
@@ -458,10 +459,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       return;
     }
 
-    // Gatekeeper 2: Daily 2 free exams quota
+    // Gatekeeper 2: Daily free exams quota
     if (!isPro) {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
+        final maxFreeExams = ref.read(maxFreeExamsPerDayProvider);
         final now = DateTime.now().toUtc();
         final startOfDay = DateTime.utc(now.year, now.month, now.day).toIso8601String();
         try {
@@ -470,13 +472,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               .select('id')
               .eq('user_id', user.id)
               .gte('created_at', startOfDay);
-          if (res.length >= 2) {
+          if (res.length >= maxFreeExams) {
             if (mounted) {
               ProUpgradeModal.show(
                 context,
                 title: 'আজকের ফ্রি কোটা শেষ 🎯',
-                message: 'তুমি আজকের ২টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
-                featurePill: 'দৈনিক ফ্রি কোটা: ২/২',
+                message: 'তুমি আজকের $maxFreeExams টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
+                featurePill: 'দৈনিক ফ্রি কোটা: ${res.length}/$maxFreeExams',
                 icon: LucideIcons.calendarCheck,
               );
             }
@@ -1057,6 +1059,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     if (!isPro) {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
+        final maxFreeExams = ref.read(maxFreeExamsPerDayProvider);
         final now = DateTime.now().toUtc();
         final startOfDay =
             DateTime.utc(now.year, now.month, now.day).toIso8601String();
@@ -1066,14 +1069,14 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               .select('id')
               .eq('user_id', user.id)
               .gte('created_at', startOfDay);
-          if (res.length >= 2) {
+          if (res.length >= maxFreeExams) {
             if (mounted) {
               ProUpgradeModal.show(
                 context,
                 title: 'আজকের ফ্রি কোটা শেষ 🎯',
                 message:
-                    'তুমি আজকের ২টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
-                featurePill: 'দৈনিক ফ্রি কোটা: ২/২',
+                    'তুমি আজকের $maxFreeExams টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
+                featurePill: 'দৈনিক ফ্রি কোটা: ${res.length}/$maxFreeExams',
                 icon: LucideIcons.calendarCheck,
               );
             }

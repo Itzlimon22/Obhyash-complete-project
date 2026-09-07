@@ -278,9 +278,14 @@ class QuestionFormatter {
 
   /// Automatically wraps raw unescaped LaTeX expressions (like \frac{...}{...} or \epsilon_0\mu_0 or \vec{A}) in $...$
   static String _wrapUnescapedLatexMath(String text) {
-    if (!text.contains(r'\')) return text;
+    if (!text.contains(r'\') && !text.contains('^') && !text.contains('_')) return text;
 
     final trimmed = text.trim();
+    // Never wrap if text contains natural language prose (3 or more spaced words)
+    final hasMultipleSpacedWords =
+        RegExp(r'[a-zA-Z]{2,}\s+[a-zA-Z]{2,}\s+[a-zA-Z]{2,}').hasMatch(trimmed);
+    if (hasMultipleSpacedWords) return text;
+
     // If the whole string is a pure LaTeX formula without dollar signs
     if (!trimmed.contains(r'$') &&
         !RegExp(r'[\u0980-\u09FF]').hasMatch(trimmed) &&

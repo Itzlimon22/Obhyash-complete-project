@@ -11,7 +11,12 @@ import {
   AlertTriangle,
   Loader2,
   Save,
-  BellRing,
+  CameraOff,
+  AlertOctagon,
+  CreditCard,
+  Trophy,
+  Sliders,
+  Gift,
 } from 'lucide-react';
 
 export interface AppConfig {
@@ -20,6 +25,7 @@ export interface AppConfig {
   live_exams_enabled?: boolean;
   registration_enabled?: boolean;
   free_trial_enabled?: boolean;
+  referral_system_enabled?: boolean;
   min_app_version?: string;
   latest_app_version?: string;
   force_update?: boolean;
@@ -27,6 +33,14 @@ export interface AppConfig {
   global_announcement_text?: string;
   global_announcement_type?: string;
   global_announcement_target?: string;
+  single_device_login_enabled?: boolean;
+  screenshot_protection_enabled?: boolean;
+  exam_anti_cheat_enabled?: boolean;
+  max_tab_switches_allowed?: number;
+  payments_enabled?: boolean;
+  leaderboard_enabled?: boolean;
+  max_free_exams_per_day?: number;
+  update_url?: string;
 }
 
 interface SystemControlsCardProps {
@@ -106,8 +120,8 @@ export function SystemControlsCard({
         )}
       </div>
 
-      {/* 4 Emergency Switches Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Emergency Platform & Security Control Switches Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 mb-2">
         {/* Switch 1: Maintenance Mode */}
         <div
           className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
@@ -132,9 +146,7 @@ export function SystemControlsCard({
             />
           </div>
           <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
-            {config.maintenance_mode
-              ? '🚨 সম্পূর্ণ প্ল্যাটফর্মে রক্ষণাবেক্ষণ নোটিশ সক্রিয় রয়েছে'
-              : 'প্ল্যাটফর্ম সচল ও অনলাইন'}
+            {config.maintenance_mode ? 'পুরো প্ল্যাটফর্ম সাময়িক বন্ধ' : 'প্ল্যাটফর্ম সচল রয়েছে'}
           </p>
         </div>
 
@@ -195,6 +207,182 @@ export function SystemControlsCard({
           </div>
           <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
             {config.force_update ? 'পুরোনো অ্যাপ ভার্সনে আপডেট স্ক্রিন দেখাবে' : 'স্বাভাবিক আপডেট পরামর্শ'}
+          </p>
+        </div>
+
+        {/* Switch 5: Single Device Session Lock */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <ShieldAlert
+                size={14}
+                className={config.single_device_login_enabled ?? true ? 'text-emerald-500' : 'text-slate-400'}
+              />
+              ডিভাইস লক
+            </span>
+            <input
+              type="checkbox"
+              checked={config.single_device_login_enabled ?? true}
+              onChange={(e) => handleToggle('single_device_login_enabled', e.target.checked)}
+              className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.single_device_login_enabled ?? true
+              ? 'নতুন ফোনে লগইনে আগের ফোন অটো লগআউট'
+              : 'মাল্টিপল ডিভাইসে একই সাথে লগইন সচল'}
+          </p>
+        </div>
+
+        {/* Switch 6: Screenshot & Screen Recording Blocker */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <CameraOff
+                size={14}
+                className={config.screenshot_protection_enabled ?? true ? 'text-indigo-500' : 'text-slate-400'}
+              />
+              স্ক্রিনশট ব্লকার
+            </span>
+            <input
+              type="checkbox"
+              checked={config.screenshot_protection_enabled ?? true}
+              onChange={(e) => handleToggle('screenshot_protection_enabled', e.target.checked)}
+              className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.screenshot_protection_enabled ?? true
+              ? 'স্ক্রিনশট ও স্ক্রিন রেকর্ড বন্ধ (সুরক্ষিত)'
+              : 'স্ক্রিনশট ও স্ক্রিন রেকর্ড অনুমোদিত'}
+          </p>
+        </div>
+
+        {/* Switch 7: Live Exam Anti-Cheat Guard */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <AlertOctagon
+                size={14}
+                className={config.exam_anti_cheat_enabled ?? true ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}
+              />
+              অ্যান্টি-চিট গার্ড
+            </span>
+            <input
+              type="checkbox"
+              checked={config.exam_anti_cheat_enabled ?? true}
+              onChange={(e) => handleToggle('exam_anti_cheat_enabled', e.target.checked)}
+              className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.exam_anti_cheat_enabled ?? true
+              ? 'ট্যাব পরিবর্তনে সতর্কবার্তা ও অটো সাবমিট'
+              : 'অ্যাপ সুইচ রেস্ট্রিকশন নিষ্ক্রিয়'}
+          </p>
+        </div>
+
+        {/* Switch 8: Payment Gateways */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <CreditCard
+                size={14}
+                className={config.payments_enabled ?? true ? 'text-pink-600 dark:text-pink-400' : 'text-slate-400'}
+              />
+              পেমেন্ট গেটওয়ে
+            </span>
+            <input
+              type="checkbox"
+              checked={config.payments_enabled ?? true}
+              onChange={(e) => handleToggle('payments_enabled', e.target.checked)}
+              className="w-4 h-4 text-pink-600 rounded focus:ring-pink-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.payments_enabled ?? true
+              ? 'বিকাশ ও উদ্দোক্তাপেমেন্ট সক্রিয়'
+              : 'পেমেন্ট সাময়িকভাবে স্থগিত'}
+          </p>
+        </div>
+
+        {/* Switch 9: Leaderboard Visibility */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <Trophy
+                size={14}
+                className={config.leaderboard_enabled ?? true ? 'text-yellow-600 dark:text-yellow-400' : 'text-slate-400'}
+              />
+              মেধা তালিকা
+            </span>
+            <input
+              type="checkbox"
+              checked={config.leaderboard_enabled ?? true}
+              onChange={(e) => handleToggle('leaderboard_enabled', e.target.checked)}
+              className="w-4 h-4 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.leaderboard_enabled ?? true
+              ? 'শিক্ষার্থীদের লিডারবোর্ড দৃশ্যমান'
+              : 'মেধা তালিকা সাময়িক স্থগিত'}
+          </p>
+        </div>
+
+        {/* Switch 10: Referral System */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <Gift
+                size={14}
+                className={config.referral_system_enabled ?? true ? 'text-emerald-500' : 'text-slate-400'}
+              />
+              রেফারেল সিস্টেম
+            </span>
+            <input
+              type="checkbox"
+              checked={config.referral_system_enabled ?? true}
+              onChange={(e) => handleToggle('referral_system_enabled', e.target.checked)}
+              className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+            {config.referral_system_enabled ?? true
+              ? 'রেফারেল প্রোগ্রাম ও রিওয়ার্ড সক্রিয়'
+              : 'রেফারেল সিস্টেম সাময়িক বন্ধ'}
+          </p>
+        </div>
+
+        {/* Control 11: Free Exam Daily Quota */}
+        <div className="p-4 rounded-xl border bg-neutral-50/70 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-700/50 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <Sliders size={14} className="text-teal-600 dark:text-teal-400" />
+              ফ্রি এক্সাম দৈনিক কোটা
+            </span>
+            <span className="text-xs font-black text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-md border border-teal-200 dark:border-teal-800">
+              {config.max_free_exams_per_day ?? 5} টি
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <input
+              type="range"
+              min="1"
+              max="20"
+              value={config.max_free_exams_per_day ?? 5}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                const updated = { ...config, max_free_exams_per_day: val };
+                setConfig(updated);
+              }}
+              onMouseUp={() => saveConfig(config)}
+              onTouchEnd={() => saveConfig(config)}
+              className="w-full h-1.5 bg-neutral-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-teal-600"
+            />
+          </div>
+          <p className="text-[10px] text-neutral-500 dark:text-zinc-400 mt-1">
+            নন-প্রো শিক্ষার্থীরা দিনে সর্বোচ্চ {config.max_free_exams_per_day ?? 5} টি ফ্রি এক্সাম দিতে পারবে
           </p>
         </div>
       </div>

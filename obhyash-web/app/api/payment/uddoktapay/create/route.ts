@@ -22,6 +22,23 @@ export async function POST(request: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
+    // 0. Check master payment emergency switch
+    const { data: config } = await supabaseAdmin
+      .from('app_config')
+      .select('payments_enabled')
+      .eq('id', 'global_config')
+      .maybeSingle();
+
+    if (config && config.payments_enabled === false) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'পেমেন্ট গেটওয়ে বর্তমানে সাময়িকভাবে স্থগিত রয়েছে। অনুগ্রহ করে কিছুক্ষণ পর চেষ্টা করুন।',
+        },
+        { status: 503 },
+      );
+    }
+
     // Fetch user details if not provided
     let name = customerName;
     let email = customerEmail;

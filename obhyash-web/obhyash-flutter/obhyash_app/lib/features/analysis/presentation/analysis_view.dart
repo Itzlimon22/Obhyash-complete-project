@@ -187,6 +187,222 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     return '${BanglaNameHelper.toBanglaNumeral(secs)} সেকেন্ড';
   }
 
+  static bool _hasP1(String lower) {
+    return lower.contains('1st') ||
+        lower.contains('১ম') ||
+        lower.contains('প্রথম') ||
+        lower.contains('_1') ||
+        lower.contains('-1') ||
+        lower.contains(' 1') ||
+        lower.endsWith('1');
+  }
+
+  static bool _hasP2(String lower) {
+    return lower.contains('2nd') ||
+        lower.contains('২য়') ||
+        lower.contains('২য়') ||
+        lower.contains('দ্বিতীয়') ||
+        lower.contains('দ্বিতীয়') ||
+        lower.contains('_2') ||
+        lower.contains('-2') ||
+        lower.contains(' 2') ||
+        lower.endsWith('2');
+  }
+
+  static bool _isNonSubject(String lower) {
+    final l = lower.trim();
+    if (l.isEmpty) return true;
+    if (l == 'general' || l == 'all' || l == 'সব' || l == 'সাধারণ' || l == 'null') {
+      return true;
+    }
+
+    final hasAcademicKeyword = l.contains('রসায়ন') ||
+        l.contains('রসায়ন') ||
+        l.contains('chem') ||
+        l.contains('পদার্থ') ||
+        l.contains('phys') ||
+        l.contains('উচ্চতর গণিত') ||
+        l.contains('সাধারণ গণিত') ||
+        l.contains('higher_math') ||
+        l.contains('h_math') ||
+        (l.contains('math') && !l.contains('format')) ||
+        l.contains('গণিত') ||
+        l.contains('জীব') ||
+        l.contains('উদ্ভিদ') ||
+        l.contains('প্রাণি') ||
+        l.contains('bio') ||
+        l.contains('botany') ||
+        l.contains('zoology') ||
+        l.contains('বাংলা') ||
+        l.contains('bangla') ||
+        l.contains('ইংরেজি') ||
+        l.contains('ইংরেজী') ||
+        l.contains('english') ||
+        l.contains('আইসিটি') ||
+        l.contains('ict') ||
+        l.contains('সাধারণ জ্ঞান') ||
+        l.contains('হিসাববিজ্ঞান') ||
+        l.contains('ফিন্যান্স') ||
+        l.contains('ব্যবস্থাপনা') ||
+        l.contains('অর্থনীতি') ||
+        l.contains('পরিসংখ্যান');
+
+    if (hasAcademicKeyword) return false;
+
+    final nonSubjectKeywords = [
+      'buet', 'বুয়েট',
+      'ruet', 'রুয়েট',
+      'cuet', 'চুয়েট',
+      'kuet', 'কুয়েট',
+      'ckruet', 'গুচ্ছ ইঞ্জি',
+      'medical', 'mbbs', 'মেডিকেল',
+      'butex', 'বুটেক্স',
+      'du', 'ঢাবি',
+      'ju', 'জাবি',
+      'ru', 'রাবি',
+      'cu', 'চবি',
+      'sust', 'শাবিপ্রবি',
+      'gst', 'জিএসটি',
+      'iut', 'আইইউটি',
+      'mist', 'এমআইএসটি',
+      'bup', 'বিইউপি',
+      'model', 'মডেল',
+      'mock', 'মক',
+      'preli', 'প্রিলি',
+      'written', 'লিখিত',
+      'preset', 'প্রিসেট',
+      'live', 'লাইভ',
+      'exam', 'পরীক্ষা',
+      'test', 'টেস্ট',
+      'practice', 'অনুশীলন',
+      'daily', 'weekly',
+    ];
+
+    for (final kw in nonSubjectKeywords) {
+      if (l.contains(kw)) return true;
+    }
+
+    return true;
+  }
+
+  static String? _resolveAcademicSubject(String? subject, [String? subjectLabel]) {
+    final s = (subject ?? '').trim();
+    final sl = (subjectLabel ?? '').trim();
+    if (s.isEmpty && sl.isEmpty) return null;
+
+    final f1 = BanglaNameHelper.formatSubject(s, sl);
+    final f2 = BanglaNameHelper.formatSubject(sl, s);
+
+    for (final raw in [f1, f2, sl, s]) {
+      if (raw.trim().isEmpty) continue;
+      final lower = raw.toLowerCase().replaceAll('-', '_').trim();
+
+      if (_isNonSubject(lower)) continue;
+
+      if (lower.contains('physics') || lower.contains('পদার্থ')) {
+        if (_hasP1(lower)) return 'পদার্থবিজ্ঞান ১ম পত্র';
+        if (_hasP2(lower)) return 'পদার্থবিজ্ঞান ২য় পত্র';
+        return 'পদার্থবিজ্ঞান';
+      }
+      if (lower.contains('chemistry') ||
+          lower.contains('chem') ||
+          lower.contains('রসায়ন') ||
+          lower.contains('রসায়ন')) {
+        if (_hasP1(lower)) return 'রসায়ন ১ম পত্র';
+        if (_hasP2(lower)) return 'রসায়ন ২য় পত্র';
+        return 'রসায়ন';
+      }
+      if (lower.contains('higher_math') ||
+          lower.contains('highermath') ||
+          lower.contains('h_math') ||
+          lower.contains('উচ্চতর গণিত') ||
+          lower.contains('উচ্চতর_গণিত')) {
+        if (_hasP1(lower)) return 'উচ্চতর গণিত ১ম পত্র';
+        if (_hasP2(lower)) return 'উচ্চতর গণিত ২য় পত্র';
+        return 'উচ্চতর গণিত';
+      }
+      if (lower.contains('general_math') ||
+          lower.contains('সাধারণ গণিত') ||
+          lower.contains('সাধারণ_গণিত') ||
+          lower.contains('ssc_math')) {
+        return 'সাধারণ গণিত';
+      }
+      if (lower.contains('math') ||
+          lower.contains('mathematics') ||
+          lower.contains('গণিত')) {
+        if (_hasP1(lower)) return 'উচ্চতর গণিত ১ম পত্র';
+        if (_hasP2(lower)) return 'উচ্চতর গণিত ২য় পত্র';
+        return 'উচ্চতর গণিত';
+      }
+      if (lower.contains('biology') ||
+          lower.contains('bio') ||
+          lower.contains('জীববিজ্ঞান') ||
+          lower.contains('উদ্ভিদ') ||
+          lower.contains('প্রাণি') ||
+          lower.contains('botany') ||
+          lower.contains('zoology')) {
+        if (_hasP1(lower) || lower.contains('botany') || lower.contains('উদ্ভিদ')) {
+          return 'জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)';
+        }
+        if (_hasP2(lower) || lower.contains('zoology') || lower.contains('প্রাণি')) {
+          return 'জীববিজ্ঞান ২য় পত্র (প্রাণিবিজ্ঞান)';
+        }
+        return 'জীববিজ্ঞান';
+      }
+      if (lower.contains('bangla') ||
+          lower.contains('bengali') ||
+          lower.contains('বাংলা')) {
+        if (_hasP1(lower)) return 'বাংলা ১ম পত্র';
+        if (_hasP2(lower)) return 'বাংলা ২য় পত্র';
+        return 'বাংলা';
+      }
+      if (lower.contains('english') ||
+          lower.contains('ইংরেজি') ||
+          lower.contains('ইংরেজী')) {
+        if (_hasP1(lower)) return 'ইংরেজি ১ম পত্র';
+        if (_hasP2(lower)) return 'ইংরেজি ২য় পত্র';
+        return 'ইংরেজি';
+      }
+      if (lower.contains('ict') ||
+          lower.contains('আইসিটি') ||
+          lower.contains('তথ্য ও যোগাযোগ')) {
+        return 'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)';
+      }
+      if (lower.contains('gk') ||
+          lower.contains('সাধারণ জ্ঞান') ||
+          lower.contains('general_knowledge')) {
+        return 'সাধারণ জ্ঞান';
+      }
+      if (lower.contains('general_science') ||
+          lower.contains('সাধারণ বিজ্ঞান')) {
+        return 'সাধারণ বিজ্ঞান';
+      }
+      if (lower.contains('bgs') ||
+          lower.contains('বাংলাদেশ ও বিশ্বপরিচয়')) {
+        return 'বাংলাদেশ ও বিশ্বপরিচয়';
+      }
+      if (lower.contains('accounting') || lower.contains('হিসাববিজ্ঞান')) {
+        return 'হিসাববিজ্ঞান';
+      }
+      if (lower.contains('finance') || lower.contains('ফিন্যান্স')) {
+        return 'ফিন্যান্স ও ব্যাংকিং';
+      }
+      if (lower.contains('management') || lower.contains('ব্যবসায় সংগঠন')) {
+        return 'ব্যবসায় সংগঠন ও ব্যবস্থাপনা';
+      }
+      if (lower.contains('economics') || lower.contains('অর্থনীতি')) {
+        return 'অর্থনীতি';
+      }
+      if (lower.contains('statistics') || lower.contains('পরিসংখ্যান')) {
+        if (_hasP1(lower)) return 'পরিসংখ্যান ১ম পত্র';
+        if (_hasP2(lower)) return 'পরিসংখ্যান ২য় পত্র';
+        return 'পরিসংখ্যান';
+      }
+    }
+
+    return null;
+  }
+
   Future<void> _fetchAnalytics() async {
     setState(() => _isLoading = true);
     try {
@@ -200,7 +416,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       var query = supabase
           .from('exam_results')
           .select(
-              'score, total_marks, total_questions, correct_count, wrong_count, time_taken, subject, subject_label, negative_marking, date, created_at')
+              'score, total_marks, total_questions, correct_count, wrong_count, time_taken, subject, subject_label, negative_marking, date, created_at, questions, user_answers')
           .eq('user_id', userId);
 
       if (_timeFilter == 'week') {
@@ -254,8 +470,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       double lowestScore = 100;
       double totalNegativeDeduction = 0;
 
-      final Map<String, ({int total, int correct, int wrong, String? label})>
-          subjectMap = {};
+      final Map<String, ({int total, int correct, int wrong})> subjectMap = {};
       final List<TimelinePoint> timeline = [];
 
       for (final row in rows) {
@@ -278,8 +493,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         final createdAt =
             DateTime.tryParse(row['created_at'] ?? row['date'] ?? '') ??
                 DateTime.now();
-        final subject = (row['subject'] as String?) ?? 'general';
-        final subjectLabel = row['subject_label'] as String?;
+        final examSub = (row['subject'] as String?) ?? '';
+        final examSubLabel = row['subject_label'] as String?;
 
         totalTime += time;
         scoreSum += score;
@@ -291,21 +506,65 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         if (score > highestScore) highestScore = score;
         if (score < lowestScore) lowestScore = score;
 
-        final prev = subjectMap[subject];
-        if (prev == null) {
-          subjectMap[subject] = (
-            total: total,
-            correct: correct,
-            wrong: wrong,
-            label: subjectLabel,
-          );
+        // Populate Subject Breakdown: ONLY genuine academic subjects!
+        final questions = row['questions'];
+        final userAnswers = row['user_answers'];
+        final answersMap = userAnswers is Map
+            ? Map<String, dynamic>.from(userAnswers)
+            : <String, dynamic>{};
+
+        if (questions is List && questions.isNotEmpty) {
+          // Question-level subject distribution
+          for (final q in questions) {
+            if (q is! Map) continue;
+            final qSub = (q['subject'] ?? '').toString();
+            final qSubLabel = (q['subject_label'] ?? '').toString();
+
+            final academicSub = _resolveAcademicSubject(qSub, qSubLabel) ??
+                _resolveAcademicSubject(examSub, examSubLabel);
+
+            if (academicSub == null) continue; // Skip non-academic entries
+
+            final qId = q['id']?.toString() ?? '';
+            final userAns = answersMap[qId];
+            final correctAns =
+                (q['correct_answer_index'] ?? q['correctAnswerIndex'])?.toString();
+            final correctIndices =
+                (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
+
+            final isAnswered =
+                userAns != null && userAns.toString().trim().isNotEmpty;
+            bool isCorrect = false;
+
+            if (isAnswered) {
+              if (correctIndices is List && correctIndices.isNotEmpty) {
+                isCorrect = correctIndices
+                    .map((e) => e.toString())
+                    .contains(userAns.toString());
+              } else if (correctAns != null) {
+                isCorrect = userAns.toString() == correctAns.toString();
+              }
+            }
+            final isWrong = isAnswered && !isCorrect;
+
+            final prev = subjectMap[academicSub];
+            subjectMap[academicSub] = (
+              total: (prev?.total ?? 0) + 1,
+              correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
+              wrong: (prev?.wrong ?? 0) + (isWrong ? 1 : 0),
+            );
+          }
         } else {
-          subjectMap[subject] = (
-            total: prev.total + total,
-            correct: prev.correct + correct,
-            wrong: prev.wrong + wrong,
-            label: subjectLabel ?? prev.label,
-          );
+          // Fallback when question details are not preserved
+          final academicSub = _resolveAcademicSubject(examSub, examSubLabel);
+          if (academicSub != null) {
+            final prev = subjectMap[academicSub];
+            subjectMap[academicSub] = (
+              total: (prev?.total ?? 0) + total,
+              correct: (prev?.correct ?? 0) + correct,
+              wrong: (prev?.wrong ?? 0) + wrong,
+            );
+          }
         }
 
         timeline.add(
@@ -329,12 +588,10 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         final w = e.value.wrong;
         final skipped = (t - c - w).clamp(0, t);
         final acc = t > 0 ? (c / t * 100.0) : 0.0;
-        final displayName =
-            BanglaNameHelper.formatSubject(e.key, e.value.label);
 
         return SubjectAnalytics(
           rawName: e.key,
-          displayName: displayName,
+          displayName: e.key,
           total: t,
           correct: c,
           wrong: w,

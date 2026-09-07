@@ -7,6 +7,7 @@ import '../../exam/domain/exam_models.dart';
 import '../../exam/providers/exam_provider.dart';
 import '../services/question_bank_service.dart';
 import 'institute_question_bank_detail_view.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 class SubjectDistribution {
   final String subject;
@@ -245,10 +246,17 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     setState(() => _isLoading = true);
     try {
       final instId = (widget.institute['id'] ?? '').toString();
-      final qs = await QuestionBankService.fetchExamSetQuestions(
+      var qs = await QuestionBankService.fetchExamSetQuestions(
         instituteId: instId,
         examSet: widget.examSet,
       );
+      final isWritten = widget.examSet.type == 'written' ||
+          widget.examSet.id.toLowerCase().contains('written') ||
+          widget.examSet.title.toLowerCase().contains('written') ||
+          widget.examSet.title.contains('লিখিত');
+      if (isWritten) {
+        qs = QuestionBankService.sortSeriallySubjectwise(qs);
+      }
       if (mounted) {
         setState(() {
           _loadedQuestions = qs;
@@ -283,16 +291,25 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
 
     final instId = (widget.institute['id'] ?? '').toString().toLowerCase();
     final instName = (widget.institute['name'] ?? 'ইনস্টিটিউট').toString();
-    final isWritten = widget.examSet.type == 'written';
+    final isWritten = widget.examSet.type == 'written' ||
+        widget.examSet.id.toLowerCase().contains('written') ||
+        widget.examSet.title.toLowerCase().contains('written') ||
+        widget.examSet.title.contains('লিখিত');
 
     final totalMarks = widget.examSet.marks ??
         (isWritten
             ? 400
             : (instId == 'ckruet' ? 500 : (instId == 'mist' ? 200 : 100)));
 
+    final rawTitle = widget.examSet.title.trim();
+    final cleanSubjectLabel = BanglaNameHelper.deduplicateExamTitle(
+      rawTitle.isEmpty ? instName : rawTitle,
+      instName,
+    );
+
     final details = ExamDetails(
       subject: instName,
-      subjectLabel: '$instName ${widget.examSet.title}',
+      subjectLabel: cleanSubjectLabel,
       examType: isWritten ? 'Written' : 'Admission',
       chapters: 'সকল অধ্যায়',
       topics: 'সকল বিষয়',
@@ -318,7 +335,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     final instLogo = (widget.institute['logo'] ?? '').toString();
 
     final distributions = getMarkDistribution(instId, widget.examSet);
-    final isWritten = widget.examSet.type == 'written';
+    final isWritten = widget.examSet.type == 'written' ||
+        widget.examSet.id.toLowerCase().contains('written') ||
+        widget.examSet.title.toLowerCase().contains('written') ||
+        widget.examSet.title.contains('লিখিত');
     final isBuet = instId.toLowerCase() == 'buet';
     final formatText = isWritten
         ? 'লিখিত'

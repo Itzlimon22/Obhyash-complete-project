@@ -40,10 +40,10 @@ class MainBottomNav extends StatelessWidget {
         'iconFilled': AppIcons.navExamFilled,
       },
       {
-        'id': 'leaderboard',
-        'label': 'র‍্যাংক',
-        'icon': AppIcons.navRank,
-        'iconFilled': AppIcons.navRankFilled,
+        'id': 'history',
+        'label': 'হিস্ট্রি',
+        'icon': AppIcons.navHistory,
+        'iconFilled': AppIcons.navHistoryFilled,
       },
       {
         'id': 'menu',
@@ -54,49 +54,49 @@ class MainBottomNav extends StatelessWidget {
       },
     ];
 
-    // High-contrast emerald active color (Chorcha brand aesthetic)
+    // Deep green active color
     final activeColor = isDark
-        ? const Color(0xFF34D399) // Vibrant emerald on dark
-        : const Color(0xFF047857); // Deep emerald forest on light
+        ? const Color(0xFF059669) // Deep green on dark
+        : const Color(0xFF047857); // Deep green on light
 
     final inactiveColor = isDark
-        ? const Color(0xFF8E8E93) // Apple muted grey
-        : const Color(0xFF71717A); // Zinc neutral
+        ? const Color(0xFF9CA3AF) // Cool slate grey
+        : const Color(0xFF6B7280); // Medium cool grey
 
     final bgColor = isDark
-        ? const Color(0xFF000000).withValues(alpha: 0.88)
-        : Colors.white.withValues(alpha: 0.92);
+        ? const Color(0xFF0A0D10).withValues(alpha: 0.94)
+        : Colors.white.withValues(alpha: 0.95);
 
     final borderColor = isDark
-        ? const Color(0xFF22252A)
+        ? const Color(0xFF1E232B)
         : const Color(0xFFE5E7EB);
 
     final bottomInset = MediaQuery.of(context).padding.bottom;
-    final safeBottom = bottomInset > 0 ? (bottomInset * 0.4).clamp(6.0, 12.0) : 4.0;
+    final safeBottom = bottomInset > 0
+        ? (bottomInset * 0.6).clamp(8.0, 22.0)
+        : 6.0;
 
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
             color: bgColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            border: Border(
-              top: BorderSide(color: borderColor, width: 1.0),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+            border: Border(top: BorderSide(color: borderColor, width: 1.0)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
+                color: Colors.black.withValues(alpha: isDark ? 0.40 : 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
               ),
             ],
           ),
           child: Padding(
-            padding: EdgeInsets.only(bottom: safeBottom),
+            padding: EdgeInsets.only(bottom: safeBottom, top: 4),
             child: SizedBox(
-              height: 56,
+              height: 58,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: items.map((item) {
@@ -105,15 +105,18 @@ class MainBottomNav extends StatelessWidget {
                   final iconFilled = item['iconFilled'] as String;
                   final label = item['label'] as String;
                   final action = item['action'];
-                  final isActive = activeTab == id ||
-                      (id == 'question_bank' &&
-                          (activeTab == 'question-bank' ||
-                              activeTab == 'question_bank'));
-                  final isRealActive = isActive && action != 'menu';
+                  final isAction = action == 'menu';
+                  final isActive =
+                      !isAction &&
+                      (activeTab == id ||
+                          (id == 'question_bank' &&
+                              (activeTab == 'question-bank' ||
+                                  activeTab == 'question_bank')) ||
+                          (id == 'history' && activeTab == 'history'));
 
                   void handleTap() {
                     HapticFeedback.lightImpact();
-                    if (action == 'menu') {
+                    if (isAction) {
                       onMenuClick();
                     } else {
                       onTabChange(id);
@@ -125,60 +128,18 @@ class MainBottomNav extends StatelessWidget {
                       onTap: handleTap,
                       behavior: HitTestBehavior.opaque,
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Top indicator glowing line
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOutCubic,
-                            width: isRealActive ? 26 : 0,
-                            height: 2.5,
-                            decoration: BoxDecoration(
-                              color: isRealActive ? activeColor : Colors.transparent,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(4),
-                                bottomRight: Radius.circular(4),
-                              ),
-                              boxShadow: isRealActive
-                                  ? [
-                                      BoxShadow(
-                                        color: activeColor.withValues(alpha: 0.5),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 1),
-                                      ),
-                                    ]
-                                  : null,
+                          AnimatedScale(
+                            duration: const Duration(milliseconds: 200),
+                            scale: isActive ? 1.08 : 1.0,
+                            child: AppIcon(
+                              isActive ? iconFilled : icon,
+                              size: 24,
+                              color: isActive ? activeColor : inactiveColor,
                             ),
                           ),
-                          const Spacer(),
-
-                          // Custom Icon with animated pill capsule container
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOutCubic,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isRealActive ? 14 : 6,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isRealActive
-                                  ? (isDark
-                                      ? activeColor.withValues(alpha: 0.15)
-                                      : activeColor.withValues(alpha: 0.10))
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: AnimatedScale(
-                              duration: const Duration(milliseconds: 200),
-                              scale: isRealActive ? 1.06 : 1.0,
-                              child: AppIcon(
-                                isRealActive ? iconFilled : icon,
-                                size: 21,
-                                color: isRealActive ? activeColor : inactiveColor,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 3),
 
                           // Bengali Label
                           Text(
@@ -186,16 +147,15 @@ class MainBottomNav extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 11.2,
+                              fontSize: 12,
                               fontFamily: 'HindSiliguri',
-                              fontWeight: isRealActive
+                              fontWeight: isActive
                                   ? FontWeight.w700
                                   : FontWeight.w500,
-                              color: isRealActive ? activeColor : inactiveColor,
+                              color: isActive ? activeColor : inactiveColor,
                               letterSpacing: 0.1,
                             ),
                           ),
-                          const SizedBox(height: 3),
                         ],
                       ),
                     ),

@@ -20,14 +20,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
       'svgPath': 'assets/images/subjects/academic.svg',
       'hasBadge': false,
     },
-    'textbook': {
-      'id': 'textbook',
-      'title': 'মূলবই',
-      'subtitle': 'অনুশীলনী ও রেফারেন্স',
-      'colors': [Color(0xFF10B981), Color(0xFF059669), Color(0xFF047857)],
-      'svgPath': 'assets/images/subjects/textbook.svg',
-      'hasBadge': false,
-    },
     'engineering': {
       'id': 'engineering',
       'title': 'ইঞ্জিনিয়ারিং',
@@ -88,70 +80,64 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
     final id = subjectId.toLowerCase();
     final name = subjectName.toLowerCase();
 
-    // 1. Math: Engineering YES, Varsity Ka YES, Medical NO!
+    // 1. Math: Academic, Engineering, Varsity Ka
     if (id.contains('math') || name.contains('গণিত')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
         _allCategories['engineering']!,
         _allCategories['varsity_ka']!,
       ];
     }
 
-    // 2. Biology: Medical YES, Varsity Ka YES, Engineering NO!
+    // 2. Biology: Academic, Medical, Varsity Ka
     if (id.contains('biology') || name.contains('জীব')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
         _allCategories['medical']!,
         _allCategories['varsity_ka']!,
       ];
     }
 
-    // 3. Bangla: Neither Medical nor Engineering
+    // 3. Bangla: Academic, Varsity Kha, Varsity Ka
     if (id.contains('bangla') || name.contains('বাংলা')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
         _allCategories['varsity_kha']!,
         _allCategories['varsity_ka']!,
       ];
     }
 
-    // 4. English: Medical YES (Medical syllabus includes English), Engineering NO, IBA/BUP YES
+    // 4. English: Academic, Engineering, Medical, Varsity Ka, IBA/BUP
     if (id.contains('english') || name.contains('ইংরেজি')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
+        _allCategories['engineering']!,
         _allCategories['medical']!,
         _allCategories['varsity_ka']!,
         _allCategories['iba_bup']!,
       ];
     }
 
-    // 5. Statistics: Academic, Textbook, Varsity Ka
+    // 5. Statistics: Academic, Varsity Ka
     if (id.contains('stat') || name.contains('পরিসংখ্যান')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
         _allCategories['varsity_ka']!,
       ];
     }
 
-    // 6. ICT: Academic, Textbook, Engineering, Varsity Ka
+    // 6. ICT: Academic, Engineering, Varsity Ka
     if (id.contains('ict') || name.contains('তথ্য') || name.contains('আইসিটি')) {
       return [
         _allCategories['academic']!,
-        _allCategories['textbook']!,
         _allCategories['engineering']!,
         _allCategories['varsity_ka']!,
       ];
     }
 
-    // 7. Physics & Chemistry (Default Science): Academic, Textbook, Engineering, Medical, Varsity Ka
+    // 7. Physics & Chemistry (Default Science): Academic, Engineering, Medical, Varsity Ka
     return [
       _allCategories['academic']!,
-      _allCategories['textbook']!,
       _allCategories['engineering']!,
       _allCategories['medical']!,
       _allCategories['varsity_ka']!,
@@ -163,11 +149,10 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final subjectId = (subject['id'] ?? '').toString();
     final subjectName = (subject['name'] ?? 'বিষয়').toString();
-    final paper = (subject['paper'] ?? '').toString();
-    final paperClean = paper.contains(' ') ? paper.split(' ').first : paper;
-    final title = paperClean.isNotEmpty ? '$subjectName $paperClean' : subjectName;
+    final paper = (subject['paper'] ?? '').toString().trim();
+    final title = paper.isNotEmpty ? '$subjectName $paper' : subjectName;
 
-    // Intelligently select categories based on subject
+    // Intelligently select categories based on subject (Mulboi removed, Engineering added)
     final categories = _getCategoriesForSubject(subjectId, subjectName);
 
     return Scaffold(
@@ -196,7 +181,7 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
           title,
           style: TextStyle(
             fontFamily: 'HindSiliguri',
-            fontSize: 20,
+            fontSize: 17.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF18181B),
           ),
@@ -230,6 +215,16 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
     final colors = cat['colors'] as List<Color>;
     final categoryTitle = cat['title'] as String;
     final svgPath = cat['svgPath'] as String;
+
+    final subjectId = (subject['id'] ?? '').toString().toLowerCase();
+    final subjectName = (subject['name'] ?? '').toString().toLowerCase();
+    final paper = (subject['paper'] ?? '').toString().toLowerCase();
+
+    // Only English 1st Paper academic section is currently in preparation
+    final isEnglishFirstPaper = subjectId == 'english_1' ||
+        subjectId == 'hsc_english_1' ||
+        ((subjectId.contains('english') || subjectName.contains('ইংরেজি')) &&
+            (paper.contains('১ম') || paper.contains('1st') || subjectId.contains('1')));
 
     return GestureDetector(
       onTap: () {
@@ -281,7 +276,7 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
                 ),
               ),
 
-              // SVG Illustration Art (Bigger)
+              // SVG Illustration Art
               Positioned(
                 right: -4,
                 bottom: -4,
@@ -293,7 +288,37 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
                 ),
               ),
 
-              // Content: Title positioned lower down
+              // Coming Soon Badge specifically for English 1st Paper Academic card
+              if (cat['id'] == 'academic' && isEnglishFirstPaper)
+                Positioned(
+                  top: 10,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: const Text(
+                      'শীঘ্রই আসছে',
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Content: Title
               Padding(
                 padding: const EdgeInsets.fromLTRB(14.0, 20.0, 12.0, 12.0),
                 child: Text(

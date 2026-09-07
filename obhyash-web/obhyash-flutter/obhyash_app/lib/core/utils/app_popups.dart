@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 enum PopupType { success, error, warning, info }
 
 class AppPopups {
+  static OverlayEntry? _activeEntry;
+
   /// General popup method (backward-compatible)
   static void show(
     BuildContext context, {
@@ -20,7 +24,7 @@ class AppPopups {
     );
   }
 
-  /// Success message (Green banner)
+  /// Success message (Emerald badge & glow)
   static void success(
     BuildContext context, {
     required String message,
@@ -29,7 +33,7 @@ class AppPopups {
     showTyped(context, message: message, type: PopupType.success, duration: duration);
   }
 
-  /// Error message (Red banner) with intelligent backend error translation
+  /// Error message (Rose/Crimson badge & glow) with intelligent backend error translation
   static void error(
     BuildContext context, {
     required String message,
@@ -38,7 +42,7 @@ class AppPopups {
     showTyped(context, message: message, type: PopupType.error, duration: duration);
   }
 
-  /// Warning / Alert message (Amber banner)
+  /// Warning / Alert message (Amber badge & glow)
   static void warning(
     BuildContext context, {
     required String message,
@@ -47,7 +51,7 @@ class AppPopups {
     showTyped(context, message: message, type: PopupType.warning, duration: duration);
   }
 
-  /// Information message (Blue banner)
+  /// Information message (Sky blue badge & glow)
   static void info(
     BuildContext context, {
     required String message,
@@ -74,8 +78,18 @@ class AppPopups {
       HapticFeedback.heavyImpact();
     } else if (type == PopupType.warning) {
       HapticFeedback.mediumImpact();
-    } else {
+    } else if (type == PopupType.success) {
       HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.selectionClick();
+    }
+
+    // Dismiss active toast before displaying a new one
+    if (_activeEntry != null && _activeEntry!.mounted) {
+      try {
+        _activeEntry!.remove();
+      } catch (_) {}
+      _activeEntry = null;
     }
 
     late OverlayEntry overlayEntry;
@@ -84,6 +98,9 @@ class AppPopups {
     void safeRemove() {
       if (!isRemoved && overlayEntry.mounted) {
         isRemoved = true;
+        if (_activeEntry == overlayEntry) {
+          _activeEntry = null;
+        }
         try {
           overlayEntry.remove();
         } catch (_) {}
@@ -100,6 +117,8 @@ class AppPopups {
         );
       },
     );
+
+    _activeEntry = overlayEntry;
 
     try {
       overlayState.insert(overlayEntry);
@@ -185,6 +204,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   Timer? _timer;
   bool _isDismissed = false;
@@ -194,17 +214,28 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 320),
-      reverseDuration: const Duration(milliseconds: 240),
+      duration: const Duration(milliseconds: 380),
+      reverseDuration: const Duration(milliseconds: 220),
     );
 
     _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, -1.2),
+      begin: const Offset(0.0, -0.9),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic,
+        curve: Curves.easeOutBack,
+        reverseCurve: Curves.easeInCubic,
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.88,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutBack,
         reverseCurve: Curves.easeInCubic,
       ),
     );
@@ -255,31 +286,30 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    // Deep rich colors according to popup type
-    final Color bgColor;
-    final Color borderColor;
+    final Color accentColor;
+    final IconData iconData;
 
     switch (widget.type) {
       case PopupType.success:
-        bgColor = const Color(0xFF064E3B); // Deep Rich Forest Green
-        borderColor = const Color(0xFF10B981).withValues(alpha: 0.35);
+        accentColor = const Color(0xFF10B981); // Emerald Green
+        iconData = Icons.check_rounded;
         break;
       case PopupType.error:
-        bgColor = const Color(0xFF7F1D1D); // Deep Rich Crimson Red
-        borderColor = const Color(0xFFEF4444).withValues(alpha: 0.35);
+        accentColor = const Color(0xFFF43F5E); // Rose Crimson
+        iconData = Icons.priority_high_rounded;
         break;
       case PopupType.warning:
-        bgColor = const Color(0xFF78350F); // Deep Rich Amber
-        borderColor = const Color(0xFFF59E0B).withValues(alpha: 0.35);
+        accentColor = const Color(0xFFF59E0B); // Amber
+        iconData = Icons.warning_amber_rounded;
         break;
       case PopupType.info:
-        bgColor = const Color(0xFF1E3A8A); // Deep Rich Midnight Blue
-        borderColor = const Color(0xFF3B82F6).withValues(alpha: 0.35);
+        accentColor = const Color(0xFF38BDF8); // Sky Blue
+        iconData = Icons.info_outline_rounded;
         break;
     }
 
     return Positioned(
-      top: topPadding + 8,
+      top: topPadding + 10,
       left: 16,
       right: 16,
       child: Align(
@@ -288,51 +318,115 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           color: Colors.transparent,
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: SlideTransition(
-              position: _offsetAnimation,
-              child: Dismissible(
-                key: const ValueKey('app_popup_dismiss_horizontal'),
-                direction: DismissDirection.horizontal,
-                onDismissed: (_) => _safeDismissImmediately(),
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: SlideTransition(
+                position: _offsetAnimation,
                 child: Dismissible(
-                  key: const ValueKey('app_popup_dismiss_up'),
-                  direction: DismissDirection.up,
+                  key: const ValueKey('app_popup_dismiss_horizontal'),
+                  direction: DismissDirection.horizontal,
                   onDismissed: (_) => _safeDismissImmediately(),
-                  child: GestureDetector(
-                    onTap: _dismissWithAnimation,
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width - 48,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: borderColor, width: 1),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.35),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
+                  child: Dismissible(
+                    key: const ValueKey('app_popup_dismiss_up'),
+                    direction: DismissDirection.up,
+                    onDismissed: (_) => _safeDismissImmediately(),
+                    child: GestureDetector(
+                      onTap: _dismissWithAnimation,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: math.min(
+                            MediaQuery.of(context).size.width - 32,
+                            440,
                           ),
-                        ],
-                      ),
-                      child: Text(
-                        widget.message,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                          height: 1.25,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        decoration: BoxDecoration(
+                          color: const Color(0xF2121318), // Deep Obsidian Glass
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: accentColor.withValues(alpha: 0.38),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accentColor.withValues(alpha: 0.22),
+                              blurRadius: 20,
+                              spreadRadius: -2,
+                              offset: const Offset(0, 6),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.55),
+                              blurRadius: 28,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Circular Glowing Status Icon Badge
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: accentColor.withValues(alpha: 0.16),
+                                      border: Border.all(
+                                        color: accentColor.withValues(alpha: 0.42),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        iconData,
+                                        color: accentColor,
+                                        size: 17,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  // Clean Message Text
+                                  Flexible(
+                                    child: Text(
+                                      widget.message,
+                                      style: const TextStyle(
+                                        color: Color(0xFFF8FAFC),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'HindSiliguri',
+                                        height: 1.32,
+                                        letterSpacing: 0.1,
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Subtle Dismiss Close Button
+                                  GestureDetector(
+                                    onTap: _dismissWithAnimation,
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4),
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: Colors.white.withValues(alpha: 0.42),
+                                        size: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),

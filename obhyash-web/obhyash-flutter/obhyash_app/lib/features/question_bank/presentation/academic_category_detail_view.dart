@@ -51,11 +51,17 @@ class AcademicCategoryDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subjectId = (subject['id'] ?? '').toString().toLowerCase();
     final subjectName = (subject['name'] as String?) ?? 'বিষয়';
     final rawPaper = (subject['paper'] as String?) ?? '';
-    final paperClean = rawPaper.isNotEmpty ? rawPaper.split(' ')[0] : '';
+    final paperClean = rawPaper.trim();
     final subjectTitle = paperClean.isNotEmpty ? '$subjectName $paperClean' : subjectName;
     final pageTitle = '$subjectTitle - একাডেমিক';
+
+    final isEnglishFirstPaper = subjectId == 'english_1' ||
+        subjectId == 'hsc_english_1' ||
+        ((subjectId.contains('english') || subjectName.contains('ইংরেজি')) &&
+            (paperClean.contains('১ম') || paperClean.contains('1st') || subjectId.contains('1')));
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8F9FA),
@@ -75,7 +81,7 @@ class AcademicCategoryDetailView extends StatelessWidget {
           pageTitle,
           style: TextStyle(
             fontFamily: 'HindSiliguri',
-            fontSize: 20,
+            fontSize: 17.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF111827),
           ),
@@ -83,23 +89,29 @@ class AcademicCategoryDetailView extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: GridView.builder(
-            physics: const BouncingScrollPhysics(),
-            itemCount: _academicSections.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: 1.25,
-            ),
-            itemBuilder: (context, index) {
-              final sec = _academicSections[index];
-              return _buildAcademicCard(context, sec, isDark, subjectTitle);
-            },
-          ),
+        child: isEnglishFirstPaper
+            ? _buildComingSoonBody(context, isDark, subjectTitle)
+            : _buildGridBody(context, isDark, subjectTitle),
+      ),
+    );
+  }
+
+  Widget _buildGridBody(BuildContext context, bool isDark, String subjectTitle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: GridView.builder(
+        physics: const BouncingScrollPhysics(),
+        itemCount: _academicSections.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          childAspectRatio: 1.25,
         ),
+        itemBuilder: (context, index) {
+          final sec = _academicSections[index];
+          return _buildAcademicCard(context, sec, isDark, subjectTitle);
+        },
       ),
     );
   }
@@ -160,7 +172,7 @@ class AcademicCategoryDetailView extends StatelessWidget {
                 ),
               ),
 
-              // Custom SVG Illustration Art (Bigger)
+              // Custom SVG Illustration Art
               Positioned(
                 right: -4,
                 bottom: -4,
@@ -172,7 +184,7 @@ class AcademicCategoryDetailView extends StatelessWidget {
                 ),
               ),
 
-              // Content: Title positioned lower down
+              // Content: Title
               Padding(
                 padding: const EdgeInsets.fromLTRB(14.0, 18.0, 12.0, 12.0),
                 child: FittedBox(
@@ -200,6 +212,133 @@ class AcademicCategoryDetailView extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComingSoonBody(BuildContext context, bool isDark, String subjectTitle) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Modern glowing rocket container
+            Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.rocket_launch_rounded,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // Coming Soon Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.35),
+                  width: 1,
+                ),
+              ),
+              child: const Text(
+                'শীঘ্রই আসছে',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3B82F6),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Main Heading
+            Text(
+              '$subjectTitle এর একাডেমিক অংশ প্রস্তুত হচ্ছে',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : const Color(0xFF18181B),
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Subtitle
+            Text(
+              'আমরা এই বিষয়ের বোর্ড প্রশ্ন (MCQ, CQ, ক ও খ প্রশ্নাবলী) সাজানোর কাজ করছি। খুব শীঘ্রই ফিচারটি সবার জন্য উন্মুক্ত করা হবে!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Return button
+            OutlinedButton.icon(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                context.pop();
+              },
+              icon: const Icon(Icons.arrow_back_rounded, size: 18),
+              label: const Text(
+                'ফিরে যান',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: isDark ? Colors.white : const Color(0xFF18181B),
+                side: BorderSide(
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -147,9 +147,21 @@ String _unwrapBengaliMathContent(String inner) {
     (m) => '(${m.group(1)} / ${m.group(2)})',
   );
 
+  // 4b. Re-wrap scientific notation e.g. 1 \times 10^5 or 1.6 \times 10^{-19}
+  clean = clean.replaceAllMapped(
+    RegExp(r'(?<!\$)(\d+(?:\.\d+)?\s*\\times\s*\d+(?:\^\{?[0-9\-\+]+\}?)?)(?!\$)'),
+    (m) => '\$${m.group(1)}\$',
+  );
+
+  // 4c. Subscripts with relations e.g. n_i - n_f, a_1 + a_2
+  clean = clean.replaceAllMapped(
+    RegExp(r'(?<!\$)([a-zA-Z]_[a-zA-Z0-9]+(?:\s*[\-\+\=\<\>]\s*[a-zA-Z]_[a-zA-Z0-9]+)+)(?!\$)'),
+    (m) => '\$${m.group(1)}\$',
+  );
+
   // 5. Re-wrap pure math/formula constructs within this mixed text
   final tokenRegex = RegExp(
-    r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?)',
+    r'(?<!\$)(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?)(?!\$)',
   );
 
   clean = clean.replaceAllMapped(tokenRegex, (m) {
@@ -284,8 +296,10 @@ String _preprocess(String text) {
     l = l.replaceAll(RegExp(r'(?<=\s|\(|\{|^)ight\b'), r'\right');
     l = l.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
 
+    final hasSpacedWords = RegExp(r'[a-zA-Z]{2,}\s+[a-zA-Z]{2,}').hasMatch(l);
     if (!l.contains(r'$') &&
         !RegExp(r'[\u0980-\u09FF]').hasMatch(l) &&
+        !hasSpacedWords &&
         (l.contains(r'\') || l.contains('='))) {
       l = '\$$l\$';
     }
@@ -490,8 +504,9 @@ String _preprocess(String text) {
         '',
       );
       final hasExternalBengali = RegExp(r'[\u0980-\u09FF]').hasMatch(stripped);
+      final hasWords = RegExp(r'[a-zA-Z]{2,}\s+[a-zA-Z]{2,}').hasMatch(stripped);
 
-      if (!hasExternalBengali) {
+      if (!hasExternalBengali && !hasWords) {
         // Pure LaTeX formula option
         processedText = '\$${processedText.trim()}\$';
       } else {
@@ -552,13 +567,21 @@ String _preprocess(String text) {
         (m) => '\\${m.group(1)}',
       );
 
-      // If math block does NOT contain Bengali, keep as pure LaTeX
-      if (!RegExp(r'[\u0980-\u09FF]').hasMatch(cleanInner)) {
-        return isDisplay ? '\$\$$cleanInner\$\$' : '\$$cleanInner\$';
+      // If math block contains Bengali OR English prose sentences (words with spaces), unwrap it!
+      final textWithoutLatexCommands = cleanInner.replaceAll(
+        RegExp(r'\\(?:text|mathrm|textbf|textit)\{[^}]*\}'),
+        '',
+      );
+      final hasBengali = RegExp(r'[\u0980-\u09FF]').hasMatch(cleanInner);
+      final hasEnglishWords =
+          RegExp(r'\b[a-zA-Z]{2,}\s+[a-zA-Z]{2,}\b').hasMatch(textWithoutLatexCommands);
+
+      if (hasBengali || hasEnglishWords) {
+        return _unwrapBengaliMathContent(cleanInner);
       }
 
-      // If it contains Bengali, unwrap Bengali content safely
-      return _unwrapBengaliMathContent(cleanInner);
+      // If math block is pure LaTeX without natural language prose, keep as pure LaTeX
+      return isDisplay ? '\$\$$cleanInner\$\$' : '\$$cleanInner\$';
     }
 
     // Non-Math Text Segment

@@ -12,6 +12,7 @@ import '../services/offline_exam_sync_queue.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../dashboard/services/streak_service.dart';
 import '../../gamification/services/exam_xp_calculator.dart';
+import '../../question_bank/services/question_bank_service.dart';
 
 enum AppState {
   idle,
@@ -161,114 +162,49 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       ];
       final rpcTopics = allRpcTopics.isNotEmpty ? allRpcTopics : null;
 
+      const kQuestionFields =
+          'id, question, options, correct_answer_indices, explanation, difficulty, subject, chapter, topic, stream, division, exam_type, institutes, years, image_url, option_images, explanation_image_url, random_id';
+
       List<Question> generatedQuestions = [];
 
-      // 1. Try Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix)
-      for (final sVar in subjectVariants) {
-        if (generatedQuestions.isNotEmpty) break;
-        try {
-          final data = await supabase.rpc(
-            'get_adaptive_mock_exam_questions',
-            params: {
-              'p_user_id': supabase.auth.currentUser?.id,
-              'p_subject': sVar,
-              'p_subject_name': sVar,
-              'p_total': config.questionCount,
-              'p_chapters': expandedChapters,
-              'p_topics': rpcTopics,
-              'p_difficulties': difficultiesList,
-              'p_exam_types': examTypesList,
-            },
-          );
-          final qList = (data as List<dynamic>?) ?? [];
-          if (qList.isNotEmpty) {
-            final parsed = qList
-                .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                .toList();
-            generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
-                parsed,
-                config.questionCount,
-                chaptersList,
-            );
-            debugPrint('[ExamProvider] Adaptive Smart Mock returned ${generatedQuestions.length} questions');
-          }
-        } catch (rpcErr) {
-          debugPrint(
-            '[ExamProvider] RPC get_adaptive_mock_exam_questions error for $sVar: $rpcErr',
-          );
-        }
+      // 1. Fast Attempt: Adaptive Mock Exam RPC (Single-shot with canonical subject and 1.2s timeout)
+      final canonicalSubject = BanglaNameHelper.formatSubject(config.subject, config.subjectLabel);
+      try {
+        final data = await supabase.rpc(
+          'get_adaptive_mock_exam_questions',
+          params: {
+            'p_user_id': supabase.auth.currentUser?.id,
+            'p_subject': canonicalSubject,
+            'p_subject_name': config.subject,
+            'p_total': config.questionCount,
+            'p_chapters': expandedChapters,
+            'p_topics': rpcTopics,
+            'p_difficulties': difficultiesList,
+            'p_exam_types': examTypesList,
+          },
+        ).timeout(const Duration(milliseconds: 1200));
 
-        // Try chapter level if specific topic returned 0 in RPC
-        if (generatedQuestions.isEmpty && rpcTopics != null && rpcTopics.isNotEmpty) {
-          try {
-            final data = await supabase.rpc(
-              'get_adaptive_mock_exam_questions',
-              params: {
-                'p_user_id': supabase.auth.currentUser?.id,
-                'p_subject': sVar,
-                'p_subject_name': sVar,
-                'p_total': config.questionCount,
-                'p_chapters': expandedChapters,
-                'p_topics': null,
-                'p_difficulties': difficultiesList,
-                'p_exam_types': examTypesList,
-              },
-            );
-            final qList = (data as List<dynamic>?) ?? [];
-            if (qList.isNotEmpty) {
-              final parsed = qList
-                  .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                  .toList();
-              generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
-                parsed,
-                config.questionCount,
-                chaptersList,
-              );
-            }
-          } catch (_) {}
+        final qList = (data as List<dynamic>?) ?? [];
+        if (qList.isNotEmpty) {
+          final parsed = qList
+              .map((e) => Question.fromJson(e as Map<String, dynamic>))
+              .toList();
+          generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+            parsed,
+            config.questionCount,
+            chaptersList,
+          );
+          debugPrint('[ExamProvider] Adaptive Smart Mock returned ${generatedQuestions.length} questions');
         }
-
-        // Secondary Distributed RPC Fallback
-        if (generatedQuestions.isEmpty) {
-          try {
-            final data = await supabase.rpc(
-              'get_distributed_exam_questions',
-              params: {
-                'p_user_id': supabase.auth.currentUser?.id,
-                'p_subject': sVar,
-                'p_subject_name': sVar,
-                'p_total': config.questionCount,
-                'p_chapters': expandedChapters,
-                'p_topics': rpcTopics,
-                'p_difficulties': difficultiesList,
-                'p_exam_types': examTypesList,
-              },
-            );
-            final qList = (data as List<dynamic>?) ?? [];
-            if (qList.isNotEmpty) {
-              final parsed = qList
-                  .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                  .where((q) => q.isStrictMcq)
-                  .toList();
-              generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
-                parsed,
-                config.questionCount,
-                chaptersList,
-              );
-            }
-          } catch (rpcErr) {
-            debugPrint(
-              '[ExamProvider] RPC get_distributed_exam_questions error for $sVar: $rpcErr',
-            );
-          }
-        }
+      } catch (rpcErr) {
+        debugPrint('[ExamProvider] Adaptive Smart Mock RPC skipped/error: $rpcErr');
       }
 
-      // 2. Direct query from questions table (Bulletproof Multi-Tier Topic & Chapter Query)
+      // 2. Direct Ultra-Fast Query from questions table (Sub-second execution)
       if (generatedQuestions.isEmpty) {
         try {
           debugPrint(
-            '[ExamProvider] RPC yielded 0, using direct questions query with bulletproof multi-tier search',
+            '[ExamProvider] Fetching directly from questions table (optimized fast query)...',
           );
 
           final bool hasTopicFilter = (expandedTopics != null && expandedTopics.isNotEmpty) ||
@@ -277,11 +213,11 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           List<dynamic> rawData = [];
 
           if (hasTopicFilter) {
-            // ── Tier 1: Dual-Query (Match topic_id IN (ids) OR topic IN (name variants)) ──
+            // ── Tier 1: Match by selected topic names or IDs ──
             try {
               var topicQuery = supabase
                   .from('questions')
-                  .select('*')
+                  .select(kQuestionFields)
                   .inFilter('subject', subjectVariants)
                   .not('options', 'is', null);
 
@@ -296,49 +232,23 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 topicQuery = topicQuery.or(orConditions);
               }
 
-              final orClauses = <String>[];
-              if (topicIdsList != null && topicIdsList.isNotEmpty) {
-                orClauses.add('topic_id.in.(${topicIdsList.join(",")})');
-              }
               if (expandedTopics != null && expandedTopics.isNotEmpty) {
-                final safeNames = expandedTopics
-                    .take(25)
-                    .map((n) => '"${n.replaceAll('"', '').replaceAll(',', ' ')}"')
-                    .join(',');
-                orClauses.add('topic.in.($safeNames)');
-              }
-
-              if (orClauses.isNotEmpty) {
-                topicQuery = topicQuery.or(orClauses.join(','));
+                topicQuery = topicQuery.inFilter('topic', expandedTopics);
+              } else if (topicIdsList != null && topicIdsList.isNotEmpty) {
+                topicQuery = topicQuery.inFilter('topic_id', topicIdsList);
               }
 
               final res = await topicQuery.limit(config.questionCount * 4);
               rawData = List<dynamic>.from(res as List);
-              debugPrint('[ExamProvider] Topic Tier 1 Dual-Query found ${rawData.length} questions');
+              debugPrint('[ExamProvider] Topic Tier 1 found ${rawData.length} questions');
             } catch (e) {
-              debugPrint('[ExamProvider] Dual-Query error (falling back to name-only): $e');
-              if (expandedTopics != null && expandedTopics.isNotEmpty) {
-                try {
-                  var fallbackTopicQuery = supabase
-                      .from('questions')
-                      .select('*')
-                      .inFilter('subject', subjectVariants)
-                      .not('options', 'is', null)
-                      .inFilter('topic', expandedTopics);
-
-                  if (expandedChapters != null && expandedChapters.isNotEmpty) {
-                    fallbackTopicQuery = fallbackTopicQuery.inFilter('chapter', expandedChapters);
-                  }
-                  final res = await fallbackTopicQuery.limit(config.questionCount * 4);
-                  rawData = List<dynamic>.from(res as List);
-                } catch (_) {}
-              }
+              debugPrint('[ExamProvider] Topic Tier 1 query error: $e');
             }
 
             // ── Tier 2: Substring / Keyword Search (Handles prefixed names like "টপিক ১ - ভেক্টর") ──
             if (rawData.length < config.questionCount && topicsList != null && topicsList.isNotEmpty) {
               final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
-              for (final rawTopic in topicsList.take(6)) {
+              for (final rawTopic in topicsList.take(4)) {
                 if (rawData.length >= config.questionCount * 2) break;
                 final clean = rawTopic
                     .replaceAll(RegExp(r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*)'), '')
@@ -349,7 +259,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 try {
                   var kwQuery = supabase
                       .from('questions')
-                      .select('*')
+                      .select(kQuestionFields)
                       .inFilter('subject', subjectVariants)
                       .ilike('topic', '%$clean%')
                       .not('options', 'is', null);
@@ -369,14 +279,14 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               }
             }
 
-            // ── Tier 3: Seamless Chapter Top-Up (So questions are NEVER missed and exam ALWAYS launches) ──
+            // ── Tier 3: Seamless Chapter Top-Up (Guarantees full question quota instantly) ──
             if (rawData.length < config.questionCount && expandedChapters != null && expandedChapters.isNotEmpty) {
-              debugPrint('[ExamProvider] Topics yielded ${rawData.length} of ${config.questionCount}, seamlessly topping up from chapter...');
+              debugPrint('[ExamProvider] Topics yielded ${rawData.length} of ${config.questionCount}, topping up from chapter...');
               final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
               try {
                 var topUpQuery = supabase
                     .from('questions')
-                    .select('*')
+                    .select(kQuestionFields)
                     .inFilter('subject', subjectVariants)
                     .inFilter('chapter', expandedChapters)
                     .not('options', 'is', null);
@@ -400,10 +310,10 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               } catch (_) {}
             }
           } else {
-            // General Chapter-level query (when no topic is specified)
+            // General Chapter-level query (when no topic is specified - Mock Exams & Question Bank)
             var query = supabase
                 .from('questions')
-                .select('*')
+                .select(kQuestionFields)
                 .inFilter('subject', subjectVariants)
                 .not('options', 'is', null);
 
@@ -577,6 +487,9 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     try {
       final supabase = Supabase.instance.client;
       List<Question> allPresetQuestions = [];
+      final isWrittenExam = examType.toLowerCase() == 'written' ||
+          examTitle.toLowerCase().contains('written') ||
+          examTitle.contains('লিখিত');
 
       // 1. Fetch each subject in parallel with 1st/2nd paper & chapter/difficulty balancing
       final subjectFutures = subjectDistribution.map((item) async {
@@ -598,18 +511,24 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             var query = supabase
                 .from('questions')
                 .select('*')
-                .inFilter('subject', variants)
-                .not('options', 'is', null);
+                .inFilter('subject', variants);
 
-            if (examType.isNotEmpty && examType != 'All' && examType != 'Mixed') {
-              query = query.ilike('exam_type', '%$examType%');
+            if (isWrittenExam) {
+              query = query.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত']);
+            } else {
+              query = query.not('options', 'is', null);
+              if (examType.isNotEmpty && examType != 'All' && examType != 'Mixed') {
+                query = query.ilike('exam_type', '%$examType%');
+              }
             }
 
             final List<dynamic> res = await query.limit(countNeeded * 8);
             if (res.isNotEmpty) {
               final parsed = res
                   .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                  .where((q) => q.isAdmissionStandardMcq)
+                  .where((q) => isWrittenExam
+                      ? (q.isStrictWritten && !q.isAdmissionStandardMcq)
+                      : q.isAdmissionStandardMcq)
                   .toList();
               candidates.addAll(parsed);
             }
@@ -620,17 +539,25 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           // 2. Fallback general pool for these variants if needed
           if (candidates.length < countNeeded * 2) {
             try {
-              final List<dynamic> res = await supabase
+              var query = supabase
                   .from('questions')
                   .select('*')
-                  .inFilter('subject', variants)
-                  .not('options', 'is', null)
-                  .limit(countNeeded * 8);
+                  .inFilter('subject', variants);
+
+              if (isWrittenExam) {
+                query = query.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত']);
+              } else {
+                query = query.not('options', 'is', null);
+              }
+
+              final List<dynamic> res = await query.limit(countNeeded * 8);
 
               if (res.isNotEmpty) {
                 final parsed = res
                     .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                    .where((q) => q.isAdmissionStandardMcq)
+                    .where((q) => isWrittenExam
+                        ? (q.isStrictWritten && !q.isAdmissionStandardMcq)
+                        : q.isAdmissionStandardMcq)
                     .toList();
                 for (final q in parsed) {
                   if (!candidates.any((c) => c.id == q.id)) {
@@ -648,17 +575,25 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 item.subject,
                 item.subject,
               );
-              final List<dynamic> res = await supabase
+              var query = supabase
                   .from('questions')
                   .select('*')
-                  .inFilter('subject', allSubjectSlugs)
-                  .not('options', 'is', null)
-                  .limit(countNeeded * 8);
+                  .inFilter('subject', allSubjectSlugs);
+
+              if (isWrittenExam) {
+                query = query.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত']);
+              } else {
+                query = query.not('options', 'is', null);
+              }
+
+              final List<dynamic> res = await query.limit(countNeeded * 8);
 
               if (res.isNotEmpty) {
                 final parsed = res
                     .map((e) => Question.fromJson(e as Map<String, dynamic>))
-                    .where((q) => q.isAdmissionStandardMcq)
+                    .where((q) => isWrittenExam
+                        ? (q.isStrictWritten && !q.isAdmissionStandardMcq)
+                        : q.isAdmissionStandardMcq)
                     .toList();
                 for (final q in parsed) {
                   if (!candidates.any((c) => c.id == q.id)) {
@@ -708,8 +643,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           subQuestions = _sampleUniformByChapterAndDifficulty(candidates, item.count);
         }
 
-        // Try RPC if direct query gave fewer questions
-        if (subQuestions.length < item.count) {
+        // Try RPC if direct query gave fewer questions (ONLY for MCQ exams; written exams do not inject MCQs)
+        if (!isWrittenExam && subQuestions.length < item.count) {
           final allVariants = BanglaNameHelper.getSubjectSearchVariants(item.subject, item.subject);
           for (final sVar in allVariants) {
             if (subQuestions.length >= item.count) break;
@@ -739,8 +674,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           }
         }
 
-        // Fallback to offline/cached question bank for this subject only
-        if (subQuestions.length < item.count) {
+        // Fallback to offline/cached question bank for this subject only (ONLY for MCQ exams)
+        if (!isWrittenExam && subQuestions.length < item.count) {
           try {
             final offline = await OfflineQuestionBankService.getQuestions(
               subject: item.subject,
@@ -754,12 +689,14 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           } catch (_) {}
         }
 
-        // Normalize subject name to main subject name (e.g. "রসায়ন") and shuffle 1st and 2nd paper questions within this subject
+        // Normalize subject name to main subject name (e.g. "রসায়ন")
         final mainSubjectName = BanglaNameHelper.getMainSubjectName(item.subject, item.subject);
         subQuestions = subQuestions
             .map((q) => q.copyWith(subject: mainSubjectName))
-            .toList()
-          ..shuffle();
+            .toList();
+        if (!isWrittenExam) {
+          subQuestions.shuffle();
+        }
 
         return subQuestions;
       }).toList();
@@ -767,6 +704,11 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       final results = await Future.wait(subjectFutures);
       for (final subList in results) {
         allPresetQuestions.addAll(subList);
+      }
+
+      // For written exams, enforce serial subject-wise sorting (Physics -> Chemistry -> Math)
+      if (isWrittenExam) {
+        allPresetQuestions = QuestionBankService.sortSeriallySubjectwise(allPresetQuestions);
       }
 
       // Cache all fetched questions for offline availability
@@ -1240,6 +1182,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 'correct_answer_indices': q.correctAnswerIndices,
                 'subject': q.subject,
                 'subject_label': q.subjectLabel,
+                'chapter': q.chapter,
+                'topic': q.topic,
                 'explanation': q.explanation,
                 'points': q.points,
               },
@@ -1255,6 +1199,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'subject': result.subject,
           'subject_label': result.subjectLabel,
           'exam_type': result.examType,
+          'chapters': state.examDetails?.chapters ?? '',
           'date': nowIso,
           'created_at': nowIso,
           'score': result.score,

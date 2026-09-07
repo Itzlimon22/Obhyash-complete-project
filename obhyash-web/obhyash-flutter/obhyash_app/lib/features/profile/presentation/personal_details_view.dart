@@ -109,17 +109,45 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1990),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _dobController.text =
-            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-      });
+    FocusScope.of(context).unfocus();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final firstDate = DateTime(1970, 1, 1);
+    final lastDate = today;
+
+    DateTime initialDate = DateTime(now.year - 17, 1, 1);
+    if (_dobController.text.trim().isNotEmpty) {
+      try {
+        final parsed = DateTime.parse(_dobController.text.trim());
+        if (!parsed.isBefore(firstDate) && !parsed.isAfter(lastDate)) {
+          initialDate = parsed;
+        }
+      } catch (_) {}
+    }
+
+    try {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: firstDate,
+        lastDate: lastDate,
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.0),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+      );
+      if (picked != null) {
+        setState(() {
+          _dobController.text =
+              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        });
+      }
+    } catch (e) {
+      debugPrint('[DatePickerError] $e');
     }
   }
 
@@ -297,12 +325,14 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
   Widget _buildDropdown({
     required String label,
     required String value,
-    required List<String> items,
+    List<String> items = const [],
+    List<AppDropdownOption<String>>? customOptions,
     required void Function(String?) onChanged,
     required bool isDark,
     String? tooltip,
   }) {
-    final safeValue = items.contains(value) ? value : items.first;
+    final effectiveOptions = customOptions ?? items.map((e) => AppDropdownOption(value: e, label: e)).toList();
+    final safeValue = effectiveOptions.any((opt) => opt.value == value) ? value : effectiveOptions.first.value;
 
     if (tooltip != null) {
       return Column(
@@ -313,7 +343,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             label: '',
             value: safeValue,
             fontSize: 14.5,
-            options: items.map((e) => AppDropdownOption(value: e, label: e)).toList(),
+            options: effectiveOptions,
             onChanged: onChanged,
           ),
         ],
@@ -324,7 +354,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       label: label,
       value: safeValue,
       fontSize: 14.5,
-      options: items.map((e) => AppDropdownOption(value: e, label: e)).toList(),
+      options: effectiveOptions,
       onChanged: onChanged,
     );
   }
@@ -735,10 +765,20 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                   child: _buildDropdown(
                                     label: 'বিভাগ',
                                     value: _group,
-                                    items: const [
-                                      'Science',
-                                      'Business Studies',
-                                      'Humanities',
+                                    customOptions: const [
+                                      AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                                      AppDropdownOption(
+                                        value: 'Business Studies',
+                                        label: 'Business Studies (ব্যবসায় শিক্ষা)',
+                                        isEnabled: false,
+                                        disabledBadge: 'শীঘ্রই আসছে',
+                                      ),
+                                      AppDropdownOption(
+                                        value: 'Humanities',
+                                        label: 'Humanities (মানবিক)',
+                                        isEnabled: false,
+                                        disabledBadge: 'শীঘ্রই আসছে',
+                                      ),
                                     ],
                                     onChanged: (val) => setState(
                                       () => _group = val ?? 'Science',

@@ -1,66 +1,151 @@
 class BanglaNameHelper {
-  /// Converts any subject identifier, slug, or label to standard Bengali.
-  /// Never returns a raw English ID like "physics_1st" or "higher_math_2nd".
-  static String formatSubject(String? subject, [String? subjectLabel]) {
-    // 1. If subjectLabel has Bengali text, use it
-    if (subjectLabel != null && _hasBengali(subjectLabel)) {
-      return subjectLabel.trim();
+  /// Removes repetitive institute / unit prefixes from exam titles.
+  /// E.g. "বুয়েট BUET 24-25 preli" -> "BUET 24-25 preli"
+  ///      "রুয়েট RUET 24-25" -> "RUET 24-25"
+  ///      "বুয়েট BUET 25-26 written" -> "BUET 25-26 written"
+  ///      "মেডিকেল Medical MBBS 24-25" -> "Medical MBBS 24-25"
+  static String deduplicateExamTitle(String? text, [String? subjectHint]) {
+    if (text == null) return '';
+    var s = text.trim();
+    if (s.isEmpty) return '';
+
+    final pairs = [
+      ('বুয়েট', 'BUET'),
+      ('রুয়েট', 'RUET'),
+      ('চুয়েট', 'CUET'),
+      ('কুয়েট', 'KUET'),
+      ('বুটেক্স', 'BUTEX'),
+      ('মেডিকেল', 'Medical'),
+      ('মেডিকেল', 'MBBS'),
+      ('গুচ্ছ ইঞ্জিঃ', 'CKRUET'),
+      ('গুচ্ছ ইঞ্জি', 'CKRUET'),
+      ('গুচ্ছ ইঞ্জিনিয়ারিং', 'CKRUET'),
+      ('ঢাবি \'ক\'', 'DU KA'),
+      ('ঢাবি \'খ\'', 'DU KHA'),
+      ('ঢাবি', 'DU'),
+      ('জাবি \'ডি\'', 'JU D'),
+      ('জাবি', 'JU'),
+      ('রাবি \'সি\'', 'RU C'),
+      ('রাবি', 'RU'),
+      ('চবি \'এ\'', 'CU A'),
+      ('চবি', 'CU'),
+      ('শাবিপ্রবি', 'SUST'),
+      ('কৃষি গুচ্ছ', 'Agri'),
+      ('GST গুচ্ছ', 'GST'),
+      ('জিএসটি', 'GST'),
+      ('আইইউটি', 'IUT'),
+      ('এমআইএসটি', 'MIST'),
+      ('বিইউপি', 'BUP'),
+    ];
+
+    for (final pair in pairs) {
+      final b = pair.$1;
+      final e = pair.$2;
+      // 1. "বুয়েট BUET 24-25" -> "BUET 24-25"
+      final reg1 = RegExp('^${RegExp.escape(b)}\\s+(${RegExp.escape(e)})\\b', caseSensitive: false);
+      if (reg1.hasMatch(s)) {
+        s = s.replaceFirst(RegExp('^${RegExp.escape(b)}\\s+'), '');
+        break;
+      }
+      // 2. "BUET বুয়েট 24-25" -> "BUET 24-25"
+      final reg2 = RegExp('^${RegExp.escape(e)}\\s+(${RegExp.escape(b)})\\b', caseSensitive: false);
+      if (reg2.hasMatch(s)) {
+        s = s.replaceFirst(RegExp('\\s+${RegExp.escape(b)}\\b'), '');
+        break;
+      }
+      // 3. "বুয়েট বুয়েট ..."
+      final reg3 = RegExp('^${RegExp.escape(b)}\\s+${RegExp.escape(b)}\\b');
+      if (reg3.hasMatch(s)) {
+        s = s.replaceFirst(RegExp('^${RegExp.escape(b)}\\s+'), '');
+        break;
+      }
+      // 4. "BUET BUET ..."
+      final reg4 = RegExp('^${RegExp.escape(e)}\\s+${RegExp.escape(e)}\\b', caseSensitive: false);
+      if (reg4.hasMatch(s)) {
+        s = s.replaceFirst(RegExp('^${RegExp.escape(e)}\\s+', caseSensitive: false), '');
+        break;
+      }
     }
 
-    final raw = (subjectLabel?.isNotEmpty == true ? subjectLabel! : (subject ?? '')).trim();
-    if (raw.isEmpty) return 'পরীক্ষা';
-
-    if (_hasBengali(raw)) {
-      return raw;
+    // Also check if subjectHint was redundantly prepended e.g. "$subjectHint $remainder" where remainder starts with subjectHint
+    if (subjectHint != null && subjectHint.trim().isNotEmpty) {
+      final sh = subjectHint.trim();
+      final prefixReg = RegExp('^${RegExp.escape(sh)}\\s+', caseSensitive: false);
+      if (prefixReg.hasMatch(s)) {
+        final rest = s.replaceFirst(prefixReg, '').trim();
+        if (rest.isNotEmpty && rest.toLowerCase().startsWith(sh.toLowerCase())) {
+          s = rest;
+        }
+      }
     }
 
-    final lower = raw.toLowerCase().replaceAll('-', '_');
+    return s.trim();
+  }
 
-    // 2. Specific multi-part mapping
+  static String? _mapToAcademicSubject(String raw) {
+    if (raw.trim().isEmpty) return null;
+    final lower = raw.toLowerCase().replaceAll('-', '_').trim();
+
+    final isP1 = lower.contains('1st') ||
+        lower.contains('_1') ||
+        lower.contains('first') ||
+        lower.contains(' 1') ||
+        lower.endsWith('1');
+    final isP2 = lower.contains('2nd') ||
+        lower.contains('_2') ||
+        lower.contains('second') ||
+        lower.contains(' 2') ||
+        lower.endsWith('2');
+
     if (lower.contains('physics')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'পদার্থবিজ্ঞান ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'পদার্থবিজ্ঞান ২য় পত্র';
+      if (isP1) return 'পদার্থবিজ্ঞান ১ম পত্র';
+      if (isP2) return 'পদার্থবিজ্ঞান ২য় পত্র';
       return 'পদার্থবিজ্ঞান';
     }
 
-    if (lower.contains('chemistry')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'রসায়ন ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'রসায়ন ২য় পত্র';
+    if (lower.contains('chemistry') || lower.contains('chem')) {
+      if (isP1) return 'রসায়ন ১ম পত্র';
+      if (isP2) return 'রসায়ন ২য় পত্র';
       return 'রসায়ন';
     }
 
-    if (lower.contains('higher_math') || lower.contains('highermath') || lower.contains('h_math')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'উচ্চতর গণিত ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'উচ্চতর গণিত ২য় পত্র';
+    if (lower.contains('higher_math') ||
+        lower.contains('highermath') ||
+        lower.contains('h_math')) {
+      if (isP1) return 'উচ্চতর গণিত ১ম পত্র';
+      if (isP2) return 'উচ্চতর গণিত ২য় পত্র';
       return 'উচ্চতর গণিত';
     }
 
     if (lower.contains('math') || lower.contains('mathematics')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'উচ্চতর গণিত ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'উচ্চতর গণিত ২য় পত্র';
+      if (isP1) return 'উচ্চতর গণিত ১ম পত্র';
+      if (isP2) return 'উচ্চতর গণিত ২য় পত্র';
       if (lower.contains('general')) return 'সাধারণ গণিত';
       return 'উচ্চতর গণিত';
     }
 
-    if (lower.contains('biology') || lower.contains('botany') || lower.contains('zoology')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('botany') || lower.contains('first')) {
+    if (lower.contains('biology') ||
+        lower.contains('botany') ||
+        lower.contains('zoology') ||
+        lower.contains('bio')) {
+      if (isP1 || lower.contains('botany')) {
         return 'জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)';
       }
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('zoology') || lower.contains('second')) {
-        return 'জীববিজ্ঞান ২য় পত্র (প্রাণিবিজ্ঞান)';
+      if (isP2 || lower.contains('zoology')) {
+        return 'জীববিজ্ঞান ২য় পত্র (প্রাণিবিজ্ঞান)';
       }
       return 'জীববিজ্ঞান';
     }
 
     if (lower.contains('bangla') || lower.contains('bengali')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'বাংলা ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'বাংলা ২য় পত্র';
+      if (isP1) return 'বাংলা ১ম পত্র';
+      if (isP2) return 'বাংলা ২য় পত্র';
       return 'বাংলা';
     }
 
     if (lower.contains('english')) {
-      if (lower.contains('1st') || lower.contains('_1') || lower.contains('first')) return 'ইংরেজি ১ম পত্র';
-      if (lower.contains('2nd') || lower.contains('_2') || lower.contains('second')) return 'ইংরেজি ২য় পত্র';
+      if (isP1) return 'ইংরেজি ১ম পত্র';
+      if (isP2) return 'ইংরেজি ২য় পত্র';
       return 'ইংরেজি';
     }
 
@@ -68,7 +153,7 @@ class BanglaNameHelper {
       return 'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)';
     }
 
-    if (lower.contains('general_science') || lower.contains('science')) {
+    if (lower.contains('general_science') || lower == 'science') {
       return 'সাধারণ বিজ্ঞান';
     }
 
@@ -89,10 +174,78 @@ class BanglaNameHelper {
     if (lower.contains('sociology')) return 'সমাজবিজ্ঞান';
     if (lower.contains('islamic_history')) return 'ইসলামের ইতিহাস ও সংস্কৃতি';
     if (lower.contains('history')) return 'ইতিহাস';
-    if (lower.contains('islamic_studies') || lower.contains('islam')) return 'ইসলাম শিক্ষা';
+    if (lower.contains('islamic_studies') || lower == 'islam') return 'ইসলাম শিক্ষা';
     if (lower.contains('psychology')) return 'মনোবিজ্ঞান';
     if (lower.contains('geography')) return 'ভূগোল';
-    if (lower.contains('statistics')) return 'পরিসংখ্যান';
+    if (lower.contains('statistics') || lower.contains('stat')) {
+      if (isP1) return 'পরিসংখ্যান ১ম পত্র';
+      if (isP2) return 'পরিসংখ্যান ২য় পত্র';
+      return 'পরিসংখ্যান';
+    }
+
+    return null;
+  }
+
+  /// Converts any subject identifier, slug, or label to standard Bengali.
+  /// Never returns a raw English ID like "physics_1st" or "higher_math_2nd".
+  static String formatSubject(String? subject, [String? subjectLabel]) {
+    // 1. If subjectLabel is provided and has Bengali, deduplicate repetitive prefixes
+    if (subjectLabel != null && subjectLabel.trim().isNotEmpty) {
+      final dedup = deduplicateExamTitle(subjectLabel, subject);
+      if (_hasBengali(dedup)) {
+        return dedup;
+      }
+    }
+
+    // 2. Check academic subject mappings first (e.g. hsc_bangla_1 -> বাংলা ১ম পত্র)
+    final labelMapped = subjectLabel != null ? _mapToAcademicSubject(subjectLabel) : null;
+    if (labelMapped != null) {
+      return labelMapped;
+    }
+
+    final subjectMapped = subject != null ? _mapToAcademicSubject(subject) : null;
+    if (subjectMapped != null &&
+        (subjectLabel == null ||
+            subjectLabel.trim().isEmpty ||
+            subjectLabel.trim().toLowerCase() == subject!.trim().toLowerCase() ||
+            subjectLabel == 'general' ||
+            subjectLabel == 'পরীক্ষা')) {
+      return subjectMapped;
+    }
+
+    // 3. For exam sets/titles (e.g. "বুয়েট BUET 24-25 preli" -> "BUET 24-25 preli")
+    if (subjectLabel != null && subjectLabel.trim().isNotEmpty) {
+      final dedup = deduplicateExamTitle(subjectLabel, subject);
+      if (dedup != subjectLabel.trim()) {
+        return dedup;
+      }
+      if (dedup.contains(RegExp(r'\d')) || dedup.contains(' ')) {
+        return dedup;
+      }
+    }
+
+    if (subjectMapped != null) {
+      return subjectMapped;
+    }
+
+    final raw = deduplicateExamTitle(
+      (subjectLabel?.isNotEmpty == true ? subjectLabel! : (subject ?? '')),
+      subject,
+    );
+    if (raw.isEmpty) return 'পরীক্ষা';
+
+    if (_hasBengali(raw)) {
+      return raw;
+    }
+
+    final fallbackMapped = _mapToAcademicSubject(raw);
+    if (fallbackMapped != null) {
+      return fallbackMapped;
+    }
+
+    if (raw.contains(' ') || raw.contains('-')) {
+      return raw;
+    }
 
     // Cleanup generic words
     return raw
@@ -1123,6 +1276,55 @@ class BanglaNameHelper {
         l.contains('zoology') ||
         l.contains('প্রাণি') ||
         l.contains('২') ||
+        l.contains('paper 2')) {
+      return base + 1;
+    }
+    return base;
+  }
+
+  /// Canonical subject priority for admission written exams (e.g. BUET, Engineering).
+  /// Enforces serial grouping: Physics -> Chemistry -> Higher Math -> Biology -> English -> Bangla -> ICT.
+  /// 1st paper strictly precedes 2nd paper within each subject.
+  static int getWrittenSubjectSortPriority(String name, [String? id]) {
+    final l = '$name ${id ?? ''}'.toLowerCase();
+    int base = 100;
+
+    if (l.contains('physics') || l.contains('পদার্থ')) {
+      base = 10;
+    } else if (l.contains('chemistry') ||
+        l.contains('chem') ||
+        l.contains('রসায়ন') ||
+        l.contains('রসায়ন')) {
+      base = 20;
+    } else if (l.contains('higher_math') ||
+        l.contains('উচ্চতর গণিত') ||
+        l.contains('math') ||
+        l.contains('গণিত')) {
+      base = 30;
+    } else if (l.contains('biology') ||
+        l.contains('botany') ||
+        l.contains('zoology') ||
+        l.contains('জীববিজ্ঞান') ||
+        l.contains('উদ্ভিদ') ||
+        l.contains('প্রাণি')) {
+      base = 40;
+    } else if (l.contains('english') || l.contains('ইংরেজি')) {
+      base = 50;
+    } else if (l.contains('bangla') || l.contains('বাংলা')) {
+      base = 60;
+    } else if (l.contains('ict') ||
+        l.contains('তথ্য') ||
+        l.contains('information')) {
+      base = 70;
+    }
+
+    // 1st paper comes before 2nd paper
+    if (l.contains('2nd') ||
+        l.contains('_2') ||
+        l.contains('২য়') ||
+        l.contains('২য়') ||
+        l.contains('zoology') ||
+        l.contains('প্রাণি') ||
         l.contains('paper 2')) {
       return base + 1;
     }

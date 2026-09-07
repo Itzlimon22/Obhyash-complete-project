@@ -71,6 +71,10 @@ class Question {
   final List<int> years;
   final String? examType;
   final String difficulty; // 'easy', 'medium', 'hard'
+  final String? type;
+  final String? section;
+  final String? passage;
+  final List<String> tags;
 
   const Question({
     required this.id,
@@ -91,6 +95,10 @@ class Question {
     this.years = const [],
     this.examType,
     this.difficulty = 'medium',
+    this.type,
+    this.section,
+    this.passage,
+    this.tags = const [],
   });
 
   /// Check whether a selected index is correct (supports single & multiple correct answers)
@@ -130,7 +138,8 @@ class Question {
           .map((e) => e.toString().trim())
           .where((s) => s.isNotEmpty)
           .toList();
-    } else {
+    }
+    if (validInstitutes.isEmpty) {
       final raw = j['institute'] ?? j['institution'] ?? j['board'];
       if (raw != null && raw.toString().trim().isNotEmpty) {
         validInstitutes = raw
@@ -154,7 +163,8 @@ class Question {
           if (parsed != null) validYears.add(parsed);
         }
       }
-    } else if (j['year'] != null && j['year'].toString().trim().isNotEmpty) {
+    }
+    if (validYears.isEmpty && j['year'] != null && j['year'].toString().trim().isNotEmpty) {
       final parts = j['year'].toString().split(',');
       for (final p in parts) {
         final digits = p.replaceAll(RegExp(r'[^0-9]'), '');
@@ -239,6 +249,27 @@ class Question {
       resolvedCorrectAnswerIndices = [resolvedCorrectAnswerIndex];
     }
 
+    final rawType = j['type']?.toString();
+    final rawSection = j['section']?.toString();
+    final rawPassage = j['passage'] != null
+        ? QuestionFormatter.format(j['passage'].toString())
+        : null;
+
+    List<String> validTags = [];
+    if (j['tags'] is List) {
+      validTags = (j['tags'] as List)
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    } else if (j['tags'] != null && j['tags'].toString().trim().isNotEmpty) {
+      validTags = j['tags']
+          .toString()
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+
     return Question(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
@@ -258,10 +289,17 @@ class Question {
       examHistory: validExamHistory,
       institutes: validInstitutes,
       years: validYears,
-      examType: j['exam_type']?.toString() ?? j['examType']?.toString(),
+      examType: j['exam_type']?.toString() ??
+          j['examType']?.toString() ??
+          rawType ??
+          rawSection,
       difficulty: j['difficulty']?.toString().toLowerCase() ??
           j['difficulty_level']?.toString().toLowerCase() ??
           'medium',
+      type: rawType,
+      section: rawSection,
+      passage: rawPassage,
+      tags: validTags,
     );
   }
 
@@ -284,6 +322,10 @@ class Question {
     'years': years,
     'exam_type': examType,
     'difficulty': difficulty,
+    'type': type,
+    'section': section,
+    'passage': passage,
+    'tags': tags,
   };
 
   Question copyWith({
@@ -305,6 +347,10 @@ class Question {
     List<int>? years,
     String? examType,
     String? difficulty,
+    String? type,
+    String? section,
+    String? passage,
+    List<String>? tags,
   }) {
     return Question(
       id: id ?? this.id,
@@ -325,6 +371,10 @@ class Question {
       years: years ?? this.years,
       examType: examType ?? this.examType,
       difficulty: difficulty ?? this.difficulty,
+      type: type ?? this.type,
+      section: section ?? this.section,
+      passage: passage ?? this.passage,
+      tags: tags ?? this.tags,
     );
   }
 
@@ -338,15 +388,19 @@ class Question {
     final nonEmptyOptions = options.where((opt) => opt.trim().isNotEmpty).toList();
     if (nonEmptyOptions.length < 2) return false;
 
-    // 3. Exclude written/CQ types
-    final type = (examType ?? '').toLowerCase();
-    if (type.contains('written') ||
-        type.contains('cq') ||
-        type.contains('creative') ||
-        type.contains('descriptive') ||
-        type.contains('সৃজনশীল') ||
-        type.contains('রচনামূলক') ||
-        type.contains('লিখিত')) {
+    // 3. Exclude written/CQ/Ka/Kha types
+    final checkType = '${type ?? ''} ${examType ?? ''} ${section ?? ''} ${tags.join(' ')}'.toLowerCase();
+    if (checkType.contains('written') ||
+        (RegExp(r'\bcq\b').hasMatch(checkType) && !checkType.contains('mcq')) ||
+        checkType.contains('creative') ||
+        checkType.contains('descriptive') ||
+        checkType.contains('সৃজনশীল') ||
+        checkType.contains('রচনামূলক') ||
+        checkType.contains('লিখিত') ||
+        RegExp(r'\bka\b').hasMatch(checkType) ||
+        RegExp(r'\bkha\b').hasMatch(checkType) ||
+        checkType.contains('জ্ঞানমূলক') ||
+        checkType.contains('অনুধাবনমূলক')) {
       return false;
     }
 
@@ -407,6 +461,30 @@ class Question {
   /// (strictly excludes Board-style বহুপদী সমাপ্তিসূচক / multiple-completion questions).
   bool get isAdmissionStandardMcq {
     return isStrictMcq && !isMultipleCompletionMcq;
+  }
+
+  /// Returns true if this question is strictly a Written question
+  /// (and strictly NOT an MCQ with options).
+  bool get isStrictWritten {
+    // 1. Must not have 2 or more non-empty options (which would indicate an MCQ)
+    final nonEmptyOptions = options.where((opt) => opt.trim().isNotEmpty).toList();
+    if (nonEmptyOptions.length >= 2) return false;
+
+    // 2. Explicit type check (written, Written, WRITTEN, লিখিত, CQ, creative, descriptive)
+    final t = (type ?? '').trim().toLowerCase();
+    if (t == 'written' || t == 'লিখিত') return true;
+
+    final checkType = '${type ?? ''} ${examType ?? ''} ${section ?? ''} ${tags.join(' ')}'.toLowerCase();
+    if (checkType.contains('written') || checkType.contains('লিখিত')) {
+      return true;
+    }
+
+    // 3. If options are empty or fewer than 2, and type is not explicitly MCQ
+    if (nonEmptyOptions.isEmpty && t != 'mcq') {
+      return true;
+    }
+
+    return false;
   }
 }
 

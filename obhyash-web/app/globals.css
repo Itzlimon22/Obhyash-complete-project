@@ -85,7 +85,7 @@
   }
 
   html {
-    font-size: 16.5px;
+    font-size: 17px;
   }
 
   body {
@@ -95,7 +95,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: var(--font-anek), var(--font-inter), system-ui, -apple-system, sans-serif;
-    font-size: 16.5px;
+    font-size: 17px;
   }
 }
 

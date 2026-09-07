@@ -18,6 +18,7 @@ interface ReferralInfo {
     is_scratched: boolean;
     reward_type?: string;
   }>;
+  is_enabled?: boolean;
 }
 
 import { ScratchCardWeb } from './ScratchCardWeb';
@@ -76,6 +77,11 @@ export const ReferralDashboard: React.FC = () => {
   return (
     <section className={styles.dashboard}>
       <h1 className={styles.title}>আপনার রেফারেল ড্যাশবোর্ড</h1>
+      {data?.is_enabled === false && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-sm font-medium font-anek">
+          ⚠️ <strong>নোটিশ:</strong> বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে স্থগিত আছে। শীঘ্রই পুনরায় চালু করা হবে।
+        </div>
+      )}
       {data?.referral ? (
         <div className={styles.codeBox}>
           <p className={styles.label}>আপনার কোড</p>

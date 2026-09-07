@@ -15,6 +15,9 @@ import 'core/presentation/screens/force_update_screen.dart';
 import 'core/presentation/screens/maintenance_screen.dart';
 import 'core/presentation/widgets/offline_banner_wrapper.dart';
 import 'features/notifications/services/notification_service.dart';
+import 'core/providers/auth_provider.dart';
+import 'services/session_monitor_service.dart';
+import 'services/anti_piracy_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,11 +85,52 @@ void main() async {
   );
 }
 
-class ObhyashApp extends ConsumerWidget {
+class ObhyashApp extends ConsumerStatefulWidget {
   const ObhyashApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ObhyashApp> createState() => _ObhyashAppState();
+}
+
+class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isEnabled = ref.read(isScreenshotProtectionEnabledProvider);
+      AntiPiracyService.setProtection(isEnabled);
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        SessionMonitorService.checkSessionSync(
+          user.id,
+          () async => ref.read(authProvider.notifier).signOut(),
+        );
+      }
+      final isSecureEnabled = ref.read(isScreenshotProtectionEnabledProvider);
+      AntiPiracyService.setProtection(isSecureEnabled);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Dynamically sync FLAG_SECURE on native window when admin toggles it in real-time
+    ref.listen<bool>(isScreenshotProtectionEnabledProvider, (prev, isEnabled) {
+      AntiPiracyService.setProtection(isEnabled);
+    });
+
     final router = ref.watch(routerProvider);
     NotificationService.onNotificationTapped ??= (route) {
       router.push(route);
@@ -129,7 +173,6 @@ class ObhyashApp extends ConsumerWidget {
         return MediaQuery(
           data: mediaQuery.copyWith(
             textScaler: mediaQuery.textScaler.clamp(
-              minScaleFactor: 1.035,
               maxScaleFactor: 2.0,
             ),
           ),

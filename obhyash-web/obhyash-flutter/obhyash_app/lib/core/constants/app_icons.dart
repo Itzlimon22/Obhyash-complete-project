@@ -37,6 +37,10 @@ class AppIcons {
   static const String navExamFilled = 'assets/icons/nav_exam_filled.svg';
   static const String navRank = 'assets/icons/nav_rank.svg';
   static const String navRankFilled = 'assets/icons/nav_rank_filled.svg';
+  static const String navHistory = 'assets/icons/nav_history.svg';
+  static const String navHistoryFilled = 'assets/icons/nav_history_filled.svg';
+  static const String navProgress = 'assets/icons/nav_progress.svg';
+  static const String navProgressFilled = 'assets/icons/nav_progress_filled.svg';
   static const String navMenu = 'assets/icons/nav_menu.svg';
   static const String navMenuFilled = 'assets/icons/nav_menu_filled.svg';
 }

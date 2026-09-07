@@ -34,7 +34,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_exam_1',
       title: 'মডেল টেস্ট চ্যাম্পিয়ন',
-      description: 'আজকের যেকোনো ১টি পূর্ণাঙ্গ মডেল টেস্ট বা পরীক্ষা সম্পন্ন করো',
+      description: 'আজকের যেকোনো 1টি পূর্ণাঙ্গ মডেল টেস্ট বা পরীক্ষা সম্পন্ন করো',
       metricType: 'exams_count',
       target: 1,
       xpReward: 30,
@@ -44,7 +44,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_correct_15',
       title: 'নির্ভুল নিশানাবাজ',
-      description: 'আজ কমপক্ষে ১৫টি প্রশ্নের সঠিক উত্তর দাও',
+      description: 'আজ কমপক্ষে 15টি প্রশ্নের সঠিক উত্তর দাও',
       metricType: 'correct_answers',
       target: 15,
       xpReward: 25,
@@ -54,7 +54,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_correct_30',
       title: 'মাস্টার ব্রেইন',
-      description: 'আজ কমপক্ষে ৩০টি প্রশ্নের সঠিক উত্তর দিয়ে পারদর্শী হও',
+      description: 'আজ কমপক্ষে 30টি প্রশ্নের সঠিক উত্তর দিয়ে পারদর্শী হও',
       metricType: 'correct_answers',
       target: 30,
       xpReward: 40,
@@ -74,7 +74,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_exam_2',
       title: 'ডাবল চ্যালেঞ্জ',
-      description: 'আজ যেকোনো ২টি ভিন্ন বিষয়ে পরীক্ষা সম্পন্ন করো',
+      description: 'আজ যেকোনো 2টি ভিন্ন বিষয়ে পরীক্ষা সম্পন্ন করো',
       metricType: 'exams_count',
       target: 2,
       xpReward: 45,
@@ -84,7 +84,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_accuracy_80',
       title: 'পারফেকশনিস্ট',
-      description: 'যেকোনো একটি পরীক্ষায় ৮০% বা তার বেশি নির্ভুল স্কোর অর্জন করো',
+      description: 'যেকোনো একটি পরীক্ষায় 80% বা তার বেশি নির্ভুল স্কোর অর্জন করো',
       metricType: 'accuracy_80',
       target: 1,
       xpReward: 35,
@@ -104,7 +104,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_speed_correct_10',
       title: 'কুইক স্প্রিন্টার',
-      description: 'যেকোনো পরীক্ষায় কমপক্ষে ১০টি সঠিক উত্তর দিয়ে সাবমিট করো',
+      description: 'যেকোনো পরীক্ষায় কমপক্ষে 10টি সঠিক উত্তর দিয়ে সাবমিট করো',
       metricType: 'correct_answers',
       target: 10,
       xpReward: 20,
@@ -114,7 +114,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_solve_40_mcqs',
       title: 'এমসিকিউ ম্যারাথন',
-      description: 'আজ সব মিলিয়ে মোট ৪০টি প্রশ্ন সমাধান করো',
+      description: 'আজ সব মিলিয়ে মোট 40টি প্রশ্ন সমাধান করো',
       metricType: 'total_mcqs',
       target: 40,
       xpReward: 40,
@@ -124,7 +124,7 @@ class MasterMissionsPool {
     MasterDailyMission(
       id: 'mission_correct_20',
       title: 'লক্ষ্য পূরণ',
-      description: 'আজ বিভিন্ন পরীক্ষায় মোট ২০টি প্রশ্নের সঠিক উত্তর দাও',
+      description: 'আজ বিভিন্ন পরীক্ষায় মোট 20টি প্রশ্নের সঠিক উত্তর দাও',
       metricType: 'correct_answers',
       target: 20,
       xpReward: 30,
@@ -293,16 +293,6 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
       sb.removeChannel(_examsChannel!);
       _examsChannel = null;
     }
-  }
-
-  static String _toBanglaDigits(dynamic number) {
-    const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    String s = number.toString();
-    for (int i = 0; i < 10; i++) {
-      s = s.replaceAll(en[i], bn[i]);
-    }
-    return s;
   }
 
   Future<void> _loadQuests() async {
@@ -573,11 +563,11 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
                   ),
                 ),
                 child: Text(
-                  '${_toBanglaDigits(completedCount)}/${_toBanglaDigits(_quests.length)} সম্পন্ন',
+                  '$completedCount/${_quests.length}',
                   style: TextStyle(
                     fontFamily: 'HindSiliguri',
                     fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: isAllCompleted
                         ? const Color(0xFF004633)
                         : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563)),
@@ -613,16 +603,6 @@ class _QuestItemRow extends StatelessWidget {
     required this.isDark,
     required this.onClaim,
   });
-
-  static String _toBanglaDigits(dynamic number) {
-    const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    String s = number.toString();
-    for (int i = 0; i < 10; i++) {
-      s = s.replaceAll(en[i], bn[i]);
-    }
-    return s;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -719,7 +699,7 @@ class _QuestItemRow extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '+${_toBanglaDigits(quest.xpReward)} XP ক্লেইম',
+                          '+${quest.xpReward} XP ক্লেইম',
                           style: const TextStyle(
                             fontFamily: 'HindSiliguri',
                             fontSize: 11.5,
@@ -739,7 +719,7 @@ class _QuestItemRow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '+${_toBanglaDigits(quest.xpReward)} XP',
+                    '+${quest.xpReward} XP',
                     style: TextStyle(
                       fontFamily: 'HindSiliguri',
                       fontSize: 11,
@@ -769,7 +749,7 @@ class _QuestItemRow extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '${_toBanglaDigits(quest.current)}/${_toBanglaDigits(quest.target)}',
+                '${quest.current}/${quest.target}',
                 style: TextStyle(
                   fontFamily: 'HindSiliguri',
                   fontSize: 11,

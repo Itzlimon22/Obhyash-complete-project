@@ -163,9 +163,8 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
   String get _subjectTitle {
     final name = (widget.subject['name'] as String?) ?? 'বিষয়';
-    final paper = (widget.subject['paper'] as String?) ?? '';
-    final paperClean = paper.isNotEmpty ? paper.split(' ')[0] : '';
-    return paperClean.isNotEmpty ? '$name $paperClean' : name;
+    final paper = ((widget.subject['paper'] as String?) ?? '').trim();
+    return paper.isNotEmpty ? '$name $paper' : name;
   }
 
   // ── Chapters & Topics Fetching ──
@@ -404,22 +403,11 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         year = q.years.isNotEmpty ? q.years.first : years[hash % years.length];
       }
 
-      return Question(
-        id: q.id,
-        subject: q.subject,
-        subjectLabel: q.subjectLabel,
-        chapter: q.chapter,
-        question: q.question,
-        explanation: q.explanation,
-        options: q.options,
-        correctAnswerIndex: q.correctAnswerIndex,
-        correctAnswerIndices: q.correctAnswerIndices,
-        points: q.points,
+      return q.copyWith(
         examHistory: [ExamHistory(code: code, institute: institute, year: year)],
         institutes: [code],
         years: [year],
         examType: q.examType ?? _sectionTitle,
-        difficulty: q.difficulty,
       );
     }
 
@@ -427,74 +415,145 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   }
 
   bool _filterQuestion(Question q) {
+    final type = (q.type ?? '').toLowerCase();
+    final sec = (q.section ?? '').toLowerCase();
+    final examType = (q.examType ?? '').toLowerCase();
+    final tagsStr = q.tags.join(' ').toLowerCase();
+    final combined = '$type $sec $examType $tagsStr';
+
     if (_sectionId == 'cq') {
-      final type = (q.examType ?? '').toLowerCase();
-      return type.contains('cq');
+      // 1. MUST NOT BE AN MCQ!
+      if (q.options.where((opt) => opt.trim().isNotEmpty).length >= 2 ||
+          q.isStrictMcq ||
+          q.isAdmissionStandardMcq ||
+          type == 'mcq') {
+        return false;
+      }
+
+      // 2. Check for explicit CQ / creative / written types (NEVER do substring check on 'cq' as 'mcq' contains 'cq')
+      final isExplicitCq = (type == 'cq' ||
+          sec == 'cq' ||
+          examType == 'cq' ||
+          type == 'creative' ||
+          sec == 'creative' ||
+          type == 'written' ||
+          type == 'সৃজনশীল' ||
+          sec == 'সৃজনশীল' ||
+          type == 'রচনামূলক' ||
+          combined.contains('creative') ||
+          combined.contains('সৃজনশীল') ||
+          combined.contains('রচনামূলক') ||
+          RegExp(r'\bcq\b').hasMatch(type) ||
+          RegExp(r'\bcq\b').hasMatch(sec) ||
+          RegExp(r'\bcq\b').hasMatch(examType));
+
+      if (isExplicitCq) {
+        return true;
+      }
+      if (q.passage != null && q.passage!.trim().isNotEmpty && q.options.isEmpty) return true;
+      final text = q.question.toLowerCase();
+      if ((text.contains('(ক)') || text.contains('ক.') || text.contains('ক)')) &&
+          (text.contains('(খ)') || text.contains('খ.') || text.contains('খ)')) &&
+          q.options.isEmpty) {
+        return true;
+      }
+      return false;
     }
+
     if (_sectionId == 'ka_bhandar') {
+      if (q.options.where((opt) => opt.trim().isNotEmpty).length >= 2 ||
+          q.isStrictMcq ||
+          q.isAdmissionStandardMcq ||
+          type == 'mcq') {
+        return false;
+      }
+
+      if (type == 'ka' ||
+          sec == 'ka' ||
+          type == 'knowledge' ||
+          combined.contains('knowledge') ||
+          combined.contains('জ্ঞান')) {
+        return true;
+      }
       final text = q.question.toLowerCase();
-      final type = (q.examType ?? '').toLowerCase();
-      return type.contains('ka') || type.contains('knowledge') || text.contains('(ক)') || text.startsWith('ক.');
+      return (text.contains('(ক)') || text.startsWith('ক.') || text.startsWith('ক)')) && q.options.isEmpty;
     }
+
     if (_sectionId == 'kha_bhandar') {
+      if (q.options.where((opt) => opt.trim().isNotEmpty).length >= 2 ||
+          q.isStrictMcq ||
+          q.isAdmissionStandardMcq ||
+          type == 'mcq') {
+        return false;
+      }
+
+      if (type == 'kha' ||
+          sec == 'kha' ||
+          type == 'comprehension' ||
+          combined.contains('comprehension') ||
+          combined.contains('অনুধাবন')) {
+        return true;
+      }
       final text = q.question.toLowerCase();
-      final type = (q.examType ?? '').toLowerCase();
-      return type.contains('kha') || type.contains('comprehension') || text.contains('(খ)') || text.startsWith('খ.');
+      return (text.contains('(খ)') || text.startsWith('খ.') || text.startsWith('খ)')) && q.options.isEmpty;
     }
 
-    // MCQ sections must have options
+    // MCQ sections must have options and must not be written/CQ/Ka/Kha
     if (q.options.isEmpty) return false;
+    if (!q.isStrictMcq && (_sectionId == 'mcq' || _sectionId == 'academic')) {
+      return false;
+    }
 
-    final type = (q.examType ?? '').toLowerCase();
+    final qExamType = examType.isNotEmpty ? examType : type;
     final institutes = q.institutes.map((e) => e.toString().toLowerCase()).join(' ');
 
     if (_sectionId == 'engineering') {
       // Must be Engineering, reject any pure Medical or Academic-only questions
-      if (type.contains('medical') || type.contains('mat') || type.contains('mbbs') || type.contains('bds')) {
+      if (qExamType.contains('medical') || qExamType.contains('mat') || qExamType.contains('mbbs') || qExamType.contains('bds')) {
         return false;
       }
-      return type.contains('eng') ||
-          type.contains('buet') ||
-          type.contains('ckruet') ||
-          type.contains('ruet') ||
-          type.contains('kuet') ||
-          type.contains('cuet') ||
+      return qExamType.contains('eng') ||
+          qExamType.contains('buet') ||
+          qExamType.contains('ckruet') ||
+          qExamType.contains('ruet') ||
+          qExamType.contains('kuet') ||
+          qExamType.contains('cuet') ||
           institutes.contains('buet') ||
           institutes.contains('ckruet');
     }
 
     if (_sectionId == 'medical') {
       // Must be Medical, reject any pure Engineering questions
-      if (type.contains('engineering') || type.contains('buet') || type.contains('ckruet') || type.contains('kuet') || type.contains('ruet')) {
+      if (qExamType.contains('engineering') || qExamType.contains('buet') || qExamType.contains('ckruet') || qExamType.contains('kuet') || qExamType.contains('ruet')) {
         return false;
       }
-      return type.contains('med') ||
-          type.contains('mat') ||
-          type.contains('dmat') ||
-          type.contains('mbbs') ||
-          type.contains('bds') ||
+      return qExamType.contains('med') ||
+          qExamType.contains('mat') ||
+          qExamType.contains('dmat') ||
+          qExamType.contains('mbbs') ||
+          qExamType.contains('bds') ||
           institutes.contains('mat') ||
           institutes.contains('dmc');
     }
 
     if (_sectionId == 'varsity_ka' || _sectionId == 'varsity_kha' || _sectionId == 'varsity') {
       // Reject pure Engineering or pure Medical
-      if (type == 'engineering' || type == 'medical' || type.contains('buet')) {
+      if (qExamType == 'engineering' || qExamType == 'medical' || qExamType.contains('buet')) {
         return false;
       }
-      return type.contains('varsity') || type.contains('admission') || institutes.contains('du') || institutes.contains('ju') || institutes.contains('ru');
+      return qExamType.contains('varsity') || qExamType.contains('admission') || institutes.contains('du') || institutes.contains('ju') || institutes.contains('ru');
     }
 
     if (_sectionId == 'textbook') {
-      if (type == 'engineering' ||
-          type == 'medical' ||
-          type.contains('buet') ||
-          type.contains('mat') ||
-          type.contains('ckruet')) {
+      if (qExamType == 'engineering' ||
+          qExamType == 'medical' ||
+          qExamType.contains('buet') ||
+          qExamType.contains('mat') ||
+          qExamType.contains('ckruet')) {
         return false;
       }
 
-      final bool isBookType = type.contains('book') || type.contains('textbook');
+      final bool isBookType = qExamType.contains('book') || qExamType.contains('textbook');
       final bool hasAuthor = BanglaNameHelper.hasTextbookAuthor(
         institutes: q.institutes,
         examHistory: q.examHistory,
@@ -521,10 +580,10 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
     if (_sectionId == 'mcq' || _sectionId == 'academic') {
       // Academic must never show pure admission questions
-      if (type == 'engineering' || type == 'medical' || type.contains('buet') || type.contains('mat')) {
+      if (qExamType == 'engineering' || qExamType == 'medical' || qExamType.contains('buet') || qExamType.contains('mat')) {
         return false;
       }
-      return type.contains('academic') || type.contains('board') || type.isEmpty;
+      return qExamType.contains('academic') || qExamType.contains('board') || qExamType.isEmpty;
     }
 
     return true;
@@ -608,11 +667,20 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
     // 3. Strict Exam Type Isolation - NEVER ALLOW CROSS-CATEGORY LEAKS
     if (_sectionId == 'cq') {
-      query = query.or('type.eq.cq,exam_type.ilike.*cq*');
+      query = query
+          .neq('type', 'MCQ')
+          .not('type', 'ilike', '%mcq%')
+          .or('type.eq.CQ,type.eq.cq,type.ilike.*creative*,type.ilike.*সৃজনশীল*,type.eq.Written,type.eq.written,section.eq.cq,section.eq.CQ,section.ilike.*creative*,section.ilike.*সৃজনশীল*,exam_type.eq.cq,exam_type.ilike.*creative*,exam_type.ilike.*সৃজনশীল*');
     } else if (_sectionId == 'ka_bhandar') {
-      query = query.or('type.eq.ka,type.eq.knowledge,question.ilike.*ক*');
+      query = query
+          .neq('type', 'MCQ')
+          .not('type', 'ilike', '%mcq%')
+          .or('type.eq.ka,type.eq.Ka,type.ilike.*knowledge*,type.ilike.*জ্ঞান*,section.eq.ka,section.eq.Ka,section.ilike.*knowledge*,section.ilike.*জ্ঞান*');
     } else if (_sectionId == 'kha_bhandar') {
-      query = query.or('type.eq.kha,type.eq.comprehension,question.ilike.*খ*');
+      query = query
+          .neq('type', 'MCQ')
+          .not('type', 'ilike', '%mcq%')
+          .or('type.eq.kha,type.eq.Kha,type.ilike.*comprehension*,type.ilike.*অনুধাবন*,section.eq.kha,section.eq.Kha,section.ilike.*comprehension*,section.ilike.*অনুধাবন*');
     } else if (_sectionId == 'engineering') {
       query = query.or('exam_type.ilike.*engineering*,exam_type.ilike.*buet*,exam_type.ilike.*ckruet*,exam_type.ilike.*ruet*,exam_type.ilike.*kuet*,exam_type.ilike.*cuet*');
     } else if (_sectionId == 'medical') {
@@ -651,12 +719,12 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             .toList();
       }
 
-      // Only if DB has 0 questions for the whole category (no filter selected), generate curated demo questions
-      if (questions.isEmpty && _selectedChapter == null && _selectedTopic == null) {
+      // If DB has 0 questions (or questions haven't been uploaded yet), generate curated questions for the selected chapter/topic
+      if (questions.isEmpty) {
         questions = _generateCuratedQuestions(
           _subjectId,
           _sectionId,
-          _selectedChapter?.name ?? '১ম অধ্যায়',
+          _selectedChapter?.name ?? (_chapters.isNotEmpty ? _chapters.first.name : '১ম অধ্যায়'),
           _selectedTopic?.name,
         );
       }
@@ -827,7 +895,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'HindSiliguri',
-            fontSize: 18,
+            fontSize: 16.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
@@ -1255,6 +1323,76 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     );
   }
 
+  // ── CQ Extraction & Formatting Helpers ──
+  static (String stimulus, List<String> subQuestions) _extractCqData(Question q) {
+    String stimulus = '';
+    List<String> subQuestions = [];
+
+    // 1. Check if passage contains stimulus (উদ্দীপক)
+    if (q.passage != null && q.passage!.trim().isNotEmpty) {
+      stimulus = q.passage!.trim();
+    }
+
+    // 2. Check options array for sub-questions
+    if (q.options.isNotEmpty) {
+      subQuestions = q.options.where((s) => s.trim().isNotEmpty).toList();
+    }
+
+    // 3. If options has fewer than 4 items, attempt regex extraction from question text
+    if (subQuestions.length < 4) {
+      final rawText = q.question.trim();
+      final splitRegex = RegExp(
+        r'(?:\r?\n|^)\s*(?:\(([ক-ঘa-d1-4])\)|([ক-ঘa-d1-4])[\.\:\)]|\b([ক-ঘa-d])\s*[-–:])\s*',
+        caseSensitive: false,
+      );
+      final matches = splitRegex.allMatches(rawText).toList();
+
+      if (matches.length >= 2) {
+        if (stimulus.isEmpty) {
+          stimulus = rawText.substring(0, matches.first.start).trim();
+        }
+        final extracted = <String>[];
+        for (int i = 0; i < matches.length; i++) {
+          final start = matches[i].start;
+          final end = (i + 1 < matches.length) ? matches[i + 1].start : rawText.length;
+          final part = rawText.substring(start, end).trim();
+          if (part.isNotEmpty) extracted.add(part);
+        }
+        if (extracted.isNotEmpty) {
+          subQuestions = extracted;
+        }
+      }
+    }
+
+    if (stimulus.isEmpty) {
+      stimulus = q.question.trim();
+    }
+
+    // 4. Ensure at least 4 items with standard defaults if missing
+    const defaultLabels = [
+      'জ্ঞানমূলক প্রশ্ন',
+      'অনুধাবনমূলক প্রশ্ন',
+      'প্রয়োগমূলক গাণিতিক সমস্যা',
+      'উচ্চতর দক্ষতামূলক বিশ্লেষণ',
+    ];
+    while (subQuestions.length < 4) {
+      subQuestions.add(defaultLabels[subQuestions.length]);
+    }
+
+    return (stimulus, subQuestions.sublist(0, 4));
+  }
+
+  static String _formatSubQuestion(String prefix, String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return prefix;
+    final cleanPrefix = prefix.replaceAll(RegExp(r'[\(\)\.\:\s]'), '');
+    final regex = RegExp('^(\\($cleanPrefix\\)|$cleanPrefix[\\.\\:\\)]|\\b$cleanPrefix\\b)\\s*', caseSensitive: false);
+    if (regex.hasMatch(trimmed)) {
+      return trimmed;
+    }
+    return '$prefix $trimmed';
+  }
+
   // ── CQ (Creative Question) Card ──
   Widget _buildCqCard(Question q, int number, bool isDark) {
     final banglaNum = BanglaNameHelper.toBanglaNumeral(number);
@@ -1264,19 +1402,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             ? '${q.institutes.first}${q.years.isNotEmpty ? " '${(q.years.first % 100).toString().padLeft(2, '0')}" : ''}'
             : 'বোর্ড প্রশ্ন');
 
-    final subQuestions = q.options.isNotEmpty && q.options.length >= 4
-        ? [
-            q.options[0],
-            q.options[1],
-            q.options[2],
-            q.options[3],
-          ]
-        : [
-            'জ্ঞানমূলক প্রশ্ন',
-            'অনুধাবনমূলক প্রশ্ন',
-            'প্রয়োগমূলক গাণিতিক সমস্যা',
-            'উচ্চতর দক্ষতামূলক বিশ্লেষণ',
-          ];
+    final (stimulus, subQuestions) = _extractCqData(q);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -1357,7 +1483,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
             // Question number then uddipok text (no "উদ্দীপক" label)
             LatexText(
-              text: '$banglaNum. ${q.question}',
+              text: '$banglaNum. $stimulus',
               style: TextStyle(
                 fontFamily: 'HindSiliguri',
                 fontSize: 15.5,
@@ -1369,10 +1495,10 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             const SizedBox(height: 12),
 
             // 4 sub-questions (no markings)
-            _buildSubQuestionItem('(ক) ${subQuestions[0]}', isDark),
-            _buildSubQuestionItem('(খ) ${subQuestions[1]}', isDark),
-            _buildSubQuestionItem('(গ) ${subQuestions[2]}', isDark),
-            _buildSubQuestionItem('(ঘ) ${subQuestions[3]}', isDark),
+            _buildSubQuestionItem(_formatSubQuestion('(ক)', subQuestions[0]), isDark),
+            _buildSubQuestionItem(_formatSubQuestion('(খ)', subQuestions[1]), isDark),
+            _buildSubQuestionItem(_formatSubQuestion('(গ)', subQuestions[2]), isDark),
+            _buildSubQuestionItem(_formatSubQuestion('(ঘ)', subQuestions[3]), isDark),
 
             const SizedBox(height: 12),
 
@@ -1393,6 +1519,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                             serialNumber: number,
                             boardName: boardName,
                             subQuestions: subQuestions,
+                            stimulus: stimulus,
                             isBookmarked: _bookmarkedQuestions.contains(q.id),
                             onToggleBookmark: () => _toggleBookmark(q.id),
                           ),
@@ -1428,8 +1555,8 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   Widget _buildSubQuestionItem(String title, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        title,
+      child: LatexText(
+        text: title,
         style: TextStyle(
           fontFamily: 'HindSiliguri',
           fontSize: 14.5,
@@ -1616,7 +1743,9 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(15)),
               ),
               child: LatexText(
-                text: q.explanation ?? 'এই প্রশ্নের উত্তর শীঘ্রই হালনাগাদ করা হবে।',
+                text: (q.explanation != null && q.explanation!.trim().isNotEmpty)
+                    ? q.explanation!
+                    : (q.options.isNotEmpty ? q.options.first : 'এই প্রশ্নের উত্তর শীঘ্রই হালনাগাদ করা হবে।'),
                 style: TextStyle(
                   fontFamily: 'HindSiliguri',
                   fontSize: 14.5,
@@ -1715,6 +1844,61 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         ChapterItem(id: 'bio1_ch08', name: '৮ম অধ্যায়: টিস্যু ও টিস্যুতন্ত্র'),
         ChapterItem(id: 'bio1_ch09', name: '৯ম অধ্যায়: উদ্ভিদ শারীরতত্ত্ব'),
         ChapterItem(id: 'bio1_ch10', name: '১০ম অধ্যায়: উদ্ভিদ প্রজনন'),
+      ];
+    } else if (lower.contains('english') || lower.contains('ইংরেজি')) {
+      if (lower.contains('2') || lower.contains('২')) {
+        return const [
+          ChapterItem(id: 'eng2_ch01', name: '১ম অধ্যায়: Gap filling activities without clues (Prepositions)'),
+          ChapterItem(id: 'eng2_ch02', name: '২য় অধ্যায়: Special phrases and words'),
+          ChapterItem(id: 'eng2_ch03', name: '৩য় অধ্যায়: Completing sentences with clauses/phrases'),
+          ChapterItem(id: 'eng2_ch04', name: '৪র্থ অধ্যায়: Right form of verbs'),
+          ChapterItem(id: 'eng2_ch05', name: '৫ম অধ্যায়: Narrative style (Direct & Indirect)'),
+          ChapterItem(id: 'eng2_ch06', name: '৬ষ্ঠ অধ্যায়: Use of modifiers'),
+          ChapterItem(id: 'eng2_ch07', name: '৭ম অধ্যায়: Sentence connectors'),
+          ChapterItem(id: 'eng2_ch08', name: '৮ম অধ্যায়: Synonym and Antonym'),
+          ChapterItem(id: 'eng2_ch09', name: '৯ম অধ্যায়: Punctuation and Capitalization'),
+        ];
+      }
+      return const [
+        ChapterItem(id: 'eng1_ch01', name: '১ম অধ্যায়: People or Institutions Making History'),
+        ChapterItem(id: 'eng1_ch02', name: '২য় অধ্যায়: Dreams'),
+        ChapterItem(id: 'eng1_ch03', name: '৩য় অধ্যায়: Lifestyle and Health'),
+        ChapterItem(id: 'eng1_ch04', name: '৪র্থ অধ্যায়: Youth and Adolescence'),
+        ChapterItem(id: 'eng1_ch05', name: '৫ম অধ্যায়: Art and Music'),
+        ChapterItem(id: 'eng1_ch06', name: '৬ষ্ঠ অধ্যায়: Environment and Nature'),
+        ChapterItem(id: 'eng1_ch07', name: '৭ম অধ্যায়: Tours and Travels'),
+      ];
+    } else if (lower.contains('ict') || lower.contains('তথ্য') || lower.contains('আইসিটি')) {
+      return const [
+        ChapterItem(id: 'ict_ch01', name: '১ম অধ্যায়: বিশ্ব ও বাংলাদেশ প্রেক্ষিত'),
+        ChapterItem(id: 'ict_ch02', name: '২য় অধ্যায়: কমিউনিকেশন সিস্টেম ও নেটওয়ার্কিং'),
+        ChapterItem(id: 'ict_ch03', name: '৩য় অধ্যায়: সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস'),
+        ChapterItem(id: 'ict_ch04', name: '৪র্থ অধ্যায়: ওয়েব ডিজাইন পরিচিতি ও HTML'),
+        ChapterItem(id: 'ict_ch05', name: '৫ম অধ্যায়: প্রোগ্রামিং ভাষা (C)'),
+        ChapterItem(id: 'ict_ch06', name: '৬ষ্ঠ অধ্যায়: ডাটাবেজ ম্যানেজমেন্ট সিস্টেম'),
+      ];
+    } else if (lower.contains('bangla') || lower.contains('বাংলা')) {
+      if (lower.contains('2') || lower.contains('২')) {
+        return const [
+          ChapterItem(id: 'ban2_ch01', name: '১ম অধ্যায়: বাংলা উচ্চারণের নিয়ম'),
+          ChapterItem(id: 'ban2_ch02', name: '২য় অধ্যায়: বাংলা বানানের নিয়ম'),
+          ChapterItem(id: 'ban2_ch03', name: '৩য় অধ্যায়: বাংলা ব্যাকরণিক শব্দশ্রেণি'),
+          ChapterItem(id: 'ban2_ch04', name: '৪র্থ অধ্যায়: বাংলা শব্দগঠন (উপসর্গ ও সমাস)'),
+          ChapterItem(id: 'ban2_ch05', name: '৫ম অধ্যায়: বাক্যতত্ত্ব ও বাক্য রূপান্তর'),
+          ChapterItem(id: 'ban2_ch06', name: '৬ষ্ঠ অধ্যায়: বাংলা ভাষার অপপ্রয়োগ ও শুদ্ধপ্রয়োগ'),
+        ];
+      }
+      return const [
+        ChapterItem(id: 'ban1_ch01', name: '১ম অধ্যায়: অপরিচিতা'),
+        ChapterItem(id: 'ban1_ch02', name: '২য় অধ্যায়: বিলাসী'),
+        ChapterItem(id: 'ban1_ch03', name: '৩য় অধ্যায়: আমার পথ'),
+        ChapterItem(id: 'ban1_ch04', name: '৪র্থ অধ্যায়: মানব কল্যাণ'),
+        ChapterItem(id: 'ban1_ch05', name: '৫ম অধ্যায়: মাসি-পিসি'),
+        ChapterItem(id: 'ban1_ch06', name: '৬ষ্ঠ অধ্যায়: বায়ান্নর দিনগুলো'),
+        ChapterItem(id: 'ban1_ch07', name: '৭ম অধ্যায়: সোনার তরী'),
+        ChapterItem(id: 'ban1_ch08', name: '৮ম অধ্যায়: বিদ্রোহী'),
+        ChapterItem(id: 'ban1_ch09', name: '৯ম অধ্যায়: প্রতিদান'),
+        ChapterItem(id: 'ban1_ch10', name: '১০ম অধ্যায়: তাহারেই পড়ে মনে'),
       ];
     }
 
@@ -2411,6 +2595,7 @@ class CqSolutionPageView extends StatefulWidget {
   final int serialNumber;
   final String boardName;
   final List<String> subQuestions;
+  final String? stimulus;
   final bool isBookmarked;
   final VoidCallback? onToggleBookmark;
 
@@ -2420,6 +2605,7 @@ class CqSolutionPageView extends StatefulWidget {
     required this.serialNumber,
     required this.boardName,
     required this.subQuestions,
+    this.stimulus,
     this.isBookmarked = false,
     this.onToggleBookmark,
   });
@@ -2450,6 +2636,22 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final banglaNum = BanglaNameHelper.toBanglaNumeral(widget.serialNumber);
 
+    // Extract stimulus & subQuestions if not pre-parsed
+    final (extractedStimulus, parsedSubQuestions) = _AcademicSectionDetailViewState._extractCqData(widget.question);
+    final displayStimulus = (widget.stimulus != null && widget.stimulus!.trim().isNotEmpty)
+        ? widget.stimulus!
+        : extractedStimulus;
+    final displaySubQuestions = widget.subQuestions.length >= 4
+        ? widget.subQuestions
+        : parsedSubQuestions;
+
+    final rawExplanation = widget.question.explanation?.trim() ?? '';
+    final solutionText = rawExplanation.isNotEmpty
+        ? rawExplanation
+        : (widget.question.options.length > 4
+            ? widget.question.options.sublist(4).join('\n\n')
+            : '');
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -2469,7 +2671,7 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
           '$banglaNum নং সৃজনশীল সমাধান',
           style: TextStyle(
             fontFamily: 'HindSiliguri',
-            fontSize: 17.5,
+            fontSize: 16.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
@@ -2584,7 +2786,7 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
 
                     // Question number then uddipok text
                     LatexText(
-                      text: '$banglaNum. ${widget.question.question}',
+                      text: '$banglaNum. $displayStimulus',
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
                         fontSize: 15.5,
@@ -2596,10 +2798,10 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                     const SizedBox(height: 12),
 
                     // 4 sub-questions (no markings)
-                    _buildSubQuestionItem('(ক) ${widget.subQuestions[0]}', isDark),
-                    _buildSubQuestionItem('(খ) ${widget.subQuestions[1]}', isDark),
-                    _buildSubQuestionItem('(গ) ${widget.subQuestions[2]}', isDark),
-                    _buildSubQuestionItem('(ঘ) ${widget.subQuestions[3]}', isDark),
+                    _buildSubQuestionItem(_AcademicSectionDetailViewState._formatSubQuestion('(ক)', displaySubQuestions[0]), isDark),
+                    _buildSubQuestionItem(_AcademicSectionDetailViewState._formatSubQuestion('(খ)', displaySubQuestions[1]), isDark),
+                    _buildSubQuestionItem(_AcademicSectionDetailViewState._formatSubQuestion('(গ)', displaySubQuestions[2]), isDark),
+                    _buildSubQuestionItem(_AcademicSectionDetailViewState._formatSubQuestion('(ঘ)', displaySubQuestions[3]), isDark),
                   ],
                 ),
               ),
@@ -2663,7 +2865,7 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                   // Solution Body
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: (widget.question.explanation != null && widget.question.explanation!.trim().isNotEmpty)
+                    child: (solutionText.isNotEmpty)
                         ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(14),
@@ -2675,7 +2877,7 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                               ),
                             ),
                             child: LatexText(
-                              text: widget.question.explanation!,
+                              text: solutionText,
                               style: TextStyle(
                                 fontFamily: 'HindSiliguri',
                                 fontSize: 15.0,
@@ -2719,8 +2921,8 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
   Widget _buildSubQuestionItem(String title, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        title,
+      child: LatexText(
+        text: title,
         style: TextStyle(
           fontFamily: 'HindSiliguri',
           fontSize: 14.5,

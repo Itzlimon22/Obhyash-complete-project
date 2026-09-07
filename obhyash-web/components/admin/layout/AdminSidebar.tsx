@@ -26,6 +26,7 @@ import {
   Gift,
   Sun,
   Moon,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -58,6 +59,12 @@ const ADMIN_NAVIGATION: NavSection[] = [
         label: 'কমান্ড সেন্টার',
         icon: LayoutDashboard,
         href: '/admin/dashboard',
+      },
+      {
+        id: 'control-panel',
+        label: 'কন্ট্রোল প্যানেল',
+        icon: SlidersHorizontal,
+        href: '/admin/control-panel',
       },
       {
         id: 'analytics',

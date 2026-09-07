@@ -71,5 +71,60 @@ void main() {
       expect(variants.any((v) => v.contains('ভেক্টর রাশির যোজন')), isTrue);
       expect(variants.any((v) => v.contains('বিয়োজন') || v.contains('বিয়োজন')), isTrue);
     });
+    test('Does not wrap English prose sentences in dollar math mode', () {
+      const raw =
+          'The temperature of an open room of volume 30 m^3 increases from 17 °C to 27 °C due to the sunshine. The atmospheric pressure in the room is 1 x 10^5 Pa.';
+      final formatted = QuestionFormatter.format(raw);
+
+      expect(formatted.startsWith(r'$The temperature'), isFalse);
+      expect(formatted.contains('The temperature of an open room'), isTrue);
+    });
+
+    test('Deduplicates repetitive institute names in QB exam titles', () {
+      expect(
+        BanglaNameHelper.formatSubject('বুয়েট', 'বুয়েট BUET 24-25 preli'),
+        'BUET 24-25 preli',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('রুয়েট', 'রুয়েট RUET 24-25'),
+        'RUET 24-25',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('বুয়েট', 'বুয়েট BUET 25-26 written'),
+        'BUET 25-26 written',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('medical', 'মেডিকেল Medical MBBS 24-25'),
+        'Medical MBBS 24-25',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('bangla_1st', 'বাংলা ১ম পত্র'),
+        'বাংলা ১ম পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('physics_1st'),
+        'পদার্থবিজ্ঞান ১ম পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('hsc_bangla_1', 'hsc_bangla_1'),
+        'বাংলা ১ম পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('hsc_bangla_1'),
+        'বাংলা ১ম পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('hsc_bangla_2', 'hsc_bangla_2'),
+        'বাংলা ২য় পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('hsc_physics_1', 'hsc_physics_1'),
+        'পদার্থবিজ্ঞান ১ম পত্র',
+      );
+      expect(
+        BanglaNameHelper.formatSubject('hsc_ict', 'hsc_ict'),
+        'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)',
+      );
+    });
   });
 }

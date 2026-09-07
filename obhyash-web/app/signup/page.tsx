@@ -656,11 +656,13 @@ function SignupForm() {
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
                       >
-                        <option value="Science">Science</option>
-                        <option value="Business Studies">
-                          Business Studies
+                        <option value="Science">Science (বিজ্ঞান)</option>
+                        <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                          Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
                         </option>
-                        <option value="Humanities">Humanities</option>
+                        <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                          Humanities (মানবিক) - শীঘ্রই আসছে
+                        </option>
                       </select>
                     </div>
                   </div>

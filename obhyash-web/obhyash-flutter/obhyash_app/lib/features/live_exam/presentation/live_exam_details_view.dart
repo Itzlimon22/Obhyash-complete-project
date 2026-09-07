@@ -5,6 +5,7 @@ import "package:lucide_icons/lucide_icons.dart";
 import "../domain/models.dart";
 import "../providers/live_exam_providers.dart";
 import "../../../core/presentation/widgets/skeleton_loading.dart";
+import "../../../core/providers/app_config_provider.dart";
 
 class LiveExamDetailsView extends ConsumerStatefulWidget {
   final String examId;
@@ -25,6 +26,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final examAsync = ref.watch(liveExamDetailsProvider(widget.examId));
+    final isLiveExamsEnabled = ref.watch(isLiveExamsEnabledProvider);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
@@ -404,12 +406,44 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
 
                 // Main CTA Action Button
                 if (!isTaken) ...[
+                  if (!isLiveExamsEnabled) ...[
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF3B1E08) : const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFFD97706).withValues(alpha: 0.6)
+                              : const Color(0xFFFDE68A),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.alertTriangle, size: 20, color: Color(0xFFD97706)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু করা হলে পরীক্ষা দেওয়া যাবে।',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'HindSiliguri',
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: (isOngoing || isPast || exam.id.startsWith("mock-"))
+                        backgroundColor: (isLiveExamsEnabled && (isOngoing || isPast || exam.id.startsWith("mock-")))
                             ? const Color(0xFF059669)
                             : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                         shape: RoundedRectangleBorder(
@@ -417,29 +451,43 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         ),
                         elevation: 0,
                       ),
-                      onPressed: isOngoing
+                      onPressed: !isLiveExamsEnabled
                           ? () {
-                              context.push(
-                                "/live_exam_session/${exam.id}",
-                                extra: exam,
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'লাইভ এক্সাম বর্তমানে সাময়িক স্থগিত রয়েছে।',
+                                    style: TextStyle(fontFamily: 'HindSiliguri'),
+                                  ),
+                                  backgroundColor: Color(0xFFDC2626),
+                                ),
                               );
                             }
-                          : (isPast || exam.id.startsWith("mock-"))
+                          : isOngoing
                               ? () {
                                   context.push(
-                                    "/live_exam_session/${exam.id}?practice=true",
+                                    "/live_exam_session/${exam.id}",
                                     extra: exam,
                                   );
                                 }
-                              : null,
+                              : (isPast || exam.id.startsWith("mock-"))
+                                  ? () {
+                                      context.push(
+                                        "/live_exam_session/${exam.id}?practice=true",
+                                        extra: exam,
+                                      );
+                                    }
+                                  : null,
                       child: Text(
-                        isOngoing
-                            ? "পরীক্ষা শুরু করুন"
-                            : (isUpcoming ? "পরীক্ষা এখনও শুরু হয়নি" : "অনুশীলন পরীক্ষা শুরু করুন"),
+                        !isLiveExamsEnabled
+                            ? "লাইভ এক্সাম সাময়িক বন্ধ রয়েছে"
+                            : isOngoing
+                                ? "পরীক্ষা শুরু করুন"
+                                : (isUpcoming ? "পরীক্ষা এখনও শুরু হয়নি" : "অনুশীলন পরীক্ষা শুরু করুন"),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: (isOngoing || isPast || exam.id.startsWith("mock-"))
+                          color: (isLiveExamsEnabled && (isOngoing || isPast || exam.id.startsWith("mock-")))
                               ? Colors.white
                               : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
                           fontFamily: "HindSiliguri",

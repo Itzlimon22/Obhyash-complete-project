@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../../core/presentation/widgets/app_icon.dart';
+import '../../../core/providers/app_config_provider.dart';
+import '../../../core/utils/app_popups.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
 import 'payment_view.dart';
 import 'widgets/coupon_bottom_sheet.dart';
 
-class PlanSelectionView extends StatefulWidget {
+class PlanSelectionView extends ConsumerStatefulWidget {
   final List<SubscriptionPlan>? initialPlans;
   final SubscriptionPlan? activeSubscription;
   final DateTime? expiresAt;
@@ -23,10 +26,10 @@ class PlanSelectionView extends StatefulWidget {
   });
 
   @override
-  State<PlanSelectionView> createState() => _PlanSelectionViewState();
+  ConsumerState<PlanSelectionView> createState() => _PlanSelectionViewState();
 }
 
-class _PlanSelectionViewState extends State<PlanSelectionView> {
+class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
   bool _isLoading = true;
   List<SubscriptionPlan> _plans = [];
   SubscriptionPlan? _activeSubscription;
@@ -274,6 +277,16 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
   void _handlePlanSelect(SubscriptionPlan plan) {
     if (plan.id == _currentPlanId || plan.id == 'free') return;
 
+    final paymentsEnabled = ref.read(isPaymentsEnabledProvider);
+    if (!paymentsEnabled) {
+      AppPopups.show(
+        context,
+        message: 'পেমেন্ট গেটওয়ে বর্তমানে সাময়িকভাবে স্থগিত রয়েছে। খুব শীঘ্রই পুনরায় চালু করা হবে।',
+        isError: true,
+      );
+      return;
+    }
+
     // Apply coupon discount if active
     SubscriptionPlan effectivePlan = plan;
     if (_appliedCoupon != null && plan.price > 0) {
@@ -364,6 +377,7 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final paymentsEnabled = ref.watch(isPaymentsEnabledProvider);
     final premiumPlans = _plans.where((p) => p.price > 0).toList();
     final selectedPlan = (premiumPlans.isNotEmpty && _selectedPlanIndex < premiumPlans.length)
         ? premiumPlans[_selectedPlanIndex]
@@ -404,6 +418,43 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (!paymentsEnabled)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.amber.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.alertTriangle, color: Colors.amber, size: 22),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'পেমেন্ট গেটওয়ে সাময়িক স্থগিত',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'বিকাশ ও অন্যান্য পেমেন্ট গেটওয়েতে কাজ চলায় সাময়িকভাবে সাবস্ক্রিপশন ক্রয় বন্ধ রয়েছে। খুব শীঘ্রই পুনরায় চালু হবে।',
+                              style: TextStyle(fontSize: 11, height: 1.35),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
               // MASTER PRICING & PLAN CARD (MATCHES SCREENSHOT EXACTLY)
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),

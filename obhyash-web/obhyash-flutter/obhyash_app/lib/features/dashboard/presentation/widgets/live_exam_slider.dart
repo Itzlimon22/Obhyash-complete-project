@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../live_exam/domain/models.dart';
 import '../../providers/dashboard_providers.dart';
+import '../../../../core/providers/app_config_provider.dart';
 
 class LiveExamSlider extends ConsumerWidget {
   const LiveExamSlider({super.key});
@@ -49,6 +50,11 @@ class LiveExamSlider extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLiveExamsEnabled = ref.watch(isLiveExamsEnabledProvider);
+    if (!isLiveExamsEnabled) {
+      return const SizedBox.shrink();
+    }
+
     final liveExamsAsync = ref.watch(dashboardLiveExamsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 

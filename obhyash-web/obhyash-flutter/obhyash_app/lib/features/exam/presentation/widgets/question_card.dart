@@ -207,11 +207,27 @@ class _QuestionCardState extends State<QuestionCard>
                                   widget.question.institutes.isNotEmpty ||
                                   widget.question.years.isNotEmpty)) ...[
                             () {
-                              final sourceText = BanglaNameHelper.formatQuestionSource(
-                                examHistory: widget.question.examHistory,
-                                institutes: widget.question.institutes,
-                                years: widget.question.years,
-                              );
+                              final String sourceText;
+                              if (widget.question.examHistory.isNotEmpty &&
+                                  widget.question.examHistory.first.institute.isNotEmpty) {
+                                final h = widget.question.examHistory.first;
+                                final yr = h.year > 0
+                                    ? " '${(h.year % 100).toString().padLeft(2, '0')}"
+                                    : '';
+                                sourceText = '${h.institute}$yr';
+                              } else if (widget.question.institutes.isNotEmpty) {
+                                final inst = widget.question.institutes.first;
+                                final yr = widget.question.years.isNotEmpty && widget.question.years.first > 0
+                                    ? " '${(widget.question.years.first % 100).toString().padLeft(2, '0')}"
+                                    : '';
+                                sourceText = '$inst$yr';
+                              } else {
+                                sourceText = BanglaNameHelper.formatQuestionSource(
+                                  examHistory: widget.question.examHistory,
+                                  institutes: widget.question.institutes,
+                                  years: widget.question.years,
+                                );
+                              }
                               if (sourceText.isEmpty) return const SizedBox.shrink();
 
                               return Flexible(

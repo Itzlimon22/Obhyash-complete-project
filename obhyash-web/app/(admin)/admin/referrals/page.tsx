@@ -90,6 +90,7 @@ export default function AdminReferralsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isReferralSystemEnabled, setIsReferralSystemEnabled] = useState<boolean>(true);
   const [stats, setStats] = useState({
     totalCodes: 0,
     totalRedemptions: 0,
@@ -133,6 +134,16 @@ export default function AdminReferralsPage() {
       else setIsLoading(true);
 
       try {
+        // Check system control status
+        fetch('/api/admin/system-controls')
+          .then((r) => r.json())
+          .then((cfg) => {
+            if (cfg?.success && cfg?.data?.referral_system_enabled !== undefined) {
+              setIsReferralSystemEnabled(cfg.data.referral_system_enabled);
+            }
+          })
+          .catch(() => {});
+
         const res = await fetch(
           `/api/admin/referrals?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(
             searchQuery,
@@ -358,6 +369,37 @@ export default function AdminReferralsPage() {
           </button>
         </div>
       </div>
+
+      {/* ── System Status Warning Banner (if disabled) ── */}
+      {!isReferralSystemEnabled && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 p-4 sm:p-5 bg-amber-500/10 dark:bg-amber-950/30 border border-amber-400/60 dark:border-amber-700/60 rounded-2xl animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0">
+              <ShieldAlert size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-black text-amber-900 dark:text-amber-200">
+                  রেফারেল সিস্টেম বর্তমানে বন্ধ (Disabled) রয়েছে
+                </h4>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                  পজড
+                </span>
+              </div>
+              <p className="text-xs text-amber-700 dark:text-amber-300/80 mt-0.5">
+                অ্যাডমিন কন্ট্রোল প্যানেল থেকে রেফারেল সুইচটি বন্ধ করা আছে। শিক্ষার্থীরা বর্তমানে নতুন রেফারেল কোড রিডিম করতে পারছে না।
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/control-panel"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm transition shrink-0"
+          >
+            <SlidersHorizontal size={14} />
+            <span>কন্ট্রোল প্যানেলে পরিবর্তন করুন</span>
+          </Link>
+        </div>
+      )}
 
       {/* ── KPI Summary Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

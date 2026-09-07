@@ -45,7 +45,7 @@ class AppColors {
 class AppTheme {
   static TextTheme _bumpTextTheme(TextTheme theme) {
     TextStyle? bump(TextStyle? style) =>
-        style?.copyWith(fontSize: (style.fontSize ?? 14) + 0.5);
+        style?.copyWith(fontSize: (style.fontSize ?? 14) + 1.0);
 
     return theme.copyWith(
       displayLarge: bump(theme.displayLarge),
@@ -117,6 +117,13 @@ class AppTheme {
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: AppColors.coolGreyLight, width: 1),
         ),
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: Colors.white,
+        headerBackgroundColor: AppColors.viridianForest,
+        headerForegroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        dividerColor: AppColors.coolGreyLight,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.white,
@@ -215,6 +222,13 @@ class AppTheme {
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: Color.fromARGB(255, 18, 18, 20), width: 1),
         ),
+      ),
+      datePickerTheme: const DatePickerThemeData(
+        backgroundColor: Color(0xFF171717),
+        headerBackgroundColor: Color(0xFF064E3B),
+        headerForegroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        dividerColor: Color(0xFF27272A),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Color(0xFF000000), // OLED Pure Black

@@ -13,6 +13,7 @@ import '../../../core/presentation/widgets/celebration_dialog.dart';
 import '../../../core/services/device_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
+import '../../../core/providers/app_config_provider.dart';
 import 'widgets/scratch_card_dialog.dart';
 
 class ReferralView extends ConsumerStatefulWidget {
@@ -275,6 +276,15 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   }
 
   Future<void> _handleClaimReferral() async {
+    final appConfig = ref.read(appConfigStreamProvider).value;
+    if (appConfig != null && !appConfig.referralSystemEnabled) {
+      AppPopups.warning(
+        context,
+        message: 'বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে বন্ধ আছে।',
+      );
+      return;
+    }
+
     final input = _claimCodeController.text.trim().toUpperCase();
     if (input.isEmpty) {
       AppPopups.warning(context, message: 'রেফারেল কোডটি লিখুন');
@@ -406,6 +416,15 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   }
 
   void _shareCode() async {
+    final appConfig = ref.read(appConfigStreamProvider).value;
+    if (appConfig != null && !appConfig.referralSystemEnabled) {
+      AppPopups.warning(
+        context,
+        message: 'বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে বন্ধ আছে।',
+      );
+      return;
+    }
+
     if (_code == null) return;
     final text =
         'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন! 🎉\n\nরেফারেল কোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
@@ -424,10 +443,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       // Fallback: copy to clipboard
       await Clipboard.setData(ClipboardData(text: text));
       if (mounted) {
-        AppPopups.show(
+        AppPopups.success(
           context,
-          message: 'শেয়ার লিংক ক্লিপবোর্ডে কপি হয়েছে',
-          isError: false,
+          message: 'রেফারেল লিঙ্ক কপি করা হয়েছে!',
         );
       }
     }
@@ -436,6 +454,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final appConfigAsync = ref.watch(appConfigStreamProvider);
+    final isReferralEnabled = appConfigAsync.value?.referralSystemEnabled ?? true;
+
     // Retry when auth becomes available after cold-start session restore
     ref.listen(authProvider, (prev, next) {
       if (next != null && prev == null) _loadReferral();
@@ -457,6 +478,37 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // ── Paused Warning Banner (if disabled by admin) ─────────
+                  if (!isReferralEnabled) ...[
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.amber.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.alertTriangle, size: 20, color: Colors.amber),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে বন্ধ আছে। শীঘ্রই পুনরায় চালু করা হবে।',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
                   // ── Hero Banner ──────────────────────────────────────────
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -626,7 +678,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                   child: TextField(
                                     controller: _claimCodeController,
                                     textCapitalization: TextCapitalization.characters,
-                                    enabled: _lockoutSeconds == 0 && !_isClaiming,
+                                    enabled: _lockoutSeconds == 0 && !_isClaiming && isReferralEnabled,
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -635,7 +687,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       color: textPrimary,
                                     ),
                                     decoration: InputDecoration(
-                                      hintText: 'CODE1234',
+                                      hintText: !isReferralEnabled ? 'সাময়িক বন্ধ' : 'CODE1234',
                                       hintStyle: TextStyle(
                                         fontSize: 13,
                                         letterSpacing: 1,
@@ -652,7 +704,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               SizedBox(
                                 height: 48,
                                 child: ElevatedButton(
-                                  onPressed: (_lockoutSeconds > 0 || _isClaiming)
+                                  onPressed: (_lockoutSeconds > 0 || _isClaiming || !isReferralEnabled)
                                       ? null
                                       : _handleClaimReferral,
                                   style: ElevatedButton.styleFrom(

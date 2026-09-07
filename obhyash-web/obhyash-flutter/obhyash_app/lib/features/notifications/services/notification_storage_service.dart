@@ -40,20 +40,35 @@ class NotificationStorageService {
     }
   }
 
-  /// Save a new notification to local storage (prepends to top)
+  /// Save a new notification to local storage (prepends to top) with intelligent deduplication
   static Future<void> saveNotification(AppNotification notif) async {
     try {
       final current = await getLocalNotifications();
 
-      // Deduplicate by ID
+      // Intelligent Deduplication:
+      // 1. By exact ID
+      // 2. By identical title & message within 24 hours (prevents repetitive spam)
+      final isDuplicate = current.any((item) {
+        if (item.id == notif.id) return true;
+        if (item.title == notif.title && item.message == notif.message) {
+          return notif.createdAt.difference(item.createdAt).inHours.abs() < 24;
+        }
+        return false;
+      });
+
+      if (isDuplicate) {
+        debugPrint('[NotificationStorageService] Skipped saving duplicate notification: ${notif.title}');
+        return;
+      }
+
       final updated = [
         notif,
         ...current.where((item) => item.id != notif.id),
       ];
 
-      // Keep up to 100 recent notifications
-      if (updated.length > 100) {
-        updated.removeRange(100, updated.length);
+      // Keep up to 50 recent notifications
+      if (updated.length > 50) {
+        updated.removeRange(50, updated.length);
       }
 
       await saveAllNotifications(updated);
@@ -119,43 +134,10 @@ class NotificationStorageService {
     }
   }
 
-  /// Seed initial witty, engaging Duolingo/Chorcha notifications for new users
+  /// Seed initial clean onboarding welcome notification for new users
   static List<AppNotification> _getInitialSeedNotifications() {
     final now = DateTime.now();
     return [
-      AppNotification(
-        id: 'seed_streak_panic',
-        userId: 'local',
-        title: '🚨 তোমার ৩ দিনের স্ট্রিক পুড়ছে!',
-        message: 'ফায়ার সার্ভিস ডাকার আগেই ১টি ৫ মিনিটের কুইজ দিয়ে আগুনটা বাঁচাও 🚒🔥 রাত ১২টার পর কিন্তু কান্না থামবে না!',
-        type: 'streak',
-        link: '/setup',
-        data: {'route': '/setup', 'category': 'streak'},
-        isRead: false,
-        createdAt: now.subtract(const Duration(minutes: 42)),
-      ),
-      AppNotification(
-        id: 'seed_morning_tea',
-        userId: 'local',
-        title: 'চা ঠান্ডা হওয়ার আগেই কুইজ শেষ করো! 🍵',
-        message: 'ঘুম থেকে উঠো শিক্ষার্থী, বুয়েট/মেডিকেল ডাকছে! মাত্র ৫ মিনিটে ১০টি কঠিন প্রশ্ন সলভ করে লিডারবোর্ডে এসো ☕⚡',
-        type: 'general',
-        link: '/setup',
-        data: {'route': '/setup', 'category': 'morning'},
-        isRead: false,
-        createdAt: now.subtract(const Duration(hours: 3, minutes: 15)),
-      ),
-      AppNotification(
-        id: 'seed_live_exam',
-        userId: 'local',
-        title: '🔴 মেগা উইকলি লাইভ টেস্ট শুরু হয়েছে!',
-        message: 'হাজারো শিক্ষার্থীর সাথে লাইভ লড়াই শুরু হয়েছে। দেরি না করে এখনই জয়েন করো, নয়তো সময় কমে যাবে! 🏆⏱️',
-        type: 'live_exam',
-        link: '/live-exams',
-        data: {'route': '/live-exams', 'category': 'live_exam'},
-        isRead: false,
-        createdAt: now.subtract(const Duration(hours: 7)),
-      ),
       AppNotification(
         id: 'seed_welcome',
         userId: 'local',
@@ -165,7 +147,7 @@ class NotificationStorageService {
         link: '/setup',
         data: {'route': '/setup', 'category': 'welcome'},
         isRead: true,
-        createdAt: now.subtract(const Duration(days: 1)),
+        createdAt: now.subtract(const Duration(minutes: 5)),
       ),
     ];
   }

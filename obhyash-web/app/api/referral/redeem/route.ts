@@ -47,6 +47,20 @@ export const POST = async (req: Request) => {
     ''
   ).trim();
 
+  // 0. Check if referral system is globally enabled in app_config
+  const { data: globalConfig } = await supabaseAdmin
+    .from('app_config')
+    .select('referral_system_enabled')
+    .eq('id', 'global_config')
+    .maybeSingle();
+
+  if (globalConfig && globalConfig.referral_system_enabled === false) {
+    return NextResponse.json(
+      { error: 'বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে বন্ধ রয়েছে।' },
+      { status: 403 },
+    );
+  }
+
   // 1. Check if the redeeming user is referral-blocked
   const { data: redeemerProfile } = await supabaseAdmin
     .from('users')
