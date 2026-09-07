@@ -68,7 +68,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Color(0xFFA1A1AA),
@@ -110,7 +110,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFF09090B);
+    const bgColor = Color(0xFF000000); // OLED Pure Black
 
     return Theme(
       data: ThemeData.dark().copyWith(
@@ -126,7 +126,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
           title: const Text(
             'নতুন পাসওয়ার্ড দাও',
             style: TextStyle(
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -183,7 +183,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
                           'পাসওয়ার্ড সংরক্ষণ করো',
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.bold,
                           ),
                         ),

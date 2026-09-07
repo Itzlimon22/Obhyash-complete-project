@@ -22,7 +22,7 @@ class NotificationPermissionSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
@@ -80,7 +80,7 @@ class NotificationPermissionSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
@@ -139,7 +139,7 @@ class NotificationPermissionSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -168,7 +168,7 @@ class NotificationPermissionSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                   ),
                 ),
@@ -203,7 +203,7 @@ class NotificationPermissionSheet extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),

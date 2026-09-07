@@ -91,7 +91,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
     final solutionAsync = ref.watch(liveExamSolutionProvider(widget.examId));
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

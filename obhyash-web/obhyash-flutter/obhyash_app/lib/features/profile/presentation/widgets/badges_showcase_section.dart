@@ -149,7 +149,7 @@ class _BadgeCard extends StatelessWidget {
             maxHeight: MediaQuery.of(context).size.height * 0.50,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
               color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),

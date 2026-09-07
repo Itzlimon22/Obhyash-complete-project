@@ -2462,7 +2462,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF141417) : Colors.white,
+          color: isDark ? const Color(0xFF000000) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -2854,7 +2854,7 @@ class _TopicCollapsibleSelectionModalState
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF141417) : Colors.white,
+          color: isDark ? const Color(0xFF000000) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -3427,7 +3427,7 @@ class _PresetBadgePill extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               letterSpacing: -0.2,
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -3491,7 +3491,7 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121214) : const Color(0xFFF8FAFC),
+        color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(

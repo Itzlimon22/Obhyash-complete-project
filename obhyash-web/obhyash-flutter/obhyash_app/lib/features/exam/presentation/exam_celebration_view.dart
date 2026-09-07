@@ -321,7 +321,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
-                                            fontFamily: 'Anek Bangla',
+                                            fontFamily: 'HindSiliguri',
                                             color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
                                           ),
                                         ),

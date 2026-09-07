@@ -208,7 +208,7 @@ class _CelebrationDialogState extends State<CelebrationDialog>
             width: double.infinity,
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF18181B) : Colors.white,
+              color: isDark ? const Color(0xFF000000) : Colors.white,
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),

@@ -579,7 +579,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
             maxHeight: MediaQuery.of(ctx).size.height * 0.52,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF13151F) : const Color(0xFFF8FAFC),
+            color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
@@ -726,7 +726,7 @@ class _StatBox extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF18181B),
             ),
           ),
@@ -736,7 +736,7 @@ class _StatBox extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
             ),
           ),
@@ -791,7 +791,7 @@ class _FilterPill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
                 color: isSelected
                     ? (isDark ? Colors.white : const Color(0xFF18181B))
@@ -829,7 +829,7 @@ class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     return Container(
-      color: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      color: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       alignment: Alignment.center,
       child: child,

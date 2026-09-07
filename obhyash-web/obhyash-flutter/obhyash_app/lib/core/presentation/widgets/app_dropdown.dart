@@ -36,7 +36,7 @@ class AppDropdown<T> extends StatelessWidget {
     if (onChanged == null) return;
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF141416) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
     final borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
 
     showModalBottomSheet(

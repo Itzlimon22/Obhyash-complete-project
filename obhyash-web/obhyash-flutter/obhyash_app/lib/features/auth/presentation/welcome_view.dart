@@ -38,7 +38,7 @@ class _WelcomeViewState extends State<WelcomeView> {
   Timer? _autoPlayTimer;
 
   // Luxury Premium Palette (Titanium Slate & Matte Dark)
-  static const Color bgDark = Color(0xFF09090B); // Pure Zinc 950
+  static const Color bgDark = Color(0xFF000000); // Pure Zinc 950
   static const Color surfaceCard = Color(0xFF141417); // Elevated Matte Grey
   static const Color surfaceBorder = Color(0xFF27272A); // Zinc 800
   static const Color textMuted = Color(0xFFA1A1AA); // Zinc 400
@@ -200,7 +200,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: 'Anek Bangla',
+                                    fontFamily: 'HindSiliguri',
                                     color: slide.accentColor,
                                   ),
                                 ),
@@ -218,7 +218,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                               style: const TextStyle(
                                 fontSize: 18.5,
                                 fontWeight: FontWeight.w800,
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                                 height: 1.3,
                                 color: Colors.white,
                                 letterSpacing: -0.2,
@@ -283,7 +283,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                                 style: TextStyle(
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                               ),
                             ),
@@ -331,7 +331,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                     ),
                                   ),
                                   SizedBox(width: 6),
@@ -353,7 +353,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           color: Color(0xFF71717A),
                           letterSpacing: 0.3,
                         ),
@@ -381,7 +381,7 @@ class _WelcomeViewState extends State<WelcomeView> {
           aspectRatio: 9 / 19.5,
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF09090B),
+              color: const Color(0xFF000000),
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: const Color(0xFF27272A), width: 1.2),
               boxShadow: [
@@ -435,7 +435,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: textMuted,
                   ),
                 ),
@@ -446,7 +446,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: textMuted,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                 ),
               ),
             ],
@@ -457,7 +457,7 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               height: 1.35,
               color: Colors.white,
             ),
@@ -503,7 +503,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: Colors.white,
                   ),
                 ),
@@ -548,7 +548,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: Colors.white,
                     ),
                   ),
@@ -563,7 +563,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: Colors.white,
                     ),
                   ),
@@ -571,7 +571,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     'মোট ৪৫টি পরীক্ষায় ৮২০টি সঠিক',
                     style: TextStyle(
                       fontSize: 9,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: textMuted,
                     ),
                   ),
@@ -617,7 +617,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
@@ -657,7 +657,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                           day,
                           style: const TextStyle(
                             fontSize: 8,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: textMuted,
                           ),
                         ),
@@ -709,7 +709,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: Colors.white70,
                   ),
                 ),
@@ -757,7 +757,7 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isSelected ? Colors.white : textMuted,
             ),
           ),
@@ -791,7 +791,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 color: Colors.white,
               ),
             ),
@@ -821,7 +821,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 color: textMuted,
               ),
             ),

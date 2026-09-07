@@ -10,6 +10,7 @@ import {
   ExamConfig,
   ExamResult,
   Question,
+  ExamDetails,
 } from "@/lib/types";
 import {
   downloadQuestionPaper,
@@ -71,6 +72,10 @@ import ReferralView from "@/components/student/features/referral/ReferralView";
 // Exam Features
 import { ExamSetupContainer } from "@/components/student/features/exam/setup/ExamSetupContainer";
 import LiveExamView from "@/components/student/features/live-exam/LiveExamView";
+import QuestionBankView, { SubjectCardItem, InstituteCardItem } from "@/components/student/features/question-bank/QuestionBankView";
+import SubjectCategoryDetailView from "@/components/student/features/question-bank/SubjectCategoryDetailView";
+import AcademicCategoryDetailView from "@/components/student/features/question-bank/AcademicCategoryDetailView";
+import InstituteDetailView from "@/components/student/features/question-bank/InstituteDetailView";
 // import InstructionsView from '@/components/student/ui/InstructionsView'; // Deprecated in new flow
 import { ExamInstructionsView } from "@/components/student/features/exam/ExamInstructionsView";
 import ExamRunner from "@/components/student/features/exam/ExamRunner";
@@ -214,6 +219,8 @@ export default function StudentRoot({
     "dashboard",
     "setup",
     "live_exam",
+    "question_bank",
+    "question-bank",
     "history",
     "practice",
     "leaderboard",
@@ -280,6 +287,10 @@ export default function StudentRoot({
 
   // Pending Config for Pre-Fetch Instructions
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
+  const [questionBankTab, setQuestionBankTab] = useState<"institution" | "subject">("institution");
+  const [selectedQuestionBankSubject, setSelectedQuestionBankSubject] = useState<SubjectCardItem | null>(null);
+  const [selectedQuestionBankCategory, setSelectedQuestionBankCategory] = useState<string | null>(null);
+  const [selectedQuestionBankInstitute, setSelectedQuestionBankInstitute] = useState<InstituteCardItem | null>(null);
 
   const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
   const isPro = isUserPro(currentUser || effectiveUser);
@@ -737,6 +748,19 @@ export default function StudentRoot({
         setIsReviewingHistory(false);
       }
 
+      if (tab === "question_bank" || tab === "question-bank") {
+        if (activeTab === tab) {
+          // Re-tap resets detail view back to main question bank
+          setSelectedQuestionBankSubject(null);
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankInstitute(null);
+        }
+      } else {
+        setSelectedQuestionBankSubject(null);
+        setSelectedQuestionBankCategory(null);
+        setSelectedQuestionBankInstitute(null);
+      }
+
       setActiveTab(tab);
       sessionStorage.setItem("obhyash_active_tab", tab);
       if (typeof window !== "undefined" && validTabs.includes(tab)) {
@@ -848,6 +872,130 @@ export default function StudentRoot({
       if (activeTab === "live_exam") {
         return (
           <LiveExamView commonLayoutProps={commonLayoutProps} />
+        );
+      }
+
+      if (activeTab === "question_bank" || activeTab === "question-bank") {
+        if (selectedQuestionBankInstitute) {
+          return (
+            <AppLayout
+              activeTab="question_bank"
+              {...commonLayoutProps}
+              title={`${selectedQuestionBankInstitute.name} প্রশ্নব্যাংক`}
+              onBack={() => setSelectedQuestionBankInstitute(null)}
+              hideTitle={false}
+              hideBottomNav={true}
+            >
+              <InstituteDetailView
+                institute={selectedQuestionBankInstitute}
+                onBack={() => setSelectedQuestionBankInstitute(null)}
+                showHeader={false}
+                onStartExam={(examSet, qs) => {
+                  const totalMarks =
+                    examSet.type === "written"
+                      ? 400
+                      : selectedQuestionBankInstitute.id === "ckruet"
+                      ? 500
+                      : selectedQuestionBankInstitute.id === "mist"
+                      ? 200
+                      : 100;
+                  const details: ExamDetails = {
+                    subject: selectedQuestionBankInstitute.name,
+                    subjectLabel: `${selectedQuestionBankInstitute.name} ${examSet.title}`,
+                    examType: examSet.type === "written" ? "Written" : "Admission",
+                    chapters: "সকল অধ্যায়",
+                    topics: "সকল বিষয়",
+                    totalQuestions: qs.length,
+                    durationMinutes: examSet.durationMinutes,
+                    totalMarks: totalMarks,
+                    negativeMarking: examSet.type === "written" ? 0 : 0.25,
+                  };
+                  startCustomExam(qs, details);
+                  beginTimer(examSet.durationMinutes * 60);
+                }}
+              />
+            </AppLayout>
+          );
+        }
+
+        if (selectedQuestionBankSubject) {
+          const paperClean = selectedQuestionBankSubject.paper
+            ? selectedQuestionBankSubject.paper.split(" ")[0]
+            : "";
+          const displayTitle = paperClean
+            ? `${selectedQuestionBankSubject.name} ${paperClean}`
+            : selectedQuestionBankSubject.name;
+
+          if (selectedQuestionBankCategory === "academic") {
+            return (
+              <AppLayout
+                activeTab="question_bank"
+                {...commonLayoutProps}
+                title={`${displayTitle} - একাডেমিক`}
+                onBack={() => setSelectedQuestionBankCategory(null)}
+                hideTitle={false}
+                hideBottomNav={true}
+              >
+                <AcademicCategoryDetailView
+                  subject={selectedQuestionBankSubject}
+                  onBack={() => setSelectedQuestionBankCategory(null)}
+                  showHeader={false}
+                />
+              </AppLayout>
+            );
+          }
+
+          return (
+            <AppLayout
+              activeTab="question_bank"
+              {...commonLayoutProps}
+              title={displayTitle}
+              onBack={() => {
+                setSelectedQuestionBankSubject(null);
+                setSelectedQuestionBankCategory(null);
+              }}
+              hideTitle={false}
+              hideBottomNav={true}
+            >
+              <SubjectCategoryDetailView
+                subject={selectedQuestionBankSubject}
+                onBack={() => {
+                  setSelectedQuestionBankSubject(null);
+                  setSelectedQuestionBankCategory(null);
+                }}
+                showHeader={false}
+                onSelectCategory={(cat) => {
+                  if (cat.id === "academic") {
+                    setSelectedQuestionBankCategory("academic");
+                  }
+                }}
+              />
+            </AppLayout>
+          );
+        }
+
+        return (
+          <AppLayout
+            activeTab="question_bank"
+            {...commonLayoutProps}
+            hideTitle={true}
+            headerTabs={{
+              tabs: [
+                { id: "institution", label: "প্রতিষ্ঠান ভিত্তিক" },
+                { id: "subject", label: "বিষয় ভিত্তিক" },
+              ],
+              activeTabId: questionBankTab,
+              onTabSelect: (id) => setQuestionBankTab(id as "institution" | "subject"),
+            }}
+          >
+            <QuestionBankView
+              user={currentUser}
+              activeHeaderTab={questionBankTab}
+              onHeaderTabChange={setQuestionBankTab}
+              onSelectSubject={(sub) => setSelectedQuestionBankSubject(sub)}
+              onSelectInstitute={(inst) => setSelectedQuestionBankInstitute(inst)}
+            />
+          </AppLayout>
         );
       }
 

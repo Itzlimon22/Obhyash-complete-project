@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="ka_b1" x1="40" y1="130" x2="160" y2="165" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B" />
+      <stop offset="1" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="ka_b2" x1="45" y1="105" x2="150" y2="135" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#334155" />
+      <stop offset="1" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="ka_b3" x1="55" y1="80" x2="140" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="ka_bulb" x1="85" y1="40" x2="115" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FEF08A" />
+      <stop offset="0.7" stop-color="#FACC15" />
+      <stop offset="1" stop-color="#EAB308" />
+    </linearGradient>
+    <filter id="ka_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <g filter="url(#ka_shadow)">
+    <!-- Bottom Book (Golden Amber) -->
+    <polygon points="45,148 152,148 168,132 60,132" fill="#FFFBEB" />
+    <polygon points="152,148 168,132 168,140 152,156" fill="#FEF3C7" />
+    <path d="M36,142 Q36,158 52,158 L154,158 L168,142 L164,136 L52,136 Q36,136 36,142 Z" fill="url(#ka_b1)" />
+    <path d="M36,142 Q36,158 52,158 L56,158 Q40,158 40,142 Q40,136 56,136 L52,136 Q36,136 36,142 Z" fill="#B45309" />
+
+    <!-- Middle Book (Charcoal Navy) -->
+    <polygon points="52,126 142,126 156,112 66,112" fill="#F8FAFC" />
+    <polygon points="142,126 156,112 156,119 142,133" fill="#E2E8F0" />
+    <path d="M44,120 Q44,134 58,134 L144,134 L158,120 L154,115 L58,115 Q44,115 44,120 Z" fill="url(#ka_b2)" />
+    <path d="M44,120 Q44,134 58,134 L62,134 Q48,134 48,120 Q48,115 62,115 L58,115 Q44,115 44,120 Z" fill="#0F172A" />
+
+    <!-- Top Book (Electric Royal Blue) -->
+    <polygon points="62,102 135,102 148,89 74,89" fill="#EFF6FF" />
+    <polygon points="135,102 148,89 148,96 135,109" fill="#DBEAFE" />
+    <path d="M54,96 Q54,110 68,110 L138,110 L150,96 L146,91 L68,91 Q54,91 54,96 Z" fill="url(#ka_b3)" />
+    <path d="M54,96 Q54,110 68,110 L72,110 Q58,110 58,96 Q58,91 72,91 L68,91 Q54,91 54,96 Z" fill="#1E40AF" />
+    <!-- White Ribbon on Blue Book -->
+    <path d="M110,102 L110,122 L114,117 L118,122 L118,102 Z" fill="#FFFFFF" />
+
+    <!-- Glowing Lightbulb of Knowledge (Top Center) -->
+    <g transform="translate(0, 5)">
+      <!-- Glow Aura -->
+      <circle cx="100" cy="58" r="24" fill="#FEF08A" opacity="0.3" />
+      <circle cx="100" cy="58" r="16" fill="url(#ka_bulb)" stroke="#EAB308" stroke-width="1.5" />
+      <!-- Filament -->
+      <path d="M96,56 Q100,50 100,54 Q100,50 104,56" fill="none" stroke="#854D0E" stroke-width="1.5" stroke-linecap="round" />
+      <!-- Bulb Screw Base -->
+      <rect x="94" y="70" width="12" height="6" rx="1.5" fill="#94A3B8" />
+      <line x1="94" y1="73" x2="106" y2="73" stroke="#64748B" stroke-width="1" />
+      <!-- Light Rays -->
+      <line x1="100" y1="34" x2="100" y2="30" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+      <line x1="118" y1="42" x2="122" y2="39" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+      <line x1="82" y1="42" x2="78" y2="39" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+      <line x1="124" y1="58" x2="128" y2="58" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+      <line x1="76" y1="58" x2="72" y2="58" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Bengali 'ক' Glyph Badge floating on side -->
+    <g transform="translate(148, 88)">
+      <circle cx="0" cy="0" r="14" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2" />
+      <text x="0" y="4.5" font-size="13" fill="#FFFFFF" font-family="'Anek Bangla', sans-serif" font-weight="bold" text-anchor="middle">ক</text>
+    </g>
+  </g>
+</svg>

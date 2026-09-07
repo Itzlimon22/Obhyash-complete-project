@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../../core/services/haptics_service.dart';
@@ -20,6 +22,8 @@ class QuestionCard extends StatefulWidget {
   final bool showAnswer;
   final bool isBookmarked;
   final bool initiallyExpanded;
+  final bool hideSourceTag;
+  final bool showReport;
   final VoidCallback? onToggleBookmark;
   final VoidCallback? onDelete;
 
@@ -37,6 +41,8 @@ class QuestionCard extends StatefulWidget {
     this.showAnswer = false,
     this.isBookmarked = false,
     this.initiallyExpanded = false,
+    this.hideSourceTag = false,
+    this.showReport = false,
     this.onToggleBookmark,
     this.onDelete,
   });
@@ -64,6 +70,19 @@ class _QuestionCardState extends State<QuestionCard>
       end: 0.5,
     ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeInOut));
     if (_isExplanationOpen) _animCtrl.value = 1.0;
+  }
+
+  @override
+  void didUpdateWidget(covariant QuestionCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.showFeedback && widget.showFeedback && widget.initiallyExpanded) {
+      if (!_isExplanationOpen) {
+        setState(() {
+          _isExplanationOpen = true;
+        });
+        _animCtrl.forward();
+      }
+    }
   }
 
   @override
@@ -116,7 +135,6 @@ class _QuestionCardState extends State<QuestionCard>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isAnswered = widget.selectedOptionIndex != null;
 
     // Card border — orange ring when flagged
     Color borderColor = isDark
@@ -157,7 +175,7 @@ class _QuestionCardState extends State<QuestionCard>
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 15.0,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'HindSiliguri',
                     color: isDark
@@ -171,84 +189,95 @@ class _QuestionCardState extends State<QuestionCard>
 
                 // Tags + action buttons row
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Unified Source Tag (Board / University & Year - Short Form e.g. DB-24)
-                    // Hidden during active exam runner, visible in Result, History, Practice review & Bookmarks
-                    if ((widget.readOnly || widget.showFeedback || widget.showAnswer) &&
-                        (widget.question.examHistory.isNotEmpty ||
-                            widget.question.institutes.isNotEmpty ||
-                            widget.question.years.isNotEmpty)) ...[
-                      () {
-                        final sourceText = BanglaNameHelper.formatQuestionSource(
-                          examHistory: widget.question.examHistory,
-                          institutes: widget.question.institutes,
-                          years: widget.question.years,
-                        );
-                        if (sourceText.isEmpty) return const SizedBox.shrink();
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          // Unified Source Tag (Board / University & Year - Short Form e.g. DB-24)
+                          // Hidden during active exam runner or when hideSourceTag is true
+                          if (!widget.hideSourceTag &&
+                              (widget.readOnly || widget.showFeedback || widget.showAnswer) &&
+                              (widget.question.examHistory.isNotEmpty ||
+                                  widget.question.institutes.isNotEmpty ||
+                                  widget.question.years.isNotEmpty)) ...[
+                            () {
+                              final sourceText = BanglaNameHelper.formatQuestionSource(
+                                examHistory: widget.question.examHistory,
+                                institutes: widget.question.institutes,
+                                years: widget.question.years,
+                              );
+                              if (sourceText.isEmpty) return const SizedBox.shrink();
 
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2.5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF0E3A4A)
-                                : const Color(0xFFE0F7FA),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF164E63)
-                                  : const Color(0xFFB2EBF2),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Text(
-                            sourceText,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
-                              color: isDark
-                                  ? const Color(0xFFA5F3FC)
-                                  : const Color(0xFF006064),
-                              letterSpacing: 0.2,
-                              height: 1.1,
-                            ),
-                          ),
-                        );
-                      }(),
-                      const SizedBox(width: 6),
-                    ],
+                              return Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF0E3A4A)
+                                        : const Color(0xFFE0F7FA),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? const Color(0xFF164E63)
+                                          : const Color(0xFFB2EBF2),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    sourceText,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'HindSiliguri',
+                                      color: isDark
+                                          ? const Color(0xFFA5F3FC)
+                                          : const Color(0xFF006064),
+                                      letterSpacing: 0.2,
+                                      height: 1.25,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }(),
+                          ],
 
-                    // Flagged badge
-                    if (widget.isFlagged) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0x4D78350F)
-                              : const Color(0xFFFEF3C7),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'চিহ্নিত',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? const Color(0xFFFBBF24)
-                                : const Color(0xFFD97706),
-                          ),
-                        ),
+                          // Flagged badge
+                          if (widget.isFlagged) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0x4D78350F)
+                                    : const Color(0xFFFEF3C7),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'চিহ্নিত',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? const Color(0xFFFBBF24)
+                                      : const Color(0xFFD97706),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                    ],
+                    ),
 
-                    const Spacer(),
+                    const SizedBox(width: 6),
 
                     // Bookmark button
                     _IconBtn(
@@ -256,13 +285,13 @@ class _QuestionCardState extends State<QuestionCard>
                       tooltip: widget.isBookmarked
                           ? 'বুকমার্ক সরাও'
                           : 'বুকমার্ক করো',
-                      child: Icon(
+                      child: AppIcon(
                         widget.isBookmarked
-                            ? Icons.bookmark_rounded
-                            : Icons.bookmark_border_rounded,
+                            ? AppIcons.bookmarkFilled
+                            : AppIcons.bookmark,
                         size: 18,
                         color: widget.isBookmarked
-                            ? const Color(0xFF1E3A8A) // amber-500
+                            ? const Color(0xFFF59E0B) // amber-500
                             : (isDark
                                   ? const Color(0xFF525252)
                                   : const Color(0xFF9CA3AF)),
@@ -275,8 +304,8 @@ class _QuestionCardState extends State<QuestionCard>
                       _IconBtn(
                         onTap: widget.onDelete,
                         tooltip: 'প্রশ্নটি মুছে ফেলো',
-                        child: Icon(
-                          LucideIcons.trash2,
+                        child: AppIcon(
+                          AppIcons.trash,
                           size: 17,
                           color: isDark
                               ? const Color(0xFFEF4444).withValues(alpha: 0.85)
@@ -285,12 +314,15 @@ class _QuestionCardState extends State<QuestionCard>
                       ),
                     ],
 
-                    if (widget.readOnly) ...[
+                    if (widget.readOnly || widget.showReport) ...[
                       const SizedBox(width: 2),
 
                       // Report / Flag button
                       _IconBtn(
-                        onTap: widget.onReport,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          widget.onReport();
+                        },
                         tooltip: 'রিপোর্ট করো',
                         child: Icon(
                           Icons.outlined_flag_rounded,
@@ -342,28 +374,26 @@ class _QuestionCardState extends State<QuestionCard>
 
                 if (widget.showFeedback) {
                   if (isCorrect) {
-                    // Premium High-Contrast Correct Styling (No harsh green)
+                    // Correct Option Styling (Deeper Rich Forest/Emerald Green)
                     boxBg = isDark
-                        ? const Color(0xFF27272A)
-                        : const Color(0xFFF1F5F9);
+                        ? const Color(0xFF064E3B).withValues(alpha: 0.55)
+                        : const Color(0xFFD1FAE5);
                     boxBorder = isDark
-                        ? const Color(0xFFF8FAFC)
-                        : const Color(0xFF1E293B);
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF047857);
                     bulletBg = isDark
-                        ? const Color(0xFFF8FAFC)
-                        : const Color(0xFF1E293B);
+                        ? const Color(0xFF059669)
+                        : const Color(0xFF047857);
                     bulletBorder = bulletBg;
-                    bulletText = isDark
-                        ? const Color(0xFF0F172A)
-                        : Colors.white;
+                    bulletText = Colors.white;
                     optionTextColor = isDark
-                        ? const Color(0xFFFFFFFF)
-                        : const Color(0xFF0F172A);
+                        ? const Color(0xFFA7F3D0)
+                        : const Color(0xFF064E3B);
                     boldText = true;
                     trailingBadge = Icon(
                       Icons.check_circle_rounded,
                       size: 20,
-                      color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                     );
                   } else if (isSelected) {
                     // Refined Crimson for Wrong Selected
@@ -390,26 +420,24 @@ class _QuestionCardState extends State<QuestionCard>
                   }
                 } else if (widget.showAnswer && isCorrect) {
                   boxBg = isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFF1F5F9);
+                      ? const Color(0xFF064E3B).withValues(alpha: 0.55)
+                      : const Color(0xFFD1FAE5);
                   boxBorder = isDark
-                      ? const Color(0xFFF8FAFC)
-                      : const Color(0xFF1E293B);
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFF047857);
                   bulletBg = isDark
-                      ? const Color(0xFFF8FAFC)
-                      : const Color(0xFF1E293B);
+                      ? const Color(0xFF059669)
+                      : const Color(0xFF047857);
                   bulletBorder = bulletBg;
-                  bulletText = isDark
-                      ? const Color(0xFF0F172A)
-                      : Colors.white;
+                  bulletText = Colors.white;
                   optionTextColor = isDark
-                      ? const Color(0xFFFFFFFF)
-                      : const Color(0xFF0F172A);
+                      ? const Color(0xFFA7F3D0)
+                      : const Color(0xFF064E3B);
                   boldText = true;
                   trailingBadge = Icon(
                     Icons.check_circle_rounded,
                     size: 20,
-                    color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+                    color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                   );
                 } else if (isSelected) {
                   boxBg = isDark
@@ -445,21 +473,18 @@ class _QuestionCardState extends State<QuestionCard>
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: boxBorder,
-                            width: (widget.showFeedback || widget.showAnswer) && isCorrect ? 1.6 : 1.0,
+                            width: (widget.showFeedback || widget.showAnswer) && isCorrect ? 1.8 : 1.0,
                           ),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
-                            if (!isAnswered && !widget.readOnly) {
-                              if (widget.showFeedback) {
-                                if (isCorrect) {
-                                  AppHaptics.success();
-                                } else {
-                                  AppHaptics.error();
-                                }
+                            if (!widget.readOnly) {
+                              HapticFeedback.mediumImpact();
+                              if (isCorrect) {
+                                AppHaptics.success();
                               } else {
-                                AppHaptics.selection();
+                                AppHaptics.error();
                               }
                               widget.onSelectOption(idx);
                             }
@@ -501,7 +526,7 @@ class _QuestionCardState extends State<QuestionCard>
                                     banglaIndex,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 12.5,
                                       fontWeight: FontWeight.w600,
                                       fontFamily: 'HindSiliguri',
                                       color: bulletText,
@@ -514,7 +539,7 @@ class _QuestionCardState extends State<QuestionCard>
                                   child: LatexText(
                                     text: option,
                                     style: TextStyle(
-                                      fontSize: 13.5,
+                                      fontSize: 14.0,
                                       fontFamily: 'HindSiliguri',
                                       fontWeight: boldText
                                           ? FontWeight.w600
@@ -630,8 +655,8 @@ class _ExplanationPanel extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    LucideIcons.bookOpen,
+                  AppIcon(
+                    AppIcons.bookOpen,
                     size: 15,
                     color: headerTextColor,
                   ),
@@ -692,7 +717,7 @@ class _ExplanationPanel extends StatelessWidget {
                   LatexText(
                     text: question.explanation!,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 14.0,
                       fontFamily: 'HindSiliguri',
                       height: 1.55,
                       color: bodyTextColor,

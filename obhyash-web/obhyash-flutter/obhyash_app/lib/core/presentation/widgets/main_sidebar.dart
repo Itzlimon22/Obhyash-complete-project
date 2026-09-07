@@ -48,6 +48,12 @@ class MainSidebar extends StatelessWidget {
         'svg': 'assets/dashboard-icons/live_exam.svg',
       },
       {
+        'id': 'question_bank',
+        'label': 'প্রশ্ন ব্যাংক',
+        'icon': LucideIcons.bookOpen,
+        'svg': 'assets/dashboard-icons/help_question.svg',
+      },
+      {
         'id': 'history',
         'label': 'ইতিহাস',
         'icon': LucideIcons.history,
@@ -165,7 +171,7 @@ class MainSidebar extends StatelessWidget {
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             height: 1.1,
                           ),
                         ),
@@ -258,7 +264,7 @@ class MainSidebar extends StatelessWidget {
                                 label,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: isActive
                                       ? FontWeight.w600
                                       : FontWeight.normal,

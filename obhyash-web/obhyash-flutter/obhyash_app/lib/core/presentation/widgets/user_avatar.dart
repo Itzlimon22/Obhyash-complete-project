@@ -104,7 +104,7 @@ class UserAvatar extends StatelessWidget {
             color: Colors.white,
             fontSize: size * 0.42,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
           ),
         ),
       ),

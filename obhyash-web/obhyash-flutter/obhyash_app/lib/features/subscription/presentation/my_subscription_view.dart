@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
@@ -456,7 +458,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
@@ -784,8 +786,8 @@ class _OverviewTab extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(
-                    LucideIcons.calendar,
+                  const AppIcon(
+                    AppIcons.calendar,
                     color: Colors.white54,
                     size: 14,
                   ),
@@ -890,8 +892,8 @@ class _OverviewTab extends StatelessWidget {
                           color: const Color(0xFF166534),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
-                          LucideIcons.check,
+                        child: const AppIcon(
+                          AppIcons.check,
                           color: Colors.white,
                           size: 12,
                         ),
@@ -968,8 +970,8 @@ class _FreePlanCard extends StatelessWidget {
               color: const Color(0xFF166534).withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(
-              LucideIcons.crown,
+            child: const AppIcon(
+              AppIcons.crown,
               color: Color(0xFF166534),
               size: 32,
             ),

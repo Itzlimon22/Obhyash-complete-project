@@ -89,7 +89,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         // 2. Main Content inside SliverToBoxAdapter
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

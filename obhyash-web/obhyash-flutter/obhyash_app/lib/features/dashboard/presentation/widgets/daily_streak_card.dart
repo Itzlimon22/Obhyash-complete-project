@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../../core/utils/bangla_name_helper.dart';
 import '../../services/streak_service.dart';
@@ -166,8 +168,8 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
           // Header
           Row(
             children: [
-              const Icon(
-                LucideIcons.calendar,
+              const AppIcon(
+                AppIcons.calendar,
                 size: 20,
                 color: Color(0xFF12544F),
               ),
@@ -177,7 +179,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
               ),
@@ -204,7 +206,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                       style: const TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF601D49),
                       ),
                     ),

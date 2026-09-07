@@ -424,7 +424,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF141416) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -554,7 +554,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        backgroundColor: isDark ? const Color(0xFF141416) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Padding(
@@ -657,7 +657,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w600)),
         content: const Text(

@@ -156,7 +156,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    final bgColor = isDark ? const Color(0xFF141414) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
     final cardBg = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFF9FAFB);
     final borderColor = isDark ? const Color(0xFF2E2E2E) : const Color(0xFFE5E7EB);
     final textColor = isDark ? Colors.white : const Color(0xFF111827);
@@ -227,7 +227,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: textColor,
                       ),
                     ),
@@ -422,7 +422,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                     ),
                   ),
           ),

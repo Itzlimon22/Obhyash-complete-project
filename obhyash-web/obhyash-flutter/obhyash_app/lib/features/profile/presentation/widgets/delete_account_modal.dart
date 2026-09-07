@@ -114,7 +114,7 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF13151F) : const Color(0xFFFFFFFF);
+    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
     final isPro = widget.user.isPro;

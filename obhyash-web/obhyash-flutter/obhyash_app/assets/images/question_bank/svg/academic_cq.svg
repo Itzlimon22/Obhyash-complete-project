@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="cq_clip" x1="90" y1="20" x2="110" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43F5E" />
+      <stop offset="1" stop-color="#BE123C" />
+    </linearGradient>
+    <filter id="cq_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <g filter="url(#cq_shadow)">
+    <!-- Back Sheet 3 (Rotated Right) -->
+    <g transform="rotate(8 115 110)">
+      <rect x="70" y="42" width="85" height="118" rx="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5" />
+    </g>
+
+    <!-- Back Sheet 2 (Rotated Left) -->
+    <g transform="rotate(-6 95 105)">
+      <rect x="55" y="38" width="88" height="122" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+    </g>
+
+    <!-- Front Main Sheet (Straight/Slight Tilt) -->
+    <g transform="rotate(-1 100 105)">
+      <!-- Main Paper Body -->
+      <rect x="52" y="32" width="94" height="134" rx="9" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+
+      <!-- Top Margins Header Line -->
+      <line x1="64" y1="56" x2="134" y2="56" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" />
+
+      <!-- Creative Question Text Lines (Red/Crimson tones) -->
+      <line x1="64" y1="68" x2="132" y2="68" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+      <line x1="64" y1="78" x2="128" y2="78" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+      <line x1="64" y1="88" x2="134" y2="88" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+      <line x1="64" y1="98" x2="120" y2="98" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+
+      <!-- Paragraph 2 (Body Answer Lines) -->
+      <line x1="64" y1="112" x2="134" y2="112" stroke="#FDA4AF" stroke-width="2" stroke-linecap="round" />
+      <line x1="64" y1="120" x2="130" y2="120" stroke="#FDA4AF" stroke-width="2" stroke-linecap="round" />
+      <line x1="64" y1="128" x2="134" y2="128" stroke="#FDA4AF" stroke-width="2" stroke-linecap="round" />
+      <line x1="64" y1="136" x2="105" y2="136" stroke="#FDA4AF" stroke-width="2" stroke-linecap="round" />
+
+      <!-- Evaluation Stamp / Marks Badge (10/10) -->
+      <circle cx="126" cy="142" r="11" fill="#DC2626" opacity="0.12" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="3 2" />
+      <text x="126" y="145" font-size="8" fill="#DC2626" font-family="sans-serif" font-weight="bold" text-anchor="middle">১০/১০</text>
+
+      <!-- Binder Paper Clip (Top Center) -->
+      <g transform="translate(90, 24)">
+        <rect x="2" y="2" width="16" height="18" rx="3" fill="url(#cq_clip)" stroke="#9F1239" stroke-width="1.2" />
+        <path d="M4,10 L16,10 M7,2 L7,10 M13,2 L13,10" stroke="#FFE4E6" stroke-width="1.5" stroke-linecap="round" />
+        <polygon points="5,2 15,2 13,-4 7,-4" fill="#E11D48" />
+      </g>
+    </g>
+
+    <!-- Red Evaluation Pen beside sheets -->
+    <g transform="rotate(32 152 145)">
+      <rect x="140" y="70" width="5.5" height="70" rx="2.5" fill="#EF4444" stroke="#B91C1C" stroke-width="1" />
+      <polygon points="140,140 142.75,148 145.5,140" fill="#FDE047" />
+      <polygon points="142,145 142.75,148 143.5,145" fill="#1E293B" />
+      <rect x="139" y="75" width="7.5" height="12" rx="1" fill="#CBD5E1" />
+    </g>
+  </g>
+</svg>

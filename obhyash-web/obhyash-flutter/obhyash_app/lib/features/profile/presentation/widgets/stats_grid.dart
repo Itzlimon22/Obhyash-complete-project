@@ -116,7 +116,7 @@ class _StatCardState extends State<_StatCard> {
                   color: isDark
                       ? const Color(0xFFA1A1AA)
                       : const Color(0xFF71717A),
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -132,7 +132,7 @@ class _StatCardState extends State<_StatCard> {
                       ? Colors.white
                       : const Color(0xFF0F172A),
                   letterSpacing: -0.3,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                 ),
                 textAlign: TextAlign.center,
               ),

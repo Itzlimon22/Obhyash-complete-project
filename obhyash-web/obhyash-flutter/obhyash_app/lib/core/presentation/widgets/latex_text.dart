@@ -272,7 +272,11 @@ String _preprocess(String text) {
       }
     }
 
-    // Auto-heal corrupted LaTeX commands (e.g. \left( ... ight) -> \left( ... \right))
+    // Auto-heal corrupted LaTeX commands
+    l = l.replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec');
+    l = l.replaceAll(RegExp(r'[\u000b\v]'), '');
+    l = l.replaceAll(RegExp(r'(?<=\s|\(|\{|^|\$|\|)ec\{'), r'\vec{');
+    l = l.replaceAll(RegExp(r'(?<=\s|\(|\{|^|\$|\|)hat\{'), r'\hat{');
     l = l.replaceAllMapped(
       RegExp(r'(\\left\s*[(\[{|.]\s*[^\\)]*?)(?:\\?r?ight|\bight)\s*([)\]}|.])'),
       (m) => '${m.group(1)}\\right${m.group(2)}',
@@ -299,7 +303,7 @@ String _preprocess(String text) {
     return l;
   });
 
-  processedText = balancedLines.join('\n\n');
+  processedText = balancedLines.join('\n');
 
   // 0. Normalize any raw or spaced @@CHEM_ARROW tokens from database
   processedText = processedText.replaceAllMapped(

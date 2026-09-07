@@ -124,7 +124,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
     return Container(
       height: 500,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -172,7 +172,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                 child: Text(
                                   'আমার',
                                   style: TextStyle(
-                                    fontFamily: 'Anek Bangla',
+                                    fontFamily: 'HindSiliguri',
                                     fontWeight: _tabIndex == 0 ? FontWeight.bold : FontWeight.w500,
                                     color: _tabIndex == 0 ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.black54),
                                     fontSize: 13,
@@ -198,7 +198,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                 child: Text(
                                   'টপ ৫',
                                   style: TextStyle(
-                                    fontFamily: 'Anek Bangla',
+                                    fontFamily: 'HindSiliguri',
                                     fontWeight: _tabIndex == 1 ? FontWeight.bold : FontWeight.w500,
                                     color: _tabIndex == 1 ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.black54),
                                     fontSize: 13,
@@ -239,7 +239,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
@@ -263,7 +263,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
                   ),
@@ -313,7 +313,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                   dayNames[index],
                                   style: TextStyle(
                                     fontSize: 16,
-                                    fontFamily: 'Anek Bangla',
+                                    fontFamily: 'HindSiliguri',
                                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                                     color: isDark ? Colors.white70 : Colors.black87,
                                   ),
@@ -345,7 +345,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                           ? const Center(
                               child: Text(
                                 "কোন তথ্য পাওয়া যায়নি",
-                                style: TextStyle(fontFamily: 'Anek Bangla', fontSize: 16),
+                                style: TextStyle(fontFamily: 'HindSiliguri', fontSize: 16),
                               ),
                             )
                           : ListView.builder(
@@ -454,7 +454,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w800,
                                                     fontSize: 16,
-                                                    fontFamily: 'Anek Bangla',
+                                                    fontFamily: 'HindSiliguri',
                                                     color: isMe
                                                         ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857))
                                                         : (isDark ? Colors.white : const Color(0xFF18181B)),
@@ -477,7 +477,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                                       fontSize: 10,
                                                       fontWeight: FontWeight.w900,
                                                       color: Colors.white,
-                                                      fontFamily: 'Anek Bangla',
+                                                      fontFamily: 'HindSiliguri',
                                                     ),
                                                   ),
                                                 ),
@@ -504,7 +504,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                               Text(
                                                 '${u['streak'] ?? 0}',
                                                 style: const TextStyle(
-                                                  fontFamily: 'Anek Bangla',
+                                                  fontFamily: 'HindSiliguri',
                                                   fontWeight: FontWeight.w900,
                                                   fontSize: 14,
                                                   color: Color(0xFFEA580C),
@@ -514,7 +514,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                               Text(
                                                 'দিন',
                                                 style: TextStyle(
-                                                  fontFamily: 'Anek Bangla',
+                                                  fontFamily: 'HindSiliguri',
                                                   fontWeight: FontWeight.w700,
                                                   fontSize: 11,
                                                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF9A3412),

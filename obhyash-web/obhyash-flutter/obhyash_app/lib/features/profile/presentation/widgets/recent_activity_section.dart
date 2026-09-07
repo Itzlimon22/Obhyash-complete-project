@@ -66,7 +66,7 @@ class RecentActivitySection extends StatelessWidget {
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : const Color(0xFF1C1C1E),
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                     ),
                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
@@ -105,7 +105,7 @@ class RecentActivitySection extends StatelessWidget {
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                     ),
                   ),
                 ],
@@ -194,7 +194,7 @@ class RecentActivitySection extends StatelessWidget {
                                   color: isDark
                                       ? Colors.white
                                       : const Color(0xFF000000),
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),

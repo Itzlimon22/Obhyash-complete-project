@@ -89,7 +89,7 @@ class _LiveExamLeaderboardViewState
             fontSize: 13,
             fontWeight: FontWeight.w900,
             color: Colors.white,
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
           ),
         ),
       );
@@ -108,7 +108,7 @@ class _LiveExamLeaderboardViewState
             fontSize: 13,
             fontWeight: FontWeight.w900,
             color: Colors.white,
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
           ),
         ),
       );
@@ -127,7 +127,7 @@ class _LiveExamLeaderboardViewState
             fontSize: 13,
             fontWeight: FontWeight.w900,
             color: Colors.white,
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
           ),
         ),
       );
@@ -137,7 +137,7 @@ class _LiveExamLeaderboardViewState
       style: TextStyle(
         fontSize: 12.5,
         fontWeight: FontWeight.w800,
-        fontFamily: 'Anek Bangla',
+        fontFamily: 'HindSiliguri',
         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
       ),
     );
@@ -152,7 +152,7 @@ class _LiveExamLeaderboardViewState
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAFA),
+          isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -299,7 +299,7 @@ class _LiveExamLeaderboardViewState
                                   ? const Color(0xFFF8FAFC)
                                   : const Color(0xFF0F172A),
                               fontWeight: FontWeight.w900,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               fontSize: 17,
                             ),
                           ),
@@ -316,7 +316,7 @@ class _LiveExamLeaderboardViewState
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
                                   fontSize: 11,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -329,7 +329,7 @@ class _LiveExamLeaderboardViewState
                                       : const Color(0xFF0F172A),
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w900,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -341,7 +341,7 @@ class _LiveExamLeaderboardViewState
                                       ? const Color(0xFF71717A)
                                       : const Color(0xFF94A3B8),
                                   fontSize: 11,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                               ),
                             ],
@@ -375,7 +375,7 @@ class _LiveExamLeaderboardViewState
                                       : const Color(0xFF0F172A),
                                   fontWeight: FontWeight.w900,
                                   fontSize: 17,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                               ),
                               Text(
@@ -385,7 +385,7 @@ class _LiveExamLeaderboardViewState
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
                                   fontSize: 10,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -430,7 +430,7 @@ class _LiveExamLeaderboardViewState
                                 ? Colors.white
                                 : const Color(0xFF0F172A),
                             fontSize: 13.5,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                           ),
                           decoration: const InputDecoration(
                             hintText:
@@ -438,7 +438,7 @@ class _LiveExamLeaderboardViewState
                             hintStyle: TextStyle(
                               color: Color(0xFF94A3B8),
                               fontSize: 13,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                             border: InputBorder.none,
                             isDense: true,
@@ -495,7 +495,7 @@ class _LiveExamLeaderboardViewState
                           'কোনো শিক্ষার্থী বা কলেজ পাওয়া যায়নি',
                           style: TextStyle(
                             fontSize: 14,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
                                 : const Color(0xFF64748B),
@@ -556,7 +556,7 @@ class _LiveExamLeaderboardViewState
                                     'র‍্যাংক',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -574,7 +574,7 @@ class _LiveExamLeaderboardViewState
                                     'ছবি',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -590,7 +590,7 @@ class _LiveExamLeaderboardViewState
                                   child: Text(
                                     'নাম ও প্রতিষ্ঠান',
                                     style: TextStyle(
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -607,7 +607,7 @@ class _LiveExamLeaderboardViewState
                                     'সময়',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -624,7 +624,7 @@ class _LiveExamLeaderboardViewState
                                     'মার্কস',
                                     textAlign: TextAlign.right,
                                     style: TextStyle(
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -722,7 +722,7 @@ class _LiveExamLeaderboardViewState
                                                 style: TextStyle(
                                                   fontSize: 13.5,
                                                   fontWeight: FontWeight.w800,
-                                                  fontFamily: 'Anek Bangla',
+                                                  fontFamily: 'HindSiliguri',
                                                   color: isDark
                                                       ? const Color(0xFFF8FAFC)
                                                       : const Color(0xFF0F172A),
@@ -751,7 +751,7 @@ class _LiveExamLeaderboardViewState
                                                     fontSize: 9.5,
                                                     fontWeight: FontWeight.bold,
                                                     color: Color(0xFF059669),
-                                                    fontFamily: 'Anek Bangla',
+                                                    fontFamily: 'HindSiliguri',
                                                   ),
                                                 ),
                                               ),
@@ -765,7 +765,7 @@ class _LiveExamLeaderboardViewState
                                               : 'প্রতিষ্ঠান নেই',
                                           style: TextStyle(
                                             fontSize: 11,
-                                            fontFamily: 'Anek Bangla',
+                                            fontFamily: 'HindSiliguri',
                                             fontWeight: FontWeight.w500,
                                             color: isDark
                                                 ? const Color(0xFFA1A1AA)
@@ -787,7 +787,7 @@ class _LiveExamLeaderboardViewState
                                       style: TextStyle(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.w600,
-                                        fontFamily: 'Anek Bangla',
+                                        fontFamily: 'HindSiliguri',
                                         color: isDark
                                             ? const Color(0xFFCBD5E1)
                                             : const Color(0xFF475569),
@@ -808,7 +808,7 @@ class _LiveExamLeaderboardViewState
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
-                                        fontFamily: 'Anek Bangla',
+                                        fontFamily: 'HindSiliguri',
                                         color: isDark
                                             ? const Color(0xFF34D399)
                                             : const Color(0xFF059669),

@@ -24,9 +24,9 @@ class FormulaSubjectsView extends ConsumerWidget {
     final subjects = getFormulaSubjectsForLevel(level);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -40,7 +40,7 @@ class FormulaSubjectsView extends ConsumerWidget {
         title: Text(
           'ফর্মুলা ব্যাংক',
           style: TextStyle(
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -196,7 +196,7 @@ class _SubjectCardState extends State<_SubjectCard>
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,

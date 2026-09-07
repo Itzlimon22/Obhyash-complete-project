@@ -423,6 +423,21 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     }
   }
 
+  void startDirectExam({
+    required List<Question> questions,
+    required ExamDetails details,
+  }) {
+    state = state.copyWith(
+      appState: AppState.instructions,
+      questions: questions,
+      examDetails: details,
+      userAnswers: {},
+      flaggedQuestions: {},
+      errorDetails: '',
+    );
+    beginTimer(details.durationMinutes * 60);
+  }
+
   Future<bool> startMultiSubjectPresetExam({
     required String examTitle,
     required String examLabel,

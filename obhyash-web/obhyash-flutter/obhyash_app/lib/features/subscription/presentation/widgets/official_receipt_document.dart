@@ -22,11 +22,19 @@ class OfficialReceiptService {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const Center(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Row(
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF000000) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              ),
+            ),
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CircularProgressIndicator(
@@ -45,8 +53,8 @@ class OfficialReceiptService {
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     try {

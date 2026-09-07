@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import '../../constants/app_icons.dart';
+import 'app_icon.dart';
 
 class MainBottomNav extends StatelessWidget {
   final String activeTab;
@@ -19,19 +20,19 @@ class MainBottomNav extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final items = [
-      {'id': 'dashboard', 'label': 'হোম', 'icon': LucideIcons.layoutDashboard},
-      {'id': 'history', 'label': 'ইতিহাস', 'icon': LucideIcons.history},
+      {'id': 'dashboard', 'label': 'হোম', 'icon': AppIcons.layoutDashboard},
+      {'id': 'question_bank', 'label': 'প্রশ্নব্যাংক', 'icon': AppIcons.bookOpen},
       {
         'id': 'setup',
         'label': 'পরীক্ষা',
-        'icon': LucideIcons.fileEdit,
+        'icon': AppIcons.fileEdit,
         'isCenter': true,
       },
-      {'id': 'leaderboard', 'label': 'র‍্যাংক', 'icon': LucideIcons.trophy},
+      {'id': 'leaderboard', 'label': 'র‍্যাংক', 'icon': AppIcons.trophy},
       {
         'id': 'menu',
         'label': 'মেনু',
-        'icon': LucideIcons.menu,
+        'icon': AppIcons.menu,
         'action': 'menu',
       },
     ];
@@ -80,11 +81,14 @@ class MainBottomNav extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: items.map((item) {
                     final id = item['id'] as String;
-                    final icon = item['icon'] as IconData;
+                    final icon = item['icon'] as String;
                     final label = item['label'] as String;
                     final action = item['action'] as String?;
                     final isCenter = item['isCenter'] as bool? ?? false;
-                    final isActive = activeTab == id;
+                    final isActive = activeTab == id ||
+                        (id == 'question_bank' &&
+                            (activeTab == 'question-bank' ||
+                                activeTab == 'question_bank'));
                     final isRealActive = isActive && action != 'menu';
 
                     void handleTap() {
@@ -118,10 +122,12 @@ class MainBottomNav extends StatelessWidget {
                                     width: 1,
                                   ),
                                 ),
-                                child: Icon(
-                                  icon,
-                                  size: 22,
-                                  color: Colors.white,
+                                child: Center(
+                                  child: AppIcon(
+                                    icon,
+                                    size: 22,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -129,7 +135,7 @@ class MainBottomNav extends StatelessWidget {
                                 label,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.w600,
                                   color: isActive ? activeColor : inactiveColor,
                                 ),
@@ -165,7 +171,7 @@ class MainBottomNav extends StatelessWidget {
                                 ),
                               ),
                               const Spacer(),
-                              Icon(
+                              AppIcon(
                                 icon,
                                 size: 20,
                                 color: isRealActive
@@ -177,7 +183,7 @@ class MainBottomNav extends StatelessWidget {
                                 label,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: isRealActive
                                       ? FontWeight.w600
                                       : FontWeight.normal,

@@ -98,10 +98,14 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/icons/
     - assets/dashboard-icons/
     - assets/leaderboard-levels/
     - assets/images/
     - assets/images/onboarding/
+    - assets/images/subjects/
+    - assets/images/institutes/
+    - assets/images/question_bank/categories/
     - assets/audio/
     - assets/formulas/
     - assets/formulas/hsc_physics_1/

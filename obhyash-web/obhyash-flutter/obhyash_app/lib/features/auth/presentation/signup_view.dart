@@ -274,7 +274,7 @@ class _SignupViewState extends ConsumerState<SignupView>
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
-    const bgColor = Color(0xFF09090B); // Luxury OLED Dark
+    const bgColor = Color(0xFF000000); // OLED Pure Black
     const textColor = Colors.white;
 
     if (_success) {
@@ -317,7 +317,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: textColor,
                   ),
                 ),
@@ -387,7 +387,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                                 'অ্যাকাউন্ট তৈরি করো',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                 ),
                               )
@@ -398,7 +398,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                                     'পরবর্তী ধাপ',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -422,7 +422,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     const Text(
                       'আগেই অ্যাকাউন্ট আছে? ',
                       style: TextStyle(
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         color: Color(0xFFA1A1AA),
                       ),
@@ -432,7 +432,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       child: const Text(
                         'লগইন করো',
                         style: TextStyle(
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF059669),
@@ -536,7 +536,7 @@ class _SignupViewState extends ConsumerState<SignupView>
       text,
       style: TextStyle(
         fontSize: 16,
-        fontFamily: 'Anek Bangla',
+        fontFamily: 'HindSiliguri',
         fontWeight: FontWeight.w700,
         color: isDark ? Colors.white70 : Colors.black87,
       ),
@@ -556,7 +556,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   margin: const EdgeInsets.symmetric(horizontal: 24),
                   padding: const EdgeInsets.all(12),
                   textStyle: const TextStyle(
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     fontSize: 13,
                     color: Colors.white,
                   ),
@@ -732,7 +732,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: Text(
                       name,
                       style: TextStyle(
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white : Colors.black87,
@@ -839,7 +839,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: Text(
                       g == 'Male' ? 'পুরুষ' : 'মহিলা',
                       style: TextStyle(
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
                         color: isSelected
                             ? const Color(0xFF059669)
@@ -878,7 +878,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   child: Text(
                     '💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
                     style: TextStyle(
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white70 : Colors.black87,
@@ -939,7 +939,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   color: isSelected
                       ? const Color(0xFF059669)
                       : (isDark ? Colors.white70 : Colors.black87),
@@ -1040,7 +1040,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: TextStyle(
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
             fontWeight: FontWeight.w500,
             color: isDark ? Colors.white : Colors.black,
           ),
@@ -1109,7 +1109,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: textColor,
                   ),
                 ),
@@ -1119,7 +1119,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -1141,7 +1141,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       'ড্যাশবোর্ডে যান',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
                       ),
                     ),

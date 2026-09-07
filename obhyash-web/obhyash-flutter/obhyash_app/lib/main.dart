@@ -125,8 +125,17 @@ class ObhyashApp extends ConsumerWidget {
           );
         }
 
-        return OfflineBannerWrapper(
-          child: child ?? const SizedBox.shrink(),
+        final mediaQuery = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: mediaQuery.textScaler.clamp(
+              minScaleFactor: 1.035,
+              maxScaleFactor: 2.0,
+            ),
+          ),
+          child: OfflineBannerWrapper(
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

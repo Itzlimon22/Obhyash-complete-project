@@ -63,19 +63,19 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         body: const BookmarksListSkeleton(),
       );
     }
 
     if (_error != null || _subject == null) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         body: Center(
           child: Text(
             'ডেটা লোড করা যায়নি',
             style: TextStyle(
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white70 : Colors.black54,
             ),
           ),
@@ -86,9 +86,9 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
     final chapters = _subject!.chapters;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -102,7 +102,7 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
         title: Text(
           _subject!.subjectName,
           style: TextStyle(
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -199,7 +199,7 @@ class _ChapterTile extends StatelessWidget {
                     'অধ্যায় ${chapter.chapterNumber}',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
                     ),
                   ),
@@ -209,7 +209,7 @@ class _ChapterTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),

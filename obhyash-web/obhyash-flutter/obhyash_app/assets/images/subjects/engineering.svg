@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="eng_calc" x1="45" y1="100" x2="135" y2="185" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#475569" />
+      <stop offset="1" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="eng_ruler" x1="100" y1="90" x2="180" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316" />
+      <stop offset="1" stop-color="#EA580C" />
+    </linearGradient>
+    <filter id="eng_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#eng_shadow)">
+    <!-- Set Square / Triangle Ruler (Back) -->
+    <g transform="rotate(15 140 135)">
+      <!-- Outer Triangle -->
+      <polygon points="110,65 175,175 95,175" fill="url(#eng_ruler)" opacity="0.95" />
+      <!-- Inner Cutout -->
+      <polygon points="120,95 155,160 110,160" fill="#FFF7ED" opacity="0.3" />
+      <!-- Measurement Ticks -->
+      <line x1="98" y1="175" x2="98" y2="168" stroke="#FFFFFF" stroke-width="1.5" />
+      <line x1="108" y1="175" x2="108" y2="171" stroke="#FFFFFF" stroke-width="1.2" />
+      <line x1="118" y1="175" x2="118" y2="168" stroke="#FFFFFF" stroke-width="1.5" />
+      <line x1="128" y1="175" x2="128" y2="171" stroke="#FFFFFF" stroke-width="1.2" />
+      <line x1="138" y1="175" x2="138" y2="168" stroke="#FFFFFF" stroke-width="1.5" />
+      <line x1="148" y1="175" x2="148" y2="171" stroke="#FFFFFF" stroke-width="1.2" />
+      <line x1="158" y1="175" x2="158" y2="168" stroke="#FFFFFF" stroke-width="1.5" />
+      <line x1="168" y1="175" x2="168" y2="171" stroke="#FFFFFF" stroke-width="1.2" />
+    </g>
+
+    <!-- Drafting Compass / Divider (Behind Calculator) -->
+    <g transform="rotate(-25 150 90)">
+      <circle cx="140" cy="70" r="5" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5" />
+      <!-- Leg 1 -->
+      <line x1="138" y1="74" x2="118" y2="135" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" />
+      <circle cx="118" cy="135" r="1.5" fill="#334155" />
+      <!-- Leg 2 -->
+      <line x1="142" y1="74" x2="162" y2="135" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" />
+      <line x1="160" y1="130" x2="164" y2="140" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" />
+    </g>
+
+    <!-- Scientific Calculator (Hero Foreground) -->
+    <g transform="rotate(-12 85 135)">
+      <!-- Main Body -->
+      <rect x="38" y="90" width="80" height="95" rx="12" fill="url(#eng_calc)" stroke="#64748B" stroke-width="2" />
+      <!-- Solar Cell -->
+      <rect x="85" y="97" width="26" height="7" rx="2" fill="#78350F" />
+      <line x1="93" y1="97" x2="93" y2="104" stroke="#92400E" stroke-width="1" />
+      <line x1="102" y1="97" x2="102" y2="104" stroke="#92400E" stroke-width="1" />
+      <!-- Display Screen -->
+      <rect x="45" y="108" width="66" height="20" rx="4" fill="#0F172A" stroke="#334155" stroke-width="1.5" />
+      <text x="50" y="118" font-size="6" fill="#38BDF8" font-family="monospace">fx-991EX</text>
+      <text x="106" y="124" font-size="9" fill="#F8FAFC" font-family="monospace" font-weight="bold" text-anchor="end">∫(x²+1)dx</text>
+
+      <!-- Function Buttons -->
+      <rect x="46" y="133" width="11" height="6" rx="1.5" fill="#E2E8F0" />
+      <rect x="60" y="133" width="11" height="6" rx="1.5" fill="#E2E8F0" />
+      <rect x="74" y="133" width="11" height="6" rx="1.5" fill="#EF4444" />
+      <rect x="88" y="133" width="11" height="6" rx="1.5" fill="#3B82F6" />
+
+      <rect x="46" y="142" width="11" height="6" rx="1.5" fill="#94A3B8" />
+      <rect x="60" y="142" width="11" height="6" rx="1.5" fill="#94A3B8" />
+      <rect x="74" y="142" width="11" height="6" rx="1.5" fill="#94A3B8" />
+      <rect x="88" y="142" width="11" height="6" rx="1.5" fill="#94A3B8" />
+
+      <!-- Numeric keypad -->
+      <circle cx="51" cy="155" r="3.5" fill="#334155" />
+      <circle cx="65" cy="155" r="3.5" fill="#334155" />
+      <circle cx="79" cy="155" r="3.5" fill="#334155" />
+      <circle cx="93" cy="155" r="3.5" fill="#EA580C" />
+
+      <circle cx="51" cy="165" r="3.5" fill="#334155" />
+      <circle cx="65" cy="165" r="3.5" fill="#334155" />
+      <circle cx="79" cy="165" r="3.5" fill="#334155" />
+      <circle cx="93" cy="165" r="3.5" fill="#10B981" />
+
+      <circle cx="51" cy="175" r="3.5" fill="#334155" />
+      <circle cx="65" cy="175" r="3.5" fill="#334155" />
+      <circle cx="79" cy="175" r="3.5" fill="#334155" />
+      <circle cx="93" cy="175" r="3.5" fill="#38BDF8" />
+    </g>
+
+    <!-- Technical Drawing Pencil -->
+    <g transform="rotate(35 155 150)">
+      <rect x="140" y="145" width="45" height="5" rx="1" fill="#0284C7" />
+      <polygon points="185,145 194,147.5 185,150" fill="#FDE047" />
+      <polygon points="191,147 194,147.5 191,148" fill="#1E293B" />
+      <rect x="135" y="145" width="5" height="5" rx="1" fill="#CBD5E1" />
+    </g>
+  </g>
+</svg>

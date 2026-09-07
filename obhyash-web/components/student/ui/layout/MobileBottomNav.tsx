@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileEdit, History, Trophy, Menu } from "lucide-react";
+import { LayoutDashboard, FileEdit, BookOpen, Trophy, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface MobileBottomNavProps {
@@ -60,7 +60,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   /* ── Standard Tab Items ─────────────────────────────────────── */
   const items = [
     { id: "dashboard", label: "হোম", icon: LayoutDashboard },
-    { id: "history", label: "ইতিহাস", icon: History },
+    { id: "question_bank", label: "প্রশ্নব্যাংক", icon: BookOpen },
     { id: "setup", label: "পরীক্ষা", icon: FileEdit, isCenter: true },
     { id: "leaderboard", label: "র‍্যাংক", icon: Trophy },
     { id: "menu", label: "মেনু", icon: Menu, action: "menu" as const },
@@ -76,7 +76,10 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <div className="relative bg-white dark:bg-neutral-950 border-t border-neutral-200/80 dark:border-neutral-800/80 flex items-end justify-around px-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
         {items.map((item) => {
-          const isActive = activeTab === item.id;
+          const isActive =
+            activeTab === item.id ||
+            (item.id === "question_bank" &&
+              (activeTab === "question-bank" || activeTab === "question_bank"));
           const Icon = item.icon;
 
           /* ── Center FAB ("পরীক্ষা") ───────────────────────────── */

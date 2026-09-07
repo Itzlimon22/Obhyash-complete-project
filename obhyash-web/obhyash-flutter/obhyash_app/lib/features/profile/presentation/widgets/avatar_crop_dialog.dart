@@ -114,7 +114,7 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
     final cropSize = (size.width * 0.72).clamp(220.0, 300.0);
 
     return Scaffold(
-      backgroundColor: Colors.black.withValues(alpha: 0.92),
+      backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: Column(
           children: [

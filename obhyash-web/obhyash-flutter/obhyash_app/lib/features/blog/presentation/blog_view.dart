@@ -407,11 +407,11 @@ class _BlogViewState extends ConsumerState<BlogView> {
       },
       child: Scaffold(
         backgroundColor: isDark
-            ? const Color(0xFF0C0A09) // Matches blog dark background
+            ? const Color(0xFF000000) // OLED Pure Black
             : const Color(0xFFFAF6F3), // Matches blog web background
         appBar: AppBar(
           backgroundColor: isDark
-              ? const Color(0xFF0C0A09).withValues(alpha: 0.95)
+              ? const Color(0xFF000000).withValues(alpha: 0.95)
               : Colors.white.withValues(alpha: 0.95),
           elevation: 0,
           scrolledUnderElevation: 0,

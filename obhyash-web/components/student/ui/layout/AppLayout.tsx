@@ -34,6 +34,13 @@ interface AppLayoutProps {
   isLiveExam?: boolean;
   onSubmit?: () => void;
   isEvaluating?: boolean;
+  hideTitle?: boolean;
+  hideBottomNav?: boolean;
+  headerTabs?: {
+    tabs: { id: string; label: string }[];
+    activeTabId: string;
+    onTabSelect: (id: string) => void;
+  };
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({
@@ -52,6 +59,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   isLiveExam,
   onSubmit,
   isEvaluating = false,
+  hideTitle = false,
+  hideBottomNav = false,
+  headerTabs,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -201,8 +211,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <header
             className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 z-30 shrink-0 sticky top-0 transition-all duration-300 select-none"
           >
-            {/* ── Left: Back Button (Sub-routes) + Title ── */}
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            {/* ── Left / Center: Back Button + (Title OR Header Tabs) ── */}
+            <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
               {activeTab !== 'dashboard' && (
                 <button
                   type="button"
@@ -223,9 +233,34 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 </button>
               )}
 
-              <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl md:text-[21px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
-                {title}
-              </h1>
+              {headerTabs ? (
+                <div className="flex items-center gap-2 sm:gap-4">
+                  {headerTabs.tabs.map((tab) => {
+                    const isActive = headerTabs.activeTabId === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => headerTabs.onTabSelect(tab.id)}
+                        className={`relative py-1.5 px-2 sm:px-3 text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none ${
+                          isActive
+                            ? "text-[#059669] dark:text-[#10B981]"
+                            : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                        }`}
+                      >
+                        {tab.label}
+                        {isActive && (
+                          <span className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : !hideTitle ? (
+                <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl md:text-[21px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
+                  {title}
+                </h1>
+              ) : null}
             </div>
 
             {/* ── Right: Streak + Notification + Divider + User Avatar ── */}
@@ -297,7 +332,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         </main>
 
         {/* ── Mobile Bottom Navigation ── */}
-        {!simpleHeader && (
+        {!simpleHeader && !hideBottomNav && (
           <MobileBottomNav
             activeTab={activeTab}
             onTabChange={onTabChange}

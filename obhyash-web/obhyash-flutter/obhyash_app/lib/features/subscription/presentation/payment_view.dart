@@ -880,7 +880,7 @@ class _PaymentViewState extends State<PaymentView>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
@@ -966,7 +966,7 @@ class _PaymentViewState extends State<PaymentView>
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
@@ -2180,7 +2180,7 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141416) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(
           top: BorderSide(

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="kha_b1" x1="40" y1="130" x2="160" y2="165" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EA580C" />
+      <stop offset="1" stop-color="#C2410C" />
+    </linearGradient>
+    <linearGradient id="kha_b2" x1="45" y1="105" x2="150" y2="135" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#059669" />
+      <stop offset="1" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="kha_b3" x1="55" y1="80" x2="140" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D97706" />
+      <stop offset="1" stop-color="#B45309" />
+    </linearGradient>
+    <filter id="kha_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <g filter="url(#kha_shadow)">
+    <!-- Bottom Book (Warm Coral Orange) -->
+    <polygon points="45,148 152,148 168,132 60,132" fill="#FFF7ED" />
+    <polygon points="152,148 168,132 168,140 152,156" fill="#FFEDD5" />
+    <path d="M36,142 Q36,158 52,158 L154,158 L168,142 L164,136 L52,136 Q36,136 36,142 Z" fill="url(#kha_b1)" />
+    <path d="M36,142 Q36,158 52,158 L56,158 Q40,158 40,142 Q40,136 56,136 L52,136 Q36,136 36,142 Z" fill="#9A3412" />
+    <!-- Red Ribbon Bookmark hanging down -->
+    <path d="M102,148 L102,168 L107,163 L112,168 L112,148 Z" fill="#EF4444" />
+
+    <!-- Middle Book (Emerald Green) -->
+    <polygon points="52,126 142,126 156,112 66,112" fill="#F0FDF4" />
+    <polygon points="142,126 156,112 156,119 142,133" fill="#DCFCE7" />
+    <path d="M44,120 Q44,134 58,134 L144,134 L158,120 L154,115 L58,115 Q44,115 44,120 Z" fill="url(#kha_b2)" />
+    <path d="M44,120 Q44,134 58,134 L62,134 Q48,134 48,120 Q48,115 62,115 L58,115 Q44,115 44,120 Z" fill="#064E3B" />
+
+    <!-- Top Book (Golden Brown / Leather Binder) -->
+    <polygon points="62,102 135,102 148,89 74,89" fill="#FEFCE8" />
+    <polygon points="135,102 148,89 148,96 135,109" fill="#FEF9C3" />
+    <path d="M54,96 Q54,110 68,110 L138,110 L150,96 L146,91 L68,91 Q54,91 54,96 Z" fill="url(#kha_b3)" />
+    <path d="M54,96 Q54,110 68,110 L72,110 Q58,110 58,96 Q58,91 72,91 L68,91 Q54,91 54,96 Z" fill="#78350F" />
+
+    <!-- Explanatory Magnifying Glass (Top Center) -->
+    <g transform="rotate(-30 95 65)">
+      <!-- Handle -->
+      <rect x="86" y="70" width="8" height="30" rx="3" fill="#B45309" stroke="#78350F" stroke-width="1.2" />
+      <rect x="85" y="68" width="10" height="4" rx="1" fill="#FDE047" />
+      <!-- Rim -->
+      <circle cx="90" cy="48" r="22" fill="#E0F2FE" opacity="0.65" stroke="#F59E0B" stroke-width="3" />
+      <circle cx="90" cy="48" r="19" fill="#38BDF8" opacity="0.2" />
+      <!-- Glass Glare Reflex -->
+      <path d="M80,35 A16,16 0 0 1 104,38" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Bengali 'খ' Glyph Badge floating on side -->
+    <g transform="translate(150, 88)">
+      <circle cx="0" cy="0" r="14" fill="#10B981" stroke="#FFFFFF" stroke-width="2" />
+      <text x="0" y="4.5" font-size="13" fill="#FFFFFF" font-family="'Anek Bangla', sans-serif" font-weight="bold" text-anchor="middle">খ</text>
+    </g>
+  </g>
+</svg>

@@ -140,7 +140,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121214) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(

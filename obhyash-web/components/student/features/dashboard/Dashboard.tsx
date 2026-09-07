@@ -211,7 +211,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="w-full max-w-5xl xl:max-w-6xl mx-auto px-3 sm:px-6 md:px-8 py-2 sm:py-4 font-['HindSiliguri']"
+      className="w-full max-w-5xl xl:max-w-6xl mx-auto px-1 sm:px-2 md:px-3 py-2 sm:py-4 font-['HindSiliguri']"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
         {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}

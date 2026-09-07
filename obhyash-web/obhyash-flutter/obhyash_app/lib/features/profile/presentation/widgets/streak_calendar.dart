@@ -304,7 +304,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                               : const Color(
                                   0xFF737373,
                                 ), // neutral-400 : neutral-500
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                         ),
                        maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),

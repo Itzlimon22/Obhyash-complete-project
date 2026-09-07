@@ -13,7 +13,7 @@ class LegendsLeagueView extends ConsumerWidget {
     final myProfile = ref.watch(userProfileProvider).whenOrNull(data: (u) => u);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAF9),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -94,7 +94,7 @@ class LegendsLeagueView extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
                       ),
                     ),
@@ -116,7 +116,7 @@ class LegendsLeagueView extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
@@ -126,7 +126,7 @@ class LegendsLeagueView extends ConsumerWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.normal,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
               height: 1.4,
             ),
@@ -183,7 +183,7 @@ class LegendsLeagueView extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
                     ),
                   ),
@@ -205,7 +205,7 @@ class LegendsLeagueView extends ConsumerWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w800,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
@@ -215,7 +215,7 @@ class LegendsLeagueView extends ConsumerWidget {
             style: TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
           ),
@@ -283,7 +283,7 @@ class LegendsLeagueView extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -356,7 +356,7 @@ class LegendsLeagueView extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.w800,
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       color: textPrimary,
                                     ),
                                   ),
@@ -372,7 +372,7 @@ class LegendsLeagueView extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
-                                      fontFamily: 'Anek Bangla',
+                                      fontFamily: 'HindSiliguri',
                                       color: st.color,
                                     ),
                                   ),
@@ -385,7 +385,7 @@ class LegendsLeagueView extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                                 color: textSub,
                                 height: 1.35,
                               ),
@@ -402,7 +402,7 @@ class LegendsLeagueView extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w800,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   color: st.color,
                                 ),
                               ),
@@ -465,7 +465,7 @@ class LegendsLeagueView extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   color: stages[idx + 1].color,
                                   letterSpacing: 0.2,
                                 ),
@@ -556,7 +556,7 @@ class LegendsLeagueView extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -600,7 +600,7 @@ class LegendsLeagueView extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: textPrimary,
                           ),
                         ),
@@ -610,7 +610,7 @@ class LegendsLeagueView extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                             height: 1.35,
                           ),
@@ -669,7 +669,7 @@ class LegendsLeagueView extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: textPrimary,
                   ),
                 ),
@@ -688,7 +688,7 @@ class LegendsLeagueView extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: textSecondary,
                   ),
                 ),
@@ -819,7 +819,7 @@ class LegendsLeagueView extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               color: textPrimary,
                             ),
                           ),
@@ -839,7 +839,7 @@ class LegendsLeagueView extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 9.5,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : tagColor,
                             ),
                           ),
@@ -852,7 +852,7 @@ class LegendsLeagueView extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w500,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                     ),
@@ -895,7 +895,7 @@ class LegendsLeagueView extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: textSub,
                           ),
                         ),

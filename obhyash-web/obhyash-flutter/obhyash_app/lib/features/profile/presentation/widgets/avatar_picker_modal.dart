@@ -332,7 +332,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
         maxHeight: screenHeight * 0.88,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F0F11) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(

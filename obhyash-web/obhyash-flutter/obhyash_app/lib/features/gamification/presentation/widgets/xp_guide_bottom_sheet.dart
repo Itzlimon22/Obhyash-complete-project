@@ -19,7 +19,7 @@ class XpGuideBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF18181B) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
     final cardBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC);
     final borderColor = isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0);
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
@@ -78,7 +78,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'XP ও লেভেল গাইড',
                           style: TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: titleColor,
@@ -87,7 +87,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'কীভাবে XP অর্জন করে লেভেল আপ করবে',
                           style: TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontSize: 11.5,
                             color: subtitleColor,
                           ),
@@ -127,7 +127,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'XP অর্জনের নিয়ম',
                           style: TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: titleColor,
@@ -209,7 +209,7 @@ class XpGuideBottomSheet extends StatelessWidget {
                             Text(
                               'লেভেল ও XP সীমা',
                               style: TextStyle(
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: titleColor,
@@ -251,7 +251,7 @@ class XpGuideBottomSheet extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
               color: subtitleColor,
@@ -288,7 +288,7 @@ class XpGuideBottomSheet extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: subtitleColor,

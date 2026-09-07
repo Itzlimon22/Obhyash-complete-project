@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="tb1" x1="30" y1="130" x2="170" y2="165" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B" />
+      <stop offset="1" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="tb2" x1="45" y1="95" x2="160" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10B981" />
+      <stop offset="1" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="tb3" x1="55" y1="60" x2="150" y2="95" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" />
+      <stop offset="1" stop-color="#6D28D9" />
+    </linearGradient>
+    <filter id="tb_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <g filter="url(#tb_shadow)">
+    <!-- Bottom Book (Golden Amber) -->
+    <!-- Pages Block -->
+    <polygon points="45,145 155,145 170,128 60,128" fill="#FFFBEB" />
+    <polygon points="155,145 170,128 170,138 155,155" fill="#FEF3C7" />
+    <!-- Book Cover -->
+    <path d="M35,138 Q35,155 52,155 L158,155 L172,139 L168,133 L52,133 Q35,133 35,138 Z" fill="url(#tb1)" />
+    <path d="M35,138 Q35,155 52,155 L56,155 Q39,155 39,138 Q39,133 56,133 L52,133 Q35,133 35,138 Z" fill="#B45309" />
+    <!-- Red Ribbon Bookmark hanging down -->
+    <path d="M98,145 L98,168 L104,162 L110,168 L110,145 Z" fill="#EF4444" />
+
+    <!-- Middle Book (Emerald Green) -->
+    <!-- Pages Block -->
+    <polygon points="55,115 145,115 158,100 68,100" fill="#F0FDF4" />
+    <polygon points="145,115 158,100 158,108 145,123" fill="#DCFCE7" />
+    <!-- Book Cover -->
+    <path d="M48,108 Q48,123 62,123 L148,123 L160,109 L156,104 L62,104 Q48,104 48,108 Z" fill="url(#tb2)" />
+    <path d="M48,108 Q48,123 62,123 L65,123 Q51,123 51,108 Q51,104 65,104 L62,104 Q48,104 48,108 Z" fill="#065F46" />
+
+    <!-- Top Book (Cosmic Purple) -->
+    <!-- Pages Block -->
+    <polygon points="65,85 138,85 150,72 77,72" fill="#FAF5FF" />
+    <polygon points="138,85 150,72 150,79 138,92" fill="#F3E8FF" />
+    <!-- Book Cover -->
+    <path d="M58,78 Q58,92 70,92 L140,92 L152,79 L148,74 L70,74 Q58,74 58,78 Z" fill="url(#tb3)" />
+    <path d="M58,78 Q58,92 70,92 L73,92 Q61,92 61,78 Q61,74 73,74 L70,74 Q58,74 58,78 Z" fill="#4C1D95" />
+    <!-- Golden Ribbon Bookmark -->
+    <path d="M125,85 L125,102 L129,98 L133,102 L133,85 Z" fill="#FBBF24" />
+
+    <!-- Decorative Highlights on Top Cover -->
+    <rect x="76" y="78" width="56" height="3" rx="1.5" fill="#C4B5FD" opacity="0.6" transform="skewX(-45)" />
+    <rect x="79" y="83" width="38" height="2" rx="1" fill="#C4B5FD" opacity="0.4" transform="skewX(-45)" />
+  </g>
+</svg>

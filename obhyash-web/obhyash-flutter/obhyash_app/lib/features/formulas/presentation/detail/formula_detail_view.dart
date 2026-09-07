@@ -128,14 +128,14 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         body: const BookmarksListSkeleton(),
       );
     }
 
     if (_errorMessage != null || _chapter == null) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -178,9 +178,9 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
     final filteredFormulas = _getFilteredFormulas();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+        backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -194,7 +194,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
         title: Text(
           _chapter?.chapterName ?? 'সূত্র তালিকা',
           style: TextStyle(
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),

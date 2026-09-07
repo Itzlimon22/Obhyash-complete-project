@@ -368,9 +368,9 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
         : (premiumPlans.isNotEmpty ? premiumPlans.first : null);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAF9),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF0C0A09) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(

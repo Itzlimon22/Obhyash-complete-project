@@ -696,7 +696,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                                     name,
                                                     style: TextStyle(
                                                       fontFamily:
-                                                          'Anek Bangla',
+                                                          'HindSiliguri',
                                                       fontSize: 16,
                                                       color: isDark
                                                           ? const Color(
@@ -798,7 +798,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 child: Text(
                                   'এসএসসি পরীক্ষার তথ্য',
                                   style: TextStyle(
-                                    fontFamily: 'Anek Bangla',
+                                    fontFamily: 'HindSiliguri',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
                                     color: isDark ? const Color(0xFFE5E5E5) : const Color(0xFF374151),

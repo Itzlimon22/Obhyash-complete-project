@@ -210,19 +210,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
           if (showFeedback || showAnswer) {
             if (isCorrect) {
-              // High-Contrast Correct Styling
-              boxBg = 'bg-[#F1F5F9] dark:bg-[#27272A]';
+              // Deep Rich Green Correct Styling
+              boxBg = 'bg-[#D1FAE5] dark:bg-[#064E3B]/50';
               boxBorder =
-                'border-[#1E293B] dark:border-[#F8FAFC] shadow-xs border-[1.5px]';
-              bulletBg = 'bg-[#1E293B] dark:bg-[#F8FAFC]';
-              bulletBorder = 'border-[#1E293B] dark:border-[#F8FAFC]';
-              bulletText = 'text-white dark:text-[#0F172A]';
-              optionTextColor = 'text-[#0F172A] dark:text-[#FFFFFF]';
+                'border-[#047857] dark:border-[#10B981] shadow-xs border-[1.8px]';
+              bulletBg = 'bg-[#047857] dark:bg-[#059669]';
+              bulletBorder = 'border-[#047857] dark:border-[#059669]';
+              bulletText = 'text-white';
+              optionTextColor = 'text-[#064E3B] dark:text-[#A7F3D0]';
               isBold = true;
               trailingBadge = (
                 <CheckCircle2
                   size={19}
-                  className="text-[#1E293B] dark:text-[#F8FAFC] shrink-0 fill-current/10"
+                  className="text-[#047857] dark:text-[#34D399] shrink-0"
                 />
               );
             } else if (isSelected && !isCorrect) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../../../core/utils/bangla_name_helper.dart';
 import '../../domain/models.dart';
 
@@ -53,17 +55,17 @@ class SubjectStatCard extends StatelessWidget {
                       : const Color(0xFFE6F0EC),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  LucideIcons.barChart2,
+                child: const AppIcon(
+                  AppIcons.barChart,
                   size: 16,
-                  color: const Color(0xFF12544F),
+                  color: Color(0xFF12544F),
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
                 style: TextStyle(
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w600,
                   fontSize: 15.5,
                   color: isDark ? Colors.white : const Color(0xFF1A1A1A),
@@ -93,7 +95,7 @@ class SubjectStatCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFFA3A3A3),
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                 ),
               ),
             )
@@ -231,7 +233,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               fontWeight:
                                   FontWeight.w600, // Medium weight like webapp
                               fontSize: 14.5, // Sleek font scale
@@ -411,7 +413,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFF059669)
                               : const Color(0xFF059669),
@@ -460,7 +462,7 @@ class _StatBox extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
                 color: isDark

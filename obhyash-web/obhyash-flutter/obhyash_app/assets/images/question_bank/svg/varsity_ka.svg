@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="vk_cap" x1="40" y1="90" x2="160" y2="135" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#312E81" />
+      <stop offset="0.6" stop-color="#1E1B4B" />
+      <stop offset="1" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="vk_scroll" x1="70" y1="40" x2="140" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FEF3C7" />
+      <stop offset="1" stop-color="#FDE68A" />
+    </linearGradient>
+    <linearGradient id="vk_book" x1="45" y1="130" x2="155" y2="175" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+    <filter id="vk_shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <g filter="url(#vk_shadow)">
+    <!-- University Reference Book at Base -->
+    <!-- Pages Block -->
+    <polygon points="50,152 148,152 165,135 68,135" fill="#F8FAFC" />
+    <polygon points="148,152 165,135 165,144 148,162" fill="#E2E8F0" />
+    <!-- Blue Book Cover -->
+    <path d="M40,146 Q40,164 54,164 L152,164 L168,146 L164,140 L54,140 Q40,140 40,146 Z" fill="url(#vk_book)" />
+    <path d="M40,146 Q40,164 54,164 L58,164 Q44,164 44,146 Q44,140 58,140 L54,140 Q40,140 40,146 Z" fill="#1E3A8A" />
+    <!-- Red Ribbon hanging down -->
+    <path d="M128,152 L128,172 L132,167 L136,172 L136,152 Z" fill="#EF4444" />
+
+    <!-- Rolled Diploma Certificate Scroll (Slanted behind cap) -->
+    <g transform="rotate(-38 120 75)">
+      <!-- Rolled Paper Cylinder -->
+      <rect x="70" y="55" width="85" height="24" rx="12" fill="url(#vk_scroll)" stroke="#D97706" stroke-width="1.2" />
+      <!-- Red Ribbon Wrap -->
+      <rect x="106" y="55" width="14" height="24" fill="#EF4444" />
+      <path d="M113,79 L108,94 L114,90 L120,95 L116,79 Z" fill="#DC2626" />
+      <!-- Paper Roll Spiral Ends -->
+      <ellipse cx="70" cy="67" rx="6" ry="12" fill="#FDE68A" stroke="#D97706" stroke-width="1.2" />
+      <ellipse cx="155" cy="67" rx="6" ry="12" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2" />
+      <path d="M70,61 A4,8 0 0 1 70,73 A2,4 0 0 1 70,65" fill="none" stroke="#B45309" stroke-width="1" />
+    </g>
+
+    <!-- Graduation Mortarboard Cap (Hero Center) -->
+    <!-- Cap Skull Skullcap Base -->
+    <path d="M78,118 C78,138 122,138 122,118 Z" fill="#1E1B4B" />
+
+    <!-- Diamond Mortarboard Top -->
+    <polygon points="100,85 162,108 100,128 38,108" fill="url(#vk_cap)" stroke="#4338CA" stroke-width="1.5" />
+
+    <!-- Center Button -->
+    <circle cx="100" cy="107" r="4.5" fill="#FBBF24" />
+
+    <!-- Golden Silk Tassel -->
+    <!-- String / Ribbon -->
+    <path d="M100,107 Q75,115 62,135 Q58,152 54,162" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" />
+    <!-- Tassel Brush -->
+    <polygon points="50,158 58,158 64,178 46,178" fill="#FBBF24" />
+    <circle cx="54" cy="158" r="4" fill="#D97706" />
+
+    <!-- Star Shimmer / Honors Laurels -->
+    <path d="M152,80 L154,86 L160,88 L154,90 L152,96 L150,90 L144,88 L150,86 Z" fill="#FDE047" />
+    <path d="M168,112 L169,116 L173,117 L169,119 L168,123 L166,119 L162,117 L166,116 Z" fill="#FDE047" opacity="0.8" />
+  </g>
+</svg>

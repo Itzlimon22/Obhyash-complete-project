@@ -38,6 +38,61 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
   const content = useMemo(() => {
     let formattedText = text || '';
 
+    // ── Step 0: Auto-heal corrupted control characters and escape sequences ──
+    formattedText = formattedText
+      .replace(/[\u000b\v]ec\b/g, '\\vec')
+      .replace(/[\u000b\v]ec\{/g, '\\vec{')
+      .replace(/[\u000b\v]/g, '')
+      .replace(/[\u0007]lpha\b/g, '\\alpha')
+      .replace(/[\u0007]pprox\b/g, '\\approx')
+      .replace(/[\u0007]/g, '')
+      .replace(/[\u0008]eta\b/g, '\\beta')
+      .replace(/[\u0008]ar\b/g, '\\bar')
+      .replace(/[\u0008]oldsymbol\b/g, '\\boldsymbol')
+      .replace(/[\u0008]/g, '')
+      .replace(/[\u000c]rac\b/g, '\\frac')
+      .replace(/[\u000c]orall\b/g, '\\forall')
+      .replace(/[\u000c]/g, '')
+      .replace(/[\u0000-\u0006\u000e-\u001f]/g, '');
+
+    // Auto-heal common LaTeX commands where the backslash was stripped
+    formattedText = formattedText
+      .replace(/(?<=\s|\$|\||^|\()ec\{/g, '\\vec{')
+      .replace(/(?<=\s|\$|\||^|\()hat\{/g, '\\hat{')
+      .replace(/(?<=\s|\$|\||^|\()bar\{/g, '\\bar{')
+      .replace(/(?<=\s|\$|\||^|\()dot\{/g, '\\dot{')
+      .replace(/(?<=\s|\$|\||^|\()ddot\{/g, '\\ddot{')
+      .replace(/(?<=\s|\$|\||^|\()tilde\{/g, '\\tilde{')
+      .replace(/(?<=\s|\$|\||^|\()sqrt\{/g, '\\sqrt{')
+      .replace(/(?<=\s|\$|\||^|\()frac\{/g, '\\frac{')
+      .replace(/(?<=\s|\$|\||^|\()imes(?=\s|[\$\d\w\\\{])/g, '\\times')
+      .replace(/(?<=\s|\$|\||^|\()heta(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\theta')
+      .replace(/(?<=\s|\$|\||^|\()lpha(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\alpha')
+      .replace(/(?<=\s|\$|\||^|\()eta(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\beta')
+      .replace(/(?<=\s|\$|\||^|\()circ(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\circ');
+
+    // Auto-wrap unwrapped vector equations with pipes: |...| = |...|
+    formattedText = formattedText.replace(
+      /(?<!\$)(?:\||\u007C)\s*(\\vec\{[^\}]+\}\s*[\+\-]\s*\\vec\{[^\}]+\})\s*(?:\||\u007C)\s*=\s*(?:\||\u007C)\s*(\\vec\{[^\}]+\}\s*[\+\-]\s*\\vec\{[^\}]+\})\s*(?:\||\u007C)(?!\$)/g,
+      '\$|$1| = |$2|\$',
+    );
+    formattedText = formattedText.replace(
+      /(?<!\$)(?:\||\u007C)\s*(\\vec\{[^\}]+\})\s*(?:\||\u007C)\s*([=><\+\-])\s*([0-9\.]+|\\vec\{[^\}]+\})(?!\$)/g,
+      '\$|$1| $2 $3\$',
+    );
+
+    // Accidental ASCII pipe to daari
+    formattedText = formattedText.replace(
+      /(?<=[a-zA-Z0-9\u0980-\u09FF\$\}])\s*\|(?=\s+[\u0980-\u09FF])/g,
+      ' ।',
+    );
+
+    // Visual separation between math and daari
+    formattedText = formattedText.replace(
+      /(\$[^\$\n]+\$)([\।\?!])/g,
+      '$1\u2009$2',
+    );
+
     // ── Step 1: Un-escape over-escaped LaTeX FIRST (before \n expansion) ──────
     // TipTap-Markdown serialises \frac as \\frac inside $…$ blocks.
     // We fix that before any other transformation so the math block is valid.
@@ -58,11 +113,20 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
       /(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+/gi,
       '\n($1) ',
     );
-    // Catch typical ending questions
-    formattedText = formattedText.replace(
-      /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
-      '\n\nনিচের কোনটি সঠিক?',
-    );
+
+    // Catch typical ending questions only when preceded by numbered items
+    const hasItems = /(?:\([iIvVxX0-9]+\)|[iIvVxX0-9]+\.)/.test(formattedText);
+    if (hasItems) {
+      formattedText = formattedText.replace(
+        /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
+        '\n\nনিচের কোনটি সঠিক?',
+      );
+    } else {
+      formattedText = formattedText.replace(
+        /\s*\n+\s*(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?)/g,
+        ' $1',
+      );
+    }
 
     return formattedText;
   }, [text]);

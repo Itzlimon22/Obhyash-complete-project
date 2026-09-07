@@ -1045,7 +1045,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w800,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: g.color,
                           ),
                         ),
@@ -1073,7 +1073,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             style: TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF1E293B),
                             ),
                           ),
@@ -1087,7 +1087,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: textPrimary,
                       letterSpacing: -0.2,
                     ),
@@ -1099,7 +1099,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w500,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                       color: textSub,
                       height: 1.45,
                     ),

@@ -1,7 +1,7 @@
 /// Centralized Question Formatter & Auto-Sanitizer
 /// Automatically cleans up accidental newlines, normalizes scientific units with
-/// non-breaking spaces, auto-wraps un-escaped LaTeX math, and formats multi-part
-/// questions across the entire application.
+/// non-breaking spaces, auto-wraps un-escaped LaTeX math, heals corrupted control
+/// characters/escape sequences, and formats multi-part questions across the entire application.
 class QuestionFormatter {
   const QuestionFormatter._();
 
@@ -11,11 +11,54 @@ class QuestionFormatter {
 
     String text = raw;
 
-    // 0. Convert HTML line breaks to standard newlines (use actual escape characters, NOT raw string r'\r')
+    // 0. Convert HTML line breaks to standard newlines
     text = text
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n');
+
+    // 0a. Auto-heal unescaped Python/JS escape sequences and control characters
+    text = text
+        // \v (vertical tab \u000b) -> \vec
+        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
+        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
+        .replaceAll(RegExp(r'[\u000b\v]'), '')
+        // \a (bell \u0007) -> \alpha, \approx
+        .replaceAll(RegExp(r'[\u0007]lpha\b'), r'\alpha')
+        .replaceAll(RegExp(r'[\u0007]pprox\b'), r'\approx')
+        .replaceAll(RegExp(r'[\u0007]'), '')
+        // \b (backspace \u0008) -> \beta, \bar, \boldsymbol
+        .replaceAll(RegExp(r'[\u0008]eta\b'), r'\beta')
+        .replaceAll(RegExp(r'[\u0008]ar\b'), r'\bar')
+        .replaceAll(RegExp(r'[\u0008]oldsymbol\b'), r'\boldsymbol')
+        .replaceAll(RegExp(r'[\u0008]'), '')
+        // \f (form feed \u000c) -> \frac, \forall
+        .replaceAll(RegExp(r'[\u000c]rac\b'), r'\frac')
+        .replaceAll(RegExp(r'[\u000c]orall\b'), r'\forall')
+        .replaceAll(RegExp(r'[\u000c]'), '')
+        // Non-printable control characters (except standard \n and \t)
+        .replaceAll(RegExp(r'[\u0000-\u0006\u000e-\u001f]'), '');
+
+    // 0b. Auto-heal corrupted LaTeX commands where the backslash was stripped
+    text = text
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ec\{'), r'\vec{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()hat\{'), r'\hat{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()bar\{'), r'\bar{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()dot\{'), r'\dot{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ddot\{'), r'\ddot{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()tilde\{'), r'\tilde{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()sqrt\{'), r'\sqrt{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()frac\{'), r'\frac{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()imes(?=\s|[\$\d\w\\\{])'), r'\times')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()heta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\theta')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()lpha(?=\s|[\$\d\w\\\}\,\.\=])'), r'\alpha')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()eta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\beta')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()amma(?=\s|[\$\d\w\\\}\,\.\=])'), r'\gamma')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ambda(?=\s|[\$\d\w\\\}\,\.\=])'), r'\lambda')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()mega(?=\s|[\$\d\w\\\}\,\.\=])'), r'\omega')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()circ(?=\s|[\$\d\w\\\}\,\.\=])'), r'\circ')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()infty(?=\s|[\$\d\w\\\}\,\.\=])'), r'\infty')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()approx(?=\s|[\$\d\w\\\}\,\.\=])'), r'\approx');
 
     // Auto-heal corrupted LaTeX commands where \r was previously stripped (e.g. \left( ... ight) -> \left( ... \right))
     text = text.replaceAllMapped(
@@ -27,10 +70,49 @@ class QuestionFormatter {
     text = text.replaceAll(RegExp(r'(?<!\\)\bightarrow\b'), r'\rightarrow');
     text = text.replaceAll(RegExp(r'(?<!\\)\bightleftharpoons\b'), r'\rightleftharpoons');
 
-    // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols (e.g. \rightleftharpoons, \leftrightharpoons)
+    // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols
     text = text.replaceAll(RegExp(r'\\?rightleftharpoons', caseSensitive: false), ' ⇌ ');
     text = text.replaceAll(RegExp(r'\\?leftrightharpoons', caseSensitive: false), ' ⇌ ');
     text = text.replaceAll(RegExp(r'\\?leftrightarrow', caseSensitive: false), ' ⇌ ');
+
+    // 0c. Auto-wrap unwrapped vector equations and modulus with pipes: |...| = |...|
+    text = text.replaceAllMapped(
+      RegExp(
+        r'(?<!\$)(?:\||\u007C)\s*(\\vec\{[^\}]+\}\s*[\+\-]\s*\\vec\{[^\}]+\})\s*(?:\||\u007C)\s*=\s*(?:\||\u007C)\s*(\\vec\{[^\}]+\}\s*[\+\-]\s*\\vec\{[^\}]+\})\s*(?:\||\u007C)(?!\$)',
+      ),
+      (m) => '\$|${m.group(1)}| = |${m.group(2)}|\$',
+    );
+    text = text.replaceAllMapped(
+      RegExp(
+        r'(?<!\$)(?:\||\u007C)\s*(\\vec\{[^\}]+\})\s*(?:\||\u007C)\s*([=><\+\-])\s*([0-9\.]+|\\vec\{[^\}]+\})(?!\$)',
+      ),
+      (m) => '\$|${m.group(1)}| ${m.group(2)} ${m.group(3)}\$',
+    );
+    text = text.replaceAllMapped(
+      RegExp(
+        r'(?<!\$)(?:\||\u007C)\s*(\\vec\{[^\}]+\}\s*\\times\s*\\vec\{[^\}]+\})\s*(?:\||\u007C)(?!\$)',
+      ),
+      (m) => '\$|${m.group(1)}|\$',
+    );
+
+    // 0d. Normalize accidental ASCII pipes '|' used as Bengali clause/sentence delimiters
+    text = text.replaceAllMapped(
+      RegExp(r'(?<=[a-zA-Z0-9\u0980-\u09FF\$\}])\s*\|(?=\s+[\u0980-\u09FF])'),
+      (m) => ' ।',
+    );
+
+    // 0e. Visual separation between inline math and Bengali dāri (।) or question marks
+    // Prevents italic math like "$R$।" from colliding and looking like "R|" or "RI"
+    text = text.replaceAllMapped(
+      RegExp(r'(\$[^\$\n]+\$)([\।\?!])'),
+      (m) => '${m.group(1)}\u2009${m.group(2)}',
+    );
+
+    // 0f. Normalize ratio colons: "3 : 5" -> "$3:5$"
+    text = text.replaceAllMapped(
+      RegExp(r'(?<!\$)\b(\d+)\s*:\s*(\d+)\b(?!\$)'),
+      (m) => '\$${m.group(1)}:${m.group(2)}\$',
+    );
 
     // 1. Convert short $$...$$ display math into inline $...$ so they flow naturally in sentences
     text = text.replaceAllMapped(
@@ -48,7 +130,6 @@ class QuestionFormatter {
     text = _mergeIntraSentenceNewlines(text);
 
     // 3. Normalize compound physics/chemistry units with non-breaking spaces
-    // e.g. "5 ms^-1", "5ms^-1", "5 ms^{-1}", "5 ms⁻¹", "8 ms^-2", "20 m/s^2", "10 km/h"
     text = text.replaceAllMapped(
       RegExp(
         r'(\d+(?:\.\d+)?)\s*(?:ms\^\{?\-?1\}?|ms\^?\-1|ms⁻¹|ms\^\{?\-?2\}?|ms\^?\-2|ms⁻²|m\/s\^?2|m\/s²|m\/s|km\/h|rad\/s|kg\s*m\/s|N\s*s)(?!\w)',
@@ -76,7 +157,6 @@ class QuestionFormatter {
     );
 
     // 4. Standard single scientific units with non-breaking spaces
-    // e.g. "1m" -> "1 m", "3s" -> "3 s", "10kg" -> "10 kg", "20N" -> "20 N", "50J" -> "50 J"
     text = text.replaceAllMapped(
       RegExp(
         r'(\d+(?:\.\d+)?)\s*(s|sec|min|hr|kg|gm|mg|cm|mm|km|nm|pm|m|N|J|W|eV|MeV|kJ|kW|kWh|Pa|kPa|atm|Hz|kHz|MHz|GHz|V|mV|kV|A|mA|μA|Ω|kΩ|MΩ|F|μF|nF|pF|H|mH|μH|T|Wb|C|μC|K|mol|cal|kcal)(?![a-zA-Z\u0980-\u09FF0-9])',
@@ -89,7 +169,6 @@ class QuestionFormatter {
     );
 
     // 5. Temperature degree normalization
-    // e.g. "25^\circ C", "25^\circ\text{C}", "25 ^\circ" -> "25 °C"
     text = text.replaceAll(RegExp(r'\^\s*\\circ\s*\\text\{C\}', caseSensitive: false), '°C');
     text = text.replaceAll(RegExp(r'\^\s*\\circ\s*C', caseSensitive: false), '°C');
     text = text.replaceAll(RegExp(r'\^\s*\\circ', caseSensitive: false), '°');
@@ -98,7 +177,7 @@ class QuestionFormatter {
       (m) => '${m.group(1)}\u00A0${m.group(0)!.contains('°C') ? '°C' : '°'}',
     );
 
-    // 6. Auto-detect unescaped Greek letters & common LaTeX math in Bengali questions (e.g. \epsilon_0\mu_0, \alpha, \theta)
+    // 6. Auto-detect unescaped Greek letters & common LaTeX math in Bengali questions
     text = _wrapUnescapedLatexMath(text);
 
     // 7. Ensure clean double linebreaks before bullet lists & concluding stem questions
@@ -112,10 +191,17 @@ class QuestionFormatter {
       (m) => '\n\n**(${m.group(1)})** ${m.group(2)}',
     );
 
-    text = text.replaceAllMapped(
-      RegExp(r'(?:\s+|^|\n)(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?|উদ্দীপকের আলোকে উত্তর দাও:|উদ্দীপকটি পড়ে নিচের প্রশ্নের উত্তর দাও:)'),
-      (m) => '\n\n${m.group(1)}',
-    );
+    // Only force "নিচের কোনটি সঠিক?" onto a separate line if there are Roman numerals or numbered statements
+    final hasItems = RegExp(r'(?:\([iIvVxX0-9]+\)|[iIvVxX0-9]+\.)').hasMatch(text);
+    if (hasItems) {
+      text = text.replaceAllMapped(
+        RegExp(r'(?:\s+|^|\n)(নিচের কোনটি সঠিক\?|উদ্দীপকের আলোকে উত্তর দাও:|উদ্দীপকটি পড়ে নিচের প্রশ্নের উত্তর দাও:)'),
+        (m) => '\n\n${m.group(1)}',
+      );
+    } else {
+      // Keep question flowing as a continuous single sentence
+      text = text.replaceAll(RegExp(r'\s*\n+\s*(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?)'), r' $1');
+    }
 
     // Clean up excessive blank lines (max 2)
     text = text.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
@@ -143,12 +229,17 @@ class QuestionFormatter {
         continue;
       }
 
+      // Check if previous buffer ended with sentence-terminating punctuation
+      final prevText = buffer.toString().trimRight();
+      final prevEndsWithPunct = RegExp(r'[।\?\!\:\;]$').hasMatch(prevText);
+
       // Check if line is an intentional list item, section header, or equation line
-      final isListItem = RegExp(
-        r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক|সুতরাং|অতএব|ধরি|দেওয়া আছে)',
+      final isNumberedItem = RegExp(
+        r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#)',
       ).hasMatch(line);
 
-      final isTableLine = line.startsWith('|') || line.endsWith('|');
+      // Real Markdown table rows require multiple pipes: | a | b |
+      final isRealTableLine = RegExp(r'^\|.+?\|.+?\|$').hasMatch(line);
 
       final isEquationLine = line.contains(r'\xrightarrow') ||
           line.contains(r'\xrightleftharpoons') ||
@@ -159,14 +250,24 @@ class QuestionFormatter {
           line.contains('⇌') ||
           line.contains('⇄');
 
-      final isPunctuation = RegExp(r'^[।,\.\?\!:\;]').hasMatch(line);
+      final isPunctuationOnly = RegExp(r'^[।,\.\?\!:\;]').hasMatch(line);
 
-      if (isListItem || isEquationLine || isTableLine) {
+      if (isNumberedItem || isEquationLine || isRealTableLine) {
         buffer.write('\n\n');
         buffer.write(line);
-      } else if (isPunctuation) {
+      } else if (prevEndsWithPunct &&
+          (line.startsWith('উদ্দীপক') ||
+              line.startsWith('ধরি') ||
+              line.startsWith('দেওয়া আছে') ||
+              line.startsWith('দেয়া আছে') ||
+              line.startsWith('সুতরাং') ||
+              line.startsWith('অতএব'))) {
+        buffer.write('\n\n');
+        buffer.write(line);
+      } else if (isPunctuationOnly) {
         buffer.write(line);
       } else {
+        // Smoothly merge intra-sentence linebreaks into continuous flowing text
         buffer.write(' ');
         buffer.write(line);
       }

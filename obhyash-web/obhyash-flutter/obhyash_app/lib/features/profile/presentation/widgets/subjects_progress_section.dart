@@ -162,7 +162,7 @@ class SubjectsProgressSection extends StatelessWidget {
             maxHeight: MediaQuery.of(context).size.height * 0.50,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
               color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
@@ -211,7 +211,7 @@ class SubjectsProgressSection extends StatelessWidget {
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF0F172A),
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -269,7 +269,7 @@ class SubjectsProgressSection extends StatelessWidget {
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -279,7 +279,7 @@ class SubjectsProgressSection extends StatelessWidget {
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
                                   color: masteryColor,
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                 ),
                               ),
                             ],
@@ -290,7 +290,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               color: _getAccuracyColor(accuracy),
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                           ),
                         ],
@@ -358,7 +358,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               ? const Color(0xFFD4D4D8)
                               : const Color(0xFF166534),
                           height: 1.4,
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ),
@@ -384,7 +384,7 @@ class SubjectsProgressSection extends StatelessWidget {
                         child: const Text(
                           'ঠিক আছে',
                           style: TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -427,7 +427,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -439,7 +439,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.w900,
               color: color,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
             ),
           ),
         ],
@@ -477,7 +477,7 @@ class SubjectsProgressSection extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
               ),
             ),
             const SizedBox(height: 8),
@@ -490,7 +490,7 @@ class SubjectsProgressSection extends StatelessWidget {
                 color: isDark
                     ? const Color(0xFFA1A1AA)
                     : const Color(0xFF64748B),
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
               ),
             ),
           ],
@@ -523,7 +523,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF0F172A),
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
             ),
           ),
           const SizedBox(height: 16),
@@ -569,7 +569,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF0F172A),
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -595,7 +595,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF64748B),
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                           ),
                         ),
@@ -615,7 +615,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
                               color: _getAccuracyTextColor(accuracy, isDark),
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                           ),
                         ),

@@ -44,6 +44,14 @@ import '../features/profile/presentation/bookmarks_view.dart';
 import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
 import '../features/formulas/presentation/chapters/formula_chapters_view.dart';
 import '../features/formulas/presentation/detail/formula_detail_view.dart';
+import '../features/question_bank/presentation/question_bank_view.dart';
+import '../features/question_bank/presentation/subject_question_bank_detail_view.dart';
+import '../features/question_bank/presentation/academic_category_detail_view.dart';
+import '../features/question_bank/presentation/academic_section_detail_view.dart';
+import '../features/question_bank/presentation/institute_question_bank_detail_view.dart';
+import '../features/question_bank/presentation/exam_set_detail_view.dart';
+import '../features/question_bank/presentation/question_viewer_view.dart';
+import '../features/exam/domain/exam_models.dart';
 import '../features/legends_league/presentation/legends_league_view.dart';
 import 'presentation/main_layout.dart';
 import 'services/deep_link_service.dart';
@@ -139,6 +147,89 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
+      ),
+      GoRoute(
+        path: '/question-bank/subject-details',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final subject = state.extra as Map<String, dynamic>? ?? {};
+          return _fadeRoute(
+            SubjectQuestionBankDetailView(subject: subject),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/question-bank/academic-details',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final subject = state.extra as Map<String, dynamic>? ?? {};
+          return _fadeRoute(
+            AcademicCategoryDetailView(subject: subject),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/question-bank/academic-section',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final subject = extra['subject'] as Map<String, dynamic>? ?? {};
+          final section = extra['section'] as Map<String, dynamic>? ?? {};
+          return _fadeRoute(
+            AcademicSectionDetailView(
+              subject: subject,
+              section: section,
+            ),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/question-bank/institute-details',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final institute = state.extra as Map<String, dynamic>? ?? {};
+          return _fadeRoute(
+            InstituteQuestionBankDetailView(institute: institute),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/question-bank/exam-set-details',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final institute = extra['institute'] as Map<String, dynamic>? ?? {};
+          final examSet = extra['examSet'] as InstituteExamSet;
+          return _fadeRoute(
+            ExamSetDetailView(
+              institute: institute,
+              examSet: examSet,
+            ),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/question-bank/questions-view',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final institute = extra['institute'] as Map<String, dynamic>? ?? {};
+          final examSet = extra['examSet'] as InstituteExamSet;
+          final questions = extra['questions'] as List<Question>? ?? [];
+          return _fadeRoute(
+            QuestionViewerView(
+              institute: institute,
+              examSet: examSet,
+              questions: questions,
+            ),
+            state,
+          );
+        },
       ),
       GoRoute(
         path: '/live_exam_details/:id',
@@ -302,18 +393,27 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                     ],
                   ),
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) => const ExamHistoryView(),
+                  ),
                 ],
               ),
             ],
           ),
 
-          // Branch 1: History tab
+          // Branch 1: Question Bank tab
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/history',
+                path: '/question-bank',
                 pageBuilder: (context, state) =>
-                    _fadeRoute(const ExamHistoryView(), state),
+                    _fadeRoute(const QuestionBankView(), state),
+              ),
+              GoRoute(
+                path: '/question_bank',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const QuestionBankView(), state),
               ),
             ],
           ),

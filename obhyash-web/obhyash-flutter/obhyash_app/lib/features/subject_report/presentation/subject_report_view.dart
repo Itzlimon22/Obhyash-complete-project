@@ -501,7 +501,7 @@ class _SRDonut extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -511,7 +511,7 @@ class _SRDonut extends StatelessWidget {
                           'সঠিকতা',
                           style: TextStyle(
                             fontSize: 11.5,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.normal,
                             color: Color(0xFFA3A3A3),
                           ),
@@ -599,7 +599,7 @@ class _SRLegend extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w600,
                   color: isDark
                       ? const Color(0xFFD4D4D4)
@@ -959,7 +959,7 @@ class _SRWeakness extends StatelessWidget {
                                   elevation: 0,
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  textStyle: const TextStyle(fontSize: 14.5, fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold),
+                                  textStyle: const TextStyle(fontSize: 14.5, fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),

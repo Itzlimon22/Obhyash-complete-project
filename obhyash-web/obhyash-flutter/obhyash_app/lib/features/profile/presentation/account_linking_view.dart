@@ -53,7 +53,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'গুগল অ্যাকাউন্ট পরিবর্তন',
@@ -121,7 +121,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'গুগল অ্যাকাউন্ট আনলিঙ্ক',
@@ -199,7 +199,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             final isDark = Theme.of(ctx).brightness == Brightness.dark;
-            final sheetBg = isDark ? const Color(0xFF18181B) : Colors.white;
+            final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
             final textPrimary = isDark ? Colors.white : const Color(0xFF111827);
             final textSecondary = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280);
             final inputBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6);
@@ -450,7 +450,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        final sheetBg = isDark ? const Color(0xFF18181B) : Colors.white;
+        final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
 
         return StatefulBuilder(
           builder: (sheetContext, setModalState) {

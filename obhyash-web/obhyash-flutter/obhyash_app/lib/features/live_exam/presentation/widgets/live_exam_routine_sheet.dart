@@ -442,7 +442,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.65,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -513,7 +513,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : Colors.black87,
                         ),
                         maxLines: 1,
@@ -581,7 +581,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -591,7 +591,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               '${item.date} (${item.dayName}) • ${item.time}',
                               style: TextStyle(
                                 fontSize: 11.5,
-                                fontFamily: 'Anek Bangla',
+                                fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                               ),
                             ),
@@ -615,7 +615,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                           ),
                         ),
                       ),

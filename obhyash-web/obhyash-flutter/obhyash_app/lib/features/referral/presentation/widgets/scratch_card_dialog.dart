@@ -66,6 +66,8 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -77,8 +79,9 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
             constraints: const BoxConstraints(maxWidth: 400),
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF000000) : Colors.white,
               borderRadius: BorderRadius.circular(24),
+              border: isDark ? Border.all(color: const Color(0xFF27272A), width: 1) : null,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.2),
@@ -90,22 +93,22 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'আপনার উপহার!',
                   style: TextStyle(
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'পুরস্কার দেখতে কার্ডটি ঘষুন',
                   style: TextStyle(
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     fontSize: 16,
-                    color: Colors.black54,
+                    color: isDark ? const Color(0xFFA1A1AA) : Colors.black54,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -116,7 +119,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Colors.red, fontFamily: 'Anek Bangla'),
+                      style: const TextStyle(color: Colors.red, fontFamily: 'HindSiliguri'),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -158,7 +161,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                                       Text(
                                         _getRewardTitle(_rewardType),
                                         style: const TextStyle(
-                                          fontFamily: 'Anek Bangla',
+                                          fontFamily: 'HindSiliguri',
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xFF92400E),
@@ -170,7 +173,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                                 : const Text(
                                     'Loading...',
                                     style: TextStyle(
-                                        fontFamily: 'Anek Bangla',
+                                        fontFamily: 'HindSiliguri',
                                         color: Colors.transparent),
                                   ),
                       ),
@@ -193,7 +196,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                     child: const Text(
                       'বন্ধ করুন',
                       style: TextStyle(
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

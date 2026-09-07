@@ -43,12 +43,40 @@ class AppColors {
 }
 
 class AppTheme {
+  static TextTheme _bumpTextTheme(TextTheme theme) {
+    TextStyle? bump(TextStyle? style) =>
+        style?.copyWith(fontSize: (style.fontSize ?? 14) + 0.5);
+
+    return theme.copyWith(
+      displayLarge: bump(theme.displayLarge),
+      displayMedium: bump(theme.displayMedium),
+      displaySmall: bump(theme.displaySmall),
+      headlineLarge: bump(theme.headlineLarge),
+      headlineMedium: bump(theme.headlineMedium),
+      headlineSmall: bump(theme.headlineSmall),
+      titleLarge: bump(theme.titleLarge),
+      titleMedium: bump(theme.titleMedium),
+      titleSmall: bump(theme.titleSmall),
+      bodyLarge: bump(theme.bodyLarge),
+      bodyMedium: bump(theme.bodyMedium),
+      bodySmall: bump(theme.bodySmall),
+      labelLarge: bump(theme.labelLarge),
+      labelMedium: bump(theme.labelMedium),
+      labelSmall: bump(theme.labelSmall),
+    );
+  }
+
   static ThemeData get lightTheme {
+    final baseTextTheme = _bumpTextTheme(
+      GoogleFonts.hindSiliguriTextTheme(ThemeData.light().textTheme),
+    );
+
     return ThemeData(
       brightness: Brightness.light,
+      fontFamily: GoogleFonts.hindSiliguri().fontFamily,
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFFFAFAF9),
-      textTheme: GoogleFonts.anekBanglaTextTheme(ThemeData.light().textTheme),
+      textTheme: baseTextTheme,
       colorScheme: const ColorScheme.light(
         primary: AppColors.viridianForest,
         secondary: AppColors.royalMulberry,
@@ -101,10 +129,13 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final baseTextTheme = GoogleFonts.anekBanglaTextTheme(ThemeData.dark().textTheme);
+    final baseTextTheme = _bumpTextTheme(
+      GoogleFonts.hindSiliguriTextTheme(ThemeData.dark().textTheme),
+    );
     
     return ThemeData(
       brightness: Brightness.dark,
+      fontFamily: GoogleFonts.hindSiliguri().fontFamily,
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFF000000), // OLED Pure Black
       textTheme: baseTextTheme.copyWith(
@@ -178,15 +209,15 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.refinedCharcoal,
+        backgroundColor: const Color(0xFF000000), // OLED Pure Black
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: AppColors.refinedCharcoal, width: 1),
+          side: const BorderSide(color: Color.fromARGB(255, 18, 18, 20), width: 1),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.refinedCharcoal,
+        backgroundColor: Color(0xFF000000), // OLED Pure Black
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

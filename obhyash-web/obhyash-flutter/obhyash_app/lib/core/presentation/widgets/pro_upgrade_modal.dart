@@ -44,7 +44,7 @@ class ProUpgradeModal extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF13151F) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(

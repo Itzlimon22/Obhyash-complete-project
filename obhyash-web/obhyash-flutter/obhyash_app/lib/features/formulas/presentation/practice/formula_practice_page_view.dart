@@ -31,9 +31,9 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
     final questions = FormulaPracticeGenerator.resolvePracticeQuestions(widget.formula);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF090A0C) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF101216) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         elevation: 0,
         scrolledUnderElevation: 1,
         leading: IconButton(

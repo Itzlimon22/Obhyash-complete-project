@@ -522,7 +522,7 @@ class _UserProfileCard extends StatelessWidget {
                     fontSize: 17.5,
                     fontWeight: FontWeight.w800,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -585,7 +585,7 @@ class _InfoChip extends StatelessWidget {
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46),
-          fontFamily: 'Anek Bangla',
+          fontFamily: 'HindSiliguri',
         ),
       ),
     );

@@ -433,7 +433,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
           Text(
             res.isPerfectScore ? '🌟 পারফেক্ট মেমোরি স্কোর!' : '🎉 আজকের রিভিশন সম্পন্ন!',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'Anek Bangla'),
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'HindSiliguri'),
           ),
           const SizedBox(height: 4),
           const Text(

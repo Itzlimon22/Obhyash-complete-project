@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/main_sidebar.dart';
+import 'widgets/app_icon.dart';
+import '../constants/app_icons.dart';
 import '../utils/global_refresh.dart';
 import 'widgets/main_bottom_nav.dart';
 import 'widgets/user_avatar.dart';
@@ -28,6 +30,7 @@ import '../../features/notifications/services/notification_service.dart';
 import '../../features/notifications/services/notification_permission_manager.dart';
 import '../../features/history/presentation/exam_history_view.dart';
 import '../../features/exam/providers/exam_provider.dart';
+import '../../features/question_bank/presentation/question_bank_tab_provider.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -132,12 +135,20 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     }
     if (location.startsWith('/live_exam')) return 'live_exam';
+    if (location.startsWith('/question-bank') ||
+        location.startsWith('/question_bank')) {
+      return 'question_bank';
+    }
     if (location.startsWith('/formulas')) return 'formulas';
     return 'dashboard';
   }
 
   bool _shouldShowBottomNav(String location) {
     try {
+      if (location == '/question-bank' ||
+          location == '/question_bank') {
+        return true;
+      }
       final uri = Uri.parse(location);
       final segs = uri.pathSegments;
 
@@ -250,6 +261,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'পরীক্ষা সেটআপ';
       case 'live_exam':
         return 'লাইভ পরীক্ষা';
+      case 'question_bank':
+      case 'question-bank':
+        return 'প্রশ্ন ব্যাংক';
       case 'history':
         return 'ইতিহাস';
       case 'practice':
@@ -321,6 +335,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       return;
     }
 
+    if (tab == 'history') {
+      widget.navigationShell.goBranch(0);
+      context.push('/history');
+      return;
+    }
+
     if (tab == 'practice' || tab == 'analysis' || tab == 'my-reports') {
       widget.navigationShell.goBranch(0);
       context.push('/$tab');
@@ -332,7 +352,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       case 'dashboard':
         index = 0;
         break;
-      case 'history':
+      case 'question_bank':
+      case 'question-bank':
         index = 1;
         break;
       case 'setup':
@@ -347,7 +368,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
     // Check if we are already on this branch. If so, pop back to its root.
     if (widget.navigationShell.currentIndex == index) {
-      context.go(tab == 'dashboard' ? '/' : '/$tab');
+      context.go(tab == 'dashboard'
+          ? '/'
+          : (tab == 'question_bank' || tab == 'question-bank'
+              ? '/question-bank'
+              : '/$tab'));
     } else {
       widget.navigationShell.goBranch(
         index,
@@ -410,7 +435,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: textColor,
-              fontFamily: 'Anek Bangla',
+              fontFamily: 'HindSiliguri',
             ),
           ),
         ],
@@ -529,7 +554,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: isDark
-            ? const Color(0xFF0C0A09)
+            ? const Color(0xFF000000)
             : const Color(0xFFFAFAF9),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(52),
@@ -539,7 +564,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               child: Container(
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF0C0A09).withValues(alpha: 0.85)
+                      ? const Color(0xFF000000).withValues(alpha: 0.85)
                       : Colors.white.withValues(alpha: 0.9),
                   border: Border(
                     bottom: BorderSide(
@@ -651,6 +676,52 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   );
                                 }
 
+                                if (activeTab == 'question_bank') {
+                                  final currentQbTab = ref.watch(
+                                    questionBankTabProvider,
+                                  );
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _HeaderUnderlineTab(
+                                        label: 'প্রতিষ্ঠান ভিত্তিক',
+                                        isActive: currentQbTab ==
+                                            QuestionBankTab.institution,
+                                        isDark: isDark,
+                                        fontSize: 15,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                questionBankTabProvider
+                                                    .notifier,
+                                              )
+                                              .setTab(
+                                                QuestionBankTab.institution,
+                                              );
+                                        },
+                                      ),
+                                      const SizedBox(width: 24),
+                                      _HeaderUnderlineTab(
+                                        label: 'বিষয় ভিত্তিক',
+                                        isActive: currentQbTab ==
+                                            QuestionBankTab.subject,
+                                        isDark: isDark,
+                                        fontSize: 15,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          ref
+                                              .read(
+                                                questionBankTabProvider
+                                                    .notifier,
+                                              )
+                                              .setTab(QuestionBankTab.subject);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
+
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -691,8 +762,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                                   : const Color(0xFFE2E8F0),
                                             ),
                                           ),
-                                          child: Icon(
-                                            LucideIcons.arrowLeft,
+                                          child: AppIcon(
+                                            AppIcons.arrowLeft,
                                             size: 18,
                                             color: isDark
                                                 ? Colors.white
@@ -711,7 +782,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                           style: TextStyle(
                                             fontSize: isSubRoute ? 18 : 21,
                                             fontWeight: FontWeight.w700,
-                                            fontFamily: 'Anek Bangla',
+                                            fontFamily: 'HindSiliguri',
                                             letterSpacing: -0.2,
                                             color: isDark
                                                 ? Colors.white
@@ -844,8 +915,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                                   const EdgeInsets.symmetric(
                                                     horizontal: 4.0,
                                                   ),
-                                              child: Icon(
-                                                LucideIcons.bell,
+                                              child: AppIcon(
+                                                AppIcons.bell,
                                                 size: 24,
                                                 color: isDark
                                                     ? const Color(0xFFD4D4D4)
@@ -868,7 +939,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                                     border: Border.all(
                                                       color: isDark
                                                           ? const Color(
-                                                              0xFF0C0A09,
+                                                              0xFF000000,
                                                             )
                                                           : Colors.white,
                                                       width: 1.5,
@@ -1067,8 +1138,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        LucideIcons.crown,
+                                      AppIcon(
+                                        AppIcons.crown,
                                         size: 16,
                                         color: Color(0xFFEF4444),
                                       ),
@@ -1076,7 +1147,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       Text(
                                         'লেজেন্ডস লিগ',
                                         style: TextStyle(
-                                          fontFamily: 'Anek Bangla',
+                                          fontFamily: 'HindSiliguri',
                                           fontSize: 15,
                                           fontWeight: FontWeight.w900,
                                           color: Color(0xFFEF4444),
@@ -1117,7 +1188,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         bottomNavigationBar: _shouldShowBottomNav(location)
             ? MainBottomNav(
                 activeTab:
-                    (activeTab == 'history' ||
+                    (activeTab == 'question_bank' ||
+                        activeTab == 'question-bank' ||
+                        activeTab == 'history' ||
                         activeTab == 'setup' ||
                         activeTab == 'leaderboard' ||
                         activeTab == 'settings')
@@ -1267,7 +1340,7 @@ class _ProfileSheet extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             color: textPrimary,
                           ),
                           maxLines: 1,
@@ -1292,7 +1365,7 @@ class _ProfileSheet extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14,
                               color: textSecondary,
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1360,14 +1433,14 @@ class _ProfileSheet extends StatelessWidget {
                         item['label'] as String,
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.w600,
                           color: textPrimary,
                         ),
                       ),
                       const Spacer(),
-                      Icon(
-                        LucideIcons.chevronRight,
+                      AppIcon(
+                        AppIcons.chevronRight,
                         size: 16,
                         color: textSecondary,
                       ),
@@ -1408,7 +1481,7 @@ class _ProfileSheet extends StatelessWidget {
                           : '\u09a1\u09be\u09b0\u09cd\u0995 \u09ae\u09cb\u09a1',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
@@ -1482,7 +1555,7 @@ class _ProfileSheet extends StatelessWidget {
                       '\u09b2\u0997\u0986\u0989\u099f',
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                         color: Color(0xFFB91C1C),
                       ),
@@ -1577,7 +1650,7 @@ class _HeaderUnderlineTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 letterSpacing: -0.2,
                 color: isActive ? activeColor : inactiveColor,
               ),

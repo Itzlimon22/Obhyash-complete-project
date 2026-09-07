@@ -80,7 +80,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -121,7 +121,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
                   ),
                 ),
@@ -191,7 +191,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -232,7 +232,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
@@ -330,7 +330,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -352,7 +352,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
@@ -1013,7 +1013,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
         .toSet()
         .toList();
 
-    final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFF4F6FA);
+    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFF4F6FA);
     final cardBg = isDark ? const Color(0xFF111113) : Colors.white;
     final border = isDark ? const Color(0xFF222226) : const Color(0xFFE4E9F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
@@ -1022,7 +1022,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF09090B) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,

@@ -52,13 +52,13 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
 
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFF141417);
+    const bgColor = Color(0xFF000000);
 
     return Theme(
       data: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: bgColor,
         colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF141417),
+          surface: Color(0xFF000000),
           primary: Color(0xFF059669),
         ),
       ),
@@ -93,7 +93,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
               const Text(
                 'পাসওয়ার্ড ভুলে গেছেন?',
                 style: TextStyle(
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -103,7 +103,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
               const Text(
                 'তোমার ইমেইল ঠিকানা দাও। আমরা একটি পাসওয়ার্ড রিসেট লিংক পাঠাবো।',
                 style: TextStyle(
-                  fontFamily: 'Anek Bangla',
+                  fontFamily: 'HindSiliguri',
                   fontSize: 13,
                   color: Color(0xFFA1A1AA),
                 ),
@@ -166,7 +166,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                           ),
                         ),
                 ),

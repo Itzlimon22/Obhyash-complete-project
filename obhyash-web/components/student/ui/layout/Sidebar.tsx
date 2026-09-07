@@ -51,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, svgIcon: "/dashboard-icons/fire_streak.svg" },
     { id: "setup", label: "পরীক্ষা", icon: FileEdit, svgIcon: "/dashboard-icons/exam_pencil.svg" },
     { id: "live_exam", label: "লাইভ পরীক্ষা", icon: Radio, svgIcon: "/dashboard-icons/live_exam.svg" },
+    { id: "question_bank", label: "প্রশ্ন ব্যাংক", icon: BookOpen, svgIcon: "/dashboard-icons/help_question.svg" },
     { id: "history", label: "ইতিহাস", icon: History, svgIcon: "/dashboard-icons/history_clock.svg" },
     { id: "practice", label: "অনুশীলন", icon: PenTool, svgIcon: "/dashboard-icons/practice_target.svg" },
     { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy, svgIcon: "/dashboard-icons/leaderboard_trophy.svg" },

@@ -112,7 +112,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
             Text(
               'সময়সীমা শেষ',
               style: TextStyle(
-                fontFamily: 'Anek Bangla',
+                fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
               ),
@@ -238,14 +238,14 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
     final isLowTime = _remainingSeconds <= 120; // 2 minutes or less
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
       appBar: AppBar(
         title: const Text(
           'পেমেন্ট সম্পন্ন করুন',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Anek Bangla',
+            fontFamily: 'HindSiliguri',
           ),
         ),
         centerTitle: false,
@@ -289,7 +289,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Anek Bangla',
+                    fontFamily: 'HindSiliguri',
                     color: isLowTime
                         ? const Color(0xFFEF4444)
                         : (isDark ? Colors.white : const Color(0xFF0F172A)),
@@ -364,7 +364,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                       'সুরক্ষিত পেমেন্ট গেটওয়ে লোড হচ্ছে...',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                       ),
                     ),

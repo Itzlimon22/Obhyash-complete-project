@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../domain/models.dart';
 import '../../../../core/presentation/widgets/user_avatar.dart';
 import '../../../../core/utils/bangla_name_helper.dart';
@@ -58,8 +60,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 : const Color(0xFFF3F4F6),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(
-                            LucideIcons.trophy,
+                          child: AppIcon(
+                            AppIcons.trophy,
                             size: 16,
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
@@ -70,7 +72,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         Text(
                           'লিডারবোর্ড',
                           style: TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             color: isDark
@@ -80,8 +82,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Icon(
-                      LucideIcons.chevronRight,
+                    AppIcon(
+                      AppIcons.chevronRight,
                       size: 18,
                       color: isDark
                           ? const Color(0xFF71717A)
@@ -136,7 +138,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontFamily: 'Anek Bangla',
+                              fontFamily: 'HindSiliguri',
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
                               color: Colors.white,
@@ -190,7 +192,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         child: Text(
                           BanglaNameHelper.toBanglaNumeral(userRank),
                           style: const TextStyle(
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w900,
                             fontSize: 16,
                             color: Colors.white,
@@ -217,7 +219,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 17,
                                   color: Colors.white,
@@ -237,7 +239,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               child: const Text(
                                 'তুমি',
                                 style: TextStyle(
-                                  fontFamily: 'Anek Bangla',
+                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                   color: Colors.white,
@@ -268,7 +270,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         'শীর্ষে পৌঁছাতে আরও ',
                         style: TextStyle(
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
@@ -278,7 +280,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         '$xpDiff XP',
                         style: TextStyle(
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark
@@ -289,7 +291,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         ' লাগবে',
                         style: TextStyle(
-                          fontFamily: 'Anek Bangla',
+                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
@@ -309,7 +311,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
 }
 
 const _headerStyle = TextStyle(
-  fontFamily: 'Anek Bangla',
+  fontFamily: 'HindSiliguri',
   fontWeight: FontWeight.w900,
   fontSize: 13,
   color: Color(0xFFA3A3A3), // neutral-400

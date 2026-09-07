@@ -53,7 +53,7 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF101216) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(

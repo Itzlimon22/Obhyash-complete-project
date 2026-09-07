@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Inter, Anek_Bangla } from "next/font/google";
+import { Inter, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Toaster } from "sonner";
@@ -19,10 +19,11 @@ const inter = Inter({
   display: "swap",
 });
 
-// ✅ Configure Anek Bangla (Bengali text)
-const anekBangla = Anek_Bangla({
+// ✅ Configure Hind Siliguri (Bengali text)
+const hindSiliguri = Hind_Siliguri({
   variable: "--font-anek",
   subsets: ["bengali", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -92,7 +93,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${anekBangla.variable}`}
+      className={`${inter.variable} ${hindSiliguri.variable}`}
       suppressHydrationWarning
     >
       <head>
