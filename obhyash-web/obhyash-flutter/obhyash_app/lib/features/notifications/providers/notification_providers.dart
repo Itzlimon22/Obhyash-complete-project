@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/notification_model.dart';
 import '../services/notification_service.dart';
+import '../services/notification_storage_service.dart';
 import '../../../core/providers/auth_provider.dart';
 
 class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
@@ -11,11 +12,38 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
 
   @override
   Future<List<AppNotification>> build() async {
-    final authId = ref.watch(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
-    if (authId == null) return [];
+    // 1. Always load local persistent notifications immediately (offline-first & seed support)
+    final localList = await NotificationStorageService.getLocalNotifications();
 
+    final authId = ref.watch(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+    if (authId == null) {
+      return localList;
+    }
+
+    // 2. Start realtime subscription
     _listenRealtime(authId);
-    return _fetchNotifications(authId);
+
+    // 3. Fetch remote notifications & merge with local
+    final remoteList = await _fetchNotifications(authId);
+    if (remoteList.isEmpty) {
+      return localList;
+    }
+
+    final map = <String, AppNotification>{};
+    for (final n in localList) {
+      map[n.id] = n;
+    }
+    for (final n in remoteList) {
+      map[n.id] = n;
+    }
+
+    final merged = map.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // Also update local cache
+    await NotificationStorageService.saveAllNotifications(merged);
+
+    return merged;
   }
 
   Future<List<AppNotification>> _fetchNotifications(String userId) async {
@@ -59,6 +87,7 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
               // Update local state
               state = state.whenData((current) => [notification, ...current]);
               ref.read(latestNotificationEventProvider.notifier).emit(notification);
+              NotificationStorageService.saveNotification(notification);
 
               // Trigger heads up local alert
               final targetRoute = notification.data?['route']?.toString() ?? notification.link;
@@ -81,45 +110,66 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
         .subscribe();
   }
 
+  /// Add in-app local notification dynamically from any event (exam finished, streak, bookmark, etc.)
+  void addLocalNotification(AppNotification notification) {
+    state = state.whenData((current) {
+      final filtered = current.where((n) => n.id != notification.id).toList();
+      return [notification, ...filtered];
+    });
+    ref.read(latestNotificationEventProvider.notifier).emit(notification);
+  }
+
   Future<void> markAsRead(String id) async {
+    // 1. Update local storage
+    await NotificationStorageService.markAsRead(id);
+
+    // 2. Update remote in background if possible
     final sb = Supabase.instance.client;
     try {
       await sb.from('notifications').update({'is_read': true}).eq('id', id);
-      state = state.whenData((list) {
-        return list.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
-      });
-      ref.read(unreadNotificationCountProvider.notifier).decrement();
-    } catch (e) {
-      debugPrint('[NotificationsNotifier] markAsRead error: $e');
-    }
+    } catch (_) {}
+
+    // 3. Update state
+    state = state.whenData((list) {
+      return list.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
+    });
+    ref.read(unreadNotificationCountProvider.notifier).decrement();
   }
 
   Future<void> markAllAsRead() async {
-    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
-    if (authId == null) return;
+    // 1. Update local storage
+    await NotificationStorageService.markAllAsRead();
 
-    final sb = Supabase.instance.client;
-    try {
-      await sb.from('notifications').update({'is_read': true}).eq('user_id', authId);
-      state = state.whenData((list) {
-        return list.map((n) => n.copyWith(isRead: true)).toList();
-      });
-      ref.read(unreadNotificationCountProvider.notifier).markAllRead();
-    } catch (e) {
-      debugPrint('[NotificationsNotifier] markAllAsRead error: $e');
+    // 2. Update remote in background if possible
+    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+    if (authId != null) {
+      final sb = Supabase.instance.client;
+      try {
+        await sb.from('notifications').update({'is_read': true}).eq('user_id', authId);
+      } catch (_) {}
     }
+
+    // 3. Update state
+    state = state.whenData((list) {
+      return list.map((n) => n.copyWith(isRead: true)).toList();
+    });
+    ref.read(unreadNotificationCountProvider.notifier).markAllRead();
   }
 
   Future<void> deleteNotification(String id) async {
+    // 1. Update local storage
+    await NotificationStorageService.deleteNotification(id);
+
+    // 2. Update remote in background if possible
     final sb = Supabase.instance.client;
     try {
       await sb.from('notifications').delete().eq('id', id);
-      state = state.whenData((list) {
-        return list.where((n) => n.id != id).toList();
-      });
-    } catch (e) {
-      debugPrint('[NotificationsNotifier] delete error: $e');
-    }
+    } catch (_) {}
+
+    // 3. Update state
+    state = state.whenData((list) {
+      return list.where((n) => n.id != id).toList();
+    });
   }
 }
 

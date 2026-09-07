@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/notification_model.dart';
 import '../providers/notification_providers.dart';
+import '../services/notification_manager.dart';
+import '../services/notification_router.dart';
+import '../services/notification_service.dart';
 
 class NotificationCenterModal extends ConsumerStatefulWidget {
   const NotificationCenterModal({super.key});
@@ -104,7 +106,46 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                   ),
                 ],
                 const Spacer(),
-                if (unreadCount > 0)
+                OutlinedButton.icon(
+                  onPressed: () {
+                    final notifId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+                    NotificationService().showNotification(
+                      id: notifId,
+                      title: 'কি ব্যাপার Limon?',
+                      body: 'একটা মক টেস্ট কি দিয়ে দেখা যায় না? 😒',
+                      channelId: NotificationService.channelStreak,
+                      route: '/setup',
+                    );
+                    NotificationManager.dispatch(
+                      context: context,
+                      ref: ref,
+                      title: 'কি ব্যাপার Limon?',
+                      message: 'একটা মক টেস্ট কি দিয়ে দেখা যায় না? 😒',
+                      type: 'streak',
+                      route: '/setup',
+                    );
+                  },
+                  icon: const Icon(LucideIcons.send, size: 13),
+                  label: const Text(
+                    'টেস্ট পুশ',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontFamily: 'HindSiliguri',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF059669),
+                    side: const BorderSide(color: Color(0xFF059669), width: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                if (unreadCount > 0) ...[
+                  const SizedBox(width: 8),
                   TextButton.icon(
                     onPressed: () => ref.read(notificationsProvider.notifier).markAllAsRead(),
                     icon: const Icon(LucideIcons.checkCheck, size: 16),
@@ -121,6 +162,7 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     ),
                   ),
+                ],
               ],
             ),
           ),
@@ -196,7 +238,7 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (ctx, index) {
                     final item = filtered[index];
                     return _NotificationCard(
@@ -206,11 +248,8 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                         if (!item.isRead) {
                           ref.read(notificationsProvider.notifier).markAsRead(item.id);
                         }
-                        final route = item.data?['route']?.toString() ?? item.link;
-                        if (route != null && route.isNotEmpty) {
-                          Navigator.pop(context);
-                          context.push(route);
-                        }
+                        Navigator.pop(context);
+                        NotificationRouter.handleTap(context, item);
                       },
                       onDismiss: () {
                         ref.read(notificationsProvider.notifier).deleteNotification(item.id);

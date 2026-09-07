@@ -48,6 +48,7 @@ List<SubjectStats> _computeSubjectStats(List<ExamResult> history) {
       e.subject,
       () => _SubjectAccum(label: BanglaNameHelper.formatSubject(e.subject, e.subjectLabel)),
     );
+    acc.examsCount++;
     acc.correct += e.correctCount;
     acc.wrong += e.wrongCount;
     acc.total += e.totalQuestions;
@@ -62,13 +63,14 @@ List<SubjectStats> _computeSubjectStats(List<ExamResult> history) {
       wrong: acc.wrong,
       skipped: skipped < 0 ? 0 : skipped,
       total: acc.total,
+      examsCount: acc.examsCount,
     );
   }).toList();
 }
 
 class _SubjectAccum {
   String label;
-  int correct = 0, wrong = 0, total = 0;
+  int correct = 0, wrong = 0, total = 0, examsCount = 0;
   _SubjectAccum({required this.label});
 }
 

@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/presentation/widgets/celebration_dialog.dart';
@@ -1439,7 +1441,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Column(
                       children: [
-                        Icon(LucideIcons.trophy, size: 48, color: isDark ? Colors.white24 : Colors.black12),
+                        AppIcon(AppIcons.trophy, size: 48, color: isDark ? Colors.white24 : Colors.black12),
                         const SizedBox(height: 12),
                         Text(
                           'এই মাসে এখনও কেউ লিডারবোর্ডে নেই!\nপ্রথম হওয়ার সুযোগ তোমারই!',

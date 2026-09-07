@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
@@ -595,8 +597,8 @@ class _NavItem extends StatelessWidget {
                       color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      LucideIcons.chevronRight,
+                    child: AppIcon(
+                      AppIcons.chevronRight,
                       size: 15,
                       color: isDark
                           ? const Color(0xFFA1A1AA)

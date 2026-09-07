@@ -116,7 +116,15 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               config.topics == 'All' ||
               config.topics.isEmpty)
           ? null
-          : config.topics.split(',').map((t) => t.trim()).toList();
+          : config.topics.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+
+      final topicIdsList =
+          (config.topicIds == null ||
+              config.topicIds == 'General' ||
+              config.topicIds == 'All' ||
+              config.topicIds!.isEmpty)
+          ? null
+          : config.topicIds!.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
 
       final difficultiesList =
           (config.difficulty == 'Mixed' ||
@@ -146,6 +154,13 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           ? topicsList.expand((t) => BanglaNameHelper.getTopicSearchVariants(t)).toSet().toList()
           : null;
 
+      // Merge both topic IDs and name variants for RPC calls
+      final allRpcTopics = [
+        if (expandedTopics != null) ...expandedTopics,
+        if (topicIdsList != null) ...topicIdsList,
+      ];
+      final rpcTopics = allRpcTopics.isNotEmpty ? allRpcTopics : null;
+
       List<Question> generatedQuestions = [];
 
       // 1. Try Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix)
@@ -160,7 +175,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               'p_subject_name': sVar,
               'p_total': config.questionCount,
               'p_chapters': expandedChapters,
-              'p_topics': expandedTopics,
+              'p_topics': rpcTopics,
               'p_difficulties': difficultiesList,
               'p_exam_types': examTypesList,
             },
@@ -171,9 +186,9 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 .map((e) => Question.fromJson(e as Map<String, dynamic>))
                 .toList();
             generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
-              parsed,
-              config.questionCount,
-              chaptersList,
+                parsed,
+                config.questionCount,
+                chaptersList,
             );
             debugPrint('[ExamProvider] Adaptive Smart Mock returned ${generatedQuestions.length} questions');
           }
@@ -183,8 +198,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           );
         }
 
-        // Try chapter level if specific topic returned 0
-        if (generatedQuestions.isEmpty && expandedTopics != null && expandedTopics.isNotEmpty) {
+        // Try chapter level if specific topic returned 0 in RPC
+        if (generatedQuestions.isEmpty && rpcTopics != null && rpcTopics.isNotEmpty) {
           try {
             final data = await supabase.rpc(
               'get_adaptive_mock_exam_questions',
@@ -224,7 +239,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 'p_subject_name': sVar,
                 'p_total': config.questionCount,
                 'p_chapters': expandedChapters,
-                'p_topics': expandedTopics,
+                'p_topics': rpcTopics,
                 'p_difficulties': difficultiesList,
                 'p_exam_types': examTypesList,
               },
@@ -249,56 +264,165 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         }
       }
 
-      // 2. Fallback: Direct query from questions table
+      // 2. Direct query from questions table (Bulletproof Multi-Tier Topic & Chapter Query)
       if (generatedQuestions.isEmpty) {
         try {
           debugPrint(
-            '[ExamProvider] RPC failed, falling back to direct questions query with balanced sampling',
+            '[ExamProvider] RPC yielded 0, using direct questions query with bulletproof multi-tier search',
           );
-          var query = supabase
-              .from('questions')
-              .select('*')
-              .inFilter('subject', subjectVariants)
-              .not('options', 'is', null);
 
-          if (expandedChapters != null && expandedChapters.isNotEmpty) {
-            query = query.inFilter('chapter', expandedChapters);
-          }
-          if (expandedTopics != null && expandedTopics.isNotEmpty) {
-            query = query.inFilter('topic', expandedTopics);
-          }
-          if (difficultiesList != null && difficultiesList.isNotEmpty) {
-            query = query.inFilter('difficulty', difficultiesList);
-          }
-          if (examTypesList != null && examTypesList.isNotEmpty) {
-            final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
-            query = query.or(orConditions);
-          }
+          final bool hasTopicFilter = (expandedTopics != null && expandedTopics.isNotEmpty) ||
+              (topicIdsList != null && topicIdsList.isNotEmpty);
 
-          var fallbackData = await query.limit(config.questionCount * 4);
-          var qList = List<dynamic>.from(fallbackData as List);
+          List<dynamic> rawData = [];
 
-          // If topic query yielded 0, retry without topic filter to get chapter questions
-          if (qList.isEmpty && expandedTopics != null && expandedTopics.isNotEmpty) {
-            var retryQuery = supabase
+          if (hasTopicFilter) {
+            // ── Tier 1: Dual-Query (Match topic_id IN (ids) OR topic IN (name variants)) ──
+            try {
+              var topicQuery = supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', subjectVariants)
+                  .not('options', 'is', null);
+
+              if (expandedChapters != null && expandedChapters.isNotEmpty) {
+                topicQuery = topicQuery.inFilter('chapter', expandedChapters);
+              }
+              if (difficultiesList != null && difficultiesList.isNotEmpty) {
+                topicQuery = topicQuery.inFilter('difficulty', difficultiesList);
+              }
+              if (examTypesList != null && examTypesList.isNotEmpty) {
+                final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+                topicQuery = topicQuery.or(orConditions);
+              }
+
+              final orClauses = <String>[];
+              if (topicIdsList != null && topicIdsList.isNotEmpty) {
+                orClauses.add('topic_id.in.(${topicIdsList.join(",")})');
+              }
+              if (expandedTopics != null && expandedTopics.isNotEmpty) {
+                final safeNames = expandedTopics
+                    .take(25)
+                    .map((n) => '"${n.replaceAll('"', '').replaceAll(',', ' ')}"')
+                    .join(',');
+                orClauses.add('topic.in.($safeNames)');
+              }
+
+              if (orClauses.isNotEmpty) {
+                topicQuery = topicQuery.or(orClauses.join(','));
+              }
+
+              final res = await topicQuery.limit(config.questionCount * 4);
+              rawData = List<dynamic>.from(res as List);
+              debugPrint('[ExamProvider] Topic Tier 1 Dual-Query found ${rawData.length} questions');
+            } catch (e) {
+              debugPrint('[ExamProvider] Dual-Query error (falling back to name-only): $e');
+              if (expandedTopics != null && expandedTopics.isNotEmpty) {
+                try {
+                  var fallbackTopicQuery = supabase
+                      .from('questions')
+                      .select('*')
+                      .inFilter('subject', subjectVariants)
+                      .not('options', 'is', null)
+                      .inFilter('topic', expandedTopics);
+
+                  if (expandedChapters != null && expandedChapters.isNotEmpty) {
+                    fallbackTopicQuery = fallbackTopicQuery.inFilter('chapter', expandedChapters);
+                  }
+                  final res = await fallbackTopicQuery.limit(config.questionCount * 4);
+                  rawData = List<dynamic>.from(res as List);
+                } catch (_) {}
+              }
+            }
+
+            // ── Tier 2: Substring / Keyword Search (Handles prefixed names like "টপিক ১ - ভেক্টর") ──
+            if (rawData.length < config.questionCount && topicsList != null && topicsList.isNotEmpty) {
+              final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
+              for (final rawTopic in topicsList.take(6)) {
+                if (rawData.length >= config.questionCount * 2) break;
+                final clean = rawTopic
+                    .replaceAll(RegExp(r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*)'), '')
+                    .replaceAll(RegExp(r'\s*\([^)]*\)\s*'), '')
+                    .trim();
+                if (clean.length < 3) continue;
+
+                try {
+                  var kwQuery = supabase
+                      .from('questions')
+                      .select('*')
+                      .inFilter('subject', subjectVariants)
+                      .ilike('topic', '%$clean%')
+                      .not('options', 'is', null);
+
+                  if (expandedChapters != null && expandedChapters.isNotEmpty) {
+                    kwQuery = kwQuery.inFilter('chapter', expandedChapters);
+                  }
+                  final kwRes = await kwQuery.limit(config.questionCount * 2);
+                  for (final row in (kwRes as List)) {
+                    final qId = row['id']?.toString();
+                    if (qId != null && !seenIds.contains(qId)) {
+                      seenIds.add(qId);
+                      rawData.add(row);
+                    }
+                  }
+                } catch (_) {}
+              }
+            }
+
+            // ── Tier 3: Seamless Chapter Top-Up (So questions are NEVER missed and exam ALWAYS launches) ──
+            if (rawData.length < config.questionCount && expandedChapters != null && expandedChapters.isNotEmpty) {
+              debugPrint('[ExamProvider] Topics yielded ${rawData.length} of ${config.questionCount}, seamlessly topping up from chapter...');
+              final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
+              try {
+                var topUpQuery = supabase
+                    .from('questions')
+                    .select('*')
+                    .inFilter('subject', subjectVariants)
+                    .inFilter('chapter', expandedChapters)
+                    .not('options', 'is', null);
+
+                if (difficultiesList != null && difficultiesList.isNotEmpty) {
+                  topUpQuery = topUpQuery.inFilter('difficulty', difficultiesList);
+                }
+                if (examTypesList != null && examTypesList.isNotEmpty) {
+                  final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+                  topUpQuery = topUpQuery.or(orConditions);
+                }
+
+                final topUpRes = await topUpQuery.limit(config.questionCount * 4);
+                for (final row in (topUpRes as List)) {
+                  final qId = row['id']?.toString();
+                  if (qId != null && !seenIds.contains(qId)) {
+                    seenIds.add(qId);
+                    rawData.add(row);
+                  }
+                }
+              } catch (_) {}
+            }
+          } else {
+            // General Chapter-level query (when no topic is specified)
+            var query = supabase
                 .from('questions')
                 .select('*')
                 .inFilter('subject', subjectVariants)
                 .not('options', 'is', null);
 
             if (expandedChapters != null && expandedChapters.isNotEmpty) {
-              retryQuery = retryQuery.inFilter('chapter', expandedChapters);
+              query = query.inFilter('chapter', expandedChapters);
             }
             if (difficultiesList != null && difficultiesList.isNotEmpty) {
-              retryQuery = retryQuery.inFilter('difficulty', difficultiesList);
+              query = query.inFilter('difficulty', difficultiesList);
             }
             if (examTypesList != null && examTypesList.isNotEmpty) {
               final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
-              retryQuery = retryQuery.or(orConditions);
+              query = query.or(orConditions);
             }
-            final retryData = await retryQuery.limit(config.questionCount * 4);
-            qList = List<dynamic>.from(retryData as List);
+
+            final res = await query.limit(config.questionCount * 4);
+            rawData = List<dynamic>.from(res as List);
           }
+
+          var qList = rawData;
 
           var allQuestions = qList
               .map((e) => Question.fromJson(e as Map<String, dynamic>))
@@ -1226,6 +1350,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       // Clear SharedPreferences stats cache so next build() re-fetches from DB
       try {
         final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('subject_stats_attended_$authId');
+        await prefs.remove('subject_stats_attended_${authId}_time');
         await prefs.remove('subject_stats_$authId');
         await prefs.remove('profile_$authId');
         await prefs.remove('cached_history_list');

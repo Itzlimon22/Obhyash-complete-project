@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
 import 'payment_view.dart';
@@ -374,8 +376,8 @@ class _PlanSelectionViewState extends State<PlanSelectionView> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
+          icon: AppIcon(
+            AppIcons.arrowLeft,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -740,7 +742,7 @@ class _PlanSelectionCard extends StatelessWidget {
               ),
               child: isSelected
                   ? const Center(
-                      child: Icon(LucideIcons.check, size: 13, color: Colors.white),
+                      child: AppIcon(AppIcons.check, size: 13, color: Colors.white),
                     )
                   : null,
             ),

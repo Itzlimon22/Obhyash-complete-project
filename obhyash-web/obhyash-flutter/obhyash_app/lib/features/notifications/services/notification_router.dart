@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/router.dart';
 import '../../../core/services/haptics_service.dart';
 import '../domain/notification_model.dart';
 import '../presentation/notifications_view.dart';
@@ -31,6 +32,9 @@ class NotificationRouter {
       var internalRoute = rawLink;
       if (!internalRoute.startsWith('/')) {
         internalRoute = '/$internalRoute';
+      }
+      if (internalRoute == '/exam-setup') {
+        internalRoute = '/setup';
       }
       return NotificationRouteResult(route: internalRoute);
     }
@@ -120,18 +124,34 @@ class NotificationRouter {
       return;
     }
 
+    final navContext = rootNavigatorKey.currentContext ?? context;
+
     if (result.route != null) {
       try {
-        context.push(result.route!);
+        var targetRoute = result.route!;
+        if (targetRoute == '/exam-setup') {
+          targetRoute = '/setup';
+        }
+        if (targetRoute == '/setup' ||
+            targetRoute == '/' ||
+            targetRoute == '/dashboard' ||
+            targetRoute == '/question-bank' ||
+            targetRoute == '/question_bank' ||
+            targetRoute == '/leaderboard' ||
+            targetRoute == '/profile') {
+          navContext.go(targetRoute);
+        } else {
+          navContext.push(targetRoute);
+        }
       } catch (e) {
         debugPrint('[NotificationRouter] Navigation error: $e');
-        _showDetailModal(context, notif);
+        _showDetailModal(navContext, notif);
       }
       return;
     }
 
     if (result.shouldShowDetailModal) {
-      _showDetailModal(context, notif);
+      _showDetailModal(navContext, notif);
     }
   }
 

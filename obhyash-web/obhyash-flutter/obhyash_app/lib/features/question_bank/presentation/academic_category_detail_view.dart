@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 
 class AcademicCategoryDetailView extends StatelessWidget {
   final Map<String, dynamic> subject;
@@ -63,8 +64,8 @@ class AcademicCategoryDetailView extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
+          icon: AppIcon(
+            AppIcons.arrowLeft,
             color: isDark ? Colors.white : const Color(0xFF1F2937),
             size: 22,
           ),

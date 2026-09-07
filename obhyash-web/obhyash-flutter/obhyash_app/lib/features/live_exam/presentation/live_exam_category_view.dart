@@ -317,48 +317,49 @@ class _LiveExamCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Row 2: Metadata (Duration | Questions)
+              // Row 2: Metadata (Duration on left, Questions on right)
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    LucideIcons.clock,
-                    size: 14,
-                    color: const Color(0xFFEF4444),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    durationText,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      '|',
-                      style: TextStyle(
-                        color: isDark ? const Color(0xFF33384C) : const Color(0xFFCBD5E1),
-                        fontSize: 13,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.clock,
+                        size: 14,
+                        color: const Color(0xFFEF4444),
                       ),
-                    ),
+                      const SizedBox(width: 5),
+                      Text(
+                        durationText,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                        ),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    LucideIcons.fileText,
-                    size: 14,
-                    color: const Color(0xFF10B981),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    questionsText,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.fileText,
+                        size: 14,
+                        color: const Color(0xFF10B981),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        questionsText,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

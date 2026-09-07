@@ -10,6 +10,8 @@ enum NotificationCategory {
   examResultEncourage,
   milestoneReward,
   leaderboardNudge,
+  bookmarkAlert,
+  welcome,
 }
 
 class NotificationTemplate {
@@ -25,7 +27,7 @@ class NotificationTemplate {
     required this.category,
     required this.title,
     required this.body,
-    this.defaultRoute = '/exam-setup',
+    this.defaultRoute = '/setup',
     this.type = 'general',
   });
 
@@ -41,7 +43,7 @@ class NotificationTemplate {
     final studentName = (name != null && name.trim().isNotEmpty) ? name.trim() : 'শিক্ষার্থী';
     final streakCount = (streak != null && streak > 0) ? streak.toString() : '১';
     final subj = subject ?? 'পদার্থবিজ্ঞান';
-    final sc = score != null ? score.toString() : '০';
+    final sc = score != null ? score.toStringAsFixed(score.truncateToDouble() == score ? 0 : 1) : '০';
     final rk = rank != null ? rank.toString() : '১';
     final titleText = examTitle ?? 'মডেল টেস্ট';
 
@@ -72,53 +74,53 @@ class NotificationTemplate {
 
 class NotificationTemplateLibrary {
   static const List<NotificationTemplate> templates = [
-    // ── 1. স্ট্রিক সেভার ও রাতের রিমাইন্ডার (Evening Streak Saviors) ───────────
+    // ── 1. স্ট্রিক সেভার ও রাতের রিমাইন্ডার (Evening & Night Panic - Duolingo/Chorcha Style) ─
     NotificationTemplate(
       id: 'streak_save_1',
       category: NotificationCategory.streakSaver,
       title: '🚨 {name}, তোমার {streak} দিনের স্ট্রিক পুড়ছে!',
-      body: 'আর মাত্র কয়েক ঘণ্টা বাকি! এখনই ১টি ছোট প্র্যাকটিস দিয়ে আগুনটা বাঁচাও 🚒',
-      defaultRoute: '/exam-setup',
+      body: 'ফায়ার সার্ভিস ডাকার আগেই ১টি ৫ মিনিটের কুইজ দিয়ে আগুনটা বাঁচাও 🚒🔥 রাত ১২টার পর কিন্তু আফসোস বাড়বে!',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
     NotificationTemplate(
       id: 'streak_save_2',
       category: NotificationCategory.streakSaver,
-      title: 'টানা {streak} দিন! {name}, আমি কি তোমাকে বিরক্ত করছি?',
-      body: 'ঠিক আছে, আর কখনও পড়তে বলব না... নিজের স্ট্রিকের যত্ন নিও 😢',
-      defaultRoute: '/exam-setup',
+      title: 'ঠিক আছে, আর কখনও পড়তে বলব না... 💔',
+      body: 'টানা {streak} দিন পড়ে আজ স্ট্রিক ভুলে গেলে? নিজের স্ট্রিকের যত্ন নিও... আমি আর কিছু বলব না 😢',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
     NotificationTemplate(
       id: 'streak_save_3',
       category: NotificationCategory.streakSaver,
-      title: 'ফোন স্ক্রল করতে করতে স্ট্রিক ভুলে গেলে? 👀',
-      body: 'রিলস কালও থাকবে, কিন্তু তোমার সাধের {streak} দিনের স্ট্রিক আজ রাতেই শেষ হয়ে যাবে! ⏳',
-      defaultRoute: '/exam-setup',
+      title: 'রিলস কালও থাকবে, কিন্তু স্ট্রিক থাকবে না! 👀',
+      body: 'ফোন স্ক্রল করতে করতে স্ট্রিক ভুলে গেলে? তোমার সাধের {streak} দিনের স্ট্রিক আজ রাতেই শেষ হবে! ⏳',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
     NotificationTemplate(
       id: 'streak_save_4',
       category: NotificationCategory.streakSaver,
       title: 'ঘুমিয়ে পড়লে নাকি {name}? 😱',
-      body: 'মাত্র ১টা ৫ মিনিটের কুইজ দাও, নয়তো কাল সকালে স্ট্রিক ০ দেখে আফসোস করবে 😭',
-      defaultRoute: '/exam-setup',
+      body: 'মাত্র ১টা ৫ মিনিটের কুইজ দাও, নয়তো কাল সকালে স্ট্রিক ০ দেখে কেঁদে বুক ভাসাবে 😭',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
     NotificationTemplate(
       id: 'streak_save_5',
       category: NotificationCategory.streakSaver,
-      title: 'শেষ ডাক {name}! ঘড়ির কাঁটা কিন্তু ঘুরছে ⏰',
-      body: 'রাত ১২টার আগে মাত্র ১০টি এমসিকিউ সলভ করে স্ট্রিকটা টিকিয়ে রাখো! ⚡',
-      defaultRoute: '/exam-setup',
+      title: 'তোমার স্ট্রিক আজ রাতে আইসিইউতে! 🏥',
+      body: 'ডাক্তার বলেছে আর দেরি করা যাবে না! মাত্র ১টি টেস্টই পারে একে জীবন ফিরিয়ে দিতে 🩺⚡',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
     NotificationTemplate(
       id: 'streak_save_6',
       category: NotificationCategory.streakSaver,
-      title: 'তোমার স্ট্রিক আজ রাতে আইসিইউতে! 🏥',
-      body: 'মাত্র ১টি টেস্টই পারে একে বাঁচাতে। ডাক্তার বলেছে আর দেরি করা যাবে না 🩺',
-      defaultRoute: '/exam-setup',
+      title: 'শেষ ডাক {name}! ঘড়ির কাঁটা কিন্তু থামবে না ⏰',
+      body: 'রাত ১২টা বাজতে আর অল্প বাকি। ১০টি এমসিকিউ সলভ করে আগুনটা টিকিয়ে রাখো! ⚡',
+      defaultRoute: '/setup',
       type: 'streak',
     ),
 
@@ -126,33 +128,25 @@ class NotificationTemplateLibrary {
     NotificationTemplate(
       id: 'morning_1',
       category: NotificationCategory.morningKickstart,
-      title: 'ঘুম থেকে উঠো {name}, স্বপ্ন পূরণ করতে হবে! ☀️',
-      body: 'সকালের প্রথম চা খাওয়ার ফাঁকে মাত্র ৫ মিনিটের স্পেশাল টেস্টটা দিয়ে দিন শুরু করো ☕',
-      defaultRoute: '/exam-setup',
+      title: 'চা ঠান্ডা হওয়ার আগেই কুইজ শেষ করো! 🍵',
+      body: 'সকালের প্রথম চা খাওয়ার ফাঁকে মাত্র ৫ মিনিট দাও, দেখা যাক চা জেতে নাকি তোমার ব্রেন 💡☕',
+      defaultRoute: '/setup',
       type: 'general',
     ),
     NotificationTemplate(
       id: 'morning_2',
       category: NotificationCategory.morningKickstart,
-      title: 'আজকের দিনের প্রথম চ্যালেঞ্জটা নিয়ে নাও! ⏱️',
-      body: 'সকালে ১০টি কঠিন প্রশ্ন সমাধান করলে সারাদিনের পড়াশোনার কনফিডেন্স বেড়ে যায় দ্বিগুণ 🧠',
-      defaultRoute: '/exam-setup',
+      title: 'ঘুম থেকে উঠো {name}, বুয়েট/মেডিকেল ডাকছে! 🩺⚡',
+      body: 'তোমার প্রতিদ্বন্দ্বীরা অলরেডি পড়া শুরু করে দিয়েছে। তুমি কাঁথা মুড়ি দিয়ে পিছিয়ে থাকবে নাকি? 🛌',
+      defaultRoute: '/setup',
       type: 'general',
     ),
     NotificationTemplate(
       id: 'morning_3',
       category: NotificationCategory.morningKickstart,
-      title: 'বুয়েট/মেডিকেলের সিট কিন্তু বসে নেই {name}! 🩺⚡',
-      body: 'তোমার প্রতিদ্বন্দ্বীরা অলরেডি পড়া শুরু করে দিয়েছে। তুমি পিছিয়ে থাকবে কেন?',
-      defaultRoute: '/exam-setup',
-      type: 'general',
-    ),
-    NotificationTemplate(
-      id: 'morning_4',
-      category: NotificationCategory.morningKickstart,
-      title: 'চা ঠান্ডা হওয়ার আগেই কুইজ শেষ করো! 🍵',
-      body: 'মাত্র ৫ মিনিট সময় দাও, নিজের মেমোরি কতটা শার্প নিজেই পরীক্ষা করে নাও 💡',
-      defaultRoute: '/exam-setup',
+      title: 'আজকের দিনের প্রথম চ্যালেঞ্জটা নিয়ে নাও! ⏱️',
+      body: 'সকালে ১০টি এমসিকিউ জয় করলে সারাদিনের পড়াশোনার কনফিডেন্স বেড়ে যায় দ্বিগুণ 🧠🔥',
+      defaultRoute: '/setup',
       type: 'general',
     ),
 
@@ -160,43 +154,43 @@ class NotificationTemplateLibrary {
     NotificationTemplate(
       id: 'afternoon_1',
       category: NotificationCategory.afternoonBite,
-      title: 'ভাতঘুমের আলসেমি দূর করার সেরা উপায়! 🥱',
-      body: '৫ মিনিটের একটি র‍্যাপিড ফায়ার কুইজ খেলো, ঘুম একদম উড়ে যাবে 🎯',
-      defaultRoute: '/exam-setup',
+      title: 'ভাতঘুমের আলসেমি তাড়ানোর সেরা দাওয়াই! 🥱',
+      body: '৫ মিনিটের একটি র‍্যাপিড ফায়ার কুইজ খেলো, আলসেমি একদম হাওয়া হয়ে যাবে 🎯',
+      defaultRoute: '/setup',
       type: 'general',
     ),
     NotificationTemplate(
       id: 'afternoon_2',
       category: NotificationCategory.afternoonBite,
-      title: '{name}, {subject} এর এই নিয়মটা মনে আছে তো? 📖',
-      body: 'মাত্র ৩টি প্রশ্নে নিজেকে যাচাই করে নাও। রিভিশন ছাড়া প্রস্তুতি কিন্তু অসম্পূর্ণ!',
+      title: '{name}, {subject} এর এই ফর্মুলাটা মনে আছে তো? 📖',
+      body: 'মাত্র ৩টি প্রশ্নে নিজেকে যাচাই করে নাও। রিভিশন ছাড়া প্রস্তুতি কিন্তু ফাঁকা আওয়াজ!',
       defaultRoute: '/question-bank',
       type: 'general',
     ),
 
-    // ── 4. ইনঅ্যাক্টিভিটি ও কামব্যাক (User Inactivity / Missing) ─────────────
+    // ── 4. ইনঅ্যাক্টিভিটি ও কামব্যাক (Guilt-trip Comeback) ─────────────────────
+    NotificationTemplate(
+      id: 'chorcha_exact_1',
+      category: NotificationCategory.inactivityGuilt,
+      title: 'কি ব্যাপার {name}?',
+      body: 'একটা মক টেস্ট কি দিয়ে দেখা যায় না? 😒',
+      defaultRoute: '/setup',
+      type: 'general',
+    ),
     NotificationTemplate(
       id: 'inactivity_1',
       category: NotificationCategory.inactivityGuilt,
-      title: '২ দিন ধরে তোমার দেখা নেই {name}... বইগুলো তো কাঁদছে 📚😢',
-      body: 'সবকিছু কি ঠিক আছে? আজ অন্তত একটি ছোট সেট প্র্যাকটিস করে কামব্যাক করো!',
-      defaultRoute: '/exam-setup',
+      title: 'পড়ার টেবিল কাঁদছে, বইগুলো অভিমান করেছে... 📚😢',
+      body: '২ দিন ধরে তোমার দেখা নেই {name}... আজ অন্তত ১টি ছোট প্র্যাকটিস দিয়ে মান ভাঙাও!',
+      defaultRoute: '/setup',
       type: 'general',
     ),
     NotificationTemplate(
       id: 'inactivity_2',
       category: NotificationCategory.inactivityGuilt,
-      title: 'তোমার পড়ার টেবিল তোমার জন্য অপেক্ষা করছে 🪑',
-      body: 'গ্যাপ পড়ে গেলে পড়া পাহাড় সমান ভারী হয়ে যায়। আজই ফিরে আসো ট্র্যাকে 🏃‍♂️',
-      defaultRoute: '/exam-setup',
-      type: 'general',
-    ),
-    NotificationTemplate(
-      id: 'inactivity_3',
-      category: NotificationCategory.inactivityGuilt,
       title: 'আমরা কি কোনো ভুল করেছি {name}? 🥺',
-      body: 'তুমি না পড়লে কার মেধা যাচাই করব বলো? অ্যাপে তোমার জন্য নতুন প্রশ্ন রেডি আছে!',
-      defaultRoute: '/exam-setup',
+      body: 'তুমি না পড়লে কার মেধা যাচাই করব বলো? অ্যাপে তোমার জন্য ফ্রেশ প্রশ্ন রেডি আছে 🏃‍♂️',
+      defaultRoute: '/setup',
       type: 'general',
     ),
 
@@ -205,7 +199,7 @@ class NotificationTemplateLibrary {
       id: 'live_exam_1',
       category: NotificationCategory.liveExamAlert,
       title: '🎯 লাইভ পরীক্ষা শুরু হতে আর মাত্র ১৫ মিনিট!',
-      body: '{exam_title} এর জন্য খাতা-কলম নিয়ে রেডি হও। সবার সাথে লাইভ লড়াই শুরু হচ্ছে ⏱️',
+      body: '{exam_title} এর জন্য প্রস্তুত হও। সারা দেশের হাজারো শিক্ষার্থীর সাথে সরাসরি লড়াই! ⏱️',
       defaultRoute: '/live-exams',
       type: 'live_exam',
     ),
@@ -217,21 +211,13 @@ class NotificationTemplateLibrary {
       defaultRoute: '/live-exams',
       type: 'live_exam',
     ),
-    NotificationTemplate(
-      id: 'live_exam_3',
-      category: NotificationCategory.liveExamAlert,
-      title: '⏳ শেষ সুযোগ! পরীক্ষা শেষ হতে আর ৩০ মিনিট বাকি',
-      body: '{exam_title} সাবমিট না করলে তোমার র‍্যাংকিং গণনা করা হবে না। দ্রুত শেষ করো!',
-      defaultRoute: '/live-exams',
-      type: 'live_exam',
-    ),
 
     // ── 6. পরীক্ষার দারুণ ফলাফল (Positive Exam Results) ──────────────────────
     NotificationTemplate(
       id: 'result_pos_1',
       category: NotificationCategory.examResultPositive,
       title: '🔥 আগুন পারফরম্যান্স {name}! পেয়েছ {score}%',
-      body: '{exam_title} পরীক্ষায় তুমি দারুণ করেছ! লিডারবোর্ডে তোমার অবস্থান দেখে নাও 🏅',
+      body: '{exam_title} পরীক্ষায় তুমি ফাটিয়ে দিয়েছ! এলাকার মিষ্টির দোকানে অগ্রিম অর্ডার দিয়ে রাখো 🍬🏅',
       defaultRoute: '/history',
       type: 'result',
     ),
@@ -239,7 +225,7 @@ class NotificationTemplateLibrary {
       id: 'result_pos_2',
       category: NotificationCategory.examResultPositive,
       title: '👏 সাবাশ! তুমি লিডারবোর্ডে #{rank} নম্বরে আছো',
-      body: 'তোমার কঠোর পরিশ্রম কাজে দিচ্ছে। এই মোমেন্টাম ধরে রাখো শেষ পর্যন্ত!',
+      body: 'তোমার পরিশ্রম বৃথা যাবে না। এই মোমেন্টাম ধরে রাখলে চান্স নিশ্চিত! 🚀',
       defaultRoute: '/history',
       type: 'result',
     ),
@@ -248,26 +234,26 @@ class NotificationTemplateLibrary {
     NotificationTemplate(
       id: 'result_enc_1',
       category: NotificationCategory.examResultEncourage,
-      title: 'ভুল থেকেই আসল শেখা শুরু হয় {name} 💡',
-      body: 'যে প্রশ্নগুলো ভুল হয়েছে সেগুলোর ব্যাখ্যা এখনই দেখে নাও, ভুলগুলোকে শক্তিতে রূপ দাও!',
+      title: '🙈 স্কোর দেখে আমি চোখ বন্ধ করে ফেলেছি... {score}%?!',
+      body: '{exam_title} এর ভুলগুলোর সমাধান দ্রুত দেখে নাও, নয়তো রাতে দুঃস্বপ্ন দেখবে 👻📖 এখনই রিভিশন দাও!',
       defaultRoute: '/history',
       type: 'result',
     ),
     NotificationTemplate(
       id: 'result_enc_2',
       category: NotificationCategory.examResultEncourage,
-      title: 'মন খারাপের কিছু নেই! অনুশীলনই তোমাকে পারফেক্ট করবে 🎯',
-      body: 'আজকের টেস্টের ভুল উত্তরগুলো রিভিশন দিয়ে কালকের জন্য নিজেকে আরও প্রস্তুত করো।',
+      title: 'ভুল থেকেই আসল শেখা শুরু হয় {name} 💡',
+      body: 'যে প্রশ্নগুলো ভুল হয়েছে সেগুলোর ব্যাখ্যা এখনই দেখে নাও, ভুলগুলোকে শক্তিতে রূপ দাও!',
       defaultRoute: '/history',
       type: 'result',
     ),
 
-    // ── 8. মাইলস্টোন সেলিব্রেশন (Milestones: 7, 30, 50, 100 Days) ─────────────
+    // ── 8. মাইলস্টোন সেলিব্রেশন (Milestones) ──────────────────────────────────
     NotificationTemplate(
       id: 'milestone_7',
       category: NotificationCategory.milestoneReward,
-      title: '🎉 অসাধারণ! টানা ৭ দিনের স্ট্রিক কমপ্লিট!',
-      body: '{name}, তুমি টানা ১ সপ্তাহ ধরে নিয়ম মেনে পড়ছ। তুমি কিন্তু এখন অন্য লেভেলে! 🚀',
+      title: '🎉 ইতিহাস সৃষ্টি! টানা ৭ দিনের স্ট্রিক সম্পন্ন!',
+      body: '{name}, তুমি টানা ১ সপ্তাহ ধরে নিয়ম মেনে পড়ছ। তুমি কিন্তু এখন প্রো লেভেলে! 🚀',
       defaultRoute: '/profile/my-profile',
       type: 'milestone',
     ),
@@ -275,9 +261,27 @@ class NotificationTemplateLibrary {
       id: 'milestone_30',
       category: NotificationCategory.milestoneReward,
       title: '👑 টানা ৩০ দিন! তুমি অভ্যাসের মাস্টার!',
-      body: '১ মাস একটানা অনুশীলন করা মুখের কথা নয়। তোমার জন্য বিশেষ ব্যাজ আনলক হয়েছে 🎖️',
+      body: '১ মাস একটানা অনুশীলন করা মুখের কথা নয়। তোমার জন্য স্পেশাল ব্যাজ আনলক হয়েছে 🎖️',
       defaultRoute: '/profile/my-profile',
       type: 'milestone',
+    ),
+
+    // ── 9. বুকমার্ক ও অনবোর্ডিং ─────────────────────────────────────────────
+    NotificationTemplate(
+      id: 'bookmark_saved',
+      category: NotificationCategory.bookmarkAlert,
+      title: '📑 ভুলে যাওয়ার আগেই বুকমার্কে রেখে দিলাম!',
+      body: 'পরীক্ষার আগের রাতে কিন্তু এটা এক পলক দেখতে হবে, কোনো ফাঁকিবাজি চলবে না 🧠',
+      defaultRoute: '/profile/bookmarks',
+      type: 'general',
+    ),
+    NotificationTemplate(
+      id: 'welcome_onboard',
+      category: NotificationCategory.welcome,
+      title: '🎉 অভ্যাসে স্বাগতম {name}! যাত্রা শুরু হলো',
+      body: 'প্রতিদিন অল্প অল্প পড়ে অভ্যাস গড়ে তোলো। হাজারো প্রতিযোগীর ভিড়ে নিজেকে সেরা প্রমাণ করো 🎓',
+      defaultRoute: '/setup',
+      type: 'general',
     ),
   ];
 
@@ -301,5 +305,24 @@ class NotificationTemplateLibrary {
   /// Get random inactivity recovery template
   static NotificationTemplate getRandomInactivity() {
     return getRandom(NotificationCategory.inactivityGuilt);
+  }
+
+  /// Get exam result notification (high score vs encouragement)
+  static Map<String, String> getExamResultNotification({
+    String? name,
+    required String examTitle,
+    required num score,
+    int? rank,
+  }) {
+    final isHigh = score >= 75;
+    final template = getRandom(
+      isHigh ? NotificationCategory.examResultPositive : NotificationCategory.examResultEncourage,
+    );
+    return template.format(
+      name: name,
+      examTitle: examTitle,
+      score: score,
+      rank: rank ?? 1,
+    );
   }
 }

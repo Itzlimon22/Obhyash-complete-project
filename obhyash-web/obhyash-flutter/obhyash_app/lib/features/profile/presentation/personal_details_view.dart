@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/utils/app_popups.dart';
 
 import '../../../core/presentation/widgets/app_dropdown.dart';
@@ -439,7 +441,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             ),
           ),
           leading: IconButton(
-            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+            icon: const AppIcon(AppIcons.arrowLeft, color: Colors.white, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           title: const Text(
@@ -593,8 +595,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               isDark: isDark,
                               readOnly: true,
                               onTap: () => _selectDate(context),
-                              suffixIcon: const Icon(
-                                LucideIcons.calendar,
+                              suffixIcon: const AppIcon(
+                                AppIcons.calendar,
                                 size: 16,
                               ),
                             ),

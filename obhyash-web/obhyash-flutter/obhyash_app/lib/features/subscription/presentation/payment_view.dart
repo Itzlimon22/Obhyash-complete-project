@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -449,8 +451,8 @@ class _PaymentViewState extends State<PaymentView>
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      LucideIcons.arrowLeft,
+                    icon: AppIcon(
+                      AppIcons.arrowLeft,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),
@@ -2486,8 +2488,8 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                     ),
                                     IconButton(
                                       onPressed: () => _deleteMethod(m),
-                                      icon: Icon(
-                                        LucideIcons.trash2,
+                                      icon: AppIcon(
+                                        AppIcons.trash,
                                         size: 16,
                                         color: isDark
                                             ? const Color(0xFF71717A)

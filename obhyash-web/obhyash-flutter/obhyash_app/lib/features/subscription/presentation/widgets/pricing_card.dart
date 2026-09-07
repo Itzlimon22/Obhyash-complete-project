@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../domain/models.dart';
 
 class PricingCard extends StatelessWidget {
@@ -95,15 +97,19 @@ class PricingCard extends StatelessWidget {
                                     : const Color(0xFFF1F5F9)),
                           ),
                           child: Center(
-                            child: Icon(
-                              isBestValue ? LucideIcons.crown : LucideIcons.zap,
-                              color: isBestValue
-                                  ? Colors.white
-                                  : (isDark
-                                      ? const Color(0xFFA3A3A3)
-                                      : const Color(0xFF525252)),
-                              size: 24,
-                            ),
+                            child: isBestValue
+                                ? const AppIcon(
+                                    AppIcons.crown,
+                                    color: Colors.white,
+                                    size: 24,
+                                  )
+                                : Icon(
+                                    LucideIcons.zap,
+                                    color: isDark
+                                        ? const Color(0xFFA3A3A3)
+                                        : const Color(0xFF525252),
+                                    size: 24,
+                                  ),
                           ),
                         ),
 
@@ -207,8 +213,8 @@ class PricingCard extends StatelessWidget {
                                                 )),
                                   ),
                                   child: Center(
-                                    child: Icon(
-                                      LucideIcons.check,
+                                    child: AppIcon(
+                                      AppIcons.check,
                                       size: 11,
                                       color: isBestValue
                                           ? (isDark
@@ -219,7 +225,7 @@ class PricingCard extends StatelessWidget {
                                           : (isDark
                                                 ? const Color(0xFFA3A3A3)
                                                 : const Color(
-                                                    0xFF525252,
+                                                    0xFF737373,
                                                   )),
                                     ),
                                   ),

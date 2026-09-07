@@ -9,6 +9,7 @@ import '../domain/models.dart';
 import '../../live_exam/domain/models.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/shared_prefs_provider.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 /// Mirrors the web app's `getAvatarUrl()` in storage-service.ts.
 /// If [raw] is already a full https URL, returns it unchanged.
@@ -282,7 +283,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (profile == null) return [];
 
     final prefs = ref.watch(sharedPreferencesProvider);
-    final cacheKey = 'subject_stats_v3_${profile.id}';
+    final cacheKey = 'subject_stats_attended_${profile.id}';
     final cacheTimeKey = '${cacheKey}_time';
 
     // 1. Cache-first with TTL check (15 min)
@@ -293,11 +294,11 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (cached != null && isCacheFresh) {
       try {
         final List list = jsonDecode(cached);
-        final cachedStats = list.map((e) => SubjectStats.fromJson(e)).toList();
-        // Only use cache if it has data; empty cache forces a re-fetch
-        if (cachedStats.isNotEmpty) {
-          return cachedStats;
-        }
+        final cachedStats = list
+            .map((e) => SubjectStats.fromJson(e))
+            .where((e) => e.total > 0)
+            .toList();
+        return cachedStats;
       } catch (_) {}
     }
 
@@ -334,18 +335,24 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     }).map((sub) {
       final subName = sub.name.toLowerCase();
       final subId = sub.id.toLowerCase();
+      final formattedSub = BanglaNameHelper.formatSubject(sub.name, sub.id);
 
       int correct = 0;
       int wrong = 0;
       int skipped = 0;
       int total = 0;
+      int examsCount = 0;
 
       for (var exam in history) {
         final hSub = (exam.subjectLabel ?? exam.subject).toLowerCase();
         final hSubId = exam.subject.toLowerCase();
+        final formattedExamSub =
+            BanglaNameHelper.formatSubject(exam.subject, exam.subjectLabel);
 
         final isMatch =
             hSubId == subId ||
+            hSub == subId ||
+            formattedExamSub == formattedSub ||
             hSub.contains(subName) ||
             hSub.contains(subId) ||
             (subName == 'পদার্থবিজ্ঞান' && hSub.contains('physics')) ||
@@ -358,6 +365,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
             (subName == 'আইসিটি' && hSub.contains('ict'));
 
         if (isMatch) {
+          examsCount++;
           correct += exam.correctCount;
           wrong += exam.wrongCount;
           total += exam.totalQuestions;
@@ -373,8 +381,9 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
         wrong: wrong,
         skipped: skipped,
         total: total,
+        examsCount: examsCount,
       );
-    }).toList();
+    }).where((stat) => stat.total > 0).toList(); // Only show attended subjects
 
     prefs.setString(
       cacheKey,
@@ -382,6 +391,21 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     );
     prefs.setInt(cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
     return fresh;
+  }
+
+  Future<void> forceRefresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(userProfileProvider.future);
+      if (profile == null) return [];
+
+      final prefs = ref.read(sharedPreferencesProvider);
+      final cacheKey = 'subject_stats_attended_${profile.id}';
+      prefs.remove(cacheKey);
+      prefs.remove('${cacheKey}_time');
+
+      return build();
+    });
   }
 }
 

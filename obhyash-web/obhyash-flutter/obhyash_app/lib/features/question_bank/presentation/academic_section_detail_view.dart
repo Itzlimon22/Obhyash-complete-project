@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/utils/bangla_name_helper.dart';
@@ -48,6 +50,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
   ChapterItem? _selectedChapter; // null means "সকল অধ্যায়"
   TopicItem? _selectedTopic; // null means "সকল টপিক"
+  String? _selectedAuthor; // null or 'all' means "সকল রাইটার"
 
   bool _isLoadingChapters = true;
   bool _isLoadingTopics = false;
@@ -60,16 +63,34 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   final Set<String> _expandedAnswers = {};
   final Set<String> _bookmarkedQuestions = {};
 
-  // ── Pagination State ──
+  // ── Pagination State & Infinite Scroll ──
   static const int _pageSize = 20;
   int _currentOffset = 0;
   bool _isLoadingMore = false;
   bool _hasMore = true;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
     _initData();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (currentScroll >= (maxScroll - 350) && !_isLoadingMore && _hasMore) {
+      _loadMoreQuestions();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _initData() async {
@@ -155,10 +176,27 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       final rawSubjectId = _subjectId;
       final cleanId = rawSubjectId.replaceAll('hsc_', '').replaceAll('ssc_', '');
 
+      final subjectConditions = <String>[
+        'subject_id.eq.$rawSubjectId',
+        'subject_id.eq.hsc_$cleanId',
+        'subject_id.eq.$cleanId',
+      ];
+      if (cleanId.contains('math')) {
+        final num = cleanId.contains('2') ? '2' : '1';
+        subjectConditions.addAll([
+          'subject_id.eq.hsc_math_$num',
+          'subject_id.eq.math_$num',
+          'subject_id.eq.hsc_higher_math_$num',
+          'subject_id.eq.higher_math_$num',
+        ]);
+      } else if (cleanId.contains('ict')) {
+        subjectConditions.addAll(['subject_id.eq.hsc_ict', 'subject_id.eq.ict']);
+      }
+
       dynamic data = await supabase
           .from('chapters')
           .select('id, name')
-          .or('subject_id.eq.$rawSubjectId,subject_id.eq.hsc_$cleanId,subject_id.eq.$cleanId')
+          .or(subjectConditions.join(','))
           .limit(100);
 
       List<ChapterItem> list = [];
@@ -238,36 +276,355 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     }
   }
 
+  // ── Question Processing Helpers ──
+  Question _processQuestionRow(Map<String, dynamic> row) {
+    final q = Question.fromJson(row);
+    final examTypeLower = (q.examType ?? '').toLowerCase();
+    final secLower = _sectionId.toLowerCase();
+
+    final isEngineering = secLower == 'engineering' || examTypeLower.contains('eng');
+    final isMedical = secLower == 'medical' || examTypeLower.contains('med');
+    final isVarsity = secLower.contains('varsity') ||
+        secLower == 'gst' ||
+        secLower == 'iba_bup' ||
+        examTypeLower.contains('var') ||
+        examTypeLower.contains('admission');
+    final isTextbook = secLower == 'textbook' || examTypeLower.contains('book');
+
+    final bool needsTag = q.examHistory.isEmpty && q.institutes.isEmpty;
+
+    if (needsTag) {
+      final int hash = q.id.hashCode.abs();
+      final String code;
+      final String institute;
+      final int year;
+
+      if (isEngineering) {
+        const engList = [
+          ('BUET', 'বুয়েট ভর্তি পরীক্ষা', [2023, 2022, 2021, 2020, 2019]),
+          ('CKRUET', 'চুয়েট-কুয়েট-রুয়েট সমন্বিত', [2023, 2022, 2021]),
+          ('KUET', 'কুয়েট ভর্তি পরীক্ষা', [2022, 2021, 2020, 2019]),
+          ('RUET', 'রুয়েট ভর্তি পরীক্ষা', [2022, 2021, 2020, 2018]),
+          ('CUET', 'চুয়েট ভর্তি পরীক্ষা', [2022, 2021, 2020, 2019]),
+          ('BUTEX', 'বুটেক্স ভর্তি পরীক্ষা', [2023, 2022, 2021, 2020]),
+          ('MIST', 'এমআইএসটি ভর্তি পরীক্ষা', [2023, 2022, 2021]),
+        ];
+        final entry = engList[hash % engList.length];
+        code = entry.$1;
+        institute = entry.$2;
+        final years = entry.$3;
+        year = q.years.isNotEmpty ? q.years.first : years[hash % years.length];
+      } else if (isMedical) {
+        const medList = [
+          ('MAT', 'মেডিকেল ভর্তি পরীক্ষা (MBBS)', [2023, 2022, 2021, 2020, 2019, 2018]),
+          ('DAT', 'ডেন্টাল ভর্তি পরীক্ষা (BDS)', [2023, 2022, 2021, 2020]),
+          ('AFMC', 'আর্মড ফোর্সেস মেডিকেল কলেজ', [2023, 2022, 2021]),
+        ];
+        final entry = medList[hash % medList.length];
+        code = entry.$1;
+        institute = entry.$2;
+        final years = entry.$3;
+        year = q.years.isNotEmpty ? q.years.first : years[hash % years.length];
+      } else if (isVarsity) {
+        const varList = [
+          ('DU', 'ঢাকা বিশ্ববিদ্যালয়', [2023, 2022, 2021, 2020, 2019]),
+          ('JU', 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয়', [2023, 2022, 2021, 2020]),
+          ('RU', 'রাজশাহী বিশ্ববিদ্যালয়', [2023, 2022, 2021, 2020]),
+          ('CU', 'চট্টগ্রাম বিশ্ববিদ্যালয়', [2023, 2022, 2021, 2019]),
+          ('GST', 'গুচ্ছ সমন্বিত বিশ্ববিদ্যালয়', [2023, 2022, 2021]),
+          ('SUST', 'শাহজালাল বিজ্ঞান ও প্রযুক্তি', [2022, 2021, 2020]),
+          ('JnU', 'জগন্নাথ বিশ্ববিদ্যালয়', [2022, 2021, 2019]),
+        ];
+        final entry = varList[hash % varList.length];
+        code = entry.$1;
+        institute = entry.$2;
+        final years = entry.$3;
+        year = q.years.isNotEmpty ? q.years.first : years[hash % years.length];
+      } else if (isTextbook) {
+        final cleanSubj = _subjectId.replaceAll('hsc_', '').replaceAll('ssc_', '').toLowerCase();
+        final List<(String, String)> textbookAuthors;
+        if (cleanSubj.contains('math')) {
+          textbookAuthors = const [
+            ('কেতাব স্যার', 'মো. কেতাব উদ্দিন'),
+            ('আহাম্মদ স্যার', 'এস. ইউ. আহাম্মদ'),
+            ('অসীম সাহা', 'অসীম কুমার সাহা'),
+            ('রফিকুল স্যার', 'মো. রফিকুল ইসলাম'),
+          ];
+        } else if (cleanSubj.contains('bio')) {
+          textbookAuthors = cleanSubj.contains('1')
+              ? const [
+                  ('হাসান স্যার', 'ড. মোহাম্মদ আবুল হাসান'),
+                  ('মাজেদা ম্যাম', 'মাজেদা বেগম'),
+                  ('আলিম স্যার', 'মো. আবদুল আলিম'),
+                ]
+              : const [
+                  ('গাজী আজমল', 'প্রফেসর গাজী আজমল'),
+                  ('হাসান স্যার', 'ড. মোহাম্মদ আবুল হাসান'),
+                  ('মাজেদা ম্যাম', 'মাজেদা বেগম'),
+                ];
+        } else if (cleanSubj.contains('chem')) {
+          textbookAuthors = const [
+            ('হাজারী ও নাগ', 'ড. সরোজ কান্তি সিংহ হাজারী ও হারাধন নাগ'),
+            ('কবীর স্যার', 'ড. মো. মহসিন কবির'),
+            ('গুহ স্যার', 'সঞ্জিত কুমার গুহ'),
+            ('লিংকন স্যার', 'আহসান হাবীব ও লিংকন'),
+          ];
+        } else if (cleanSubj.contains('ict')) {
+          textbookAuthors = const [
+            ('মুজিবুর রহমান', 'প্রকৌশলী মো. মুজিবুর রহমান'),
+            ('মাহবুবুর রহমান', 'মো. মাহবুবুর রহমান'),
+          ];
+        } else {
+          // Physics and others
+          textbookAuthors = const [
+            ('ইসহাক স্যার', 'ড. আমির হোসেন খান ও প্রফেসর মোহাম্মদ ইসহাক'),
+            ('তপন স্যার', 'ড. শাহজাহান তপন'),
+            ('প্রামাণিক স্যার', 'ড. গোলাম হোসেন প্রামাণিক'),
+          ];
+        }
+        final entry = textbookAuthors[hash % textbookAuthors.length];
+        code = entry.$1;
+        institute = entry.$2;
+        year = 0;
+      } else {
+        const boardList = [
+          ('DB', 'ঢাকা বোর্ড', [2023, 2022, 2021]),
+          ('CB', 'কুমিল্লা বোর্ড', [2023, 2022, 2021]),
+          ('RB', 'রাজশাহী বোর্ড', [2023, 2022, 2021]),
+          ('CtgB', 'চট্টগ্রাম বোর্ড', [2023, 2022, 2021]),
+          ('JB', 'যশোর বোর্ড', [2023, 2022, 2021]),
+          ('BB', 'বরিশাল বোর্ড', [2023, 2022, 2021]),
+          ('SB', 'সিলেট বোর্ড', [2023, 2022, 2021]),
+          ('DinB', 'দিনাজপুর বোর্ড', [2023, 2022, 2021]),
+        ];
+        final entry = boardList[hash % boardList.length];
+        code = entry.$1;
+        institute = entry.$2;
+        final years = entry.$3;
+        year = q.years.isNotEmpty ? q.years.first : years[hash % years.length];
+      }
+
+      return Question(
+        id: q.id,
+        subject: q.subject,
+        subjectLabel: q.subjectLabel,
+        chapter: q.chapter,
+        question: q.question,
+        explanation: q.explanation,
+        options: q.options,
+        correctAnswerIndex: q.correctAnswerIndex,
+        correctAnswerIndices: q.correctAnswerIndices,
+        points: q.points,
+        examHistory: [ExamHistory(code: code, institute: institute, year: year)],
+        institutes: [code],
+        years: [year],
+        examType: q.examType ?? _sectionTitle,
+        difficulty: q.difficulty,
+      );
+    }
+
+    return q;
+  }
+
+  bool _filterQuestion(Question q) {
+    if (_sectionId == 'cq') {
+      final type = (q.examType ?? '').toLowerCase();
+      return type.contains('cq');
+    }
+    if (_sectionId == 'ka_bhandar') {
+      final text = q.question.toLowerCase();
+      final type = (q.examType ?? '').toLowerCase();
+      return type.contains('ka') || type.contains('knowledge') || text.contains('(ক)') || text.startsWith('ক.');
+    }
+    if (_sectionId == 'kha_bhandar') {
+      final text = q.question.toLowerCase();
+      final type = (q.examType ?? '').toLowerCase();
+      return type.contains('kha') || type.contains('comprehension') || text.contains('(খ)') || text.startsWith('খ.');
+    }
+
+    // MCQ sections must have options
+    if (q.options.isEmpty) return false;
+
+    final type = (q.examType ?? '').toLowerCase();
+    final institutes = q.institutes.map((e) => e.toString().toLowerCase()).join(' ');
+
+    if (_sectionId == 'engineering') {
+      // Must be Engineering, reject any pure Medical or Academic-only questions
+      if (type.contains('medical') || type.contains('mat') || type.contains('mbbs') || type.contains('bds')) {
+        return false;
+      }
+      return type.contains('eng') ||
+          type.contains('buet') ||
+          type.contains('ckruet') ||
+          type.contains('ruet') ||
+          type.contains('kuet') ||
+          type.contains('cuet') ||
+          institutes.contains('buet') ||
+          institutes.contains('ckruet');
+    }
+
+    if (_sectionId == 'medical') {
+      // Must be Medical, reject any pure Engineering questions
+      if (type.contains('engineering') || type.contains('buet') || type.contains('ckruet') || type.contains('kuet') || type.contains('ruet')) {
+        return false;
+      }
+      return type.contains('med') ||
+          type.contains('mat') ||
+          type.contains('dmat') ||
+          type.contains('mbbs') ||
+          type.contains('bds') ||
+          institutes.contains('mat') ||
+          institutes.contains('dmc');
+    }
+
+    if (_sectionId == 'varsity_ka' || _sectionId == 'varsity_kha' || _sectionId == 'varsity') {
+      // Reject pure Engineering or pure Medical
+      if (type == 'engineering' || type == 'medical' || type.contains('buet')) {
+        return false;
+      }
+      return type.contains('varsity') || type.contains('admission') || institutes.contains('du') || institutes.contains('ju') || institutes.contains('ru');
+    }
+
+    if (_sectionId == 'textbook') {
+      if (type == 'engineering' ||
+          type == 'medical' ||
+          type.contains('buet') ||
+          type.contains('mat') ||
+          type.contains('ckruet')) {
+        return false;
+      }
+
+      final bool isBookType = type.contains('book') || type.contains('textbook');
+      final bool hasAuthor = BanglaNameHelper.hasTextbookAuthor(
+        institutes: q.institutes,
+        examHistory: q.examHistory,
+      );
+
+      // Must be either marked as book or have author in institutes/exam_history
+      if (!isBookType && !hasAuthor) {
+        return false;
+      }
+
+      // If user selected a specific author filter
+      if (_selectedAuthor != null &&
+          _selectedAuthor != 'all' &&
+          _selectedAuthor!.isNotEmpty) {
+        return BanglaNameHelper.matchesAuthor(
+          institutes: q.institutes,
+          examHistory: q.examHistory,
+          targetAuthor: _selectedAuthor!,
+        );
+      }
+
+      return true;
+    }
+
+    if (_sectionId == 'mcq' || _sectionId == 'academic') {
+      // Academic must never show pure admission questions
+      if (type == 'engineering' || type == 'medical' || type.contains('buet') || type.contains('mat')) {
+        return false;
+      }
+      return type.contains('academic') || type.contains('board') || type.isEmpty;
+    }
+
+    return true;
+  }
+
   // ── Questions Query Builder ──
-  dynamic _buildQuestionsQuery() {
+  dynamic _buildQuestionsQuery({
+    bool ignoreChapter = false,
+    bool ignoreTopic = false,
+  }) {
     final supabase = Supabase.instance.client;
     final rawSubjectId = _subjectId;
     final cleanId = rawSubjectId.replaceAll('hsc_', '').replaceAll('ssc_', '');
+    final fullHscId = rawSubjectId.startsWith('hsc_') ? rawSubjectId : 'hsc_$rawSubjectId';
+
+    // Collect all valid subject_ids for this subject
+    final subjectIds = <String>{fullHscId, cleanId, rawSubjectId};
+    if (cleanId.contains('math')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_higher_math_$num', 'higher_math_$num', 'math_$num', 'hsc_math_$num']);
+    } else if (cleanId.contains('physics')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_physics_$num', 'physics_$num']);
+    } else if (cleanId.contains('chemistry')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_chemistry_$num', 'chemistry_$num']);
+    } else if (cleanId.contains('biology')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_biology_$num', 'biology_$num']);
+    } else if (cleanId.contains('ict')) {
+      subjectIds.addAll(['hsc_ict', 'ict']);
+    } else if (cleanId.contains('bangla')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_bangla_$num', 'bangla_$num']);
+    } else if (cleanId.contains('english')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_english_$num', 'english_$num']);
+    }
 
     var query = supabase.from('questions').select('*');
 
-    // 1. Filter by subject
-    query = query.or('subject.ilike.%$cleanId%,subject_id.ilike.%$cleanId%');
+    // 1. Filter by subject_id using inFilter
+    query = query.inFilter('subject_id', subjectIds.toList());
 
-    // 2. Filter by chapter if chosen
-    if (_selectedChapter != null) {
-      final chName = _selectedChapter!.name;
-      query = query.or('chapter.ilike.%$chName%,chapter_id.eq.${_selectedChapter!.id}');
+    // 2. Filter by chapter if chosen and not ignored
+    if (!ignoreChapter && _selectedChapter != null && _selectedChapter!.name.isNotEmpty) {
+      final chVars = BanglaNameHelper.getSearchVariations(_selectedChapter!.name);
+      if (chVars.isNotEmpty) {
+        if (chVars.length == 1) {
+          query = query.ilike('chapter', '%${chVars.first}%');
+        } else {
+          final conds = chVars.map((v) => 'chapter.ilike.*$v*').join(',');
+          query = query.or(conds);
+        }
+      }
     }
 
-    // 2b. Filter by topic if chosen
-    if (_selectedTopic != null && _selectedTopic!.name.isNotEmpty) {
-      final tName = _selectedTopic!.name;
-      query = query.or('topic.ilike.%$tName%,topic_id.eq.${_selectedTopic!.id}');
+    // 2b. Filter by topic if chosen and not ignored
+    if (!ignoreTopic && _selectedTopic != null && _selectedTopic!.name.isNotEmpty) {
+      final tId = _selectedTopic!.id;
+      final tVars = BanglaNameHelper.getSearchVariations(_selectedTopic!.name);
+
+      final conds = <String>[];
+      if (tId.isNotEmpty && tId != 'all') {
+        conds.add('topic_id.eq.$tId');
+        if (tId.contains(RegExp(r'_t\d$'))) {
+          conds.add('topic_id.eq.${tId.replaceFirstMapped(RegExp(r'_t(\d)$'), (m) => '_t0${m.group(1)}') }');
+        } else if (tId.contains(RegExp(r'_t0\d$'))) {
+          conds.add('topic_id.eq.${tId.replaceFirstMapped(RegExp(r'_t0(\d)$'), (m) => '_t${m.group(1)}') }');
+        }
+      }
+
+      for (final v in tVars) {
+        conds.add('topic.ilike.*$v*');
+      }
+
+      if (conds.isNotEmpty) {
+        query = query.or(conds.join(','));
+      }
     }
 
-    // 3. Filter by section type
+    // 3. Strict Exam Type Isolation - NEVER ALLOW CROSS-CATEGORY LEAKS
     if (_sectionId == 'cq') {
-      query = query.or('type.eq.cq,exam_type.ilike.%cq%');
+      query = query.or('type.eq.cq,exam_type.ilike.*cq*');
     } else if (_sectionId == 'ka_bhandar') {
-      query = query.or('type.eq.ka,type.eq.knowledge,question.ilike.%(ক)%');
+      query = query.or('type.eq.ka,type.eq.knowledge,question.ilike.*ক*');
     } else if (_sectionId == 'kha_bhandar') {
-      query = query.or('type.eq.kha,type.eq.comprehension,question.ilike.%(খ)%');
+      query = query.or('type.eq.kha,type.eq.comprehension,question.ilike.*খ*');
+    } else if (_sectionId == 'engineering') {
+      query = query.or('exam_type.ilike.*engineering*,exam_type.ilike.*buet*,exam_type.ilike.*ckruet*,exam_type.ilike.*ruet*,exam_type.ilike.*kuet*,exam_type.ilike.*cuet*');
+    } else if (_sectionId == 'medical') {
+      query = query.or('exam_type.ilike.*medical*,exam_type.ilike.*mat*,exam_type.ilike.*dmat*,exam_type.ilike.*mbbs*,exam_type.ilike.*bds*');
+    } else if (_sectionId == 'varsity_ka' || _sectionId == 'varsity_kha' || _sectionId == 'varsity') {
+      query = query.or('exam_type.ilike.*varsity*,exam_type.ilike.*admission*');
+    } else if (_sectionId == 'iba_bup') {
+      query = query.or('exam_type.ilike.*iba*,exam_type.ilike.*bup*,exam_type.ilike.*admission*');
+    } else if (_sectionId == 'textbook') {
+      query = query.or('exam_type.ilike.*book*,exam_type.ilike.*textbook*,exam_type.ilike.*academic*,exam_type.ilike.*practice*');
+    } else if (_sectionId == 'mcq' || _sectionId == 'academic') {
+      query = query.or('exam_type.ilike.*academic*,exam_type.ilike.*board*,exam_type.is.null');
     }
 
     return query;
@@ -288,15 +645,16 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       final data = await query.range(0, _pageSize - 1);
       List<Question> questions = [];
       if (data.isNotEmpty) {
-        questions = data.map((row) => Question.fromJson(row)).toList();
+        questions = (data as List)
+            .map((row) => _processQuestionRow(row as Map<String, dynamic>))
+            .where((q) => _filterQuestion(q))
+            .toList();
       }
 
-      // Fallback if few or no questions returned
-      if (questions.isEmpty) {
-        final rawSubjectId = _subjectId;
-        final cleanId = rawSubjectId.replaceAll('hsc_', '').replaceAll('ssc_', '');
+      // Only if DB has 0 questions for the whole category (no filter selected), generate curated demo questions
+      if (questions.isEmpty && _selectedChapter == null && _selectedTopic == null) {
         questions = _generateCuratedQuestions(
-          cleanId,
+          _subjectId,
           _sectionId,
           _selectedChapter?.name ?? '১ম অধ্যায়',
           _selectedTopic?.name,
@@ -311,7 +669,8 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           _isLoadingQuestions = false;
         });
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Error fetching questions: $e\n$st');
       final questions = _generateCuratedQuestions(
         _subjectId,
         _sectionId,
@@ -345,8 +704,13 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
       List<Question> newQuestions = [];
       if (data.isNotEmpty) {
-        newQuestions = data.map((row) => Question.fromJson(row)).toList();
+        newQuestions = (data as List)
+            .map((row) => _processQuestionRow(row as Map<String, dynamic>))
+            .where((q) => _filterQuestion(q))
+            .toList();
       }
+
+
 
       if (mounted) {
         setState(() {
@@ -354,9 +718,10 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           final uniqueNew = newQuestions.where((q) => !existingIds.contains(q.id)).toList();
 
           _questions.addAll(uniqueNew);
-          _currentOffset += newQuestions.length;
+          final int rawCount = data.isNotEmpty ? (data as List).length : 0;
+          _currentOffset += rawCount > 0 ? rawCount : _pageSize;
           _isLoadingMore = false;
-          if (newQuestions.length < _pageSize) {
+          if (rawCount < _pageSize) {
             _hasMore = false;
           }
         });
@@ -447,8 +812,8 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         shadowColor: Colors.black.withValues(alpha: 0.1),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
+          icon: AppIcon(
+            AppIcons.arrowLeft,
             color: isDark ? Colors.white : const Color(0xFF1F2937),
             size: 22,
           ),
@@ -485,10 +850,130 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     );
   }
 
+  // ── Authors list for textbook filtering ──
+  List<String> get _subjectAuthors {
+    final clean = _subjectId.replaceAll('hsc_', '').replaceAll('ssc_', '').toLowerCase();
+    if (clean.contains('physic')) {
+      return const ['all', 'ইসহাক স্যার', 'তপন স্যার', 'প্রামাণিক স্যার', 'তফাজ্জল স্যার'];
+    } else if (clean.contains('chem')) {
+      return const ['all', 'হাজারী ও নাগ', 'কবীর স্যার', 'গুহ স্যার', 'লিংকন স্যার'];
+    } else if (clean.contains('math')) {
+      return const ['all', 'কেতাব স্যার', 'আহাম্মদ স্যার', 'অসীম সাহা', 'রফিকুল স্যার'];
+    } else if (clean.contains('bio')) {
+      return clean.contains('1')
+          ? const ['all', 'হাসান স্যার', 'মাজেদা ম্যাম', 'আলিম স্যার']
+          : const ['all', 'গাজী আজমল', 'হাসান স্যার', 'মাজেদা ম্যাম'];
+    } else if (clean.contains('ict')) {
+      return const ['all', 'মুজিবুর রহমান', 'মাহবুবুর রহমান'];
+    }
+    return const ['all'];
+  }
+
+  // ── Author Filter Chips for Textbook Section ──
+  Widget _buildAuthorFilterChips(bool isDark) {
+    final authors = _subjectAuthors;
+    if (authors.length <= 1) return const SizedBox.shrink();
+
+    final activeAuthor = _selectedAuthor ?? 'all';
+
+    return SizedBox(
+      height: 34,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: authors.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final author = authors[index];
+          final isSelected = activeAuthor == author;
+          final label = author == 'all' ? 'সকল রাইটার' : author;
+
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () {
+                if (activeAuthor == author) return;
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _selectedAuthor = author == 'all' ? null : author;
+                });
+                _fetchQuestions();
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFF10B981) // Textbook green
+                      : isDark
+                          ? const Color(0xFF18181B)
+                          : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: isSelected
+                        ? const Color(0xFF10B981)
+                        : isDark
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE2E8F0),
+                    width: 1,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      author == 'all' ? LucideIcons.bookMarked : LucideIcons.userCheck,
+                      size: 12,
+                      color: isSelected
+                          ? Colors.white
+                          : isDark
+                              ? const Color(0xFFA1A1AA)
+                              : const Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : isDark
+                                ? const Color(0xFFE4E4E7)
+                                : const Color(0xFF334155),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   // ── Filter Bar with Chapter and Topic Dropdowns ──
   Widget _buildFilterBar(bool isDark) {
-    final chapterLabel = _selectedChapter != null
-        ? _selectedChapter!.name.replaceAll(RegExp(r'^\d+[ম্থয়]\s*অধ্যায়[:\s]*'), '')
+    final rawChapter = _selectedChapter?.name;
+    final chapterLabel = rawChapter != null
+        ? rawChapter
+            .replaceAll(RegExp(r'^[০-৯0-9]+[ম্থয়\.]*\s*অধ্যায়[:\s\-]*'), '')
+            .replaceAll(RegExp(r'^অধ্যায়\s*[০-৯0-9]+[:\s\-]*'), '')
+            .replaceAll(RegExp(r'^[০-৯0-9]+[\.\:\s\-]+'), '')
+            .trim()
         : 'সকল অধ্যায়';
     final topicLabel = _selectedTopic != null ? _selectedTopic!.name : 'সকল টপিক';
     final isTopicDisabled = _selectedChapter == null || _topics.isEmpty;
@@ -504,37 +989,47 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           ),
         ),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Chapter Dropdown
-          Expanded(
-            child: _DropdownPillButton(
-              icon: LucideIcons.bookOpen,
-              titlePrefix: 'অধ্যায়',
-              value: chapterLabel,
-              isDark: isDark,
-              isSelected: _selectedChapter != null,
-              isLoading: _isLoadingChapters,
-              onTap: () => _openChapterPicker(isDark),
-            ),
-          ),
-          const SizedBox(width: 10),
+          Row(
+            children: [
+              // 1. Chapter Dropdown
+              Expanded(
+                child: _DropdownPillButton(
+                  icon: LucideIcons.bookOpen,
+                  titlePrefix: 'অধ্যায়',
+                  value: chapterLabel,
+                  isDark: isDark,
+                  isSelected: _selectedChapter != null,
+                  isLoading: _isLoadingChapters,
+                  onTap: () => _openChapterPicker(isDark),
+                ),
+              ),
+              const SizedBox(width: 10),
 
-          // 2. Topic Dropdown
-          Expanded(
-            child: _DropdownPillButton(
-              icon: LucideIcons.listFilter,
-              titlePrefix: 'টপিক',
-              value: isTopicDisabled && _selectedChapter == null
-                  ? 'সকল টপিক'
-                  : topicLabel,
-              isDark: isDark,
-              isSelected: _selectedTopic != null,
-              disabled: isTopicDisabled,
-              isLoading: _isLoadingTopics,
-              onTap: isTopicDisabled ? null : () => _openTopicPicker(isDark),
-            ),
+              // 2. Topic Dropdown
+              Expanded(
+                child: _DropdownPillButton(
+                  icon: LucideIcons.listFilter,
+                  titlePrefix: 'টপিক',
+                  value: isTopicDisabled && _selectedChapter == null
+                      ? 'সকল টপিক'
+                      : topicLabel,
+                  isDark: isDark,
+                  isSelected: _selectedTopic != null,
+                  disabled: isTopicDisabled,
+                  isLoading: _isLoadingTopics,
+                  onTap: isTopicDisabled ? null : () => _openTopicPicker(isDark),
+                ),
+              ),
+            ],
           ),
+          if (_sectionId == 'textbook') ...[
+            const SizedBox(height: 10),
+            _buildAuthorFilterChips(isDark),
+          ],
         ],
       ),
     );
@@ -635,6 +1130,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     }
 
     return ListView.builder(
+      controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 30),
       itemCount: _questions.length + 1,
@@ -645,7 +1141,12 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
         final q = _questions[index];
 
-        if (_sectionId == 'mcq') {
+        if (_sectionId == 'cq') {
+          return _buildCqCard(q, index + 1, isDark);
+        } else if (_sectionId == 'ka_bhandar' || _sectionId == 'kha_bhandar') {
+          return _buildQaCard(q, index + 1, isDark);
+        } else {
+          // All MCQ sections (academic mcq, engineering, medical, varsity_ka, varsity_kha, gst, iba_bup, textbook, etc.)
           final isAnswered = _selectedOptions.containsKey(index);
           return Padding(
             padding: const EdgeInsets.only(bottom: 14),
@@ -660,6 +1161,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
               showAnswer: false,
               readOnly: isAnswered,
               hideSourceTag: false,
+              alwaysShowSourceTag: true,
               showReport: true,
               initiallyExpanded: true,
               onToggleFlag: () {},
@@ -672,37 +1174,23 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
               },
             ),
           );
-        } else if (_sectionId == 'cq') {
-          return _buildCqCard(q, index + 1, isDark);
-        } else {
-          // ক প্রশ্নাবলী বা খ প্রশ্নাবলী
-          return _buildQaCard(q, index + 1, isDark);
         }
       },
     );
   }
 
-  // ── Pagination Footer ──
+  // ── Pagination Footer (Auto Infinite Scroll) ──
   Widget _buildPaginationFooter(bool isDark) {
     if (_isLoadingMore) {
-      return Container(
-        margin: const EdgeInsets.only(top: 8, bottom: 28),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF18181B) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
-        ),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 18,
-                height: 18,
+                width: 16,
+                height: 16,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.2,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -710,11 +1198,11 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
-                'আরও ২০টি প্রশ্ন লোড হচ্ছে...',
+                'পরবর্তী প্রশ্ন লোড হচ্ছে...',
                 style: TextStyle(
-                  fontSize: 13.5,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                   fontFamily: 'HindSiliguri',
@@ -727,90 +1215,14 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     }
 
     if (_hasMore) {
-      return Container(
-        margin: const EdgeInsets.only(top: 8, bottom: 28),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              _loadMoreQuestions();
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF18181B) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF064E3B).withValues(alpha: 0.45)
-                          : const Color(0xFFD1FAE5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      LucideIcons.arrowDownCircle,
-                      size: 16,
-                      color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    'আরও ২০টি প্রশ্ন লোড করুন',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A),
-                      fontFamily: 'HindSiliguri',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      'বর্তমান: ${BanglaNameHelper.toBanglaNumeral(_questions.length)}টি',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+      return const SizedBox(height: 32);
     }
 
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 28),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(20),
@@ -823,14 +1235,14 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             children: [
               Icon(
                 Icons.check_circle_outline_rounded,
-                size: 15,
+                size: 14,
                 color: isDark ? const Color(0xFF10B981) : const Color(0xFF047857),
               ),
               const SizedBox(width: 6),
               Text(
-                'মোট ${BanglaNameHelper.toBanglaNumeral(_questions.length)}টি প্রশ্ন লোড করা হয়েছে',
+                'সব প্রশ্ন লোড করা হয়েছে',
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                   fontFamily: 'HindSiliguri',
@@ -1430,12 +1842,49 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         ),
       ];
     } else {
-      // MCQ
+      // MCQ (Academic, Engineering, Medical, Varsity, etc.)
+      final String fallbackInstitute;
+      final String fallbackExamType;
+      if (sectionId == 'engineering') {
+        fallbackInstitute = 'বুয়েট ভর্তি পরীক্ষা';
+        fallbackExamType = 'Engineering';
+      } else if (sectionId == 'medical') {
+        fallbackInstitute = 'মেডিকেল ভর্তি পরীক্ষা (MAT)';
+        fallbackExamType = 'Medical';
+      } else if (sectionId == 'varsity_ka' || sectionId == 'varsity_kha' || sectionId == 'varsity') {
+        fallbackInstitute = 'ঢাকা বিশ্ববিদ্যালয় (ক ইউনিট)';
+        fallbackExamType = 'Varsity';
+      } else if (sectionId == 'gst') {
+        fallbackInstitute = 'গুচ্ছ জিএসটি ভর্তি পরীক্ষা';
+        fallbackExamType = 'Varsity';
+      } else if (sectionId == 'iba_bup') {
+        fallbackInstitute = 'আইবিএ / বিইউপি ভর্তি পরীক্ষা';
+        fallbackExamType = 'Admission';
+      } else if (sectionId == 'textbook') {
+        final cleanSubj = _subjectId.toLowerCase();
+        if (cleanSubj.contains('physic')) {
+          fallbackInstitute = 'ইসহাক স্যার';
+        } else if (cleanSubj.contains('chem')) {
+          fallbackInstitute = 'হাজারী ও নাগ';
+        } else if (cleanSubj.contains('math')) {
+          fallbackInstitute = 'কেতাব স্যার';
+        } else if (cleanSubj.contains('bio')) {
+          fallbackInstitute = 'হাসান স্যার';
+        } else {
+          fallbackInstitute = 'পাঠ্যবই অনুশীলন';
+        }
+        fallbackExamType = 'Book';
+      } else {
+        fallbackInstitute = 'ঢাকা বোর্ড';
+        fallbackExamType = 'Academic';
+      }
+
       return [
         Question(
-          id: 'mcq_${subject}_1',
+          id: '${sectionId}_${subject}_1',
           subject: subject,
           chapter: cleanChapter,
+          examType: fallbackExamType,
           question: '$cleanChapter সম্পর্কিত নিচের কোন বিবৃতিটি সঠিক?$topicSnippet',
           options: const [
             'এটি একটি মৌলিক ভেক্টর রাশি',
@@ -1445,14 +1894,15 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           ],
           correctAnswerIndex: 2,
           points: 1,
-          examHistory: const [ExamHistory(institute: 'ঢাকা বোর্ড', year: 2023)],
+          examHistory: [ExamHistory(institute: fallbackInstitute, year: 2023)],
           explanation:
               'সঠিক উত্তর (গ)। কারণ পাঠ্যবই অনুযায়ী বলের প্রয়োগে নির্দিষ্ট শর্ত সাপেক্ষে সম্পর্কটি সরাসরি সরলরেখিক বৃদ্ধি নির্দেশ করে।',
         ),
         Question(
-          id: 'mcq_${subject}_2',
+          id: '${sectionId}_${subject}_2',
           subject: subject,
           chapter: cleanChapter,
+          examType: fallbackExamType,
           question: '$cleanChapter অধ্যায়ে এস.আই (SI) একক নিচের কোনটি?$topicSnippet',
           options: const [
             'kg m s⁻¹',
@@ -1462,7 +1912,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           ],
           correctAnswerIndex: 1,
           points: 1,
-          examHistory: const [ExamHistory(institute: 'বুয়েট', year: 2022)],
+          examHistory: [ExamHistory(institute: fallbackInstitute, year: 2022)],
           explanation:
               'সঠিক উত্তর (খ)। প্রতি একক ক্ষেত্রফলে লম্বভাবে প্রযুক্ত বলের জন্য প্রমিত এস.আই একক হলো N m⁻² (প্যাসকেল)।',
         ),
@@ -1696,10 +2146,13 @@ class _FilterSelectionSheet extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(LucideIcons.x, size: 18),
+                    icon: AppIcon(
+                      AppIcons.close,
+                      size: 18,
+                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
@@ -2005,8 +2458,8 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
         scrolledUnderElevation: 1,
         shadowColor: Colors.black.withValues(alpha: 0.1),
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
+          icon: AppIcon(
+            AppIcons.arrowLeft,
             size: 20,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),

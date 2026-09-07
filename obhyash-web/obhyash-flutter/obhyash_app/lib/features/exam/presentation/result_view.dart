@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,8 +16,9 @@ import '../../../core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../gamification/services/gamification_service.dart';
+import '../../notifications/services/notification_manager.dart';
 
-class ResultView extends StatefulWidget {
+class ResultView extends ConsumerStatefulWidget {
   final ExamResult result;
   final VoidCallback onRestart;
   final bool isHistoryMode;
@@ -29,10 +31,10 @@ class ResultView extends StatefulWidget {
   });
 
   @override
-  State<ResultView> createState() => _ResultViewState();
+  ConsumerState<ResultView> createState() => _ResultViewState();
 }
 
-class _ResultViewState extends State<ResultView> {
+class _ResultViewState extends ConsumerState<ResultView> {
   final Set<String> _bookmarkedIds = {};
   late final ConfettiController _confettiController;
   String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
@@ -50,14 +52,29 @@ class _ResultViewState extends State<ResultView> {
       AppHaptics.celebrate();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final uid = Supabase.instance.client.auth.currentUser?.id;
-        if (uid != null && mounted) {
-          GamificationService.checkAndUnlockBadges(
+        if (mounted) {
+          final total = widget.result.totalQuestions;
+          final scorePct = total > 0
+              ? ((widget.result.correctCount / total) * 100).round()
+              : 0;
+          final subjectName = widget.result.subjectLabel ?? widget.result.subject;
+
+          NotificationManager.notifyExamCompleted(
             context: context,
-            userId: uid,
-            latestScore: widget.result.correctCount,
-            totalQuestions: widget.result.totalQuestions,
-            timeTakenSeconds: widget.result.timeTaken,
+            ref: ref,
+            examTitle: subjectName,
+            scorePercentage: scorePct,
           );
+
+          if (uid != null) {
+            GamificationService.checkAndUnlockBadges(
+              context: context,
+              userId: uid,
+              latestScore: widget.result.correctCount,
+              totalQuestions: widget.result.totalQuestions,
+              timeTakenSeconds: widget.result.timeTaken,
+            );
+          }
         }
       });
     }
@@ -134,6 +151,11 @@ class _ResultViewState extends State<ResultView> {
         _bookmarkedIds.remove(id);
       } else {
         _bookmarkedIds.add(id);
+        NotificationManager.notifyBookmarkSaved(
+          context: context,
+          ref: ref,
+          subject: widget.result.subjectLabel ?? widget.result.subject,
+        );
       }
     });
     // Persist to Supabase bookmarks table

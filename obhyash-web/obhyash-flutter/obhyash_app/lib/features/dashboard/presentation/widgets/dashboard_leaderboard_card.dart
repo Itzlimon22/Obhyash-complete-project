@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../domain/models.dart';

@@ -7,6 +7,7 @@ import 'package:obhyash_app/core/utils/app_popups.dart';
 import '../domain/notification_model.dart';
 import '../providers/notification_providers.dart';
 import '../services/notification_router.dart';
+import '../services/notification_storage_service.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 
@@ -18,8 +19,8 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'icon': LucideIcons.checkCircle2,
         'bg': isDark
             ? const Color(0x33064E3B)
-            : const Color(0xFFECFDF5), // emerald-900/20 : emerald-100
-        'color': const Color(0xFF059669), // emerald-500
+            : const Color(0xFFD1FAE5), // emerald-900/20 : emerald-100
+        'color': const Color(0xFF059669), // emerald-600
       };
     case 'warning':
       return {
@@ -27,23 +28,48 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'bg': isDark
             ? const Color(0x3378350F)
             : const Color(0xFFFEF3C7), // amber-900/20 : amber-100
-        'color': const Color(0xFFD97706), // amber-500
+        'color': const Color(0xFFD97706), // amber-600
       };
     case 'error':
       return {
         'icon': LucideIcons.alertCircle,
         'bg': isDark
-            ? const Color(0x33881337)
-            : const Color(0xFFFEF2F2), // rose-900/20 : rose-100
-        'color': const Color(0xFFDC2626), // rose-500
+            ? const Color(0x337F1D1D)
+            : const Color(0xFFFEE2E2), // red-900/20 : red-100
+        'color': const Color(0xFFDC2626), // red-600
       };
-    case 'system':
+    case 'streak':
       return {
-        'icon': LucideIcons.settings,
+        'icon': LucideIcons.flame,
+        'bg': isDark
+            ? const Color(0x337C2D12)
+            : const Color(0xFFFFEDD5), // orange-900/20 : orange-100
+        'color': const Color(0xFFEA580C), // orange-600
+      };
+    case 'live_exam':
+    case 'exam':
+      return {
+        'icon': LucideIcons.timer,
         'bg': isDark
             ? const Color(0x334C1D95)
-            : const Color(0xFFEDE9FE), // violet-900/20 : violet-100
-        'color': const Color(0xFF8B5CF6), // violet-500
+            : const Color(0xFFEDE9FE), // purple-900/20 : purple-100
+        'color': const Color(0xFF7C3AED), // purple-600
+      };
+    case 'result':
+      return {
+        'icon': LucideIcons.trophy,
+        'bg': isDark
+            ? const Color(0x33064E3B)
+            : const Color(0xFFD1FAE5),
+        'color': const Color(0xFF059669),
+      };
+    case 'milestone':
+      return {
+        'icon': LucideIcons.award,
+        'bg': isDark
+            ? const Color(0x3378350F)
+            : const Color(0xFFFEF3C7),
+        'color': const Color(0xFFD97706),
       };
     case 'info':
     default:
@@ -72,7 +98,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
   bool _hasMore = true;
   String _filter = 'all'; // 'all', 'unread'
   int _offset = 0;
-  static const int _limit = 10;
+  static const int _limit = 20;
   final supabase = Supabase.instance.client;
 
   @override
@@ -94,31 +120,52 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
     }
 
     try {
-      final user = supabase.auth.currentUser;
-      if (user == null) return;
-
-      var query = supabase.from('notifications').select().eq('user_id', user.id);
+      // 1. Fetch local offline-first & seeded notifications
+      final local = await NotificationStorageService.getLocalNotifications();
+      var currentList = List<AppNotification>.from(local);
 
       if (_filter == 'unread') {
-        query = query.eq('is_read', false);
+        currentList = currentList.where((n) => !n.isRead).toList();
       }
 
-      final response = await query
-          .order('created_at', ascending: false)
-          .range(_offset, _offset + _limit - 1);
-
-      final newItems = (response as List).map((e) => AppNotification.fromJson(e)).toList();
-
-      if (mounted) {
+      if (!isLoadMore && mounted) {
         setState(() {
-          if (isLoadMore) {
-            _notifications.addAll(newItems);
-          } else {
-            _notifications = newItems;
-          }
-          _offset += newItems.length;
-          _hasMore = newItems.length == _limit;
+          _notifications = currentList;
         });
+      }
+
+      // 2. Fetch remote notifications if user is logged in
+      final user = supabase.auth.currentUser;
+      if (user != null) {
+        var query = supabase.from('notifications').select().eq('user_id', user.id);
+
+        if (_filter == 'unread') {
+          query = query.eq('is_read', false);
+        }
+
+        final response = await query
+            .order('created_at', ascending: false)
+            .range(_offset, _offset + _limit - 1);
+
+        final newItems = (response as List).map((e) => AppNotification.fromJson(e)).toList();
+
+        if (mounted && newItems.isNotEmpty) {
+          final map = <String, AppNotification>{};
+          for (final n in _notifications) {
+            map[n.id] = n;
+          }
+          for (final n in newItems) {
+            map[n.id] = n;
+          }
+          final merged = map.values.toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+          setState(() {
+            _notifications = merged;
+            _offset += newItems.length;
+            _hasMore = newItems.length == _limit;
+          });
+        }
       }
     } catch (e) {
       debugPrint('Failed to fetch notifications: $e');
@@ -144,13 +191,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
       }
     });
 
-    ref.read(unreadNotificationCountProvider.notifier).decrement();
-
-    try {
-      await supabase.from('notifications').update({'is_read': true}).eq('id', id);
-    } catch (e) {
-      debugPrint('Failed to mark notification as read: $e');
-    }
+    await ref.read(notificationsProvider.notifier).markAsRead(id);
   }
 
   Future<void> _markAllAsRead() async {
@@ -162,18 +203,10 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
       }
     });
 
-    ref.read(unreadNotificationCountProvider.notifier).markAllRead();
+    await ref.read(notificationsProvider.notifier).markAllAsRead();
 
-    try {
-      final user = supabase.auth.currentUser;
-      if (user != null) {
-        await supabase.from('notifications').update({'is_read': true}).eq('user_id', user.id).eq('is_read', false);
-      }
-      if (mounted) {
-        AppPopups.show(context, message: 'সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে', isError: false);
-      }
-    } catch (e) {
-      debugPrint('Failed to mark all as read: $e');
+    if (mounted) {
+      AppPopups.show(context, message: 'সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে', isError: false);
     }
   }
 
@@ -182,13 +215,10 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
       _notifications.removeWhere((n) => n.id == id);
     });
 
-    try {
-      await supabase.from('notifications').delete().eq('id', id);
-      if (mounted) {
-        AppPopups.show(context, message: 'মুছে ফেলা হয়েছে', isError: false);
-      }
-    } catch (e) {
-      debugPrint('Failed to delete notification: $e');
+    await ref.read(notificationsProvider.notifier).deleteNotification(id);
+
+    if (mounted) {
+      AppPopups.show(context, message: 'মুছে ফেলা হয়েছে', isError: false);
     }
   }
 

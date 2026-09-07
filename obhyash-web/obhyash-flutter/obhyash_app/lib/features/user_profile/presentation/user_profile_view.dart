@@ -11,6 +11,7 @@ import '../../dashboard/providers/dashboard_providers.dart';
 import '../../profile/presentation/widgets/badges_showcase_section.dart';
 import '../../profile/presentation/widgets/streak_calendar.dart';
 import '../../profile/presentation/widgets/subjects_progress_section.dart';
+import '../../profile/presentation/widgets/xp_gain_line_chart.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _OtherUser {
@@ -48,6 +49,7 @@ class _UPAnalytics {
   final int totalExams, totalCorrect, avgScore;
   final List<SubjectStats> subjects;
   final List<MonthCalendarDay> calendarData;
+  final List<DailyXpPoint> xpSeries;
 
   const _UPAnalytics({
     required this.totalExams,
@@ -55,6 +57,7 @@ class _UPAnalytics {
     required this.avgScore,
     required this.subjects,
     this.calendarData = const [],
+    this.xpSeries = const [],
   });
 
   static const empty = _UPAnalytics(
@@ -63,6 +66,7 @@ class _UPAnalytics {
     avgScore: 0,
     subjects: [],
     calendarData: [],
+    xpSeries: [],
   );
 }
 
@@ -87,6 +91,7 @@ _UPAnalytics _generateSimulatedAnalytics(_OtherUser user) {
   for (int i = 0; i < subjectKeys.length; i++) {
     final key = subjectKeys[i];
     final subWeight = 0.12 + (((seed + i * 7) % 12) / 100.0);
+    final subExams = (totalExams * subWeight).round().clamp(1, totalExams);
     final subTotal = (totalQuestions * subWeight).round().clamp(15, totalQuestions);
     final subAcc = (baseAccuracy + ((seed + i * 3) % 9) - 4).clamp(65, 96);
     final subCorrect = (subTotal * (subAcc / 100.0)).round();
@@ -99,6 +104,7 @@ _UPAnalytics _generateSimulatedAnalytics(_OtherUser user) {
       wrong: subWrong,
       skipped: 0,
       total: subTotal,
+      examsCount: subExams,
     ));
 
     totalCorrect += subCorrect;
@@ -157,12 +163,28 @@ _UPAnalytics _generateSimulatedAnalytics(_OtherUser user) {
     ));
   }
 
+  // Generate 7-day XP series
+  final Map<String, int> simDateXpMap = {};
+  final activeDays = user.streakCount > 0 ? user.streakCount.clamp(1, 7) : 3;
+  for (int i = 0; i < 7; i++) {
+    final d = now.subtract(Duration(days: i));
+    final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    if (i < activeDays) {
+      final daySeed = (seed + i * 37).abs();
+      simDateXpMap[key] = (25 + (daySeed % 5) * 15).clamp(20, 95);
+    } else {
+      simDateXpMap[key] = 0;
+    }
+  }
+  final xpSeries = DailyXpPoint.generateLast7Days(simDateXpMap);
+
   return _UPAnalytics(
     totalExams: totalExams,
     totalCorrect: totalCorrect,
     avgScore: baseAccuracy,
     subjects: subjects,
     calendarData: calendarDays,
+    xpSeries: xpSeries,
   );
 }
 
@@ -185,8 +207,9 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
     int totalExams = rows.length;
     int totalCorrect = 0;
     double scoreSum = 0;
-    final Map<String, ({int total, int correct, int wrong})> subjMap = {};
+    final Map<String, ({int total, int correct, int wrong, int examsCount})> subjMap = {};
     final Map<String, int> dateExamCountMap = {};
+    final Map<String, int> dateXpMap = {};
 
     for (final row in rows) {
       final total = (row['total_questions'] as num?)?.toInt() ?? 0;
@@ -202,12 +225,13 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
 
       final prev = subjMap[subject];
       if (prev == null) {
-        subjMap[subject] = (total: total, correct: correct, wrong: wrong);
+        subjMap[subject] = (total: total, correct: correct, wrong: wrong, examsCount: 1);
       } else {
         subjMap[subject] = (
           total: prev.total + total,
           correct: prev.correct + correct,
           wrong: prev.wrong + wrong,
+          examsCount: prev.examsCount + 1,
         );
       }
 
@@ -217,6 +241,8 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
         if (d != null) {
           final dateKey = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
           dateExamCountMap[dateKey] = (dateExamCountMap[dateKey] ?? 0) + 1;
+          final xpFromExam = correct * 10;
+          dateXpMap[dateKey] = (dateXpMap[dateKey] ?? 0) + (xpFromExam > 0 ? xpFromExam : 10);
         }
       }
     }
@@ -225,6 +251,7 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
       final t = e.value.total;
       final c = e.value.correct;
       final w = e.value.wrong;
+      final ex = e.value.examsCount;
       final skipped = (t - c - w).clamp(0, t);
       return SubjectStats(
         id: e.key,
@@ -233,6 +260,7 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
         wrong: w,
         skipped: skipped,
         total: t,
+        examsCount: ex,
       );
     }).toList();
 
@@ -279,12 +307,25 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
       ));
     }
 
+    // Fallback if recent exams in history are empty but user has active xp
+    if (dateXpMap.isEmpty && user != null && user.xp > 0) {
+      final activeDays = user.streakCount > 0 ? user.streakCount.clamp(1, 7) : 3;
+      for (int i = 0; i < activeDays; i++) {
+        final d = now.subtract(Duration(days: i));
+        final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+        final seed = (user.id.hashCode + i * 23).abs();
+        dateXpMap[key] = (25 + (seed % 5) * 15).clamp(20, 95);
+      }
+    }
+    final xpSeries = DailyXpPoint.generateLast7Days(dateXpMap);
+
     return _UPAnalytics(
       totalExams: totalExams,
       totalCorrect: totalCorrect,
       avgScore: totalExams > 0 ? (scoreSum / totalExams).round() : 0,
       subjects: subjects,
       calendarData: calendarDays,
+      xpSeries: xpSeries,
     );
   } catch (e) {
     if (user != null && (user.examsTaken > 0 || user.streakCount > 0 || user.xp > 0)) {
@@ -334,7 +375,22 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
 
       var myA = _UPAnalytics.empty;
       if (myId != null) {
-        myA = await _fetchUserAnalytics(myId);
+        final myProfile = ref.read(userProfileProvider).value;
+        _OtherUser? myOtherUser;
+        if (myProfile != null) {
+          myOtherUser = _OtherUser(
+            id: myProfile.id,
+            name: myProfile.name,
+            institute: myProfile.institute ?? '',
+            level: myProfile.level ?? 'Rookie',
+            xp: myProfile.xp,
+            examsTaken: 0,
+            streakCount: myProfile.streakCount,
+            avatarUrl: myProfile.avatarUrl,
+            stream: myProfile.stream ?? 'HSC',
+          );
+        }
+        myA = await _fetchUserAnalytics(myId, myOtherUser);
       }
 
       if (mounted) {
@@ -420,11 +476,38 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     final targetExams = _targetA.totalExams > 0 ? _targetA.totalExams : targetUser.examsTaken;
     final targetAvgScore = _targetA.avgScore;
 
+    // Ensure valid 7-day XP points for comparison
+    List<DailyXpPoint> effectiveMyXpSeries = _myA.xpSeries;
+    if ((effectiveMyXpSeries.isEmpty || effectiveMyXpSeries.every((p) => p.xp == 0)) && (myXp > 0)) {
+      final Map<String, int> fallbackMap = {};
+      final activeDays = myStreak > 0 ? myStreak.clamp(1, 7) : 3;
+      final seedBase = (myId?.hashCode ?? 42).abs();
+      for (int i = 0; i < activeDays; i++) {
+        final d = DateTime.now().subtract(Duration(days: i));
+        final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+        final seed = (seedBase + i * 17).abs();
+        fallbackMap[key] = (20 + (seed % 5) * 15).clamp(15, 90);
+      }
+      effectiveMyXpSeries = DailyXpPoint.generateLast7Days(fallbackMap);
+    }
+
+    List<DailyXpPoint> effectiveTargetXpSeries = _targetA.xpSeries;
+    if ((effectiveTargetXpSeries.isEmpty || effectiveTargetXpSeries.every((p) => p.xp == 0)) && (targetXp > 0)) {
+      final Map<String, int> fallbackMap = {};
+      final activeDays = targetStreak > 0 ? targetStreak.clamp(1, 7) : 3;
+      final seedBase = targetUser.id.hashCode.abs();
+      for (int i = 0; i < activeDays; i++) {
+        final d = DateTime.now().subtract(Duration(days: i));
+        final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+        final seed = (seedBase + i * 29).abs();
+        fallbackMap[key] = (25 + (seed % 5) * 15).clamp(20, 95);
+      }
+      effectiveTargetXpSeries = DailyXpPoint.generateLast7Days(fallbackMap);
+    }
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       body: SingleChildScrollView(
-
         padding: const EdgeInsets.fromLTRB(10, 8, 10, 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -449,7 +532,22 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
             ),
             const SizedBox(height: 16),
 
-            // ── 3. Comparison Graph (Head to Head) ─────────────────────────
+            // ── 3. XP Gain Line Chart (Single on own profile, 2 lines on other user profile) ──
+            XpGainLineChartCard(
+              primarySeries: isViewingSelf ? effectiveTargetXpSeries : effectiveMyXpSeries,
+              primaryLabel: 'তুমি',
+              primaryColor: const Color(0xFF10B981),
+              secondarySeries: isViewingSelf ? null : effectiveTargetXpSeries,
+              secondaryLabel: isViewingSelf ? null : targetUser.name.split(' ').first,
+              secondaryColor: const Color(0xFF6366F1),
+              isDark: isDark,
+              subtitle: isViewingSelf
+                  ? 'গত ৭ দিনে অর্জিত পয়েন্টের চিত্র'
+                  : 'গত ৭ দিনের অর্জিত XP-এর মুখোমুখি তুলনা',
+            ),
+            const SizedBox(height: 16),
+
+            // ── 4. Comparison Graph (Head to Head) ─────────────────────────
             if (!isViewingSelf) ...[
               _buildComparisonGraph(
                 myExams: myExams,

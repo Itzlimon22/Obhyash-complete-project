@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/presentation/widgets/app_icon.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
@@ -136,8 +137,8 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                             color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Icon(
-                            LucideIcons.arrowLeft,
+                          child: AppIcon(
+                            AppIcons.arrowLeft,
                             size: 18,
                             color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
                           ),

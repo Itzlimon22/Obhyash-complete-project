@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
@@ -956,7 +958,7 @@ class _ReportCard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 Row(
                                   children: [
-                                    const Icon(LucideIcons.calendarDays, size: 12, color: Color(0xFFA3A3A3)),
+                                    const AppIcon(AppIcons.calendar, size: 12, color: Color(0xFFA3A3A3)),
                                     const SizedBox(width: 6),
                                     Text(
                                       dateStr,

@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
@@ -970,8 +971,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                LucideIcons.trash2,
+              child: const AppIcon(
+                AppIcons.trash,
                 color: Color(0xFFEF4444),
                 size: 20,
               ),
@@ -1097,8 +1098,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
-                LucideIcons.trash2,
+              child: const AppIcon(
+                AppIcons.trash,
                 color: Color(0xFFEF4444),
                 size: 20,
               ),
@@ -1432,8 +1433,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        LucideIcons.calendar,
+                      AppIcon(
+                        AppIcons.calendar,
                         size: 14,
                         color: _filterDate != null
                             ? (isDark
@@ -1980,8 +1981,8 @@ class _ExamCardState extends State<_ExamCard> {
                       const SizedBox(height: 3),
                       Row(
                         children: [
-                          Icon(
-                            LucideIcons.calendar,
+                          AppIcon(
+                            AppIcons.calendar,
                             size: 12,
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
@@ -2080,8 +2081,8 @@ class _ExamCardState extends State<_ExamCard> {
                         onTap: () => widget.onDelete(record),
                         child: Padding(
                           padding: const EdgeInsets.all(6),
-                          child: Icon(
-                            LucideIcons.trash2,
+                          child: AppIcon(
+                            AppIcons.trash,
                             size: 16,
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
@@ -2091,8 +2092,8 @@ class _ExamCardState extends State<_ExamCard> {
                       ),
                     ),
                     const SizedBox(width: 2),
-                    Icon(
-                      LucideIcons.chevronRight,
+                    AppIcon(
+                      AppIcons.chevronRight,
                       size: 18,
                       color: isDark
                           ? const Color(0xFF52525B)
@@ -2532,8 +2533,8 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                       color: const Color(0xFF059669).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
-                      LucideIcons.calendar,
+                    child: const AppIcon(
+                      AppIcons.calendar,
                       size: 18,
                       color: Color(0xFF10B981),
                     ),

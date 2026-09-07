@@ -2,11 +2,15 @@
 -- 10/10 Upgrade: Relational Taxonomy & Background Jobs
 -- =====================================================
 
--- Part A: Relational Taxonomy
+-- Part A: Relational Taxonomy & Fingerprint Deduplication
 ALTER TABLE public.questions 
 ADD COLUMN IF NOT EXISTS subject_id TEXT, 
 ADD COLUMN IF NOT EXISTS chapter_id TEXT, 
-ADD COLUMN IF NOT EXISTS topic_id TEXT;
+ADD COLUMN IF NOT EXISTS topic_id TEXT,
+ADD COLUMN IF NOT EXISTS fingerprint TEXT;
+
+-- Ensure fast index on (stream_id, fingerprint) for fast deduplication lookups
+CREATE INDEX IF NOT EXISTS idx_questions_stream_fingerprint ON public.questions(stream_id, fingerprint);
 
 -- Optional: Add Foreign Key constraints if tables exist and are clean
 -- ALTER TABLE public.questions ADD CONSTRAINT fk_questions_subject FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL;
@@ -30,6 +34,16 @@ CREATE TABLE IF NOT EXISTS public.bulk_upload_jobs (
 
 CREATE INDEX IF NOT EXISTS idx_bulk_upload_jobs_status ON public.bulk_upload_jobs(status);
 
+-- Enable RLS and add policies so bulk upload operations are permitted
+ALTER TABLE public.bulk_upload_jobs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "bulk_upload_jobs_policy" ON public.bulk_upload_jobs;
+CREATE POLICY "bulk_upload_jobs_policy" 
+ON public.bulk_upload_jobs 
+FOR ALL 
+USING (true) 
+WITH CHECK (true);
+
 -- Part C: Modernized Bulk Merge RPC
 -- This version supports background job tracking and relational IDs
 CREATE OR REPLACE FUNCTION bulk_merge_questions_v2(
@@ -48,6 +62,7 @@ DECLARE
   v_errors INTEGER := 0;
   v_error_details TEXT[] := '{}';
   v_fingerprint TEXT;
+  v_stream_id TEXT;
 BEGIN
   -- If p_job_id is provided, mark it as Processing
   IF p_job_id IS NOT NULL THEN
@@ -57,56 +72,63 @@ BEGIN
   FOR i IN 1..v_total LOOP
     v_question := p_questions[i];
     v_fingerprint := v_question->>'fingerprint';
+    v_stream_id := COALESCE(v_question->>'stream_id', UPPER(trim(v_question->>'stream')), 'GENERAL');
 
-    BEGIN
-      INSERT INTO questions (
-        question, options, correct_answer_indices, explanation, 
-        type, difficulty, subject, chapter, topic, 
-        subject_id, chapter_id, topic_id,
-        stream, division, section, exam_type, 
-        institutes, years, status, author, tags, 
-        image_url, option_images, explanation_image_url,
-        fingerprint, random_id
-      ) VALUES (
-        v_question->>'question',
-        ARRAY(SELECT jsonb_array_elements_text(v_question->'options')),
-        ARRAY(SELECT (jsonb_array_elements(v_question->'correct_answer_indices'))::integer),
-        v_question->>'explanation',
-        COALESCE(v_question->>'type', 'MCQ'),
-        COALESCE(v_question->>'difficulty', 'Medium'),
-        v_question->>'subject',
-        v_question->>'chapter',
-        v_question->>'topic',
-        v_question->>'subject_id',
-        v_question->>'chapter_id',
-        v_question->>'topic_id',
-        v_question->>'stream',
-        COALESCE(v_question->>'division', v_question->>'section'),
-        v_question->>'section',
-        COALESCE(v_question->>'exam_type', 'Academic'),
-        ARRAY(SELECT jsonb_array_elements_text(v_question->'institutes')),
-        ARRAY(SELECT (jsonb_array_elements(v_question->'years'))::integer),
-        COALESCE(v_question->>'status', 'Pending'),
-        COALESCE(v_question->>'author', 'Admin'),
-        ARRAY(SELECT jsonb_array_elements_text(v_question->'tags')),
-        v_question->>'image_url',
-        ARRAY(SELECT jsonb_array_elements_text(v_question->'option_images')),
-        v_question->>'explanation_image_url',
-        v_fingerprint,
-        COALESCE((v_question->>'random_id')::double precision, random())
-      )
-      ON CONFLICT (fingerprint) DO NOTHING;
+    -- Safe Duplicate Check: Does not require UNIQUE constraint on partitioned table
+    IF v_fingerprint IS NOT NULL AND EXISTS (
+      SELECT 1 FROM questions 
+      WHERE stream_id = v_stream_id AND fingerprint = v_fingerprint 
+      LIMIT 1
+    ) THEN
+      v_duplicates := v_duplicates + 1;
+    ELSE
+      BEGIN
+        INSERT INTO questions (
+          stream_id,
+          question, options, correct_answer_indices, explanation, 
+          type, difficulty, subject, chapter, topic, 
+          subject_id, chapter_id, topic_id,
+          stream, division, section, exam_type, 
+          institutes, years, status, author, tags, 
+          image_url, option_images, explanation_image_url,
+          fingerprint, random_id
+        ) VALUES (
+          v_stream_id,
+          v_question->>'question',
+          ARRAY(SELECT jsonb_array_elements_text(v_question->'options')),
+          ARRAY(SELECT (jsonb_array_elements(v_question->'correct_answer_indices'))::integer),
+          v_question->>'explanation',
+          COALESCE(v_question->>'type', 'MCQ'),
+          COALESCE(v_question->>'difficulty', 'Medium'),
+          v_question->>'subject',
+          v_question->>'chapter',
+          v_question->>'topic',
+          v_question->>'subject_id',
+          v_question->>'chapter_id',
+          v_question->>'topic_id',
+          COALESCE(v_question->>'stream', v_stream_id),
+          COALESCE(v_question->>'division', v_question->>'section'),
+          v_question->>'section',
+          COALESCE(v_question->>'exam_type', 'Academic'),
+          ARRAY(SELECT jsonb_array_elements_text(v_question->'institutes')),
+          ARRAY(SELECT (jsonb_array_elements(v_question->'years'))::integer),
+          COALESCE(v_question->>'status', 'Pending'),
+          COALESCE(v_question->>'author', 'Admin'),
+          ARRAY(SELECT jsonb_array_elements_text(v_question->'tags')),
+          v_question->>'image_url',
+          ARRAY(SELECT jsonb_array_elements_text(v_question->'option_images')),
+          v_question->>'explanation_image_url',
+          v_fingerprint,
+          COALESCE((v_question->>'random_id')::double precision, random())
+        );
 
-      IF FOUND THEN
         v_inserted := v_inserted + 1;
-      ELSE
-        v_duplicates := v_duplicates + 1;
-      END IF;
 
-    EXCEPTION WHEN OTHERS THEN
-      v_errors := v_errors + 1;
-      v_error_details := array_append(v_error_details, 'Row ' || i || ': ' || SQLERRM);
-    END;
+      EXCEPTION WHEN OTHERS THEN
+        v_errors := v_errors + 1;
+        v_error_details := array_append(v_error_details, 'Row ' || i || ': ' || SQLERRM);
+      END;
+    END IF;
 
     -- Periodically update progress if job exists (every 20 rows - more frequent for testing)
     IF p_job_id IS NOT NULL AND (i % 20 = 0 OR i = v_total) THEN

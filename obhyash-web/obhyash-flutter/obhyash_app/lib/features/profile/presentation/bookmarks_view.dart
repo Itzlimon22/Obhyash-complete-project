@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
-
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../exam/domain/exam_models.dart';
@@ -418,8 +419,8 @@ class _BookmarksViewState extends State<BookmarksView> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    LucideIcons.calendar,
+                  AppIcon(
+                    AppIcons.calendar,
                     size: 16,
                     color: _filterDate != null
                         ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
@@ -445,8 +446,8 @@ class _BookmarksViewState extends State<BookmarksView> {
                         setState(() => _filterDate = null);
                         _resetPagination();
                       },
-                      child: Icon(
-                        LucideIcons.x,
+                      child: AppIcon(
+                        AppIcons.close,
                         size: 14,
                         color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                       ),
@@ -522,7 +523,11 @@ class _BookmarksViewState extends State<BookmarksView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.bookmark, size: 54, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+            AppIcon(
+              AppIcons.bookmark,
+              size: 54,
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+            ),
             const SizedBox(height: 14),
             Text(
               'কোনো বুকমার্ক করা প্রশ্ন নেই!',
@@ -593,7 +598,7 @@ class _BookmarksViewState extends State<BookmarksView> {
               color: Colors.red.shade500,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(LucideIcons.trash2, color: Colors.white),
+            child: const AppIcon(AppIcons.trash, color: Colors.white, size: 20),
           ),
           onDismissed: (direction) => _removeBookmark(q.id),
           child: Padding(

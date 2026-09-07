@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
@@ -23,6 +22,7 @@ class QuestionCard extends StatefulWidget {
   final bool isBookmarked;
   final bool initiallyExpanded;
   final bool hideSourceTag;
+  final bool alwaysShowSourceTag;
   final bool showReport;
   final VoidCallback? onToggleBookmark;
   final VoidCallback? onDelete;
@@ -42,6 +42,7 @@ class QuestionCard extends StatefulWidget {
     this.isBookmarked = false,
     this.initiallyExpanded = false,
     this.hideSourceTag = false,
+    this.alwaysShowSourceTag = false,
     this.showReport = false,
     this.onToggleBookmark,
     this.onDelete,
@@ -198,7 +199,10 @@ class _QuestionCardState extends State<QuestionCard>
                           // Unified Source Tag (Board / University & Year - Short Form e.g. DB-24)
                           // Hidden during active exam runner or when hideSourceTag is true
                           if (!widget.hideSourceTag &&
-                              (widget.readOnly || widget.showFeedback || widget.showAnswer) &&
+                              (widget.alwaysShowSourceTag ||
+                                  widget.readOnly ||
+                                  widget.showFeedback ||
+                                  widget.showAnswer) &&
                               (widget.question.examHistory.isNotEmpty ||
                                   widget.question.institutes.isNotEmpty ||
                                   widget.question.years.isNotEmpty)) ...[

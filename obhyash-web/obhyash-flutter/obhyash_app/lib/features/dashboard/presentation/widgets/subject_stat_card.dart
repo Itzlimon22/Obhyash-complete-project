@@ -26,6 +26,8 @@ class SubjectStatCard extends StatelessWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final attendedData = data.where((s) => s.total > 0).toList();
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -74,7 +76,7 @@ class SubjectStatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          if (data.isEmpty)
+          if (attendedData.isEmpty)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 32),
               width: double.infinity,
@@ -100,7 +102,7 @@ class SubjectStatCard extends StatelessWidget {
               ),
             )
           else
-            ...data.map(
+            ...attendedData.map(
               (subject) => _SubjectItem(
                 subject: subject,
                 onClick: onSubjectClick != null

@@ -299,9 +299,19 @@ class SubjectsProgressSection extends StatelessWidget {
 
                     const SizedBox(height: 14),
 
-                    // Stats Breakdown Grid (3 chips)
+                    // Stats Breakdown Grid (4 chips)
                     Row(
                       children: [
+                        Expanded(
+                          child: _buildModalStatChip(
+                            title: 'মোট পরীক্ষা',
+                            value: examCount.toString(),
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            bgColor: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                            isDark: isDark,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: _buildModalStatChip(
                             title: 'মোট প্রশ্ন',
@@ -311,7 +321,7 @@ class SubjectsProgressSection extends StatelessWidget {
                             isDark: isDark,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: _buildModalStatChip(
                             title: 'সঠিক উত্তর',
@@ -321,7 +331,7 @@ class SubjectsProgressSection extends StatelessWidget {
                             isDark: isDark,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: _buildModalStatChip(
                             title: 'ভুল উত্তর',
@@ -529,7 +539,9 @@ class SubjectsProgressSection extends StatelessWidget {
           const SizedBox(height: 16),
           ...subjectStats.map((stat) {
             final accuracy = _calculateAccuracy(stat);
-            final examCount = stat.correct + stat.wrong + stat.skipped;
+            final examCount = stat.examsCount > 0
+                ? stat.examsCount
+                : (stat.total > 0 ? (stat.total / 25).ceil().clamp(1, 999) : 0);
 
             return InkWell(
               onTap: () => _showSubjectDetailModal(

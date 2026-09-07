@@ -108,6 +108,7 @@ class SubjectStats {
   final int wrong;
   final int skipped;
   final int total;
+  final int examsCount;
 
   SubjectStats({
     required this.id,
@@ -116,6 +117,7 @@ class SubjectStats {
     required this.wrong,
     required this.skipped,
     required this.total,
+    this.examsCount = 0,
   });
 
   factory SubjectStats.fromJson(Map<String, dynamic> json) {
@@ -126,6 +128,7 @@ class SubjectStats {
       wrong: json['wrong'] as int,
       skipped: json['skipped'] as int,
       total: json['total'] as int,
+      examsCount: (json['exams_count'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -136,6 +139,7 @@ class SubjectStats {
     'wrong': wrong,
     'skipped': skipped,
     'total': total,
+    'exams_count': examsCount,
   };
 }
 

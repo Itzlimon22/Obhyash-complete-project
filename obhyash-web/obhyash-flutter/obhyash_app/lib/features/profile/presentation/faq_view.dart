@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 
 class FaqItem {
   final String category;
@@ -216,10 +218,13 @@ class _FaqViewState extends State<FaqView> {
                           color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                           fontSize: 14,
                         ),
-                        prefixIcon: Icon(
-                          LucideIcons.search,
-                          size: 18,
-                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: AppIcon(
+                            AppIcons.search,
+                            size: 18,
+                            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                          ),
                         ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

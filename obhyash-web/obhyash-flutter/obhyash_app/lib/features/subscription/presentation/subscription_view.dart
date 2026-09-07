@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../../core/presentation/widgets/app_icon.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
 import 'plan_selection_view.dart';
@@ -344,7 +346,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.crown, size: 20, color: Color(0xFFFBBF24)),
+                    AppIcon(AppIcons.crown, size: 20, color: Color(0xFFFBBF24)),
                     SizedBox(width: 10),
                     Text(
                       'আপগ্রেড করুন',
@@ -421,7 +423,7 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
               ],
             ),
             child: const Center(
-              child: Icon(LucideIcons.crown, color: Color(0xFFFDE68A), size: 26),
+              child: AppIcon(AppIcons.crown, color: Color(0xFFFDE68A), size: 26),
             ),
           ),
           const SizedBox(height: 14),
@@ -688,7 +690,7 @@ class _UnifiedFeaturesShowcase extends StatelessWidget {
                   color: const Color(0xFF004633).withValues(alpha: isDark ? 0.25 : 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(LucideIcons.crown, color: Color(0xFF004633), size: 16),
+                child: const AppIcon(AppIcons.crown, color: Color(0xFF004633), size: 16),
               ),
               const SizedBox(width: 10),
               Text(

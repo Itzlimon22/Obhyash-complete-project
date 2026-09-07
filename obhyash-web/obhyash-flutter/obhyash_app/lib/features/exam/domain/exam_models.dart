@@ -57,6 +57,9 @@ class Question {
   final String subject;
   final String? subjectLabel;
   final String chapter;
+  final String? chapterId;
+  final String? topic;
+  final String? topicId;
   final String question;
   final String? explanation;
   final List<String> options;
@@ -74,6 +77,9 @@ class Question {
     required this.subject,
     this.subjectLabel,
     this.chapter = '',
+    this.chapterId,
+    this.topic,
+    this.topicId,
     required this.question,
     this.explanation,
     required this.options,
@@ -238,6 +244,9 @@ class Question {
       subject: j['subject']?.toString() ?? 'general',
       subjectLabel: j['subject_label']?.toString() ?? j['subject']?.toString(),
       chapter: j['chapter']?.toString() ?? '',
+      chapterId: (j['chapter_id'] ?? j['chapterId'])?.toString(),
+      topic: j['topic']?.toString(),
+      topicId: (j['topic_id'] ?? j['topicId'])?.toString(),
       question: QuestionFormatter.format(j['question']?.toString() ?? ''),
       explanation: j['explanation'] != null
           ? QuestionFormatter.format(j['explanation'].toString())
@@ -261,6 +270,9 @@ class Question {
     'subject': subject,
     'subject_label': subjectLabel,
     'chapter': chapter,
+    'chapter_id': chapterId,
+    'topic': topic,
+    'topic_id': topicId,
     'question': question,
     'explanation': explanation,
     'options': options,
@@ -279,6 +291,9 @@ class Question {
     String? subject,
     String? subjectLabel,
     String? chapter,
+    String? chapterId,
+    String? topic,
+    String? topicId,
     String? question,
     String? explanation,
     List<String>? options,
@@ -296,6 +311,9 @@ class Question {
       subject: subject ?? this.subject,
       subjectLabel: subjectLabel ?? this.subjectLabel,
       chapter: chapter ?? this.chapter,
+      chapterId: chapterId ?? this.chapterId,
+      topic: topic ?? this.topic,
+      topicId: topicId ?? this.topicId,
       question: question ?? this.question,
       explanation: explanation ?? this.explanation,
       options: options ?? this.options,
@@ -397,7 +415,9 @@ class ExamConfig {
   final String subjectLabel;
   final String examType;
   final String chapters;
+  final String? chapterIds;
   final String topics;
+  final String? topicIds;
   final String difficulty;
   final int questionCount;
   final int durationMinutes;
@@ -408,7 +428,9 @@ class ExamConfig {
     required this.subjectLabel,
     required this.examType,
     required this.chapters,
+    this.chapterIds,
     required this.topics,
+    this.topicIds,
     required this.difficulty,
     required this.questionCount,
     required this.durationMinutes,

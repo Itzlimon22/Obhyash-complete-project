@@ -7,7 +7,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../domain/notification_model.dart';
 import '../domain/notification_templates.dart';
+import 'notification_storage_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -300,6 +302,78 @@ class NotificationService {
       notificationDetails: NotificationDetails(android: androidDetails, iOS: iosDetails),
       payload: jsonEncode(payloadData),
     );
+
+    // Also persist into local notification inbox
+    try {
+      final notif = AppNotification(
+        id: id.toString(),
+        userId: 'local',
+        title: title,
+        message: body,
+        type: channelId == channelLiveExams
+            ? 'live_exam'
+            : (channelId == channelStreak ? 'streak' : 'general'),
+        link: route,
+        data: payloadData,
+        isRead: false,
+        createdAt: DateTime.now(),
+      );
+      NotificationStorageService.saveNotification(notif);
+    } catch (_) {}
+  }
+
+  /// Schedule Daily Witty Morning Challenge (e.g. 8:00 AM)
+  Future<void> scheduleDailyMorningChallenge({
+    required String userName,
+  }) async {
+    if (!_isInitialized) await initialize();
+
+    try {
+      final formatted = NotificationTemplateLibrary.getRandomMorning().format(
+        name: userName,
+      );
+      final title = formatted['title']!;
+      final body = formatted['body']!;
+
+      final now = tz.TZDateTime.now(tz.local);
+      
+      // Schedule at 8:00 AM
+      var scheduled800 = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        8, // 8 AM
+        0, // 00 Min
+      );
+      if (scheduled800.isBefore(now)) {
+        scheduled800 = scheduled800.add(const Duration(days: 1));
+      }
+
+      await _localNotif.zonedSchedule(
+        id: 800,
+        title: title,
+        body: body,
+        scheduledDate: scheduled800,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            channelGeneral,
+            'সাধারণ নোটিশ ও টিপস',
+            importance: Importance.high,
+            priority: Priority.high,
+            color: Color(0xFF0284C7),
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: jsonEncode({'route': '/setup', 'type': 'morning'}),
+      );
+
+      debugPrint('[NotificationService] Daily 8:00 AM morning challenge scheduled successfully');
+    } catch (e) {
+      debugPrint('[NotificationService] scheduleDailyMorningChallenge error: $e');
+    }
   }
 
   /// Schedule Daily Witty Evening Streak Reminder (e.g. 8:30 PM & 10:15 PM)
@@ -349,7 +423,7 @@ class NotificationService {
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
-        payload: jsonEncode({'route': '/exam-setup', 'type': 'streak'}),
+        payload: jsonEncode({'route': '/setup', 'type': 'streak'}),
       );
 
       debugPrint('[NotificationService] Daily 8:30 PM streak saver reminder scheduled successfully');

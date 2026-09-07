@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 class SubjectQuestionBankDetailView extends StatelessWidget {
   final Map<String, dynamic> subject;
@@ -96,7 +95,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
         _allCategories['textbook']!,
         _allCategories['engineering']!,
         _allCategories['varsity_ka']!,
-        _allCategories['gst']!,
       ];
     }
 
@@ -107,7 +105,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
         _allCategories['textbook']!,
         _allCategories['medical']!,
         _allCategories['varsity_ka']!,
-        _allCategories['gst']!,
       ];
     }
 
@@ -118,7 +115,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
         _allCategories['textbook']!,
         _allCategories['varsity_kha']!,
         _allCategories['varsity_ka']!,
-        _allCategories['gst']!,
       ];
     }
 
@@ -133,24 +129,22 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
       ];
     }
 
-    // 5. Statistics: Academic, Textbook, Varsity Ka, GST
+    // 5. Statistics: Academic, Textbook, Varsity Ka
     if (id.contains('stat') || name.contains('পরিসংখ্যান')) {
       return [
         _allCategories['academic']!,
         _allCategories['textbook']!,
         _allCategories['varsity_ka']!,
-        _allCategories['gst']!,
       ];
     }
 
-    // 6. ICT: Academic, Textbook, Engineering, Varsity Ka, GST
+    // 6. ICT: Academic, Textbook, Engineering, Varsity Ka
     if (id.contains('ict') || name.contains('তথ্য') || name.contains('আইসিটি')) {
       return [
         _allCategories['academic']!,
         _allCategories['textbook']!,
         _allCategories['engineering']!,
         _allCategories['varsity_ka']!,
-        _allCategories['gst']!,
       ];
     }
 
@@ -243,7 +237,13 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
         if (cat['id'] == 'academic') {
           context.push('/question-bank/academic-details', extra: subject);
         } else {
-          _showCategoryActionSheet(context, cat, isDark, subjectTitle);
+          context.push(
+            '/question-bank/academic-section',
+            extra: {
+              'subject': subject,
+              'section': cat,
+            },
+          );
         }
       },
       child: Container(
@@ -318,116 +318,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showCategoryActionSheet(
-    BuildContext context,
-    Map<String, dynamic> cat,
-    bool isDark,
-    String subjectTitle,
-  ) {
-    final catTitle = cat['title'] as String;
-    final svgPath = cat['svgPath'] as String;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
-          ),
-        ),
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 38,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD1D5DB),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: SvgPicture.asset(
-                svgPath,
-                width: 80,
-                height: 80,
-                fit: BoxFit.contain,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: Text(
-                '$subjectTitle - $catTitle',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
-                  color: isDark ? Colors.white : const Color(0xFF111827),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '$catTitle সেগমেন্টের বিগত বছরের বোর্ড ও বিশ্ববিদ্যালয় ভর্তি পরীক্ষার সকল প্রশ্ন সমাধানসহ সাজানো রয়েছে।',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
-                fontFamily: 'HindSiliguri',
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      context.push('/practice');
-                    },
-                    icon: const Icon(LucideIcons.penTool, size: 16),
-                    label: const Text('অনুশীলন শুরু করো'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
-                    foregroundColor: isDark ? Colors.white : const Color(0xFF374151),
-                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text('বন্ধ করো'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-          ],
         ),
       ),
     );

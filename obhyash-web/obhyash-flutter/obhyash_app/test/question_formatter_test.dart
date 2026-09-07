@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/utils/question_formatter.dart';
 
 void main() {
@@ -58,6 +59,17 @@ void main() {
 
       expect(formatted.contains(r'\vec{v}'), isTrue);
       expect(formatted.contains('ms⁻¹'), isTrue);
+    });
+
+    test('Topic search variants generate clean stripped prefixes and conjunctions', () {
+      final variants = BanglaNameHelper.getTopicSearchVariants(
+        'টপিক ০১: ভেক্টর রাশির যোজন ও বিয়োজন (সামান্তরিক সূত্র)',
+      );
+
+      expect(variants.contains('টপিক ০১: ভেক্টর রাশির যোজন ও বিয়োজন (সামান্তরিক সূত্র)'), isTrue);
+      expect(variants.any((v) => v.contains('সামান্তরিক সূত্র')), isTrue);
+      expect(variants.any((v) => v.contains('ভেক্টর রাশির যোজন')), isTrue);
+      expect(variants.any((v) => v.contains('বিয়োজন') || v.contains('বিয়োজন')), isTrue);
     });
   });
 }

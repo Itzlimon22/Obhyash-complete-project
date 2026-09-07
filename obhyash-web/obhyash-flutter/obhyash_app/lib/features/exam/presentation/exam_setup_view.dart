@@ -492,18 +492,17 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
     final selectedSub = _subjects.firstWhere((s) => s.id == _selectedSubject);
 
+    final selectedChaptersList = _chapters.where((c) => _selectedChapters.contains(c.id)).toList();
+    final selectedTopicsList = _topics.where((t) => _selectedTopics.contains(t.id)).toList();
+
     final config = ExamConfig(
       subject: selectedSub.name,
       subjectLabel: selectedSub.id,
       examType: _examTypes.join('+'),
-      chapters: _chapters
-          .where((c) => _selectedChapters.contains(c.id))
-          .map((c) => c.name)
-          .join(','),
-      topics: _topics
-          .where((t) => _selectedTopics.contains(t.id))
-          .map((t) => t.name)
-          .join(','),
+      chapters: selectedChaptersList.map((c) => c.name).join(','),
+      chapterIds: selectedChaptersList.map((c) => c.id).join(','),
+      topics: selectedTopicsList.map((t) => t.name).join(','),
+      topicIds: selectedTopicsList.map((t) => t.id).join(','),
       difficulty: _difficulties.isNotEmpty ? _difficulties.join('+') : 'Medium',
       questionCount: _questionCount,
       durationMinutes: _durationMinutes,

@@ -500,10 +500,10 @@ class _InstituteQuestionBankDetailViewState
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
         ),
         boxShadow: [
           BoxShadow(

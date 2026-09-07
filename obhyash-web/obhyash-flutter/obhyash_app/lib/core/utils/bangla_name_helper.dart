@@ -401,10 +401,16 @@ class BanglaNameHelper {
           } catch (_) {}
         }
 
-        final yr = _formatYearShort(rawYear);
-        final label = code.isNotEmpty ? code : _normalizeInstituteOrAuthor(inst);
+        final isAuthor = isTextbookAuthor(code) || isTextbookAuthor(inst);
+        final yr = isAuthor ? '' : _formatYearShort(rawYear);
+        final label = isAuthor
+            ? _normalizeInstituteOrAuthor(inst.isNotEmpty ? inst : code)
+            : (code.isNotEmpty ? code : _normalizeInstituteOrAuthor(inst));
 
-        if (label.isNotEmpty && yr.isNotEmpty) {
+        if (isAuthor) {
+          // Author tags prioritized first
+          tags.insert(0, label);
+        } else if (label.isNotEmpty && yr.isNotEmpty) {
           tags.add('$label-$yr');
         } else if (label.isNotEmpty) {
           tags.add(label);
@@ -432,9 +438,9 @@ class BanglaNameHelper {
     int yearIdx = 0;
 
     for (final raw in rawInsts) {
-      final isAuthor = _isTextbookAuthor(raw);
+      final isAuthor = isTextbookAuthor(raw);
       if (isAuthor) {
-        tags.add(_normalizeInstituteOrAuthor(raw));
+        tags.insert(0, _normalizeInstituteOrAuthor(raw));
         continue;
       }
 
@@ -488,7 +494,7 @@ class BanglaNameHelper {
   }
 
   /// Recognizes textbook writers and book references across HSC/SSC
-  static bool _isTextbookAuthor(String name) {
+  static bool isTextbookAuthor(String name) {
     final lower = name.toLowerCase();
     return lower.contains('ম্যাম') ||
         lower.contains('স্যার') ||
@@ -496,14 +502,17 @@ class BanglaNameHelper {
         lower.contains('হাসান') ||
         lower.contains('মাজেদা') ||
         lower.contains('হাজারী') ||
+        lower.contains('হাজারি') ||
         lower.contains('নাগ') ||
         lower.contains('গুহ') ||
         lower.contains('লিংকন') ||
         lower.contains('কবির') ||
+        lower.contains('কবীর') ||
         lower.contains('ইসহাক') ||
         lower.contains('তপন') ||
         lower.contains('সেলু') ||
         lower.contains('তোফাজ্জল') ||
+        lower.contains('তফাজ্জল') ||
         lower.contains('কেতাব') ||
         lower.contains('আহাম্মদ') ||
         lower.contains('আহমেদ') ||
@@ -524,7 +533,146 @@ class BanglaNameHelper {
         lower.contains('গিয়াসউদ্দিন') ||
         lower.contains('রফিকুল') ||
         lower.contains('হারুনুর') ||
-        lower.contains('নজরুল');
+        lower.contains('নজরুল') ||
+        lower.contains('প্রামাণিক') ||
+        lower.contains('প্রামানিক') ||
+        lower.contains('textbook') ||
+        lower.contains('পাঠ্যবই');
+  }
+
+  /// Returns true if any of the institutes or examHistory entries match a textbook author
+  static bool hasTextbookAuthor({
+    List<dynamic> institutes = const [],
+    List<dynamic> examHistory = const [],
+  }) {
+    for (final inst in institutes) {
+      if (isTextbookAuthor(inst.toString())) return true;
+    }
+    for (final h in examHistory) {
+      if (h is Map) {
+        final code = h['code']?.toString() ?? '';
+        final institute = h['institute']?.toString() ?? '';
+        if (isTextbookAuthor(code) || isTextbookAuthor(institute)) return true;
+      } else if (h != null) {
+        try {
+          final dynamic obj = h;
+          final code = obj.code?.toString() ?? '';
+          final institute = obj.institute?.toString() ?? '';
+          if (isTextbookAuthor(code) || isTextbookAuthor(institute)) return true;
+        } catch (_) {}
+      }
+    }
+    return false;
+  }
+
+  /// Checks if a question's institutes or examHistory match a specific author
+  static bool matchesAuthor({
+    required List<dynamic> institutes,
+    required List<dynamic> examHistory,
+    required String targetAuthor,
+  }) {
+    if (targetAuthor.isEmpty ||
+        targetAuthor == 'all' ||
+        targetAuthor == 'সকল রাইটার' ||
+        targetAuthor == 'সকল লেখক') {
+      return true;
+    }
+    final cleanTarget = targetAuthor
+        .replaceAll('স্যার', '')
+        .replaceAll('ম্যাম', '')
+        .replaceAll('ড.', '')
+        .replaceAll('প্রফেসর', '')
+        .replaceAll('ও', '')
+        .replaceAll('নাগ', '')
+        .trim()
+        .toLowerCase();
+
+    for (final inst in institutes) {
+      final s = inst.toString().toLowerCase();
+      if (s.contains(cleanTarget)) return true;
+    }
+    for (final h in examHistory) {
+      String code = '';
+      String institute = '';
+      if (h is Map) {
+        code = h['code']?.toString() ?? '';
+        institute = h['institute']?.toString() ?? '';
+      } else if (h != null) {
+        try {
+          final dynamic obj = h;
+          code = obj.code?.toString() ?? '';
+          institute = obj.institute?.toString() ?? '';
+        } catch (_) {}
+      }
+      if (code.toLowerCase().contains(cleanTarget) ||
+          institute.toLowerCase().contains(cleanTarget)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Generates clean search keyword variations for Bengali chapters/topics,
+  /// normalizing precomposed and decomposed Unicode forms (ড়/ড়, ঢ়/ঢ়, য়/য়)
+  /// and common textbook spelling variations (রী/রি, জৈব যৌগ/জৈব রসায়ন).
+  /// Ensures all variants are comma-free so PostgREST .or() syntax is never broken.
+  static List<String> getSearchVariations(String raw) {
+    if (raw.trim().isEmpty) return [];
+
+    // 1. Strip chapter / topic prefixes: "১ম অধ্যায়:", "অধ্যায় ১ :", "টপিক ০২ -", etc.
+    final clean = raw
+        .replaceAll(RegExp(r'^[০-৯0-9]+[ম্থয়\.]*\s*(অধ্যায়|অধ্যায়|টপিক)[:\s\-]*'), '')
+        .replaceAll(RegExp(r'^(অধ্যায়|অধ্যায়|টপিক)\s*[০-৯0-9]+[:\s\-]*'), '')
+        .replaceAll(RegExp(r'^[০-৯0-9]+[\.\:\s\-]+'), '')
+        .trim();
+
+    if (clean.isEmpty) return [];
+
+    // Split by comma if present, so each segment is queried safely
+    final rawList = <String>[];
+    if (clean.contains(RegExp(r'[,،]'))) {
+      clean.split(RegExp(r'[,،]')).forEach((part) {
+        final p = part.trim();
+        if (p.length >= 2) rawList.add(p);
+      });
+    } else {
+      rawList.add(clean);
+    }
+
+    final variants = <String>{};
+
+    for (final item in rawList) {
+      final sanitized = item.replaceAll(',', '').replaceAll('،', '').trim();
+      if (sanitized.length < 2) continue;
+
+      variants.add(sanitized);
+
+      // Unicode normalization:
+      variants.add(sanitized.replaceAll('য়', 'য়'));
+      variants.add(sanitized.replaceAll('য়', 'য়'));
+      variants.add(sanitized.replaceAll('ড়', 'ড়'));
+      variants.add(sanitized.replaceAll('ড়', 'ড়'));
+      variants.add(sanitized.replaceAll('ঢ়', 'ঢ়'));
+      variants.add(sanitized.replaceAll('ঢ়', 'ঢ়'));
+
+      // Textbook spelling variations:
+      if (sanitized.contains('ল্যাবরেটরী')) {
+        variants.add(sanitized.replaceAll('ল্যাবরেটরী', 'ল্যাবরেটরি'));
+      } else if (sanitized.contains('ল্যাবরেটরি')) {
+        variants.add(sanitized.replaceAll('ল্যাবরেটরি', 'ল্যাবরেটরী'));
+      }
+
+      if (sanitized.contains('জৈব যৌগ')) {
+        variants.add('জৈব রসায়ন');
+        variants.add('জৈব');
+      } else if (sanitized.contains('জৈব রসায়ন')) {
+        variants.add('জৈব যৌগ');
+        variants.add('জৈব');
+      }
+    }
+
+    variants.removeWhere((s) => s.trim().length < 2);
+    return variants.toList();
   }
 
   static String _normalizeInstituteOrAuthor(String raw) {
@@ -584,22 +732,29 @@ class BanglaNameHelper {
     if (trimmed.contains('মাজেদা')) return 'মাজেদা ম্যাম';
     if (trimmed.contains('আজমল')) return 'গাজী আজমল';
     if (trimmed.contains('হাসান') && !trimmed.contains('হোসেন')) return 'আবুল হাসান';
-    if (trimmed.contains('হাজারী') || trimmed.contains('হাজারি')) return 'হাজারী নাগ';
+    if (trimmed.contains('হাজারী') || trimmed.contains('হাজারি')) return 'হাজারী ও নাগ';
     if (trimmed.contains('ইসহাক') || trimmed.contains('ইস Scrap')) return 'ইসহাক স্যার';
     if (trimmed.contains('তপন')) return 'তপন স্যার';
+    if (trimmed.contains('প্রামাণিক') || trimmed.contains('প্রামানিক')) return 'প্রামাণিক স্যার';
     if (trimmed.contains('কেতাব')) return 'কেতাব স্যার';
-    if (trimmed.contains('আহাম্মদ') || trimmed.contains('আহমেদ')) return 'এস ইউ আহাম্মদ';
+    if (trimmed.contains('আহাম্মদ') || trimmed.contains('আহমেদ')) return 'আহাম্মদ স্যার';
     if (trimmed.contains('অসীম')) return 'অসীম সাহা';
     if (trimmed.contains('গুহ')) return 'গুহ স্যার';
     if (trimmed.contains('লিংকন')) return 'লিংকন স্যার';
-    if (trimmed.contains('কবির')) return 'কবির স্যার';
+    if (trimmed.contains('কবির') || trimmed.contains('কবীর')) return 'কবীর স্যার';
+    if (trimmed.contains('তফাজ্জল')) return 'তফাজ্জল স্যার';
+    if (trimmed.contains('সেলু')) return 'সেলু স্যার';
+    if (trimmed.contains('মুজিবুর')) return 'মুজিবুর রহমান';
+    if (trimmed.contains('মাহবুবুর')) return 'মাহবুবুর রহমান';
+    if (trimmed.contains('রফিকুল')) return 'রফিকুল স্যার';
+    if (trimmed.contains('আলিম')) return 'আলিম স্যার';
 
     return trimmed;
   }
 
   static String _formatYearShort(String raw) {
     final trimmed = raw.trim();
-    if (trimmed.isEmpty) return '';
+    if (trimmed.isEmpty || trimmed == '0' || trimmed == '০') return '';
 
     // If session format like 2014-2015 or 2014-15 or 14-15
     final sessionMatch =
@@ -1272,7 +1427,7 @@ class BanglaNameHelper {
   }
 
 
-  /// Returns all search variants for a topic name (handling prefixes and Unicode)
+  /// Returns all search variants for a topic name (handling prefixes, parentheses, conjunctions and Unicode)
   static List<String> getTopicSearchVariants(String topicName, [List<String>? knownQuestionTopics]) {
     final set = <String>{};
     final trimmed = topicName.trim();
@@ -1280,22 +1435,45 @@ class BanglaNameHelper {
 
     set.add(trimmed);
 
-    // Strip prefixes like "টপিক 01 - ", "টপিক ১: ", "১.১৪ ", "২.৯ ", "৫.৫ "
-    final strippedPrefix = trimmed
-        .replaceAll(
-          RegExp(
-            r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*)',
-            caseSensitive: false,
-          ),
-          '',
-        )
-        .trim();
-
-    if (strippedPrefix.isNotEmpty && strippedPrefix != trimmed) {
-      set.add(strippedPrefix);
+    // 1. Strip parenthesized descriptions: e.g. "ভেক্টর বিভাজন (লম্বাংশ সূত্র)" -> "ভেক্টর বিভাজন"
+    final strippedParen = trimmed.replaceAll(RegExp(r'\s*\([^)]*\)\s*'), ' ').trim();
+    if (strippedParen.isNotEmpty && strippedParen != trimmed) {
+      set.add(strippedParen);
     }
 
-    // Unicode variations
+    // 2. Strip prefixes like "টপিক 01 - ", "টপিক ১: ", "১.১৪ ", "২.৯ ", "৫.৫ ", "Topic 02: "
+    for (final base in [trimmed, strippedParen]) {
+      final strippedPrefix = base
+          .replaceAll(
+            RegExp(
+              r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*|Topic\s*[০-৯0-9]+\s*[-–—:]\s*|অধ্যায়\s*[০-৯0-9]+\s*[-–—:]\s*)',
+              caseSensitive: false,
+            ),
+            '',
+          )
+          .trim();
+
+      if (strippedPrefix.isNotEmpty && strippedPrefix != base) {
+        set.add(strippedPrefix);
+      }
+    }
+
+    // 3. Conjunction splitting for multi-concept topics: "A ও B" -> "A", "B"
+    // e.g. "ভেক্টরের যোজন ও বিয়োজন" -> "ভেক্টরের যোজন", "ভেক্টরের বিয়োজন"
+    final currentList = set.toList();
+    for (final item in currentList) {
+      if (item.contains(' ও ') || item.contains(' এবং ')) {
+        final parts = item.split(RegExp(r'\s+(?:ও|এবং)\s+'));
+        for (final p in parts) {
+          final cleanP = p.trim();
+          if (cleanP.length >= 3) {
+            set.add(cleanP);
+          }
+        }
+      }
+    }
+
+    // 4. Unicode variations
     final extra = <String>[];
     for (final t in set) {
       extra.add(t.replaceAll('\u09df', '\u09af\u09bc'));
@@ -1303,11 +1481,13 @@ class BanglaNameHelper {
       extra.add(t.replaceAll('২য়', '২য়'));
       extra.add(t.replaceAll('২য়', '২য়'));
       extra.add(t.replaceAll('১ম', '১ম'));
+      extra.add(t.replaceAll('৩য়', '৩য়'));
+      extra.add(t.replaceAll('৩য়', '৩য়'));
     }
     set.addAll(extra);
 
     if (knownQuestionTopics != null && knownQuestionTopics.isNotEmpty) {
-      final cleanNorm = normalizeBengali(strippedPrefix.isNotEmpty ? strippedPrefix : trimmed).toLowerCase();
+      final cleanNorm = normalizeBengali(strippedParen.isNotEmpty ? strippedParen : trimmed).toLowerCase();
       for (final qTop in knownQuestionTopics) {
         final qStripped = qTop
             .replaceAll(

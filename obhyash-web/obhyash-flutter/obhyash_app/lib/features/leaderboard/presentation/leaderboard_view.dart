@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/data/college_list.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
@@ -101,13 +102,6 @@ _LevelInfo _levelById(String id) {
   } else {
     return _levels[4]; // Explorer
   }
-}
-
-/// Next higher level (null if already at Legend).
-_LevelInfo? _nextLevel(String id) {
-  final idx = _levels.indexWhere((l) => l.id == id);
-  if (idx > 0) return _levels[idx - 1];
-  return null;
 }
 
 // ─── User Model ────────────────────────────────────────────────────────────────
@@ -645,128 +639,139 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
               : _viewMode == 'level'
               ? (_isLoading && _users.isEmpty
                     ? const LeaderboardSkeleton()
-                    : AppRefreshIndicator(
-                        onRefresh: () async {
-                          await _fetchCounts();
-                          await _fetch();
-                        },
-                        child: ListView(
-                          physics: const AlwaysScrollableScrollPhysics(
-                            parent: BouncingScrollPhysics(),
-                          ),
-                          padding: const EdgeInsets.only(bottom: 80),
-                          children: [
-                          _LevelSelector(
-                            levels: _levels,
-                            selectedLevel: _selectedLevel,
-                            myLevel: myCalculatedLevelId,
-                            levelCounts: _levelCounts,
-                            onSelect: (id) {
-                              setState(() => _selectedLevel = id);
-                              _fetch();
-                            },
-                            isDark: isDark,
-                          ),
-
-                          // ── My Batch Badge & Timeframe Filter (Below Level Selector) ──
-                          _BatchAndTimelineHeader(
-                            userBatchLabel: userBatchLabel,
-                            timeframe: _timeframe,
-                            isDark: isDark,
-                            onTimeframeChanged: (t) {
-                              if (_timeframe != t) {
-                                setState(() {
-                                  _timeframe = t;
-                                  _hasSetDefaultLevel = false;
-                                });
-                                _fetchCounts();
-                                _fetch();
-                              }
-                            },
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                if (myProfile != null && isOnOwnLevel)
-                                  _UserProgressCard(
-                                    level: myCalculatedLevelId,
-                                    xp: effectiveUserXp,
-                                    rank: myRank,
-                                    isDark: isDark,
-                                  ),
-                                if (!_isLoading && displayedUsers.length >= 3)
-                                  _PodiumSection(
-                                    users: displayedUsers.take(3).toList(),
-                                    isDark: isDark,
-                                    onTap: (id) => context.push(
-                                      '/leaderboard/user-profile/$id',
-                                    ),
-                                  ),
-                                _LeaderboardTable(
-                                  users: displayedUsers,
-                                  levelLabel: lvl.label.split(' ').first,
-                                  isLoading: _isLoading,
-                                  isDark: isDark,
-                                  onUserTap: (id) => context.push(
-                                    '/leaderboard/user-profile/$id',
-                                  ),
+                    : Column(
+                        children: [
+                          Expanded(
+                            child: AppRefreshIndicator(
+                              onRefresh: () async {
+                                await _fetchCounts();
+                                await _fetch();
+                              },
+                              child: ListView(
+                                physics: const AlwaysScrollableScrollPhysics(
+                                  parent: BouncingScrollPhysics(),
                                 ),
-                                if (_hasMore && !_isLoading)
+                                padding: const EdgeInsets.only(bottom: 24),
+                                children: [
+                                  _LevelSelector(
+                                    levels: _levels,
+                                    selectedLevel: _selectedLevel,
+                                    myLevel: myCalculatedLevelId,
+                                    levelCounts: _levelCounts,
+                                    onSelect: (id) {
+                                      setState(() => _selectedLevel = id);
+                                      _fetch();
+                                    },
+                                    isDark: isDark,
+                                  ),
+
+                                  // ── My Batch Badge & Timeframe Filter (Below Level Selector) ──
+                                  _BatchAndTimelineHeader(
+                                    userBatchLabel: userBatchLabel,
+                                    timeframe: _timeframe,
+                                    isDark: isDark,
+                                    onTimeframeChanged: (t) {
+                                      if (_timeframe != t) {
+                                        setState(() {
+                                          _timeframe = t;
+                                          _hasSetDefaultLevel = false;
+                                        });
+                                        _fetchCounts();
+                                        _fetch();
+                                      }
+                                    },
+                                  ),
+
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 16),
-                                    child: ElevatedButton(
-                                      onPressed: _isLoadingMore
-                                          ? null
-                                          : () => _fetch(isLoadMore: true),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: isDark
-                                            ? const Color(0xFF141414)
-                                            : const Color(0xFFFAFAFA),
-                                        foregroundColor: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                        side: BorderSide(
-                                          color: isDark
-                                              ? const Color(0xFF1C1C1E)
-                                              : const Color(0xFFE5E5E5),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        if (!_isLoading && displayedUsers.length >= 3)
+                                          _PodiumSection(
+                                            users: displayedUsers.take(3).toList(),
+                                            isDark: isDark,
+                                            onTap: (id) => context.push(
+                                              '/leaderboard/user-profile/$id',
+                                            ),
+                                          ),
+                                        _LeaderboardTable(
+                                          users: displayedUsers,
+                                          levelLabel: lvl.label.split(' ').first,
+                                          isLoading: _isLoading,
+                                          isDark: isDark,
+                                          onUserTap: (id) => context.push(
+                                            '/leaderboard/user-profile/$id',
                                           ),
                                         ),
-                                        elevation: 0,
-                                      ),
-                                      child: _isLoadingMore
-                                          ? const SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
+                                        if (_hasMore && !_isLoading)
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 16),
+                                            child: ElevatedButton(
+                                              onPressed: _isLoadingMore
+                                                  ? null
+                                                  : () => _fetch(isLoadMore: true),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: isDark
+                                                    ? const Color(0xFF141414)
+                                                    : const Color(0xFFFAFAFA),
+                                                foregroundColor: isDark
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                                side: BorderSide(
+                                                  color: isDark
+                                                      ? const Color(0xFF1C1C1E)
+                                                      : const Color(0xFFE5E5E5),
+                                                ),
+                                                padding: const EdgeInsets.symmetric(
+                                                  vertical: 14,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(
+                                                    16,
+                                                  ),
+                                                ),
+                                                elevation: 0,
                                               ),
-                                            )
-                                          : const Text(
-                                              'আরও লোড করুন',
-                                              style: TextStyle(
-                                                fontFamily: 'HindSiliguri',
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 17,
-                                              ),
+                                              child: _isLoadingMore
+                                                  ? const SizedBox(
+                                                      height: 20,
+                                                      width: 20,
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                    )
+                                                  : const Text(
+                                                      'আরও লোড করুন',
+                                                      style: TextStyle(
+                                                        fontFamily: 'HindSiliguri',
+                                                        fontWeight: FontWeight.w700,
+                                                        fontSize: 17,
+                                                      ),
+                                                    ),
                                             ),
+                                          ),
+                                      ],
                                     ),
                                   ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
+                          if (myProfile != null)
+                            _StickyUserRankCard(
+                              user: myProfile,
+                              rank: myRank,
+                              xp: effectiveUserXp,
+                              isOnOwnLevel: isOnOwnLevel,
+                              levelLabel: myLvl.label.split(' ').first,
+                              isDark: isDark,
+                              onTap: () => context.push(
+                                '/leaderboard/user-profile/${myProfile.id}',
+                              ),
+                            ),
                         ],
-                      ),
-                    ))
+                      ))
               : _CollegeLeaderboardBody(
                   institute: myProfile?.institute ?? '',
                   users: _collegeUsers,
@@ -797,16 +802,8 @@ class _BatchAndTimelineHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(10, 6, 10, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141416) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1618,196 +1615,214 @@ class _LevelSelector extends StatelessWidget {
   }
 }
 
-// ─── UserProgress Card ──────────────────────────────────────────────────────────
-class _UserProgressCard extends StatelessWidget {
-  final String level;
-  final int xp;
+// ─── Sticky User Rank Card (Docked above Bottom Nav) ───────────────────────────
+class _StickyUserRankCard extends StatelessWidget {
+  final UserProfile user;
   final int rank;
+  final int xp;
+  final bool isOnOwnLevel;
+  final String levelLabel;
   final bool isDark;
+  final VoidCallback? onTap;
 
-  const _UserProgressCard({
-    required this.level,
-    required this.xp,
+  const _StickyUserRankCard({
+    required this.user,
     required this.rank,
+    required this.xp,
+    required this.isOnOwnLevel,
+    required this.levelLabel,
     required this.isDark,
+    this.onTap,
   });
+
+  Widget _buildRankBadge(int rank, bool isDark) {
+    if (rank == 1) {
+      return const Center(child: Text('🥇', style: TextStyle(fontSize: 18)));
+    }
+    if (rank == 2) {
+      return const Center(child: Text('🥈', style: TextStyle(fontSize: 18)));
+    }
+    if (rank == 3) {
+      return const Center(child: Text('🥉', style: TextStyle(fontSize: 18)));
+    }
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
+          shape: BoxShape.circle,
+        ),
+        width: 24,
+        height: 24,
+        child: Text(
+          rank > 0 ? '$rank' : '-',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 11,
+            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final lvl = _levelById(level);
-    final nextLvl = _nextLevel(level);
-
-    double progress = 1.0;
-    int neededXp = 0;
-    if (nextLvl != null) {
-      final denom = (nextLvl.minXP - lvl.minXP).toDouble();
-      if (denom > 0) {
-        progress = ((xp - lvl.minXP) / denom).clamp(0.0, 1.0);
-      }
-      neededXp = (nextLvl.minXP - xp).clamp(0, nextLvl.minXP);
-    }
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF092328) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE5E7EB),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: SvgPicture.asset(
-                  lvl.svgAsset,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lvl.label,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 22,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white : const Color(0xFF111827),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_numFmt.format(xp)} XP',
-                      style: TextStyle(
-                        color: lvl.start,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (rank > 0)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF27272A) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF3F3F46)
-                          : const Color(0xFFE5E5E5),
-                    ),
-                    boxShadow: [
-                      if (!isDark)
-                        const BoxShadow(
-                          color: Color(0x0A000000),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        BanglaNameHelper.toBanglaNumeral(rank),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 22,
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF111827),
-                        ),
-                      ),
-                      Text(
-                        'তোমার র‍্যাঙ্ক',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? const Color(0xFF9CA3AF)
-                              : const Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+        color: isDark ? const Color(0xFF101012) : Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+            width: 1,
           ),
-          if (nextLvl != null) ...[
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'পরবর্তী লেভেল: ${nextLvl.label.split(' ').first}',
-                  style: TextStyle(
-                    fontFamily: 'HindSiliguri',
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? const Color(0xFF9CA3AF)
-                        : const Color(0xFF4B5563),
-                  ),
-                ),
-                Text(
-                  '${_numFmt.format(neededXp)} XP প্রয়োজন',
-                  style: TextStyle(
-                    fontFamily: 'HindSiliguri',
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? const Color(0xFF9CA3AF)
-                        : const Color(0xFF4B5563),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Stack(
-              children: [
-                Container(
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E5E5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                FractionallySizedBox(
-                  widthFactor: progress.clamp(0.02, 1.0),
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    height: 10,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [lvl.start, lvl.end]),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: lvl.start.withValues(alpha: 0.5),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.5)
+                : Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
+      ),
+      padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1F1F23) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF2E2E33) : const Color(0xFFE5E7EB),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(6, 4, 12, 4),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 36,
+                  child: _buildRankBadge(rank, isDark),
+                ),
+                const SizedBox(width: 6),
+                UserAvatar(
+                  id: user.id,
+                  name: user.name,
+                  avatarUrl: user.avatarUrl,
+                  size: 32,
+                  isPro: user.isPro,
+                  showBorder: false,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              user.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111827),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 0.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFF3F3F46)
+                                    : const Color(0xFFE5E7EB),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Text(
+                              'তুমি',
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark
+                                    ? const Color(0xFFD4D4D8)
+                                    : const Color(0xFF4B5563),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 1),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              isOnOwnLevel
+                                  ? (user.institute?.isNotEmpty == true
+                                      ? user.institute!
+                                      : 'আমার প্রোফাইল')
+                                  : '$levelLabel লেভেল • ${user.institute?.isNotEmpty == true ? user.institute! : 'আমার প্রোফাইল'}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? const Color(0xFF9CA3AF)
+                                    : const Color(0xFF6B7280),
+                                fontFamily: 'HindSiliguri',
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _numFmt.format(xp),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.5,
+                    color: isDark
+                        ? const Color(0xFFE5E5E5)
+                        : const Color(0xFF1F2937),
+                    fontFamily: 'HindSiliguri',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1988,7 +2003,7 @@ class _LeaderboardTable extends StatelessWidget {
                                   spreadRadius: 1,
                                 ),
                               ]
-                            : [],
+                            : const [],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(8, 10, 14, 10),

@@ -113,7 +113,7 @@ class DashboardRepository {
     try {
       final response = await _supabase
           .from('exam_results')
-          .select('id, subject, total_questions, correct_count, wrong_count, date')
+          .select('id, subject, subject_label, total_questions, correct_count, wrong_count, date, created_at')
           .eq('user_id', userId)
           .eq('status', 'evaluated')
           .order('created_at', ascending: false)

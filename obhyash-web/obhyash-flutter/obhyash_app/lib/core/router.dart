@@ -203,7 +203,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final institute = extra['institute'] as Map<String, dynamic>? ?? {};
-          final examSet = extra['examSet'] as InstituteExamSet;
+          final examSet = extra['examSet'] as InstituteExamSet? ??
+              const InstituteExamSet(
+                id: 'cuet_22_23',
+                title: 'CUET 22-23',
+                year: '2022-23',
+                questionCount: 100,
+                questionLabel: '১০০টি প্রশ্ন',
+                durationMinutes: 90,
+                durationLabel: '৯০ মিনিট',
+                type: 'mcq',
+              );
           return _fadeRoute(
             ExamSetDetailView(
               institute: institute,
@@ -219,7 +229,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final institute = extra['institute'] as Map<String, dynamic>? ?? {};
-          final examSet = extra['examSet'] as InstituteExamSet;
+          final examSet = extra['examSet'] as InstituteExamSet? ??
+              const InstituteExamSet(
+                id: 'cuet_22_23',
+                title: 'CUET 22-23',
+                year: '2022-23',
+                questionCount: 100,
+                questionLabel: '১০০টি প্রশ্ন',
+                durationMinutes: 90,
+                durationLabel: '৯০ মিনিট',
+                type: 'mcq',
+              );
           final questions = extra['questions'] as List<Question>? ?? [];
           return _fadeRoute(
             QuestionViewerView(
@@ -278,6 +298,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             state,
           );
         },
+      ),
+      GoRoute(
+        path: '/exam-setup',
+        redirect: (context, state) => '/setup',
       ),
       GoRoute(
         path: '/blog',

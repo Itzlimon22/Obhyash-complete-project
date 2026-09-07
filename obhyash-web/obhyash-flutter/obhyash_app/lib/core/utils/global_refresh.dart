@@ -30,7 +30,7 @@ Future<void> globalRefresh(WidgetRef ref) async {
     if (currentUserId != null) StreakService.syncStreak(currentUserId),
     ref.read(userProfileProvider.future).catchError((_) => null),
     ref.read(leaderboardProvider.future).catchError((_) => <LeaderboardUser>[]),
-    ref.read(dashboardSubjectStatsProvider.future).catchError((_) => <SubjectStats>[]),
+    ref.read(dashboardSubjectStatsProvider.notifier).forceRefresh().catchError((_) => <SubjectStats>[]),
     ref.read(dashboardLiveExamsProvider.future).catchError((_) => <LiveExam>[]),
   ];
 

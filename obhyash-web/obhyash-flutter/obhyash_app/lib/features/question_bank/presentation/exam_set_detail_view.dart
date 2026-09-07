@@ -381,10 +381,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        color: isDark ? const Color(0xFF18181B) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -466,10 +466,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        color: isDark ? const Color(0xFF18181B) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -488,8 +488,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               children: [
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.fileQuestion,
-                                    iconColor: const Color(0xFF10B981),
                                     title: 'মোট প্রশ্ন',
                                     value: widget.examSet.questionLabel,
                                     isDark: isDark,
@@ -498,12 +496,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                 VerticalDivider(
                                   width: 24,
                                   thickness: 1,
-                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                 ),
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.timer,
-                                    iconColor: const Color(0xFFF43F5E),
                                     title: 'নির্ধারিত সময়',
                                     value: formatDurationMinutes(widget.examSet.durationMinutes),
                                     isDark: isDark,
@@ -515,7 +511,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                           Divider(
                             height: 20,
                             thickness: 1,
-                            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                           ),
                           // Row 2: পূর্ণমান | নেগেটিভ মার্ক
                           IntrinsicHeight(
@@ -524,8 +520,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               children: [
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.award,
-                                    iconColor: const Color(0xFFF59E0B),
                                     title: 'পূর্ণমান',
                                     value: '$totalMarks নম্বর',
                                     isDark: isDark,
@@ -534,12 +528,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                 VerticalDivider(
                                   width: 24,
                                   thickness: 1,
-                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                 ),
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.alertCircle,
-                                    iconColor: const Color(0xFFEF4444),
                                     title: 'নেগেটিভ মার্ক',
                                     value: negativeMarkText,
                                     isDark: isDark,
@@ -551,7 +543,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                           Divider(
                             height: 20,
                             thickness: 1,
-                            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                           ),
                           // Row 3: পদ্ধতি | ক্যালকুলেটর
                           IntrinsicHeight(
@@ -560,8 +552,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               children: [
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.layers,
-                                    iconColor: const Color(0xFF8B5CF6),
                                     title: 'পদ্ধতি',
                                     value: formatText,
                                     isDark: isDark,
@@ -570,12 +560,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                 VerticalDivider(
                                   width: 24,
                                   thickness: 1,
-                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                 ),
                                 Expanded(
                                   child: _buildInfoItem(
-                                    icon: LucideIcons.calculator,
-                                    iconColor: const Color(0xFF0EA5E9),
                                     title: 'ক্যালকুলেটর',
                                     value: calculatorAllowed,
                                     isDark: isDark,
@@ -603,10 +591,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        color: isDark ? const Color(0xFF18181B) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -623,7 +611,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               Divider(
                                 height: 20,
                                 thickness: 1,
-                                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                               ),
                             IntrinsicHeight(
                               child: Row(
@@ -636,7 +624,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                     VerticalDivider(
                                       width: 24,
                                       thickness: 1,
-                                      color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                     ),
                                     Expanded(
                                       child: _buildSubjectItem(distributions[i + 1], isDark),
@@ -659,10 +647,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: isDark ? const Color(0xFF18181B) : Colors.white,
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                   ),
                 ),
                 boxShadow: [
@@ -679,24 +667,23 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   Expanded(
                     child: SizedBox(
                       height: 48,
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: _isLoading ? null : _handleViewQuestions,
-                        icon: const Icon(LucideIcons.eye, size: 18),
-                        label: const Text(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
+                          side: BorderSide(
+                            color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
                           'প্রশ্ন দেখো',
                           style: TextStyle(
                             fontFamily: 'HindSiliguri',
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
-                          side: BorderSide(
-                            color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                       ),
@@ -708,23 +695,22 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   Expanded(
                     child: SizedBox(
                       height: 48,
-                      child: ElevatedButton.icon(
+                      child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleStartExam,
-                        icon: const Icon(LucideIcons.play, size: 18, color: Colors.white),
-                        label: const Text(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF004633),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
                           'পরীক্ষা দাও',
                           style: TextStyle(
                             fontFamily: 'HindSiliguri',
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                       ),
@@ -742,7 +728,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  color: isDark ? const Color(0xFF18181B) : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -785,46 +771,38 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
   }
 
   Widget _buildInfoItem({
-    required IconData icon,
-    required Color iconColor,
     required String title,
     required String value,
     required bool isDark,
   }) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 18, color: iconColor),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  height: 1.2,
-                ),
-              ),
-            ],
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            height: 1.2,
           ),
         ),
       ],
@@ -832,50 +810,36 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
   }
 
   Widget _buildSubjectItem(SubjectDistribution dist, bool isDark) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: dist.color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+        Text(
+          dist.subject,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            height: 1.2,
           ),
-          child: Icon(dist.icon, size: 15, color: dist.color),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                dist.subject,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '${dist.questions} • ${dist.marks}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                  height: 1.2,
-                ),
-              ),
-            ],
+        const SizedBox(height: 2),
+        Text(
+          '${dist.questions} • ${dist.marks}',
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            height: 1.2,
           ),
         ),
       ],

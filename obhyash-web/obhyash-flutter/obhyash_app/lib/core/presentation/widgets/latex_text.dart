@@ -465,11 +465,17 @@ String _preprocess(String text) {
     (m) => '\n\n**(${m.group(1)})** ${m.group(2)}',
   );
 
-  // Common Bangla question concluding sentences
-  processedText = processedText.replaceAllMapped(
-    RegExp(r'(?:\s+|^|\n)(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?|উদ্দীপকের আলোকে উত্তর দাও:|উদ্দীপকটি পড়ে নিচের প্রশ্নের উত্তর দাও:)'),
-    (m) => '\n\n${m.group(1)}',
-  );
+  // Common Bangla question concluding sentences (Only split onto separate line if there are list items)
+  final hasRomanOrNumberItems = RegExp(r'(?:\([iIvVxX0-9]+\)|[iIvVxX0-9]+\.)').hasMatch(processedText);
+  if (hasRomanOrNumberItems) {
+    processedText = processedText.replaceAllMapped(
+      RegExp(r'(?:\s+|^|\n)(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?|উদ্দীপকের আলোকে উত্তর দাও:|উদ্দীপকটি পড়ে নিচের প্রশ্নের উত্তর দাও:)'),
+      (m) => '\n\n${m.group(1)}',
+    );
+  } else {
+    // Keep question flowing as a continuous single sentence
+    processedText = processedText.replaceAll(RegExp(r'\s*\n+\s*(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?)'), r' $1');
+  }
 
   // 4b. Auto-detect un-escaped LaTeX in options / formulas (e.g. "1.6 \times 10^{-19} \text{ Kg}")
   if (!processedText.contains(r'$')) {

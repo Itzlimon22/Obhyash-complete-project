@@ -499,13 +499,16 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     });
 
-    // Schedule local witty daily streak saver reminder (Chorcha style) + sync FCM + Smart Soft-Ask
+    // Schedule local witty daily streak saver reminder (Chorcha style) + morning challenge + sync FCM
     ref.listen(userProfileProvider, (prev, next) {
       final u = next.value;
       if (u != null) {
         NotificationService().scheduleDailyStreakReminders(
           userName: u.name,
           currentStreak: u.streakCount,
+        );
+        NotificationService().scheduleDailyMorningChallenge(
+          userName: u.name,
         );
         NotificationService().syncFCMToken(u.id);
 
@@ -741,30 +744,18 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                           } else {
                                             widget.navigationShell.goBranch(0);
                                             context.go('/');
-                                          }
-                                        },
+                                            }
+                                          },
                                         behavior: HitTestBehavior.opaque,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(7),
-                                          margin: const EdgeInsets.only(
-                                            right: 10,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? const Color(0xFF1C1C1E)
-                                                : const Color(0xFFF1F5F9),
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            border: Border.all(
-                                              color: isDark
-                                                  ? const Color(0xFF27272A)
-                                                  : const Color(0xFFE2E8F0),
-                                            ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 8,
+                                            top: 4,
+                                            bottom: 4,
                                           ),
                                           child: AppIcon(
                                             AppIcons.arrowLeft,
-                                            size: 18,
+                                            size: 22,
                                             color: isDark
                                                 ? Colors.white
                                                 : const Color(0xFF0F172A),

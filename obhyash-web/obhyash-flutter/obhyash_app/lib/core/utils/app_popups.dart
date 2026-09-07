@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 enum PopupType { success, error, warning, info }
 
@@ -186,6 +185,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  late Animation<double> _fadeAnimation;
   Timer? _timer;
   bool _isDismissed = false;
 
@@ -194,8 +194,8 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
-      reverseDuration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 320),
+      reverseDuration: const Duration(milliseconds: 240),
     );
 
     _offsetAnimation = Tween<Offset>(
@@ -204,18 +204,31 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutBack,
+        curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       ),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
     );
 
     _controller.forward();
 
     // Auto dismiss after specified duration
-    _timer = Timer(widget.duration, _dismiss);
+    _timer = Timer(widget.duration, _dismissWithAnimation);
   }
 
-  void _dismiss() {
+  void _safeDismissImmediately() {
+    if (_isDismissed) return;
+    _isDismissed = true;
+    _timer?.cancel();
+    widget.onDismiss();
+  }
+
+  void _dismissWithAnimation() {
     if (_isDismissed) return;
     _isDismissed = true;
     _timer?.cancel();
@@ -242,71 +255,88 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
 
-    // Rich modern gradients according to type
+    // Deep rich colors according to popup type
     final Color bgColor;
-    final IconData icon;
+    final Color borderColor;
 
     switch (widget.type) {
       case PopupType.success:
-        bgColor = const Color(0xFF047857); // Deep Emerald Green
-        icon = LucideIcons.checkCircle2;
+        bgColor = const Color(0xFF064E3B); // Deep Rich Forest Green
+        borderColor = const Color(0xFF10B981).withValues(alpha: 0.35);
         break;
       case PopupType.error:
-        bgColor = const Color(0xFFDC2626); // Rich Crimson Red
-        icon = LucideIcons.alertCircle;
+        bgColor = const Color(0xFF7F1D1D); // Deep Rich Crimson Red
+        borderColor = const Color(0xFFEF4444).withValues(alpha: 0.35);
         break;
       case PopupType.warning:
-        bgColor = const Color(0xFFD97706); // Warm Amber Gold
-        icon = LucideIcons.alertTriangle;
+        bgColor = const Color(0xFF78350F); // Deep Rich Amber
+        borderColor = const Color(0xFFF59E0B).withValues(alpha: 0.35);
         break;
       case PopupType.info:
-        bgColor = const Color(0xFF2563EB); // Royal Blue
-        icon = LucideIcons.info;
+        bgColor = const Color(0xFF1E3A8A); // Deep Rich Midnight Blue
+        borderColor = const Color(0xFF3B82F6).withValues(alpha: 0.35);
         break;
     }
 
     return Positioned(
-      top: topPadding + 12,
+      top: topPadding + 8,
       left: 16,
       right: 16,
-      child: Material(
-        color: Colors.transparent,
-        child: SlideTransition(
-          position: _offsetAnimation,
-          child: GestureDetector(
-            onTap: _dismiss, // Dismiss on tap
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.28),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Icon(icon, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.message,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                        height: 1.35,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Material(
+          color: Colors.transparent,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _offsetAnimation,
+              child: Dismissible(
+                key: const ValueKey('app_popup_dismiss_horizontal'),
+                direction: DismissDirection.horizontal,
+                onDismissed: (_) => _safeDismissImmediately(),
+                child: Dismissible(
+                  key: const ValueKey('app_popup_dismiss_up'),
+                  direction: DismissDirection.up,
+                  onDismissed: (_) => _safeDismissImmediately(),
+                  child: GestureDetector(
+                    onTap: _dismissWithAnimation,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width - 48,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: borderColor, width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        widget.message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          height: 1.25,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
