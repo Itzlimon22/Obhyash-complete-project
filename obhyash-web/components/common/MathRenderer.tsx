@@ -137,6 +137,51 @@ function wrapLatexExpressionsInBengaliText(str: string): string {
 const preprocessCache = new Map<string, string>();
 const MAX_PREPROCESS_CACHE = 600;
 
+function extractAndProtectTables(text: string): { textWithoutTables: string; tables: string[] } {
+  const lines = text.split("\n");
+  const tables: string[] = [];
+  const outputLines: string[] = [];
+  let currentTableLines: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    const isTableLine = trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.split("|").length > 2;
+
+    if (isTableLine) {
+      // Escape inner pipes inside $...$ in table cells so GFM doesn't confuse them with column delimiters
+      const safeLine = line.replace(/\$([^$]+)\$/g, (_m, math) => {
+        return '$' + math.replace(/\|/g, '\\vert ') + '$';
+      });
+      currentTableLines.push(safeLine);
+    } else {
+      if (currentTableLines.length > 0) {
+        const placeholder = `___MD_TABLE_${tables.length}___`;
+        tables.push(currentTableLines.join("\n"));
+        outputLines.push(placeholder);
+        currentTableLines = [];
+      }
+      outputLines.push(line);
+    }
+  }
+
+  if (currentTableLines.length > 0) {
+    const placeholder = `___MD_TABLE_${tables.length}___`;
+    tables.push(currentTableLines.join("\n"));
+    outputLines.push(placeholder);
+  }
+
+  return { textWithoutTables: outputLines.join("\n"), tables };
+}
+
+function restoreTables(text: string, tables: string[]): string {
+  let result = text;
+  tables.forEach((table, index) => {
+    result = result.replace(`___MD_TABLE_${index}___`, `\n\n${table}\n\n`);
+  });
+  return result;
+}
+
 function preprocess(text: string): string {
   if (preprocessCache.has(text)) {
     return preprocessCache.get(text)!;
@@ -144,6 +189,11 @@ function preprocess(text: string): string {
 
   // 1. Normalize literal \n and multiple $$$$
   let processedText = text.replace(/\\n/g, "\n").replace(/\${3,}/g, "\n\n");
+
+  // Protect Markdown tables from delimiters, step splitting and line restructuring
+  const { textWithoutTables, tables } = extractAndProtectTables(processedText);
+  processedText = textWithoutTables;
+
   processedText = cleanPipesAndDelimiters(processedText);
   processedText = separateTransitionSteps(processedText);
 
@@ -253,7 +303,10 @@ function preprocess(text: string): string {
     return t;
   });
 
-  const result = processedParts.join("").replace(/\n{3,}/g, "\n\n");
+  const result = restoreTables(
+    processedParts.join("").replace(/\n{3,}/g, "\n\n"),
+    tables
+  );
   if (preprocessCache.size >= MAX_PREPROCESS_CACHE) {
     const firstKey = preprocessCache.keys().next().value;
     if (firstKey) preprocessCache.delete(firstKey);

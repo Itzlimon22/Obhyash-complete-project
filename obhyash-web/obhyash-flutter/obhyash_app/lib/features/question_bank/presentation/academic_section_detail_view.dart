@@ -630,14 +630,20 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
     // 2. Filter by chapter if chosen and not ignored
     if (!ignoreChapter && _selectedChapter != null && _selectedChapter!.name.isNotEmpty) {
-      final chVars = BanglaNameHelper.getSearchVariations(_selectedChapter!.name);
-      if (chVars.isNotEmpty) {
-        if (chVars.length == 1) {
-          query = query.ilike('chapter', '%${chVars.first}%');
-        } else {
-          final conds = chVars.map((v) => 'chapter.ilike.*$v*').join(',');
-          query = query.or(conds);
+      final chId = _selectedChapter!.id;
+      final chVars = BanglaNameHelper.getChapterSearchVariants(_selectedChapter!.name);
+      final chConds = <String>[];
+      if (chId.isNotEmpty && chId != 'all') {
+        chConds.add('chapter_id.eq.$chId');
+      }
+      for (final v in chVars) {
+        final sanitizedV = v.replaceAll(',', '*').replaceAll('،', '*').replaceAll('**', '*').trim();
+        if (sanitizedV.length >= 2) {
+          chConds.add('chapter.ilike.*$sanitizedV*');
         }
+      }
+      if (chConds.isNotEmpty) {
+        query = query.or(chConds.join(','));
       }
     }
 
@@ -682,13 +688,13 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           .not('type', 'ilike', '%mcq%')
           .or('type.eq.kha,type.eq.Kha,type.ilike.*comprehension*,type.ilike.*অনুধাবন*,section.eq.kha,section.eq.Kha,section.ilike.*comprehension*,section.ilike.*অনুধাবন*');
     } else if (_sectionId == 'engineering') {
-      query = query.or('exam_type.ilike.*engineering*,exam_type.ilike.*buet*,exam_type.ilike.*ckruet*,exam_type.ilike.*ruet*,exam_type.ilike.*kuet*,exam_type.ilike.*cuet*');
+      query = query.or('exam_type.ilike.*engineering*,exam_type.ilike.*buet*,exam_type.ilike.*ckruet*,exam_type.ilike.*ruet*,exam_type.ilike.*kuet*,exam_type.ilike.*cuet*,institutes.cs.{BUET},institutes.cs.{CKRUET},institutes.cs.{RUET},institutes.cs.{KUET},institutes.cs.{CUET},institutes.cs.{বুটেক্স},institutes.cs.{আইইউটি},institutes.cs.{SUST}');
     } else if (_sectionId == 'medical') {
-      query = query.or('exam_type.ilike.*medical*,exam_type.ilike.*mat*,exam_type.ilike.*dmat*,exam_type.ilike.*mbbs*,exam_type.ilike.*bds*');
+      query = query.or('exam_type.ilike.*medical*,exam_type.ilike.*mat*,exam_type.ilike.*dmat*,exam_type.ilike.*mbbs*,exam_type.ilike.*bds*,institutes.cs.{মেডিকেল ভর্তি পরীক্ষা},institutes.cs.{ডেন্টাল ভর্তি পরীক্ষা},institutes.cs.{MAT},institutes.cs.{DAT},institutes.cs.{Medical},institutes.cs.{মেডিকেল}');
     } else if (_sectionId == 'varsity_ka' || _sectionId == 'varsity_kha' || _sectionId == 'varsity') {
-      query = query.or('exam_type.ilike.*varsity*,exam_type.ilike.*admission*');
+      query = query.or('exam_type.ilike.*varsity*,exam_type.ilike.*admission*,institutes.cs.{DU},institutes.cs.{JU},institutes.cs.{RU},institutes.cs.{CU},institutes.cs.{GST},institutes.cs.{KU},institutes.cs.{JnU},institutes.cs.{HSTU},institutes.cs.{BUP}');
     } else if (_sectionId == 'iba_bup') {
-      query = query.or('exam_type.ilike.*iba*,exam_type.ilike.*bup*,exam_type.ilike.*admission*');
+      query = query.or('exam_type.ilike.*iba*,exam_type.ilike.*bup*,exam_type.ilike.*admission*,institutes.cs.{IBA},institutes.cs.{BUP}');
     } else if (_sectionId == 'textbook') {
       query = query.or('exam_type.ilike.*book*,exam_type.ilike.*textbook*,exam_type.ilike.*academic*,exam_type.ilike.*practice*');
     } else if (_sectionId == 'mcq' || _sectionId == 'academic') {

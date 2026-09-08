@@ -193,6 +193,19 @@ export function validateUploadQuestion(
       if (q.options && Array.isArray(q.options) && q.options.length > 0) {
         return q.options.map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
       }
+      if (q.options && typeof q.options === 'object' && !Array.isArray(q.options)) {
+        const nested = [
+          q.options.option1 ?? q.options.option_1 ?? q.options.optionA ?? q.options.opt1 ?? q.options['Option 1'] ?? q.options['ক'],
+          q.options.option2 ?? q.options.option_2 ?? q.options.optionB ?? q.options.opt2 ?? q.options['Option 2'] ?? q.options['খ'],
+          q.options.option3 ?? q.options.option_3 ?? q.options.optionC ?? q.options.opt3 ?? q.options['Option 3'] ?? q.options['গ'],
+          q.options.option4 ?? q.options.option_4 ?? q.options.optionD ?? q.options.opt4 ?? q.options['Option 4'] ?? q.options['ঘ'],
+          q.options.option5 ?? q.options.option_5 ?? q.options.optionE ?? q.options.opt5 ?? q.options['Option 5'] ?? q.options['ঙ'],
+          q.options.option6 ?? q.options.option_6 ?? q.options.optionF ?? q.options.opt6 ?? q.options['Option 6'],
+        ].filter((opt): opt is string => typeof opt === 'string' && opt.trim() !== '');
+        if (nested.length > 0) return nested;
+        const vals = Object.values(q.options).map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
+        if (vals.length > 0) return vals;
+      }
       const cols = [
         q.option1 ?? q.option_1 ?? q.optionA ?? q.option_a ?? q.opt1 ?? q['Option 1'] ?? q['Option A'] ?? q['ক'],
         q.option2 ?? q.option_2 ?? q.optionB ?? q.option_b ?? q.opt2 ?? q['Option 2'] ?? q['Option B'] ?? q['খ'],
@@ -373,6 +386,21 @@ export function transformUploadToDatabase(
   if (!isWrittenOrCQ) {
     if (uploadQuestion.options && Array.isArray(uploadQuestion.options) && uploadQuestion.options.length > 0) {
       options = uploadQuestion.options.map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
+    } else if (uploadQuestion.options && typeof uploadQuestion.options === 'object' && !Array.isArray(uploadQuestion.options)) {
+      const optObj: any = uploadQuestion.options;
+      const nested = [
+        optObj.option1 ?? optObj.option_1 ?? optObj.optionA ?? optObj.opt1 ?? optObj['Option 1'] ?? optObj['ক'],
+        optObj.option2 ?? optObj.option_2 ?? optObj.optionB ?? optObj.opt2 ?? optObj['Option 2'] ?? optObj['খ'],
+        optObj.option3 ?? optObj.option_3 ?? optObj.optionC ?? optObj.opt3 ?? optObj['Option 3'] ?? optObj['গ'],
+        optObj.option4 ?? optObj.option_4 ?? optObj.optionD ?? optObj.opt4 ?? optObj['Option 4'] ?? optObj['ঘ'],
+        optObj.option5 ?? optObj.option_5 ?? optObj.optionE ?? optObj.opt5 ?? optObj['Option 5'] ?? optObj['ঙ'],
+        optObj.option6 ?? optObj.option_6 ?? optObj.optionF ?? optObj.opt6 ?? optObj['Option 6'],
+      ].filter((opt): opt is string => typeof opt === 'string' && opt.trim() !== '');
+      if (nested.length > 0) {
+        options = nested;
+      } else {
+        options = Object.values(uploadQuestion.options).map((o: any) => String(o ?? '').trim()).filter((o: string) => o.length > 0);
+      }
     } else {
       const q: any = uploadQuestion;
       const cols = [

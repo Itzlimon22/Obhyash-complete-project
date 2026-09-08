@@ -258,6 +258,15 @@ String _preprocess(String text) {
     var l = line.trim();
     if (l.isEmpty) return '';
 
+    // If it's a markdown table row, convert pipes inside math $...$ to \vert
+    // so markdown table parsers don't split columns on formula modulus signs
+    if (l.startsWith('|') && l.endsWith('|') && l.contains(r'$')) {
+      l = l.replaceAllMapped(RegExp(r'\$([^$]+)\$'), (m) {
+        final math = m.group(1) ?? '';
+        return '\$${math.replaceAll('|', r'\vert ')}\$';
+      });
+    }
+
     final dollarCount = RegExp(r'\$').allMatches(l).length;
     if (dollarCount % 2 != 0) {
       if (l.endsWith(r'$')) {

@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { NOTIFICATION_TEMPLATES } from '@/lib/notification-templates';
+import { dispatchAutomatedWittyNotification } from '@/lib/notification-cron-service';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 /**
  * Automated Cron Endpoint for Scheduled Notifications:
- * 1. Inactive Users (2+ days without taking an exam) -> Sends comeback notification
- * 2. Upcoming Live Exams (Starts within 15-30 minutes) -> Sends alert notification
+ * 1. Timely & contextual Duolingo/Chorcha style witty notifications (Morning, Afternoon, Streak-Savior, Late Night)
+ * 2. Inactive Users (2+ days without taking an exam) -> Sends comeback notification
+ * 3. Upcoming Live Exams (Starts within 15-30 minutes) -> Sends alert notification
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,12 +22,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const categoryParam = searchParams.get('category') || undefined;
+
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
     const now = new Date();
-    const results = {
+    const results: Record<string, any> = {
       inactiveUsersNotified: 0,
       liveExamsNotified: 0,
+      wittyNotification: null,
     };
+
+    // ── 0. Timely Witty / Duolingo Style Notification ────────────────────────
+    try {
+      const wittyRes = await dispatchAutomatedWittyNotification(supabaseAdmin, categoryParam);
+      results.wittyNotification = wittyRes;
+    } catch (wittyErr: any) {
+      console.error('Error dispatching witty notification:', wittyErr);
+      results.wittyNotificationError = wittyErr.message;
+    }
 
     // ── 1. Inactivity Recovery Notification (2+ days inactive) ───────────────
     const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
@@ -119,4 +134,8 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
