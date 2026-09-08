@@ -100,6 +100,21 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final isEnabled = ref.read(isScreenshotProtectionEnabledProvider);
       AntiPiracyService.setProtection(isEnabled);
+
+      // Handle cold start notification tap: opens app and takes user to dashboard / target
+      final pending = NotificationService.initialPendingRoute;
+      if (pending != null && pending.isNotEmpty) {
+        NotificationService.initialPendingRoute = null;
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          final target = (pending != '/') ? pending : '/dashboard';
+          try {
+            ref.read(routerProvider).go(target);
+          } catch (_) {
+            ref.read(routerProvider).push(target);
+          }
+        });
+      }
     });
   }
 
@@ -132,8 +147,13 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
     });
 
     final router = ref.watch(routerProvider);
-    NotificationService.onNotificationTapped ??= (route) {
-      router.push(route);
+    NotificationService.onNotificationTapped = (route) {
+      final target = (route.isNotEmpty && route != '/') ? route : '/dashboard';
+      try {
+        router.go(target);
+      } catch (_) {
+        router.push(target);
+      }
     };
     final themeMode = ref.watch(themeModeProvider);
     final configAsync = ref.watch(appConfigStreamProvider);

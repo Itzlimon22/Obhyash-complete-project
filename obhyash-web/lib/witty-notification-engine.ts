@@ -14,6 +14,52 @@ export interface ContextualNotification {
   type: 'announcement' | 'warning' | 'info' | 'streak';
 }
 
+/**
+ * Intelligently extracts a friendly nickname from a user's full name.
+ * Strips formal prefixes/titles (Md., Mohammad, Most., Kazi, Dr., Engr., etc.)
+ * and returns the first calling name (e.g., "Md. Limon Howlader" -> "Limon", "Most. Sadia Akter" -> "Sadia").
+ */
+export function extractIntelligentNickname(fullName?: string | null): string {
+  if (!fullName || typeof fullName !== 'string') return 'বন্ধু';
+
+  const clean = fullName.trim();
+  if (!clean) return 'বন্ধু';
+
+  // Words/prefixes to strip
+  const ignorePrefixes = new Set([
+    'md.', 'md', 'md:', 'mohammad', 'mohammed', 'muhammad', 'mohd', 'mohd.',
+    'most.', 'most', 'mst.', 'mst', 'mosa.', 'mosa',
+    'dr.', 'dr', 'engr.', 'engr', 'prof.', 'prof',
+    'kazi', 'syed', 'syeda', 'sheikh', 'sk.', 'sk', 'al',
+    // Bengali prefixes
+    'মো:', 'মোঃ', 'মুহাম্মদ', 'মোহাম্মদ', 'মোসা:', 'মোসাম্মৎ', 'ডা:', 'ইঞ্জি:',
+  ]);
+
+  // Split by whitespace
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'বন্ধু';
+
+  // Find the first non-prefix calling part
+  let callingPart = '';
+  for (const p of parts) {
+    const normalized = p.toLowerCase().replace(/[,.:_-]/g, '');
+    const rawLower = p.toLowerCase();
+    if (!ignorePrefixes.has(rawLower) && !ignorePrefixes.has(normalized) && normalized.length > 1) {
+      callingPart = p;
+      break;
+    }
+  }
+
+  if (!callingPart) {
+    callingPart = parts[0];
+  }
+
+  // Strip trailing punctuation like comma/period
+  callingPart = callingPart.replace(/[,.:_-]+$/, '').trim();
+
+  return callingPart || 'বন্ধু';
+}
+
 export const WITTY_NOTIFICATION_POOLS: Record<string, Array<{ title: string; body: string; type: string; priority: string }>> = {
   // ── 1. রাত ১০:৩০ PM - স্ট্রিক ও ডুওলিঙ্গো/চর্চা গিল্ট-ট্রিপ (Night Streak) ────────────
   night_streak: [

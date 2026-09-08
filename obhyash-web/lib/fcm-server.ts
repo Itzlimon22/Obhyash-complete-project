@@ -11,6 +11,7 @@ interface SendPushOptions {
   body: string;
   data?: Record<string, string>;
   channelId?: string;
+  perUserPayload?: Record<string, { title: string; body: string }>;
 }
 
 // In-memory cached OAuth2 access token
@@ -166,17 +167,21 @@ export async function sendFCMNotificationToUsers(
       const chunk = tokensData.slice(i, i + BATCH_CONCURRENCY);
 
       const promises = chunk.map(async (row: any) => {
+        const userSpecific = options.perUserPayload?.[row.user_id];
+        const pushTitle = userSpecific?.title || title;
+        const pushBody = userSpecific?.body || body;
+
         const messagePayload = {
           message: {
             token: row.fcm_token,
             notification: {
-              title,
-              body,
+              title: pushTitle,
+              body: pushBody,
             },
             data: {
               ...data,
-              title,
-              body,
+              title: pushTitle,
+              body: pushBody,
               click_action: 'FLUTTER_NOTIFICATION_CLICK',
             },
             android: {
@@ -190,7 +195,7 @@ export async function sendFCMNotificationToUsers(
             apns: {
               payload: {
                 aps: {
-                  alert: { title, body },
+                  alert: { title: pushTitle, body: pushBody },
                   sound: 'default',
                   badge: 1,
                 },

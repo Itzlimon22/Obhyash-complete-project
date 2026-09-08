@@ -28,6 +28,7 @@ class NotificationService {
 
   // Callback to navigate to deep link route
   static void Function(String route)? onNotificationTapped;
+  static String? initialPendingRoute;
 
   // Channels
   static const String channelLiveExams = 'obhyash_live_exams';
@@ -108,12 +109,25 @@ class NotificationService {
           if (payload != null && payload.isNotEmpty) {
             try {
               final data = jsonDecode(payload) as Map<String, dynamic>;
-              final route = data['route']?.toString();
-              if (route != null && onNotificationTapped != null) {
+              final route = data['route']?.toString() ?? '/dashboard';
+              if (onNotificationTapped != null) {
                 onNotificationTapped!(route);
+              } else {
+                initialPendingRoute = route;
               }
             } catch (e) {
               debugPrint('[NotificationService] payload parse error: $e');
+              if (onNotificationTapped != null) {
+                onNotificationTapped!('/dashboard');
+              } else {
+                initialPendingRoute = '/dashboard';
+              }
+            }
+          } else {
+            if (onNotificationTapped != null) {
+              onNotificationTapped!('/dashboard');
+            } else {
+              initialPendingRoute = '/dashboard';
             }
           }
         },
@@ -165,7 +179,7 @@ class NotificationService {
             id: message.hashCode,
             title: notif.title ?? 'অভ্যাস',
             body: notif.body ?? '',
-            route: message.data['route']?.toString(),
+            route: message.data['route']?.toString() ?? '/dashboard',
             channelId: message.data['channel_id']?.toString() ?? channelGeneral,
           );
         }
@@ -173,11 +187,47 @@ class NotificationService {
 
       // 6. Notification Tap (App in background opened by tap)
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        final route = message.data['route']?.toString();
-        if (route != null && onNotificationTapped != null) {
+        final route = message.data['route']?.toString() ?? '/dashboard';
+        debugPrint('[NotificationService] onMessageOpenedApp triggered: $route');
+        if (onNotificationTapped != null) {
           onNotificationTapped!(route);
+        } else {
+          initialPendingRoute = route;
         }
       });
+
+      // 7. Cold-start launch: check if app was launched from terminated state by tapping push notification
+      try {
+        final initialMsg = await FirebaseMessaging.instance.getInitialMessage();
+        if (initialMsg != null) {
+          final route = initialMsg.data['route']?.toString() ?? '/dashboard';
+          initialPendingRoute = route;
+          debugPrint('[NotificationService] Cold-start launched via FCM push: $route');
+        }
+      } catch (e) {
+        debugPrint('[NotificationService] getInitialMessage error: $e');
+      }
+
+      // Check if launched from terminated state via local notification
+      try {
+        final launchDetails = await _localNotif.getNotificationAppLaunchDetails();
+        if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
+          final payload = launchDetails.notificationResponse?.payload;
+          if (payload != null && payload.isNotEmpty) {
+            try {
+              final data = jsonDecode(payload) as Map<String, dynamic>;
+              initialPendingRoute = data['route']?.toString() ?? '/dashboard';
+            } catch (_) {
+              initialPendingRoute = '/dashboard';
+            }
+          } else {
+            initialPendingRoute = '/dashboard';
+          }
+          debugPrint('[NotificationService] Cold-start launched via local notification: $initialPendingRoute');
+        }
+      } catch (e) {
+        debugPrint('[NotificationService] getNotificationAppLaunchDetails error: $e');
+      }
 
       _isInitialized = true;
       debugPrint('[NotificationService] initialized successfully with Firebase FCM');

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -20,6 +21,21 @@ class LiveExamCategoryView extends ConsumerStatefulWidget {
 }
 
 class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -244,29 +260,37 @@ class _LiveExamCard extends StatelessWidget {
 
   static String _formatDurationBn(int minutes) {
     if (minutes <= 0) return '২০ মিনিট';
-    if (minutes < 60) return '${_toBanglaDigits(minutes)} মিনিট';
-    final h = minutes ~/ 60;
-    final m = minutes % 60;
-    if (m == 0) return '${_toBanglaDigits(h)} ঘণ্টা';
-    return '${_toBanglaDigits(h)} ঘণ্টা ${_toBanglaDigits(m)} মিনিট';
+    return '${_toBanglaDigits(minutes)} মিনিট';
   }
 
   static String _formatTimeRemaining(LiveExam exam) {
     final now = DateTime.now();
     if (exam.isOngoing) {
       final diff = exam.endTime.difference(now);
-      if (diff.inDays > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inDays)} দিন';
-      if (diff.inHours > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা';
-      if (diff.inMinutes > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inMinutes)} মিনিট';
-      return 'শীঘ্রই শেষ হবে';
+      if (diff.isNegative) return 'পরীক্ষা সম্পন্ন';
+      final totalMins = diff.inMinutes;
+      final s = diff.inSeconds % 60;
+      return 'সময় বাকি - ${_toBanglaDigits(totalMins)} মি. ${_toBanglaDigits(s)} সে.';
     } else if (exam.isPast) {
       return 'পরীক্ষা সম্পন্ন';
     } else {
       final diff = exam.startTime.difference(now);
-      if (diff.inDays > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inDays)} দিন';
-      if (diff.inHours > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা';
-      if (diff.inMinutes > 0) return 'সময় বাকি - ${_toBanglaDigits(diff.inMinutes)} মিনিট';
-      return 'আজ শুরু হবে';
+      if (diff.isNegative) return 'এখনই শুরু হচ্ছে';
+
+      // Start countdown from 24 hours including minutes and seconds
+      if (diff.inHours < 24) {
+        final h = diff.inHours;
+        final m = diff.inMinutes % 60;
+        final s = diff.inSeconds % 60;
+        if (h > 0) {
+          return '${_toBanglaDigits(h)} ঘণ্টা ${_toBanglaDigits(m)} মি. ${_toBanglaDigits(s)} সে.';
+        } else {
+          return '${_toBanglaDigits(m)} মি. ${_toBanglaDigits(s)} সে.';
+        }
+      } else {
+        final days = diff.inDays;
+        return '${_toBanglaDigits(days)} দিন';
+      }
     }
   }
 

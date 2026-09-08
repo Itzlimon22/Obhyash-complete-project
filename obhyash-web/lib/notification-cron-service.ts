@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { getContextualNotification } from './witty-notification-engine';
+import { getContextualNotification, extractIntelligentNickname } from './witty-notification-engine';
 import { sendFCMNotificationToUsers } from './fcm-server';
 
 export interface AutomatedNotificationResult {
@@ -21,7 +21,6 @@ export async function dispatchAutomatedWittyNotification(
   categoryOverride?: string,
 ): Promise<AutomatedNotificationResult> {
   const notifMeta = getContextualNotification(categoryOverride);
-  const now = new Date().toISOString();
 
   // 1. Fetch all registered users
   const { data: users, error: usersErr } = await supabaseAdmin
@@ -32,57 +31,36 @@ export async function dispatchAutomatedWittyNotification(
     throw new Error(`Failed to fetch users: ${usersErr?.message || 'No users found'}`);
   }
 
-  // 2. Prepare personalized in-app notifications
-  const inAppNotifications = users.map((u) => {
+  // NOTE: Automated witty Chorcha/Duolingo notifications are strictly device push notifications.
+  // Per user specification, device push notifications NEVER enter the user's in-app `notifications` page/table.
+
+  // 2. Build personalized push payloads using intelligent nicknames
+  const perUserMap: Record<string, { title: string; body: string }> = {};
+  for (const u of users) {
     const userObj = u as Record<string, any>;
-    const fullName = (userObj.name && typeof userObj.name === 'string' && userObj.name.trim())
-      ? userObj.name.trim()
-      : 'বন্ধু';
+    const nickname = extractIntelligentNickname(userObj.name);
     const streakVal = (userObj.streak_count && userObj.streak_count > 0) ? userObj.streak_count : 6;
-    const personalizedTitle = notifMeta.title
-      .replace(/\{name\}/g, fullName)
-      .replace(/\{streak\}/g, String(streakVal));
-    const personalizedBody = notifMeta.body
-      .replace(/\{name\}/g, fullName)
-      .replace(/\{streak\}/g, String(streakVal));
-
-    return {
-      user_id: userObj.id,
-      title: personalizedTitle,
-      message: personalizedBody,
-      body: personalizedBody,
-      type: 'announcement', // Always use announcement to satisfy Supabase notifications_type_check
-      priority: notifMeta.priority,
-      link: notifMeta.route,
-      data: { route: notifMeta.route },
-      is_read: false,
-      created_at: now,
+    perUserMap[userObj.id] = {
+      title: notifMeta.title.replace(/\{name\}/g, nickname).replace(/\{streak\}/g, String(streakVal)),
+      body: notifMeta.body.replace(/\{name\}/g, nickname).replace(/\{streak\}/g, String(streakVal)),
     };
-  });
-
-  // Batch insert into `notifications` table (chunk of 50)
-  let inAppCount = 0;
-  const CHUNK_SIZE = 50;
-  for (let i = 0; i < inAppNotifications.length; i += CHUNK_SIZE) {
-    const chunk = inAppNotifications.slice(i, i + CHUNK_SIZE);
-    const { error: insErr } = await supabaseAdmin.from('notifications').insert(chunk);
-    if (!insErr) {
-      inAppCount += chunk.length;
-    } else {
-      console.error('In-app batch insert error:', insErr);
-    }
   }
 
-  // 3. Dispatch Device Push Notification via Firebase FCM v1
-  const genericTitle = notifMeta.title.replace(/\{name\}/g, 'Limon Howlader').replace(/\{streak\}/g, '6');
-  const genericBody = notifMeta.body.replace(/\{name\}/g, 'Limon Howlader').replace(/\{streak\}/g, '6');
+  const sampleNickname = users.length > 0 ? extractIntelligentNickname((users[0] as any).name) : 'বন্ধু';
+  const genericTitle = notifMeta.title.replace(/\{name\}/g, sampleNickname).replace(/\{streak\}/g, '6');
+  const genericBody = notifMeta.body.replace(/\{name\}/g, sampleNickname).replace(/\{streak\}/g, '6');
 
+  // 3. Dispatch Device Push Notification via Firebase FCM v1
   const allUserIds = users.map((u) => u.id);
   const fcmResult = await sendFCMNotificationToUsers(supabaseAdmin, {
     userIds: allUserIds,
     title: genericTitle,
     body: genericBody,
-    data: { route: notifMeta.route },
+    perUserPayload: perUserMap,
+    data: {
+      route: notifMeta.route || '/dashboard',
+      click_action: 'FLUTTER_NOTIFICATION_CLICK',
+    },
     channelId: notifMeta.channelId,
   });
 
@@ -90,7 +68,7 @@ export async function dispatchAutomatedWittyNotification(
     success: true,
     category: notifMeta.category,
     totalUsersTargeted: users.length,
-    inAppInserted: inAppCount,
+    inAppInserted: 0, // Strictly separated from in-app notifications page
     fcmDispatched: fcmResult.sent,
     fcmFailed: fcmResult.failed,
     title: genericTitle,

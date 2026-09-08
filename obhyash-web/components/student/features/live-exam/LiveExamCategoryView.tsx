@@ -48,6 +48,15 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   const [exams, setExams] = useState<(LiveExam & { userAttemptStatus?: string })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRoutineOpen, setIsRoutineOpen] = useState(false);
+  const [now, setNow] = useState<Date>(new Date());
+
+  // 1-second interval for real-time countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const displayCategoryTitle = CATEGORY_NAMES[category.toLowerCase()] || category;
 
@@ -204,12 +213,11 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
               let timeRemainingText = "শীঘ্রই শুরু হবে";
               if (isOngoing) {
                 const diffMs = end.getTime() - now.getTime();
-                const diffMins = Math.floor(diffMs / (1000 * 60));
-                const diffHours = Math.floor(diffMins / 60);
-                if (diffHours > 0) {
-                  timeRemainingText = `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(diffHours)} ঘণ্টা`;
-                } else if (diffMins > 0) {
-                  timeRemainingText = `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(diffMins)} মিনিট`;
+                const totalSecs = Math.max(0, Math.floor(diffMs / 1000));
+                const totalMins = Math.floor(totalSecs / 60);
+                const diffSecs = totalSecs % 60;
+                if (totalMins > 0 || diffSecs > 0) {
+                  timeRemainingText = `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(totalMins)} মি. ${BanglaNameHelper.toBanglaNumeral(diffSecs)} সে.`;
                 } else {
                   timeRemainingText = "শীঘ্রই শেষ হবে";
                 }
@@ -217,14 +225,23 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
                 timeRemainingText = "পরীক্ষা সম্পন্ন";
               } else {
                 const diffMs = start.getTime() - now.getTime();
-                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                const diffHours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
-                if (diffDays > 0) {
-                  timeRemainingText = `বাকি - ${BanglaNameHelper.toBanglaNumeral(diffDays)} দিন`;
-                } else if (diffHours > 0) {
-                  timeRemainingText = `বাকি - ${BanglaNameHelper.toBanglaNumeral(diffHours)} ঘণ্টা`;
+                const totalSecs = Math.max(0, Math.floor(diffMs / 1000));
+                const diffHours = Math.floor(totalSecs / 3600);
+                const diffMins = Math.floor((totalSecs % 3600) / 60);
+                const diffSecs = totalSecs % 60;
+
+                // 24-hour countdown with hours, minutes, and seconds
+                if (diffMs <= 24 * 60 * 60 * 1000 && diffMs > 0) {
+                  if (diffHours > 0) {
+                    timeRemainingText = `${BanglaNameHelper.toBanglaNumeral(diffHours)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(diffMins)} মি. ${BanglaNameHelper.toBanglaNumeral(diffSecs)} সে.`;
+                  } else {
+                    timeRemainingText = `${BanglaNameHelper.toBanglaNumeral(diffMins)} মি. ${BanglaNameHelper.toBanglaNumeral(diffSecs)} সে.`;
+                  }
+                } else if (diffMs > 24 * 60 * 60 * 1000) {
+                  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                  timeRemainingText = `${BanglaNameHelper.toBanglaNumeral(diffDays)} দিন`;
                 } else {
-                  timeRemainingText = "আজ শুরু হবে";
+                  timeRemainingText = "এখনই শুরু হচ্ছে";
                 }
               }
 
