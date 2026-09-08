@@ -34,8 +34,11 @@ export async function dispatchAutomatedWittyNotification(
 
   // 2. Prepare personalized in-app notifications
   const inAppNotifications = users.map((u) => {
-    const fullName = (u.name && u.name.trim()) ? u.name.trim() : 'বন্ধু';
-    const streakVal = (u.streak_count && u.streak_count > 0) ? u.streak_count : 6;
+    const userObj = u as Record<string, any>;
+    const fullName = (userObj.name && typeof userObj.name === 'string' && userObj.name.trim())
+      ? userObj.name.trim()
+      : 'বন্ধু';
+    const streakVal = (userObj.streak_count && userObj.streak_count > 0) ? userObj.streak_count : 6;
     const personalizedTitle = notifMeta.title
       .replace(/\{name\}/g, fullName)
       .replace(/\{streak\}/g, String(streakVal));
@@ -44,11 +47,11 @@ export async function dispatchAutomatedWittyNotification(
       .replace(/\{streak\}/g, String(streakVal));
 
     return {
-      user_id: u.id,
+      user_id: userObj.id,
       title: personalizedTitle,
       message: personalizedBody,
       body: personalizedBody,
-      type: notifMeta.type,
+      type: 'announcement', // Always use announcement to satisfy Supabase notifications_type_check
       priority: notifMeta.priority,
       link: notifMeta.route,
       data: { route: notifMeta.route },
