@@ -120,7 +120,7 @@ class BanglaNameHelper {
     if (lower.contains('math') || lower.contains('mathematics')) {
       if (isP1) return 'উচ্চতর গণিত ১ম পত্র';
       if (isP2) return 'উচ্চতর গণিত ২য় পত্র';
-      if (lower.contains('general')) return 'সাধারণ গণিত';
+      if (lower.contains('general') || lower == 'ssc_math' || lower == 'math' || lower.contains('ssc_math') || lower.contains('ssc-math')) return 'সাধারণ গণিত';
       return 'উচ্চতর গণিত';
     }
 
@@ -166,17 +166,21 @@ class BanglaNameHelper {
     }
 
     if (lower.contains('accounting')) return 'হিসাববিজ্ঞান';
+    if (lower.contains('finance_banking')) return 'ফিন্যান্স ও ব্যাংকিং';
     if (lower.contains('finance')) return 'ফিন্যান্স ও ব্যাংকিং';
+    if (lower.contains('business_ent') || lower.contains('business_entrepreneurship')) return 'ব্যবসায় উদ্যোগ';
     if (lower.contains('management')) return 'ব্যবসায় সংগঠন ও ব্যবস্থাপনা';
     if (lower.contains('marketing')) return 'উৎপাদন ব্যবস্থাপনা ও বিপণন';
     if (lower.contains('economics')) return 'অর্থনীতি';
     if (lower.contains('civics')) return 'পৌরনীতি ও সুশাসন';
     if (lower.contains('sociology')) return 'সমাজবিজ্ঞান';
+    if (lower.contains('history_bd')) return 'বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা';
     if (lower.contains('islamic_history')) return 'ইসলামের ইতিহাস ও সংস্কৃতি';
     if (lower.contains('history')) return 'ইতিহাস';
+    if (lower.contains('religion') || lower.contains('dhormo')) return 'ধর্ম ও নৈতিক শিক্ষা';
     if (lower.contains('islamic_studies') || lower == 'islam') return 'ইসলাম শিক্ষা';
     if (lower.contains('psychology')) return 'মনোবিজ্ঞান';
-    if (lower.contains('geography')) return 'ভূগোল';
+    if (lower.contains('geography')) return 'ভূগোল ও পরিবেশ';
     if (lower.contains('statistics') || lower.contains('stat')) {
       if (isP1) return 'পরিসংখ্যান ১ম পত্র';
       if (isP2) return 'পরিসংখ্যান ২য় পত্র';
@@ -186,73 +190,90 @@ class BanglaNameHelper {
     return null;
   }
 
+  /// Strips redundant stream/level prefixes like "SSC ", "HSC ", or "(SSC)" from subject names
+  static String cleanSubjectTitle(String text) {
+    if (text.isEmpty) return '';
+    return text
+        .replaceAll(RegExp(r'^(?:SSC|HSC)[\s\-_:]+', caseSensitive: false), '')
+        .replaceAll(RegExp(r'[\s\-_:]*\((?:SSC|HSC)\)$', caseSensitive: false), '')
+        .replaceAll(RegExp(r'\b(?:SSC|HSC)\b', caseSensitive: false), '')
+        .trim();
+  }
+
   /// Converts any subject identifier, slug, or label to standard Bengali.
   /// Never returns a raw English ID like "physics_1st" or "higher_math_2nd".
   static String formatSubject(String? subject, [String? subjectLabel]) {
-    // 1. If subjectLabel is provided and has Bengali, deduplicate repetitive prefixes
-    if (subjectLabel != null && subjectLabel.trim().isNotEmpty) {
-      final dedup = deduplicateExamTitle(subjectLabel, subject);
+    // 0. Clean redundant level prefixes like "SSC " or "HSC " from subjectLabel and subject
+    String? cleanLabel = subjectLabel != null ? cleanSubjectTitle(subjectLabel) : null;
+    final cleanSubject = subject != null ? cleanSubjectTitle(subject) : null;
+
+    // 1. If cleanLabel is provided and has Bengali, deduplicate repetitive prefixes
+    if (cleanLabel != null && cleanLabel.isNotEmpty) {
+      final dedup = deduplicateExamTitle(cleanLabel, cleanSubject);
       if (_hasBengali(dedup)) {
-        return dedup;
+        return cleanSubjectTitle(dedup);
       }
     }
 
     // 2. Check academic subject mappings first (e.g. hsc_bangla_1 -> বাংলা ১ম পত্র)
-    final labelMapped = subjectLabel != null ? _mapToAcademicSubject(subjectLabel) : null;
+    final labelMapped = cleanLabel != null ? _mapToAcademicSubject(cleanLabel) : null;
     if (labelMapped != null) {
-      return labelMapped;
+      return cleanSubjectTitle(labelMapped);
     }
 
-    final subjectMapped = subject != null ? _mapToAcademicSubject(subject) : null;
+    final subjectMapped = cleanSubject != null ? _mapToAcademicSubject(cleanSubject) : null;
     if (subjectMapped != null &&
         (subjectLabel == null ||
             subjectLabel.trim().isEmpty ||
-            subjectLabel.trim().toLowerCase() == subject!.trim().toLowerCase() ||
-            subjectLabel == 'general' ||
-            subjectLabel == 'পরীক্ষা')) {
-      return subjectMapped;
+            cleanLabel == null ||
+            cleanLabel.isEmpty ||
+            cleanLabel.toLowerCase() == cleanSubject!.toLowerCase() ||
+            cleanLabel == 'general' ||
+            cleanLabel == 'পরীক্ষা')) {
+      return cleanSubjectTitle(subjectMapped);
     }
 
     // 3. For exam sets/titles (e.g. "বুয়েট BUET 24-25 preli" -> "BUET 24-25 preli")
-    if (subjectLabel != null && subjectLabel.trim().isNotEmpty) {
-      final dedup = deduplicateExamTitle(subjectLabel, subject);
-      if (dedup != subjectLabel.trim()) {
-        return dedup;
+    if (cleanLabel != null && cleanLabel.isNotEmpty) {
+      final dedup = deduplicateExamTitle(cleanLabel, cleanSubject);
+      if (dedup != cleanLabel) {
+        return cleanSubjectTitle(dedup);
       }
       if (dedup.contains(RegExp(r'\d')) || dedup.contains(' ')) {
-        return dedup;
+        return cleanSubjectTitle(dedup);
       }
     }
 
     if (subjectMapped != null) {
-      return subjectMapped;
+      return cleanSubjectTitle(subjectMapped);
     }
 
     final raw = deduplicateExamTitle(
-      (subjectLabel?.isNotEmpty == true ? subjectLabel! : (subject ?? '')),
-      subject,
+      (cleanLabel?.isNotEmpty == true ? cleanLabel! : (cleanSubject ?? '')),
+      cleanSubject,
     );
     if (raw.isEmpty) return 'পরীক্ষা';
 
     if (_hasBengali(raw)) {
-      return raw;
+      return cleanSubjectTitle(raw);
     }
 
     final fallbackMapped = _mapToAcademicSubject(raw);
     if (fallbackMapped != null) {
-      return fallbackMapped;
+      return cleanSubjectTitle(fallbackMapped);
     }
 
     if (raw.contains(' ') || raw.contains('-')) {
-      return raw;
+      return cleanSubjectTitle(raw);
     }
 
     // Cleanup generic words
-    return raw
+    final cleaned = raw
         .replaceAll('_', ' ')
         .split(' ')
         .map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : '')
         .join(' ');
+    return cleanSubjectTitle(cleaned);
   }
 
   /// Returns the base canonical main subject name (merging 1st & 2nd papers)
@@ -1061,6 +1082,20 @@ class BanglaNameHelper {
       } else {
         variants.addAll(['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত']);
       }
+    } else if (lowerKey.contains('higher_math') || lowerBangla.contains('উচ্চতর গণিত')) {
+      if (isPaper1) {
+        variants.addAll([
+          'hsc_higher_math_1', 'higher_math_1', 'higher_math1', 'higher_math 1',
+          'math_1', 'math1', 'Higher Math 1st Paper', 'উচ্চতর গণিত ১ম পত্র', 'উচ্চতর গণিত ১',
+        ]);
+      } else if (isPaper2) {
+        variants.addAll([
+          'hsc_higher_math_2', 'higher_math_2', 'higher_math2', 'higher_math 2',
+          'math_2', 'math2', 'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২',
+        ]);
+      } else {
+        variants.addAll(['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত', 'SSC উচ্চতর গণিত']);
+      }
     } else if (lowerKey.contains('math') || lowerBangla.contains('গণিত')) {
       if (isPaper1) {
         variants.addAll([
@@ -1073,7 +1108,7 @@ class BanglaNameHelper {
           'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'গণিত ২য় পত্র', 'গণিত ২',
         ]);
       } else {
-        variants.addAll(['ssc_general_math', 'math', 'general_math', 'গণিত', 'সাধারণ গণিত']);
+        variants.addAll(['ssc_math', 'ssc_general_math', 'general_math', 'general-math', 'math', 'সাধারণ গণিত', 'গণিত', 'SSC সাধারণ গণিত', 'SSC গণিত']);
       }
     } else if (lowerKey.contains('bio') || lowerKey.contains('botany') || lowerKey.contains('zoology') || lowerBangla.contains('জীববিজ্ঞান') || lowerBangla.contains('উদ্ভিদ') || lowerBangla.contains('প্রাণি')) {
       if (isPaper1 || lowerKey.contains('botany') || lowerBangla.contains('উদ্ভিদ')) {
@@ -1087,37 +1122,57 @@ class BanglaNameHelper {
           'Biology 2nd Paper', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২', 'প্রাণিবিজ্ঞান', 'প্রাণীবিজ্ঞান',
         ]);
       } else {
-        variants.addAll(['ssc_biology', 'biology', 'জীববিজ্ঞান']);
+        variants.addAll(['ssc_biology', 'biology', 'জীববিজ্ঞান', 'SSC জীববিজ্ঞান']);
       }
     } else if (lowerKey.contains('ict') || lowerBangla.contains('তথ্য') || lowerBangla.contains('আইসিটি')) {
-      variants.addAll(['hsc_ict', 'ssc_ict', 'ict', 'তথ্য ও যোগাযোগ প্রযুক্তি', 'আইসিটি']);
+      variants.addAll(['hsc_ict', 'ssc_ict', 'ict', 'তথ্য ও যোগাযোগ প্রযুক্তি', 'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)', 'আইসিটি', 'SSC আইসিটি']);
+    } else if (lowerKey.contains('bgs') || lowerBangla.contains('বাংলাদেশ ও বিশ্ব') || lowerKey.contains('bangladesh')) {
+      variants.addAll(['ssc_bgs', 'bgs', 'বাংলাদেশ ও বিশ্বপরিচয়', 'বাংলাদেশ ও বিশ্বপরিচয়', 'SSC বাংলাদেশ ও বিশ্বপরিচয়']);
+    } else if (lowerKey.contains('religion') || lowerBangla.contains('ধর্ম') || lowerBangla.contains('নৈতিক')) {
+      variants.addAll(['ssc_religion', 'religion', 'ধর্ম ও নৈতিক শিক্ষা', 'ইসলাম ও নৈতিক শিক্ষা', 'ধর্ম', 'SSC ধর্ম ও নৈতিক শিক্ষা']);
+    } else if (lowerKey.contains('accounting') || lowerBangla.contains('হিসাব')) {
+      variants.addAll(['ssc_accounting', 'accounting', 'হিসাববিজ্ঞান', 'SSC হিসাববিজ্ঞান']);
+    } else if (lowerKey.contains('finance') || lowerBangla.contains('ফিন্যান্স')) {
+      variants.addAll(['ssc_finance_banking', 'finance_banking', 'finance', 'ফিন্যান্স ও ব্যাংকিং', 'SSC ফিন্যান্স ও ব্যাংকিং']);
+    } else if (lowerKey.contains('business') || lowerBangla.contains('উদ্যোগ')) {
+      variants.addAll(['ssc_business_ent', 'business_ent', 'ব্যবসায় উদ্যোগ', 'SSC ব্যবসায় উদ্যোগ']);
+    } else if (lowerKey.contains('general_science') || lowerBangla.contains('সাধারণ বিজ্ঞান')) {
+      variants.addAll(['ssc_general_science', 'general_science', 'সাধারণ বিজ্ঞান', 'SSC সাধারণ বিজ্ঞান']);
+    } else if (lowerKey.contains('history') || lowerBangla.contains('ইতিহাস')) {
+      variants.addAll(['ssc_history_bd', 'history_bd', 'history', 'বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা', 'বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা', 'ইতিহাস ও বিশ্ব সভ্যতা', 'ইতিহাস ও বিশ্বসভ্যতা', 'ইতিহাস', 'SSC ইতিহাস', 'SSC বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা']);
+    } else if (lowerKey.contains('geography') || lowerBangla.contains('ভূগোল')) {
+      variants.addAll(['ssc_geography', 'geography', 'ভূগোল ও পরিবেশ', 'ভূগোল', 'SSC ভূগোল ও পরিবেশ']);
+    } else if (lowerKey.contains('civics') || lowerBangla.contains('পৌরনীতি')) {
+      variants.addAll(['ssc_civics', 'civics', 'পৌরনীতি ও নাগরিকতা', 'পৌরনীতি ও সুশাসন', 'পৌরনীতি', 'SSC পৌরনীতি ও নাগরিকতা']);
+    } else if (lowerKey.contains('economics') || lowerBangla.contains('অর্থনীতি')) {
+      variants.addAll(['ssc_economics', 'economics', 'অর্থনীতি', 'SSC অর্থনীতি']);
     } else if (lowerKey.contains('bangla') || lowerBangla.contains('বাংলা')) {
       if (isPaper1) {
         variants.addAll([
-          'hsc_bangla_1', 'bangla_1', 'bangla1', 'bangla 1',
-          'Bangla 1st Paper', 'বাংলা ১ম পত্র', 'বাংলা ১',
+          'hsc_bangla_1', 'bangla_1', 'bangla1', 'bangla 1', 'ssc_bangla_1',
+          'Bangla 1st Paper', 'বাংলা ১ম পত্র', 'বাংলা ১', 'SSC বাংলা ১ম পত্র',
         ]);
       } else if (isPaper2) {
         variants.addAll([
-          'hsc_bangla_2', 'bangla_2', 'bangla2', 'bangla 2',
-          'Bangla 2nd Paper', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র', 'বাংলা ২',
+          'hsc_bangla_2', 'bangla_2', 'bangla2', 'bangla 2', 'ssc_bangla_2',
+          'Bangla 2nd Paper', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র', 'বাংলা ২', 'SSC বাংলা ২য় পত্র',
         ]);
       } else {
-        variants.addAll(['ssc_bangla', 'bangla', 'বাংলা']);
+        variants.addAll(['ssc_bangla', 'bangla', 'বাংলা', 'SSC বাংলা']);
       }
     } else if (lowerKey.contains('english') || lowerBangla.contains('ইংরেজি')) {
       if (isPaper1) {
         variants.addAll([
-          'hsc_english_1', 'english_1', 'english1', 'english 1',
-          'English 1st Paper', 'ইংরেজি ১ম পত্র', 'ইংরেজি ১',
+          'hsc_english_1', 'english_1', 'english1', 'english 1', 'ssc_english_1',
+          'English 1st Paper', 'ইংরেজি ১ম পত্র', 'ইংরেজি ১', 'SSC ইংরেজি ১ম পত্র',
         ]);
       } else if (isPaper2) {
         variants.addAll([
-          'hsc_english_2', 'english_2', 'english2', 'english 2',
-          'English 2nd Paper', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২',
+          'hsc_english_2', 'english_2', 'english2', 'english 2', 'ssc_english_2',
+          'English 2nd Paper', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২', 'SSC ইংরেজি ২য় পত্র',
         ]);
       } else {
-        variants.addAll(['ssc_english', 'english', 'ইংরেজি']);
+        variants.addAll(['ssc_english', 'english', 'ইংরেজি', 'SSC ইংরেজি']);
       }
     }
 
@@ -1135,11 +1190,107 @@ class BanglaNameHelper {
     return variants.where((s) => s.trim().isNotEmpty).toList();
   }
 
-  /// Returns separate variant lists for Paper 1 and Paper 2 for uniform paper-balanced sampling
-  static ({List<String> paper1, List<String> paper2, List<String> general}) getSubjectPaperSplitVariants(String subjectKey, [String? banglaName]) {
+  /// Returns separate variant lists for Paper 1 and Paper 2 for uniform paper-balanced sampling.
+  /// When isSSC is true (or subject/level includes SSC), treats single-paper SSC subjects properly
+  /// so Paper 2 is empty and questions are sampled from Paper 1 without HSC bias.
+  static ({List<String> paper1, List<String> paper2, List<String> general}) getSubjectPaperSplitVariants(
+    String subjectKey, [
+    String? banglaName,
+    bool isSSC = false,
+  ]) {
     final lowerKey = subjectKey.trim().toLowerCase();
     final lowerBangla = (banglaName ?? '').trim().toLowerCase();
+    final isSscMode = isSSC ||
+        lowerKey.contains('ssc') ||
+        lowerBangla.contains('ssc') ||
+        lowerBangla.contains('এসএসসি');
 
+    // ── SSC Mode: Single-paper subjects for SSC ──
+    if (isSscMode) {
+      if (lowerKey.contains('physics') || lowerBangla.contains('পদার্থ')) {
+        final list = ['ssc_physics', 'physics', 'পদার্থবিজ্ঞান', 'SSC পদার্থবিজ্ঞান'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('chem') || lowerBangla.contains('রসায়ন') || lowerBangla.contains('রসায়ন')) {
+        final list = ['ssc_chemistry', 'chemistry', 'রসায়ন', 'রসায়ন', 'SSC রসায়ন', 'SSC রসায়ন'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('higher_math') || lowerBangla.contains('উচ্চতর গণিত')) {
+        final list = ['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত', 'SSC উচ্চতর গণিত'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('math') || lowerBangla.contains('গণিত')) {
+        final list = ['ssc_math', 'ssc_general_math', 'general_math', 'math', 'সাধারণ গণিত', 'গণিত', 'SSC সাধারণ গণিত', 'SSC গণিত'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('bio') || lowerBangla.contains('জীববিজ্ঞান') || lowerBangla.contains('উদ্ভিদ') || lowerBangla.contains('প্রাণি')) {
+        final list = ['ssc_biology', 'biology', 'জীববিজ্ঞান', 'SSC জীববিজ্ঞান'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('ict') || lowerBangla.contains('তথ্য') || lowerBangla.contains('আইসিটি')) {
+        final list = ['ssc_ict', 'hsc_ict', 'ict', 'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)', 'তথ্য ও যোগাযোগ প্রযুক্তি', 'আইসিটি', 'SSC আইসিটি'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('bgs') || lowerBangla.contains('বাংলাদেশ ও বিশ্ব') || lowerKey.contains('bangladesh')) {
+        final list = ['ssc_bgs', 'bgs', 'বাংলাদেশ ও বিশ্বপরিচয়', 'বাংলাদেশ ও বিশ্বপরিচয়', 'SSC বাংলাদেশ ও বিশ্বপরিচয়'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('religion') || lowerBangla.contains('ধর্ম') || lowerBangla.contains('নৈতিক')) {
+        final list = ['ssc_religion', 'religion', 'ধর্ম ও নৈতিক শিক্ষা', 'ইসলাম ও নৈতিক শিক্ষা', 'ধর্ম', 'SSC ধর্ম ও নৈতিক শিক্ষা'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('accounting') || lowerBangla.contains('হিসাব')) {
+        final list = ['ssc_accounting', 'accounting', 'হিসাববিজ্ঞান', 'SSC হিসাববিজ্ঞান'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('business') || lowerBangla.contains('উদ্যোগ')) {
+        final list = ['ssc_business_ent', 'business_ent', 'ব্যবসায় উদ্যোগ', 'SSC ব্যবসায় উদ্যোগ'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('finance') || lowerBangla.contains('ফিন্যান্স')) {
+        final list = ['ssc_finance_banking', 'finance_banking', 'finance', 'ফিন্যান্স ও ব্যাংকিং', 'SSC ফিন্যান্স ও ব্যাংকিং'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('general_science') || lowerBangla.contains('সাধারণ বিজ্ঞান')) {
+        final list = ['ssc_general_science', 'general_science', 'সাধারণ বিজ্ঞান', 'SSC সাধারণ বিজ্ঞান'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('history') || lowerBangla.contains('ইতিহাস')) {
+        final list = ['ssc_history_bd', 'history_bd', 'history', 'বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা', 'বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা', 'ইতিহাস ও বিশ্ব সভ্যতা', 'ইতিহাস ও বিশ্বসভ্যতা', 'ইতিহাস', 'SSC ইতিহাস'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('geography') || lowerBangla.contains('ভূগোল')) {
+        final list = ['ssc_geography', 'geography', 'ভূগোল ও পরিবেশ', 'ভূগোল', 'SSC ভূগোল ও পরিবেশ'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('civics') || lowerBangla.contains('পৌরনীতি')) {
+        final list = ['ssc_civics', 'civics', 'পৌরনীতি ও নাগরিকতা', 'পৌরনীতি', 'SSC পৌরনীতি'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('economics') || lowerBangla.contains('অর্থনীতি')) {
+        final list = ['ssc_economics', 'economics', 'অর্থনীতি', 'SSC অর্থনীতি'];
+        return (paper1: list, paper2: const <String>[], general: list);
+      } else if (lowerKey.contains('bangla') || lowerBangla.contains('বাংলা')) {
+        final isP1 = lowerKey.contains('1') || lowerKey.contains('first') || lowerBangla.contains('১ম') || lowerBangla.contains('১');
+        final isP2 = lowerKey.contains('2') || lowerKey.contains('second') || lowerBangla.contains('২য়') || lowerBangla.contains('২য়') || lowerBangla.contains('২');
+        if (isP1) {
+          final list = ['ssc_bangla_1', 'bangla_1', 'bangla1', 'বাংলা ১ম পত্র', 'বাংলা ১', 'SSC বাংলা ১ম পত্র'];
+          return (paper1: list, paper2: const <String>[], general: list);
+        } else if (isP2) {
+          final list = ['ssc_bangla_2', 'bangla_2', 'bangla2', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র', 'বাংলা ২', 'SSC বাংলা ২য় পত্র'];
+          return (paper1: list, paper2: const <String>[], general: list);
+        } else {
+          return (
+            paper1: ['ssc_bangla_1', 'bangla_1', 'bangla1', 'বাংলা ১ম পত্র', 'বাংলা ১'],
+            paper2: ['ssc_bangla_2', 'bangla_2', 'bangla2', 'বাংলা ২য় পত্র', 'বাংলা ২'],
+            general: ['ssc_bangla', 'bangla', 'বাংলা'],
+          );
+        }
+      } else if (lowerKey.contains('english') || lowerBangla.contains('ইংরেজি')) {
+        final isP1 = lowerKey.contains('1') || lowerKey.contains('first') || lowerBangla.contains('১ম') || lowerBangla.contains('১');
+        final isP2 = lowerKey.contains('2') || lowerKey.contains('second') || lowerBangla.contains('২য়') || lowerBangla.contains('২য়') || lowerBangla.contains('২');
+        if (isP1) {
+          final list = ['ssc_english_1', 'english_1', 'english1', 'ইংরেজি ১ম পত্র', 'English 1st Paper', 'ইংরেজি ১', 'SSC ইংরেজি ১ম পত্র'];
+          return (paper1: list, paper2: const <String>[], general: list);
+        } else if (isP2) {
+          final list = ['ssc_english_2', 'english_2', 'english2', 'ইংরেজি ২য় পত্র', 'English 2nd Paper', 'ইংরেজি ২', 'SSC ইংরেজি ২য় পত্র'];
+          return (paper1: list, paper2: const <String>[], general: list);
+        } else {
+          return (
+            paper1: ['ssc_english_1', 'english_1', 'english1', 'ইংরেজি ১ম পত্র', 'English 1st Paper'],
+            paper2: ['ssc_english_2', 'english_2', 'english2', 'ইংরেজি ২য় পত্র', 'English 2nd Paper'],
+            general: ['ssc_english', 'english', 'ইংরেজি'],
+          );
+        }
+      }
+    }
+
+    // ── Standard HSC / Admission Paper-Split Logic ──
     if (lowerKey.contains('physics') || lowerBangla.contains('পদার্থ')) {
       return (
         paper1: [
@@ -1176,6 +1327,9 @@ class BanglaNameHelper {
         ],
         general: ['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত'],
       );
+    } else if (lowerKey.contains('general_math') || lowerKey == 'math' || lowerBangla.contains('সাধারণ গণিত')) {
+      final list = ['ssc_math', 'ssc_general_math', 'general_math', 'math', 'সাধারণ গণিত', 'গণিত'];
+      return (paper1: list, paper2: const <String>[], general: list);
     } else if (lowerKey.contains('bio') || lowerKey.contains('botany') || lowerKey.contains('zoology') || lowerBangla.contains('জীববিজ্ঞান') || lowerBangla.contains('উদ্ভিদ') || lowerBangla.contains('প্রাণি')) {
       return (
         paper1: [

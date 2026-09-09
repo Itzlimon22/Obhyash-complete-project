@@ -38,13 +38,17 @@ export async function GET(req: NextRequest) {
 
   let rows: LeaderboardUserRow[] | null = rpcData;
 
+  const nowUtc = new Date();
+  const startOfMonthUtc = new Date(Date.UTC(nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), 1));
+
   if (rpcError || !rows) {
     const { data, error } = await supabase
       .from('public_profiles')
-      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, role')
+      .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, avatar_color, streak, role')
       .or('role.ilike.student,role.is.null')
       .eq('institute', institute)
-      .order('xp', { ascending: false })
+      .order('monthly_xp', { ascending: false, nullsFirst: false })
+      .order('xp', { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
     if (error || !data) {
@@ -58,18 +62,22 @@ export async function GET(req: NextRequest) {
     return r === 'student';
   });
 
-  const users = studentRows.map((user, index) => ({
-    id: user.id,
-    name: user.name || 'Unknown User',
-    institute: user.institute || institute,
-    xp: user.xp || 0,
-    level: user.level || 'Rookie',
-    examsTaken: user.exams_taken || 0,
-    avatarUrl: user.avatar_url || undefined,
-    avatarColor: user.avatar_color || null,
-    streakCount: user.streak || 0,
-    _index: offset + index,
-  }));
+  const users = studentRows.map((user: any, index: number) => {
+    const mXp = user.monthly_xp ?? user.xp ?? 0;
+
+    return {
+      id: user.id,
+      name: user.name || 'শিক্ষার্থী',
+      institute: user.institute || institute,
+      xp: mXp,
+      level: user.level || 'Rookie',
+      examsTaken: user.exams_taken || 0,
+      avatarUrl: user.avatar_url || undefined,
+      avatarColor: user.avatar_color || null,
+      streakCount: user.streak || 0,
+      _index: offset + index,
+    };
+  });
 
   return NextResponse.json(
     { users, hasMore: rows.length === limit, nextOffset: offset + rows.length },

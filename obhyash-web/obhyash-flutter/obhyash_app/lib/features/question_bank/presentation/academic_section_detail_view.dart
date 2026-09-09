@@ -55,6 +55,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   bool _isLoadingChapters = true;
   bool _isLoadingTopics = false;
   bool _isLoadingQuestions = true;
+  bool _fetchedBySubjectName = false;
 
   List<Question> _questions = [];
   final Map<int, int?> _selectedOptions = {};
@@ -177,6 +178,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
       final subjectConditions = <String>[
         'subject_id.eq.$rawSubjectId',
+        'subject_id.eq.ssc_$cleanId',
         'subject_id.eq.hsc_$cleanId',
         'subject_id.eq.$cleanId',
       ];
@@ -593,40 +595,67 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   dynamic _buildQuestionsQuery({
     bool ignoreChapter = false,
     bool ignoreTopic = false,
+    bool bySubjectName = false,
   }) {
     final supabase = Supabase.instance.client;
     final rawSubjectId = _subjectId;
     final cleanId = rawSubjectId.replaceAll('hsc_', '').replaceAll('ssc_', '');
     final fullHscId = rawSubjectId.startsWith('hsc_') ? rawSubjectId : 'hsc_$rawSubjectId';
+    final fullSscId = rawSubjectId.startsWith('ssc_') ? rawSubjectId : 'ssc_$rawSubjectId';
 
     // Collect all valid subject_ids for this subject
-    final subjectIds = <String>{fullHscId, cleanId, rawSubjectId};
+    final subjectIds = <String>{fullHscId, fullSscId, cleanId, rawSubjectId};
     if (cleanId.contains('math')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_higher_math_$num', 'higher_math_$num', 'math_$num', 'hsc_math_$num']);
+      subjectIds.addAll(['hsc_higher_math_$num', 'higher_math_$num', 'math_$num', 'hsc_math_$num', 'ssc_math', 'ssc_higher_math', 'general_math']);
     } else if (cleanId.contains('physics')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_physics_$num', 'physics_$num']);
+      subjectIds.addAll(['hsc_physics_$num', 'physics_$num', 'ssc_physics']);
     } else if (cleanId.contains('chemistry')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_chemistry_$num', 'chemistry_$num']);
+      subjectIds.addAll(['hsc_chemistry_$num', 'chemistry_$num', 'ssc_chemistry']);
     } else if (cleanId.contains('biology')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_biology_$num', 'biology_$num']);
+      subjectIds.addAll(['hsc_biology_$num', 'biology_$num', 'ssc_biology']);
     } else if (cleanId.contains('ict')) {
-      subjectIds.addAll(['hsc_ict', 'ict']);
+      subjectIds.addAll(['hsc_ict', 'ict', 'ssc_ict']);
     } else if (cleanId.contains('bangla')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_bangla_$num', 'bangla_$num']);
+      subjectIds.addAll(['hsc_bangla_$num', 'bangla_$num', 'ssc_bangla_$num', 'ssc_bangla']);
     } else if (cleanId.contains('english')) {
       final num = cleanId.contains('2') ? '2' : '1';
-      subjectIds.addAll(['hsc_english_$num', 'english_$num']);
+      subjectIds.addAll(['hsc_english_$num', 'english_$num', 'ssc_english_$num', 'ssc_english']);
+    } else if (cleanId.contains('accounting') || cleanId.contains('হিসাব')) {
+      subjectIds.addAll(['ssc_accounting', 'accounting']);
+    } else if (cleanId.contains('business') || cleanId.contains('উদ্যোগ')) {
+      subjectIds.addAll(['ssc_business_ent', 'business_ent', 'business']);
+    } else if (cleanId.contains('finance') || cleanId.contains('ফিন্যান্স')) {
+      subjectIds.addAll(['ssc_finance_banking', 'finance_banking', 'finance']);
+    } else if (cleanId.contains('general_science') || cleanId.contains('বিজ্ঞান')) {
+      subjectIds.addAll(['ssc_general_science', 'general_science', 'science']);
+    } else if (cleanId.contains('history') || cleanId.contains('ইতিহাস')) {
+      subjectIds.addAll(['ssc_history_bd', 'history_bd', 'history']);
+    } else if (cleanId.contains('geography') || cleanId.contains('ভূগোল')) {
+      subjectIds.addAll(['ssc_geography', 'geography']);
+    } else if (cleanId.contains('civics') || cleanId.contains('পৌরনীতি')) {
+      subjectIds.addAll(['ssc_civics', 'civics']);
+    } else if (cleanId.contains('economics') || cleanId.contains('অর্থনীতি')) {
+      subjectIds.addAll(['ssc_economics', 'economics']);
+    } else if (cleanId.contains('bgs') || cleanId.contains('বাংলাদেশ ও বিশ্ব')) {
+      subjectIds.addAll(['ssc_bgs', 'bgs']);
+    } else if (cleanId.contains('religion') || cleanId.contains('ধর্ম')) {
+      subjectIds.addAll(['ssc_religion', 'religion']);
     }
 
     var query = supabase.from('questions').select('*');
 
-    // 1. Filter by subject_id using inFilter
-    query = query.inFilter('subject_id', subjectIds.toList());
+    // 1. Filter by subject_id or subject name
+    if (bySubjectName) {
+      final nameVariants = BanglaNameHelper.getSubjectSearchVariants(rawSubjectId, _subjectTitle);
+      query = query.inFilter('subject', nameVariants);
+    } else {
+      query = query.inFilter('subject_id', subjectIds.toList());
+    }
 
     // 2. Filter by chapter if chosen and not ignored
     if (!ignoreChapter && _selectedChapter != null && _selectedChapter!.name.isNotEmpty) {
@@ -716,13 +745,32 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
 
     try {
       final query = _buildQuestionsQuery();
-      final data = await query.range(0, _pageSize - 1);
+      var data = await query.range(0, _pageSize - 1);
       List<Question> questions = [];
       if (data.isNotEmpty) {
         questions = (data as List)
             .map((row) => _processQuestionRow(row as Map<String, dynamic>))
             .where((q) => _filterQuestion(q))
             .toList();
+      }
+
+      // If DB has 0 questions by subject_id, try fetching by subject name column
+      if (questions.isEmpty) {
+        try {
+          final altQuery = _buildQuestionsQuery(bySubjectName: true);
+          final altData = await altQuery.range(0, _pageSize - 1);
+          if (altData.isNotEmpty) {
+            final altQuestions = (altData as List)
+                .map((row) => _processQuestionRow(row as Map<String, dynamic>))
+                .where((q) => _filterQuestion(q))
+                .toList();
+            if (altQuestions.isNotEmpty) {
+              data = altData;
+              questions = altQuestions;
+              _fetchedBySubjectName = true;
+            }
+          }
+        } catch (_) {}
       }
 
       // If DB has 0 questions (or questions haven't been uploaded yet), generate curated questions for the selected chapter/topic
@@ -771,10 +819,10 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     });
 
     try {
-      final query = _buildQuestionsQuery();
+      final query = _buildQuestionsQuery(bySubjectName: _fetchedBySubjectName);
       final from = _currentOffset;
       final to = _currentOffset + _pageSize - 1;
-      final data = await query.range(from, to);
+      var data = await query.range(from, to);
 
       List<Question> newQuestions = [];
       if (data.isNotEmpty) {
@@ -784,7 +832,23 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             .toList();
       }
 
-
+      if (newQuestions.isEmpty && !_fetchedBySubjectName) {
+        try {
+          final altQuery = _buildQuestionsQuery(bySubjectName: true);
+          final altData = await altQuery.range(from, to);
+          if (altData.isNotEmpty) {
+            final altList = (altData as List)
+                .map((row) => _processQuestionRow(row as Map<String, dynamic>))
+                .where((q) => _filterQuestion(q))
+                .toList();
+            if (altList.isNotEmpty) {
+              data = altData;
+              newQuestions = altList;
+              _fetchedBySubjectName = true;
+            }
+          }
+        } catch (_) {}
+      }
 
       if (mounted) {
         setState(() {
@@ -1905,6 +1969,96 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         ChapterItem(id: 'ban1_ch08', name: '৮ম অধ্যায়: বিদ্রোহী'),
         ChapterItem(id: 'ban1_ch09', name: '৯ম অধ্যায়: প্রতিদান'),
         ChapterItem(id: 'ban1_ch10', name: '১০ম অধ্যায়: তাহারেই পড়ে মনে'),
+      ];
+    } else if (lower.contains('accounting') || lower.contains('হিসাব')) {
+      return const [
+        ChapterItem(id: 'acc_ch01', name: '১ম অধ্যায়: হিসাববিজ্ঞান পরিচিতি'),
+        ChapterItem(id: 'acc_ch02', name: '২য় অধ্যায়: লেনদেন'),
+        ChapterItem(id: 'acc_ch03', name: '৩য় অধ্যায়: দুতরফা দাখিলা পদ্ধতি'),
+        ChapterItem(id: 'acc_ch04', name: '৪র্থ অধ্যায়: মূলধন ও মুনাফা জাতীয় লেনদেন'),
+        ChapterItem(id: 'acc_ch05', name: '৫ম অধ্যায়: হিসাব'),
+        ChapterItem(id: 'acc_ch06', name: '৬ষ্ঠ অধ্যায়: জাবেদা'),
+        ChapterItem(id: 'acc_ch07', name: '৭ম অধ্যায়: খতিয়ান'),
+        ChapterItem(id: 'acc_ch08', name: '৮ম অধ্যায়: নগদান বই'),
+        ChapterItem(id: 'acc_ch09', name: '৯ম অধ্যায়: রেওয়ামিল'),
+        ChapterItem(id: 'acc_ch10', name: '১০ম অধ্যায়: আর্থিক বিবরণী'),
+      ];
+    } else if (lower.contains('business') || lower.contains('উদ্যোগ')) {
+      return const [
+        ChapterItem(id: 'biz_ch01', name: '১ম অধ্যায়: ব্যবসায়ের পরিচিতি'),
+        ChapterItem(id: 'biz_ch02', name: '২য় অধ্যায়: ব্যবসায় উদ্যোগ ও উদ্যোক্তা'),
+        ChapterItem(id: 'biz_ch03', name: '৩য় অধ্যায়: আত্মকর্মসংস্থান'),
+        ChapterItem(id: 'biz_ch04', name: '৪র্থ অধ্যায়: মালিকানার ভিত্তিতে ব্যবসায়'),
+        ChapterItem(id: 'biz_ch05', name: '৫ম অধ্যায়: ব্যবসায়ের আইনগত দিক'),
+        ChapterItem(id: 'biz_ch06', name: '৬ষ্ঠ অধ্যায়: ব্যবসায় পরিকল্পনা'),
+      ];
+    } else if (lower.contains('finance') || lower.contains('ফিন্যান্স')) {
+      return const [
+        ChapterItem(id: 'fin_ch01', name: '১ম অধ্যায়: অর্থায়ন ও ব্যবসায় অর্থায়ন'),
+        ChapterItem(id: 'fin_ch02', name: '২য় অধ্যায়: অর্থায়নের উৎস'),
+        ChapterItem(id: 'fin_ch03', name: '৩য় অধ্যায়: অর্থের সময়মূল্য'),
+        ChapterItem(id: 'fin_ch04', name: '৪র্থ অধ্যায়: ঝুঁকি ও অনিশ্চয়তা'),
+        ChapterItem(id: 'fin_ch05', name: '৫ম অধ্যায়: মূলধনি আয়-ব্যয় প্রাক্কলন'),
+        ChapterItem(id: 'fin_ch06', name: '৬ষ্ঠ অধ্যায়: ব্যাংকিং ব্যবসায় ও তার ধরন'),
+      ];
+    } else if (lower.contains('general_science') || lower.contains('বিজ্ঞান')) {
+      return const [
+        ChapterItem(id: 'sci_ch01', name: '১ম অধ্যায়: উন্নততর জীবনধারা'),
+        ChapterItem(id: 'sci_ch02', name: '২য় অধ্যায়: জীবনের জন্য পানি'),
+        ChapterItem(id: 'sci_ch03', name: '৩য় অধ্যায়: হৃদযন্ত্রের যত কথা'),
+        ChapterItem(id: 'sci_ch04', name: '৪র্থ অধ্যায়: নবজীবনের সূচনা'),
+        ChapterItem(id: 'sci_ch05', name: '৫ম অধ্যায়: দেখতে হলে আলো চাই'),
+        ChapterItem(id: 'sci_ch06', name: '৬ষ্ঠ অধ্যায়: পলিমার'),
+      ];
+    } else if (lower.contains('history') || lower.contains('ইতিহাস')) {
+      return const [
+        ChapterItem(id: 'hist_ch01', name: '১ম অধ্যায়: ইতিহাস পরিচিতি'),
+        ChapterItem(id: 'hist_ch02', name: '২য় অধ্যায়: বিশ্বসভ্যতা'),
+        ChapterItem(id: 'hist_ch03', name: '৩য় অধ্যায়: প্রাচীন বাংলার জনপদ'),
+        ChapterItem(id: 'hist_ch04', name: '৪র্থ অধ্যায়: প্রাচীন বাংলার রাজনৈতিক ইতিহাস'),
+        ChapterItem(id: 'hist_ch05', name: '৫ম অধ্যায়: প্রাচীন বাংলার সামাজিক ও অর্থনৈতিক ইতিহাস'),
+        ChapterItem(id: 'hist_ch06', name: '১১শ অধ্যায়: ভাষা আন্দোলন ও পরবর্তী রাজনৈতিক ঘটনাপ্রবাহ'),
+      ];
+    } else if (lower.contains('geography') || lower.contains('ভূগোল')) {
+      return const [
+        ChapterItem(id: 'geo_ch01', name: '১ম অধ্যায়: ভূগোল ও পরিবেশ'),
+        ChapterItem(id: 'geo_ch02', name: '২য় অধ্যায়: মহাবিশ্ব ও আমাদের পৃথিবী'),
+        ChapterItem(id: 'geo_ch03', name: '৩য় অধ্যায়: মানচিত্র পঠন ও ব্যবহার'),
+        ChapterItem(id: 'geo_ch04', name: '৪র্থ অধ্যায়: পৃথিবীর অভ্যন্তরীণ ও বাহ্যিক গঠন'),
+        ChapterItem(id: 'geo_ch05', name: '৫ম অধ্যায়: বায়ুমণ্ডল'),
+      ];
+    } else if (lower.contains('civics') || lower.contains('পৌরনীতি')) {
+      return const [
+        ChapterItem(id: 'civ_ch01', name: '১ম অধ্যায়: পৌরনীতি ও নাগরিকতা'),
+        ChapterItem(id: 'civ_ch02', name: '২য় অধ্যায়: নাগরিক ও নাগরিকতা'),
+        ChapterItem(id: 'civ_ch03', name: '৩য় অধ্যায়: আইন, স্বাধীনতা ও সাম্য'),
+        ChapterItem(id: 'civ_ch04', name: '৪র্থ অধ্যায়: রাষ্ট্র ও সরকার ব্যবস্থা'),
+        ChapterItem(id: 'civ_ch05', name: '৫ম অধ্যায়: সংবিধান'),
+      ];
+    } else if (lower.contains('economics') || lower.contains('অর্থনীতি')) {
+      return const [
+        ChapterItem(id: 'econ_ch01', name: '১ম অধ্যায়: অর্থনীতি পরিচয়'),
+        ChapterItem(id: 'econ_ch02', name: '২য় অধ্যায়: অর্থনীতির মৌলিক ধারণা'),
+        ChapterItem(id: 'econ_ch03', name: '৩য় অধ্যায়: উপযোগ, চাহিদা, জোগান ও ভারসাম্য'),
+        ChapterItem(id: 'econ_ch04', name: '৪র্থ অধ্যায়: উৎপাদন ও সংগঠন'),
+        ChapterItem(id: 'econ_ch05', name: '৫ম অধ্যায়: বাজার'),
+      ];
+    } else if (lower.contains('bgs') || lower.contains('বাংলাদেশ ও বিশ্ব')) {
+      return const [
+        ChapterItem(id: 'bgs_ch01', name: '১ম অধ্যায়: পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উত্থান'),
+        ChapterItem(id: 'bgs_ch02', name: '২য় অধ্যায়: স্বাধীন বাংলাদেশ'),
+        ChapterItem(id: 'bgs_ch03', name: '৩য় অধ্যায়: সৌরজগৎ ও ভূমণ্ডল'),
+        ChapterItem(id: 'bgs_ch04', name: '৪র্থ অধ্যায়: বাংলাদেশের ভূপ্রকৃতি ও জলবায়ু'),
+        ChapterItem(id: 'bgs_ch05', name: '৫ম অধ্যায়: বাংলাদেশের নদ-নদী ও প্রাকৃতিক সম্পদ'),
+        ChapterItem(id: 'bgs_ch06', name: '৬ষ্ঠ অধ্যায়: রাষ্ট্র, নাগরিকতা ও আইন'),
+      ];
+    } else if (lower.contains('religion') || lower.contains('ধর্ম')) {
+      return const [
+        ChapterItem(id: 'rel_ch01', name: '১ম অধ্যায়: আকাইদ ও নৈতিক জীবন'),
+        ChapterItem(id: 'rel_ch02', name: '২য় অধ্যায়: শরিয়তের উৎস'),
+        ChapterItem(id: 'rel_ch03', name: '৩য় অধ্যায়: ইবাদত'),
+        ChapterItem(id: 'rel_ch04', name: '৪র্থ অধ্যায়: আখলাক'),
+        ChapterItem(id: 'rel_ch05', name: '৫ম অধ্যায়: আদর্শ জীবনচরিত'),
       ];
     }
 

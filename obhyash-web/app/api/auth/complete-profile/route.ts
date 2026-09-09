@@ -54,6 +54,7 @@ export async function POST(request: Request) {
         stream: profileData.stream,
         division: profileData.group,
         batch: profileData.batch,
+        optional_subject: profileData.optional_subject || 'Biology',
         role: 'Student',
         status: 'Active',
         subscription: {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../features/exam/services/local_exam_cache_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../services/session_monitor_service.dart';
 import '../router.dart';
@@ -168,6 +169,7 @@ class AuthNotifier extends Notifier<User?> {
     await Future.wait([
       SecureStorageService.clearSession().catchError((_) {}),
       SecureStorageService.clearUserMeta().catchError((_) {}),
+      LocalExamCacheService.clearAll().catchError((_) {}),
     ]);
     try {
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);

@@ -128,9 +128,9 @@ function SignupForm() {
   ) => {
     const { name, value } = e.target;
     if (name === 'stream') {
-      // Auto-reset batch when stream changes
       const firstBatch = `${value} 2026`;
-      setFormData({ ...formData, stream: value, batch: firstBatch });
+      const newGroup = value === 'HSC' ? 'Science' : formData.group;
+      setFormData({ ...formData, stream: value, batch: firstBatch, group: newGroup });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -321,6 +321,7 @@ function SignupForm() {
               division: formData.group, // Mapping group -> division
               batch: formData.batch,
               exam_target: formData.examTarget || null,
+              optional_subject: 'Biology',
               role: 'Student',
               status: 'Active',
               avatar_url: getRandomAvatar(formData.gender, data.user.id),
@@ -524,7 +525,7 @@ function SignupForm() {
             {step === 1 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                     তোমার নাম
                   </label>
                   <div className="relative group">
@@ -542,7 +543,7 @@ function SignupForm() {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between ml-1">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300">
                       মোবাইল নম্বর
                     </label>
                     {isPhoneVerified && verifiedPhone === formData.phone.trim() && (
@@ -578,7 +579,7 @@ function SignupForm() {
             {step === 2 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                     শিক্ষা প্রতিষ্ঠান
                   </label>
                   <div className="relative group">
@@ -625,7 +626,7 @@ function SignupForm() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                     স্ট্রিম (Stream)
                   </label>
                   <div className="relative">
@@ -638,14 +639,13 @@ function SignupForm() {
                     >
                       <option value="HSC">HSC</option>
                       <option value="SSC">SSC</option>
-                      <option value="Admission">Admission</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                       বিভাগ (Division)
                     </label>
                     <div className="relative">
@@ -657,18 +657,27 @@ function SignupForm() {
                         className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
                       >
                         <option value="Science">Science (বিজ্ঞান)</option>
-                        <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                          Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
-                        </option>
-                        <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                          Humanities (মানবিক) - শীঘ্রই আসছে
-                        </option>
+                        {formData.stream === 'SSC' ? (
+                          <>
+                            <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                            <option value="Humanities">Humanities (মানবিক)</option>
+                          </>
+                        ) : (
+                          <>
+                            <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                              Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
+                            </option>
+                            <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                              Humanities (মানবিক) - শীঘ্রই আসছে
+                            </option>
+                          </>
+                        )}
                       </select>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                       ব্যাচ
                     </label>
                     <div className="relative">
@@ -679,7 +688,7 @@ function SignupForm() {
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
                       >
-                        {[2024, 2025, 2026, 2027].map((year) => (
+                        {(formData.stream === 'SSC' ? [2026, 2027, 2028] : [2025, 2026, 2027, 2028]).map((year) => (
                           <option
                             key={year}
                             value={`${formData.stream} ${year}`}
@@ -693,7 +702,7 @@ function SignupForm() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                     লিঙ্গ (Gender)
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -702,7 +711,7 @@ function SignupForm() {
                         key={g}
                         type="button"
                         onClick={() => setFormData({ ...formData, gender: g })}
-                        className={`py-3 rounded-xl text-sm font-bold transition-all border ${
+                        className={`py-3 rounded-xl text-sm font-normal transition-all border ${
                           formData.gender === g
                             ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
                             : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
@@ -717,13 +726,9 @@ function SignupForm() {
                 {/* Exam Target in Step 2 — Only for HSC Stream (Optional) */}
                 {formData.stream === 'HSC' && (
                   <div className="space-y-2 pt-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1 flex items-center justify-between">
                       <span>টার্গেট / লক্ষ্য (ঐচ্ছিক)</span>
                     </label>
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                      <Info className="w-4 h-4 shrink-0 text-emerald-500" />
-                      <span>💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।</span>
-                    </div>
                     <div className="grid grid-cols-3 gap-2.5 mt-2">
                       {EXAM_TARGETS.map((t) => (
                         <button
@@ -743,7 +748,7 @@ function SignupForm() {
                         >
                           <span className="text-xl">{t.emoji}</span>
                           <span
-                            className={`text-xs font-bold leading-tight ${
+                            className={`text-xs font-normal leading-tight ${
                               formData.examTarget === t.id
                                 ? 'text-emerald-700 dark:text-emerald-400'
                                 : 'text-neutral-700 dark:text-neutral-300'
@@ -765,7 +770,7 @@ function SignupForm() {
 
                 <div className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                       ইমেইল এড্রেস
                     </label>
                     <div className="relative group">
@@ -782,7 +787,7 @@ function SignupForm() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                       পাসওয়ার্ড
                     </label>
                     <div className="relative group">
@@ -810,7 +815,7 @@ function SignupForm() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
                       পাসওয়ার্ড নিশ্চিত করো
                     </label>
                     <div className="relative group">
@@ -828,7 +833,7 @@ function SignupForm() {
 
                   {!isReferralLocked && (
                     <div className="space-y-1.5 pt-2">
-                      <label className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 ml-1 flex items-center gap-1.5">
+                      <label className="text-sm font-normal text-emerald-700 dark:text-emerald-400 ml-1 flex items-center gap-1.5">
                         <Gift className="w-4 h-4" />
                         রেফারেল কোড (optional)
                       </label>

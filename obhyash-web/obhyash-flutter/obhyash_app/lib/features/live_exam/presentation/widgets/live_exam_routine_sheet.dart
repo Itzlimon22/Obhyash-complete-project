@@ -61,6 +61,39 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     return s;
   }
 
+  static String formatCategoryTitle(String cat) {
+    switch (cat.toLowerCase().trim()) {
+      case 'ssc_board':
+        return 'এসএসসি বোর্ড মডেল';
+      case 'ssc_school':
+        return 'শীর্ষ স্কুল ও ক্যাডেট';
+      case 'ssc_science':
+        return 'এসএসসি বিজ্ঞান বিভাগ';
+      case 'ssc_business':
+        return 'এসএসসি বাণিজ্য বিভাগ';
+      case 'ssc_humanities':
+        return 'এসএসসি মানবিক বিভাগ';
+      case 'ssc_compulsory':
+        return 'এসএসসি আবশ্যিক বিষয়';
+      case 'engineering':
+        return 'ইঞ্জিনিয়ারিং ভর্তি';
+      case 'medical':
+        return 'মেডিকেল ভর্তি';
+      case 'varsity':
+      case 'varsity_a':
+        return 'ভার্সিটি ক-ইউনিট';
+      case 'hsc':
+        return 'এইচএসসি স্পেশাল';
+      case 'all':
+        return 'সকল লাইভ পরীক্ষা';
+      default:
+        if (cat.toLowerCase().startsWith('ssc_')) {
+          return 'এসএসসি ${cat.substring(4).toUpperCase()}';
+        }
+        return cat;
+    }
+  }
+
   static List<RoutineItemModel> _convertLiveExamsToRoutine(
       List<LiveExam> exams, String category) {
     if (exams.isEmpty) return [];
@@ -178,33 +211,175 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     ),
   ];
 
-  static const List<RoutineItemModel> _defaultSscRoutineList = [
+  static const List<RoutineItemModel> _defaultSscScienceRoutineList = [
     RoutineItemModel(
-      id: 'ssc-1',
+      id: 'ssc-sci-1',
       date: '১৮ আগস্ট ২০২৬',
       dayName: 'মঙ্গলবার',
       time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
       subject: 'পদার্থবিজ্ঞান',
-      paper: 'সাধারণ',
+      paper: 'বিজ্ঞান',
       chapters: ['অধ্যায় ২: গতি', 'অধ্যায় ৩: বল'],
       totalMarks: 40,
       durationMinutes: 40,
     ),
     RoutineItemModel(
-      id: 'ssc-2',
+      id: 'ssc-sci-2',
       date: '২০ আগস্ট ২০২৬',
       dayName: 'বৃহস্পতিবার',
       time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
       subject: 'রসায়ন',
-      paper: 'সাধারণ',
+      paper: 'বিজ্ঞান',
       chapters: ['অধ্যায় ৩: পদার্থের গঠন', 'অধ্যায় ৪: পর্যায় সারণি'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-sci-3',
+      date: '২২ আগস্ট ২০২৬',
+      dayName: 'শনিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'জীববিজ্ঞান',
+      paper: 'বিজ্ঞান',
+      chapters: ['অধ্যায় ২: জীবকোষ ও টিস্যু', 'অধ্যায় ৪: জীবনীশক্তি'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-sci-4',
+      date: '২৪ আগস্ট ২০২৬',
+      dayName: 'সোমবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'উচ্চতর গণিত',
+      paper: 'বিজ্ঞান',
+      chapters: ['অধ্যায় ২: বীজগাণিতিক রাশি', 'অধ্যায় ৭: অসীম ধারা'],
       totalMarks: 40,
       durationMinutes: 40,
     ),
   ];
 
+  static const List<RoutineItemModel> _defaultSscBusinessRoutineList = [
+    RoutineItemModel(
+      id: 'ssc-biz-1',
+      date: '১৮ আগস্ট ২০২৬',
+      dayName: 'মঙ্গলবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'হিসাববিজ্ঞান',
+      paper: 'বাণিজ্য',
+      chapters: ['অধ্যায় ২: লেনদেন', 'অধ্যায় ৩: দুতরফা দাখিলা পদ্ধতি'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-biz-2',
+      date: '২০ আগস্ট ২০২৬',
+      dayName: 'বৃহস্পতিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'ব্যবসায় উদ্যোগ',
+      paper: 'বাণিজ্য',
+      chapters: ['অধ্যায় ১: ব্যবসায় পরিচিতি', 'অধ্যায় ৩: আত্মকর্মসংস্থান'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-biz-3',
+      date: '২২ আগস্ট ২০২৬',
+      dayName: 'শনিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'ফিন্যান্স ও ব্যাংকিং',
+      paper: 'বাণিজ্য',
+      chapters: ['অধ্যায় ৩: অর্থের সময়মূল্য', 'অধ্যায় ৪: ঝুঁকি ও অনিশ্চয়তা'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+  ];
+
+  static const List<RoutineItemModel> _defaultSscHumanitiesRoutineList = [
+    RoutineItemModel(
+      id: 'ssc-hum-1',
+      date: '১৮ আগস্ট ২০২৬',
+      dayName: 'মঙ্গলবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা',
+      paper: 'মানবিক',
+      chapters: ['অধ্যায় ১: ইতিহাস পরিচিতি', 'অধ্যায় ২: বিশ্বসভ্যতা'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-hum-2',
+      date: '২০ আগস্ট ২০২৬',
+      dayName: 'বৃহস্পতিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'ভূগোল ও পরিবেশ',
+      paper: 'মানবিক',
+      chapters: ['অধ্যায় ১: ভূগোল ও পরিবেশ', 'অধ্যায় ২: মহাবিশ্ব ও আমাদের পৃথিবী'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-hum-3',
+      date: '২২ আগস্ট ২০২৬',
+      dayName: 'শনিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'পৌরনীতি ও নাগরিকতা',
+      paper: 'মানবিক',
+      chapters: ['অধ্যায় ১: পৌরনীতি ও নাগরিকতা', 'অধ্যায় ৪: রাষ্ট্র ও সরকার ব্যবস্থা'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+  ];
+
+  static const List<RoutineItemModel> _defaultSscCompulsoryRoutineList = [
+    RoutineItemModel(
+      id: 'ssc-comp-1',
+      date: '১৮ আগস্ট ২০২৬',
+      dayName: 'মঙ্গলবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'বাংলা ১ম পত্র',
+      paper: 'আবশ্যিক',
+      chapters: ['গদ্য: শুভা, বই পড়া', 'পদ্য: বঙ্গবাণী, কপোতাক্ষ নদ'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-comp-2',
+      date: '২০ আগস্ট ২০২৬',
+      dayName: 'বৃহস্পতিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'সাধারণ গণিত',
+      paper: 'আবশ্যিক',
+      chapters: ['অধ্যায় ২: সেট ও ফাংশন', 'অধ্যায় ৩: বীজগাণিতিক রাশি'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-comp-3',
+      date: '২২ আগস্ট ২০২৬',
+      dayName: 'শনিবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'ইংরেজি ১ম পত্র',
+      paper: 'আবশ্যিক',
+      chapters: ['Unit 1: Good Citizens', 'Unit 3: Events and Festivals'],
+      totalMarks: 40,
+      durationMinutes: 40,
+    ),
+    RoutineItemModel(
+      id: 'ssc-comp-4',
+      date: '২৪ আগস্ট ২০২৬',
+      dayName: 'সোমবার',
+      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
+      subject: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+      paper: 'আবশ্যিক',
+      chapters: ['অধ্যায় ১: তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', 'অধ্যায় ২: কম্পিউটার নিরাপত্তা'],
+      totalMarks: 25,
+      durationMinutes: 25,
+    ),
+  ];
+
   Future<void> _downloadPdf(
-      BuildContext context, List<RoutineItemModel> routineList, bool isHSC) async {
+      BuildContext context, List<RoutineItemModel> routineList, bool isHSC,
+      {String categoryTitle = ''}) async {
     final banglaRegular = await PdfGoogleFonts.notoSerifBengaliRegular();
     final banglaBold = await PdfGoogleFonts.notoSerifBengaliBold();
     final timesRegular = await PdfGoogleFonts.tinosRegular();
@@ -307,9 +482,11 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
-                    isHSC
-                        ? 'এইচএসসি (HSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন'
-                        : 'এসএসসি (SSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন',
+                    categoryTitle.isNotEmpty
+                        ? '${formatCategoryTitle(categoryTitle)} লাইভ পরীক্ষা ও সিলেবাস রুটিন'
+                        : (isHSC
+                            ? 'এইচএসসি (HSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন'
+                            : 'এসএসসি (SSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন'),
                     style: pw.TextStyle(
                       fontSize: 13,
                       fontWeight: pw.FontWeight.bold,
@@ -402,7 +579,9 @@ class LiveExamRoutineSheet extends ConsumerWidget {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: fileName,
-        notificationTitle: '$categoryTitle রুটিন ও সিলেবাস',
+        notificationTitle: categoryTitle.isNotEmpty
+            ? '${formatCategoryTitle(categoryTitle)} রুটিন ও সিলেবাস'
+            : '$categoryTitle রুটিন ও সিলেবাস',
         context: context.mounted ? context : null,
       );
 
@@ -421,8 +600,9 @@ class LiveExamRoutineSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isHSC = categoryTitle.toLowerCase().contains('hsc') ||
-        categoryTitle.contains('এইচএসসি');
+    final formattedTitle = formatCategoryTitle(categoryTitle);
+    final catLower = categoryTitle.toLowerCase().trim();
+    final isHSC = catLower.contains('hsc') || categoryTitle.contains('এইচএসসি');
 
     final liveExamsAsync = ref.watch(liveExamsCategoryProvider(categoryTitle));
     final dynamicRoutine = liveExamsAsync.maybeWhen(
@@ -433,9 +613,20 @@ class LiveExamRoutineSheet extends ConsumerWidget {
       orElse: () => <RoutineItemModel>[],
     );
 
-    final List<RoutineItemModel> routineList = dynamicRoutine.isNotEmpty
-        ? dynamicRoutine
-        : (isHSC ? _defaultHscRoutineList : _defaultSscRoutineList);
+    final List<RoutineItemModel> routineList;
+    if (dynamicRoutine.isNotEmpty) {
+      routineList = dynamicRoutine;
+    } else if (catLower.contains('business') || catLower.contains('বাণিজ্য')) {
+      routineList = _defaultSscBusinessRoutineList;
+    } else if (catLower.contains('humanities') || catLower.contains('মানবিক')) {
+      routineList = _defaultSscHumanitiesRoutineList;
+    } else if (catLower.contains('compulsory') || catLower.contains('আবশ্যিক')) {
+      routineList = _defaultSscCompulsoryRoutineList;
+    } else if (isHSC) {
+      routineList = _defaultHscRoutineList;
+    } else {
+      routineList = _defaultSscScienceRoutineList;
+    }
 
     return Container(
       constraints: BoxConstraints(
@@ -489,7 +680,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              categoryTitle.toUpperCase(),
+                              formattedTitle,
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -509,7 +700,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$categoryTitle পরীক্ষার রুটিন',
+                        '$formattedTitle রুটিন',
                         style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.bold,
@@ -642,7 +833,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                           side: const BorderSide(color: Color(0xFF004633), width: 1.5),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        onPressed: () => _downloadPdf(context, routineList, isHSC),
+                        onPressed: () => _downloadPdf(context, routineList, isHSC, categoryTitle: categoryTitle),
                         icon: const Icon(LucideIcons.download, size: 17),
                         label: const Text('রুটিন PDF', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),

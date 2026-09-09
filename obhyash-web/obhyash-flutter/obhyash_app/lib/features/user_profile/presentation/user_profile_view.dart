@@ -18,6 +18,7 @@ class _OtherUser {
   final String id, name, institute, level;
   final int xp, examsTaken, streakCount;
   final String? avatarUrl;
+  final String? gender;
   final String stream;
 
   const _OtherUser({
@@ -29,6 +30,7 @@ class _OtherUser {
     required this.examsTaken,
     required this.streakCount,
     this.avatarUrl,
+    this.gender,
     this.stream = 'HSC',
   });
 
@@ -41,6 +43,7 @@ class _OtherUser {
     examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
     streakCount: (j['streak'] as num?)?.toInt() ?? 0,
     avatarUrl: j['avatar_url'] as String?,
+    gender: j['gender'] as String?,
     stream: (j['stream'] as String?)?.toUpperCase() == 'SSC' ? 'SSC' : 'HSC',
   );
 }
@@ -365,7 +368,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       final profileData = await supabase
           .from('public_profiles')
           .select(
-            'id, name, institute, level, xp, exams_taken, streak, avatar_url',
+            'id, name, institute, level, xp, exams_taken, streak, avatar_url, gender',
           )
           .eq('id', widget.userId)
           .single();
@@ -387,6 +390,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
             examsTaken: 0,
             streakCount: myProfile.streakCount,
             avatarUrl: myProfile.avatarUrl,
+            gender: myProfile.gender,
             stream: myProfile.stream ?? 'HSC',
           );
         }
@@ -612,8 +616,10 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       child: Row(
         children: [
           UserAvatar(
-            avatarUrl: user.avatarUrl,
+            id: user.id,
             name: user.name,
+            avatarUrl: user.avatarUrl,
+            gender: user.gender,
             size: 64,
           ),
           const SizedBox(width: 14),

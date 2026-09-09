@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../features/dashboard/providers/dashboard_providers.dart';
 
 /// Helper to generate DiceBear avatar URL matching web app's `lib/avatar-utils.ts`.
 String getRandomAvatar({String? gender, required String seed}) {
   final cleanGender = (gender ?? 'Other').toLowerCase();
-  String style = 'fun-emoji';
+  String style = 'adventurer';
   if (cleanGender == 'male') {
     style = 'adventurer';
   } else if (cleanGender == 'female') {
     style = 'lorelei';
+  } else {
+    // For unspecified/other, pick deterministically based on seed so user gets a consistent student avatar
+    final hash = seed.hashCode.abs();
+    style = (hash % 2 == 0) ? 'adventurer' : 'lorelei';
   }
 
   return 'https://api.dicebear.com/7.x/$style/svg?seed=${Uri.encodeComponent(seed.isNotEmpty ? seed : "default")}&scale=120&radius=0&backgroundColor=b6e3f4,c0aede,d1d4f9';
@@ -51,7 +57,8 @@ Color getAvatarBgColor(String name) {
 /// 1. Custom uploaded avatar (Supabase Storage or external URL)
 /// 2. If no custom avatar, auto-generates a DiceBear cartoon character SVG
 /// 3. If image fails to load or offline, displays first letter initial
-class UserAvatar extends StatelessWidget {
+/// 4. Synchronizes seamlessly with userProfileProvider for current user
+class UserAvatar extends ConsumerWidget {
   final String? avatarUrl;
   final String name;
   final String? gender;
@@ -78,16 +85,39 @@ class UserAvatar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final myProfile = ref.watch(userProfileProvider).value;
+    final currentAuthId = Supabase.instance.client.auth.currentUser?.id;
+
+    // Check if this avatar represents the current logged-in user
+    final bool isMe = (id != null && (id == myProfile?.id || id == currentAuthId)) ||
+        (id == null && (name.isNotEmpty && name == myProfile?.name)) ||
+        (id == null && (avatarUrl == null || avatarUrl == myProfile?.avatarUrl));
+
+    final effectiveAvatarUrl = (avatarUrl != null && avatarUrl!.isNotEmpty)
+        ? avatarUrl
+        : (isMe ? myProfile?.avatarUrl : null);
+
+    final effectiveGender = gender ?? (isMe ? myProfile?.gender : null);
+    final effectiveId = (id != null && id!.isNotEmpty)
+        ? id
+        : (isMe ? (myProfile?.id ?? currentAuthId) : null);
+    final effectiveIsPro = isPro || (isMe && (myProfile?.isPro ?? false));
+
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    final resolvedCustom = resolveAvatarUrl(avatarUrl);
+    final resolvedCustom = resolveAvatarUrl(effectiveAvatarUrl);
     final hasCustom = resolvedCustom != null && resolvedCustom.isNotEmpty;
     
     // Choose image URL: custom or DiceBear
     final imageUrl = hasCustom
         ? resolvedCustom
         : (useDiceBearFallback
-            ? getRandomAvatar(gender: gender, seed: (id != null && id!.isNotEmpty) ? id! : (name.isNotEmpty ? name : 'default'))
+            ? getRandomAvatar(
+                gender: effectiveGender,
+                seed: (effectiveId != null && effectiveId.isNotEmpty)
+                    ? effectiveId
+                    : (name.isNotEmpty ? name : 'default'),
+              )
             : null);
 
     final isSvg = imageUrl != null && (imageUrl.toLowerCase().contains('.svg') || imageUrl.contains('dicebear.com'));
@@ -138,7 +168,7 @@ class UserAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: bgColor,
-        border: showBorder && !isPro
+        border: showBorder && !effectiveIsPro
             ? Border.all(
                 color: borderColor ?? Colors.white,
                 width: borderWidth,
@@ -159,7 +189,7 @@ class UserAvatar extends StatelessWidget {
       ),
     );
 
-    if (!isPro) return baseAvatar;
+    if (!effectiveIsPro) return baseAvatar;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final ringPad = size >= 60 ? 3.5 : 2.5;

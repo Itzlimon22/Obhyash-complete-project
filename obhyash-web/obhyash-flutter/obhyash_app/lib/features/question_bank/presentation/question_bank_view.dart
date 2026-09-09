@@ -140,6 +140,199 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     },
   ];
 
+  // ── SSC Subject List (Science, Business Studies, Humanities & General) ──
+  final List<Map<String, dynamic>> _sscSubjects = [
+    // ── Science Core ──
+    {
+      'id': 'ssc_physics',
+      'name': 'পদার্থবিজ্ঞান',
+      'paper': 'এসএসসি',
+      'division': 'Science',
+      'count': 14,
+      'image': 'assets/images/subjects/physics_1.jpg',
+      'gradient': [Color(0xFF0A2540), Color(0xFF0D3B66), Color(0xFF14213D)],
+    },
+    {
+      'id': 'ssc_chemistry',
+      'name': 'রসায়ন',
+      'paper': 'এসএসসি',
+      'division': 'Science',
+      'count': 12,
+      'image': 'assets/images/subjects/chemistry_1.jpg',
+      'gradient': [Color(0xFF380459), Color(0xFF4A0E78), Color(0xFF25023D)],
+    },
+    {
+      'id': 'ssc_higher_math',
+      'name': 'উচ্চতর গণিত',
+      'paper': 'এসএসসি',
+      'division': 'Science',
+      'count': 14,
+      'image': 'assets/images/subjects/math_2.jpg',
+      'gradient': [Color(0xFF8B1E03), Color(0xFF9E2A2B), Color(0xFF540B0E)],
+    },
+    {
+      'id': 'ssc_biology',
+      'name': 'জীববিজ্ঞান',
+      'paper': 'এসএসসি',
+      'division': 'Science',
+      'count': 14,
+      'image': 'assets/images/subjects/biology_1.jpg',
+      'gradient': [Color(0xFF064E3B), Color(0xFF047857), Color(0xFF022C22)],
+    },
+
+    // ── Business Studies (ব্যবসায় শিক্ষা) ──
+    {
+      'id': 'ssc_accounting',
+      'name': 'হিসাববিজ্ঞান',
+      'paper': 'এসএসসি',
+      'division': 'Business Studies',
+      'count': 12,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF1E3A8A), Color(0xFF1D4ED8), Color(0xFF172554)],
+    },
+    {
+      'id': 'ssc_business_ent',
+      'name': 'ব্যবসায় উদ্যোগ',
+      'paper': 'এসএসসি',
+      'division': 'Business Studies',
+      'count': 12,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF7A3602), Color(0xFF8C4303), Color(0xFF542401)],
+    },
+    {
+      'id': 'ssc_finance_banking',
+      'name': 'ফিন্যান্স ও ব্যাংকিং',
+      'paper': 'এসএসসি',
+      'division': 'Business Studies',
+      'count': 11,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF065F46), Color(0xFF047857), Color(0xFF022C22)],
+    },
+
+    // ── Humanities (মানবিক) ──
+    {
+      'id': 'ssc_history_bd',
+      'name': 'ইতিহাস ও বিশ্ব সভ্যতা',
+      'paper': 'এসএসসি',
+      'division': 'Humanities',
+      'count': 15,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF701A75), Color(0xFF86198F), Color(0xFF4A044E)],
+    },
+    {
+      'id': 'ssc_geography',
+      'name': 'ভূগোল ও পরিবেশ',
+      'paper': 'এসএসসি',
+      'division': 'Humanities',
+      'count': 14,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF0F766E), Color(0xFF0D9488), Color(0xFF134E4A)],
+    },
+    {
+      'id': 'ssc_civics',
+      'name': 'পৌরনীতি ও নাগরিকতা',
+      'paper': 'এসএসসি',
+      'division': 'Humanities',
+      'count': 12,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF164E63), Color(0xFF0891B2), Color(0xFF155E75)],
+    },
+    {
+      'id': 'ssc_economics',
+      'name': 'অর্থনীতি',
+      'paper': 'এসএসসি',
+      'division': 'Humanities',
+      'count': 10,
+      'image': 'assets/images/subjects/math_1.jpg',
+      'gradient': [Color(0xFF831843), Color(0xFF9D174D), Color(0xFF500724)],
+    },
+
+    // ── Business & Humanities Elective ──
+    {
+      'id': 'ssc_general_science',
+      'name': 'সাধারণ বিজ্ঞান',
+      'paper': 'এসএসসি',
+      'division': 'Non-Science',
+      'count': 14,
+      'image': 'assets/images/subjects/chemistry_1.jpg',
+      'gradient': [Color(0xFF0A2540), Color(0xFF0D3B66), Color(0xFF14213D)],
+    },
+
+    // ── Compulsory for All Divisions (আবশ্যিক বিষয়সমূহ) ──
+    {
+      'id': 'ssc_math',
+      'name': 'সাধারণ গণিত',
+      'paper': 'এসএসসি',
+      'division': 'General',
+      'count': 17,
+      'image': 'assets/images/subjects/math_1.jpg',
+      'gradient': [Color(0xFF7A3602), Color(0xFF8C4303), Color(0xFF542401)],
+    },
+    {
+      'id': 'ssc_bangla_1',
+      'name': 'বাংলা',
+      'paper': '১ম পত্র',
+      'division': 'General',
+      'count': 2,
+      'image': 'assets/images/subjects/bangla_1.jpg',
+      'gradient': [Color(0xFF831843), Color(0xFF9D174D), Color(0xFF500724)],
+    },
+    {
+      'id': 'ssc_bangla_2',
+      'name': 'বাংলা',
+      'paper': '২য় পত্র',
+      'division': 'General',
+      'count': 17,
+      'image': 'assets/images/subjects/bangla_2.jpg',
+      'gradient': [Color(0xFF701A75), Color(0xFF86198F), Color(0xFF4A044E)],
+    },
+    {
+      'id': 'ssc_english_1',
+      'name': 'ইংরেজি',
+      'paper': '১ম পত্র',
+      'division': 'General',
+      'count': 14,
+      'image': 'assets/images/subjects/english_1.jpg',
+      'gradient': [Color(0xFF1E3A8A), Color(0xFF1D4ED8), Color(0xFF172554)],
+    },
+    {
+      'id': 'ssc_english_2',
+      'name': 'ইংরেজি',
+      'paper': '২য় পত্র',
+      'division': 'General',
+      'count': 15,
+      'image': 'assets/images/subjects/english_2.jpg',
+      'gradient': [Color(0xFF0F766E), Color(0xFF0D9488), Color(0xFF134E4A)],
+    },
+    {
+      'id': 'ssc_ict',
+      'name': 'তথ্য ও যোগাযোগ',
+      'paper': 'আইসিটি',
+      'division': 'General',
+      'count': 6,
+      'image': 'assets/images/subjects/ict.jpg',
+      'gradient': [Color(0xFF0E4766), Color(0xFF0284C7), Color(0xFF072F44)],
+    },
+    {
+      'id': 'ssc_bgs',
+      'name': 'বাংলাদেশ ও বিশ্ব',
+      'paper': 'বিজিএস',
+      'division': 'General',
+      'count': 16,
+      'image': 'assets/images/subjects/language.jpg',
+      'gradient': [Color(0xFF164E63), Color(0xFF0891B2), Color(0xFF155E75)],
+    },
+    {
+      'id': 'ssc_religion',
+      'name': 'ধর্ম ও নৈতিক শিক্ষা',
+      'paper': 'এসএসসি',
+      'division': 'General',
+      'count': 4,
+      'image': 'assets/images/subjects/bangla_1.jpg',
+      'gradient': [Color(0xFF065F46), Color(0xFF059669), Color(0xFF047857)],
+    },
+  ];
+
   // ── Official Admission Institutes matching user reference screenshot ──
   final List<Map<String, dynamic>> _institutes = [
     {
@@ -297,6 +490,136 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     },
   ];
 
+  // ── SSC Education Boards & Top Schools ──
+  final List<Map<String, dynamic>> _sscInstitutes = [
+    {
+      'id': 'board_dhaka',
+      'name': 'ঢাকা বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, ঢাকা',
+      'count': 28,
+      'isBoard': true,
+      'colors': [Color(0xFF1E3A8A), Color(0xFF2563EB), Color(0xFF3B82F6)],
+      'textColor': Color(0xFF1E3A8A),
+    },
+    {
+      'id': 'board_chittagong',
+      'name': 'চট্টগ্রাম বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, চট্টগ্রাম',
+      'count': 26,
+      'isBoard': true,
+      'colors': [Color(0xFF065F46), Color(0xFF059669), Color(0xFF10B981)],
+      'textColor': Color(0xFF064E3B),
+    },
+    {
+      'id': 'board_rajshahi',
+      'name': 'রাজশাহী বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, রাজশাহী',
+      'count': 26,
+      'isBoard': true,
+      'colors': [Color(0xFF831843), Color(0xFF9D174D), Color(0xFFF43F5E)],
+      'textColor': Color(0xFF4C0519),
+    },
+    {
+      'id': 'board_comilla',
+      'name': 'কুমিল্লা বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, কুমিল্লা',
+      'count': 24,
+      'isBoard': true,
+      'colors': [Color(0xFF4C0254), Color(0xFF701A75), Color(0xFFA855F7)],
+      'textColor': Color(0xFF3B0764),
+    },
+    {
+      'id': 'board_jessore',
+      'name': 'যশোর বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, যশোর',
+      'count': 24,
+      'isBoard': true,
+      'colors': [Color(0xFF7A3602), Color(0xFFB45309), Color(0xFFF59E0B)],
+      'textColor': Color(0xFF78350F),
+    },
+    {
+      'id': 'board_sylhet',
+      'name': 'সিলেট বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, সিলেট',
+      'count': 22,
+      'isBoard': true,
+      'colors': [Color(0xFF0E4766), Color(0xFF0284C7), Color(0xFF38BDF8)],
+      'textColor': Color(0xFF082F49),
+    },
+    {
+      'id': 'board_dinajpur',
+      'name': 'দিনাজপুর বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, দিনাজপুর',
+      'count': 22,
+      'isBoard': true,
+      'colors': [Color(0xFF312E81), Color(0xFF4338CA), Color(0xFF6366F1)],
+      'textColor': Color(0xFF1E1B4B),
+    },
+    {
+      'id': 'board_barisal',
+      'name': 'বরিশাল বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, বরিশাল',
+      'count': 20,
+      'isBoard': true,
+      'colors': [Color(0xFF134E4A), Color(0xFF0D9488), Color(0xFF2DD4BF)],
+      'textColor': Color(0xFF134E4A),
+    },
+    {
+      'id': 'board_mymensingh',
+      'name': 'ময়মনসিংহ বোর্ড',
+      'fullName': 'মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ড, ময়মনসিংহ',
+      'count': 18,
+      'isBoard': true,
+      'colors': [Color(0xFF701A75), Color(0xFF9333EA), Color(0xFFC084FC)],
+      'textColor': Color(0xFF3B0764),
+    },
+    {
+      'id': 'school_rajuk',
+      'name': 'রাজউক উত্তরা',
+      'fullName': 'রাজউক উত্তরা মডেল কলেজ',
+      'count': 15,
+      'isBoard': false,
+      'colors': [Color(0xFF1E3A8A), Color(0xFF3B82F6), Color(0xFF60A5FA)],
+      'textColor': Color(0xFF1E3A8A),
+    },
+    {
+      'id': 'school_ideal',
+      'name': 'আইডিয়াল স্কুল',
+      'fullName': 'আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল',
+      'count': 15,
+      'isBoard': false,
+      'colors': [Color(0xFF065F46), Color(0xFF10B981), Color(0xFF34D399)],
+      'textColor': Color(0xFF064E3B),
+    },
+    {
+      'id': 'school_viqarunnisa',
+      'name': 'ভিকারুননিসা',
+      'fullName': 'ভিকারুননিসা নূন স্কুল অ্যান্ড কলেজ',
+      'count': 14,
+      'isBoard': false,
+      'colors': [Color(0xFF831843), Color(0xFFF43F5E), Color(0xFFFB7185)],
+      'textColor': Color(0xFF4C0519),
+    },
+    {
+      'id': 'school_cadet',
+      'name': 'ক্যাডেট কলেজ',
+      'fullName': 'সকল ক্যাডেট কলেজ সমন্বিত টেস্ট',
+      'count': 16,
+      'isBoard': false,
+      'colors': [Color(0xFF7A3602), Color(0xFFF59E0B), Color(0xFFFBBF24)],
+      'textColor': Color(0xFF78350F),
+    },
+    {
+      'id': 'school_st_joseph',
+      'name': 'সেন্ট জোসেফ',
+      'fullName': 'সেন্ট জোসেফ উচ্চ মাধ্যমিক বিদ্যালয়',
+      'count': 12,
+      'isBoard': false,
+      'colors': [Color(0xFF4C0254), Color(0xFF9333EA), Color(0xFFA855F7)],
+      'textColor': Color(0xFF3B0764),
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     final activeTab = ref.watch(questionBankTabProvider);
@@ -328,9 +651,37 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
   // ── SUBJECT-WISE GRID (2 PER ROW) ──
   Widget _buildSubjectGrid(bool isDark) {
     final user = ref.watch(userProfileProvider).value;
+    final isSSC = (user?.stream?.toLowerCase().contains('ssc') ?? false) ||
+        (user?.level?.toLowerCase().contains('ssc') ?? false);
     final optionalSubject = user?.optionalSubject?.trim().toLowerCase();
 
-    final items = _subjects.where((subject) {
+    final userDivision = (user?.division ?? '').toLowerCase().trim();
+
+    final sourceList = isSSC ? _sscSubjects : _subjects;
+    final items = sourceList.where((subject) {
+      if (isSSC && userDivision.isNotEmpty && userDivision != 'general') {
+        final subDiv = (subject['division'] ?? 'General').toString();
+        if (subDiv != 'General') {
+          final isBizUser = userDivision.contains('business') ||
+              userDivision.contains('commerce') ||
+              userDivision.contains('বাণিজ্য') ||
+              userDivision.contains('ব্যবসায়');
+          final isHumUser = userDivision.contains('humanities') ||
+              userDivision.contains('arts') ||
+              userDivision.contains('মানবিক');
+          final isSciUser = userDivision.contains('science') ||
+              userDivision.contains('বিজ্ঞান');
+
+          if (isBizUser) {
+            if (subDiv != 'Business Studies' && subDiv != 'Non-Science') return false;
+          } else if (isHumUser) {
+            if (subDiv != 'Humanities' && subDiv != 'Non-Science') return false;
+          } else if (isSciUser) {
+            if (subDiv != 'Science') return false;
+          }
+        }
+      }
+
       final id = (subject['id'] ?? '').toString().toLowerCase();
       final name = (subject['name'] ?? '').toString().toLowerCase();
 
@@ -376,7 +727,14 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
-        context.push('/question-bank/subject-details', extra: item);
+        final user = ref.read(userProfileProvider).value;
+        final isSSC = (user?.stream?.toLowerCase().contains('ssc') ?? false) ||
+            (user?.level?.toLowerCase().contains('ssc') ?? false);
+        if (isSSC) {
+          context.push('/question-bank/academic-details', extra: item);
+        } else {
+          context.push('/question-bank/subject-details', extra: item);
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -490,7 +848,10 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
 
   // ── INSTITUTION-WISE GRID (2 PER ROW WITH REAL LOGOS EXACTLY LIKE USER SCREENSHOT) ──
   Widget _buildInstitutionGrid(bool isDark) {
-    final items = _institutes;
+    final user = ref.watch(userProfileProvider).value;
+    final isSSC = (user?.stream?.toLowerCase().contains('ssc') ?? false) ||
+        (user?.level?.toLowerCase().contains('ssc') ?? false);
+    final items = isSSC ? _sscInstitutes : _institutes;
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -499,7 +860,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
           crossAxisCount: 2,
           crossAxisSpacing: 14,
           mainAxisSpacing: 14,
-          childAspectRatio: 0.96,
+          childAspectRatio: 1.18,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
@@ -514,10 +875,11 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
 
   Widget _buildInstitutionCard(Map<String, dynamic> inst, bool isDark) {
     final name = inst['name'] as String;
-    final logo = inst['logo'] as String;
+    final logo = (inst['logo'] as String?) ?? '';
     final colors = inst['colors'] as List<Color>;
     final textColor = inst['textColor'] as Color;
     final isIut = inst['id'] == 'iut';
+    final isBoard = inst['isBoard'] == true;
 
     return GestureDetector(
       onTap: () {
@@ -526,7 +888,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(26),
           gradient: LinearGradient(
             colors: colors,
             begin: Alignment.topLeft,
@@ -541,7 +903,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(26),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -571,51 +933,84 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                 ),
               ),
 
+              // Optional top-right badge for IUT
+              if (isIut)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 4),
+                      ],
+                    ),
+                    child: const Icon(
+                      LucideIcons.check,
+                      size: 13,
+                      color: Color(0xFF0891B2),
+                    ),
+                  ),
+                ),
+
               // Card Layout Content
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // 1. Center Top: White Circular Emblem with Official Logo
+                    // 1. Center: White Circular Emblem with Large Official Logo
                     Container(
-                      width: 54,
-                      height: 54,
+                      width: 66,
+                      height: 66,
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black12,
-                            blurRadius: 6,
+                            blurRadius: 8,
                             offset: Offset(0, 2),
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(7),
                       child: Center(
-                        child: Image.asset(
-                          logo,
-                          width: 38,
-                          height: 38,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                            LucideIcons.graduationCap,
-                            color: Colors.grey,
-                            size: 24,
-                          ),
-                        ),
+                        child: logo.isNotEmpty
+                            ? Image.asset(
+                                logo,
+                                width: 52,
+                                height: 52,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                  isBoard
+                                      ? LucideIcons.landmark
+                                      : LucideIcons.school,
+                                  color: textColor,
+                                  size: 32,
+                                ),
+                              )
+                            : Icon(
+                                isBoard
+                                    ? LucideIcons.landmark
+                                    : LucideIcons.school,
+                                color: textColor,
+                                size: 32,
+                              ),
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     // 2. Middle: Large Bold Bengali Institute Name
                     Text(
                       name,
                       textAlign: TextAlign.center,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
@@ -625,26 +1020,6 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                         height: 1.1,
                       ),
                     ),
-
-                    if (isIut)
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.85),
-                          ),
-                          child: const Icon(
-                            LucideIcons.check,
-                            size: 13,
-                            color: Color(0xFF0891B2),
-                          ),
-                        ),
-                      )
-                    else
-                      const SizedBox(height: 4),
                   ],
                 ),
               ),

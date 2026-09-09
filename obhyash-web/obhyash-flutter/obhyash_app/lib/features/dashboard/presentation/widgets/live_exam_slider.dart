@@ -54,9 +54,25 @@ class _LiveExamSliderState extends ConsumerState<LiveExamSlider> {
     if (exam.isOngoing) {
       final diff = exam.endTime.difference(now);
       if (diff.isNegative) return 'পরীক্ষা সম্পন্ন';
-      final totalMins = diff.inMinutes;
-      final s = diff.inSeconds % 60;
-      return 'সময় বাকি - ${_toBanglaDigits(totalMins)} মি. ${_toBanglaDigits(s)} সে.';
+
+      final days = diff.inDays;
+      final hours = diff.inHours % 24;
+      final mins = diff.inMinutes % 60;
+      final secs = diff.inSeconds % 60;
+
+      if (days > 0) {
+        return hours > 0
+            ? 'সময় বাকি - ${_toBanglaDigits(days)} দিন ${_toBanglaDigits(hours)} ঘণ্টা'
+            : 'সময় বাকি - ${_toBanglaDigits(days)} দিন';
+      } else if (diff.inHours > 0) {
+        if (diff.inHours < 3) {
+          return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা ${_toBanglaDigits(mins)} মি. ${_toBanglaDigits(secs)} সে.';
+        } else {
+          return 'সময় বাকি - ${_toBanglaDigits(diff.inHours)} ঘণ্টা ${_toBanglaDigits(mins)} মি.';
+        }
+      } else {
+        return 'সময় বাকি - ${_toBanglaDigits(mins)} মি. ${_toBanglaDigits(secs)} সে.';
+      }
     } else if (exam.isPast) {
       return 'পরীক্ষা সম্পন্ন';
     } else {
@@ -75,7 +91,10 @@ class _LiveExamSliderState extends ConsumerState<LiveExamSlider> {
         }
       } else {
         final days = diff.inDays;
-        return '${_toBanglaDigits(days)} দিন';
+        final hours = diff.inHours % 24;
+        return hours > 0
+            ? '${_toBanglaDigits(days)} দিন ${_toBanglaDigits(hours)} ঘণ্টা বাকি'
+            : '${_toBanglaDigits(days)} দিন বাকি';
       }
     }
   }

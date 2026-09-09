@@ -90,6 +90,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   }
 
   List<String> _getAllowedExamTypesForProfile(UserProfile? profile) {
+    final stream = profile?.stream?.trim() ?? '';
+    final level = profile?.level?.trim() ?? '';
+    final isSSC = level.toUpperCase().contains('SSC') || stream.toUpperCase().contains('SSC');
+    if (isSSC) {
+      return const ['Board', 'Academic'];
+    }
+
     final rawTarget = [
       profile?.target,
       profile?.examTarget,
@@ -223,11 +230,18 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
       // If over-filtered to empty, fall back to safe list excluding SSC/General Math for HSC
       if (filteredData.isEmpty) {
-        filteredData = rawList.where((e) {
-          final subName = (e['name'] ?? '').toString().toLowerCase();
-          final subId = e['id'].toString().toLowerCase();
-          final subLevel = (e['level'] ?? '').toString().toUpperCase();
-          if (!isSSC) {
+        if (isSSC) {
+          filteredData = rawList.where((e) {
+            final subName = (e['name'] ?? '').toString().toLowerCase();
+            final subId = e['id'].toString().toLowerCase();
+            final subLevel = (e['level'] ?? '').toString().toUpperCase();
+            return subId.startsWith('ssc_') || subLevel == 'SSC' || subName.contains('ssc');
+          }).toList();
+        } else {
+          filteredData = rawList.where((e) {
+            final subName = (e['name'] ?? '').toString().toLowerCase();
+            final subId = e['id'].toString().toLowerCase();
+            final subLevel = (e['level'] ?? '').toString().toUpperCase();
             if (subId.startsWith('ssc_') ||
                 subLevel == 'SSC' ||
                 subId == 'math' ||
@@ -239,9 +253,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                 subName == 'সাধারণ গণিত') {
               return false;
             }
-          }
-          return true;
-        }).toList();
+            return true;
+          }).toList();
+        }
       }
 
       final seen = <String>{};
@@ -249,9 +263,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       for (final e in filteredData) {
         final rawName = (e['name'] ?? e['name_en'] ?? '').toString();
         final rawNameEn = (e['name_en'] ?? '').toString();
-        final formattedName = BanglaNameHelper.formatSubject(
-          rawNameEn.isNotEmpty ? rawNameEn : rawName,
-          rawName,
+        final formattedName = BanglaNameHelper.cleanSubjectTitle(
+          BanglaNameHelper.formatSubject(
+            rawNameEn.isNotEmpty ? rawNameEn : rawName,
+            rawName,
+          ),
         );
 
         if (formattedName.isEmpty || seen.contains(formattedName)) continue;
@@ -971,7 +987,637 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     ),
   ];
 
+  static const List<_PresetExamBadge> _sscSciencePresetBadges = [
+    _PresetExamBadge(
+      id: 'ssc_board_science',
+      label: 'বোর্ড মডেল (বিজ্ঞান)',
+      fullName: 'এসএসসি বিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 100,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+        PresetSubjectDistribution('জীববিজ্ঞান', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_board_special',
+      label: 'বোর্ড স্পেশাল',
+      fullName: 'এসএসসি বোর্ড স্পেশাল মডেল (৪র্থ বিষয় সহ)',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 105,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+      ],
+      optionalChoices: ['উচ্চতর গণিত', 'জীববিজ্ঞান'],
+      optionalQuestionsCount: 25,
+    ),
+    _PresetExamBadge(
+      id: 'ssc_top_school',
+      label: 'শীর্ষ স্কুল মডেল',
+      fullName: 'ক্যাডেট ও শীর্ষ স্কুল টেস্ট পরীক্ষা স্পেশাল',
+      category: 'school',
+      defaultExamType: 'Academic',
+      durationMinutes: 80,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_math_full',
+      label: 'সাধারণ গণিত',
+      fullName: 'সাধারণ গণিত পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_higher_math_full',
+      label: 'উচ্চতর গণিত',
+      fullName: 'উচ্চতর গণিত পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_physics_full',
+      label: 'পদার্থবিজ্ঞান',
+      fullName: 'পদার্থবিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_chemistry_full',
+      label: 'রসায়ন',
+      fullName: 'রসায়ন পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('রসায়ন', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_biology_full',
+      label: 'জীববিজ্ঞান',
+      fullName: 'জীববিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('জীববিজ্ঞান', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_ict_full',
+      label: 'আইসিটি',
+      fullName: 'তথ্য ও যোগাযোগ প্রযুক্তি মডেল টেস্ট',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('তথ্য ও যোগাযোগ প্রযুক্তি', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bangla_english',
+      label: 'বাংলা ও ইংরেজি',
+      fullName: 'বাংলা ও ইংরেজি সমন্বিত মডেল টেস্ট',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 50,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলা ১ম পত্র', 15),
+        PresetSubjectDistribution('বাংলা ২য় পত্র', 15),
+        PresetSubjectDistribution('English', 20),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bgs_full',
+      label: 'বাংলাদেশ ও বিশ্বপরিচয়',
+      fullName: 'বাংলাদেশ ও বিশ্বপরিচয় পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলাদেশ ও বিশ্বপরিচয়', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_religion_full',
+      label: 'ধর্ম ও নৈতিক শিক্ষা',
+      fullName: 'ধর্ম ও নৈতিক শিক্ষা পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ধর্ম ও নৈতিক শিক্ষা', 30),
+      ],
+    ),
+  ];
+
+  static const List<_PresetExamBadge> _sscBusinessPresetBadges = [
+    _PresetExamBadge(
+      id: 'ssc_board_business',
+      label: 'বোর্ড মডেল (বাণিজ্য)',
+      fullName: 'এসএসসি ব্যবসায় শিক্ষা পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('হিসাববিজ্ঞান', 30),
+        PresetSubjectDistribution('ব্যবসায় উদ্যোগ', 30),
+        PresetSubjectDistribution('ফিন্যান্স ও ব্যাংকিং', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_board_special_business',
+      label: 'বোর্ড স্পেশাল',
+      fullName: 'এসএসসি বাণিজ্য স্পেশাল মডেল (৪র্থ বিষয় সহ)',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 120,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('হিসাববিজ্ঞান', 30),
+        PresetSubjectDistribution('ব্যবসায় উদ্যোগ', 30),
+        PresetSubjectDistribution('ফিন্যান্স ও ব্যাংকিং', 30),
+      ],
+      optionalChoices: ['সাধারণ বিজ্ঞান', 'সাধারণ গণিত'],
+      optionalQuestionsCount: 30,
+    ),
+    _PresetExamBadge(
+      id: 'ssc_top_school_business',
+      label: 'শীর্ষ স্কুল মডেল',
+      fullName: 'ক্যাডেট ও শীর্ষ স্কুল টেস্ট পরীক্ষা (বাণিজ্য)',
+      category: 'school',
+      defaultExamType: 'Academic',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('হিসাববিজ্ঞান', 30),
+        PresetSubjectDistribution('ব্যবসায় উদ্যোগ', 30),
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_accounting_full',
+      label: 'হিসাববিজ্ঞান',
+      fullName: 'হিসাববিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('হিসাববিজ্ঞান', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_business_ent_full',
+      label: 'ব্যবসায় উদ্যোগ',
+      fullName: 'ব্যবসায় উদ্যোগ পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ব্যবসায় উদ্যোগ', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_finance_full',
+      label: 'ফিন্যান্স ও ব্যাংকিং',
+      fullName: 'ফিন্যান্স ও ব্যাংকিং পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ফিন্যান্স ও ব্যাংকিং', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_general_science_full',
+      label: 'সাধারণ বিজ্ঞান',
+      fullName: 'সাধারণ বিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ বিজ্ঞান', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_math_full',
+      label: 'সাধারণ গণিত',
+      fullName: 'সাধারণ গণিত পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_ict_full',
+      label: 'আইসিটি',
+      fullName: 'তথ্য ও যোগাযোগ প্রযুক্তি মডেল টেস্ট',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('তথ্য ও যোগাযোগ প্রযুক্তি', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bangla_english',
+      label: 'বাংলা ও ইংরেজি',
+      fullName: 'বাংলা ও ইংরেজি সমন্বিত মডেল টেস্ট',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 50,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলা ১ম পত্র', 15),
+        PresetSubjectDistribution('বাংলা ২য় পত্র', 15),
+        PresetSubjectDistribution('English', 20),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bgs_full',
+      label: 'বাংলাদেশ ও বিশ্বপরিচয়',
+      fullName: 'বাংলাদেশ ও বিশ্বপরিচয় পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলাদেশ ও বিশ্বপরিচয়', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_religion_full',
+      label: 'ধর্ম ও নৈতিক শিক্ষা',
+      fullName: 'ধর্ম ও নৈতিক শিক্ষা পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ধর্ম ও নৈতিক শিক্ষা', 30),
+      ],
+    ),
+  ];
+
+  static const List<_PresetExamBadge> _sscHumanitiesPresetBadges = [
+    _PresetExamBadge(
+      id: 'ssc_board_humanities',
+      label: 'বোর্ড মডেল (মানবিক)',
+      fullName: 'এসএসসি মানবিক বিভাগ পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ইতিহাস ও বিশ্ব সভ্যতা', 30),
+        PresetSubjectDistribution('ভূগোল ও পরিবেশ', 30),
+        PresetSubjectDistribution('পৌরনীতি ও নাগরিকতা', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_board_special_humanities',
+      label: 'বোর্ড স্পেশাল',
+      fullName: 'এসএসসি মানবিক স্পেশাল মডেল (৪র্থ বিষয় সহ)',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 120,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ইতিহাস ও বিশ্ব সভ্যতা', 30),
+        PresetSubjectDistribution('ভূগোল ও পরিবেশ', 30),
+        PresetSubjectDistribution('পৌরনীতি ও নাগরিকতা', 30),
+      ],
+      optionalChoices: ['অর্থনীতি', 'সাধারণ বিজ্ঞান', 'সাধারণ গণিত'],
+      optionalQuestionsCount: 30,
+    ),
+    _PresetExamBadge(
+      id: 'ssc_top_school_humanities',
+      label: 'শীর্ষ স্কুল মডেল',
+      fullName: 'শীর্ষ স্কুল টেস্ট পরীক্ষা স্পেশাল (মানবিক)',
+      category: 'school',
+      defaultExamType: 'Academic',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ইতিহাস ও বিশ্ব সভ্যতা', 30),
+        PresetSubjectDistribution('ভূগোল ও পরিবেশ', 30),
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_history_full',
+      label: 'ইতিহাস ও বিশ্ব সভ্যতা',
+      fullName: 'বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ইতিহাস ও বিশ্ব সভ্যতা', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_geography_full',
+      label: 'ভূগোল ও পরিবেশ',
+      fullName: 'ভূগোল ও পরিবেশ পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ভূগোল ও পরিবেশ', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_civics_full',
+      label: 'পৌরনীতি ও নাগরিকতা',
+      fullName: 'পৌরনীতি ও নাগরিকতা পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পৌরনীতি ও নাগরিকতা', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_economics_full',
+      label: 'অর্থনীতি',
+      fullName: 'অর্থনীতি পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('অর্থনীতি', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_general_science_full',
+      label: 'সাধারণ বিজ্ঞান',
+      fullName: 'সাধারণ বিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ বিজ্ঞান', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_math_full',
+      label: 'সাধারণ গণিত',
+      fullName: 'সাধারণ গণিত পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_ict_full',
+      label: 'আইসিটি',
+      fullName: 'তথ্য ও যোগাযোগ প্রযুক্তি মডেল টেস্ট',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('তথ্য ও যোগাযোগ প্রযুক্তি', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bangla_english',
+      label: 'বাংলা ও ইংরেজি',
+      fullName: 'বাংলা ও ইংরেজি সমন্বিত মডেল টেস্ট',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 50,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলা ১ম পত্র', 15),
+        PresetSubjectDistribution('বাংলা ২য় পত্র', 15),
+        PresetSubjectDistribution('English', 20),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bgs_full',
+      label: 'বাংলাদেশ ও বিশ্বপরিচয়',
+      fullName: 'বাংলাদেশ ও বিশ্বপরিচয় পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলাদেশ ও বিশ্বপরিচয়', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_religion_full',
+      label: 'ধর্ম ও নৈতিক শিক্ষা',
+      fullName: 'ধর্ম ও নৈতিক শিক্ষা পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ধর্ম ও নৈতিক শিক্ষা', 30),
+      ],
+    ),
+  ];
+
+  static const List<_PresetExamBadge> _sscGeneralPresetBadges = [
+    _PresetExamBadge(
+      id: 'ssc_board_science',
+      label: 'বোর্ড মডেল (বিজ্ঞান)',
+      fullName: 'এসএসসি বিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 100,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('পদার্থবিজ্ঞান', 25),
+        PresetSubjectDistribution('রসায়ন', 25),
+        PresetSubjectDistribution('উচ্চতর গণিত', 25),
+        PresetSubjectDistribution('জীববিজ্ঞান', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_board_business',
+      label: 'বোর্ড মডেল (বাণিজ্য)',
+      fullName: 'এসএসসি ব্যবসায় শিক্ষা পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('হিসাববিজ্ঞান', 30),
+        PresetSubjectDistribution('ব্যবসায় উদ্যোগ', 30),
+        PresetSubjectDistribution('ফিন্যান্স ও ব্যাংকিং', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_board_humanities',
+      label: 'বোর্ড মডেল (মানবিক)',
+      fullName: 'এসএসসি মানবিক বিভাগ পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 90,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ইতিহাস ও বিশ্ব সভ্যতা', 30),
+        PresetSubjectDistribution('ভূগোল ও পরিবেশ', 30),
+        PresetSubjectDistribution('পৌরনীতি ও নাগরিকতা', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_math_full',
+      label: 'সাধারণ গণিত',
+      fullName: 'সাধারণ গণিত পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ গণিত', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_general_science_full',
+      label: 'সাধারণ বিজ্ঞান',
+      fullName: 'সাধারণ বিজ্ঞান পূর্ণাঙ্গ বোর্ড মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('সাধারণ বিজ্ঞান', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_ict_full',
+      label: 'আইসিটি',
+      fullName: 'তথ্য ও যোগাযোগ প্রযুক্তি মডেল টেস্ট',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 25,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('তথ্য ও যোগাযোগ প্রযুক্তি', 25),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bangla_english',
+      label: 'বাংলা ও ইংরেজি',
+      fullName: 'বাংলা ও ইংরেজি সমন্বিত মডেল টেস্ট',
+      category: 'board',
+      defaultExamType: 'Board',
+      durationMinutes: 50,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলা ১ম পত্র', 15),
+        PresetSubjectDistribution('বাংলা ২য় পত্র', 15),
+        PresetSubjectDistribution('English', 20),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_bgs_full',
+      label: 'বাংলাদেশ ও বিশ্বপরিচয়',
+      fullName: 'বাংলাদেশ ও বিশ্বপরিচয় পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('বাংলাদেশ ও বিশ্বপরিচয়', 30),
+      ],
+    ),
+    _PresetExamBadge(
+      id: 'ssc_religion_full',
+      label: 'ধর্ম ও নৈতিক শিক্ষা',
+      fullName: 'ধর্ম ও নৈতিক শিক্ষা পূর্ণাঙ্গ মডেল',
+      category: 'subject',
+      defaultExamType: 'Board',
+      durationMinutes: 30,
+      negativeMarking: 0.0,
+      compulsorySubjects: [
+        PresetSubjectDistribution('ধর্ম ও নৈতিক শিক্ষা', 30),
+      ],
+    ),
+  ];
+
   List<_PresetExamBadge> _getFilteredPresetBadges(UserProfile? profile) {
+    final stream = profile?.stream?.trim() ?? '';
+    final level = profile?.level?.trim() ?? '';
+    final isSSC = level.toUpperCase().contains('SSC') || stream.toUpperCase().contains('SSC');
+    if (isSSC) {
+      final div = (profile?.division ?? '').toLowerCase().trim();
+      final isBiz = div.contains('business') ||
+          div.contains('commerce') ||
+          div.contains('বাণিজ্য') ||
+          div.contains('ব্যবসায়');
+      final isHum = div.contains('humanities') ||
+          div.contains('arts') ||
+          div.contains('মানবিক');
+      final isSci = div.contains('science') ||
+          div.contains('বিজ্ঞান');
+
+      if (isBiz) {
+        return List.of(_sscBusinessPresetBadges);
+      } else if (isHum) {
+        return List.of(_sscHumanitiesPresetBadges);
+      } else if (isSci) {
+        return List.of(_sscSciencePresetBadges);
+      } else {
+        return List.of(_sscGeneralPresetBadges);
+      }
+    }
+
     final rawTarget = [
       profile?.target,
       profile?.examTarget,
@@ -3396,6 +4042,41 @@ class _PresetBadgePill extends StatelessWidget {
     required this.onTap,
   });
 
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'board':
+        return LucideIcons.award;
+      case 'school':
+        return LucideIcons.school;
+      case 'subject':
+        return LucideIcons.bookOpen;
+      case 'medical':
+        return LucideIcons.activity;
+      case 'engineering':
+        return LucideIcons.zap;
+      case 'varsity':
+      default:
+        return LucideIcons.compass;
+    }
+  }
+
+  Color _getCategoryColor(String category, bool isDark) {
+    switch (category) {
+      case 'board':
+        return isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+      case 'school':
+        return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
+      case 'subject':
+        return isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED);
+      case 'medical':
+        return isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
+      case 'engineering':
+        return isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
+      default:
+        return isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -3405,7 +4086,7 @@ class _PresetBadgePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         splashColor: (isDark ? Colors.white12 : Colors.black12),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF18181B) : Colors.white,
             borderRadius: BorderRadius.circular(28),
@@ -3424,15 +4105,26 @@ class _PresetBadgePill extends StatelessWidget {
                     ),
                   ],
           ),
-          child: Text(
-            badge.label,
-            style: TextStyle(
-              fontSize: 13.5,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
-              letterSpacing: -0.2,
-              color: isDark ? Colors.white : const Color(0xFF111827),
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _getCategoryIcon(badge.category),
+                size: 14,
+                color: _getCategoryColor(badge.category, isDark),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                badge.label,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'HindSiliguri',
+                  letterSpacing: -0.2,
+                  color: isDark ? Colors.white : const Color(0xFF111827),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -3661,34 +4353,110 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
           ),
           const SizedBox(height: 12),
 
-          // Card 2: Duration (সময়)
+          // Card 2: Key Exam Stats (মোট প্রশ্ন, সময়, নেগেটিভ মার্কিং)
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: cardBg,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: cardBorder),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  'সময়',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
-                    color: textDark,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'মোট প্রশ্ন',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'HindSiliguri',
+                          color: textSub,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${BanglaNameHelper.toBanglaNumeral(widget.badge.totalQuestions)}টি',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          color: textDark,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  '${BanglaNameHelper.toBanglaNumeral(widget.badge.durationMinutes)} মিনিট',
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: 'HindSiliguri',
-                    color: textDark,
+                Container(
+                  width: 1,
+                  height: 30,
+                  color: cardBorder,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'সময়',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'HindSiliguri',
+                            color: textSub,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '${BanglaNameHelper.toBanglaNumeral(widget.badge.durationMinutes)} মিনিট',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                            color: textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 30,
+                  color: cardBorder,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'নেগেটিভ মার্ক',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'HindSiliguri',
+                            color: textSub,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          widget.badge.negativeMarking > 0
+                              ? BanglaNameHelper.toBanglaNumeral(widget.badge.negativeMarking)
+                              : 'নেই',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                            color: textDark,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

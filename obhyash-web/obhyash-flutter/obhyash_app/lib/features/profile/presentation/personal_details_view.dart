@@ -75,12 +75,28 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
     _gender = user.gender ?? '';
     _stream = user.stream ?? 'HSC';
+    if (_stream != 'HSC' && _stream != 'SSC') {
+      _stream = 'HSC';
+    }
     _group = user.division ?? 'Science';
-    _batch = user.batch ?? 'HSC 2025';
+    if (_stream == 'HSC' && _group != 'Science') {
+      _group = 'Science';
+    }
+
+    final validBatches = _stream == 'SSC'
+        ? const ['SSC 2026', 'SSC 2027', 'SSC 2028']
+        : const ['HSC 2025', 'HSC 2026', 'HSC 2027', 'HSC 2028'];
+
+    _batch = user.batch ?? validBatches.first;
+    if (!validBatches.contains(_batch)) {
+      _batch = validBatches.contains('$_stream 2026') ? '$_stream 2026' : validBatches.first;
+    }
+
     _target = user.target ?? '';
     _sscBoard = user.sscBoard ?? 'Dhaka';
-    _sscYear = user.sscYear ?? '2023';
-    _optionalSubject = user.optionalSubject ?? '';
+    _optionalSubject = (user.optionalSubject != null && user.optionalSubject!.trim().isNotEmpty)
+        ? user.optionalSubject!
+        : 'Biology';
   }
 
   @override
@@ -750,86 +766,105 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                             const SizedBox(height: 16),
                             _buildDropdown(
-                              label:
-                                  'কী নিয়ে চর্চা করতে চাও?',
+                              label: 'কী নিয়ে অভ্যাস করতে চাও?',
                               value: _stream,
-                              items: const ['HSC', 'SSC', 'Admission'],
-                              onChanged: (val) =>
-                                  setState(() => _stream = val ?? 'HSC'),
+                              items: const ['HSC', 'SSC'],
+                              onChanged: (val) {
+                                if (val != null) {
+                                  setState(() {
+                                    _stream = val;
+                                    if (val == 'HSC') {
+                                      _group = 'Science';
+                                      if (!_batch.startsWith('HSC ')) {
+                                        _batch = 'HSC 2026';
+                                      }
+                                    } else if (val == 'SSC') {
+                                      if (!_batch.startsWith('SSC ')) {
+                                        _batch = 'SSC 2026';
+                                      }
+                                    }
+                                  });
+                                }
+                              },
                               isDark: isDark,
                             ),
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDropdown(
-                                    label: 'বিভাগ',
-                                    value: _group,
-                                    customOptions: const [
-                                      AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-                                      AppDropdownOption(
-                                        value: 'Business Studies',
-                                        label: 'Business Studies (ব্যবসায় শিক্ষা)',
-                                        isEnabled: false,
-                                        disabledBadge: 'শীঘ্রই আসছে',
-                                      ),
-                                      AppDropdownOption(
-                                        value: 'Humanities',
-                                        label: 'Humanities (মানবিক)',
-                                        isEnabled: false,
-                                        disabledBadge: 'শীঘ্রই আসছে',
-                                      ),
-                                    ],
-                                    onChanged: (val) => setState(
-                                      () => _group = val ?? 'Science',
-                                    ),
-                                    isDark: isDark,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: widget.user.isBatchLocked
-                                      ? _buildTextField(
-                                          label: 'ব্যাচ',
-                                          controller: TextEditingController(text: _batch),
-                                          isDark: isDark,
-                                          readOnly: true,
-                                          tooltip: 'তুমি ইতিমধ্যে ১ বার ব্যাচ পরিবর্তন করেছো। তাই এটি আর পরিবর্তন করা যাবে না।',
-                                        )
-                                      : _buildDropdown(
-                                          label: 'ব্যাচ',
-                                          value: _batch,
-                                          tooltip: 'ব্যাচ সর্বোচ্চ ১ বার পরিবর্তন করার সুযোগ পাবে।',
-                                          items: const [
-                                            'HSC 2024',
-                                            'HSC 2025',
-                                            'HSC 2026',
-                                            'HSC 2027',
-                                            'SSC 2025',
-                                            'SSC 2026',
-                                            'SSC 2027',
-                                          ],
-                                          onChanged: (val) => setState(
-                                            () => _batch = val ?? 'HSC 2025',
-                                          ),
-                                          isDark: isDark,
+                            Builder(
+                              builder: (context) {
+                                final groupOptions = _stream == 'SSC'
+                                    ? const [
+                                        AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                                        AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
+                                        AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
+                                      ]
+                                    : const [
+                                        AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+                                        AppDropdownOption(
+                                          value: 'Business Studies',
+                                          label: 'Business Studies (ব্যবসায় শিক্ষা)',
+                                          isEnabled: false,
+                                          disabledBadge: 'শীঘ্রই আসছে',
                                         ),
-                                ),
-                              ],
+                                        AppDropdownOption(
+                                          value: 'Humanities',
+                                          label: 'Humanities (মানবিক)',
+                                          isEnabled: false,
+                                          disabledBadge: 'শীঘ্রই আসছে',
+                                        ),
+                                      ];
+
+                                final batchOptions = _stream == 'SSC'
+                                    ? const ['SSC 2026', 'SSC 2027', 'SSC 2028']
+                                    : const ['HSC 2025', 'HSC 2026', 'HSC 2027', 'HSC 2028'];
+
+                                final currentBatch = batchOptions.contains(_batch)
+                                    ? _batch
+                                    : (batchOptions.contains('$_stream 2026') ? '$_stream 2026' : batchOptions.first);
+
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildDropdown(
+                                        label: 'বিভাগ',
+                                        value: _group,
+                                        customOptions: groupOptions,
+                                        onChanged: (val) => setState(
+                                          () => _group = val ?? 'Science',
+                                        ),
+                                        isDark: isDark,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _buildDropdown(
+                                        label: 'ব্যাচ',
+                                        value: currentBatch,
+                                        items: batchOptions,
+                                        onChanged: (val) => setState(
+                                          () => _batch = val ?? currentBatch,
+                                        ),
+                                        isDark: isDark,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
-                            const SizedBox(height: 16),
-                            _buildDropdown(
-                              label: 'টার্গেট',
-                              value: _target.isEmpty ? 'Medical' : _target,
-                              items: const [
-                                'Medical',
-                                'Engineering',
-                                'University',
-                              ],
-                              onChanged: (val) =>
-                                  setState(() => _target = val ?? 'Medical'),
-                              isDark: isDark,
-                            ),
+                            if (_stream == 'HSC') ...[
+                              const SizedBox(height: 16),
+                              _buildDropdown(
+                                label: 'টার্গেট',
+                                value: _target.isEmpty ? 'Medical' : _target,
+                                items: const [
+                                  'Medical',
+                                  'Engineering',
+                                  'University',
+                                ],
+                                onChanged: (val) =>
+                                    setState(() => _target = val ?? 'Medical'),
+                                isDark: isDark,
+                              ),
+                            ],
                             const SizedBox(height: 20),
 
                             // SSC Information Header

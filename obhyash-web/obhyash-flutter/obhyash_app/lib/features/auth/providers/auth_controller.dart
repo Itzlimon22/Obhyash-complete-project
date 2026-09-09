@@ -7,6 +7,7 @@ import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
 import '../../../core/services/device_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   () => AuthController(),
@@ -254,6 +255,7 @@ class AuthController extends AsyncNotifier<void> {
             'stream': stream,
             'division': group,
             'batch': batch,
+            'optional_subject': 'Biology',
             'role': 'Student',
             'status': 'Active',
             'xp': 0,
@@ -358,6 +360,7 @@ class AuthController extends AsyncNotifier<void> {
       await Future.wait([
         SecureStorageService.clearSession().catchError((_) {}),
         SecureStorageService.clearUserMeta().catchError((_) {}),
+        LocalExamCacheService.clearAll().catchError((_) {}),
       ]);
 
       // 4. In the background (non-blocking), clean up session monitor & revoke server token

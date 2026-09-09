@@ -4,6 +4,7 @@ class LeaderboardUser {
   final int xp;
   final String? avatarUrl;
   final String? avatarColor;
+  final String? gender;
 
   LeaderboardUser({
     required this.id,
@@ -11,6 +12,7 @@ class LeaderboardUser {
     required this.xp,
     this.avatarUrl,
     this.avatarColor,
+    this.gender,
   });
 
   factory LeaderboardUser.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class LeaderboardUser {
       xp: json['xp'] as int? ?? 0,
       avatarUrl: json['avatar_url'] as String?,
       avatarColor: json['avatar_color'] as String?,
+      gender: json['gender'] as String?,
     );
   }
 
@@ -29,6 +32,7 @@ class LeaderboardUser {
     'xp': xp,
     'avatar_url': avatarUrl,
     'avatar_color': avatarColor,
+    'gender': gender,
   };
 }
 
@@ -218,8 +222,7 @@ class UserProfile {
     this.status = 'Active',
   });
 
-  bool get isBatchLocked =>
-      (batch != null && batch!.trim().isNotEmpty) && batchChangeCount >= 1;
+  bool get isBatchLocked => false; // For now user is not restricted to change batch
 
   bool get isSscLocked => false; // SSC exam details can now be edited anytime
 
@@ -231,7 +234,7 @@ class UserProfile {
       isEmailVerified &&
       !requiresEmailVerification;
 
-  int get batchChangesRemaining => isBatchLocked ? 0 : 1;
+  int get batchChangesRemaining => 999;
 
   bool get isBlocked {
     final s = status.trim().toLowerCase();

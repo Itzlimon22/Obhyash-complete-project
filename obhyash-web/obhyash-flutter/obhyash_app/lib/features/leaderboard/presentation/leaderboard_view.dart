@@ -110,6 +110,7 @@ class _LBUser {
   final String id, name, institute, level;
   final String? batch;
   final String? avatarUrl;
+  final String? gender;
   final int xp, monthlyXp, examsTaken;
   final bool isCurrentUser;
   final bool isPro;
@@ -121,6 +122,7 @@ class _LBUser {
     required this.level,
     this.batch,
     this.avatarUrl,
+    this.gender,
     required this.xp,
     this.monthlyXp = 0,
     required this.examsTaken,
@@ -147,6 +149,7 @@ class _LBUser {
       level: calculatedLevel,
       batch: j['batch']?.toString(),
       avatarUrl: j['avatar_url'] as String?,
+      gender: j['gender'] as String?,
       xp: effectiveXp,
       monthlyXp: mXp,
       examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
@@ -155,6 +158,8 @@ class _LBUser {
     );
   }
 }
+
+
 
 // ─── Institute Rank Model ────────────────────────────────────────────────────
 class _InstituteRank {
@@ -302,7 +307,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       // 1. Query users who belong to this Tier (Level) in active timeframe (Students Only)
       PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
           .from('users')
-          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, role')
+          .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, role, gender')
           .or('role.ilike.student,role.is.null')
           .gte(sortColumn, minXp);
 
@@ -403,35 +408,34 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     try {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
-      final isMonthly = _timeframe == 'monthly';
 
-      PostgrestFilterBuilder<List<Map<String, dynamic>>> query = supabase
+      final data = await supabase
           .from('users')
-          .select('id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, role')
+          .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, role, gender')
           .or('role.ilike.student,role.is.null')
-          .eq('institute', institute);
-
-      final PostgrestTransformBuilder<List<Map<String, dynamic>>> orderedQuery;
-      if (isMonthly) {
-        orderedQuery = query
-            .order('monthly_xp', ascending: false, nullsFirst: false)
-            .order('xp', ascending: false, nullsFirst: false);
-      } else {
-        orderedQuery = query
-            .order('xp', ascending: false, nullsFirst: false);
-      }
-
-      final data = await orderedQuery.limit(100);
+          .eq('institute', institute)
+          .order('monthly_xp', ascending: false, nullsFirst: false)
+          .order('xp', ascending: false, nullsFirst: false)
+          .limit(100);
 
       if (mounted) {
+        final list = (data as List)
+            .where((u) {
+              final role = (u['role'] ?? 'student').toString().toLowerCase();
+              return role == 'student';
+            })
+            .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: 'monthly'))
+            .toList();
+
+        // Sort by effective monthly XP descending, then lifetime XP
+        list.sort((a, b) {
+          final cmp = b.monthlyXp.compareTo(a.monthlyXp);
+          if (cmp != 0) return cmp;
+          return b.xp.compareTo(a.xp);
+        });
+
         setState(() {
-          _collegeUsers = (data as List)
-              .where((u) {
-                final role = (u['role'] ?? 'student').toString().toLowerCase();
-                return role == 'student';
-              })
-              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me, timeframe: _timeframe))
-              .toList();
+          _collegeUsers = list;
           _isLoadingCollege = false;
         });
       }
@@ -455,7 +459,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           : null;
 
       final isMonthly = _timeframe == 'monthly';
-      final xpColumn = isMonthly ? 'monthly_xp' : 'xp';
+      final sortColumn = isMonthly ? 'monthly_xp' : 'xp';
 
       final data = await supabase
           .from('users')
@@ -463,10 +467,10 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           .or('role.ilike.student,role.is.null')
           .not('institute', 'is', null)
           .neq('institute', '')
-          .order(xpColumn, ascending: false)
+          .order(sortColumn, ascending: false)
           .limit(5000);
 
-      // Group student national ranks by normalized institute
+      // Group student national monthly ranks by normalized institute
       final institutePoints = <String, int>{};
       final instituteCounts = <String, int>{};
       final instituteBestRank = <String, int>{};
@@ -636,77 +640,85 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     final myInstTabLabel = 'আমার $instLabel';
     final allInstTabLabel = 'সব $instLabel';
 
-    return Column(
-      children: [
-        // ── View Mode Tab Switcher ──────────────────────────────────────────
-        Container(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
-          padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF141416) : const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+    return AppRefreshIndicator(
+      onRefresh: () async {
+        if (_viewMode == 'level') {
+          await _fetchCounts();
+          await _fetch();
+        } else if (_viewMode == 'college') {
+          final inst = myProfile?.institute;
+          if (inst != null && inst.isNotEmpty) {
+            await _fetchCollege(inst);
+          }
+        } else if (_viewMode == 'rankings') {
+          await _fetchInstituteRankings(forceRefresh: true);
+        }
+      },
+      child: Column(
+        children: [
+          // ── View Mode Tab Switcher ──────────────────────────────────────────
+          Container(
+            color: isDark ? const Color(0xFF000000) : Colors.white,
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF141416) : const Color(0xFFF3F4F6),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+                ),
+              ),
+              child: Row(
+                children: [
+                  _ViewModeTab(
+                    label: 'র‍্যাংকিং',
+                    isActive: _viewMode == 'level',
+                    isDark: isDark,
+                    onTap: () => setState(() => _viewMode = 'level'),
+                  ),
+                  const SizedBox(width: 4),
+                  _ViewModeTab(
+                    label: myInstTabLabel,
+                    isActive: _viewMode == 'college',
+                    isDark: isDark,
+                    onTap: () {
+                      setState(() => _viewMode = 'college');
+                      final inst = myProfile?.institute;
+                      if (inst != null && inst.isNotEmpty) {
+                        _fetchCollege(inst);
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 4),
+                  _ViewModeTab(
+                    label: allInstTabLabel,
+                    isActive: _viewMode == 'rankings',
+                    isDark: isDark,
+                    onTap: () {
+                      setState(() => _viewMode = 'rankings');
+                      _fetchInstituteRankings(forceRefresh: true);
+                    },
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                _ViewModeTab(
-                  label: 'র‍্যাংকিং',
-                  isActive: _viewMode == 'level',
-                  isDark: isDark,
-                  onTap: () => setState(() => _viewMode = 'level'),
-                ),
-                const SizedBox(width: 4),
-                _ViewModeTab(
-                  label: myInstTabLabel,
-                  isActive: _viewMode == 'college',
-                  isDark: isDark,
-                  onTap: () {
-                    setState(() => _viewMode = 'college');
-                    final inst = myProfile?.institute;
-                    if (inst != null && inst.isNotEmpty) {
-                      _fetchCollege(inst);
-                    }
-                  },
-                ),
-                const SizedBox(width: 4),
-                _ViewModeTab(
-                  label: allInstTabLabel,
-                  isActive: _viewMode == 'rankings',
-                  isDark: isDark,
-                  onTap: () {
-                    setState(() => _viewMode = 'rankings');
-                    _fetchInstituteRankings(forceRefresh: true);
-                  },
-                ),
-              ],
-            ),
           ),
-        ),
 
-        // ── Body ────────────────────────────────────────────────────────────
-        Expanded(
-          child: _viewMode == 'rankings'
-              ? _InstituteRankingsBody(
-                  rankings: _instituteRankings,
-                  isLoading: _isLoadingRankings,
-                  isDark: isDark,
-                  onRefresh: () => _fetchInstituteRankings(forceRefresh: true),
-                )
-              : _viewMode == 'level'
-              ? (_isLoading && _users.isEmpty
-                    ? const LeaderboardSkeleton()
-                    : Column(
-                        children: [
-                          Expanded(
-                            child: AppRefreshIndicator(
-                              onRefresh: () async {
-                                await _fetchCounts();
-                                await _fetch();
-                              },
+          // ── Body ────────────────────────────────────────────────────────────
+          Expanded(
+            child: _viewMode == 'rankings'
+                ? _InstituteRankingsBody(
+                    rankings: _instituteRankings,
+                    isLoading: _isLoadingRankings,
+                    isDark: isDark,
+                  )
+                : _viewMode == 'level'
+                ? (_isLoading && _users.isEmpty
+                      ? const LeaderboardSkeleton()
+                      : Column(
+                          children: [
+                            Expanded(
                               child: ListView(
                                 physics: const AlwaysScrollableScrollPhysics(
                                   parent: BouncingScrollPhysics(),
@@ -817,7 +829,6 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                                 ],
                               ),
                             ),
-                          ),
                           if (myProfile != null)
                             _StickyUserRankCard(
                               user: myProfile,
@@ -842,7 +853,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                 ),
         ),
       ],
-    );
+    ),
+  );
   }
 }
 
@@ -1083,29 +1095,39 @@ class _CollegeLeaderboardBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (institute.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('🏫', style: TextStyle(fontSize: 42)),
-              const SizedBox(height: 12),
-              Text(
-                'তোমার প্রোফাইলে কলেজের নাম যোগ করো',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: isDark
-                      ? const Color(0xFF737373)
-                      : const Color(0xFF9CA3AF),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🏫', style: TextStyle(fontSize: 42)),
+                    const SizedBox(height: 12),
+                    Text(
+                      'তোমার প্রোফাইলে কলেজের নাম যোগ করো',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: isDark
+                            ? const Color(0xFF737373)
+                            : const Color(0xFF9CA3AF),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     }
 
@@ -1114,6 +1136,9 @@ class _CollegeLeaderboardBody extends StatelessWidget {
     }
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(10, 12, 10, 80),
       children: [
         // College name header
@@ -1204,13 +1229,11 @@ class _InstituteRankingsBody extends StatelessWidget {
   final List<_InstituteRank> rankings;
   final bool isLoading;
   final bool isDark;
-  final Future<void> Function()? onRefresh;
 
   const _InstituteRankingsBody({
     required this.rankings,
     required this.isLoading,
     required this.isDark,
-    this.onRefresh,
   });
 
   @override
@@ -1270,23 +1293,17 @@ class _InstituteRankingsBody extends StatelessWidget {
         ),
       );
 
-      if (onRefresh != null) {
-        return AppRefreshIndicator(
-          onRefresh: onRefresh!,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: emptyContent,
-              ),
-            ],
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: emptyContent,
           ),
-        );
-      }
-      return emptyContent;
+        ],
+      );
     }
 
     final myCollegeIdx = rankings.indexWhere((e) => e.isMyCollege);
@@ -1461,12 +1478,6 @@ class _InstituteRankingsBody extends StatelessWidget {
       ],
     );
 
-    if (onRefresh != null) {
-      return AppRefreshIndicator(
-        onRefresh: onRefresh!,
-        child: list,
-      );
-    }
     return list;
   }
 }
@@ -1782,6 +1793,7 @@ class _StickyUserRankCard extends StatelessWidget {
                   id: user.id,
                   name: user.name,
                   avatarUrl: user.avatarUrl,
+                  gender: user.gender,
                   size: 32,
                   isPro: user.isPro,
                   showBorder: false,
@@ -2078,6 +2090,7 @@ class _LeaderboardTable extends StatelessWidget {
                               id: u.id,
                               name: u.name,
                               avatarUrl: u.avatarUrl,
+                              gender: u.gender,
                               size: 40,
                               isPro: u.isPro,
                               showBorder: isMe,
@@ -2466,6 +2479,7 @@ class _PodiumSection extends StatelessWidget {
                                 id: slot.user.id,
                                 name: slot.user.name,
                                 avatarUrl: slot.user.avatarUrl,
+                                gender: slot.user.gender,
                                 size: slot.avatarSize,
                                 isPro: slot.user.isPro,
                                 showBorder: true,

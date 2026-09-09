@@ -25,11 +25,11 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('users')
-    .select('institute, xp, monthly_xp, role')
+    .select('institute, xp, monthly_xp, monthly_xp_reset_at, role')
     .or('role.ilike.student,role.is.null')
     .not('institute', 'is', null)
     .neq('institute', '')
-    .order(xpCol, { ascending: false, nullsFirst: false })
+    .order('monthly_xp', { ascending: false, nullsFirst: false })
     .limit(5000);
 
   if (error || !data) {
@@ -39,14 +39,29 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Consider students with active XP
+  const activeStudents: { institute: string; xp: number }[] = [];
+  data.forEach((row) => {
+    const rawInst = row.institute;
+    if (!rawInst || !rawInst.trim()) return;
+
+    const userXp = timeframe === 'all_time' ? (row.xp || 0) : (row.monthly_xp || 0);
+    if (userXp > 0) {
+      activeStudents.push({
+        institute: getCanonicalCollegeName(rawInst),
+        xp: userXp,
+      });
+    }
+  });
+
+  activeStudents.sort((a, b) => b.xp - a.xp);
+
   const institutePoints: Record<string, number> = {};
   const instituteCounts: Record<string, number> = {};
   const instituteBestRank: Record<string, number> = {};
 
-  data.forEach((row, idx) => {
-    const rawInst = row.institute;
-    if (!rawInst || !rawInst.trim()) return;
-    const inst = getCanonicalCollegeName(rawInst);
+  activeStudents.forEach((student, idx) => {
+    const inst = student.institute;
     const nationalRank = idx + 1;
     const pts = calculateRankPoints(nationalRank);
 

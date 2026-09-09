@@ -219,6 +219,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         'varsity': 'ভার্সিটি লাইভ এক্সাম',
         'varsity_a': 'ভার্সিটি লাইভ এক্সাম',
         'hsc': 'এইচএসসি লাইভ এক্সাম',
+        'ssc_board': 'এসএসসি বোর্ড মডেল টেস্ট',
+        'ssc_school': 'শীর্ষ স্কুল ও ক্যাডেট টেস্ট',
+        'ssc_science': 'এসএসসি বিজ্ঞান লাইভ টেস্ট',
+        'ssc_business': 'এসএসসি বাণিজ্য লাইভ টেস্ট',
+        'ssc_humanities': 'এসএসসি মানবিক লাইভ টেস্ট',
+        'ssc_compulsory': 'এসএসসি আবশ্যিক লাইভ টেস্ট',
+        'ssc': 'এসএসসি লাইভ এক্সাম',
         'all': 'সকল লাইভ পরীক্ষা',
       };
       return liveNames[cat] ?? 'লাইভ পরীক্ষা';
@@ -1208,6 +1215,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           userName: userName,
           userInstitute: userInst,
           avatarUrl: user?.avatarUrl,
+          gender: user?.gender,
+          id: user?.id,
+          isPro: user?.isPro ?? false,
         ),
 
         body: widget.navigationShell,

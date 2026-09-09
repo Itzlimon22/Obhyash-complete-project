@@ -126,5 +126,71 @@ void main() {
         'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)',
       );
     });
+
+    test('Strips SSC and HSC prefixes completely from all subject names', () {
+      expect(BanglaNameHelper.cleanSubjectTitle('SSC বাংলা ১ম পত্র'), 'বাংলা ১ম পত্র');
+      expect(BanglaNameHelper.cleanSubjectTitle('SSC পদার্থবিজ্ঞান'), 'পদার্থবিজ্ঞান');
+      expect(BanglaNameHelper.cleanSubjectTitle('HSC উচ্চতর গণিত ১ম পত্র'), 'উচ্চতর গণিত ১ম পত্র');
+      expect(BanglaNameHelper.cleanSubjectTitle('সাধারণ গণিত (SSC)'), 'সাধারণ গণিত');
+      expect(BanglaNameHelper.cleanSubjectTitle('SSC - রসায়ন'), 'রসায়ন');
+
+      // formatSubject cleans inputs and labels
+      expect(BanglaNameHelper.formatSubject('SSC বাংলা ১ম পত্র'), 'বাংলা ১ম পত্র');
+      expect(BanglaNameHelper.formatSubject('ssc_physics', 'SSC পদার্থবিজ্ঞান'), 'পদার্থবিজ্ঞান');
+      expect(BanglaNameHelper.formatSubject('ssc_chemistry', 'SSC রসায়ন'), 'রসায়ন');
+      expect(BanglaNameHelper.formatSubject('ssc_math', 'SSC সাধারণ গণিত'), 'সাধারণ গণিত');
+      expect(BanglaNameHelper.formatSubject('ssc_higher_math', 'SSC উচ্চতর গণিত'), 'উচ্চতর গণিত');
+      expect(BanglaNameHelper.formatSubject('ssc_bgs', 'SSC বাংলাদেশ ও বিশ্বপরিচয়'), 'বাংলাদেশ ও বিশ্বপরিচয়');
+      expect(BanglaNameHelper.formatSubject('ssc_religion', 'SSC ধর্ম ও নৈতিক শিক্ষা'), 'ধর্ম ও নৈতিক শিক্ষা');
+    });
+
+    test('getSubjectPaperSplitVariants accurately treats SSC subjects as single-paper', () {
+      final phySplit = BanglaNameHelper.getSubjectPaperSplitVariants('পদার্থবিজ্ঞান', 'পদার্থবিজ্ঞান', true);
+      expect(phySplit.paper2.isEmpty, isTrue, reason: 'SSC Physics has no 2nd paper');
+      expect(phySplit.paper1.contains('ssc_physics'), isTrue);
+      expect(phySplit.paper1.contains('পদার্থবিজ্ঞান'), isTrue);
+
+      final mathSplit = BanglaNameHelper.getSubjectPaperSplitVariants('সাধারণ গণিত', 'সাধারণ গণিত', true);
+      expect(mathSplit.paper2.isEmpty, isTrue);
+      expect(mathSplit.paper1.contains('ssc_math') || mathSplit.paper1.contains('ssc_general_math'), isTrue);
+
+      final ictSplit = BanglaNameHelper.getSubjectPaperSplitVariants('আইসিটি', 'তথ্য ও যোগাযোগ প্রযুক্তি', true);
+      expect(ictSplit.paper2.isEmpty, isTrue);
+      expect(ictSplit.paper1.contains('ssc_ict'), isTrue);
+
+      // Business Studies subjects
+      final accSplit = BanglaNameHelper.getSubjectPaperSplitVariants('হিসাববিজ্ঞান', 'হিসাববিজ্ঞান', true);
+      expect(accSplit.paper2.isEmpty, isTrue);
+      expect(accSplit.paper1.contains('ssc_accounting'), isTrue);
+
+      final bizSplit = BanglaNameHelper.getSubjectPaperSplitVariants('ব্যবসায় উদ্যোগ', 'ব্যবসায় উদ্যোগ', true);
+      expect(bizSplit.paper2.isEmpty, isTrue);
+      expect(bizSplit.paper1.contains('ssc_business_ent'), isTrue);
+
+      final finSplit = BanglaNameHelper.getSubjectPaperSplitVariants('ফিন্যান্স ও ব্যাংকিং', 'ফিন্যান্স ও ব্যাংকিং', true);
+      expect(finSplit.paper2.isEmpty, isTrue);
+      expect(finSplit.paper1.contains('ssc_finance_banking'), isTrue);
+
+      // Humanities subjects
+      final histSplit = BanglaNameHelper.getSubjectPaperSplitVariants('ইতিহাস ও বিশ্ব সভ্যতা', 'ইতিহাস ও বিশ্ব সভ্যতা', true);
+      expect(histSplit.paper2.isEmpty, isTrue);
+      expect(histSplit.paper1.contains('ssc_history_bd'), isTrue);
+
+      final geoSplit = BanglaNameHelper.getSubjectPaperSplitVariants('ভূগোল ও পরিবেশ', 'ভূগোল ও পরিবেশ', true);
+      expect(geoSplit.paper2.isEmpty, isTrue);
+      expect(geoSplit.paper1.contains('ssc_geography'), isTrue);
+
+      final civSplit = BanglaNameHelper.getSubjectPaperSplitVariants('পৌরনীতি ও নাগরিকতা', 'পৌরনীতি ও নাগরিকতা', true);
+      expect(civSplit.paper2.isEmpty, isTrue);
+      expect(civSplit.paper1.contains('ssc_civics'), isTrue);
+
+      final econSplit = BanglaNameHelper.getSubjectPaperSplitVariants('অর্থনীতি', 'অর্থনীতি', true);
+      expect(econSplit.paper2.isEmpty, isTrue);
+      expect(econSplit.paper1.contains('ssc_economics'), isTrue);
+
+      final sciSplit = BanglaNameHelper.getSubjectPaperSplitVariants('সাধারণ বিজ্ঞান', 'সাধারণ বিজ্ঞান', true);
+      expect(sciSplit.paper2.isEmpty, isTrue);
+      expect(sciSplit.paper1.contains('ssc_general_science'), isTrue);
+    });
   });
 }

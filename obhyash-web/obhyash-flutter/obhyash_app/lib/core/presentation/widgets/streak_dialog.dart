@@ -82,7 +82,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
       final supabase = Supabase.instance.client;
       final response = await supabase
           .from('public_profiles')
-          .select('id, name, avatar_url, streak')
+          .select('id, name, avatar_url, streak, gender')
           .order('streak', ascending: false)
           .limit(10);
 
@@ -435,6 +435,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                           id: u['id']?.toString(),
                                           name: u['name']?.toString() ?? 'U',
                                           avatarUrl: u['avatar_url']?.toString(),
+                                          gender: u['gender']?.toString(),
                                           size: 34,
                                           showBorder: true,
                                           borderColor: isMe

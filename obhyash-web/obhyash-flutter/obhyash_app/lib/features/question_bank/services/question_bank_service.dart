@@ -43,7 +43,29 @@ class QuestionBankService {
       case 'gst':
       case 'agri':
         return ['GST', 'গুচ্ছ', 'কৃষি গুচ্ছ', 'Agri'];
+      case 'board_dhaka':
+        return ['DB', 'ঢাকা বোর্ড', 'Dhaka Board', 'Dhaka'];
+      case 'board_rajshahi':
+        return ['RB', 'রাজশাহী বোর্ড', 'Rajshahi Board', 'Rajshahi'];
+      case 'board_chittagong':
+        return ['CB', 'CtgB', 'চট্টগ্রাম বোর্ড', 'Chittagong Board', 'Chittagong', 'Chattogram Board'];
+      case 'board_comilla':
+        return ['ComB', 'CB', 'কুমিল্লা বোর্ড', 'Comilla Board', 'Cumilla Board'];
+      case 'board_jessore':
+        return ['JB', 'যশোর বোর্ড', 'Jessore Board', 'Jashore Board'];
+      case 'board_sylhet':
+        return ['SB', 'সিলেট বোর্ড', 'Sylhet Board'];
+      case 'board_dinajpur':
+        return ['DinB', 'দিনাজপুর বোর্ড', 'Dinajpur Board'];
+      case 'board_barisal':
+        return ['BB', 'বরিশাল বোর্ড', 'Barisal Board', 'Barishal Board'];
+      case 'board_mymensingh':
+        return ['MB', 'ময়মনসিংহ বোর্ড', 'Mymensingh Board'];
       default:
+        if (id.startsWith('board_')) {
+          final boardName = id.replaceFirst('board_', '');
+          return [instituteId.toUpperCase(), boardName, '${boardName.toUpperCase()} BOARD'];
+        }
         return [instituteId.toUpperCase()];
     }
   }
@@ -87,6 +109,7 @@ class QuestionBankService {
   static Future<List<Question>> fetchExamSetQuestions({
     required String instituteId,
     required InstituteExamSet examSet,
+    List<String> selectedSubjects = const [],
   }) async {
     final isWritten = examSet.type == 'written' ||
         examSet.id.toLowerCase().contains('written') ||
@@ -102,6 +125,123 @@ class QuestionBankService {
 
     try {
       final supabase = Supabase.instance.client;
+
+      // ======================================================================
+      // 0. SELECTED SUBJECTS PIPELINE (One-by-one subject serially)
+      // When subjects are chosen, fetch each subject's questions in exact order!
+      // ======================================================================
+      if (selectedSubjects.isNotEmpty) {
+        final List<Question> orderedQuestions = [];
+        final Set<String> subjectSeenIds = {};
+
+        for (final subjectName in selectedSubjects) {
+          final subjectVariants = BanglaNameHelper.getSubjectSearchVariants(subjectName, subjectName);
+          final isScienceSubj = subjectName.contains('পদার্থ') ||
+              subjectName.contains('রসায়ন') ||
+              subjectName.contains('উচ্চতর গণিত') ||
+              subjectName.contains('জীববিজ্ঞান') ||
+              subjectName.contains('আইসিটি');
+
+          final int targetSubjCount = isWritten ? 11 : (isScienceSubj ? 25 : 30);
+          final List<Question> subjCollected = [];
+
+          // Tier 1: exact institute + exact years + exact subject
+          if (years.isNotEmpty) {
+            try {
+              var qry = supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', subjectVariants)
+                  .overlaps('institutes', tags)
+                  .overlaps('years', years);
+
+              if (isWritten) {
+                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
+              }
+
+              final res = await qry.limit(targetSubjCount * 2);
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
+                  if (!subjectSeenIds.contains(q.id)) {
+                    subjectSeenIds.add(q.id);
+                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
+                  }
+                }
+              }
+            } catch (e) {
+              debugPrint('[QuestionBankService] Subj Tier 1 error: $e');
+            }
+          }
+
+          // Tier 2: institute questions for this subject
+          if (subjCollected.length < targetSubjCount) {
+            final needed = targetSubjCount - subjCollected.length;
+            try {
+              var qry = supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', subjectVariants)
+                  .overlaps('institutes', tags);
+
+              if (isWritten) {
+                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
+              }
+
+              final res = await qry.limit(needed * 2);
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
+                  if (!subjectSeenIds.contains(q.id)) {
+                    subjectSeenIds.add(q.id);
+                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
+                  }
+                  if (subjCollected.length >= targetSubjCount) break;
+                }
+              }
+            } catch (e) {
+              debugPrint('[QuestionBankService] Subj Tier 2 error: $e');
+            }
+          }
+
+          // Tier 3: Standard question bank pool for this subject
+          if (subjCollected.length < targetSubjCount) {
+            final needed = targetSubjCount - subjCollected.length;
+            try {
+              var qry = supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject', subjectVariants);
+
+              if (isWritten) {
+                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
+              }
+
+              final res = await qry.limit(needed * 2);
+              for (final row in res) {
+                final q = Question.fromJson(row);
+                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
+                  if (!subjectSeenIds.contains(q.id)) {
+                    subjectSeenIds.add(q.id);
+                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
+                  }
+                  if (subjCollected.length >= targetSubjCount) break;
+                }
+              }
+            } catch (e) {
+              debugPrint('[QuestionBankService] Subj Tier 3 error: $e');
+            }
+          }
+
+          // Append this subject's questions before moving to the next subject!
+          orderedQuestions.addAll(subjCollected.take(targetSubjCount));
+        }
+
+        if (orderedQuestions.isNotEmpty) {
+          OfflineQuestionBankService.cacheQuestions(orderedQuestions);
+          return orderedQuestions;
+        }
+      }
 
       // ======================================================================
       // 1. WRITTEN EXAM PIPELINE (BUET / QB Written Exams)

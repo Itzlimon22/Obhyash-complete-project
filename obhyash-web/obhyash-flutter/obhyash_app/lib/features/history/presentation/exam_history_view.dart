@@ -152,7 +152,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   static const int _examPageSize = 20;
   int _examOffset = 0;
 
-  // Questions Tab state (Server-side paginated)
+  // Questions Tab state (Server-side paginated from user exam results)
   List<Question> _questions = [];
   Set<String> _bookmarkedIds = {};
   bool _isLoadingQuestions = true;
@@ -160,7 +160,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   bool _hasMoreQuestions = true;
   bool _hasErrorQuestions = false;
   static const int _qPageSize = 20;
-  int _qOffset = 0;
+  int _qExamOffset = 0;
+  final Set<String> _qSeenIds = {};
 
   @override
   void initState() {
@@ -278,11 +279,18 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }).toList();
 
       if (filteredData.isEmpty) {
-        filteredData = rawList.where((e) {
-          final subName = (e['name'] ?? '').toString().toLowerCase();
-          final subId = e['id'].toString().toLowerCase();
-          final subLevel = (e['level'] ?? '').toString().toUpperCase();
-          if (!isSSC) {
+        if (isSSC) {
+          filteredData = rawList.where((e) {
+            final subName = (e['name'] ?? '').toString().toLowerCase();
+            final subId = e['id'].toString().toLowerCase();
+            final subLevel = (e['level'] ?? '').toString().toUpperCase();
+            return subId.startsWith('ssc_') || subLevel == 'SSC' || subName.contains('ssc');
+          }).toList();
+        } else {
+          filteredData = rawList.where((e) {
+            final subName = (e['name'] ?? '').toString().toLowerCase();
+            final subId = e['id'].toString().toLowerCase();
+            final subLevel = (e['level'] ?? '').toString().toUpperCase();
             if (subId.startsWith('ssc_') ||
                 subLevel == 'SSC' ||
                 subId == 'math' ||
@@ -294,21 +302,21 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 subName == 'সাধারণ গণিত') {
               return false;
             }
-          }
-          return true;
-        }).toList();
+            return true;
+          }).toList();
+        }
       }
 
       final sortOrderMap = <String, int>{};
       final seen = <String, String>{};
       for (final s in filteredData) {
         final id = s['id']?.toString() ?? '';
-        final rawName = (s['name'] ?? s['name_en'] ?? '').toString();
-        final rawNameEn = (s['name_en'] ?? '').toString();
+        final rawName = (s['name'] ?? s['name_en'] ?? '').toString().replaceAll(RegExp(r'^(?:SSC|HSC)[\s\-_]+', caseSensitive: false), '').trim();
+        final rawNameEn = (s['name_en'] ?? '').toString().replaceAll(RegExp(r'^(?:SSC|HSC)[\s\-_]+', caseSensitive: false), '').trim();
         final formattedName = BanglaNameHelper.formatSubject(
           rawNameEn.isNotEmpty ? rawNameEn : rawName,
           rawName,
-        );
+        ).replaceAll(RegExp(r'^(?:SSC|HSC)[\s\-_]+', caseSensitive: false), '').trim();
 
         if (formattedName.isEmpty || seen.containsKey(id)) continue;
         if (!isSSC && (formattedName == 'গণিত' || formattedName == 'সাধারণ গণিত')) continue;
@@ -702,9 +710,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   Future<void> _fetchQuestions({bool refresh = false}) async {
-    // 1. Stale-while-revalidate: Hydrate local cache immediately for Questions tab
-    if (refresh && _questions.isEmpty) {
-      final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
+    final sb = Supabase.instance.client;
+    final currentUid = sb.auth.currentUser?.id;
+
+    // 1. Stale-while-revalidate: Hydrate local cache immediately for Questions tab (user-scoped)
+    if (refresh && _questions.isEmpty && currentUid != null) {
+      final cachedQ = await LocalExamCacheService.getCachedQuestionsList(userId: currentUid);
       if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
         final cachedQuestions = cachedQ
             .map((q) => Question.fromJson(q))
@@ -720,7 +731,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       setState(() {
         _isLoadingQuestions = _questions.isEmpty;
         _hasErrorQuestions = false;
-        _qOffset = 0;
+        _qExamOffset = 0;
+        _qSeenIds.clear();
         _hasMoreQuestions = true;
       });
     } else {
@@ -739,24 +751,37 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     }
 
     try {
-      final sb = Supabase.instance.client;
-      final currentOffset = refresh ? 0 : _qOffset;
-
-      var query = sb.from('questions').select();
-
-      if (_filterSubject.isNotEmpty) {
-        final variants = BanglaNameHelper.getSubjectSearchVariants(
-          _filterSubject,
-          filterBanglaSubject,
-        );
-        query = query.inFilter('subject', variants);
+      final authResponse = await sb.auth.getSession();
+      final uid = sb.auth.currentUser?.id ?? authResponse?.user.id;
+      if (uid == null) {
+        if (mounted) {
+          setState(() {
+            _questions = [];
+            _isLoadingQuestions = false;
+            _isLoadingMoreQuestions = false;
+            _hasMoreQuestions = false;
+          });
+        }
+        return;
       }
 
-      if (_filterChapter.isNotEmpty) {
-        final chapterVariants = BanglaNameHelper.getChapterSearchVariants(
-          _filterChapter,
-        );
-        query = query.inFilter('chapter', chapterVariants);
+      var query = sb
+          .from('exam_results')
+          .select('id, subject, subject_label, created_at, date, questions')
+          .eq('user_id', uid)
+          .not('questions', 'is', null);
+
+      if (_filterSubject.isNotEmpty) {
+        if (filterBanglaSubject.isNotEmpty &&
+            filterBanglaSubject != _filterSubject) {
+          query = query.or(
+            'subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%,subject.eq.$filterBanglaSubject,subject.ilike.%$filterBanglaSubject%,subject_label.ilike.%$filterBanglaSubject%',
+          );
+        } else {
+          query = query.or(
+            'subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%',
+          );
+        }
       }
 
       if (_filterDate != null) {
@@ -777,21 +802,66 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           59,
           999,
         ).toIso8601String();
-        query = query.gte('created_at', startUtc).lte('created_at', endUtc);
+        query = query.gte('date', startUtc).lte('date', endUtc);
       }
 
-      final data = await query
-          .order('created_at', ascending: false)
-          .range(currentOffset, currentOffset + _qPageSize - 1);
+      const int examBatchSize = 10;
+      int currentOffset = refresh ? 0 : _qExamOffset;
+      bool hasMoreExams = true;
+      final List<Question> fetched = [];
 
-      final rawList = data as List;
-      final fetched = rawList
-          .map((q) => Question.fromJson(q as Map<String, dynamic>))
-          .toList();
+      while (fetched.length < _qPageSize && hasMoreExams) {
+        final examData = await query
+            .order('created_at', ascending: false)
+            .range(currentOffset, currentOffset + examBatchSize - 1);
 
-      if (refresh && _filterSubject.isEmpty && _filterChapter.isEmpty) {
+        final list = examData as List;
+        if (list.length < examBatchSize) {
+          hasMoreExams = false;
+        }
+        currentOffset += list.length;
+
+        for (final row in list) {
+          final questionsRaw = row['questions'];
+          if (questionsRaw is! List) continue;
+          final examSubject = (row['subject'] as String?) ?? '';
+          final examSubjectLabel = (row['subject_label'] as String?) ?? '';
+
+          for (final qData in questionsRaw) {
+            if (qData is! Map<String, dynamic>) continue;
+            final q = Question.fromJson(qData);
+            if (q.id.isEmpty) continue;
+            if (_qSeenIds.contains(q.id)) continue;
+
+            // Apply subject filter if question's subject or exam's subject matches
+            if (_filterSubject.isNotEmpty) {
+              final matchesQSub = _matchesSubject(q.subject, q.subjectLabel ?? '', _filterSubject);
+              final matchesExamSub = _matchesSubject(examSubject, examSubjectLabel, _filterSubject);
+              if (!matchesQSub && !matchesExamSub) continue;
+            }
+
+            // Apply chapter filter if set
+            if (_filterChapter.isNotEmpty) {
+              final chapterVariants = BanglaNameHelper.getChapterSearchVariants(_filterChapter);
+              final lowerCh = chapterVariants.map((v) => v.toLowerCase().trim()).toSet();
+              final c = q.chapter.toLowerCase().trim();
+              final matchesCh = lowerCh.contains(c) ||
+                  lowerCh.any((v) => c.contains(v) || v.contains(c));
+              if (!matchesCh) continue;
+            }
+
+            _qSeenIds.add(q.id);
+            fetched.add(q);
+          }
+        }
+
+        if (list.isEmpty) break;
+      }
+
+      if (refresh && _filterSubject.isEmpty && _filterChapter.isEmpty && _filterDate == null) {
         await LocalExamCacheService.cacheQuestionsList(
-          rawList.map((e) => e as Map<String, dynamic>).toList(),
+          fetched.map((e) => e.toJson()).toList(),
+          userId: uid,
         );
       }
 
@@ -804,15 +874,16 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             _questions.addAll(fetched);
             _isLoadingMoreQuestions = false;
           }
-          _qOffset = currentOffset + fetched.length;
-          _hasMoreQuestions = fetched.length >= _qPageSize;
+          _qExamOffset = currentOffset;
+          _hasMoreQuestions = hasMoreExams;
         });
       }
     } catch (e) {
       debugPrint(
         '[ExamHistoryView] _fetchQuestions error (offline fallback): $e',
       );
-      final cachedQ = await LocalExamCacheService.getCachedQuestionsList();
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      final cachedQ = await LocalExamCacheService.getCachedQuestionsList(userId: uid);
       if (cachedQ != null && cachedQ.isNotEmpty && mounted) {
         var cachedQuestions = cachedQ.map((q) => Question.fromJson(q)).toList();
 
@@ -1059,6 +1130,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         setState(() {
           _history.removeWhere((r) => r.id == record.id);
         });
+        _fetchQuestions(refresh: true);
         AppPopups.success(
           context,
           message: 'পরীক্ষার ফলাফল সফলভাবে মুছে ফেলা হয়েছে',
@@ -1078,6 +1150,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         setState(() {
           _history.removeWhere((r) => r.id == record.id);
         });
+        _fetchQuestions(refresh: true);
         AppPopups.success(context, message: 'পরীক্ষার ফলাফল মুছে ফেলা হয়েছে');
       }
     }
@@ -1172,12 +1245,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       HapticFeedback.mediumImpact();
       setState(() {
         _questions.removeWhere((item) => item.id == q.id);
+        _qSeenIds.remove(q.id);
       });
       try {
-        final cached = await LocalExamCacheService.getCachedQuestionsList();
+        final uid = Supabase.instance.client.auth.currentUser?.id;
+        final cached = await LocalExamCacheService.getCachedQuestionsList(userId: uid);
         if (cached != null) {
           final updated = cached.where((e) => e['id'] != q.id).toList();
-          await LocalExamCacheService.cacheQuestionsList(updated);
+          await LocalExamCacheService.cacheQuestionsList(updated, userId: uid);
         }
       } catch (e) {
         debugPrint('[ExamHistoryView] delete question cache update error: $e');
@@ -1526,6 +1601,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                       isLoadingMore: _isLoadingMoreQuestions,
                       onLoadMore: () => _fetchQuestions(refresh: false),
                       onRefresh: () => _fetchQuestions(refresh: true),
+                      isFiltered: _filterSubject.isNotEmpty ||
+                          _filterChapter.isNotEmpty ||
+                          _filterDate != null,
                     ),
             ],
           ),
@@ -2122,6 +2200,7 @@ class _QuestionsTab extends StatelessWidget {
   final bool isLoadingMore;
   final VoidCallback onLoadMore;
   final Future<void> Function() onRefresh;
+  final bool isFiltered;
 
   const _QuestionsTab({
     required this.questions,
@@ -2134,6 +2213,7 @@ class _QuestionsTab extends StatelessWidget {
     required this.isLoadingMore,
     required this.onLoadMore,
     required this.onRefresh,
+    this.isFiltered = false,
   });
 
   @override
@@ -2150,8 +2230,10 @@ class _QuestionsTab extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.45,
               child: _emptyState(
                 isDark,
-                'কোনো প্রশ্ন পাওয়া যায়নি',
-                'অন্য ফিল্টার নির্বাচন করে আবার চেষ্টা করুন।',
+                'কোনো প্রশ্ন পাওয়া যায়নি',
+                isFiltered
+                    ? 'অন্য ফিল্টার নির্বাচন করে আবার চেষ্টা করুন।'
+                    : 'একটি পরীক্ষা দাও এবং তোমার সমাধান করা প্রশ্ন এখানে দেখো।',
               ),
             ),
           ],

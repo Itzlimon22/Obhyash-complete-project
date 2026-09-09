@@ -270,9 +270,24 @@ export const getChapters = async (
             const bi = orderMap.get(b.name.trim().toLowerCase()) ?? 9999;
             return ai - bi;
           });
+        } else {
+          const { sscSubjects } = await import('@/lib/data/ssc');
+          const cleanSubjectId = subjectId.replace(/_/g, '-');
+          const sscSubject = sscSubjects.find((s) => s.id === subjectId || s.id === cleanSubjectId);
+          if (sscSubject) {
+            const orderMap = new Map<string, number>();
+            sscSubject.chapters.forEach((ch: { name: string }, idx: number) => {
+              orderMap.set(ch.name.trim().toLowerCase(), idx);
+            });
+            return [...data].sort((a, b) => {
+              const ai = orderMap.get(a.name.trim().toLowerCase()) ?? 9999;
+              const bi = orderMap.get(b.name.trim().toLowerCase()) ?? 9999;
+              return ai - bi;
+            });
+          }
         }
       } catch {
-        // hsc.ts unavailable — return DB order as-is
+        // hsc.ts/ssc.ts unavailable — return DB order as-is
       }
       return data;
     }

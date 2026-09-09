@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 দয়া করে বাংলায় একটি সহজ, স্পষ্ট ব্যাখ্যা দিন যা শিক্ষার্থীদের বুঝতে সাহায্য করবে। ব্যাখ্যাটি ৩-৫ বাক্যের মধ্যে রাখুন।`;
 
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -97,7 +97,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/welcome',
     refreshListenable: _GoRouterRefreshStream(authStateStream),
     redirect: (context, state) {
       final session = Supabase.instance.client.auth.currentSession;

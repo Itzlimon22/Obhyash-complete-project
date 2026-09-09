@@ -286,7 +286,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         try {
           let query = supabase
             .from("users")
-            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role");
+            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender");
 
           if (currentLevelInfo.minXP > 0) {
             query = query.gte(sortColumn, currentLevelInfo.minXP);
@@ -396,40 +396,45 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     try {
       let mapped: LeaderboardUser[] = [];
       try {
-        const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
-        let query = supabase
+        const { data, error } = await supabase
           .from("users")
-          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role")
-          .eq("institute", currentUser.institute);
+          .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
+          .or("role.ilike.student,role.is.null")
+          .eq("institute", currentUser.institute)
+          .order("monthly_xp", { ascending: false, nullsFirst: false })
+          .order("xp", { ascending: false, nullsFirst: false })
+          .limit(100);
 
-        if (timeframe === "monthly") {
-          query = query.order("monthly_xp", { ascending: false, nullsFirst: false }).order("xp", { ascending: false, nullsFirst: false });
-        } else {
-          query = query.order("xp", { ascending: false, nullsFirst: false });
-        }
-
-        query = query.limit(100);
-
-        const { data, error } = await query;
         if (error) throw error;
 
-        mapped = (data || []).map((u: any, idx: number) => {
-          const isPro = isUserPro(u);
-          const effXp = timeframe === "monthly" ? u.monthly_xp || 0 : u.xp || 0;
+        mapped = (data || [])
+          .filter((u: any) => (u.role || "student").toLowerCase() === "student")
+          .map((u: any) => {
+            const isPro = isUserPro(u);
+            const mXp = u.monthly_xp ?? 0;
+            const effXp = timeframe === "monthly" ? mXp : (u.xp || 0);
 
-          return {
-            id: u.id,
-            name: u.name || "শিক্ষার্থী",
-            institute: u.institute,
-            xp: effXp,
-            monthly_xp: u.monthly_xp || 0,
-            level: calculateLevelFromXp(effXp),
-            exams_taken: u.exams_taken || 0,
-            avatar_url: u.avatar_url || undefined,
-            batch: u.batch || undefined,
-            rank: idx + 1,
-            is_pro: isPro,
-          };
+            return {
+              id: u.id,
+              name: u.name || "শিক্ষার্থী",
+              institute: u.institute,
+              xp: effXp,
+              monthly_xp: mXp,
+              level: calculateLevelFromXp(effXp),
+              exams_taken: u.exams_taken || 0,
+              avatar_url: u.avatar_url || undefined,
+              batch: u.batch || undefined,
+              rank: 0,
+              is_pro: isPro,
+            };
+          });
+
+        mapped.sort((a, b) => {
+          if (b.xp !== a.xp) return b.xp - a.xp;
+          return (b.monthly_xp || 0) - (a.monthly_xp || 0);
+        });
+        mapped.forEach((u, idx) => {
+          u.rank = idx + 1;
         });
       } catch (collegeErr) {
         console.warn("[LeaderboardView] Direct college query failed, falling back to API:", collegeErr);
@@ -458,7 +463,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     } finally {
       setIsLoadingCollege(false);
     }
-  }, [supabase, currentUser, timeframe]);
+  }, [supabase, currentUser]);
 
   useEffect(() => {
     if (viewMode === "college") {
@@ -476,11 +481,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         const sortColumn = timeframe === "monthly" ? "monthly_xp" : "xp";
         const { data, error } = await supabase
           .from("users")
-          .select("institute, xp, monthly_xp")
+          .select("institute, xp, monthly_xp, role")
+          .or("role.ilike.student,role.is.null")
           .not("institute", "is", null)
           .neq("institute", "")
           .order(sortColumn, { ascending: false, nullsFirst: false })
-          .limit(3000);
+          .limit(5000);
 
         if (error) throw error;
 
@@ -517,7 +523,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         });
       } catch (rankingsErr) {
         console.warn("[LeaderboardView] Direct rankings query failed, falling back to API:", rankingsErr);
-        const res = await fetch(`/api/leaderboard/rankings?timeframe=${timeframe}`);
+        const res = await fetch(`/api/leaderboard/rankings?timeframe=monthly`);
         if (res.ok) {
           const json = await res.json();
           const myInst = (currentUser?.institute || "").trim().toLowerCase();

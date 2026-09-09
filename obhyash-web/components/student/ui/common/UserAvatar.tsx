@@ -46,7 +46,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   // 2. If it fails or doesn't exist, try the gender-based DiceBear avatar.
   // 3. If that also fails, show initials as the final fallback.
 
-  const hasCustomAvatar = !!user.avatarUrl && !customAvatarError;
+  const effectiveAvatarUrl = user.avatarUrl || (user as any).avatar_url;
+  const hasCustomAvatar = !!effectiveAvatarUrl && !customAvatarError;
   const diceBearAvatar = getRandomAvatar(
     user.gender || null,
     user.id || user.name || 'default',
@@ -54,7 +55,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   const hasFallbackAvatar = !fallbackAvatarError;
 
   const showImage = hasCustomAvatar || (diceBearAvatar && hasFallbackAvatar);
-  const currentSrc = hasCustomAvatar ? user.avatarUrl! : diceBearAvatar;
+  const currentSrc = hasCustomAvatar ? effectiveAvatarUrl! : diceBearAvatar;
 
   const avatarNode = (
     <div

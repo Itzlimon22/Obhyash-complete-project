@@ -330,6 +330,37 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
             final res = await query.limit(config.questionCount * 4);
             rawData = List<dynamic>.from(res as List);
+
+            if (rawData.length < config.questionCount) {
+              try {
+                var queryId = supabase
+                    .from('questions')
+                    .select(kQuestionFields)
+                    .inFilter('subject_id', subjectVariants)
+                    .not('options', 'is', null);
+
+                if (expandedChapters != null && expandedChapters.isNotEmpty) {
+                  queryId = queryId.inFilter('chapter', expandedChapters);
+                }
+                if (difficultiesList != null && difficultiesList.isNotEmpty) {
+                  queryId = queryId.inFilter('difficulty', difficultiesList);
+                }
+                if (examTypesList != null && examTypesList.isNotEmpty) {
+                  final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+                  queryId = queryId.or(orConditions);
+                }
+
+                final resId = await queryId.limit(config.questionCount * 4);
+                final seenIds = rawData.map((e) => e['id']?.toString()).toSet();
+                for (final row in (resId as List)) {
+                  final qId = row['id']?.toString();
+                  if (qId != null && !seenIds.contains(qId)) {
+                    seenIds.add(qId);
+                    rawData.add(row);
+                  }
+                }
+              } catch (_) {}
+            }
           }
 
           var qList = rawData;
@@ -491,11 +522,16 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           examTitle.toLowerCase().contains('written') ||
           examTitle.contains('লিখিত');
 
+      final isSSC = examTitle.contains('এসএসসি') ||
+          examTitle.toUpperCase().contains('SSC') ||
+          examLabel.toUpperCase().contains('SSC');
+
       // 1. Fetch each subject in parallel with 1st/2nd paper & chapter/difficulty balancing
       final subjectFutures = subjectDistribution.map((item) async {
         final split = BanglaNameHelper.getSubjectPaperSplitVariants(
           item.subject,
           item.subject,
+          isSSC,
         );
 
         List<Question> subQuestions = [];
@@ -506,7 +542,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           if (variants.isEmpty || countNeeded <= 0) return [];
           final candidates = <Question>[];
 
-          // 1. Target examType priority
+          // 1. Target examType priority (by subject)
           try {
             var query = supabase
                 .from('questions')
@@ -534,6 +570,42 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             }
           } catch (e) {
             debugPrint('[ExamProvider] Query pool error for $variants: $e');
+          }
+
+          // 1b. Target examType priority (by subject_id if needed)
+          if (candidates.length < countNeeded * 2) {
+            try {
+              var query = supabase
+                  .from('questions')
+                  .select('*')
+                  .inFilter('subject_id', variants);
+
+              if (isWrittenExam) {
+                query = query.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত']);
+              } else {
+                query = query.not('options', 'is', null);
+                if (examType.isNotEmpty && examType != 'All' && examType != 'Mixed') {
+                  query = query.ilike('exam_type', '%$examType%');
+                }
+              }
+
+              final List<dynamic> res = await query.limit(countNeeded * 8);
+              if (res.isNotEmpty) {
+                final parsed = res
+                    .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                    .where((q) => isWrittenExam
+                        ? (q.isStrictWritten && !q.isAdmissionStandardMcq)
+                        : q.isAdmissionStandardMcq)
+                    .toList();
+                for (final q in parsed) {
+                  if (!candidates.any((c) => c.id == q.id)) {
+                    candidates.add(q);
+                  }
+                }
+              }
+            } catch (e) {
+              debugPrint('[ExamProvider] Query pool subject_id error: $e');
+            }
           }
 
           // 2. Fallback general pool for these variants if needed
@@ -602,6 +674,42 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 }
               }
             } catch (_) {}
+
+            // 3b. Fallback: all search variants of THIS subject across subject_id
+            if (candidates.length < countNeeded * 2) {
+              try {
+                final allSubjectSlugs = BanglaNameHelper.getSubjectSearchVariants(
+                  item.subject,
+                  item.subject,
+                );
+                var query = supabase
+                    .from('questions')
+                    .select('*')
+                    .inFilter('subject_id', allSubjectSlugs);
+
+                if (isWrittenExam) {
+                  query = query.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত']);
+                } else {
+                  query = query.not('options', 'is', null);
+                }
+
+                final List<dynamic> res = await query.limit(countNeeded * 8);
+
+                if (res.isNotEmpty) {
+                  final parsed = res
+                      .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                      .where((q) => isWrittenExam
+                          ? (q.isStrictWritten && !q.isAdmissionStandardMcq)
+                          : q.isAdmissionStandardMcq)
+                      .toList();
+                  for (final q in parsed) {
+                    if (!candidates.any((c) => c.id == q.id)) {
+                      candidates.add(q);
+                    }
+                  }
+                }
+              } catch (_) {}
+            }
           }
 
           return candidates;

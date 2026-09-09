@@ -535,9 +535,9 @@ class _SignupViewState extends ConsumerState<SignupView>
     final labelText = Text(
       text,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 15,
         fontFamily: 'HindSiliguri',
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.normal,
         color: isDark ? Colors.white70 : Colors.black87,
       ),
     );
@@ -676,8 +676,37 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   Widget _buildStep2(bool isDark) {
-    final nextYears = [2024, 2025, 2026, 2027];
-    final batchOptions = nextYears.map((y) => '$_stream $y').toList();
+    final batchYears = _stream == 'SSC'
+        ? [2026, 2027, 2028]
+        : [2025, 2026, 2027, 2028];
+    final batchOptions = batchYears.map((y) => '$_stream $y').toList();
+
+    // Ensure _batch is valid for current stream
+    if (!batchOptions.contains(_batch)) {
+      _batch = batchOptions.first;
+    }
+
+    final groupOptions = _stream == 'SSC'
+        ? const [
+            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+            AppDropdownOption(value: 'Business Studies', label: 'Business Studies (ব্যবসায় শিক্ষা)'),
+            AppDropdownOption(value: 'Humanities', label: 'Humanities (মানবিক)'),
+          ]
+        : const [
+            AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
+            AppDropdownOption(
+              value: 'Business Studies',
+              label: 'Business Studies (ব্যবসায় শিক্ষা)',
+              isEnabled: false,
+              disabledBadge: 'শীঘ্রই আসছে',
+            ),
+            AppDropdownOption(
+              value: 'Humanities',
+              label: 'Humanities (মানবিক)',
+              isEnabled: false,
+              disabledBadge: 'শীঘ্রই আসছে',
+            ),
+          ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,7 +763,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.normal,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
@@ -753,13 +782,18 @@ class _SignupViewState extends ConsumerState<SignupView>
         _buildDropdown(
           icon: LucideIcons.bookOpen,
           value: _stream,
-          options: const ['HSC', 'SSC', 'Admission'],
+          options: const ['HSC', 'SSC'],
           isDark: isDark,
           onChanged: (val) {
             if (val != null) {
               setState(() {
                 _stream = val;
-                _batch = '$val 2026';
+                if (val == 'HSC') {
+                  _batch = 'HSC 2026';
+                  _group = 'Science';
+                } else if (val == 'SSC') {
+                  _batch = 'SSC 2026';
+                }
               });
             }
           },
@@ -777,21 +811,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   _buildDropdown(
                     icon: LucideIcons.graduationCap,
                     value: _group,
-                    customOptions: const [
-                      AppDropdownOption(value: 'Science', label: 'Science (বিজ্ঞান)'),
-                      AppDropdownOption(
-                        value: 'Business Studies',
-                        label: 'Business Studies (ব্যবসায় শিক্ষা)',
-                        isEnabled: false,
-                        disabledBadge: 'শীঘ্রই আসছে',
-                      ),
-                      AppDropdownOption(
-                        value: 'Humanities',
-                        label: 'Humanities (মানবিক)',
-                        isEnabled: false,
-                        disabledBadge: 'শীঘ্রই আসছে',
-                      ),
-                    ],
+                    customOptions: groupOptions,
                     isDark: isDark,
                     onChanged: (val) {
                       if (val != null) setState(() => _group = val);
@@ -852,7 +872,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       g == 'Male' ? 'পুরুষ' : 'মহিলা',
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         color: isSelected
                             ? const Color(0xFF059669)
                             : (isDark ? Colors.white70 : Colors.black87),
@@ -869,36 +889,6 @@ class _SignupViewState extends ConsumerState<SignupView>
           _buildLabel(
             'টার্গেট / লক্ষ্য (ঐচ্ছিক)',
             isDark,
-            tooltip:
-                'এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF059669).withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFF059669).withValues(alpha: 0.25),
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(LucideIcons.info, size: 16, color: Color(0xFF10B981)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    '💡 এটি তুমি পরবর্তীতে প্রোফাইল পেজ থেকে যেকোনো সময় পরিবর্তন করতে পারবে।',
-                    style: TextStyle(
-                      fontFamily: 'HindSiliguri',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white70 : Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 12),
           GridView.count(
@@ -907,7 +897,7 @@ class _SignupViewState extends ConsumerState<SignupView>
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.15,
             children: [
               _examTargetOption('Medical', '🩺', 'মেডিকেল', isDark),
               _examTargetOption('Engineering', '⚙️', 'ইঞ্জিনিয়ারিং', isDark),
@@ -935,22 +925,23 @@ class _SignupViewState extends ConsumerState<SignupView>
             width: isSelected ? 2 : 1,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
         alignment: Alignment.center,
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 8),
-            Flexible(
+            Text(emoji, style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
               child: Text(
                 label,
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
                   fontFamily: 'HindSiliguri',
                   color: isSelected
                       ? const Color(0xFF059669)

@@ -28,10 +28,10 @@ class MainBottomNav extends StatelessWidget {
         'iconFilled': AppIcons.navHomeFilled,
       },
       {
-        'id': 'question_bank',
-        'label': 'প্রশ্নব্যাংক',
-        'icon': AppIcons.navQuestionBank,
-        'iconFilled': AppIcons.navQuestionBankFilled,
+        'id': 'history',
+        'label': 'হিস্ট্রি',
+        'icon': AppIcons.navHistory,
+        'iconFilled': AppIcons.navHistoryFilled,
       },
       {
         'id': 'setup',
@@ -40,10 +40,10 @@ class MainBottomNav extends StatelessWidget {
         'iconFilled': AppIcons.navExamFilled,
       },
       {
-        'id': 'history',
-        'label': 'হিস্ট্রি',
-        'icon': AppIcons.navHistory,
-        'iconFilled': AppIcons.navHistoryFilled,
+        'id': 'question_bank',
+        'label': 'প্রশ্নব্যাংক',
+        'icon': AppIcons.navQuestionBank,
+        'iconFilled': AppIcons.navQuestionBankFilled,
       },
       {
         'id': 'menu',

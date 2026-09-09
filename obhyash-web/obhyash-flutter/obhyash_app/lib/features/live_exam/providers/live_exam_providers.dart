@@ -54,6 +54,57 @@ bool matchesLiveExamCategory(LiveExam exam, String targetCategory) {
   final examCat = (exam.category).toLowerCase().trim();
   final title = exam.title.toLowerCase().trim();
 
+  // ── SSC Intelligent Matching & Isolation ──
+  if (target.startsWith('ssc')) {
+    // Rejection: Must NOT be pure HSC, Engineering, Medical or University Admission
+    if (examCat == 'engineering' || examCat == 'medical' || examCat == 'buet' || examCat == 'ckruet' || examCat == 'mat' || examCat == 'hsc') {
+      return false;
+    }
+    if (title.contains('buet') || title.contains('মেডিকেল') || title.contains('ইঞ্জিনিয়ারিং') || title.contains('varsity') || title.contains('ভার্সিটি') || title.contains('hsc') || title.contains('এইচএসসি')) {
+      return false;
+    }
+
+    if (target == 'ssc' || target == 'ssc_board') {
+      if (examCat == 'ssc' || examCat == 'ssc_board' || examCat == 'board') return true;
+      if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
+        return title.contains('ssc') || title.contains('এসএসসি') || title.contains('বোর্ড') || !title.contains('school');
+      }
+      return examCat.contains('ssc');
+    }
+
+    if (target == 'ssc_school') {
+      if (examCat == 'ssc_school' || examCat == 'school') return true;
+      return title.contains('স্কুল') || title.contains('ক্যাডেট') || title.contains('শীর্ষ') || title.contains('school') || title.contains('cadet');
+    }
+
+    if (target == 'ssc_science') {
+      if (examCat == 'ssc_science' || examCat == 'science') return true;
+      return title.contains('বিজ্ঞান') || title.contains('পদার্থ') || title.contains('রসায়ন') || title.contains('উচ্চতর গণিত') || title.contains('জীববিজ্ঞান');
+    }
+
+    if (target == 'ssc_business') {
+      if (examCat == 'ssc_business' || examCat == 'business' || examCat == 'commerce') return true;
+      return title.contains('বাণিজ্য') || title.contains('ব্যবসায়') || title.contains('হিসাববিজ্ঞান') || title.contains('ফিন্যান্স') || title.contains('উদ্যোগ');
+    }
+
+    if (target == 'ssc_humanities') {
+      if (examCat == 'ssc_humanities' || examCat == 'humanities' || examCat == 'arts') return true;
+      return title.contains('মানবিক') || title.contains('ইতিহাস') || title.contains('ভূগোল') || title.contains('পৌরনীতি') || title.contains('অর্থনীতি');
+    }
+
+    if (target == 'ssc_compulsory') {
+      if (examCat == 'ssc_compulsory' || examCat == 'compulsory') return true;
+      return title.contains('আবশ্যিক') || title.contains('বাংলা') || title.contains('ইংরেজি') || title.contains('গণিত') || title.contains('আইসিটি') || title.contains('বিজিএস');
+    }
+
+    return examCat == target || title.contains(target);
+  }
+
+  // ── HSC / Admission Isolation: Reject SSC exams ──
+  if (examCat.contains('ssc') || title.contains('ssc') || title.contains('এসএসসি')) {
+    return false;
+  }
+
   if (target == 'engineering') {
     if (examCat == 'engineering' || examCat == 'buet' || examCat == 'ckruet') return true;
     if (examCat == 'all' || examCat.isEmpty || examCat == 'general') {
@@ -114,6 +165,8 @@ final liveExamsCategoryProvider = FutureProvider.autoDispose.family<List<LiveExa
   if (rawCategory.isNotEmpty && rawCategory != 'all') {
     if (rawCategory == 'varsity' || rawCategory == 'varsity_a') {
       filterBuilder = filterBuilder.or('category.ilike.varsity,category.ilike.varsity_a,category.ilike.all,category.ilike.general');
+    } else if (rawCategory.startsWith('ssc')) {
+      filterBuilder = filterBuilder.or('category.ilike.ssc%,category.ilike.%ssc%,category.ilike.all,category.ilike.general');
     } else {
       filterBuilder = filterBuilder.or('category.ilike.$rawCategory,category.ilike.all,category.ilike.general');
     }

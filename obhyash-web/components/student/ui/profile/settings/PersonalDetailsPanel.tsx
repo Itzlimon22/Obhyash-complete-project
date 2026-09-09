@@ -45,15 +45,24 @@ export default function PersonalDetailsPanel({
   const [collegeSuggestions, setCollegeSuggestions] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
+  const initialStream = user.stream === 'SSC' ? 'SSC' : 'HSC';
+  const validBatches = initialStream === 'SSC'
+    ? ['SSC 2026', 'SSC 2027', 'SSC 2028']
+    : ['HSC 2025', 'HSC 2026', 'HSC 2027', 'HSC 2028'];
+  const initialBatch = validBatches.includes(user.batch || '')
+    ? (user.batch as string)
+    : `${initialStream} 2026`;
+  const initialGroup = initialStream === 'HSC' ? 'Science' : (user.division || 'Science');
+
   const [formData, setFormData] = useState({
     name: user.name || '',
     dob: user.dob || '',
     gender: user.gender || '',
     address: user.address || '',
     institute: user.institute || '',
-    stream: user.stream || 'HSC',
-    group: user.division || 'Science',
-    batch: user.batch || 'HSC 2025',
+    stream: initialStream,
+    group: initialGroup,
+    batch: initialBatch,
     target: user.target || '',
     sscRoll: user.ssc_roll || '',
     sscReg: user.ssc_reg || '',
@@ -77,7 +86,23 @@ export default function PersonalDetailsPanel({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'stream') {
+      const allowedBatches = value === 'SSC'
+        ? ['SSC 2026', 'SSC 2027', 'SSC 2028']
+        : ['HSC 2025', 'HSC 2026', 'HSC 2027', 'HSC 2028'];
+      const newBatch = allowedBatches.includes(formData.batch)
+        ? formData.batch
+        : `${value} 2026`;
+      const newGroup = value === 'HSC' ? 'Science' : formData.group;
+      setFormData((prev) => ({
+        ...prev,
+        stream: value,
+        batch: newBatch,
+        group: newGroup,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const validateForm = () => {
@@ -173,8 +198,7 @@ export default function PersonalDetailsPanel({
     }
   };
 
-  const isBatchLocked =
-    !!user.batch && (user.batch_change_count ?? 0) >= 1;
+  const isBatchLocked = false; // For now user is not restricted to change batch
 
   const cardContainerClass =
     'bg-white dark:bg-[#18181B] rounded-[16px] border border-[#F5F5F5] dark:border-[#1C1C1E] shadow-2xs overflow-hidden mb-6';
@@ -355,7 +379,7 @@ export default function PersonalDetailsPanel({
 
           {/* Stream */}
           <div>
-            <label className={labelClass}>কী নিয়ে চর্চা করতে চাও?</label>
+            <label className={labelClass}>কী নিয়ে অভ্যাস করতে চাও?</label>
             <select
               name="stream"
               value={formData.stream}
@@ -364,7 +388,6 @@ export default function PersonalDetailsPanel({
             >
               <option value="HSC">HSC</option>
               <option value="SSC">SSC</option>
-              <option value="Admission">Admission</option>
             </select>
           </div>
 
@@ -379,25 +402,27 @@ export default function PersonalDetailsPanel({
                 className={selectClass}
               >
                 <option value="Science">Science (বিজ্ঞান)</option>
-                <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                  Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
-                </option>
-                <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
-                  Humanities (মানবিক) - শীঘ্রই আসছে
-                </option>
+                {formData.stream === 'SSC' ? (
+                  <>
+                    <option value="Business Studies">Business Studies (ব্যবসায় শিক্ষা)</option>
+                    <option value="Humanities">Humanities (মানবিক)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Business Studies" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                      Business Studies (ব্যবসায় শিক্ষা) - শীঘ্রই আসছে
+                    </option>
+                    <option value="Humanities" disabled className="text-neutral-400 dark:text-neutral-600 bg-neutral-100 dark:bg-neutral-800">
+                      Humanities (মানবিক) - শীঘ্রই আসছে
+                    </option>
+                  </>
+                )}
               </select>
             </div>
 
             <div>
               <label className={labelClass}>
                 <span>ব্যাচ</span>
-                <FieldTooltip
-                  text={
-                    isBatchLocked
-                      ? 'তুমি ইতিমধ্যে ১ বার ব্যাচ পরিবর্তন করেছো। তাই এটি আর পরিবর্তন করা যাবে না।'
-                      : 'ব্যাচ সর্বোচ্চ ১ বার পরিবর্তন করার সুযোগ পাবে।'
-                  }
-                />
               </label>
               <select
                 name="batch"
@@ -406,13 +431,14 @@ export default function PersonalDetailsPanel({
                 disabled={isBatchLocked}
                 className={`${selectClass} ${isBatchLocked ? 'bg-[#F5F5F5] dark:bg-[#1C1C1E] text-[#A3A3A3] cursor-not-allowed' : ''}`}
               >
-                <option value="HSC 2024">HSC 2024</option>
-                <option value="HSC 2025">HSC 2025</option>
-                <option value="HSC 2026">HSC 2026</option>
-                <option value="HSC 2027">HSC 2027</option>
-                <option value="SSC 2025">SSC 2025</option>
-                <option value="SSC 2026">SSC 2026</option>
-                <option value="SSC 2027">SSC 2027</option>
+                {(formData.stream === 'SSC'
+                  ? ['SSC 2026', 'SSC 2027', 'SSC 2028']
+                  : ['HSC 2025', 'HSC 2026', 'HSC 2027', 'HSC 2028']
+                ).map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

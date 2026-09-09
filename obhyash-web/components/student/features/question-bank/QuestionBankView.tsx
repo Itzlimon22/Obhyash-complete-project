@@ -470,7 +470,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                       setSelectedInstModal(inst);
                     }
                   }}
-                  className={`group relative rounded-[28px] sm:rounded-[36px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 select-none flex flex-col justify-between p-3.5 sm:p-5 ${inst.bgColor}`}
+                  className={`group relative rounded-[26px] sm:rounded-[36px] overflow-hidden aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 select-none flex flex-col justify-between p-3 sm:p-5 ${inst.bgColor}`}
                 >
                   {/* Decorative Corner Bubbles matching screenshot */}
                   <div
@@ -482,7 +482,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                   {/* 1. Center Top: Official Logo in White Circular Emblem */}
                   <div className="relative z-10 w-full flex justify-center pt-1 sm:pt-2">
-                    <div className="w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center justify-center p-2 sm:p-2.5 transition-transform group-hover:scale-105 duration-300">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center justify-center p-2.5 transition-transform group-hover:scale-105 duration-300">
                       <img
                         src={inst.logo}
                         alt={inst.name}

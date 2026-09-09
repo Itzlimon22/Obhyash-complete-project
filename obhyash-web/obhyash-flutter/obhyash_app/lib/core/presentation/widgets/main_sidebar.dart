@@ -12,6 +12,9 @@ class MainSidebar extends StatelessWidget {
   final String userName;
   final String userInstitute;
   final String? avatarUrl;
+  final String? gender;
+  final String? id;
+  final bool isPro;
 
   const MainSidebar({
     super.key,
@@ -22,6 +25,9 @@ class MainSidebar extends StatelessWidget {
     required this.userName,
     required this.userInstitute,
     this.avatarUrl,
+    this.gender,
+    this.id,
+    this.isPro = false,
   });
 
   @override
@@ -328,6 +334,9 @@ class MainSidebar extends StatelessWidget {
                           UserAvatar(
                             name: userName,
                             avatarUrl: avatarUrl,
+                            gender: gender,
+                            id: id,
+                            isPro: isPro,
                             size: 36,
                             showBorder: true,
                             borderColor: Colors.white,

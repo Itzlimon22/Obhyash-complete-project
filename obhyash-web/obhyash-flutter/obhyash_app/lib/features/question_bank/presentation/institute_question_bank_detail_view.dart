@@ -55,6 +55,73 @@ class _InstituteQuestionBankDetailViewState
     final sets = <InstituteExamSet>[];
     final id = instituteId.toLowerCase();
 
+    if (id.startsWith('board_')) {
+      for (var yr = 2024; yr >= 2015; yr--) {
+        sets.add(InstituteExamSet(
+          id: '${id}_${yr}_mcq',
+          title: 'এসএসসি $yr বহুনির্বাচনী',
+          year: '$yr',
+          questionCount: 30,
+          questionLabel: '৩০টি প্রশ্ন',
+          durationMinutes: 30,
+          durationLabel: '৩০ মিনিট',
+          type: 'mcq',
+          marks: 30,
+        ));
+        sets.add(InstituteExamSet(
+          id: '${id}_${yr}_cq',
+          title: 'এসএসসি $yr সৃজনশীল',
+          year: '$yr',
+          questionCount: 11,
+          questionLabel: '১১টি প্রশ্ন',
+          durationMinutes: 150,
+          durationLabel: '২ ঘন্টা ৩০ মিনিট',
+          type: 'written',
+          marks: 70,
+        ));
+      }
+      return sets;
+    }
+
+    if (id.startsWith('school_')) {
+      for (final yr in [2024, 2023, 2022]) {
+        sets.add(InstituteExamSet(
+          id: '${id}_${yr}_test_mcq',
+          title: 'টেস্ট পরীক্ষা $yr (MCQ)',
+          year: '$yr',
+          questionCount: 30,
+          questionLabel: '৩০টি প্রশ্ন',
+          durationMinutes: 30,
+          durationLabel: '৩০ মিনিট',
+          type: 'mcq',
+          marks: 30,
+        ));
+        sets.add(InstituteExamSet(
+          id: '${id}_${yr}_model_mcq',
+          title: 'মডেল টেস্ট $yr (MCQ)',
+          year: '$yr',
+          questionCount: 30,
+          questionLabel: '৩০টি প্রশ্ন',
+          durationMinutes: 30,
+          durationLabel: '৩০ মিনিট',
+          type: 'mcq',
+          marks: 30,
+        ));
+        sets.add(InstituteExamSet(
+          id: '${id}_${yr}_cq',
+          title: 'টেস্ট পরীক্ষা $yr (সৃজনশীল)',
+          year: '$yr',
+          questionCount: 11,
+          questionLabel: '১১টি প্রশ্ন',
+          durationMinutes: 150,
+          durationLabel: '২ ঘন্টা ৩০ মিনিট',
+          type: 'written',
+          marks: 70,
+        ));
+      }
+      return sets;
+    }
+
     switch (id) {
       case 'buet':
         sets.add(const InstituteExamSet(
@@ -402,12 +469,22 @@ class _InstituteQuestionBankDetailViewState
               ),
               padding: const EdgeInsets.all(3.5),
               child: ClipOval(
-                child: Image.asset(
-                  instLogo,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(LucideIcons.graduationCap, size: 18, color: Color(0xFF2563EB)),
-                ),
+                child: instLogo.isNotEmpty
+                    ? Image.asset(
+                        instLogo,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(
+                          instId.startsWith('board_') ? LucideIcons.landmark : LucideIcons.school,
+                          size: 18,
+                          color: const Color(0xFF2563EB),
+                        ),
+                      )
+                    : Icon(
+                        instId.startsWith('board_') ? LucideIcons.landmark : LucideIcons.school,
+                        size: 18,
+                        color: const Color(0xFF2563EB),
+                      ),
               ),
             ),
             const SizedBox(width: 10),

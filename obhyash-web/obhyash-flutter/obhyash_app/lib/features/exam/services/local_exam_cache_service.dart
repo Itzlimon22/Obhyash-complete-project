@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 
 class LocalExamCacheService {
@@ -12,8 +13,22 @@ class LocalExamCacheService {
   static const String _kSubjectListCacheKey = 'obhyash_cached_subject_list_v1';
   static const int _kMaxCachedExams = 100; // Max 100 exams cached locally
 
+  static String? _resolveUserId(String? userId) {
+    if (userId != null && userId.isNotEmpty) return userId;
+    try {
+      return Supabase.instance.client.auth.currentUser?.id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String _scopedKey(String baseKey, String? userId) {
+    final uid = _resolveUserId(userId);
+    return uid != null && uid.isNotEmpty ? '${baseKey}_$uid' : baseKey;
+  }
+
   /// Automatically cache an evaluated exam result to local storage
-  static Future<void> saveExamResult(ExamResult result) async {
+  static Future<void> saveExamResult(ExamResult result, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final key = '$_kExamPrefix${result.id}';
@@ -22,7 +37,8 @@ class LocalExamCacheService {
       await prefs.setString(key, jsonStr);
 
       // Update index list (keep most recent _kMaxCachedExams)
-      List<String> ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      final idsKey = _scopedKey(_kSavedExamIdsKey, userId);
+      List<String> ids = prefs.getStringList(idsKey) ?? [];
       ids.remove(result.id);
       ids.insert(0, result.id);
 
@@ -35,21 +51,21 @@ class LocalExamCacheService {
         ids = ids.sublist(0, _kMaxCachedExams);
       }
 
-      await prefs.setStringList(_kSavedExamIdsKey, ids);
+      await prefs.setStringList(idsKey, ids);
       debugPrint('[LocalExamCacheService] Saved exam ${result.id} locally.');
 
       // Also ensure this exam is prepended to the cached history list
-      await addExamToHistoryCache(result);
+      await addExamToHistoryCache(result, userId: userId);
     } catch (e) {
       debugPrint('[LocalExamCacheService] saveExamResult error: $e');
     }
   }
 
   /// Add/prepend a newly submitted exam to the local history list cache
-  static Future<void> addExamToHistoryCache(ExamResult result) async {
+  static Future<void> addExamToHistoryCache(ExamResult result, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      List<Map<String, dynamic>> current = await getCachedHistoryList() ?? [];
+      List<Map<String, dynamic>> current = await getCachedHistoryList(userId: userId) ?? [];
 
       // Remove existing if matching ID
       current.removeWhere((item) => item['id']?.toString() == result.id);
@@ -73,7 +89,7 @@ class LocalExamCacheService {
         current = current.sublist(0, _kMaxCachedExams);
       }
 
-      await prefs.setString(_kHistoryCacheKey, jsonEncode(current));
+      await prefs.setString(_scopedKey(_kHistoryCacheKey, userId), jsonEncode(current));
     } catch (e) {
       debugPrint('[LocalExamCacheService] addExamToHistoryCache error: $e');
     }
@@ -96,10 +112,11 @@ class LocalExamCacheService {
   }
 
   /// Retrieve all locally cached exam results
-  static Future<List<ExamResult>> getAllCachedExamResults() async {
+  static Future<List<ExamResult>> getAllCachedExamResults({String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      final idsKey = _scopedKey(_kSavedExamIdsKey, userId);
+      final ids = prefs.getStringList(idsKey) ?? [];
       final List<ExamResult> results = [];
       for (final id in ids) {
         final res = await getExamResult(id);
@@ -123,21 +140,21 @@ class LocalExamCacheService {
   }
 
   /// Cache the exam history list for instant offline display
-  static Future<void> cacheHistoryList(List<Map<String, dynamic>> rawList) async {
+  static Future<void> cacheHistoryList(List<Map<String, dynamic>> rawList, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonStr = jsonEncode(rawList);
-      await prefs.setString(_kHistoryCacheKey, jsonStr);
+      await prefs.setString(_scopedKey(_kHistoryCacheKey, userId), jsonStr);
     } catch (e) {
       debugPrint('[LocalExamCacheService] cacheHistoryList error: $e');
     }
   }
 
   /// Load cached history list when offline
-  static Future<List<Map<String, dynamic>>?> getCachedHistoryList() async {
+  static Future<List<Map<String, dynamic>>?> getCachedHistoryList({String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final jsonStr = prefs.getString(_kHistoryCacheKey);
+      final jsonStr = prefs.getString(_scopedKey(_kHistoryCacheKey, userId));
       if (jsonStr == null || jsonStr.isEmpty) return null;
 
       final list = jsonDecode(jsonStr) as List<dynamic>;
@@ -149,20 +166,20 @@ class LocalExamCacheService {
   }
 
   /// Cache questions list for Questions tab offline support
-  static Future<void> cacheQuestionsList(List<Map<String, dynamic>> questions) async {
+  static Future<void> cacheQuestionsList(List<Map<String, dynamic>> questions, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kQuestionsCacheKey, jsonEncode(questions));
+      await prefs.setString(_scopedKey(_kQuestionsCacheKey, userId), jsonEncode(questions));
     } catch (e) {
       debugPrint('[LocalExamCacheService] cacheQuestionsList error: $e');
     }
   }
 
   /// Retrieve cached questions list for Questions tab offline support
-  static Future<List<Map<String, dynamic>>?> getCachedQuestionsList() async {
+  static Future<List<Map<String, dynamic>>?> getCachedQuestionsList({String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final jsonStr = prefs.getString(_kQuestionsCacheKey);
+      final jsonStr = prefs.getString(_scopedKey(_kQuestionsCacheKey, userId));
       if (jsonStr == null || jsonStr.isEmpty) return null;
 
       final list = jsonDecode(jsonStr) as List<dynamic>;
@@ -174,20 +191,20 @@ class LocalExamCacheService {
   }
 
   /// Cache bookmarked question IDs
-  static Future<void> cacheBookmarks(Set<String> bookmarkIds) async {
+  static Future<void> cacheBookmarks(Set<String> bookmarkIds, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList(_kBookmarksCacheKey, bookmarkIds.toList());
+      await prefs.setStringList(_scopedKey(_kBookmarksCacheKey, userId), bookmarkIds.toList());
     } catch (e) {
       debugPrint('[LocalExamCacheService] cacheBookmarks error: $e');
     }
   }
 
   /// Retrieve cached bookmarked question IDs
-  static Future<Set<String>> getCachedBookmarks() async {
+  static Future<Set<String>> getCachedBookmarks({String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final list = prefs.getStringList(_kBookmarksCacheKey);
+      final list = prefs.getStringList(_scopedKey(_kBookmarksCacheKey, userId));
       return list?.toSet() ?? {};
     } catch (e) {
       debugPrint('[LocalExamCacheService] getCachedBookmarks error: $e');
@@ -224,31 +241,34 @@ class LocalExamCacheService {
   }
 
   /// Delete a single cached exam
-  static Future<void> removeExam(String id) async {
+  static Future<void> removeExam(String id, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('$_kExamPrefix$id');
-      List<String> ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      final idsKey = _scopedKey(_kSavedExamIdsKey, userId);
+      List<String> ids = prefs.getStringList(idsKey) ?? [];
       ids.remove(id);
-      await prefs.setStringList(_kSavedExamIdsKey, ids);
+      await prefs.setStringList(idsKey, ids);
     } catch (e) {
       debugPrint('[LocalExamCacheService] removeExam error: $e');
     }
   }
 
   /// Delete an exam result from local storage and update history cache
-  static Future<void> deleteExamFromCache(String id) async {
+  static Future<void> deleteExamFromCache(String id, {String? userId}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('$_kExamPrefix$id');
 
-      List<String> ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      final idsKey = _scopedKey(_kSavedExamIdsKey, userId);
+      List<String> ids = prefs.getStringList(idsKey) ?? [];
       ids.remove(id);
-      await prefs.setStringList(_kSavedExamIdsKey, ids);
+      await prefs.setStringList(idsKey, ids);
 
-      List<Map<String, dynamic>> current = await getCachedHistoryList() ?? [];
+      List<Map<String, dynamic>> current = await getCachedHistoryList(userId: userId) ?? [];
       current.removeWhere((item) => item['id']?.toString() == id);
-      await prefs.setString(_kHistoryCacheKey, jsonEncode(current));
+      await prefs.setString(_scopedKey(_kHistoryCacheKey, userId), jsonEncode(current));
+
       debugPrint('[LocalExamCacheService] Deleted exam $id from cache.');
     } catch (e) {
       debugPrint('[LocalExamCacheService] deleteExamFromCache error: $e');
@@ -290,20 +310,16 @@ class LocalExamCacheService {
     }
   }
 
-  /// Clear all cached exams
+  /// Clear all cached exams and data across users
   static Future<void> clearAll() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
-      for (final id in ids) {
-        await prefs.remove('$_kExamPrefix$id');
+      final allKeys = prefs.getKeys();
+      for (final key in allKeys) {
+        if (key.startsWith('obhyash_cached_')) {
+          await prefs.remove(key);
+        }
       }
-      await prefs.remove(_kSavedExamIdsKey);
-      await prefs.remove(_kHistoryCacheKey);
-      await prefs.remove(_kQuestionsCacheKey);
-      await prefs.remove(_kBookmarksCacheKey);
-      await prefs.remove(_kSubjectListCacheKey);
-      await prefs.remove(_kActiveDraftKey);
     } catch (e) {
       debugPrint('[LocalExamCacheService] clearAll error: $e');
     }

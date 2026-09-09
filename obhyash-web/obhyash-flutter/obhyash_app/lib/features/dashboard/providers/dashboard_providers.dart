@@ -424,7 +424,9 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
 
     final targetStream = profile?.stream?.toLowerCase().trim() ?? '';
     final examTarget = profile?.examTarget?.toLowerCase().trim() ?? '';
-    final cacheKey = 'cached_dashboard_live_exams_${targetStream}_$examTarget';
+    final level = profile?.level?.toLowerCase().trim() ?? '';
+    final isSSC = targetStream.contains('ssc') || level.contains('ssc');
+    final cacheKey = 'cached_dashboard_live_exams_${targetStream}_${examTarget}_$isSSC';
 
     // 1. Cache-first: return immediately if cached
     final cached = prefs.getString(cacheKey);
@@ -437,19 +439,20 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
             .toList();
         if (cachedExams.isNotEmpty) {
           // Trigger background refresh
-          unawaited(_fetchAndCache(targetStream, examTarget, cacheKey, prefs));
+          unawaited(_fetchAndCache(targetStream, examTarget, isSSC, cacheKey, prefs));
           return cachedExams;
         }
       } catch (_) {}
     }
 
     // 2. Network fetch
-    return _fetchAndCache(targetStream, examTarget, cacheKey, prefs);
+    return _fetchAndCache(targetStream, examTarget, isSSC, cacheKey, prefs);
   }
 
   Future<List<LiveExam>> _fetchAndCache(
     String targetStream,
     String examTarget,
+    bool isSSC,
     String cacheKey,
     dynamic prefs,
   ) async {
@@ -477,17 +480,52 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
         return a.startTime.compareTo(b.startTime);
       });
 
-      // Keep all relevant exams for HSC & Admission students (HSC, Medical, Engineering, Varsity, All)
       final matchingExams = activeExams.where((e) {
         final cat = e.category.toLowerCase().trim();
-        if (cat.isEmpty || cat == 'all' || cat == 'general') return true;
-        if (cat == 'hsc' || cat == 'medical' || cat == 'engineering' || cat == 'varsity_a' || cat == 'varsity') return true;
-        if (targetStream.isNotEmpty && (cat.contains(targetStream) || targetStream.contains(cat))) return true;
-        if (examTarget.isNotEmpty && (cat.contains(examTarget) || examTarget.contains(cat))) return true;
-        return false;
+        final title = e.title.toLowerCase();
+
+        if (isSSC) {
+          // Exclude pure HSC & Admission exams for SSC students
+          if (cat == 'hsc' ||
+              cat == 'medical' ||
+              cat == 'engineering' ||
+              cat == 'varsity' ||
+              cat == 'varsity_a' ||
+              title.contains('buet') ||
+              title.contains('মেডিকেল') ||
+              title.contains('ইঞ্জিনিয়ারিং') ||
+              title.contains('varsity') ||
+              title.contains('hsc') ||
+              title.contains('এইচএসসি')) {
+            return false;
+          }
+          if (cat.startsWith('ssc') || title.contains('ssc') || title.contains('এসএসসি')) {
+            return true;
+          }
+          if (cat.isEmpty || cat == 'all' || cat == 'general') return true;
+          if (targetStream.isNotEmpty && (cat.contains(targetStream) || targetStream.contains(cat))) return true;
+          return false;
+        } else {
+          // HSC / Admission student: reject SSC exams
+          if (cat.startsWith('ssc') || title.contains('ssc') || title.contains('এসএসসি')) {
+            return false;
+          }
+          if (cat.isEmpty || cat == 'all' || cat == 'general') return true;
+          if (cat == 'hsc' || cat == 'medical' || cat == 'engineering' || cat == 'varsity_a' || cat == 'varsity') return true;
+          if (targetStream.isNotEmpty && (cat.contains(targetStream) || targetStream.contains(cat))) return true;
+          if (examTarget.isNotEmpty && (cat.contains(examTarget) || examTarget.contains(cat))) return true;
+          return false;
+        }
       }).toList();
 
-      final displayExams = matchingExams.isNotEmpty ? matchingExams : activeExams;
+      final displayExams = matchingExams.isNotEmpty
+          ? matchingExams
+          : (isSSC
+              ? activeExams.where((e) => !e.category.toLowerCase().contains('engineering') &&
+                  !e.category.toLowerCase().contains('medical') &&
+                  !e.category.toLowerCase().contains('varsity') &&
+                  !e.category.toLowerCase().contains('hsc')).toList()
+              : activeExams);
 
       prefs.setString(
         cacheKey,
