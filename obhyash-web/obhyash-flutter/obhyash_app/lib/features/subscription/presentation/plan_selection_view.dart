@@ -631,7 +631,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                         text: 'মেয়াদ বৃদ্ধি: ',
                                         style: TextStyle(fontWeight: FontWeight.w600),
                                       ),
-                                      TextSpan(text: 'বর্তমান $_daysRemaining দিনের সাথে নতুন ${selectedPlan.durationDays} দিন যোগ হয়ে মোট '),
+                                      TextSpan(text: 'বর্তমান $_daysRemaining দিনের সাথে নতুন ${selectedPlan.durationDays} দিন যোগ হয়ে মোট '),
                                       TextSpan(
                                         text: '${_daysRemaining + selectedPlan.durationDays} দিন ',
                                         style: const TextStyle(
@@ -653,12 +653,17 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                         Builder(builder: (ctx) {
                           final effectivePrice = CouponService.effectivePrice(selectedPlan.price, _appliedCoupon);
                           final hasDiscount = effectivePrice != selectedPlan.price;
+                          final isDisabled = !paymentsEnabled;
                           return SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF12544F),
-                                foregroundColor: Colors.white,
+                                backgroundColor: isDisabled
+                                    ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
+                                    : const Color(0xFF12544F),
+                                foregroundColor: isDisabled
+                                    ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                                    : Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -669,53 +674,60 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text(
-                                    'পেমেন্ট করতে এগিয়ে যান',
-                                    style: TextStyle(
+                                  if (isDisabled)
+                                    const Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(LucideIcons.lock, size: 16),
+                                    ),
+                                  Text(
+                                    isDisabled ? 'পেমেন্ট সাময়িক বন্ধ' : 'পেমেন্ট করতে এগিয়ে যান',
+                                    style: const TextStyle(
                                       fontSize: 15.5,
                                       fontWeight: FontWeight.w600,
                                       fontFamily: 'HindSiliguri',
                                       letterSpacing: 0.2,
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (hasDiscount) ...[
+                                  if (!isDisabled) ...[
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (hasDiscount) ...[
+                                            Text(
+                                              '৳${selectedPlan.price}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.normal,
+                                                fontFamily: 'HindSiliguri',
+                                                color: Colors.white60,
+                                                decoration: TextDecoration.lineThrough,
+                                                decorationColor: Colors.white60,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                          ],
                                           Text(
-                                            '৳${selectedPlan.price}',
+                                            '৳$effectivePrice',
                                             style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
                                               fontFamily: 'HindSiliguri',
-                                              color: Colors.white60,
-                                              decoration: TextDecoration.lineThrough,
-                                              decorationColor: Colors.white60,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          const SizedBox(width: 4),
                                         ],
-                                        Text(
-                                          '৳$effectivePrice',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: 'HindSiliguri',
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(LucideIcons.arrowRight, size: 18),
+                                    const SizedBox(width: 8),
+                                    const Icon(LucideIcons.arrowRight, size: 18),
+                                  ],
                                 ],
                               ),
                             ),
