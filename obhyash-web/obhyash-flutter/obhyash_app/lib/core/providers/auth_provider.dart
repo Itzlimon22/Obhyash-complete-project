@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/exam/services/local_exam_cache_service.dart';
 import '../../services/secure_storage_service.dart';
 import '../../services/session_monitor_service.dart';
+import '../../features/notifications/providers/notification_providers.dart';
 import '../router.dart';
 import '../utils/app_popups.dart';
 
@@ -98,9 +99,13 @@ class AuthNotifier extends Notifier<User?> {
       }
     }
 
-    // 2. Unregistered Google account check
-    if (!isRegistered) {
-      debugPrint('[AuthNotifier] ❌ Unregistered account ($email). Rejecting login and signing out.');
+    // 2. Unregistered Google account check (Only applies to Google OAuth logins)
+    final provider = user.appMetadata['provider'] as String? ?? '';
+    final isGoogleUser = provider == 'google' ||
+        (user.identities?.any((i) => i.provider == 'google') ?? false);
+
+    if (isGoogleUser && !isRegistered) {
+      debugPrint('[AuthNotifier] ❌ Unregistered Google account ($email). Rejecting login and signing out.');
       state = null;
       try {
         await supabase.auth.signOut(scope: SignOutScope.local);
@@ -134,7 +139,8 @@ class AuthNotifier extends Notifier<User?> {
     // On fresh login, generate a new unique session and set it in DB.
     // Previous devices will receive the Realtime event and auto-logout silently.
     var sessionId = await SecureStorageService.getSessionId();
-    if (event == AuthChangeEvent.signedIn || sessionId == null || sessionId.isEmpty) {
+    final isFreshLogin = event == AuthChangeEvent.signedIn || sessionId == null || sessionId.isEmpty;
+    if (isFreshLogin) {
       sessionId = SessionMonitorService.generateSessionId(session.user.id);
       await SessionMonitorService.registerActiveSession(session.user.id, sessionId);
     }
@@ -151,6 +157,7 @@ class AuthNotifier extends Notifier<User?> {
     unawaited(
       SessionMonitorService.start(
         userId: session.user.id,
+        isFreshLogin: isFreshLogin,
         onForcedSignOut: () async {
           debugPrint('[AuthNotifier] Newer session on another device. Silent auto-logout.');
           await signOut();
@@ -166,6 +173,7 @@ class AuthNotifier extends Notifier<User?> {
       unawaited(SessionMonitorService.stop(userId: uid));
     }
     state = null;
+    ref.invalidate(notificationsProvider);
     await Future.wait([
       SecureStorageService.clearSession().catchError((_) {}),
       SecureStorageService.clearUserMeta().catchError((_) {}),

@@ -9,7 +9,7 @@ TESTERS_GROUP="beta-testers"
 RELEASE_NOTES="${1:-নতুন আপডেট। Bug পেলে জানাও।}"
 
 echo "🔨 Building release APK..."
-flutter build apk --release --flavor production
+flutter build apk --release
 
 if [ $? -ne 0 ]; then
   echo "❌ Build failed!"

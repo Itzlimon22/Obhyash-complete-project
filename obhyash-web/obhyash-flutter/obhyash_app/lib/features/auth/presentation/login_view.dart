@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/app_popups.dart';
 import '../providers/auth_controller.dart';
 import 'forgot_password_sheet.dart';
+import '../../../core/theme/app_theme.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -99,7 +100,7 @@ class _LoginViewState extends ConsumerState<LoginView>
     const bgColor = Color(0xFF000000); // OLED Pure Black
 
     return Theme(
-      data: ThemeData.dark().copyWith(
+      data: AppTheme.darkTheme.copyWith(
         scaffoldBackgroundColor: bgColor,
         colorScheme: const ColorScheme.dark(
           surface: Color(0xFF141417),

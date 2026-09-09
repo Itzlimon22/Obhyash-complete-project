@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/app_popups.dart';
 import '../providers/auth_controller.dart';
+import '../../../core/theme/app_theme.dart';
 
 class ForgotPasswordSheet extends ConsumerStatefulWidget {
   const ForgotPasswordSheet({super.key});
@@ -55,7 +56,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
     const bgColor = Color(0xFF000000);
 
     return Theme(
-      data: ThemeData.dark().copyWith(
+      data: AppTheme.darkTheme.copyWith(
         scaffoldBackgroundColor: bgColor,
         colorScheme: const ColorScheme.dark(
           surface: Color(0xFF000000),

@@ -400,11 +400,11 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
           ElevatedButton(
             onPressed: _isVerifying ? null : _handleVerify,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
+              backgroundColor: const Color(0xFF064E3B),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 13),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
               ),
               elevation: 0,
             ),
@@ -420,8 +420,8 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                 : const Text(
                     'যাচাই করে এগিয়ে যাও',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      fontWeight: FontWeight.normal,
                       fontFamily: 'HindSiliguri',
                     ),
                   ),

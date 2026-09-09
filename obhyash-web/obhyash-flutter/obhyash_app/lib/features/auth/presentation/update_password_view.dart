@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/app_popups.dart';
 import '../providers/auth_controller.dart';
+import '../../../core/theme/app_theme.dart';
 
 class UpdatePasswordView extends ConsumerStatefulWidget {
   const UpdatePasswordView({super.key});
@@ -113,7 +114,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
     const bgColor = Color(0xFF000000); // OLED Pure Black
 
     return Theme(
-      data: ThemeData.dark().copyWith(
+      data: AppTheme.darkTheme.copyWith(
         scaffoldBackgroundColor: bgColor,
         colorScheme: const ColorScheme.dark(
           surface: Color(0xFF141417),

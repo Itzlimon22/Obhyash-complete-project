@@ -12,13 +12,13 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
 
   @override
   Future<List<AppNotification>> build() async {
-    // 1. Always load local persistent notifications immediately (offline-first & seed support)
-    final localList = await NotificationStorageService.getLocalNotifications();
-
     final authId = ref.watch(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
     if (authId == null) {
-      return localList;
+      return [];
     }
+
+    // 1. Load user-scoped local persistent notifications
+    final localList = await NotificationStorageService.getLocalNotifications(userId: authId);
 
     // 2. Start realtime subscription
     _listenRealtime(authId);
@@ -31,7 +31,9 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
 
     final map = <String, AppNotification>{};
     for (final n in localList) {
-      map[n.id] = n;
+      if (n.userId == authId || n.userId == 'local' || n.id.startsWith('seed_')) {
+        map[n.id] = n;
+      }
     }
     for (final n in remoteList) {
       map[n.id] = n;
@@ -40,8 +42,8 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
     final merged = map.values.toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-    // Also update local cache
-    await NotificationStorageService.saveAllNotifications(merged);
+    // Also update local cache for this specific user
+    await NotificationStorageService.saveAllNotifications(merged, userId: authId);
 
     return merged;
   }
@@ -87,7 +89,7 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
               // Update local state
               state = state.whenData((current) => [notification, ...current]);
               ref.read(latestNotificationEventProvider.notifier).emit(notification);
-              NotificationStorageService.saveNotification(notification);
+              NotificationStorageService.saveNotification(notification, userId: userId);
 
               // Trigger heads up local alert
               final targetRoute = notification.data?['route']?.toString() ?? notification.link;
@@ -120,8 +122,10 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
   }
 
   Future<void> markAsRead(String id) async {
+    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+
     // 1. Update local storage
-    await NotificationStorageService.markAsRead(id);
+    await NotificationStorageService.markAsRead(id, userId: authId);
 
     // 2. Update remote in background if possible
     final sb = Supabase.instance.client;
@@ -137,11 +141,12 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
   }
 
   Future<void> markAllAsRead() async {
+    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+
     // 1. Update local storage
-    await NotificationStorageService.markAllAsRead();
+    await NotificationStorageService.markAllAsRead(userId: authId);
 
     // 2. Update remote in background if possible
-    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
     if (authId != null) {
       final sb = Supabase.instance.client;
       try {
@@ -157,8 +162,10 @@ class NotificationsNotifier extends AsyncNotifier<List<AppNotification>> {
   }
 
   Future<void> deleteNotification(String id) async {
+    final authId = ref.read(authProvider)?.id ?? Supabase.instance.client.auth.currentUser?.id;
+
     // 1. Update local storage
-    await NotificationStorageService.deleteNotification(id);
+    await NotificationStorageService.deleteNotification(id, userId: authId);
 
     // 2. Update remote in background if possible
     final sb = Supabase.instance.client;

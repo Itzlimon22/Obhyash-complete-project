@@ -18,6 +18,9 @@ import 'features/notifications/services/notification_service.dart';
 import 'core/providers/auth_provider.dart';
 import 'services/session_monitor_service.dart';
 import 'services/anti_piracy_service.dart';
+import 'core/services/shake_feedback_service.dart';
+import 'core/services/device_security_service.dart';
+import 'core/presentation/screens/device_blocked_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,6 +101,7 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    ShakeFeedbackService().initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final isEnabled = ref.read(isScreenshotProtectionEnabledProvider);
       AntiPiracyService.setProtection(isEnabled);
@@ -121,6 +125,7 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
 
   @override
   void dispose() {
+    ShakeFeedbackService().stop();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -128,6 +133,7 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      ShakeFeedbackService().initialize();
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
         SessionMonitorService.checkSessionSync(
@@ -137,6 +143,8 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
       }
       final isSecureEnabled = ref.read(isScreenshotProtectionEnabledProvider);
       AntiPiracyService.setProtection(isSecureEnabled);
+    } else if (state == AppLifecycleState.paused) {
+      ShakeFeedbackService().stop();
     }
   }
 
@@ -168,6 +176,15 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
+        // 0. Hardware / Persistent Device Block Screen
+        final deviceBlockAsync = ref.watch(deviceBlockStreamProvider);
+        if (deviceBlockAsync.value?.isBlocked == true) {
+          return DeviceBlockedScreen(
+            deviceId: deviceBlockAsync.value?.deviceId,
+            reason: deviceBlockAsync.value?.reason,
+          );
+        }
+
         // 1. Force Update Screen
         if (isForceUpdate) {
           final minVersion = configAsync.value?.minAppVersion ?? '1.0.0';
@@ -197,8 +214,14 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
               maxScaleFactor: 2.0,
             ),
           ),
-          child: OfflineBannerWrapper(
-            child: child ?? const SizedBox.shrink(),
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontFamilyFallback: ['HindSiliguri', 'sans-serif'],
+            ),
+            child: OfflineBannerWrapper(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },

@@ -286,6 +286,7 @@ class _QuestionCardState extends State<QuestionCard>
                                 style: TextStyle(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
+                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFFBBF24)
                                       : const Color(0xFFD97706),

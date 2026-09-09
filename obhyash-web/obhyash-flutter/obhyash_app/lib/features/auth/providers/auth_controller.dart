@@ -89,18 +89,6 @@ class AuthController extends AsyncNotifier<void> {
         final user = response.user;
 
         if (session != null && user != null) {
-          final sessionId = '${user.id}:${session.accessToken.hashCode}';
-
-          // Persist tokens in background (non-blocking)
-          unawaited(
-            SecureStorageService.saveSession(
-              accessToken: session.accessToken,
-              refreshToken: session.refreshToken ?? '',
-              userId: user.id,
-              sessionId: sessionId,
-            ),
-          );
-
           unawaited(
             SecureStorageService.saveUserMeta({
               'name': user.userMetadata?['full_name'] ?? '',
@@ -110,34 +98,15 @@ class AuthController extends AsyncNotifier<void> {
 
           try {
             unawaited(
-              _supabase.from('users').upsert({
-                'id': user.id,
-                'email': user.email ?? '',
-                'name':
-                    user.userMetadata?['full_name'] ??
-                    user.userMetadata?['name'] ??
-                    'Student',
-                'role':
-                    user.userMetadata?['role'] ??
-                    user.appMetadata['role'] ??
-                    'Student',
+              _supabase.from('users').update({
                 'last_active': DateTime.now().toIso8601String(),
-              }, onConflict: 'id'),
+              }).eq('id', user.id),
             );
-          } catch (upsertErr) {
+          } catch (updateErr) {
             debugPrint(
-              '[AuthController] users row upsert error (non-fatal): $upsertErr',
+              '[AuthController] users last_active update error (non-fatal): $updateErr',
             );
           }
-
-          try {
-            unawaited(
-              SessionMonitorService.start(
-                userId: user.id,
-                onForcedSignOut: () async => logout(forced: true),
-              ),
-            );
-          } catch (_) {}
 
           ref.invalidate(userProfileProvider);
         }
@@ -293,6 +262,18 @@ class AuthController extends AsyncNotifier<void> {
             } catch (refErr) {
               debugPrint('[AuthController] Referral error on signup: $refErr');
               // Proceed with signup even if referral fails
+            }
+          }
+
+          // Ensure active session exists after registration so user is logged in
+          if (_supabase.auth.currentSession == null) {
+            try {
+              await _supabase.auth.signInWithPassword(
+                email: email,
+                password: password,
+              );
+            } catch (loginErr) {
+              debugPrint('[AuthController] Auto-login after signup: $loginErr');
             }
           }
         }

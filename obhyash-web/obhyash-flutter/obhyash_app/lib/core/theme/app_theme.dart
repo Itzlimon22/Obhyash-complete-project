@@ -66,17 +66,49 @@ class AppTheme {
     );
   }
 
+  static TextTheme _applyHindSiliguri(TextTheme theme) {
+    TextStyle apply(TextStyle? style) {
+      final s = style ?? const TextStyle();
+      return s.copyWith(
+        fontFamily: 'HindSiliguri',
+        fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
+      );
+    }
+
+    return theme.copyWith(
+      displayLarge: apply(theme.displayLarge),
+      displayMedium: apply(theme.displayMedium),
+      displaySmall: apply(theme.displaySmall),
+      headlineLarge: apply(theme.headlineLarge),
+      headlineMedium: apply(theme.headlineMedium),
+      headlineSmall: apply(theme.headlineSmall),
+      titleLarge: apply(theme.titleLarge),
+      titleMedium: apply(theme.titleMedium),
+      titleSmall: apply(theme.titleSmall),
+      bodyLarge: apply(theme.bodyLarge),
+      bodyMedium: apply(theme.bodyMedium),
+      bodySmall: apply(theme.bodySmall),
+      labelLarge: apply(theme.labelLarge),
+      labelMedium: apply(theme.labelMedium),
+      labelSmall: apply(theme.labelSmall),
+    );
+  }
+
   static ThemeData get lightTheme {
-    final baseTextTheme = _bumpTextTheme(
-      GoogleFonts.hindSiliguriTextTheme(ThemeData.light().textTheme),
+    final baseTextTheme = _applyHindSiliguri(
+      _bumpTextTheme(
+        GoogleFonts.hindSiliguriTextTheme(ThemeData.light().textTheme),
+      ),
     );
 
     return ThemeData(
       brightness: Brightness.light,
-      fontFamily: GoogleFonts.hindSiliguri().fontFamily,
+      fontFamily: 'HindSiliguri',
+      fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFFFAFAF9),
       textTheme: baseTextTheme,
+      primaryTextTheme: baseTextTheme,
       colorScheme: const ColorScheme.light(
         primary: AppColors.viridianForest,
         secondary: AppColors.royalMulberry,
@@ -90,6 +122,12 @@ class AppTheme {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimaryLight,
         elevation: 0,
+        titleTextStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimaryLight,
+        ),
       ),
       cardTheme: CardThemeData(
         color: Colors.white,
@@ -104,15 +142,86 @@ class AppTheme {
           elevation: 0,
           backgroundColor: AppColors.viridianForest,
           foregroundColor: Colors.white,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.viridianForest,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.viridianForest,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      tabBarTheme: const TabBarThemeData(
+        labelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        selectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 12,
+        ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        hintStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          color: AppColors.textSecondaryLight,
+        ),
+        labelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          color: AppColors.textSecondaryLight,
+        ),
+      ),
       dialogTheme: DialogThemeData(
         backgroundColor: Colors.white,
         elevation: 0,
+        titleTextStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimaryLight,
+        ),
+        contentTextStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+          color: AppColors.textSecondaryLight,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: AppColors.coolGreyLight, width: 1),
@@ -136,13 +245,16 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final baseTextTheme = _bumpTextTheme(
-      GoogleFonts.hindSiliguriTextTheme(ThemeData.dark().textTheme),
+    final baseTextTheme = _applyHindSiliguri(
+      _bumpTextTheme(
+        GoogleFonts.hindSiliguriTextTheme(ThemeData.dark().textTheme),
+      ),
     );
     
     return ThemeData(
       brightness: Brightness.dark,
-      fontFamily: GoogleFonts.hindSiliguri().fontFamily,
+      fontFamily: 'HindSiliguri',
+      fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFF000000), // OLED Pure Black
       textTheme: baseTextTheme.copyWith(
@@ -156,6 +268,7 @@ class AppTheme {
         headlineMedium: baseTextTheme.headlineMedium?.copyWith(color: AppColors.textPrimaryDark),
         headlineSmall: baseTextTheme.headlineSmall?.copyWith(color: AppColors.textPrimaryDark),
       ),
+      primaryTextTheme: baseTextTheme,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.viridianForest,
         secondary: AppColors.royalMulberry,
@@ -170,6 +283,12 @@ class AppTheme {
         foregroundColor: AppColors.textPrimaryDark,
         elevation: 0,
         centerTitle: true,
+        titleTextStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimaryDark,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.refinedCharcoal,
@@ -179,28 +298,83 @@ class AppTheme {
           side: const BorderSide(color: AppColors.refinedCharcoal, width: 0.5),
         ),
       ),
+      tabBarTheme: const TabBarThemeData(
+        labelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+        ),
+      ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Color(0xFF000000), // OLED Black
         selectedItemColor: AppColors.viridianForest,
         unselectedItemColor: AppColors.textSecondaryDark,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+        selectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 12,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.viridianForest,
           foregroundColor: Colors.white,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.viridianForest,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.viridianForest,
+          textStyle: const TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.refinedCharcoal,
-        hintStyle: const TextStyle(color: AppColors.textSecondaryDark),
+        hintStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          color: AppColors.textSecondaryDark,
+        ),
+        labelStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          color: AppColors.textSecondaryDark,
+        ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -218,6 +392,17 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: const Color(0xFF000000), // OLED Pure Black
         elevation: 0,
+        titleTextStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimaryDark,
+        ),
+        contentTextStyle: const TextStyle(
+          fontFamily: 'HindSiliguri',
+          fontSize: 14,
+          color: AppColors.textSecondaryDark,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: Color.fromARGB(255, 18, 18, 20), width: 1),

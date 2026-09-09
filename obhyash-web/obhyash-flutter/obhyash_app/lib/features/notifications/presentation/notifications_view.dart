@@ -120,9 +120,18 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
     }
 
     try {
-      // 1. Fetch local offline-first & seeded notifications
-      final local = await NotificationStorageService.getLocalNotifications();
+      final user = supabase.auth.currentUser;
+
+      // 1. Fetch user-scoped local notifications
+      final local = await NotificationStorageService.getLocalNotifications(userId: user?.id);
       var currentList = List<AppNotification>.from(local);
+
+      // Filter to ensure no other user's notifications are ever displayed
+      if (user != null) {
+        currentList = currentList
+            .where((n) => n.userId == user.id || n.userId == 'local' || n.id.startsWith('seed_'))
+            .toList();
+      }
 
       if (_filter == 'unread') {
         currentList = currentList.where((n) => !n.isRead).toList();
@@ -135,7 +144,6 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
       }
 
       // 2. Fetch remote notifications if user is logged in
-      final user = supabase.auth.currentUser;
       if (user != null) {
         var query = supabase.from('notifications').select().eq('user_id', user.id);
 

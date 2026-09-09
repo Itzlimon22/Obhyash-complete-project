@@ -57,18 +57,18 @@ class SessionMonitorService {
     await SecureStorageService.saveSessionId(sessionId);
 
     try {
+      await _supabase.from('users').update({
+        'current_session_id': sessionId,
+      }).eq('id', userId);
+    } catch (e) {
+      debugPrint('[SessionMonitor] Direct update session error: $e');
+    }
+
+    try {
       await _supabase.rpc('set_active_user_session', params: {
         'p_session_id': sessionId,
       });
-    } catch (_) {
-      try {
-        await _supabase.from('users').update({
-          'current_session_id': sessionId,
-        }).eq('id', userId);
-      } catch (e) {
-        debugPrint('[SessionMonitor] Error registering active session: $e');
-      }
-    }
+    } catch (_) {}
   }
 
   /// Starts real-time monitoring of the user's active session.
@@ -76,11 +76,12 @@ class SessionMonitorService {
   static Future<void> start({
     required String userId,
     required ForceSignOutCallback onForcedSignOut,
+    bool isFreshLogin = false,
   }) async {
     // 1. Retrieve local session ID
     var sessionId = await SecureStorageService.getSessionId();
-    if (sessionId == null || sessionId.isEmpty) {
-      sessionId = generateSessionId(userId);
+    if (sessionId == null || sessionId.isEmpty || isFreshLogin) {
+      sessionId = _currentSessionId ?? generateSessionId(userId);
       await registerActiveSession(userId, sessionId);
     }
     _currentSessionId = sessionId;
@@ -96,14 +97,22 @@ class SessionMonitorService {
             .maybeSingle();
 
         final dbSessionId = res?['current_session_id'] as String?;
-        if (dbSessionId != null &&
-            dbSessionId.isNotEmpty &&
-            dbSessionId != _currentSessionId) {
-          debugPrint('[SessionMonitor] ⚠️ Stale session detected on startup. Silent auto-logout.');
-          await onForcedSignOut();
-          return;
-        } else if (dbSessionId == null || dbSessionId.isEmpty) {
-          await registerActiveSession(userId, _currentSessionId!);
+        if (isFreshLogin) {
+          // On fresh login, this device takes ownership of the active session
+          if (dbSessionId != _currentSessionId) {
+            await registerActiveSession(userId, _currentSessionId!);
+          }
+        } else {
+          // On cold start / existing session, check if replaced elsewhere
+          if (dbSessionId != null &&
+              dbSessionId.isNotEmpty &&
+              dbSessionId != _currentSessionId) {
+            debugPrint('[SessionMonitor] ⚠️ Stale session detected on startup. Silent auto-logout.');
+            await onForcedSignOut();
+            return;
+          } else if (dbSessionId == null || dbSessionId.isEmpty) {
+            await registerActiveSession(userId, _currentSessionId!);
+          }
         }
       }
     } catch (e) {

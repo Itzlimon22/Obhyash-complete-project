@@ -11,6 +11,7 @@ import 'widgets/otp_verification_dialog.dart';
 
 import '../providers/auth_controller.dart';
 import '../../../core/data/college_list.dart';
+import '../../../core/theme/app_theme.dart';
 
 class SignupView extends ConsumerStatefulWidget {
   const SignupView({super.key});
@@ -282,11 +283,11 @@ class _SignupViewState extends ConsumerState<SignupView>
     }
 
     return Theme(
-      data: ThemeData.dark().copyWith(
+      data: AppTheme.darkTheme.copyWith(
         scaffoldBackgroundColor: bgColor,
         colorScheme: const ColorScheme.dark(
           surface: Color(0xFF141417),
-          primary: Color(0xFF059669),
+          primary: Color(0xFF064E3B),
         ),
       ),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -296,159 +297,161 @@ class _SignupViewState extends ConsumerState<SignupView>
         ),
         child: Scaffold(
           backgroundColor: bgColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 32),
-          child: AnimatedBuilder(
-            animation: _animController,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Opacity(opacity: _fadeAnimation.value, child: child),
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Header
-                Text(
-                  'রেজিস্ট্রেশন',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                _buildProgressBar(isDark),
-                const SizedBox(height: 32),
-
-                // Render Step Content
-                _step == 1
-                    ? _buildStep1(isDark)
-                    : _step == 2
-                    ? _buildStep2(isDark)
-                    : _buildStep3(isDark),
-
-                const SizedBox(height: 32),
-
-                // Action Buttons
-                Row(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+              child: AnimatedBuilder(
+                animation: _animController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _scaleAnimation.value,
+                    child: Opacity(opacity: _fadeAnimation.value, child: child),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_step > 1) ...[
-                      InkWell(
-                        onTap: _handleBack,
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF141417),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFF27272A)),
+                    // Header
+                    const Text(
+                      'রেজিস্ট্রেশন',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        fontFamily: 'HindSiliguri',
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildProgressBar(isDark),
+                    const SizedBox(height: 20),
+
+                    // Render Step Content
+                    _step == 1
+                        ? _buildStep1(isDark)
+                        : _step == 2
+                        ? _buildStep2(isDark)
+                        : _buildStep3(isDark),
+
+                    const SizedBox(height: 20),
+
+                    // Action Buttons
+                    Row(
+                      children: [
+                        if (_step > 1) ...[
+                          InkWell(
+                            onTap: _handleBack,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF141417),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFF27272A)),
+                              ),
+                              child: const Icon(
+                                LucideIcons.chevronLeft,
+                                size: 20,
+                                color: Color(0xFFA1A1AA),
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            LucideIcons.chevronLeft,
+                          const SizedBox(width: 10),
+                        ],
+
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: (isLoading || _isSendingOtp)
+                                ? null
+                                : (_step == 3 ? _handleSignup : _handleNext),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF064E3B),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: (isLoading || _isSendingOtp)
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : _step == 3
+                                ? const Text(
+                                    'অ্যাকাউন্ট তৈরি করো',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: 'HindSiliguri',
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  )
+                                : const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'পরবর্তী ধাপ',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'HindSiliguri',
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                      SizedBox(width: 6),
+                                      Icon(
+                                        LucideIcons.chevronRight,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'আগেই অ্যাকাউন্ট আছে? ',
+                          style: TextStyle(
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.normal,
                             color: Color(0xFFA1A1AA),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: (isLoading || _isSendingOtp)
-                            ? null
-                            : (_step == 3 ? _handleSignup : _handleNext),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF059669),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                        GestureDetector(
+                          onTap: () => context.push('/login'),
+                          child: const Text(
+                            'লগইন করো',
+                            style: TextStyle(
+                              fontFamily: 'HindSiliguri',
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.normal,
+                              color: Color(0xFF34D399),
+                            ),
                           ),
                         ),
-                        child: (isLoading || _isSendingOtp)
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : _step == 3
-                            ? const Text(
-                                'অ্যাকাউন্ট তৈরি করো',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'HindSiliguri',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'পরবর্তী ধাপ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'HindSiliguri',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Icon(
-                                    LucideIcons.chevronRight,
-                                    size: 20,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'আগেই অ্যাকাউন্ট আছে? ',
-                      style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 16,
-                        color: Color(0xFFA1A1AA),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => context.push('/login'),
-                      child: const Text(
-                        'লগইন করো',
-                        style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF059669),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  ),
-);
+    );
 }
 
   Widget _buildProgressBar(bool isDark) {
@@ -458,7 +461,7 @@ class _SignupViewState extends ConsumerState<SignupView>
       children: [1, 2, 3].map((s) {
         final isActive = _step >= s;
         final isLineActive = _step > s;
-        
+
         String stepName = '';
         if (s == 1) stepName = 'বেসিক তথ্য';
         if (s == 2) stepName = 'একাডেমিক';
@@ -471,22 +474,29 @@ class _SignupViewState extends ConsumerState<SignupView>
               children: [
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? const Color(0xFF059669)
+                        ? const Color(0xFF064E3B)
                         : (isDark
                             ? const Color(0xFF1C1C1E)
                             : const Color(0xFFF5F5F5)),
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isActive
+                          ? const Color(0xFF065F46)
+                          : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                      width: 1,
+                    ),
                   ),
                   child: Center(
                     child: Text(
                       s.toString(),
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        fontFamily: 'HindSiliguri',
+                        fontWeight: FontWeight.normal,
                         color: isActive
                             ? Colors.white
                             : (isDark ? Colors.white54 : Colors.black54),
@@ -494,12 +504,13 @@ class _SignupViewState extends ConsumerState<SignupView>
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   stepName,
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 11.5,
+                    fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.normal,
                     color: isActive
                         ? (isDark ? Colors.white : Colors.black87)
                         : (isDark ? Colors.white54 : Colors.black54),
@@ -509,15 +520,15 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
             if (s < 3)
               Container(
-                margin: const EdgeInsets.only(top: 18),
+                margin: const EdgeInsets.only(top: 14),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 500),
-                  width: 32,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  width: 28,
+                  height: 2.5,
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                     color: isLineActive
-                        ? const Color(0xFF059669)
+                        ? const Color(0xFF064E3B)
                         : (isDark
                             ? const Color(0xFF1C1C1E)
                             : const Color(0xFFF5F5F5)),
@@ -535,7 +546,7 @@ class _SignupViewState extends ConsumerState<SignupView>
     final labelText = Text(
       text,
       style: TextStyle(
-        fontSize: 15,
+        fontSize: 13.5,
         fontFamily: 'HindSiliguri',
         fontWeight: FontWeight.normal,
         color: isDark ? Colors.white70 : Colors.black87,
@@ -557,7 +568,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                   padding: const EdgeInsets.all(12),
                   textStyle: const TextStyle(
                     fontFamily: 'HindSiliguri',
-                    fontSize: 13,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.normal,
                     color: Colors.white,
                   ),
                   decoration: BoxDecoration(
@@ -566,7 +578,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   ),
                   child: Icon(
                     LucideIcons.info,
-                    size: 16,
+                    size: 15,
                     color: isDark ? Colors.white54 : Colors.black45,
                   ),
                 ),
@@ -591,7 +603,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           hint: 'পূর্ণ নাম (Full Name)',
           isDark: isDark,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -603,7 +615,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF059669).withValues(alpha: 0.12),
+                      color: const Color(0xFF064E3B).withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Row(
@@ -612,16 +624,16 @@ class _SignupViewState extends ConsumerState<SignupView>
                         Icon(
                           LucideIcons.checkCircle2,
                           size: 13,
-                          color: Color(0xFF059669),
+                          color: Color(0xFF34D399),
                         ),
                         SizedBox(width: 4),
                         Text(
                           'যাচাইকৃত',
                           style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.normal,
                             fontFamily: 'HindSiliguri',
-                            color: Color(0xFF059669),
+                            color: Color(0xFF34D399),
                           ),
                         ),
                       ],
@@ -629,7 +641,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 5),
             _buildInputField(
               label: '',
               icon: LucideIcons.phone,
@@ -640,30 +652,31 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF3F4F6),
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF141417) : const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFE5E7EB),
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
             ),
           ),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 LucideIcons.shieldCheck,
-                size: 16,
-                color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                size: 15,
+                color: Color(0xFF34D399),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইলে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.normal,
                     color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                   ),
                 ),
@@ -723,8 +736,11 @@ class _SignupViewState extends ConsumerState<SignupView>
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: isDark ? const Color(0xFF141417) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),
@@ -743,12 +759,12 @@ class _SignupViewState extends ConsumerState<SignupView>
                       _collegeSuggestions.clear();
                     });
                   },
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
+                      horizontal: 14,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       border: Border(
@@ -762,7 +778,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       name,
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
-                        fontSize: 16,
+                        fontSize: 13.5,
                         fontWeight: FontWeight.normal,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
@@ -773,12 +789,12 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
           ),
         ] else if (_instituteController.text.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
         ],
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
 
         _buildLabel('স্ট্রিম (Stream)', isDark, tooltip: 'তুমি যে ক্লাসে বা প্রোগ্রামে আছো'),
-        const SizedBox(height: 8),
+        const SizedBox(height: 5),
         _buildDropdown(
           icon: LucideIcons.bookOpen,
           value: _stream,
@@ -798,7 +814,7 @@ class _SignupViewState extends ConsumerState<SignupView>
             }
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
 
         Row(
           children: [
@@ -807,7 +823,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLabel('বিভাগ (Division)', isDark, tooltip: 'তোমার পঠিত বিষয়সমূহ'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _buildDropdown(
                     icon: LucideIcons.graduationCap,
                     value: _group,
@@ -820,13 +836,13 @@ class _SignupViewState extends ConsumerState<SignupView>
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildLabel('ব্যাচ', isDark),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _buildDropdown(
                     icon: LucideIcons.graduationCap,
                     value: _batch,
@@ -839,42 +855,43 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
 
         _buildLabel('লিঙ্গ (Gender)', isDark),
-        const SizedBox(height: 8),
+        const SizedBox(height: 5),
         Row(
           children: ['Male', 'Female'].map((g) {
             final isSelected = _gender == g;
             return Expanded(
               child: Padding(
-                padding: EdgeInsets.only(right: g == 'Male' ? 12 : 0),
+                padding: EdgeInsets.only(right: g == 'Male' ? 10 : 0),
                 child: InkWell(
                   onTap: () => setState(() => _gender = g),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF059669).withValues(alpha: 0.1)
+                          ? const Color(0xFF064E3B).withValues(alpha: 0.2)
                           : (isDark
-                                ? const Color(0xFF1C1C1E)
+                                ? const Color(0xFF141417)
                                 : const Color(0xFFF5F5F5)),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF059669)
-                            : Colors.transparent,
+                            ? const Color(0xFF065F46)
+                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       g == 'Male' ? 'পুরুষ' : 'মহিলা',
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
+                        fontSize: 13.5,
                         fontWeight: FontWeight.normal,
                         color: isSelected
-                            ? const Color(0xFF059669)
+                            ? const Color(0xFF34D399)
                             : (isDark ? Colors.white70 : Colors.black87),
                       ),
                     ),
@@ -885,19 +902,19 @@ class _SignupViewState extends ConsumerState<SignupView>
           }).toList(),
         ),
         if (_stream == 'HSC') ...[
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildLabel(
             'টার্গেট / লক্ষ্য (ঐচ্ছিক)',
             isDark,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 1.15,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.35,
             children: [
               _examTargetOption('Medical', '🩺', 'মেডিকেল', isDark),
               _examTargetOption('Engineering', '⚙️', 'ইঞ্জিনিয়ারিং', isDark),
@@ -917,22 +934,24 @@ class _SignupViewState extends ConsumerState<SignupView>
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF059669).withValues(alpha: 0.12)
-              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
-          borderRadius: BorderRadius.circular(16),
+              ? const Color(0xFF064E3B).withValues(alpha: 0.2)
+              : (isDark ? const Color(0xFF141417) : const Color(0xFFF5F5F5)),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF059669) : Colors.transparent,
-            width: isSelected ? 2 : 1,
+            color: isSelected
+                ? const Color(0xFF065F46)
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+            width: isSelected ? 1.5 : 1,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 6),
+            Text(emoji, style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 4),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -940,11 +959,11 @@ class _SignupViewState extends ConsumerState<SignupView>
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.normal,
                   fontFamily: 'HindSiliguri',
                   color: isSelected
-                      ? const Color(0xFF059669)
+                      ? const Color(0xFF34D399)
                       : (isDark ? Colors.white70 : Colors.black87),
                 ),
               ),
@@ -959,7 +978,6 @@ class _SignupViewState extends ConsumerState<SignupView>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         _buildInputField(
           label: 'ইমেইল এড্রেস',
           icon: LucideIcons.mail,
@@ -968,7 +986,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           isDark: isDark,
           keyboardType: TextInputType.emailAddress,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         _buildInputField(
           label: 'পাসওয়ার্ড',
           icon: LucideIcons.lock,
@@ -979,12 +997,13 @@ class _SignupViewState extends ConsumerState<SignupView>
           suffixIcon: IconButton(
             icon: Icon(
               _showPassword ? LucideIcons.eyeOff : LucideIcons.eye,
+              size: 18,
               color: isDark ? Colors.white54 : Colors.black54,
             ),
             onPressed: () => setState(() => _showPassword = !_showPassword),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         _buildInputField(
           label: 'পাসওয়ার্ড কনফার্ম করো',
           icon: LucideIcons.lock,
@@ -993,7 +1012,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           isDark: isDark,
           obscureText: !_showPassword,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         _buildInputField(
           label: 'রেফারেল কোড (অপশনাল)',
           tooltip: 'বন্ধুর দেয়া কোড ব্যবহার করে ডিসকাউন্ট পেতে পারো',
@@ -1017,6 +1036,8 @@ class _SignupViewState extends ConsumerState<SignupView>
     return AppDropdown<String>(
       value: value,
       icon: icon,
+      borderRadius: 12,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       options: customOptions ?? options.map((opt) => AppDropdownOption(value: opt, label: opt)).toList(),
       onChanged: onChanged,
     );
@@ -1033,48 +1054,60 @@ class _SignupViewState extends ConsumerState<SignupView>
     TextInputType keyboardType = TextInputType.text,
     String? tooltip,
   }) {
-    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
+    final bgColor = isDark ? const Color(0xFF141417) : const Color(0xFFF5F5F5);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label, isDark, tooltip: tooltip),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) ...[
+          _buildLabel(label, isDark, tooltip: tooltip),
+          const SizedBox(height: 5),
+        ],
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: TextStyle(
             fontFamily: 'HindSiliguri',
-            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
             color: isDark ? Colors.white : Colors.black,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 13.5,
+              fontWeight: FontWeight.normal,
               color: isDark ? Colors.white38 : Colors.black38,
             ),
             prefixIcon: Icon(
               icon,
+              size: 18,
               color: isDark ? Colors.white54 : Colors.black54,
             ),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: bgColor,
+            isDense: true,
             contentPadding: const EdgeInsets.symmetric(
-              vertical: 18,
-              horizontal: 16,
+              vertical: 12,
+              horizontal: 14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF059669), width: 2),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF065F46), width: 1.5),
             ),
           ),
         ),
@@ -1088,65 +1121,66 @@ class _SignupViewState extends ConsumerState<SignupView>
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 96,
-                  height: 96,
+                  width: 76,
+                  height: 76,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: 0.1),
+                    color: const Color(0xFF064E3B).withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
                     child: Icon(
                       LucideIcons.checkCircle2,
-                      color: Color(0xFF059669),
-                      size: 48,
+                      color: Color(0xFF34D399),
+                      size: 40,
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Text(
                   'রেজিস্ট্রেশন সফল!',
                   style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    fontWeight: FontWeight.normal,
                     fontFamily: 'HindSiliguri',
                     color: textColor,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
-                  'তোমার অ্যাকাউন্টটি সফলভাবে তৈরি হয়েছে। লগইন করে তোমার প্রস্তুতি শুরু করো।',
+                  'তোমার অ্যাকাউন্টটি সফলভাবে তৈরি হয়েছে। এখনই তোমার প্রস্তুতি শুরু করো। 🚀',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14.5,
                     fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.normal,
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => context.go('/'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669),
+                      backgroundColor: const Color(0xFF064E3B),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: const Text(
                       'ড্যাশবোর্ডে যান',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontFamily: 'HindSiliguri',
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ),
