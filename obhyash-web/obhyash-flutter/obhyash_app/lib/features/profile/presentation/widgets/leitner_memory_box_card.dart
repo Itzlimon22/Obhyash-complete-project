@@ -42,7 +42,7 @@ class _LeitnerMemoryBoxCardState extends State<LeitnerMemoryBoxCard> {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -56,7 +56,7 @@ class _LeitnerMemoryBoxCardState extends State<LeitnerMemoryBoxCard> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.2),
+                      color: Colors.purple.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(LucideIcons.brain, color: Colors.purpleAccent, size: 18),
@@ -154,10 +154,10 @@ class _LeitnerMemoryBoxCardState extends State<LeitnerMemoryBoxCard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
-        color: isGold ? Colors.amber.withOpacity(0.12) : const Color(0xFF0F172A),
+        color: isGold ? Colors.amber.withValues(alpha: 0.12) : const Color(0xFF0F172A),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isGold ? Colors.amber.withOpacity(0.4) : Colors.white.withOpacity(0.06),
+          color: isGold ? Colors.amber.withValues(alpha: 0.4) : Colors.white.withValues(alpha: 0.06),
         ),
       ),
       child: Column(

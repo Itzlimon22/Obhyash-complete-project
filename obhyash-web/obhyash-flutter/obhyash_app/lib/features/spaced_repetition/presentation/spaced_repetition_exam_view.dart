@@ -161,7 +161,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.2),
+                color: Colors.purple.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(LucideIcons.brain, color: Colors.purpleAccent, size: 18),
@@ -191,11 +191,11 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: _timeLeft <= 60
-                        ? Colors.red.withOpacity(0.2)
-                        : Colors.purple.withOpacity(0.15),
+                        ? Colors.red.withValues(alpha: 0.2)
+                        : Colors.purple.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: _timeLeft <= 60 ? Colors.redAccent : Colors.purpleAccent.withOpacity(0.4),
+                      color: _timeLeft <= 60 ? Colors.redAccent : Colors.purpleAccent.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(
@@ -269,7 +269,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.06),
+                        color: Colors.white.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -287,7 +287,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Text(
                     q.question,
@@ -309,10 +309,10 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.purple.withOpacity(0.2) : const Color(0xFF1E293B).withOpacity(0.6),
+                          color: isSelected ? Colors.purple.withValues(alpha: 0.2) : const Color(0xFF1E293B).withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected ? Colors.purpleAccent : Colors.white.withOpacity(0.06),
+                            color: isSelected ? Colors.purpleAccent : Colors.white.withValues(alpha: 0.06),
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -419,7 +419,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: res.isPerfectScore ? Colors.amber.withOpacity(0.2) : Colors.purple.withOpacity(0.2),
+                color: res.isPerfectScore ? Colors.amber.withValues(alpha: 0.2) : Colors.purple.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -484,9 +484,9 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.15),
+                    color: Colors.purple.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
+                    border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
@@ -506,9 +506,9 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.15),
+                color: Colors.amber.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.amber.withOpacity(0.4)),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
               ),
               child: const Row(
                 children: [
@@ -584,9 +584,9 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       decoration: BoxDecoration(
-        color: isMastered ? Colors.amber.withOpacity(0.1) : Colors.white.withOpacity(0.04),
+        color: isMastered ? Colors.amber.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: isMastered ? Colors.amber.withOpacity(0.3) : Colors.white10),
+        border: Border.all(color: isMastered ? Colors.amber.withValues(alpha: 0.3) : Colors.white10),
       ),
       child: Column(
         children: [

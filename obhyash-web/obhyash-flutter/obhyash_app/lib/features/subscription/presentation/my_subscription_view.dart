@@ -714,7 +714,7 @@ class _OverviewTab extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
@@ -782,7 +782,7 @@ class _OverviewTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Divider(color: Colors.white.withOpacity(0.15)),
+              Divider(color: Colors.white.withValues(alpha: 0.15)),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -808,10 +808,10 @@ class _OverviewTab extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFB91C1C).withOpacity(0.2),
+                    color: const Color(0xFFB91C1C).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFB91C1C).withOpacity(0.4),
+                      color: const Color(0xFFB91C1C).withValues(alpha: 0.4),
                     ),
                   ),
                   child: Row(
@@ -967,7 +967,7 @@ class _FreePlanCard extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: const Color(0xFF166534).withOpacity(0.1),
+              color: const Color(0xFF166534).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const AppIcon(
@@ -1346,7 +1346,7 @@ class _RingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 8) / 2;
     final trackPaint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = Colors.white.withValues(alpha: 0.15)
       ..strokeWidth = 5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

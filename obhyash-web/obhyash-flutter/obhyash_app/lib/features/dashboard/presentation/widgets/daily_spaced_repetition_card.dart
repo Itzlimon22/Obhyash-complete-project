@@ -49,7 +49,7 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.purple.shade900.withOpacity(0.4),
+            Colors.purple.shade900.withValues(alpha: 0.4),
             const Color(0xFF1E293B),
           ],
           begin: Alignment.topLeft,
@@ -57,12 +57,12 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
         ),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.purpleAccent.withOpacity(0.35),
+          color: Colors.purpleAccent.withValues(alpha: 0.35),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.purple.withOpacity(0.12),
+            color: Colors.purple.withValues(alpha: 0.12),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -78,9 +78,9 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.2),
+                  color: Colors.purple.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.purpleAccent.withOpacity(0.4)),
+                  border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.4)),
                 ),
                 child: const Row(
                   children: [
@@ -101,7 +101,7 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.15),
+                    color: Colors.amber.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -133,9 +133,9 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
+                  color: Colors.red.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.redAccent.withOpacity(0.4)),
+                  border: Border.all(color: Colors.redAccent.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '$dueCountটি প্রস্তুত',
@@ -165,7 +165,7 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 4,
-              shadowColor: Colors.purple.withOpacity(0.4),
+              shadowColor: Colors.purple.withValues(alpha: 0.4),
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,

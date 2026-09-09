@@ -33,7 +33,7 @@ class MaintenanceScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -46,10 +46,10 @@ class MaintenanceScreen extends StatelessWidget {
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withOpacity(0.12),
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: const Color(0xFFF59E0B).withOpacity(0.3),
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
                       ),
                     ),
                     child: const Icon(

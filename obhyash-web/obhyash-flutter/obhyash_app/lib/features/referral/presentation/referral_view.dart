@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -106,22 +107,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         debugPrint('[ReferralView] check_referral_eligibility rpc error: $e');
       }
 
-      // 2. Direct table fallback check if RPC wasn't definitive
-      if (!hasUsed) {
-        try {
-          final usedCheck = await sb
-              .from('referral_history')
-              .select('id')
-              .eq('redeemed_by', uid)
-              .limit(1)
-              .maybeSingle();
-          hasUsed = usedCheck != null;
-        } catch (e) {
-          debugPrint('[ReferralView] usedCheck error: $e');
-        }
-      }
-
-      // 3. Fallback attempt status check
+      // 2. Attempt status fallback (lockout countdown)
       if (_lockoutSeconds == 0) {
         try {
           final statusRes = await sb.rpc('get_referral_attempt_status', params: {
@@ -151,12 +137,10 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
             .maybeSingle();
 
         if (existing == null) {
-          final chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-          final rand = List.generate(8, (i) {
-            return chars[(DateTime.now().millisecondsSinceEpoch + i * 7) %
-                chars.length];
-          });
-          code = rand.join();
+          // Use cryptographically secure random to avoid timestamp-collision duplicates
+          final rng = Random.secure();
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+          code = List.generate(8, (_) => chars[rng.nextInt(chars.length)]).join();
 
           final created = await sb
               .from('referrals')

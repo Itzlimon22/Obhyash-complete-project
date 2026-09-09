@@ -61,9 +61,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
         data: (data) {
           final exam = data.exam;
           final attempt = data.attempt;
-          if (exam == null) {
-            return const Center(child: Text("পরীক্ষা পাওয়া যায়নি"));
-          }
 
           final now = DateTime.now();
           final isUpcoming = now.isBefore(exam.startTime);
@@ -558,7 +555,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                 ],
 
                 // Score Overview Card (When taken)
-                if (isTaken && attempt != null) ...[
+                if (isTaken) ...[
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(20),

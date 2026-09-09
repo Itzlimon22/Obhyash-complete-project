@@ -551,57 +551,6 @@ class ResultStats extends StatelessWidget {
   }
 }
 
-class _MiniStatBadge extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  final bool isDark;
-
-  const _MiniStatBadge({
-    required this.label,
-    required this.value,
-    required this.color,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.14 : 0.08),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: color.withValues(alpha: isDark ? 0.25 : 0.18),
-          width: 0.8,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontSize: 11,
-              fontFamily: 'HindSiliguri',
-              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;

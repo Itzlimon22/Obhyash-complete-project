@@ -1,0 +1,6 @@
+[project]
+id = "ufeepgzheopyaefuyegg"
+
+
+[functions.send-push-notification]
+verify_jwt = false  # Webhook calls don't carry user JWT; auth via service role in header

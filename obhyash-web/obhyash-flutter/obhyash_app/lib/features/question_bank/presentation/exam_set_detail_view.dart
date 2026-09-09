@@ -31,6 +31,7 @@ class SubjectDistribution {
     this.totalMarks = 25,
     this.durationMinutes = 25,
   });
+
 }
 
 class ExamSetDetailView extends ConsumerStatefulWidget {
@@ -1194,11 +1195,13 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                         ),
                         const SizedBox(height: 22),
 
-                        // Section: বিষয় নির্বাচন ও নম্বর বণ্টন
+                        // Section header: SSC = subject select, HSC = mark distribution
                         Row(
                           children: [
                             Text(
-                              isWritten ? 'বিষয় নির্বাচন (একটি প্রযোজ্য)' : 'বিষয় নির্বাচন (একাধিক সম্ভব)',
+                              isBoardOrSchool
+                                  ? (isWritten ? 'বিষয় নির্বাচন (একটি প্রযোজ্য)' : 'বিষয় নির্বাচন (একাধিক সম্ভব)')
+                                  : 'নম্বর বণ্টন',
                               style: TextStyle(
                                 fontFamily: 'HindSiliguri',
                                 fontSize: 16,
@@ -1207,45 +1210,60 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                               ),
                             ),
                             const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: isWritten
-                                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
-                                    : const Color(0xFF059669).withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
+                            // Badge only for SSC selectable mode
+                            if (isBoardOrSchool)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
                                   color: isWritten
-                                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
-                                      : const Color(0xFF059669).withValues(alpha: 0.3),
+                                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
+                                      : const Color(0xFF059669).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isWritten
+                                        ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
+                                        : const Color(0xFF059669).withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Text(
+                                  isWritten ? '১টি বিষয়' : '${BanglaNameHelper.toBanglaNumeral(_selectedSubjects.length)}টি নির্বাচিত',
+                                  style: TextStyle(
+                                    fontFamily: 'HindSiliguri',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: isWritten ? const Color(0xFF8B5CF6) : const Color(0xFF059669),
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                isWritten ? '১টি বিষয়' : '${BanglaNameHelper.toBanglaNumeral(_selectedSubjects.length)}টি নির্বাচিত',
-                                style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: isWritten ? const Color(0xFF8B5CF6) : const Color(0xFF059669),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 10),
 
-                        // Interactive Subject Selection List
-                        Column(
-                          children: distributions.map((dist) {
-                            final isSelected = _selectedSubjects.contains(dist.subject);
-                            return _buildInteractiveSubjectCard(
-                              dist: dist,
-                              isSelected: isSelected,
-                              isWritten: isWritten,
-                              isDark: isDark,
-                            );
-                          }).toList(),
-                        ),
+                        // SSC: 2-column interactive grid | HSC/Admission: static non-selectable list
+                        if (isBoardOrSchool)
+                          GridView.count(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 2.2,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: distributions.map((dist) {
+                              final isSelected = _selectedSubjects.contains(dist.subject);
+                              return _buildInteractiveSubjectCard(
+                                dist: dist,
+                                isSelected: isSelected,
+                                isWritten: isWritten,
+                                isDark: isDark,
+                              );
+                            }).toList(),
+                          )
+                        else
+                          Column(
+                            children: distributions
+                                .map((dist) => _buildStaticSubjectRow(dist: dist, isDark: isDark))
+                                .toList(),
+                          ),
                       ],
                     ),
                   ),
@@ -1422,6 +1440,67 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     );
   }
 
+
+  Widget _buildStaticSubjectRow({
+    required SubjectDistribution dist,
+    required bool isDark,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF18181B) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+          ),
+        ),
+        child: Row(
+          children: [
+            // Subject Icon
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: dist.color.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(dist.icon, size: 18, color: dist.color),
+            ),
+            const SizedBox(width: 12),
+            // Name & details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    dist.subject,
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${dist.questions} • ${dist.marks}',
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
   Widget _buildInteractiveSubjectCard({
     required SubjectDistribution dist,
     required bool isSelected,
@@ -1431,117 +1510,88 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     final activeColor = dist.color;
     final primaryThemeGreen = const Color(0xFF004633);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _toggleSubject(dist, isWritten),
-          borderRadius: BorderRadius.circular(14),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _toggleSubject(dist, isWritten),
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? (isDark ? activeColor.withValues(alpha: 0.15) : activeColor.withValues(alpha: 0.08))
+                : (isDark ? const Color(0xFF18181B) : Colors.white),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
               color: isSelected
-                  ? (isDark ? activeColor.withValues(alpha: 0.12) : activeColor.withValues(alpha: 0.06))
-                  : (isDark ? const Color(0xFF18181B) : Colors.white),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isSelected
-                    ? activeColor.withValues(alpha: 0.6)
-                    : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-                width: isSelected ? 1.5 : 1.0,
+                  ? activeColor.withValues(alpha: 0.7)
+                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+              width: isSelected ? 1.5 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isSelected ? 0.05 : 0.02),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isSelected ? 0.04 : 0.01),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // Subject Icon inside colored circle
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: dist.color.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    dist.icon,
-                    size: 18,
-                    color: dist.color,
+            ],
+          ),
+          child: Row(
+            children: [
+              // Subject Name (plain text only)
+              Expanded(
+                child: Text(
+                  dist.subject,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'HindSiliguri',
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    height: 1.25,
                   ),
                 ),
-                const SizedBox(width: 12),
+              ),
 
-                // Subject Name & details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        dist.subject,
-                        style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${dist.questions} • ${dist.marks}',
-                        style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
+              const SizedBox(width: 6),
+
+              // Selection Indicator: Radio for written/SSC, Checkbox for admission MCQ
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: isWritten ? BoxShape.circle : BoxShape.rectangle,
+                  borderRadius: isWritten ? null : BorderRadius.circular(5),
+                  color: isSelected ? primaryThemeGreen : Colors.transparent,
+                  border: Border.all(
+                    color: isSelected
+                        ? primaryThemeGreen
+                        : (isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1)),
+                    width: 1.8,
                   ),
                 ),
-
-                // Selection Indicator: Radio for CQ, Checkbox for MCQ
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: isWritten ? BoxShape.circle : BoxShape.rectangle,
-                    borderRadius: isWritten ? null : BorderRadius.circular(6),
-                    color: isSelected ? primaryThemeGreen : Colors.transparent,
-                    border: Border.all(
-                      color: isSelected
-                          ? primaryThemeGreen
-                          : (isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1)),
-                      width: 1.8,
-                    ),
-                  ),
-                  child: isSelected
-                      ? (isWritten
-                          ? Center(
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white,
-                                ),
+                child: isSelected
+                    ? (isWritten
+                        ? Center(
+                            child: Container(
+                              width: 7,
+                              height: 7,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
                               ),
-                            )
-                          : const Icon(
-                              LucideIcons.check,
-                              size: 14,
-                              color: Colors.white,
-                            ))
-                      : null,
-                ),
-              ],
-            ),
+                            ),
+                          )
+                        : const Icon(
+                            LucideIcons.check,
+                            size: 12,
+                            color: Colors.white,
+                          ))
+                    : null,
+              ),
+            ],
           ),
         ),
       ),

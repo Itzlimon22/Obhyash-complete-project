@@ -267,31 +267,31 @@ class AuthController extends AsyncNotifier<void> {
             'last_active': DateTime.now().toIso8601String(),
           });
 
-          // Handle referral code if provided
+          // Handle referral code if provided — uses unified RPC with brute-force,
+          // device-lock, IP rate limiting and anomaly detection built in.
           if (referralCode != null && referralCode.isNotEmpty) {
             try {
-              // Lookup referral
-              final referral = await _supabase
-                  .from('referrals')
-                  .select('*')
-                  .eq('code', referralCode.trim().toUpperCase())
-                  .maybeSingle();
+              final deviceId = await DeviceService.getDeviceId();
+              final res = await _supabase.rpc('redeem_referral_by_code', params: {
+                'p_code': referralCode.trim().toUpperCase(),
+                'p_user_id': response.user!.id,
+                'p_device_id': deviceId,
+                // p_ip_address intentionally omitted — not available in Flutter;
+                // IP is captured server-side via Supabase Edge Functions if needed.
+              });
 
-              if (referral != null) {
-                final deviceId = await DeviceService.getDeviceId();
-                // Redeem via RPC with Device Lock
-                await _supabase.rpc('redeem_referral_tx', params: {
-                  'p_referral_id': referral['id'],
-                  'p_redeemer_id': response.user!.id,
-                  'p_device_id': deviceId,
-                });
-
-                // Clear saved referral code
+              if (res is Map<String, dynamic> && res['success'] == true) {
+                // Clear saved referral code from local storage
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.remove('referralCode');
+                debugPrint('[AuthController] Referral redeemed successfully on signup.');
+              } else {
+                final errMsg = res is Map ? res['error']?.toString() : null;
+                debugPrint('[AuthController] Referral redeem failed on signup: $errMsg');
+                // Non-fatal — signup still succeeds
               }
             } catch (refErr) {
-              debugPrint('[AuthController] Referral error: $refErr');
+              debugPrint('[AuthController] Referral error on signup: $refErr');
               // Proceed with signup even if referral fails
             }
           }

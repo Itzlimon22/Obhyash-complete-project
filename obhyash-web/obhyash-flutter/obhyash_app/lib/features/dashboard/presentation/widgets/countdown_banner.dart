@@ -163,9 +163,9 @@ class CountdownBanner extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: textColor.withOpacity(0.1),
+                  color: textColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: textColor.withOpacity(0.3)),
+                  border: Border.all(color: textColor.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   'পরিবর্তন',
