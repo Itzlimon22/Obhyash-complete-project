@@ -75,7 +75,7 @@ final isScreenshotProtectionEnabledProvider = Provider<bool>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   return configAsync.maybeWhen(
     data: (config) => config.screenshotProtectionEnabled,
-    orElse: () => true,
+    orElse: () => false, // Default to false until config loads
   );
 });
 
