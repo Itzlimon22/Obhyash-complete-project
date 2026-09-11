@@ -173,7 +173,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          fontFamily: 'HindSiliguri',
                           color: textColor,
                           height: 1.2,
                         ),
@@ -203,7 +202,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              fontFamily: 'HindSiliguri',
                               color: pillTextColor,
                             ),
                           ),
@@ -262,7 +260,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFFA1A1AA)
                                     : const Color(0xFF64748B),
@@ -289,7 +286,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                               'সম্পূর্ণ সিলেবাসের সকল অধ্যায় থেকে প্রশ্ন অন্তর্ভুক্ত রয়েছে।',
                               style: TextStyle(
                                 fontSize: 12,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFF71717A)
                                     : const Color(0xFF64748B),
@@ -334,7 +330,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                                         style: TextStyle(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w800,
-                                          fontFamily: 'HindSiliguri',
                                           color: isDark
                                               ? const Color(0xFF34D399)
                                               : const Color(0xFF047857),
@@ -348,7 +343,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
-                                          fontFamily: 'HindSiliguri',
                                           color: textColor,
                                         ),
                                       ),
@@ -377,7 +371,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
@@ -411,7 +404,6 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFF93C5FD)
                                         : const Color(0xFF1D4ED8),

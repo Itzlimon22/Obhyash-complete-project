@@ -88,7 +88,6 @@ class AppDropdown<T> extends StatelessWidget {
                     child: Text(
                       label,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
                         color: isDark ? const Color(0xFFFAFAFA) : Colors.black,
@@ -124,7 +123,6 @@ class AppDropdown<T> extends StatelessWidget {
                                     child: Text(
                                       option.label,
                                       style: TextStyle(
-                                        fontFamily: 'HindSiliguri',
                                         fontSize: 15,
                                         fontWeight: isSelected && isEnabled ? FontWeight.w700 : FontWeight.w500,
                                         color: isEnabled
@@ -152,7 +150,6 @@ class AppDropdown<T> extends StatelessWidget {
                                       child: Text(
                                         option.disabledBadge ?? 'শীঘ্রই আসছে',
                                         style: TextStyle(
-                                          fontFamily: 'HindSiliguri',
                                           fontSize: 10,
                                           fontWeight: FontWeight.w600,
                                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
@@ -232,7 +229,6 @@ class AppDropdown<T> extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w600,
                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
               ),
@@ -262,7 +258,6 @@ class AppDropdown<T> extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: fontSize ?? 14.5,
                       fontWeight: displayLabel != null ? FontWeight.w600 : FontWeight.normal,
                       color: displayLabel != null

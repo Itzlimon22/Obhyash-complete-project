@@ -336,11 +336,8 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                   backgroundColor: const Color(0xFF004633),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  elevation: 3,
-                  shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
+                  
+                  
                 ),
                 onPressed: _navigateToPlanSelection,
                 child: const Row(
@@ -353,7 +350,6 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                       style: TextStyle(
                         fontSize: 16.5,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'HindSiliguri',
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -434,7 +430,6 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
             textAlign: TextAlign.center,
@@ -448,8 +443,7 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
               fontSize: 13,
               height: 1.4,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 18),
@@ -462,11 +456,8 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
                 backgroundColor: const Color(0xFF004633),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 3,
-                shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
+                
+                
               ),
               onPressed: onUpgradeTap,
               child: const Row(
@@ -479,7 +470,6 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      fontFamily: 'HindSiliguri',
                       letterSpacing: 0.2,
                     ),
                   ),
@@ -573,8 +563,7 @@ class _CurrentSubscriptionCard extends StatelessWidget {
                       style: TextStyle(
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         fontSize: 12.5,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                     Flexible(
                       child: Text(
@@ -583,8 +572,7 @@ class _CurrentSubscriptionCard extends StatelessWidget {
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -596,8 +584,7 @@ class _CurrentSubscriptionCard extends StatelessWidget {
                   style: TextStyle(
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     fontSize: 12.5,
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -621,8 +608,7 @@ class _CurrentSubscriptionCard extends StatelessWidget {
                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
           ),
         ],
@@ -698,7 +684,6 @@ class _UnifiedFeaturesShowcase extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -736,7 +721,6 @@ class _UnifiedFeaturesShowcase extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: textPrimary,
                       ),
                     ),
@@ -800,7 +784,6 @@ class _TrustBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
               maxLines: 1,
@@ -851,7 +834,6 @@ class _ComparisonTable extends StatelessWidget {
           child: Text(
             'ফ্রি বনাম প্রিমিয়াম',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 20,
               fontWeight: FontWeight.w900,
               color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -887,7 +869,6 @@ class _ComparisonTable extends StatelessWidget {
                       child: Text(
                         'ফিচার',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
                           color: textSub,
@@ -900,7 +881,6 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'ফ্রি',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 14.5,
                             fontWeight: FontWeight.w800,
                             color: textSub,
@@ -914,7 +894,6 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'প্রিমিয়াম',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 14.5,
                             fontWeight: FontWeight.w900,
                             color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF004633),
@@ -946,7 +925,6 @@ class _ComparisonTable extends StatelessWidget {
                       child: Text(
                         text,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: isPaidColumn
@@ -985,7 +963,6 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           label,
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
                             color: textMain,

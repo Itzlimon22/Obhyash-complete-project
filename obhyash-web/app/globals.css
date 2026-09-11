@@ -128,7 +128,19 @@ body::after {
 }
 
 .font-serif-exam {
-  font-family: var(--font-anek), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), var(--font-anek), system-ui, sans-serif;
+}
+
+/* KaTeX mathematical typography matching Chorcha MathJax/KaTeX benchmark */
+.katex {
+  font-size: 1.05em;
+  text-rendering: auto;
+}
+
+.katex-display {
+  margin: 0.5em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* --- 3. CUSTOM SCROLLBARS (Combined) --- */

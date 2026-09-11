@@ -119,7 +119,6 @@ class PricingCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(
@@ -172,7 +171,6 @@ class PricingCard extends StatelessWidget {
                                       : '/${plan.billingCycle}',
                                   style: TextStyle(
                                     fontSize: 12.5,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFFA3A3A3)
                                         : const Color(
@@ -235,7 +233,6 @@ class PricingCard extends StatelessWidget {
                                     feature,
                                     style: TextStyle(
                                       fontSize: 13,
-                                      fontFamily: 'HindSiliguri',
                                       color: isDark
                                           ? const Color(0xFFD4D4D4)
                                           : const Color(
@@ -263,18 +260,13 @@ class PricingCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               backgroundColor: const Color(0xFF12544F),
                                 foregroundColor: Colors.white,
-                                elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                                ),
                             child: Text(
                               isCurrent ? 'রিনিউ করো' : 'পেমেন্ট করো',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                           ),
                         ),
@@ -308,7 +300,6 @@ class PricingCard extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       letterSpacing: 0.5,
                     ),
                   ),

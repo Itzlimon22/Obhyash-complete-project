@@ -70,7 +70,6 @@ class _ReviewListState extends State<ReviewList> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
               ),
@@ -197,7 +196,6 @@ class _FilterButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
                 color: isSelected
                     ? color
                     : (isDark ? Colors.grey[400] : Colors.grey[600]),

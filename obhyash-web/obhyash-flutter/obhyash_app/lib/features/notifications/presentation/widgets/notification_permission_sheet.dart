@@ -80,7 +80,6 @@ class NotificationPermissionSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
@@ -139,17 +138,13 @@ class NotificationPermissionSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF059669),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                  
                   ),
-                  elevation: 0,
-                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -168,7 +163,6 @@ class NotificationPermissionSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                   ),
                 ),
@@ -203,7 +197,6 @@ class NotificationPermissionSheet extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),

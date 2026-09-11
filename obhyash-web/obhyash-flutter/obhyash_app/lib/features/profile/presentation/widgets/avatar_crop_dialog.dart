@@ -131,7 +131,6 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                       'বাতিল',
                       style: TextStyle(
                         color: Colors.white70,
-                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -141,7 +140,6 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                     'ছবি অ্যাডজাস্ট ও ক্রপ',
                     style: TextStyle(
                       color: Colors.white,
-                      fontFamily: 'HindSiliguri',
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                     ),
@@ -159,7 +157,6 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                       'নিশ্চিত',
                       style: TextStyle(
                         color: Color(0xFF10B981),
-                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                       ),
@@ -183,7 +180,6 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                     'ছবি ড্র্যাগ করে পজিশন করো অথবা জুম করো',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.75),
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -304,11 +300,7 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF059669),
                     foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
                     ),
-                  ),
                   icon: _isProcessing
                       ? const SizedBox(
                           width: 18,
@@ -322,7 +314,6 @@ class _AvatarCropDialogState extends State<AvatarCropDialog> {
                   label: Text(
                     _isProcessing ? 'প্রসেসিং হচ্ছে...' : 'ক্রপ ও সেভ করো',
                     style: const TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
@@ -364,7 +355,6 @@ class _CropControlBtn extends StatelessWidget {
               label,
               style: const TextStyle(
                 color: Colors.white70,
-                fontFamily: 'HindSiliguri',
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),

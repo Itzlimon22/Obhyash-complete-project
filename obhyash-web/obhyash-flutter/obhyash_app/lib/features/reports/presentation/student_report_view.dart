@@ -262,9 +262,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                   horizontal: 24,
                   vertical: 12,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                
               ),
             ),
           ],
@@ -631,7 +629,6 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
                           ),
@@ -728,7 +725,6 @@ class _StatBox extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF18181B),
             ),
           ),
@@ -738,7 +734,6 @@ class _StatBox extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
             ),
           ),
@@ -793,7 +788,6 @@ class _FilterPill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
-                fontFamily: 'HindSiliguri',
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
                 color: isSelected
                     ? (isDark ? Colors.white : const Color(0xFF18181B))

@@ -80,7 +80,6 @@ class AboutUsView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -90,7 +89,6 @@ class AboutUsView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'HindSiliguri',
                       color: Color(0xFF10B981),
                     ),
                   ),
@@ -109,7 +107,6 @@ class AboutUsView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.normal,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                       ),
                     ),
@@ -192,7 +189,6 @@ class AboutUsView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
@@ -251,7 +247,6 @@ class AboutUsView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -284,7 +279,6 @@ class AboutUsView extends StatelessWidget {
                     '© 2026 Obhyash Technologies. All rights reserved.',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                     ),
                   ),
@@ -342,7 +336,6 @@ class _StatBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: color,
               ),
             ),
@@ -352,7 +345,6 @@ class _StatBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.normal,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               ),
             ),
@@ -410,7 +402,6 @@ class _InfoSectionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
@@ -422,7 +413,6 @@ class _InfoSectionCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 1.5,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
             ),
           ),
@@ -473,7 +463,6 @@ class _FeatureRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
@@ -483,7 +472,6 @@ class _FeatureRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.35,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                   ),
                 ),
@@ -535,7 +523,6 @@ class _ContactTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -543,7 +530,6 @@ class _ContactTile extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'HindSiliguri',
                       color: const Color(0xFF10B981),
                     ),
                   ),

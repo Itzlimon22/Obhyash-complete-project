@@ -91,9 +91,10 @@ const config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-anek)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
-        anek: ['var(--font-anek)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
-        bengali: ['var(--font-anek)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'var(--font-anek)', 'system-ui', 'sans-serif'],
+        anek: ['var(--font-inter)', 'var(--font-anek)', 'system-ui', 'sans-serif'],
+        bengali: ['var(--font-inter)', 'var(--font-anek)', 'system-ui', 'sans-serif'],
+        math: ['KaTeX_Math', 'KaTeX_Main', 'KaTeX_AMS', 'serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {

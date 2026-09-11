@@ -236,8 +236,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
           style: TextStyle(
             fontSize: 15.5,
             fontWeight: FontWeight.w600,
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -292,8 +291,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
                               style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
@@ -329,8 +327,7 @@ class _ResultViewState extends ConsumerState<ResultView> {
                               style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isDark
@@ -379,7 +376,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   'পরীক্ষা',
                                   style: TextStyle(
                                     fontSize: 11.5,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -391,7 +387,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   style: TextStyle(
                                     fontSize: 14.5,
                                     fontWeight: FontWeight.w600,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                                   ),
                                 ),
@@ -413,7 +408,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   'বিষয়সমূহ (${BanglaNameHelper.toBanglaNumeral(distinctMainSubjects.length)}টি)',
                                   style: TextStyle(
                                     fontSize: 11.5,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -423,7 +417,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                                   ),
                                   maxLines: 2,
@@ -485,7 +478,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
@@ -612,7 +604,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
-                                          fontFamily: 'HindSiliguri',
                                           color: isDark
                                               ? const Color(0xFFE4E4E7)
                                               : const Color(0xFF0F172A),
@@ -624,7 +615,6 @@ class _ResultViewState extends ConsumerState<ResultView> {
                                         style: TextStyle(
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w500,
-                                          fontFamily: 'HindSiliguri',
                                           color: isDark
                                               ? const Color(0xFF34D399)
                                               : const Color(0xFF047857),
@@ -693,18 +683,13 @@ class _ResultViewState extends ConsumerState<ResultView> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
                   ),
                 ),
               ),
@@ -822,7 +807,6 @@ class _ResultFilterChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal,
-                fontFamily: 'HindSiliguri',
                 color: textColor,
               ),
             ),

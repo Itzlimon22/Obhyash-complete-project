@@ -71,7 +71,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         Text(
                           'লিডারবোর্ড',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             color: isDark
@@ -138,7 +137,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontFamily: 'HindSiliguri',
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
                               color: Colors.white,
@@ -192,7 +190,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         child: Text(
                           BanglaNameHelper.toBanglaNumeral(userRank),
                           style: const TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w900,
                             fontSize: 16,
                             color: Colors.white,
@@ -220,7 +217,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 17,
                                   color: Colors.white,
@@ -240,7 +236,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               child: const Text(
                                 'তুমি',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                   color: Colors.white,
@@ -271,7 +266,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         'শীর্ষে পৌঁছাতে আরও ',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
@@ -281,7 +275,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         '$xpDiff XP',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark
@@ -292,7 +285,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         ' লাগবে',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
@@ -312,7 +304,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
 }
 
 const _headerStyle = TextStyle(
-  fontFamily: 'HindSiliguri',
   fontWeight: FontWeight.w900,
   fontSize: 13,
   color: Color(0xFFA3A3A3), // neutral-400

@@ -211,8 +211,7 @@ class SubjectsProgressSection extends StatelessWidget {
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF0F172A),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -269,8 +268,7 @@ class SubjectsProgressSection extends StatelessWidget {
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
-                                  fontFamily: 'HindSiliguri',
-                                ),
+                                  ),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -279,8 +277,7 @@ class SubjectsProgressSection extends StatelessWidget {
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
                                   color: masteryColor,
-                                  fontFamily: 'HindSiliguri',
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -290,8 +287,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               color: _getAccuracyColor(accuracy),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         ],
                       ),
@@ -368,8 +364,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               ? const Color(0xFFD4D4D8)
                               : const Color(0xFF166534),
                           height: 1.4,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ),
 
@@ -386,15 +381,11 @@ class SubjectsProgressSection extends StatelessWidget {
                               : const Color(0xFF0F172A),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                          
                           ),
-                          elevation: 0,
-                        ),
                         child: const Text(
                           'ঠিক আছে',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -437,8 +428,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -449,8 +439,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.w900,
               color: color,
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
           ),
         ],
       ),
@@ -487,8 +476,7 @@ class SubjectsProgressSection extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -500,8 +488,7 @@ class SubjectsProgressSection extends StatelessWidget {
                 color: isDark
                     ? const Color(0xFFA1A1AA)
                     : const Color(0xFF64748B),
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
           ],
         ),
@@ -533,8 +520,7 @@ class SubjectsProgressSection extends StatelessWidget {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF0F172A),
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
           ),
           const SizedBox(height: 16),
           ...subjectStats.map((stat) {
@@ -581,8 +567,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF0F172A),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -607,8 +592,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF64748B),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -627,8 +611,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
                               color: _getAccuracyTextColor(accuracy, isDark),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         ),
                       ],

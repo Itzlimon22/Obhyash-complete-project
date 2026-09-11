@@ -9,11 +9,13 @@ import { useTheme } from '@/components/providers/ThemeProvider';
 interface DashboardClientProps {
   user: UserProfile;
   subjects?: any[];
+  initialTab?: string;
 }
 
 export default function DashboardClient({
   user,
   subjects = [],
+  initialTab = "dashboard",
 }: DashboardClientProps) {
   const { signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -41,6 +43,7 @@ export default function DashboardClient({
       toggleTheme={toggleTheme}
       onLogout={handleLogout}
       subjects={subjects}
+      initialTab={initialTab}
     />
   );
 }

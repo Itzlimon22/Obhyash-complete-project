@@ -86,7 +86,6 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                           'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু না করা পর্যন্ত নতুন লাইভ পরীক্ষা দেওয়া যাবে না।',
                           style: TextStyle(
                             fontSize: 13,
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w600,
                             color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                           ),
@@ -190,7 +189,6 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFF60A5FA)
                                   : const Color(0xFF2563EB),
@@ -218,7 +216,6 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF737373),
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         fontSize: 14,
                       ),
                     ),
@@ -389,7 +386,6 @@ class _LiveExamCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
@@ -413,7 +409,6 @@ class _LiveExamCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
                         ),
                       ),
@@ -433,7 +428,6 @@ class _LiveExamCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
                         ),
                       ),
@@ -477,7 +471,6 @@ class _LiveExamCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),

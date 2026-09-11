@@ -67,7 +67,6 @@ class SubjectStatCard extends StatelessWidget {
               Text(
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w600,
                   fontSize: 15.5,
                   color: isDark ? Colors.white : const Color(0xFF1A1A1A),
@@ -97,8 +96,7 @@ class SubjectStatCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFFA3A3A3),
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             )
           else
@@ -235,7 +233,6 @@ class _SubjectItemState extends State<_SubjectItem> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
                               fontWeight:
                                   FontWeight.w600, // Medium weight like webapp
                               fontSize: 14.5, // Sleek font scale
@@ -415,7 +412,6 @@ class _SubjectItemState extends State<_SubjectItem> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFF059669)
                               : const Color(0xFF059669),
@@ -464,7 +460,6 @@ class _StatBox extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
                 color: isDark

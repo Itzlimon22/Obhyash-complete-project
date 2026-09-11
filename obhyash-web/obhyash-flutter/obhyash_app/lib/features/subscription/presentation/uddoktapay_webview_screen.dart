@@ -112,7 +112,6 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
             Text(
               'সময়সীমা শেষ',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
               ),
@@ -122,7 +121,6 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
         content: const Text(
           'পেমেন্ট সেশনের নির্ধারিত সময়সীমা (১০ মিনিট) পার হয়ে গেছে। লেনদেনের সুরক্ষার স্বার্থে নতুন করে পেমেন্ট শুরু করুন।',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 14,
           ),
         ),
@@ -135,7 +133,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF059669),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              
             ),
             child: const Text('ঠিক আছে'),
           ),
@@ -245,8 +243,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
         centerTitle: false,
         leading: IconButton(
@@ -289,7 +286,6 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
                     color: isLowTime
                         ? const Color(0xFFEF4444)
                         : (isDark ? Colors.white : const Color(0xFF0F172A)),
@@ -328,8 +324,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 15,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
@@ -340,7 +335,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        
                       ),
                       child: const Text('আবার চেষ্টা করুন'),
                     ),
@@ -364,7 +359,6 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
                       'সুরক্ষিত পেমেন্ট গেটওয়ে লোড হচ্ছে...',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                       ),
                     ),

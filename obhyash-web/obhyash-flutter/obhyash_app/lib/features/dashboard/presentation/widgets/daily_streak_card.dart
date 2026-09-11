@@ -178,7 +178,6 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
               ),
@@ -205,7 +204,6 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                       style: const TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF601D49),
                       ),
                     ),

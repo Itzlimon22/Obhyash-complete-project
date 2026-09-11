@@ -754,7 +754,10 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
           {/* User Progress Banner (When viewing own level) */}
           {currentUser && isOnOwnLevel && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-neutral-50 to-white dark:from-emerald-950/20 dark:via-[#12100E] dark:to-[#12100E] border border-emerald-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div
+              onClick={() => onUserClick?.(currentUser, myRank)}
+              className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-neutral-50 to-white dark:from-emerald-950/20 dark:via-[#12100E] dark:to-[#12100E] border border-emerald-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:border-emerald-500/40 transition-all"
+            >
               <div className="flex items-center gap-3.5">
                 <div className="relative">
                   <UserAvatar user={currentUser} size="md" className="w-12 h-12 ring-2 ring-emerald-500" />

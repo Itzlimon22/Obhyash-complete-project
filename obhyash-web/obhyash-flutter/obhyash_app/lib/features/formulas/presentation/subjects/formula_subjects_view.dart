@@ -40,7 +40,6 @@ class FormulaSubjectsView extends ConsumerWidget {
         title: Text(
           'ফর্মুলা ব্যাংক',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -196,7 +195,6 @@ class _SubjectCardState extends State<_SubjectCard>
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,

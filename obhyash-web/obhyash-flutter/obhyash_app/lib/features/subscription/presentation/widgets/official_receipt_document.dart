@@ -45,7 +45,6 @@ class OfficialReceiptService {
                 Text(
                   'রিসিট প্রস্তুত হচ্ছে...',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -218,7 +217,6 @@ class OfficialReceiptCard extends StatelessWidget {
                         child: const Text(
                           'অভ্যাস',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
@@ -241,7 +239,6 @@ class OfficialReceiptCard extends StatelessWidget {
                   const Text(
                     'স্মার্ট এডুকেশন ও এক্সাম প্রিপারেশন প্ল্যাটফর্ম',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 12,
                       color: Color(0xFF64748B),
                     ),
@@ -261,7 +258,6 @@ class OfficialReceiptCard extends StatelessWidget {
                   const Text(
                     'পেমেন্ট রিসিট',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF059669),
@@ -280,7 +276,6 @@ class OfficialReceiptCard extends StatelessWidget {
                   Text(
                     'রিসিট নং: #$shortId',
                     style: const TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF0F172A),
@@ -307,7 +302,6 @@ class OfficialReceiptCard extends StatelessWidget {
                     const Text(
                       'গ্রাহকের তথ্য (BILLED TO):',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF64748B),
@@ -317,7 +311,6 @@ class OfficialReceiptCard extends StatelessWidget {
                     Text(
                       displayName,
                       style: const TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF0F172A),
@@ -335,7 +328,6 @@ class OfficialReceiptCard extends StatelessWidget {
                       Text(
                         userInstitute,
                         style: const TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 12,
                           color: Color(0xFF475569),
                         ),
@@ -391,7 +383,6 @@ class OfficialReceiptCard extends StatelessWidget {
                         child: Text(
                           'নং',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                             color: Color(0xFF475569),
@@ -402,7 +393,6 @@ class OfficialReceiptCard extends StatelessWidget {
                         child: Text(
                           'সেবার বিবরণ (Description)',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                             color: Color(0xFF475569),
@@ -415,7 +405,6 @@ class OfficialReceiptCard extends StatelessWidget {
                           'মূল্য',
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                             color: Color(0xFF475569),
@@ -437,7 +426,6 @@ class OfficialReceiptCard extends StatelessWidget {
                         child: Text(
                           '০১',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 13,
                             color: Color(0xFF334155),
                           ),
@@ -450,7 +438,6 @@ class OfficialReceiptCard extends StatelessWidget {
                             Text(
                               invoice.planName,
                               style: const TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF0F172A),
@@ -460,7 +447,6 @@ class OfficialReceiptCard extends StatelessWidget {
                             const Text(
                               'অভ্যাস প্রিমিয়াম অ্যাক্সেস ও লাইভ এক্সাম ফিচারসমূহ',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 11,
                                 color: Color(0xFF64748B),
                               ),
@@ -516,7 +502,6 @@ class OfficialReceiptCard extends StatelessWidget {
                         const Text(
                           'সর্বমোট পরিশোধ:',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 13.5,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF0F172A),
@@ -563,7 +548,6 @@ class OfficialReceiptCard extends StatelessWidget {
                       Text(
                         'পেমেন্ট নিশ্চিত ও ভেরিফাইড (VERIFIED & CONFIRMED)',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF065F46),
@@ -572,7 +556,6 @@ class OfficialReceiptCard extends StatelessWidget {
                       Text(
                         'এটি একটি ইলেকট্রনিক জেনারেটেড অফিসিয়াল মানি রিসিট। কোনো স্বাক্ষর বা সিলমোহরের প্রয়োজন নেই।',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 10.5,
                           color: Color(0xFF047857),
                         ),
@@ -589,7 +572,6 @@ class OfficialReceiptCard extends StatelessWidget {
             child: Text(
               'অভ্যাস (Obhyash) প্ল্যাটফর্ম ব্যবহার করার জন্য আপনাকে ধন্যবাদ!',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF64748B),
@@ -607,7 +589,6 @@ class OfficialReceiptCard extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 12,
             color: Color(0xFF64748B),
           ),
@@ -616,7 +597,6 @@ class OfficialReceiptCard extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 12,
             fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
             color: valueColor ?? const Color(0xFF0F172A),
@@ -633,7 +613,6 @@ class OfficialReceiptCard extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 12,
             color: Color(0xFF64748B),
           ),

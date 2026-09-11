@@ -493,7 +493,6 @@ class _InstituteQuestionBankDetailViewState
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -523,7 +522,6 @@ class _InstituteQuestionBankDetailViewState
                       Text(
                         'কোনো প্রশ্নসেট খুঁজে পাওয়া যায়নি',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -614,7 +612,6 @@ class _InstituteQuestionBankDetailViewState
                       child: Text(
                         item.title,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -631,7 +628,6 @@ class _InstituteQuestionBankDetailViewState
                       child: Text(
                         badgeText,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: badgeColor,
@@ -658,7 +654,6 @@ class _InstituteQuestionBankDetailViewState
                         Text(
                           item.questionLabel,
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
                             color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
@@ -692,7 +687,6 @@ class _InstituteQuestionBankDetailViewState
                         Text(
                           formatDurationMinutes(item.durationMinutes),
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
                             color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),

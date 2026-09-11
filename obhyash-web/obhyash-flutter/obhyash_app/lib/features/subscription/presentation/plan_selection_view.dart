@@ -336,7 +336,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
             SnackBar(
               content: Text(
                 "🎉 '${result.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
-                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               backgroundColor: const Color(0xFF004633),
               behavior: SnackBarBehavior.floating,
@@ -348,7 +348,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
             SnackBar(
               content: Text(
                 result.errorMessage ?? 'অকার্যকর কুপন কোড!',
-                style: const TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               backgroundColor: const Color(0xFF991B1B),
               behavior: SnackBarBehavior.floating,
@@ -363,7 +363,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
           SnackBar(
             content: const Text(
               'কুপন মুছে ফেলা হয়েছে',
-              style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+              style: TextStyle(fontWeight: FontWeight.w700),
             ),
             backgroundColor: Colors.grey[700],
             behavior: SnackBarBehavior.floating,
@@ -402,8 +402,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
             color: isDark ? Colors.white : const Color(0xFF0F172A),
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
         centerTitle: true,
       ),
@@ -482,7 +481,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                       textAlign: TextAlign.center,
@@ -493,8 +491,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
@@ -521,7 +518,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                         child: const Center(
                           child: Text(
                             'কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।',
-                            style: TextStyle(fontFamily: 'HindSiliguri'),
+                            style: TextStyle(),
                           ),
                         ),
                       )
@@ -563,7 +560,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                 SnackBar(
                                   content: const Text(
                                     'কুপন মুছে ফেলা হয়েছে',
-                                    style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w700),
+                                    style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
                                   backgroundColor: const Color(0xFF2C2C2C),
                                   behavior: SnackBarBehavior.floating,
@@ -582,7 +579,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
                                 color: _appliedCoupon != null
                                     ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
                                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
@@ -622,7 +618,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                   text: TextSpan(
                                     style: TextStyle(
                                       fontSize: 13,
-                                      fontFamily: 'HindSiliguri',
                                       color: isDark ? Colors.white70 : const Color(0xFF334155),
                                       height: 1.4,
                                     ),
@@ -665,11 +660,8 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                     ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                                     : Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                
                                 ),
-                                elevation: 0,
-                              ),
                               onPressed: () => _handlePlanSelect(selectedPlan),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -684,7 +676,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                     style: const TextStyle(
                                       fontSize: 15.5,
                                       fontWeight: FontWeight.w600,
-                                      fontFamily: 'HindSiliguri',
                                       letterSpacing: 0.2,
                                     ),
                                   ),
@@ -705,7 +696,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.normal,
-                                                fontFamily: 'HindSiliguri',
                                                 color: Colors.white60,
                                                 decoration: TextDecoration.lineThrough,
                                                 decorationColor: Colors.white60,
@@ -718,7 +708,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                                             style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              fontFamily: 'HindSiliguri',
                                               color: Colors.white,
                                             ),
                                           ),
@@ -817,7 +806,6 @@ class _PlanSelectionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
                 maxLines: 1,
@@ -840,7 +828,6 @@ class _PlanSelectionCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.normal,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
                         decoration: TextDecoration.lineThrough,
                         decorationColor: isDark ? Colors.white38 : const Color(0xFFCBD5E1),
@@ -851,7 +838,6 @@ class _PlanSelectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: hasDiscount
                           ? (isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A))
                           : priceColor,
@@ -862,7 +848,6 @@ class _PlanSelectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'HindSiliguri',
                       color: isDark
                           ? const Color(0xFFA1A1AA)
                           : const Color(0xFF64748B),

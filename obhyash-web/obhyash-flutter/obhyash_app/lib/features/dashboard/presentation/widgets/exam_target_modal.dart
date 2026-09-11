@@ -206,9 +206,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                             ? const Color(0xFF1C1C1E)
                             : const Color(0xFFE5E5E5),
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        
                       ),
                       child: _saving
                           ? const SizedBox(

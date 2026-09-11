@@ -11,6 +11,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
 // Dashboard Components
+import GlobalAnnouncementBanner from "@/components/student/ui/common/GlobalAnnouncementBanner";
 import LiveExamSlider from "@/components/student/ui/dashboard/LiveExamSlider";
 import DashboardActionGrid from "@/components/student/ui/dashboard/DashboardActionGrid";
 import DailyStreakCard from "@/components/student/ui/dashboard/DailyStreakCard";
@@ -213,6 +214,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
       animate="show"
       className="w-full max-w-5xl xl:max-w-6xl mx-auto px-1 sm:px-2 md:px-3 py-2 sm:py-4 font-['HindSiliguri']"
     >
+      {/* 0. Live In-App Global Broadcast Announcement Banner */}
+      <GlobalAnnouncementBanner />
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-start">
         {/* ── Left Column: Main Dashboard Controls & Activities (Col Span 7) ── */}
         <div className="lg:col-span-7 xl:col-span-7 flex flex-col gap-3.5 sm:gap-4.5">

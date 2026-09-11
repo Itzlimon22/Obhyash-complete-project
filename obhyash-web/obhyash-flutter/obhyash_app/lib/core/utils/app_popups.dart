@@ -400,7 +400,6 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
                                         color: Color(0xFFF8FAFC),
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        fontFamily: 'HindSiliguri',
                                         height: 1.32,
                                         letterSpacing: 0.1,
                                       ),

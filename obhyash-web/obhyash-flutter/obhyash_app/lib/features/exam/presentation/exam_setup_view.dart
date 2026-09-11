@@ -1836,7 +1836,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
         ),
@@ -1875,7 +1874,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       value.isEmpty ? hint : value,
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'HindSiliguri',
                         fontWeight: value.isEmpty
                             ? FontWeight.normal
                             : FontWeight.bold,
@@ -1968,7 +1966,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
-                          fontFamily: 'HindSiliguri',
                           color: isSelected
                               ? Colors.white
                               : (isDark
@@ -2024,7 +2021,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark
                     ? Colors.white
                     : const Color(0xFF12544F),
@@ -2079,7 +2075,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                fontFamily: 'HindSiliguri',
                 color: isSelected
                     ? Colors.white
                     : (isDark
@@ -2156,7 +2151,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
           ),
         ),
@@ -2266,7 +2260,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                     : 'বিষয় নির্বাচন করো...',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   color: _selectedSubject != null
                                       ? (isDark
@@ -2404,7 +2397,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         'মোট প্রশ্ন:',
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFA1A1AA)
@@ -2496,7 +2488,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         'মোট সময়:',
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFA1A1AA)
@@ -2613,7 +2604,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                         fontWeight: isSelected
                                             ? FontWeight.w600
                                             : FontWeight.normal,
-                                        fontFamily: 'HindSiliguri',
                                         color: isSelected
                                             ? Colors.white
                                             : (isDark
@@ -2651,11 +2641,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   0xFF12544F,
                 ).withValues(alpha: 0.6),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                
                 ),
-                elevation: 0,
-              ),
               child: _isStarting
                   ? const SizedBox(
                       width: 22,
@@ -2671,8 +2658,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         color: Colors.white,
                         fontSize: 15.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
             ),
             const SizedBox(height: 40),
@@ -2728,7 +2714,6 @@ class _CardContainer extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
@@ -2808,7 +2793,6 @@ class _SubjectDropdownModal extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
@@ -2836,8 +2820,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                                 ? const Color(0xFFA1A1AA)
                                 : const Color(0xFF64748B),
                             fontSize: 14,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       )
                     : Builder(
@@ -2943,7 +2926,6 @@ class _SubjectDropdownModal extends StatelessWidget {
                                           style: TextStyle(
                                             fontSize: 12.5,
                                             fontWeight: FontWeight.w600,
-                                            fontFamily: 'HindSiliguri',
                                             color: isDark
                                                 ? const Color(0xFFA1A1AA)
                                                 : const Color(0xFF64748B),
@@ -3004,7 +2986,6 @@ class _SubjectDropdownModal extends StatelessWidget {
                                                     fontWeight: isSelected
                                                         ? FontWeight.w600
                                                         : FontWeight.normal,
-                                                    fontFamily: 'HindSiliguri',
                                                     color: textColor,
                                                   ),
                                                 ),
@@ -3141,7 +3122,6 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                       maxLines: 1,
@@ -3200,7 +3180,6 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'HindSiliguri',
                               color: isAllSelected
                                   ? (isDark
                                       ? const Color(0xFF34D399)
@@ -3249,8 +3228,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
                           fontSize: 14,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     )
                   : ListView.builder(
@@ -3332,7 +3310,6 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                       text: name,
                                       style: TextStyle(
                                         fontSize: 14.5,
-                                        fontFamily: 'HindSiliguri',
                                         fontWeight: isSelected
                                             ? FontWeight.w600
                                             : FontWeight.normal,
@@ -3371,18 +3348,14 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      
                       ),
-                      elevation: 0,
-                    ),
                     child: Text(
                       'সংরক্ষণ করো (${_currentSelected.length})',
                       style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                   ),
                 ),
@@ -3533,7 +3506,6 @@ class _TopicCollapsibleSelectionModalState
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                       maxLines: 1,
@@ -3592,7 +3564,6 @@ class _TopicCollapsibleSelectionModalState
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'HindSiliguri',
                               color: isAllSelected
                                   ? (isDark
                                       ? const Color(0xFF34D399)
@@ -3641,8 +3612,7 @@ class _TopicCollapsibleSelectionModalState
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
                           fontSize: 14,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     )
                   : ListView.builder(
@@ -3769,7 +3739,6 @@ class _TopicCollapsibleSelectionModalState
                                               style: TextStyle(
                                                 fontSize: 14.5,
                                                 fontWeight: FontWeight.w600,
-                                                fontFamily: 'HindSiliguri',
                                                 color: isDark
                                                     ? Colors.white
                                                     : const Color(0xFF0F172A),
@@ -3780,7 +3749,6 @@ class _TopicCollapsibleSelectionModalState
                                               '$selectedInChapterCount/${chapterTopics.length}টি টপিক নির্বাচিত',
                                               style: TextStyle(
                                                 fontSize: 11.5,
-                                                fontFamily: 'HindSiliguri',
                                                 fontWeight: FontWeight.normal,
                                                 color:
                                                     selectedInChapterCount > 0
@@ -3927,7 +3895,6 @@ class _TopicCollapsibleSelectionModalState
                                                 text: topic.name,
                                                 style: TextStyle(
                                                   fontSize: 13.5,
-                                                  fontFamily: 'HindSiliguri',
                                                   fontWeight: isSelected
                                                       ? FontWeight.w500
                                                       : FontWeight.normal,
@@ -3977,18 +3944,14 @@ class _TopicCollapsibleSelectionModalState
                       backgroundColor: const Color(0xFF12544F),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      
                       ),
-                      elevation: 0,
-                    ),
                     child: Text(
                       'সংরক্ষণ করো (${_currentSelected.length}টি টপিক)',
                       style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                   ),
                 ),
@@ -4119,7 +4082,6 @@ class _PresetBadgePill extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'HindSiliguri',
                   letterSpacing: -0.2,
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
@@ -4221,7 +4183,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: textDark,
                 ),
               ),
@@ -4257,7 +4218,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: textDark,
                   ),
                 ),
@@ -4271,7 +4231,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.normal,
-                        fontFamily: 'HindSiliguri',
                         color: textDark,
                       ),
                     ),
@@ -4286,7 +4245,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: textDark,
                     ),
                   ),
@@ -4337,7 +4295,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.normal,
-                                  fontFamily: 'HindSiliguri',
                                   color: textDark,
                                 ),
                               ),
@@ -4372,7 +4329,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
                           color: textSub,
                         ),
                       ),
@@ -4382,7 +4338,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: textDark,
                         ),
                       ),
@@ -4405,7 +4360,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            fontFamily: 'HindSiliguri',
                             color: textSub,
                           ),
                         ),
@@ -4415,7 +4369,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: textDark,
                           ),
                         ),
@@ -4439,7 +4392,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            fontFamily: 'HindSiliguri',
                             color: textSub,
                           ),
                         ),
@@ -4451,7 +4403,6 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: textDark,
                           ),
                         ),
@@ -4475,18 +4426,14 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
               backgroundColor: const Color(0xFF12544F),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+              
               ),
-              elevation: 0,
-            ),
             child: const Text(
               'পরীক্ষা শুরু করো',
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
           ),
         ],

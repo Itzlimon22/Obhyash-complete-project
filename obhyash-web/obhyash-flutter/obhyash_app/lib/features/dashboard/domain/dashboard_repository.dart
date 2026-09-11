@@ -13,7 +13,7 @@ class DashboardRepository {
     try {
       final response = await _supabase
           .from('public_profiles')
-          .select('id, name, xp, level, avatar_url, avatar_color, gender')
+          .select('id, name, xp, level, avatar_url, avatar_color')
           .eq('level', level)
           //.ilike('role', 'student') // If your view requires 'role' mapping
           .order('xp', ascending: false)

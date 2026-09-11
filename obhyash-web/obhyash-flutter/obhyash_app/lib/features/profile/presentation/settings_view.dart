@@ -341,8 +341,7 @@ class SettingsView extends ConsumerWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                         if (user.email != null) ...[
                           const SizedBox(height: 3),
@@ -351,7 +350,6 @@ class SettingsView extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12.5,
-                              fontFamily: 'HindSiliguri',
                               color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
@@ -466,7 +464,6 @@ class SettingsView extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: isDark
                             ? const Color(0xFFA1A1AA)
                             : const Color(0xFF71717A),
@@ -586,8 +583,7 @@ class _NavItem extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: labelColor,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -654,7 +650,6 @@ class _InfoChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151),
               ),
             ),
@@ -717,7 +712,6 @@ class _ActionBtn extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'HindSiliguri',
                   color: fg,
                 ),
               ),

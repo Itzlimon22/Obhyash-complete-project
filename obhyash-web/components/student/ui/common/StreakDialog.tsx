@@ -51,35 +51,62 @@ export default function StreakDialog({
       }
     };
 
-    fetchWeeklyActivity();
+    if (isOpen) {
+      fetchWeeklyActivity();
+      fetchTopStreaks();
+    }
   }, [isOpen, userId]);
 
   const fetchTopStreaks = async () => {
-    // Check if we have cached data from the last 24 hours
-    if (cachedTopStreaks && lastFetchTime) {
-      if (Date.now() - lastFetchTime < 24 * 60 * 60 * 1000) {
+    // Check if we have cached valid data from the last 60 seconds
+    if (cachedTopStreaks && cachedTopStreaks.length > 0 && lastFetchTime) {
+      if (Date.now() - lastFetchTime < 60 * 1000) {
         setTopStreaks(cachedTopStreaks);
         return;
       }
     }
 
-    if (topStreaks.length > 0) return;
     setIsLoadingLeaderboard(true);
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from('public_profiles')
-        .select('id, name, avatar_url, streak')
-        .order('streak', { ascending: false })
-        .limit(5);
-      if (error) throw error;
-      
-      cachedTopStreaks = data || [];
-      lastFetchTime = Date.now();
-      
-      setTopStreaks(data || []);
+      let listData: any[] | null = null;
+
+      try {
+        const { data, error } = await supabase
+          .from('public_profiles')
+          .select('id, name, avatar_url, streak')
+          .order('streak', { ascending: false })
+          .limit(10);
+        if (!error && data && data.length > 0) {
+          listData = data;
+        }
+      } catch (e) {
+        console.warn('public_profiles streak error:', e);
+      }
+
+      if (!listData || listData.length === 0) {
+        try {
+          const { data } = await supabase
+            .from('users')
+            .select('id, name, avatar_url, streak')
+            .order('streak', { ascending: false })
+            .limit(10);
+          if (data && data.length > 0) {
+            listData = data;
+          }
+        } catch (e) {
+          console.warn('users table streak fallback error:', e);
+        }
+      }
+
+      const finalRows = listData || [];
+      if (finalRows.length > 0) {
+        cachedTopStreaks = finalRows;
+        lastFetchTime = Date.now();
+      }
+      setTopStreaks(finalRows);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch top streaks:', err);
     } finally {
       setIsLoadingLeaderboard(false);
     }

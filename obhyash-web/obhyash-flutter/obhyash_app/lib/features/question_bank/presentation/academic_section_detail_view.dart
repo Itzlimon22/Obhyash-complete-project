@@ -138,7 +138,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           wasBookmarked
               ? 'বুকমার্ক থেকে সরানো হয়েছে'
               : 'বুকমার্কে সংরক্ষণ করা হয়েছে 📌',
-          style: const TextStyle(fontFamily: 'HindSiliguri', fontSize: 13),
+          style: const TextStyle(fontSize: 13),
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
@@ -964,7 +964,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
           '$_subjectTitle - $_sectionTitle',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1082,7 +1081,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                     Text(
                       label,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 12,
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -1188,7 +1186,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             Text(
               'প্রশ্ন লোড হচ্ছে...',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 14,
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               ),
@@ -1222,7 +1219,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
               Text(
                 'কোনো প্রশ্ন পাওয়া যায়নি',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : const Color(0xFF1E293B),
@@ -1233,7 +1229,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                 'নির্বাচিত ফিল্টারে এই মুহূর্তে কোনো প্রশ্ন অন্তর্ভুক্ত নেই। অনুগ্রহ করে অন্য অধ্যায় বা টপিক নির্বাচন করুন।',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 13.5,
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                   height: 1.45,
@@ -1252,7 +1247,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                 icon: const Icon(LucideIcons.rotateCcw, size: 15),
                 label: const Text(
                   'সকল প্রশ্ন দেখুন',
-                  style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w600),
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF047857),
@@ -1343,8 +1338,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             ],
           ),
@@ -1383,8 +1377,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             ],
           ),
@@ -1540,7 +1533,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   child: Text(
                     boardName,
                     style: const TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 12.0,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFFDC2626),
@@ -1555,7 +1547,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             LatexText(
               text: '$banglaNum. $stimulus',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 15.5,
                 fontWeight: FontWeight.w500,
                 height: 1.55,
@@ -1605,7 +1596,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                       child: const Text(
                         'উত্তর দেখো',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -1628,7 +1618,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       child: LatexText(
         text: title,
         style: TextStyle(
-          fontFamily: 'HindSiliguri',
           fontSize: 14.5,
           fontWeight: FontWeight.w500,
           color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
@@ -1680,7 +1669,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   child: Text(
                     isKa ? '$banglaNum. জ্ঞানমূলক প্রশ্ন' : '$banglaNum. অনুধাবনমূলক প্রশ্ন',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: isKa ? const Color(0xFF2563EB) : const Color(0xFF047857),
@@ -1698,7 +1686,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                     child: Text(
                       '${q.examHistory.first.institute} \'${(q.examHistory.first.year % 100).toString().padLeft(2, '0')}',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 11.5,
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                       ),
@@ -1742,7 +1729,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
             child: LatexText(
               text: q.question,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 15.5,
                 fontWeight: FontWeight.w600,
                 height: 1.5,
@@ -1788,7 +1774,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                   Text(
                     isExpanded ? 'উত্তর সংক্ষেপ করুন' : 'উত্তর ও ব্যাখ্যা দেখুন',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: isKa ? const Color(0xFF2563EB) : const Color(0xFF047857),
@@ -1817,7 +1802,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
                     ? q.explanation!
                     : (q.options.isNotEmpty ? q.options.first : 'এই প্রশ্নের উত্তর শীঘ্রই হালনাগাদ করা হবে।'),
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 14.5,
                   height: 1.6,
                   color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF2E2621),
@@ -2357,7 +2341,6 @@ class _DropdownPillButton extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 12.5,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: disabled
@@ -2482,7 +2465,6 @@ class _FilterSelectionSheet extends StatelessWidget {
                     child: Text(
                       title,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -2600,7 +2582,6 @@ class _FilterSelectionSheet extends StatelessWidget {
                     Text(
                       item.title,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 13,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                         color: isSelected
@@ -2612,7 +2593,6 @@ class _FilterSelectionSheet extends StatelessWidget {
                       Text(
                         item.subtitle!,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 10.5,
                           color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                         ),
@@ -2698,7 +2678,6 @@ class _FilterSelectionSheet extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
                           color: isSelected
@@ -2713,7 +2692,6 @@ class _FilterSelectionSheet extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 12,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                         height: 1.2,
@@ -2830,7 +2808,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
         title: Text(
           '$banglaNum নং সৃজনশীল সমাধান',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -2933,7 +2910,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                           child: Text(
                             widget.boardName,
                             style: const TextStyle(
-                              fontFamily: 'HindSiliguri',
                               fontSize: 12.0,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFDC2626),
@@ -2948,7 +2924,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                     LatexText(
                       text: '$banglaNum. $displayStimulus',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 15.5,
                         fontWeight: FontWeight.w500,
                         height: 1.55,
@@ -3011,7 +2986,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                         Text(
                           'আদর্শ উত্তর ও পূর্ণাঙ্গ সমাধান',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
                             color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
@@ -3039,7 +3013,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                             child: LatexText(
                               text: solutionText,
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 15.0,
                                 height: 1.6,
                                 color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF1E293B),
@@ -3060,7 +3033,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
                                   'এই সৃজনশীল প্রশ্নের উত্তর ও সমাধান শীঘ্রই যুক্ত করা হবে।',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontSize: 14.0,
                                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                   ),
@@ -3084,7 +3056,6 @@ class _CqSolutionPageViewState extends State<CqSolutionPageView> {
       child: LatexText(
         text: title,
         style: TextStyle(
-          fontFamily: 'HindSiliguri',
           fontSize: 14.5,
           fontWeight: FontWeight.w500,
           color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),

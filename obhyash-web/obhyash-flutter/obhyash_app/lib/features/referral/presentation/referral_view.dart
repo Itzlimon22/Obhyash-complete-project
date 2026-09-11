@@ -521,7 +521,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           color: Colors.white,
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           height: 1.35,
                         ),
                       ),
@@ -582,16 +581,14 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         fontSize: 14.5,
                                         fontWeight: FontWeight.bold,
                                         color: textPrimary,
-                                        fontFamily: 'HindSiliguri',
-                                      ),
+                                        ),
                                     ),
                                     Text(
                                       '১৫ দিনের সম্পূর্ণ প্রো প্রিমিয়াম উপভোগ করো',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: textSecondary,
-                                        fontFamily: 'HindSiliguri',
-                                      ),
+                                        ),
                                     ),
                                   ],
                                 ),
@@ -626,7 +623,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        fontFamily: 'HindSiliguri',
                                         color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                                       ),
                                     ),
@@ -640,7 +636,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
                                 color: _remainingAttempts < 3 ? const Color(0xFFD97706) : textSecondary,
                               ),
                             ),
@@ -694,10 +689,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF059669),
                                     foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                   ),
                                   child: _isClaiming
@@ -714,8 +705,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            fontFamily: 'HindSiliguri',
-                                          ),
+                                            ),
                                         ),
                                 ),
                               ),
@@ -754,8 +744,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             fontWeight: FontWeight.bold,
                             color: textSecondary,
                             letterSpacing: 0.5,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                         const SizedBox(height: 10),
                         Container(
@@ -825,7 +814,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
                                           color: _isCopied
                                               ? Colors.white
                                               : (isDark ? Colors.white70 : const Color(0xFF334155)),
@@ -848,7 +836,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             label: const Text(
                               'বন্ধুদের সাথে শেয়ার করো',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14.5,
                               ),
@@ -857,11 +844,8 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               backgroundColor: const Color(0xFFB91C1C),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 13),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                              
                               ),
-                              elevation: 0,
-                            ),
                           ),
                         ),
                       ],
@@ -902,7 +886,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.5,
-                            fontFamily: 'HindSiliguri',
                             color: textSecondary,
                           ),
                         ),
@@ -968,7 +951,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 style: TextStyle(
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: textPrimary,
                                 ),
                               ),
@@ -1046,7 +1028,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
-                                            fontFamily: 'HindSiliguri',
                                             color: textPrimary,
                                           ),
                                         ),
@@ -1082,7 +1063,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        fontFamily: 'HindSiliguri',
                                         color: statusColor,
                                       ),
                                     ),
@@ -1114,7 +1094,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: textPrimary,
                           ),
                         ),
@@ -1176,8 +1155,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
                                         color: Color(0xFFB91C1C),
-                                        fontFamily: 'HindSiliguri',
-                                      ),
+                                        ),
                                     ),
                                   ),
                                 ),
@@ -1192,7 +1170,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
                                           color: textPrimary,
                                         ),
                                       ),
@@ -1201,7 +1178,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         item.$3,
                                         style: TextStyle(
                                           fontSize: 12.5,
-                                          fontFamily: 'HindSiliguri',
                                           color: textSecondary,
                                           height: 1.4,
                                         ),
@@ -1257,7 +1233,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
               Text(
                 'স্ক্র্যাচ কার্ড প্রগ্রেস',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : Colors.black87,
@@ -1272,7 +1247,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 child: Text(
                   '$_totalReferrals / $nextMilestone',
                   style: const TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFF59E0B),
                   ),
@@ -1296,7 +1270,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 ? 'অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
                 : 'আর মাত্র $needed টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               color: isDark ? Colors.white70 : Colors.black54,
             ),
@@ -1313,7 +1286,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         Text(
           'আপনার স্ক্র্যাচ কার্ডসমূহ',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 15.5,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : Colors.black87,
@@ -1383,7 +1355,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                       Text(
                         isScratched ? 'ব্যবহৃত' : 'খুলতে ক্লিক করুন',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isScratched
                               ? (isDark ? Colors.white54 : Colors.black54)
@@ -1449,7 +1420,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                     Text(
                       'এই মাসের সেরা রেফারার',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -1461,7 +1431,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                 Text(
                   'সবচেয়ে বেশি বন্ধুদের ইনভাইট করুন এবং জিতে নিন দারুণ সব পুরস্কার!',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 12.5,
                     color: Color(0xFFFFE4E6),
                   ),
@@ -1483,7 +1452,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           'এই মাসে এখনও কেউ লিডারবোর্ডে নেই!\nপ্রথম হওয়ার সুযোগ তোমারই!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 16,
                             color: isDark ? Colors.white54 : Colors.black54,
                           ),
@@ -1547,7 +1515,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                   Text(
                                     user['name'] ?? 'ব্যবহারকারী',
                                     style: TextStyle(
-                                      fontFamily: 'HindSiliguri',
                                       fontWeight: FontWeight.bold,
                                       fontSize: isTop3 ? 14.5 : 13.5,
                                       color: isDark ? Colors.white : Colors.black87,
@@ -1563,7 +1530,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         child: Text(
                                           getPrizeText(rank),
                                           style: const TextStyle(
-                                            fontFamily: 'HindSiliguri',
                                             fontSize: 12,
                                             color: Color(0xFF64748B),
                                           ),
@@ -1582,7 +1548,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 Text(
                                   '${user['total_referrals']}',
                                   style: const TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontWeight: FontWeight.w900,
                                     fontSize: 20,
                                     color: Color(0xFFE11D48),
@@ -1591,7 +1556,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 const Text(
                                   'রেফারেল',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF94A3B8),
@@ -1656,7 +1620,6 @@ class _StepBubble extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.bold,
-              fontFamily: 'HindSiliguri',
               color: textPrimary,
             ),
           ),
@@ -1666,7 +1629,6 @@ class _StepBubble extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: textSecondary,
               height: 1.4,
             ),

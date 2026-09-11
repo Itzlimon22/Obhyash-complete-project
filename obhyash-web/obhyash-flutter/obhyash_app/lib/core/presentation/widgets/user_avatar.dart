@@ -134,8 +134,7 @@ class UserAvatar extends ConsumerWidget {
             color: Colors.white,
             fontSize: size * 0.42,
             fontWeight: FontWeight.bold,
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
       ),
     );

@@ -117,7 +117,6 @@ class _OfflineBannerWrapperState extends ConsumerState<OfflineBannerWrapper> {
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
                           color: isOffline
                               ? (isDark ? const Color(0xFFFEE2E2) : const Color(0xFF991B1B))
                               : (isDark ? const Color(0xFFD1FAE5) : const Color(0xFF065F46)),

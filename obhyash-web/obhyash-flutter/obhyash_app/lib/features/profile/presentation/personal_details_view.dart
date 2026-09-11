@@ -276,7 +276,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
@@ -297,7 +296,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
             ),
           ),
@@ -324,8 +322,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                 color: Colors.white,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
               child: Icon(
                 LucideIcons.helpCircle,
                 size: 14,
@@ -399,7 +396,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           validator: validator,
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'HindSiliguri',
             color: readOnly
                 ? (isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3))
                 : (isDark ? Colors.white : Colors.black),
@@ -408,7 +404,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             hintText: placeholder,
             hintStyle: TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
             ),
             contentPadding: const EdgeInsets.symmetric(
@@ -496,8 +491,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
               fontWeight: FontWeight.w600,
               color: Colors.white,
               fontSize: 16,
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
           ),
           centerTitle: true,
           elevation: 10,
@@ -546,7 +540,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
@@ -555,7 +548,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               'ছবি আপলোড করো বা কার্টুন ছবি বেছে নাও',
                               style: TextStyle(
                                 fontSize: 12.5,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
                                 height: 1.35,
                               ),
@@ -569,7 +561,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),
                               ),
@@ -743,8 +734,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                                   child: Text(
                                                     name,
                                                     style: TextStyle(
-                                                      fontFamily:
-                                                          'HindSiliguri',
                                                       fontSize: 16,
                                                       color: isDark
                                                           ? const Color(
@@ -875,7 +864,6 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 child: Text(
                                   'এসএসসি পরীক্ষার তথ্য',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
                                     color: isDark ? const Color(0xFFE5E5E5) : const Color(0xFF374151),
@@ -1043,11 +1031,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                       backgroundColor: const Color(0xFF059669), // emerald-700
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                      shadowColor: const Color(0x3310B981), // emerald-500/20
+                      
+                       // emerald-500/20
                     ),
                     child: _isLoading
                         ? const SizedBox(
@@ -1063,8 +1048,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                   ),
                 ),

@@ -137,6 +137,16 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
           setIsTakingExam(false);
           fetchDetails(); // refresh attempt status
         }}
+        onViewLeaderboard={() => {
+          setIsTakingExam(false);
+          setIsViewingLeaderboard(true);
+          fetchDetails();
+        }}
+        onViewSolutions={() => {
+          setIsTakingExam(false);
+          setIsViewingSolutions(true);
+          fetchDetails();
+        }}
         isDarkMode={commonLayoutProps.isDarkMode}
         toggleTheme={commonLayoutProps.toggleTheme}
       />
@@ -272,7 +282,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               // Untaken
               isOngoing ? (
                 <button 
-                  className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                  className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-[#12544F]/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                   onClick={() => setIsTakingExam(true)}
                 >
                   <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
@@ -288,7 +298,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               ) : (
                 // Past & Untaken -> Practice mode
                 <button 
-                  className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                  className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-[#12544F]/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                   onClick={() => setIsTakingExam(true)}
                 >
                   <RotateCcw className="w-5 h-5" />
@@ -300,28 +310,44 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               isPast || exam.id.startsWith("mock-") ? (
                 <div className="space-y-3">
                   <button 
+                    onClick={() => setIsViewingLeaderboard(true)}
+                    className="w-full bg-[#601D49] hover:bg-[#4D173B] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Trophy className="w-5 h-5" />
+                    মেধা তালিকা দেখুন
+                  </button>
+                  <button 
                     onClick={() => setIsViewingSolutions(true)}
-                    className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                    className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <BookOpen className="w-5 h-5" />
                     সমাধান ও ব্যাখ্যা দেখুন
                   </button>
                   <button 
                     onClick={() => setIsTakingExam(true)}
-                    className="w-full bg-transparent border-2 border-[#0B6B42] text-[#0B6B42] dark:border-emerald-600 dark:text-emerald-400 py-3.5 rounded-2xl font-bold text-base hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-transparent border-2 border-[#12544F] text-[#12544F] dark:border-[#34D399] dark:text-[#34D399] py-3 rounded-2xl font-bold text-sm hover:bg-[#E6F0EC] dark:hover:bg-[#12544F]/20 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <RotateCcw className="w-4 h-4" />
                     পুনরায় অনুশীলন করুন
                   </button>
                 </div>
               ) : (
-                <button 
-                  disabled
-                  className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-4 rounded-2xl font-bold text-base cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <Clock className="w-5 h-5" />
-                  ফলাফল প্রকাশের অপেক্ষায়...
-                </button>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => setIsViewingLeaderboard(true)}
+                    className="w-full bg-[#601D49] hover:bg-[#4D173B] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Trophy className="w-5 h-5" />
+                    চলমান মেধা তালিকা দেখুন
+                  </button>
+                  <button 
+                    disabled
+                    className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-3 rounded-2xl font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <Clock className="w-4 h-4" />
+                    ফলাফল ও সমাধান প্রকাশের অপেক্ষায়...
+                  </button>
+                </div>
               )
             )}
           </div>

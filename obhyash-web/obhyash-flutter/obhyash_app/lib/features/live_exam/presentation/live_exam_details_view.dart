@@ -46,8 +46,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
             color: isDark ? Colors.white : Colors.black87,
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            fontFamily: "HindSiliguri",
-          ),
+            ),
         ),
       ),
       body: examAsync.when(
@@ -179,7 +178,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                               color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
-                              fontFamily: "HindSiliguri",
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -202,8 +200,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.w700,
                                   color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -320,8 +317,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.w700,
                                   color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -358,8 +354,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w700,
                                                     color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                                    fontFamily: "HindSiliguri",
-                                                  ),
+                                                    ),
                                                 ),
                                                 Expanded(
                                                   child: Text(
@@ -369,8 +364,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                                       height: 1.35,
                                                       fontWeight: FontWeight.w500,
                                                       color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF1E293B),
-                                                      fontFamily: "HindSiliguri",
-                                                    ),
+                                                      ),
                                                     maxLines: 2,
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
@@ -390,8 +384,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                       fontSize: 13.5,
                                       height: 1.4,
                                       color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                                      fontFamily: "HindSiliguri",
-                                    ),
+                                      ),
                                   ),
                           ),
                         ],
@@ -425,7 +418,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                               'লাইভ এক্সাম সাময়িক স্থগিত রয়েছে। অ্যাডমিন কর্তৃক পুনরায় চালু করা হলে পরীক্ষা দেওয়া যাবে।',
                               style: TextStyle(
                                 fontSize: 13,
-                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.w600,
                                 color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                               ),
@@ -443,18 +435,15 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         backgroundColor: (isLiveExamsEnabled && (isOngoing || isPast || exam.id.startsWith("mock-")))
                             ? const Color(0xFF059669)
                             : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        
                         ),
-                        elevation: 0,
-                      ),
                       onPressed: !isLiveExamsEnabled
                           ? () {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
                                     'লাইভ এক্সাম বর্তমানে সাময়িক স্থগিত রয়েছে।',
-                                    style: TextStyle(fontFamily: 'HindSiliguri'),
+                                    style: TextStyle(),
                                   ),
                                   backgroundColor: Color(0xFFDC2626),
                                 ),
@@ -487,8 +476,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                           color: (isLiveExamsEnabled && (isOngoing || isPast || exam.id.startsWith("mock-")))
                               ? Colors.white
                               : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
-                          fontFamily: "HindSiliguri",
-                        ),
+                          ),
                       ),
                     ),
                   ),
@@ -503,11 +491,8 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF059669),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                          
                           ),
-                          elevation: 0,
-                        ),
                         onPressed: () {
                           context.push(
                             "/live_exam_solution/${exam.id}",
@@ -517,7 +502,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         icon: const Icon(LucideIcons.bookOpen, size: 18),
                         label: const Text(
                           "সমাধান ও ব্যাখ্যা দেখুন",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.5, fontFamily: "HindSiliguri"),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.5, ),
                         ),
                       ),
                     ),
@@ -547,7 +532,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                         icon: const Icon(LucideIcons.rotateCcw, size: 18),
                         label: const Text(
                           "অনুশীলন পরীক্ষা দিন (Practice)",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, fontFamily: "HindSiliguri"),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, ),
                         ),
                       ),
                     ),
@@ -583,7 +568,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                           style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
-                            fontFamily: "HindSiliguri",
                             color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
                           ),
                         ),
@@ -629,7 +613,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   SizedBox(width: 8),
                                   Text(
                                     "অনুশীলন পরীক্ষার ইতিহাস",
-                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, fontFamily: "HindSiliguri"),
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, ),
                                   ),
                                 ],
                               ),
@@ -638,8 +622,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: isDark ? Colors.white54 : Colors.black54,
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -698,8 +681,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: isDark ? Colors.white38 : Colors.black45,
-                                            fontFamily: "HindSiliguri",
-                                          ),
+                                            ),
                                         ),
                                       ],
                                     ),
@@ -751,8 +733,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFD97706),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -761,8 +742,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 12.5,
                                   height: 1.4,
                                   color: isDark ? Colors.white70 : const Color(0xFF78350F),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -799,8 +779,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : const Color(0xFF1F2937),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -809,8 +788,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   fontSize: 12.5,
                                   height: 1.4,
                                   color: isDark ? Colors.white70 : const Color(0xFF4B5563),
-                                  fontFamily: "HindSiliguri",
-                                ),
+                                  ),
                               ),
                             ],
                           ),
@@ -916,7 +894,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
-                                      fontFamily: "HindSiliguri",
                                       color: idx < 3 ? Colors.white : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                                     ),
                                   ),
@@ -931,7 +908,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w800,
-                                          fontFamily: "HindSiliguri",
                                           color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
                                         ),
                                         maxLines: 1,
@@ -942,7 +918,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                         lb.userInstitute.isNotEmpty ? lb.userInstitute : "প্রতিষ্ঠান নেই",
                                         style: TextStyle(
                                           fontSize: 11.5,
-                                          fontFamily: "HindSiliguri",
                                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                                         ),
                                         maxLines: 1,
@@ -957,7 +932,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: "HindSiliguri",
                                     color: accuracy >= 80
                                         ? const Color(0xFF10B981)
                                         : (accuracy >= 50 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444)),
@@ -978,7 +952,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w900,
-                                      fontFamily: "HindSiliguri",
                                       color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
                                     ),
                                   ),
@@ -1015,7 +988,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                       icon: const Icon(LucideIcons.trophy, size: 18),
                       label: const Text(
                         "সম্পূর্ণ মেধা তালিকা দেখুন",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: "HindSiliguri"),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, ),
                       ),
                     ),
                   ),
@@ -1037,7 +1010,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
           style: TextStyle(
             fontSize: 19,
             fontWeight: FontWeight.w900,
-            fontFamily: "HindSiliguri",
             color: color,
           ),
         ),
@@ -1046,7 +1018,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
           label,
           style: TextStyle(
             fontSize: 12,
-            fontFamily: "HindSiliguri",
             fontWeight: FontWeight.w500,
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
@@ -1063,7 +1034,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w900,
-            fontFamily: "HindSiliguri",
             color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A),
           ),
         ),
@@ -1072,7 +1042,6 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
           label,
           style: TextStyle(
             fontSize: 11.5,
-            fontFamily: "HindSiliguri",
             fontWeight: FontWeight.w500,
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),

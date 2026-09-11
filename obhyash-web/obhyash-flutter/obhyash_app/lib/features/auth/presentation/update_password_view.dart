@@ -69,7 +69,6 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Color(0xFFA1A1AA),
@@ -127,7 +126,6 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
           title: const Text(
             'নতুন পাসওয়ার্ড দাও',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -166,11 +164,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
                     backgroundColor: const Color(0xFF059669),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 24,
@@ -184,7 +178,6 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
                           'পাসওয়ার্ড সংরক্ষণ করো',
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.bold,
                           ),
                         ),

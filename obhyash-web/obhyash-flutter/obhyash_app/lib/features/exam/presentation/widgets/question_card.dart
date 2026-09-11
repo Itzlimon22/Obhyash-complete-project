@@ -172,17 +172,16 @@ class _QuestionCardState extends State<QuestionCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Serial number + question text (seamless continuous wrapping & baseline)
+                // Serial number + question text (Chorcha Benchmark: 16.5px, w600, 1.5 line-height)
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'HindSiliguri',
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w600,
                     color: isDark
-                        ? const Color(0xFFF5F5F5)
-                        : const Color(0xFF111827),
-                    height: 1.45,
+                        ? const Color(0xFFF8FAFC)
+                        : const Color(0xFF0F172A),
+                    height: 1.5,
                   ),
                 ),
 
@@ -254,7 +253,6 @@ class _QuestionCardState extends State<QuestionCard>
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
-                                      fontFamily: 'HindSiliguri',
                                       color: isDark
                                           ? const Color(0xFFA5F3FC)
                                           : const Color(0xFF006064),
@@ -286,7 +284,6 @@ class _QuestionCardState extends State<QuestionCard>
                                 style: TextStyle(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFFBBF24)
                                       : const Color(0xFFD97706),
@@ -547,26 +544,24 @@ class _QuestionCardState extends State<QuestionCard>
                                     banglaIndex,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 12.5,
+                                      fontSize: 13.0,
                                       fontWeight: FontWeight.w600,
-                                      fontFamily: 'HindSiliguri',
                                       color: bulletText,
                                       height: 1.1,
                                     ),
                                   ),
                                 ),
-                                // Option text
+                                // Option text (Chorcha Benchmark: 16.0px, w500)
                                 Expanded(
                                   child: LatexText(
                                     text: option,
                                     style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'HindSiliguri',
+                                      fontSize: 16.0,
                                       fontWeight: boldText
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
                                       color: optionTextColor,
-                                      height: 1.35,
+                                      height: 1.45,
                                     ),
                                   ),
                                 ),
@@ -685,9 +680,8 @@ class _ExplanationPanel extends StatelessWidget {
                   Text(
                     'ব্যাখ্যা',
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
                       color: headerTextColor,
                     ),
                   ),
@@ -738,9 +732,8 @@ class _ExplanationPanel extends StatelessWidget {
                   LatexText(
                     text: question.explanation!,
                     style: TextStyle(
-                      fontSize: 14.0,
-                      fontFamily: 'HindSiliguri',
-                      height: 1.55,
+                      fontSize: 14.5,
+                      height: 1.6,
                       color: bodyTextColor,
                     ),
                   ),

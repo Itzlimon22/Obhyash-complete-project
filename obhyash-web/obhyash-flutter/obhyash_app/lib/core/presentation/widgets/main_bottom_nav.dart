@@ -148,7 +148,6 @@ class MainBottomNav extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              fontFamily: 'HindSiliguri',
                               fontWeight: isActive
                                   ? FontWeight.w700
                                   : FontWeight.w500,

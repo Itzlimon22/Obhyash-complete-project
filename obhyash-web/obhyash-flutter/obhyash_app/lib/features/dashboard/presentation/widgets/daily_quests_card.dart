@@ -541,7 +541,6 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
               Text(
                 'আজকের মিশন',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -565,7 +564,6 @@ class _DailyQuestsCardState extends ConsumerState<DailyQuestsCard>
                 child: Text(
                   '$completedCount/${_quests.length}',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: isAllCompleted
@@ -639,7 +637,6 @@ class _QuestItemRow extends StatelessWidget {
                 child: Text(
                   quest.description,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 13,
                     fontWeight: FontWeight.normal,
                     color: isDark ? const Color(0xFFF3F4F6) : const Color(0xFF1E293B),
@@ -669,7 +666,6 @@ class _QuestItemRow extends StatelessWidget {
                       Text(
                         'ক্লেইমড',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF12544F),
@@ -701,7 +697,6 @@ class _QuestItemRow extends StatelessWidget {
                         Text(
                           '+${quest.xpReward} XP ক্লেইম',
                           style: const TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -721,7 +716,6 @@ class _QuestItemRow extends StatelessWidget {
                   child: Text(
                     '+${quest.xpReward} XP',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
@@ -751,7 +745,6 @@ class _QuestItemRow extends StatelessWidget {
               Text(
                 '${quest.current}/${quest.target}',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: quest.isCompleted

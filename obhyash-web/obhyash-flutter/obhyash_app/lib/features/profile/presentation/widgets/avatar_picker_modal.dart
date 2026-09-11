@@ -380,7 +380,6 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
@@ -485,7 +484,6 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                           ),
                         ),
@@ -494,7 +492,6 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: const Color(0xFF059669),
                           ),
                         ),
@@ -547,7 +544,6 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                      fontFamily: 'HindSiliguri',
                                       color: isSelected
                                           ? Colors.white
                                           : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF334155)),
@@ -668,11 +664,8 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                       onPressed: _isUploading ? null : () => _saveAvatarToDatabase(_selectedAvatarUrl),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                        
                         ),
-                        elevation: 0,
-                      ),
                       child: _isUploading
                           ? const SizedBox(
                               width: 20,
@@ -692,7 +685,6 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,
-                                    fontFamily: 'HindSiliguri',
                                     color: Colors.white,
                                   ),
                                 ),
@@ -710,8 +702,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           color: Color(0xFFEF4444),
                           fontSize: 12.5,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ),
                   ],
@@ -763,7 +754,6 @@ class _ActionButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF1E293B),
                 ),
                 maxLines: 1,

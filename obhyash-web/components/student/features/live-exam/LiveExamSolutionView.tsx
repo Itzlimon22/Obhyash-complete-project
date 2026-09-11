@@ -244,9 +244,9 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
             <button
               key={item.id}
               onClick={() => setFilter(item.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                 filter === item.id
-                  ? "bg-[#0B6B42] text-white shadow-md shadow-emerald-700/20"
+                  ? "bg-[#12544F] text-white shadow-md shadow-[#12544F]/20"
                   : "bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800"
               }`}
             >

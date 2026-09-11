@@ -54,7 +54,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                     style: const TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'HindSiliguri',
                       color: Color(0xFF059669),
                     ),
                   ),
@@ -63,7 +62,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
                     color: Color(0xFF059669),
                   ),
                 ),
@@ -76,7 +74,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
@@ -126,7 +123,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white70 : const Color(0xFF334155),
                       ),
                     ),
@@ -146,7 +142,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                     text: widget.formula.description,
                     style: TextStyle(
                       fontSize: 13.5,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white60 : const Color(0xFF64748B),
                     ),
                   ),
@@ -175,7 +170,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                   style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
@@ -224,7 +218,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
@@ -237,7 +230,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       height: 1.55,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
@@ -272,7 +264,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: Color(0xFF059669),
                               ),
                             ),
@@ -309,7 +300,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
@@ -326,7 +316,6 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white60 : Colors.black45,
                               ),
                             ),

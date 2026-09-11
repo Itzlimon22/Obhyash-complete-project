@@ -215,7 +215,6 @@ class ResultStats extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
@@ -319,7 +318,6 @@ class ResultStats extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
@@ -328,7 +326,6 @@ class ResultStats extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF10B981),
                       ),
                     ),
@@ -363,7 +360,6 @@ class ResultStats extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
@@ -387,7 +383,6 @@ class ResultStats extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                           ),
                         ),
@@ -400,7 +395,6 @@ class ResultStats extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: const Color(0xFF10B981),
                           ),
                         ),
@@ -413,7 +407,6 @@ class ResultStats extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: const Color(0xFFEF4444),
                           ),
                         ),
@@ -426,7 +419,6 @@ class ResultStats extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                           ),
                         ),
@@ -472,7 +464,6 @@ class ResultStats extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
-                                        fontFamily: 'HindSiliguri',
                                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -490,7 +481,6 @@ class ResultStats extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF10B981),
                                 ),
                               ),
@@ -504,7 +494,6 @@ class ResultStats extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: sub.wrongCount > 0
                                       ? const Color(0xFFEF4444)
                                       : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
@@ -520,7 +509,6 @@ class ResultStats extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: sub.finalScore > 0
                                       ? const Color(0xFF10B981)
                                       : (isDark ? Colors.white54 : const Color(0xFF94A3B8)),
@@ -602,7 +590,6 @@ class _StatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 15.5,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
@@ -611,7 +598,6 @@ class _StatCard extends StatelessWidget {
               subtitle!,
               style: TextStyle(
                 fontSize: 11.5,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
               ),
             ),
@@ -621,7 +607,6 @@ class _StatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
             ),
           ),
@@ -659,7 +644,6 @@ class _TableRow extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12.5,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
               ),
               maxLines: 1,
@@ -672,7 +656,6 @@ class _TableRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
             ),
           ),
@@ -740,7 +723,6 @@ class _CircularAccuracyCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -754,7 +736,6 @@ class _CircularAccuracyCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
             ),
           ),

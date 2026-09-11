@@ -458,7 +458,6 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
@@ -466,7 +465,6 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                       'পেমেন্ট রিসিট',
                       style: TextStyle(
                         fontSize: 13,
-                        fontFamily: 'HindSiliguri',
                         color: isDark
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF737373),
@@ -514,7 +512,6 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                           style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -551,7 +548,6 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 label: const Text(
                   'অফিসিয়াল রিসিট ডাউনলোড করুন',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
                   ),
@@ -560,11 +556,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   backgroundColor: const Color(0xFF059669),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
                   ),
-                ),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
@@ -592,7 +584,6 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 label: Text(
                   'রিসিটের বিবরণ কপি করুন',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                     color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF64748B),
@@ -932,9 +923,7 @@ class _OverviewTab extends StatelessWidget {
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 14),
             minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
+            
           ),
         ),
         const SizedBox(height: 24),
@@ -1014,9 +1003,7 @@ class _FreePlanCard extends StatelessWidget {
                 horizontal: 24,
                 vertical: 14,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
+              
             ),
           ),
         ),

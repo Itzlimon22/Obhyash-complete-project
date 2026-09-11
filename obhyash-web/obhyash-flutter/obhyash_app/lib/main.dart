@@ -216,7 +216,6 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
           ),
           child: DefaultTextStyle.merge(
             style: const TextStyle(
-              fontFamily: 'HindSiliguri',
               fontFamilyFallback: ['HindSiliguri', 'sans-serif'],
             ),
             child: OfflineBannerWrapper(

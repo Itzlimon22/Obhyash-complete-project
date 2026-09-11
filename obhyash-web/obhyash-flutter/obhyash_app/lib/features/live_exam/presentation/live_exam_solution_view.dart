@@ -202,7 +202,6 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
                       child: Text(
                         'কোনো প্রশ্ন পাওয়া যায়নি',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         ),
                       ),

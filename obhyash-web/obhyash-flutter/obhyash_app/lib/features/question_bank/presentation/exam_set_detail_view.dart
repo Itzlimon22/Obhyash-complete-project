@@ -777,7 +777,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
               const SnackBar(
                 content: Text(
                   'কমপক্ষে একটি বিষয় নির্বাচন করতে হবে',
-                  style: TextStyle(fontFamily: 'HindSiliguri'),
+                  style: TextStyle(),
                 ),
                 duration: Duration(seconds: 2),
                 behavior: SnackBarBehavior.floating,
@@ -975,7 +975,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1046,7 +1045,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                     Text(
                                       widget.examSet.title,
                                       style: TextStyle(
-                                        fontFamily: 'HindSiliguri',
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
                                         color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1056,7 +1054,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                     Text(
                                       subtitleText,
                                       style: TextStyle(
-                                        fontFamily: 'HindSiliguri',
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -1074,7 +1071,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                         Text(
                           'পরীক্ষার তথ্যাবলি',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1203,7 +1199,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                   ? (isWritten ? 'বিষয় নির্বাচন (একটি প্রযোজ্য)' : 'বিষয় নির্বাচন (একাধিক সম্ভব)')
                                   : 'নম্বর বণ্টন',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1228,7 +1223,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                 child: Text(
                                   isWritten ? '১টি বিষয়' : '${BanglaNameHelper.toBanglaNumeral(_selectedSubjects.length)}টি নির্বাচিত',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: isWritten ? const Color(0xFF8B5CF6) : const Color(0xFF059669),
@@ -1307,7 +1301,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                             child: const Text(
                               'প্রশ্ন দেখো',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1330,15 +1323,10 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                     ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF004633),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
                               ),
-                            ),
                             child: const Text(
                               'পরীক্ষা দাও',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -1384,7 +1372,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                         Text(
                           'প্রশ্নাবলি সাজানো হচ্ছে...',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1415,7 +1402,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
           title,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 11,
             fontWeight: FontWeight.w500,
             color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -1429,7 +1415,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1477,7 +1462,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   Text(
                     dist.subject,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1487,7 +1471,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   Text(
                     '${dist.questions} • ${dist.marks}',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -1546,7 +1529,6 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),

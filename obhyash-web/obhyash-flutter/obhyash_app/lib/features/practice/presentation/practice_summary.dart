@@ -123,7 +123,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              fontFamily: 'HindSiliguri',
                               letterSpacing: -0.5,
                               color: isDark ? Colors.white : const Color(0xFF111827),
                             ),
@@ -135,7 +134,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.5,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                             ),
                           ),
@@ -271,7 +269,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: 'HindSiliguri',
                                     color: Colors.white,
                                     letterSpacing: 0.2,
                                   ),
@@ -309,7 +306,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),

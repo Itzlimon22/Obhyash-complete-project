@@ -97,11 +97,8 @@ class MaintenanceScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF004633),
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        
                         ),
-                        elevation: 0,
-                      ),
                     ),
                   ),
                   const SizedBox(height: 16),

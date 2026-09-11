@@ -306,7 +306,6 @@ class _TooltipBubble extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               height: 1.45,
-              fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.w600,
               color: textColor,
             ),

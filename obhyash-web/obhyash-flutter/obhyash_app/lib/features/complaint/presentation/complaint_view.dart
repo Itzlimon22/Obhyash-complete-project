@@ -513,7 +513,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark
                           ? const Color(0xFFFDE68A)
                           : const Color(0xFF92400E),
@@ -552,7 +551,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark
                           ? const Color(0xFFFDE68A)
                           : const Color(0xFF92400E),
@@ -591,7 +589,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark
                           ? const Color(0xFFC7D2FE)
                           : const Color(0xFF3730A3),
@@ -721,7 +718,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                         fontWeight: isSelected
                                             ? FontWeight.w700
                                             : FontWeight.w600,
-                                        fontFamily: 'HindSiliguri',
                                         color: isSelected
                                             ? (isDark
                                                   ? Colors.white
@@ -736,7 +732,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                       cat['description'] as String,
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontFamily: 'HindSiliguri',
                                         color: isSelected
                                             ? (isDark
                                                   ? const Color(0xFF6EE7B7)
@@ -800,7 +795,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: charCount == 0
                     ? (isDark
                           ? const Color(0xFF71717A)
@@ -841,7 +835,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             enabled: !isBlocked,
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'HindSiliguri',
               height: 1.5,
               color: isDark ? Colors.white : Colors.black87,
             ),
@@ -850,7 +843,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   'সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো (কমপক্ষে ১৫ অক্ষর)…',
               hintStyle: TextStyle(
                 fontSize: 13,
-                fontFamily: 'HindSiliguri',
                 color: isDark
                     ? const Color(0xFF52525B)
                     : const Color(0xFFBBBBBB),
@@ -888,11 +880,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               foregroundColor: isBlocked
                   ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                   : Colors.white,
-              elevation: 0,
-              shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
+              
+              
             ),
             child: _isLoading
                 ? const SizedBox(
@@ -922,8 +911,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ],
                   ),
@@ -959,7 +947,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            fontFamily: 'HindSiliguri',
             color: isDark ? Colors.white : const Color(0xFF111827),
           ),
         ),
@@ -1012,7 +999,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               style: TextStyle(
                 fontSize: 15.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
@@ -1022,7 +1008,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.5,
-                fontFamily: 'HindSiliguri',
                 color: Color(0xFFA3A3A3),
               ),
             ),
@@ -1034,15 +1019,12 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 'নতুন অভিযোগ করো',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                
               ),
             ),
           ],
@@ -1114,7 +1096,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF0F172A),
@@ -1158,7 +1139,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                           style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: statusInfo['iconColor'] as Color,
                           ),
                         ),
@@ -1174,7 +1154,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 complaint.description,
                 style: TextStyle(
                   fontSize: 14.5,
-                  fontFamily: 'HindSiliguri',
                   color: isDark
                       ? const Color(0xFFD1D5DB)
                       : const Color(0xFF475569),
@@ -1216,7 +1195,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
@@ -1226,7 +1204,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: Color(0xFFA3A3A3),
               height: 1.45,
             ),
@@ -1253,7 +1230,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13.5,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -1273,18 +1249,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: const Color(0xFF12544F),
                     foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
                   child: const Text(
                     'তালিকা দেখো',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13.5,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
                 ),
               ),
@@ -1346,7 +1317,6 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
                   color: isActive
                       ? (isDark ? Colors.white : const Color(0xFF059669))
                       : const Color(0xFFA3A3A3),

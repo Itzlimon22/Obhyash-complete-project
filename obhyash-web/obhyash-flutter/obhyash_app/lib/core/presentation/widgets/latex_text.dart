@@ -718,8 +718,7 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
     final style =
         (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle())
             .copyWith(
-      fontFamily: 'HindSiliguri',
-    );
+      );
 
     // If string accidentally has Bengali, render as native text fallback
     if (RegExp(r'[\u0980-\u09FF]').hasMatch(latex)) {
@@ -792,8 +791,7 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
     final latex = element.textContent;
     final style =
         (textStyle ?? preferredStyle ?? const TextStyle()).copyWith(
-      fontFamily: 'HindSiliguri',
-    );
+      );
 
     if (RegExp(r'[\u0980-\u09FF]').hasMatch(latex)) {
       return Text(
@@ -843,7 +841,7 @@ class _ChemArrowBuilder extends MarkdownElementBuilder {
 
     final style =
         (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle())
-            .copyWith(fontFamily: 'HindSiliguri');
+            .copyWith();
 
     return _ChemicalArrowWidget(
       above: _cleanConditionText(above),
@@ -895,7 +893,6 @@ class _ChemicalArrowWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: ((style.fontSize ?? 14) * 0.78).clamp(10.0, 13.0),
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: textColor,
                   height: 1.1,
                 ),
@@ -921,7 +918,6 @@ class _ChemicalArrowWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: ((style.fontSize ?? 14) * 0.72).clamp(9.5, 12.0),
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'HindSiliguri',
                   color: textColor.withValues(alpha: 0.85),
                   height: 1.1,
                 ),

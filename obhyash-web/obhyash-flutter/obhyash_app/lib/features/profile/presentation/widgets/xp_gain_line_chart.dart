@@ -201,8 +201,7 @@ class XpGainLineChartCard extends StatelessWidget {
                             color: color,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         );
                       }).toList();
                     },
@@ -235,8 +234,7 @@ class XpGainLineChartCard extends StatelessWidget {
                             color: isDark
                                 ? const Color(0xFF71717A)
                                 : const Color(0xFF94A3B8),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                           textAlign: TextAlign.right,
                         );
                       },
@@ -264,8 +262,7 @@ class XpGainLineChartCard extends StatelessWidget {
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF64748B),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         );
                       },
@@ -371,8 +368,7 @@ class XpGainLineChartCard extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF1E293B),
-              fontFamily: 'HindSiliguri',
-            ),
+              ),
           ),
         ],
       ),

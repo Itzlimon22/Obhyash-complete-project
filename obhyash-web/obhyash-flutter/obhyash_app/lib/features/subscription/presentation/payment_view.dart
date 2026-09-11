@@ -158,13 +158,12 @@ class _PaymentViewState extends State<PaymentView>
         title: const Text(
           'আবেদন বাতিল করবেন?',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontWeight: FontWeight.bold,
           ),
         ),
         content: const Text(
           'ভুল তথ্য দেওয়া হয়ে থাকলে বর্তমান আবেদনটি বাতিল করে আপনি নতুন সঠিক TrxID ও মোবাইল নম্বর দিয়ে পুনরায় আবেদন করতে পারবেন।',
-          style: TextStyle(fontFamily: 'HindSiliguri'),
+          style: TextStyle(),
         ),
         actions: [
           TextButton(
@@ -465,7 +464,6 @@ class _PaymentViewState extends State<PaymentView>
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
@@ -497,7 +495,6 @@ class _PaymentViewState extends State<PaymentView>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF000000),
@@ -511,7 +508,6 @@ class _PaymentViewState extends State<PaymentView>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
@@ -690,7 +686,6 @@ class _PaymentViewState extends State<PaymentView>
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: _appliedCoupon != null
                           ? (isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626))
                           : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
@@ -756,7 +751,6 @@ class _PaymentViewState extends State<PaymentView>
                             style: TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: _paymentMode == 0
                                   ? Colors.white
                                   : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
@@ -804,7 +798,6 @@ class _PaymentViewState extends State<PaymentView>
                             style: TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: _paymentMode == 1
                                   ? Colors.white
                                   : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
@@ -882,7 +875,6 @@ class _PaymentViewState extends State<PaymentView>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
@@ -890,7 +882,6 @@ class _PaymentViewState extends State<PaymentView>
                               'বিকাশ, নগদ, রকেট ও কার্ডে ১-ক্লিকে সরাসরি পেমেন্ট',
                               style: TextStyle(
                                 fontSize: 12.5,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                               ),
                             ),
@@ -953,22 +944,14 @@ class _PaymentViewState extends State<PaymentView>
                       backgroundColor: const Color(0xFF022C22),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: const BorderSide(
-                          color: Color(0xFF065F46),
-                          width: 1,
-                        ),
-                      ),
-                      elevation: 3,
-                      shadowColor: const Color(0xFF022C22).withValues(alpha: 0.5),
+                      
+                      
                     ),
                     child: Text(
                       '৳ ${_currentPlan.price}.00 পে করুন (অটোমেটিক)',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
@@ -999,7 +982,6 @@ class _PaymentViewState extends State<PaymentView>
                   'অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: isDark
@@ -1035,7 +1017,6 @@ class _PaymentViewState extends State<PaymentView>
                             Text(
                               'bKash / Nagad (Send Money)',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
                                 color: isDark
@@ -1092,7 +1073,6 @@ class _PaymentViewState extends State<PaymentView>
                               Text(
                                 'কপি',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
@@ -1139,7 +1119,6 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             step,
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
                               fontSize: 13.5,
                               height: 1.4,
                               color: isDark
@@ -1164,7 +1143,6 @@ class _PaymentViewState extends State<PaymentView>
               Text(
                 'SAVED PAYMENT METHODS',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
@@ -1192,7 +1170,6 @@ class _PaymentViewState extends State<PaymentView>
                       Text(
                         _savedMethods.isEmpty ? 'মেথড যোগ করুন' : 'এডিট / যোগ করুন',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: isDark
@@ -1281,7 +1258,6 @@ class _PaymentViewState extends State<PaymentView>
                               Text(
                                 method.type.toUpperCase(),
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                   color: isDark
@@ -1340,7 +1316,6 @@ class _PaymentViewState extends State<PaymentView>
                       child: Text(
                         'ভবিষ্যতে সহজে পেমেন্ট করতে আপনার বিকাশ/নগদ নম্বর যোগ করুন',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 12.5,
                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         ),
@@ -1356,7 +1331,6 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'পেমেন্ট মেথড (Payment Method)',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
@@ -1378,7 +1352,6 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'প্রেরকের মোবাইল নম্বর (Your Mobile Number)',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
@@ -1397,7 +1370,6 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'ট্রানজেকশন আইডি (TrxID)',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
@@ -1445,7 +1417,6 @@ class _PaymentViewState extends State<PaymentView>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: Color(0xFFD97706),
                           ),
                         ),
@@ -1454,7 +1425,6 @@ class _PaymentViewState extends State<PaymentView>
                           'আপনার পূর্বে পাঠানো TrxID (${_pendingTrxId ?? "..."}) যাচাই করা হচ্ছে। অনুমোদিত হলে স্বয়ংক্রিয়ভাবে প্ল্যান চালু হবে।',
                           style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFFDE68A)
                                 : const Color(0xFF92400E),
@@ -1508,7 +1478,6 @@ class _PaymentViewState extends State<PaymentView>
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFFFDE68A)
                                         : const Color(0xFF92400E),
@@ -1542,11 +1511,9 @@ class _PaymentViewState extends State<PaymentView>
                     ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
                     : const Color(0xFF059669).withValues(alpha: 0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                
                 elevation: _hasPendingPayment ? 0 : 4,
-                shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
+                
               ),
               child: _isSubmitting
                   ? Row(
@@ -1577,7 +1544,6 @@ class _PaymentViewState extends State<PaymentView>
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: _hasPendingPayment
                             ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                             : Colors.white,
@@ -1658,7 +1624,6 @@ class _PaymentViewState extends State<PaymentView>
                   child: Text(
                     'পেমেন্টে কোনো ভুল (টাকা কম বা বেশি পাঠানো) হলে কিংবা ভেরিফিকেশনে সমস্যা হলে নিচের হোয়াটসঅ্যাপে আপনার TrxID সহ মেসেজ দিন। আমাদের টিম দ্রুত সমাধান করে দেবে।',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
@@ -1711,7 +1676,6 @@ class _PaymentViewState extends State<PaymentView>
                             Text(
                               item.$2,
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 color: isDark
@@ -1723,7 +1687,6 @@ class _PaymentViewState extends State<PaymentView>
                             Text(
                               item.$3,
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 13,
                                 color: isDark
                                     ? const Color(0xFFA1A1AA)
@@ -1748,18 +1711,14 @@ class _PaymentViewState extends State<PaymentView>
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                
                 ),
-                elevation: 0,
-              ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'পেমেন্ট করতে এগিয়ে যান',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
                     ),
@@ -1848,7 +1807,6 @@ class _PaymentViewState extends State<PaymentView>
                   child: Text(
                     'পেমেন্ট সংক্রান্ত যেকোনো প্রশ্নে নিচের উত্তরগুলো দেখে নিন',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 13.5,
                       fontWeight: FontWeight.bold,
                       color: isDark
@@ -1875,18 +1833,14 @@ class _PaymentViewState extends State<PaymentView>
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                
                 ),
-                elevation: 0,
-              ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'পেমেন্ট করতে এগিয়ে যান',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
                     ),
@@ -1956,7 +1910,6 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             label.toUpperCase(),
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.4,
@@ -1969,7 +1922,6 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             value,
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 15.5,
               fontWeight: FontWeight.w900,
               color: valueColor,
@@ -1990,7 +1942,6 @@ class _PaymentViewState extends State<PaymentView>
               child: Text(
                 badge,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF004633),
@@ -2024,7 +1975,6 @@ class _PaymentViewState extends State<PaymentView>
         hintText: hint,
         hintStyle: TextStyle(
           color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
-          fontFamily: 'HindSiliguri',
           fontWeight: FontWeight.normal,
         ),
         filled: true,
@@ -2218,7 +2168,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                   Text(
                     'পেমেন্ট মেথড ম্যানেজমেন্ট',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -2272,7 +2221,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                             child: Text(
                               'সংরক্ষিত নম্বর (${_localMethods.length})',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 13,
                                 fontWeight: _currentTab == 0
                                     ? FontWeight.w800
@@ -2316,7 +2264,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                 Text(
                                   'নতুন যোগ করুন',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontSize: 13,
                                     fontWeight: _currentTab == 1
                                         ? FontWeight.w800
@@ -2360,7 +2307,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                 Text(
                                   'কোনো সেভ করা মেথড নেই',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontSize: 14,
                                     color: isDark
                                         ? const Color(0xFFA1A1AA)
@@ -2442,7 +2388,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                           Text(
                                             m.type.toUpperCase(),
                                             style: TextStyle(
-                                              fontFamily: 'HindSiliguri',
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13,
                                               color: isDark
@@ -2480,7 +2425,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                       child: const Text(
                                         'ব্যবহার করুন',
                                         style: TextStyle(
-                                          fontFamily: 'HindSiliguri',
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -2536,7 +2480,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                         child: Text(
                                           prov,
                                           style: TextStyle(
-                                            fontFamily: 'HindSiliguri',
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                             color: isSel
@@ -2570,7 +2513,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                   color: isDark
                                       ? const Color(0xFF71717A)
                                       : const Color(0xFF94A3B8),
-                                  fontFamily: 'HindSiliguri',
                                   fontSize: 13,
                                 ),
                                 filled: true,
@@ -2615,11 +2557,8 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                 backgroundColor: const Color(0xFF059669),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                
                                 ),
-                                elevation: 0,
-                              ),
                               child: _isSaving
                                   ? const SizedBox(
                                       width: 20,
@@ -2632,7 +2571,6 @@ class _PaymentMethodsBottomSheetState extends State<_PaymentMethodsBottomSheet> 
                                   : const Text(
                                       'সংরক্ষণ ও ব্যবহার করুন',
                                       style: TextStyle(
-                                        fontFamily: 'HindSiliguri',
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -2698,7 +2636,6 @@ class _FaqTileState extends State<_FaqTile> {
                     child: Text(
                       widget.q,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                         color: widget.isDark
@@ -2732,7 +2669,6 @@ class _FaqTileState extends State<_FaqTile> {
               child: Text(
                 widget.a,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 14,
                   color: widget.isDark
                       ? const Color(0xFFD4D4D8)

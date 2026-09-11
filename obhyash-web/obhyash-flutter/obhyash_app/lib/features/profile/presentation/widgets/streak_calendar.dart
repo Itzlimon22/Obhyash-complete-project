@@ -216,8 +216,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF0F172A),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                         ),
@@ -278,8 +277,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                   ],
                 ),
@@ -304,8 +302,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                               : const Color(
                                   0xFF737373,
                                 ), // neutral-400 : neutral-500
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                        maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                   ),
@@ -377,8 +374,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                                               week[i].isCurrentMonth,
                                               isDark,
                                             ),
-                                            fontFamily: 'HindSiliguri',
-                                          ),
+                                            ),
                                         ),
                                       ),
                                     ),
@@ -459,8 +455,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
             color: isDark
                 ? const Color(0xFFA1A1AA)
                 : const Color(0xFF64748B),
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
       ],
     );

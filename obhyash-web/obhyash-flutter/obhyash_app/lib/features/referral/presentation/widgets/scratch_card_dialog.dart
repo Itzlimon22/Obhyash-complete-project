@@ -96,7 +96,6 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                 Text(
                   'আপনার উপহার!',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : Colors.black87,
@@ -106,7 +105,6 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                 Text(
                   'পুরস্কার দেখতে কার্ডটি ঘষুন',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 16,
                     color: isDark ? const Color(0xFFA1A1AA) : Colors.black54,
                   ),
@@ -119,7 +117,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Colors.red, fontFamily: 'HindSiliguri'),
+                      style: const TextStyle(color: Colors.red, ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -161,7 +159,6 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                                       Text(
                                         _getRewardTitle(_rewardType),
                                         style: const TextStyle(
-                                          fontFamily: 'HindSiliguri',
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xFF92400E),
@@ -173,7 +170,6 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                                 : const Text(
                                     'Loading...',
                                     style: TextStyle(
-                                        fontFamily: 'HindSiliguri',
                                         color: Colors.transparent),
                                   ),
                       ),
@@ -189,14 +185,11 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFB91C1C),
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      
                     ),
                     child: const Text(
                       'বন্ধ করুন',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

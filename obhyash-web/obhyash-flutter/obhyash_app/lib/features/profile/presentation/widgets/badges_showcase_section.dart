@@ -72,7 +72,6 @@ class _BadgesShowcaseSectionState extends State<BadgesShowcaseSection> {
                   Text(
                     'অর্জন ও ব্যাজসমূহ',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -89,7 +88,6 @@ class _BadgesShowcaseSectionState extends State<BadgesShowcaseSection> {
                 child: Text(
                   '$unlockedCount/${_badges.length} আনলকড',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
@@ -220,7 +218,6 @@ class _BadgeCard extends StatelessWidget {
                     Text(
                       badge.titleBangla,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -263,7 +260,6 @@ class _BadgeCard extends StatelessWidget {
                           Text(
                             isUnlocked ? 'আনলকড সম্পন্ন' : 'লকড অর্জন',
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: isUnlocked
@@ -279,7 +275,6 @@ class _BadgeCard extends StatelessWidget {
                       badge.description,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 15,
                         color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF3F3F46),
                         height: 1.4,
@@ -294,18 +289,11 @@ class _BadgeCard extends StatelessWidget {
                           backgroundColor: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
                           foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: BorderSide(
-                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
-                            ),
+                          
                           ),
-                          elevation: 0,
-                        ),
                         child: const Text(
                           'ঠিক আছে',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -396,7 +384,6 @@ class _BadgeCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 13,
                   fontWeight: isUnlocked ? FontWeight.bold : FontWeight.normal,
                   color: isUnlocked
@@ -408,7 +395,6 @@ class _BadgeCard extends StatelessWidget {
               Text(
                 isUnlocked ? 'অর্জন সম্পন্ন' : 'লকড',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 10,
                   color: isUnlocked
                       ? const Color(0xFF10B981)

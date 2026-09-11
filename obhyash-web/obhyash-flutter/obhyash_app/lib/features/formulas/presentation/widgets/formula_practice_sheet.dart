@@ -110,7 +110,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: Color(0xFF059669),
                               ),
                             ),
@@ -119,7 +118,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFF059669),
                             ),
                           ),
@@ -132,7 +130,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
@@ -186,7 +183,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white70 : const Color(0xFF475569),
                               ),
                             ),
@@ -226,7 +222,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                           style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white60 : Colors.black54,
                           ),
                         ),
@@ -236,7 +231,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                           style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             height: 1.55,
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
@@ -262,7 +256,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: Color(0xFF12544F),
                           ),
                         ),
@@ -305,7 +298,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF12544F),
                                 ),
                               ),
@@ -321,7 +313,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? Colors.white60 : Colors.black54,
                                   ),
                                 ),
@@ -334,7 +325,6 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                             style: TextStyle(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF0F172A),
                             ),
                           ),
@@ -354,17 +344,14 @@ class _FormulaPracticeSheetState extends State<FormulaPracticeSheet> {
                         backgroundColor: const Color(0xFF12544F),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        
                       ),
                       child: const Text(
                         'সম্পন্ন (Close)',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ),
                   ),

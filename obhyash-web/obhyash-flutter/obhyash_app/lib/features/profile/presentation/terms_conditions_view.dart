@@ -74,7 +74,6 @@ class TermsConditionsView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -85,7 +84,6 @@ class TermsConditionsView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.45,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                     ),
                   ),
@@ -101,7 +99,6 @@ class TermsConditionsView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                       ),
                     ),
@@ -220,7 +217,6 @@ class TermsConditionsView extends StatelessWidget {
                 'শর্ত সংক্রান্ত যেকোনো প্রয়োজনে: support@obhyash.com',
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                 ),
               ),
@@ -288,7 +284,6 @@ class _TermsCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
@@ -317,7 +312,6 @@ class _TermsCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.45,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
                       ),
                     ),

@@ -107,8 +107,7 @@ class _DeviceBlockedScreenState extends State<DeviceBlockedScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                     const SizedBox(height: 10),
 
@@ -122,8 +121,7 @@ class _DeviceBlockedScreenState extends State<DeviceBlockedScreen> {
                         fontSize: 14,
                         height: 1.5,
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                     const SizedBox(height: 24),
 
@@ -185,17 +183,13 @@ class _DeviceBlockedScreenState extends State<DeviceBlockedScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFEF4444),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                          
                           ),
-                          elevation: 0,
-                        ),
                       ),
                     ),
                   ],

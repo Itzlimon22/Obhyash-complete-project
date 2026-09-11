@@ -798,13 +798,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                                                 padding: const EdgeInsets.symmetric(
                                                   vertical: 14,
                                                 ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(
-                                                    16,
-                                                  ),
+                                                
                                                 ),
-                                                elevation: 0,
-                                              ),
                                               child: _isLoadingMore
                                                   ? const SizedBox(
                                                       height: 20,
@@ -816,7 +811,6 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                                                   : const Text(
                                                       'আরও লোড করুন',
                                                       style: TextStyle(
-                                                        fontFamily: 'HindSiliguri',
                                                         fontWeight: FontWeight.w700,
                                                         fontSize: 17,
                                                       ),
@@ -901,7 +895,6 @@ class _BatchAndTimelineHeader extends StatelessWidget {
                 Text(
                   userBatchLabel,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: isDark ? Colors.white : const Color(0xFF111827),
@@ -934,7 +927,6 @@ class _BatchAndTimelineHeader extends StatelessWidget {
                     Text(
                       'মাসিক (Monthly)',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 13,
                         fontWeight: timeframe == 'monthly' ? FontWeight.w800 : FontWeight.w500,
                         color: timeframe == 'monthly' 
@@ -954,7 +946,6 @@ class _BatchAndTimelineHeader extends StatelessWidget {
                     Text(
                       'লাইফটাইম (Lifetime)',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 13,
                         fontWeight: timeframe == 'all_time' ? FontWeight.w800 : FontWeight.w500,
                         color: timeframe == 'all_time' 
@@ -993,7 +984,6 @@ class _BatchAndTimelineHeader extends StatelessWidget {
                         ? 'মাসিক'
                         : 'লাইফটাইম',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -1059,7 +1049,6 @@ class _ViewModeTab extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: isActive
@@ -1114,7 +1103,6 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                       'তোমার প্রোফাইলে কলেজের নাম যোগ করো',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                         color: isDark
@@ -1160,7 +1148,6 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                 child: Text(
                   institute,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: isDark
@@ -1187,7 +1174,6 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     'তোমার কলেজ থেকে এখনো কেউ যোগ দেয়নি',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: isDark
@@ -1200,7 +1186,6 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     'বন্ধুদের আমন্ত্রণ জানাও!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 16,
                       color: isDark
                           ? const Color(0xFF525252)
@@ -1268,7 +1253,6 @@ class _InstituteRankingsBody extends StatelessWidget {
                 'এখনো যথেষ্ট ডেটা নেই',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
                   color: isDark
@@ -1281,7 +1265,6 @@ class _InstituteRankingsBody extends StatelessWidget {
                 'প্রতিটি কলেজ থেকে কমপক্ষে ৫ জন শিক্ষার্থী লাগবে',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 16,
                   color: isDark
                       ? const Color(0xFF525252)
@@ -1363,7 +1346,6 @@ class _InstituteRankingsBody extends StatelessWidget {
                     : Text(
                         BanglaNameHelper.toBanglaNumeral(rank),
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: isMe
@@ -1385,7 +1367,6 @@ class _InstituteRankingsBody extends StatelessWidget {
                       entry.institute,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
                         color: isDark
@@ -1405,7 +1386,6 @@ class _InstituteRankingsBody extends StatelessWidget {
                       child: Text(
                         'তোমার',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: isDark ? const Color(0xFFE5E7EB) : const Color(0xFF374151),
@@ -1436,7 +1416,6 @@ class _InstituteRankingsBody extends StatelessWidget {
               child: Text(
                 '${_numFmt.format(entry.points)} pts',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
                   color: isDark
@@ -1599,7 +1578,6 @@ class _LevelSelector extends StatelessWidget {
                             Text(
                               l.label,
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.w900,
                                 fontSize: 13,
                                 height: 1.1,
@@ -1664,7 +1642,6 @@ class _LevelSelector extends StatelessWidget {
                               child: const Text(
                                 'তোমার',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontSize: 8,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
@@ -1812,7 +1789,6 @@ class _StickyUserRankCard extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? Colors.white
                                     : const Color(0xFF111827),
@@ -1843,7 +1819,6 @@ class _StickyUserRankCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w700,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFFD4D4D8)
                                     : const Color(0xFF4B5563),
@@ -1868,8 +1843,7 @@ class _StickyUserRankCard extends StatelessWidget {
                                 color: isDark
                                     ? const Color(0xFF9CA3AF)
                                     : const Color(0xFF6B7280),
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -1888,8 +1862,7 @@ class _StickyUserRankCard extends StatelessWidget {
                     color: isDark
                         ? const Color(0xFFE5E5E5)
                         : const Color(0xFF1F2937),
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                 ),
               ],
             ),
@@ -1961,8 +1934,7 @@ class _LeaderboardTable extends StatelessWidget {
                     color: isDark
                         ? const Color(0xFFE5E5E5)
                         : const Color(0xFF1F2937),
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                 ),
                 const Spacer(),
                 Icon(
@@ -1989,7 +1961,6 @@ class _LeaderboardTable extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: isDark
                             ? const Color(0xFF71717A)
                             : const Color(0xFF9CA3AF),
@@ -2006,7 +1977,6 @@ class _LeaderboardTable extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: isDark
                             ? const Color(0xFF71717A)
                             : const Color(0xFF9CA3AF),
@@ -2019,7 +1989,6 @@ class _LeaderboardTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
                       color: isDark
                           ? const Color(0xFF71717A)
                           : const Color(0xFF9CA3AF),
@@ -2111,7 +2080,6 @@ class _LeaderboardTable extends StatelessWidget {
                                           style: TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 13.5,
-                                            fontFamily: 'HindSiliguri',
                                             color: isMe
                                                 ? (isDark
                                                       ? const Color(0xFFFCA5A5)
@@ -2157,7 +2125,6 @@ class _LeaderboardTable extends StatelessWidget {
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.w800,
-                                              fontFamily: 'HindSiliguri',
                                               color: Colors.white,
                                             ),
                                           ),
@@ -2178,8 +2145,7 @@ class _LeaderboardTable extends StatelessWidget {
                                               color: isDark
                                                   ? const Color(0xFF9CA3AF)
                                                   : const Color(0xFF6B7280),
-                                              fontFamily: 'HindSiliguri',
-                                            ),
+                                              ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -2440,7 +2406,6 @@ class _PodiumSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
@@ -2497,7 +2462,6 @@ class _PodiumSection extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: slot.rank == 1 ? 13.5 : 12.5,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? Colors.white
                                   : const Color(0xFF111827),
@@ -2568,7 +2532,6 @@ class _PodiumSection extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w900,
-                                    fontFamily: 'HindSiliguri',
                                     color: slot.accentColor,
                                   ),
                                 ),

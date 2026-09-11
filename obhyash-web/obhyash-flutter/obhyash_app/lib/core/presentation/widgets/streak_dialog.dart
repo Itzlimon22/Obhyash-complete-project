@@ -63,8 +63,8 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
             _topStreaks[idx] = updated;
             // Re-sort
             _topStreaks.sort((a, b) =>
-                ((b['streak'] as int?) ?? 0)
-                    .compareTo((a['streak'] as int?) ?? 0));
+                ((b['streak'] as num?)?.toInt() ?? 0)
+                    .compareTo((a['streak'] as num?)?.toInt() ?? 0));
           }
         });
       }
@@ -80,31 +80,50 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
     setState(() => _isLoadingLeaderboard = true);
     try {
       final supabase = Supabase.instance.client;
-      final response = await supabase
-          .from('public_profiles')
-          .select('id, name, avatar_url, streak, gender')
-          .order('streak', ascending: false)
-          .limit(10);
+      dynamic response;
+      try {
+        response = await supabase
+            .from('public_profiles')
+            .select('id, name, avatar_url, streak')
+            .order('streak', ascending: false)
+            .limit(10);
+      } catch (e) {
+        debugPrint('[StreakDialog] public_profiles error: $e');
+      }
 
-      final List<Map<String, dynamic>> rows = (response as List<dynamic>)
-          .map((r) => Map<String, dynamic>.from(r as Map))
-          .toList();
-
-      // Override current user's entry with freshly-computed streak
-      for (int i = 0; i < rows.length; i++) {
-        if (rows[i]['id'] == widget.userId) {
-          rows[i] = {...rows[i], 'streak': _streakCount};
-          break;
+      if (response == null || (response is List && response.isEmpty)) {
+        try {
+          response = await supabase
+              .from('users')
+              .select('id, name, avatar_url, streak')
+              .order('streak', ascending: false)
+              .limit(10);
+        } catch (e) {
+          debugPrint('[StreakDialog] users table error: $e');
         }
       }
 
-      // Re-sort and take top 5
-      rows.sort((a, b) =>
-          ((b['streak'] as num?)?.toInt() ?? 0)
-              .compareTo((a['streak'] as num?)?.toInt() ?? 0));
+      if (response != null && response is List && response.isNotEmpty) {
+        final List<Map<String, dynamic>> rows = response
+            .map((r) => Map<String, dynamic>.from(r as Map))
+            .toList();
 
-      if (mounted) {
-        setState(() => _topStreaks = rows.take(5).toList());
+        // Override current user's entry with freshly-computed streak
+        for (int i = 0; i < rows.length; i++) {
+          if (rows[i]['id'] == widget.userId) {
+            rows[i] = {...rows[i], 'streak': _streakCount};
+            break;
+          }
+        }
+
+        // Re-sort and take top 5
+        rows.sort((a, b) =>
+            ((b['streak'] as num?)?.toInt() ?? 0)
+                .compareTo((a['streak'] as num?)?.toInt() ?? 0));
+
+        if (mounted) {
+          setState(() => _topStreaks = rows.take(5).toList());
+        }
       }
     } catch (e) {
       debugPrint('[StreakDialog] leaderboard fetch error: $e');
@@ -172,7 +191,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                 child: Text(
                                   'আমার',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontWeight: _tabIndex == 0 ? FontWeight.bold : FontWeight.w500,
                                     color: _tabIndex == 0 ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.black54),
                                     fontSize: 13,
@@ -186,6 +204,9 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() => _tabIndex = 1);
+                              if (_topStreaks.isEmpty && !_isLoadingLeaderboard) {
+                                _fetchTopStreaks();
+                              }
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -198,7 +219,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                 child: Text(
                                   'টপ ৫',
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
                                     fontWeight: _tabIndex == 1 ? FontWeight.bold : FontWeight.w500,
                                     color: _tabIndex == 1 ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.black54),
                                     fontSize: 13,
@@ -239,7 +259,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
@@ -263,7 +282,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
                   ),
@@ -313,7 +331,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                   dayNames[index],
                                   style: TextStyle(
                                     fontSize: 16,
-                                    fontFamily: 'HindSiliguri',
                                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                                     color: isDark ? Colors.white70 : Colors.black87,
                                   ),
@@ -342,10 +359,24 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                   child: _isLoadingLeaderboard
                       ? const Center(child: CircularProgressIndicator())
                       : _topStreaks.isEmpty
-                          ? const Center(
-                              child: Text(
-                                "কোন তথ্য পাওয়া যায়নি",
-                                style: TextStyle(fontFamily: 'HindSiliguri', fontSize: 16),
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "কোন তথ্য পাওয়া যায়নি",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: isDark ? Colors.white70 : Colors.black54,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    onPressed: _fetchTopStreaks,
+                                    icon: const Icon(Icons.refresh, size: 18),
+                                    label: const Text('আবার চেষ্টা করো'),
+                                  ),
+                                ],
                               ),
                             )
                           : ListView.builder(
@@ -455,7 +486,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w800,
                                                     fontSize: 16,
-                                                    fontFamily: 'HindSiliguri',
                                                     color: isMe
                                                         ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857))
                                                         : (isDark ? Colors.white : const Color(0xFF18181B)),
@@ -478,8 +508,7 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                                       fontSize: 10,
                                                       fontWeight: FontWeight.w900,
                                                       color: Colors.white,
-                                                      fontFamily: 'HindSiliguri',
-                                                    ),
+                                                      ),
                                                   ),
                                                 ),
                                               ],
@@ -505,7 +534,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                               Text(
                                                 '${u['streak'] ?? 0}',
                                                 style: const TextStyle(
-                                                  fontFamily: 'HindSiliguri',
                                                   fontWeight: FontWeight.w900,
                                                   fontSize: 14,
                                                   color: Color(0xFFEA580C),
@@ -515,7 +543,6 @@ class _StreakDialogState extends ConsumerState<StreakDialog> {
                                               Text(
                                                 'দিন',
                                                 style: TextStyle(
-                                                  fontFamily: 'HindSiliguri',
                                                   fontWeight: FontWeight.w700,
                                                   fontSize: 11,
                                                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF9A3412),

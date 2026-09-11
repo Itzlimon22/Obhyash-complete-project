@@ -295,7 +295,6 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                     child: Text(
                       widget.badgeLabel!,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: widget.primaryColor,
@@ -308,7 +307,6 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                   widget.title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -322,7 +320,6 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                   widget.subtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 15,
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     height: 1.4,
@@ -346,7 +343,6 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                         Text(
                           '+${widget.xpAwarded} XP অর্জিত!',
                           style: const TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w900,
                             color: Colors.amber,
                             fontSize: 16,
@@ -368,15 +364,11 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                       backgroundColor: widget.primaryColor,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                      
                       ),
-                      elevation: 0,
-                    ),
                     child: const Text(
                       'দারুণ! চালিয়ে যাও 🚀',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

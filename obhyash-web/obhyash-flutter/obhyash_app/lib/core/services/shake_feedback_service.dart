@@ -417,11 +417,8 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.viridianForest,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  
                   ),
-                  elevation: 0,
-                ),
                 child: _isSubmitting
                     ? const SizedBox(
                         width: 20,

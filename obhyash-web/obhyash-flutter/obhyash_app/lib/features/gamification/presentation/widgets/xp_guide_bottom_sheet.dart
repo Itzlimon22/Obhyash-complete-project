@@ -78,7 +78,6 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'XP ও লেভেল গাইড',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: titleColor,
@@ -87,7 +86,6 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'কীভাবে XP অর্জন করে লেভেল আপ করবে',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 11.5,
                             color: subtitleColor,
                           ),
@@ -127,7 +125,6 @@ class XpGuideBottomSheet extends StatelessWidget {
                         Text(
                           'XP অর্জনের নিয়ম',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: titleColor,
@@ -209,7 +206,6 @@ class XpGuideBottomSheet extends StatelessWidget {
                             Text(
                               'লেভেল ও XP সীমা',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: titleColor,
@@ -251,7 +247,6 @@ class XpGuideBottomSheet extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
               color: subtitleColor,
@@ -267,7 +262,6 @@ class XpGuideBottomSheet extends StatelessWidget {
           child: Text(
             value,
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
               color: valueColor,
@@ -288,7 +282,6 @@ class XpGuideBottomSheet extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: subtitleColor,
@@ -298,7 +291,6 @@ class XpGuideBottomSheet extends StatelessWidget {
           Text(
             '·  $range',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 11.5,
               color: subtitleColor.withValues(alpha: 0.7),
             ),

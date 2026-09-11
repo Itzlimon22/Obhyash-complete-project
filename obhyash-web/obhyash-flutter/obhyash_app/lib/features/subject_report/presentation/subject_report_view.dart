@@ -776,7 +776,6 @@ class _SRDonut extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -786,7 +785,6 @@ class _SRDonut extends StatelessWidget {
                           'সঠিকতা',
                           style: TextStyle(
                             fontSize: 11.5,
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.normal,
                             color: Color(0xFFA3A3A3),
                           ),
@@ -874,7 +872,6 @@ class _SRLegend extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'HindSiliguri',
                   fontWeight: FontWeight.w600,
                   color: isDark
                       ? const Color(0xFFD4D4D4)
@@ -963,7 +960,6 @@ class _SRChapterRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark
                       ? const Color(0xFFD4D4D4)
                       : const Color(0xFF27272A),
@@ -1231,10 +1227,9 @@ class _SRWeakness extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFE11D48),
                                   foregroundColor: Colors.white,
-                                  elevation: 0,
                                   padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  textStyle: const TextStyle(fontSize: 14.5, fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold),
+                                  
+                                  textStyle: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),

@@ -215,7 +215,6 @@ class _FlashcardModeState extends State<FlashcardMode> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
                                       : const Color(0xFF525252),
@@ -236,7 +235,6 @@ class _FlashcardModeState extends State<FlashcardMode> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFF737373)
                                 : const Color(0xFF737373),

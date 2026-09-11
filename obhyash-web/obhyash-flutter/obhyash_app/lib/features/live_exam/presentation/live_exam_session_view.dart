@@ -282,7 +282,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF10B981),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                
               ),
               child: const Text('আমি বুঝেছি, পরীক্ষা চালিয়ে যান'),
             ),
@@ -334,7 +334,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                
               ),
               child: const Text('ঠিক আছে'),
             ),
@@ -669,7 +669,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                         ),
@@ -739,7 +738,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'HindSiliguri',
                                     color: textColor,
                                   ),
                                 ),
@@ -789,7 +787,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
@@ -824,7 +821,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                       child: Text(
                         'আরেকটু দেখব',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                         ),
@@ -842,14 +838,13 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                         backgroundColor: const Color(0xFF12544F), // Solid #12544F
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        
                       ),
                       child: _isSubmitting
                           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Text(
                               'হ্যাঁ, জমা দাও',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -871,15 +866,15 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.w600)),
+        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontWeight: FontWeight.w600)),
         content: const Text(
           'এখন বের হয়ে গেলে তোমার উত্তরপত্র জমা হবে না।',
-          style: TextStyle(fontFamily: 'HindSiliguri'),
+          style: TextStyle(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('না, ফিরে যাই', style: TextStyle(fontFamily: 'HindSiliguri')),
+            child: const Text('না, ফিরে যাই', style: TextStyle()),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -890,7 +885,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               Navigator.pop(ctx);
               context.pop();
             },
-            child: const Text('হ্যাঁ, বের হন', style: TextStyle(fontFamily: 'HindSiliguri')),
+            child: const Text('হ্যাঁ, বের হন', style: TextStyle()),
           ),
         ],
       ),
@@ -939,7 +934,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
                             ),
                           ),
@@ -1066,12 +1060,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             child: CircularProgressIndicator(color: Color(0xFF004633)),
           ),
           error: (e, _) => Center(
-            child: Text('Error: $e', style: const TextStyle(fontFamily: 'HindSiliguri')),
+            child: Text('Error: $e', style: const TextStyle()),
           ),
           data: (questions) {
             if (questions.isEmpty) {
               return const Center(
-                child: Text('কোনো প্রশ্ন পাওয়া যায়নি।', style: TextStyle(fontFamily: 'HindSiliguri')),
+                child: Text('কোনো প্রশ্ন পাওয়া যায়নি।', style: TextStyle()),
               );
             }
 
@@ -1136,7 +1130,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark ? Colors.white : const Color(0xFF0F172A),
                                 ),
                               ),
@@ -1146,7 +1139,6 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? Colors.white54 : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -1241,21 +1233,17 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                       foregroundColor: Colors.white,
-                      elevation: 0,
                       minimumSize: const Size(0, 38),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      
                     ),
                     child: const Text(
                       'জমা দাও',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14.5,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                   ),
                 ],
@@ -1288,7 +1276,6 @@ class _LegendDot extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
         ),
@@ -1320,7 +1307,6 @@ class _DialogStat extends StatelessWidget {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w900,
-            fontFamily: 'HindSiliguri',
             color: color,
           ),
         ),
@@ -1329,7 +1315,6 @@ class _DialogStat extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
         ),

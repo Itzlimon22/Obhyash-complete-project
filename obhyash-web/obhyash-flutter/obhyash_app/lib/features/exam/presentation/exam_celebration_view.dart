@@ -252,7 +252,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFF34D399)
                                         : const Color(0xFF004633),
@@ -270,7 +269,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                       style: TextStyle(
                                         fontSize: 46,
                                         fontWeight: FontWeight.w900,
-                                        fontFamily: 'HindSiliguri',
                                         color: isDark
                                             ? Colors.white
                                             : const Color(0xFF004633),
@@ -286,7 +284,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? Colors.white70
                                         : const Color(0xFF065F46),
@@ -321,7 +318,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
-                                            fontFamily: 'HindSiliguri',
                                             color: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
                                           ),
                                         ),
@@ -408,7 +404,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w800,
-                                        fontFamily: 'HindSiliguri',
                                         color: isDark
                                             ? const Color(0xFFFDE68A)
                                             : const Color(0xFFB45309),
@@ -482,7 +477,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                fontFamily: 'HindSiliguri',
                 color: accentColor,
                 height: 1.1,
               ),
@@ -493,7 +487,6 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white70 : const Color(0xFF475569),
               ),
               maxLines: 1,

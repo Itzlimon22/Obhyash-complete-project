@@ -97,7 +97,6 @@ class AccountInfoModal extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -106,7 +105,6 @@ class AccountInfoModal extends StatelessWidget {
                 'সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য',
                 style: TextStyle(
                   fontSize: 12.5,
-                  fontFamily: 'HindSiliguri',
                   color: textSecondary,
                 ),
               ),
@@ -187,11 +185,7 @@ class AccountInfoModal extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF047857), // Obhyash Emerald
                     foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
                     ),
-                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
@@ -200,8 +194,7 @@ class AccountInfoModal extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                       SizedBox(width: 8),
                       Icon(LucideIcons.copy, size: 16),
@@ -261,8 +254,7 @@ class AccountInfoModal extends StatelessWidget {
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: textSecondary,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
                   const SizedBox(height: 2),
                   Text(

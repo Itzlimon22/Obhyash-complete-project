@@ -118,8 +118,7 @@ class ProUpgradeModal extends StatelessWidget {
                     color: Color(0xFFD97706),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                 ),
               ),
             ),
@@ -132,7 +131,6 @@ class ProUpgradeModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
@@ -145,7 +143,6 @@ class ProUpgradeModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               ),
             ),
@@ -201,11 +198,8 @@ class ProUpgradeModal extends StatelessWidget {
                 backgroundColor: const Color(0xFF12544F),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                
                 ),
-                elevation: 0,
-              ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -216,8 +210,7 @@ class ProUpgradeModal extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
                 ],
               ),
@@ -232,7 +225,6 @@ class ProUpgradeModal extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                 ),
               ),
@@ -272,7 +264,6 @@ class ProUpgradeModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
@@ -282,7 +273,6 @@ class ProUpgradeModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
-                fontFamily: 'HindSiliguri',
                 color: isPopular
                     ? const Color(0xFF059669)
                     : (isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
@@ -294,7 +284,6 @@ class ProUpgradeModal extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isPopular ? const Color(0xFF059669) : const Color(0xFF94A3B8),
               ),
             ),

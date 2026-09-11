@@ -189,7 +189,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
                             ),
                           ),
@@ -197,7 +196,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                             'এই প্রক্রিয়াটি অপরিবর্তনীয় ও স্থায়ী',
                             style: TextStyle(
                               fontSize: 12.5,
-                              fontFamily: 'HindSiliguri',
                               color: textSecondary,
                             ),
                           ),
@@ -230,7 +228,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                               height: 1.4,
                             ),
@@ -248,7 +245,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: textPrimary,
                   ),
                 ),
@@ -264,7 +260,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: textPrimary,
                   ),
                 ),
@@ -303,7 +298,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                     _errorMessage!,
                     style: const TextStyle(
                       fontSize: 12,
-                      fontFamily: 'HindSiliguri',
                       color: Color(0xFFEF4444),
                       fontWeight: FontWeight.bold,
                     ),
@@ -325,7 +319,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                         child: Text(
                           'বাতিল করো',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w600,
                             fontSize: 13.5,
                             color: textPrimary,
@@ -341,9 +334,8 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                           backgroundColor: const Color(0xFF740A03), // Solid Deep Crimson #740A03
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          elevation: 0,
-                        ),
+                          
+                          ),
                         child: _isLoading
                             ? const SizedBox(
                                 width: 20,
@@ -353,7 +345,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
                             : const Text(
                                 'হ্যাঁ, মুছে ফেলো',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -391,7 +382,6 @@ class _DeleteAccountModalState extends State<DeleteAccountModal> {
               text,
               style: TextStyle(
                 fontSize: 12.5,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                 height: 1.35,
               ),

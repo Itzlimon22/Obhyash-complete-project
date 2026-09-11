@@ -58,7 +58,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           title: Text(
             'গুগল অ্যাকাউন্ট পরিবর্তন',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -66,7 +65,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           content: Text(
             'আপনি কি বর্তমান গুগল অ্যাকাউন্ট পরিবর্তন করে অন্য একটি গুগল অ্যাকাউন্ট যুক্ত করতে চান?',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
             ),
@@ -74,18 +72,18 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('বাতিল', style: TextStyle(fontFamily: 'HindSiliguri')),
+              child: const Text('বাতিল', style: TextStyle()),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                
               ),
               child: const Text(
                 'হ্যাঁ, পরিবর্তন করুন',
-                style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -126,7 +124,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           title: Text(
             'গুগল অ্যাকাউন্ট আনলিঙ্ক',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
@@ -134,7 +131,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           content: Text(
             'আপনি কি নিশ্চিত যে গুগল অ্যাকাউন্টটি এই আইডি থেকে বিচ্ছিন্ন (আনলিঙ্ক) করতে চান?',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               fontSize: 14,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
             ),
@@ -142,18 +138,18 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('বাতিল', style: TextStyle(fontFamily: 'HindSiliguri')),
+              child: const Text('বাতিল', style: TextStyle()),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFEF4444),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                
               ),
               child: const Text(
                 'আনলিঙ্ক করুন',
-                style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -258,7 +254,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'HindSiliguri',
                                     color: textPrimary,
                                   ),
                                 ),
@@ -267,7 +262,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                   'তোমার সক্রিয় মোবাইল নম্বর প্রদান করো',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontFamily: 'HindSiliguri',
                                     color: textSecondary,
                                   ),
                                 ),
@@ -285,15 +279,13 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: textPrimary,
                         ),
                         decoration: InputDecoration(
                           hintText: '017XXXXXXXX',
                           hintStyle: TextStyle(
                             color: textSecondary.withValues(alpha: 0.7),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                           prefixIcon: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Row(
@@ -405,11 +397,8 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                           backgroundColor: const Color(0xFF059669),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                          
                           ),
-                          elevation: 0,
-                        ),
                         child: isSaving
                             ? const SizedBox(
                                 width: 20,
@@ -424,8 +413,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
-                                ),
+                                  ),
                               ),
                       ),
                     ],
@@ -514,7 +502,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? Colors.white : const Color(0xFF111827),
                                   ),
                                 ),
@@ -523,7 +510,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                   'আপনার সক্রিয় ইমেইল অ্যাড্রেস লিখুন',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                                   ),
                                 ),
@@ -621,11 +607,8 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                           backgroundColor: const Color(0xFF3B82F6),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                          
                           ),
-                          elevation: 0,
-                        ),
                         child: isSaving
                             ? const SizedBox(
                                 width: 20,
@@ -640,8 +623,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
-                                ),
+                                  ),
                               ),
                       ),
                     ],
@@ -869,7 +851,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white : const Color(0xFF111827),
                           ),
                           maxLines: 1,
@@ -880,7 +861,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                           email.isNotEmpty ? email : (phone.isNotEmpty ? phone : 'ইউজার অ্যাকাউন্ট'),
                           style: TextStyle(
                             fontSize: 12.5,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                           ),
                           maxLines: 1,
@@ -900,7 +880,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF059669),
                       ),
                     ),
@@ -919,7 +898,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                 ),
               ),
@@ -975,7 +953,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
@@ -986,7 +963,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                                 ),
                                 maxLines: 1,
@@ -1020,7 +996,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),
                               ),
@@ -1047,8 +1022,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: const Color(0xFF059669),
@@ -1081,8 +1055,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                           ),
                         ),
@@ -1094,11 +1067,8 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
-                        elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                        
                       ),
                       child: _isLinking
                           ? const SizedBox(
@@ -1119,8 +1089,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                   style: TextStyle(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: 'HindSiliguri',
-                                  ),
+                                    ),
                                 ),
                               ],
                             ),
@@ -1175,7 +1144,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
@@ -1185,7 +1153,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: email.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                                fontFamily: 'HindSiliguri',
                                 color: email.isNotEmpty
                                     ? (isDark ? Colors.white : const Color(0xFF111827))
                                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280)),
@@ -1220,7 +1187,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),
                               ),
@@ -1242,7 +1208,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFFF59E0B),
                             ),
                           ),
@@ -1262,7 +1227,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFFF59E0B),
                             ),
                           ),
@@ -1282,7 +1246,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFF71717A),
                             ),
                           ),
@@ -1304,17 +1267,13 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3B82F6),
                               foregroundColor: Colors.white,
-                              elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 11),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -1327,8 +1286,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF3B82F6),
@@ -1393,7 +1351,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
@@ -1403,7 +1360,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: phone.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                                fontFamily: 'HindSiliguri',
                                 color: phone.isNotEmpty
                                     ? (isDark ? Colors.white : const Color(0xFF111827))
                                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280)),
@@ -1438,7 +1394,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),
                               ),
@@ -1460,7 +1415,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFFF59E0B),
                             ),
                           ),
@@ -1480,7 +1434,6 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Color(0xFF71717A),
                             ),
                           ),
@@ -1498,17 +1451,13 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD97706),
                         foregroundColor: Colors.white,
-                        elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 11),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        
                       ),
                     ),
                   ] else if (!isPhoneVerifiedAndLocked) ...[
@@ -1521,17 +1470,13 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
-                        elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 11),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        
                       ),
                     ),
                   ],

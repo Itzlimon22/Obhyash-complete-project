@@ -384,7 +384,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                     backgroundColor: Colors.purpleAccent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    
                   ),
                 )
               else
@@ -396,7 +396,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
                     backgroundColor: Colors.purpleAccent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    
                   ),
                 ),
             ],
@@ -433,13 +433,13 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
           Text(
             res.isPerfectScore ? '🌟 পারফেক্ট মেমোরি স্কোর!' : '🎉 আজকের রিভিশন সম্পন্ন!',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'HindSiliguri'),
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, ),
           ),
           const SizedBox(height: 4),
           const Text(
             'আপনার ফলাফল মেমোরি বক্সে প্রসেস করা হয়েছে।',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white54, fontSize: 12.5, fontFamily: 'HindSiliguri'),
+            style: TextStyle(color: Colors.white54, fontSize: 12.5, ),
           ),
           const SizedBox(height: 20),
 
@@ -571,7 +571,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
               backgroundColor: Colors.purpleAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              
             ),
             child: const Text('ড্যাশবোর্ডে ফিরে যান', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           ),

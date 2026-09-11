@@ -316,8 +316,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                             fontSize: 12.5,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF004633),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ],
                     ),
@@ -365,8 +364,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
-                                      fontFamily: 'HindSiliguri',
-                                    ),
+                                      ),
                                   ),
                                 ],
                               ),
@@ -400,16 +398,9 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
                                           foregroundColor: isDark ? Colors.white : Colors.black,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
-                                            side: BorderSide(
-                                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
-                                            ),
-                                          ),
                                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                         ),
-                                        child: const Text('আরও দেখুন', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'HindSiliguri')),
+                                        child: const Text('আরও দেখুন', style: TextStyle(fontWeight: FontWeight.bold, )),
                                       ),
                               ),
                             );
@@ -480,8 +471,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                                                   color: notif.isRead
                                                       ? (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252))
                                                       : (isDark ? Colors.white : const Color(0xFF000000)),
-                                                  fontFamily: 'HindSiliguri',
-                                                ),
+                                                  ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -505,8 +495,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                                             fontSize: 13.5,
                                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF737373),
                                             height: 1.4,
-                                            fontFamily: 'HindSiliguri',
-                                          ),
+                                            ),
                                         ),
                                         const SizedBox(height: 10),
                                         Row(
@@ -525,8 +514,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: isDark ? const Color(0xFF71717A) : const Color(0xFFA1A1AA),
-                                                    fontFamily: 'HindSiliguri',
-                                                  ),
+                                                    ),
                                                 ),
                                               ],
                                             ),
@@ -607,8 +595,7 @@ class _NotificationsViewState extends ConsumerState<NotificationsView> {
             color: isActive
                 ? (isDark ? Colors.black : Colors.white)
                 : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
       ),
     );

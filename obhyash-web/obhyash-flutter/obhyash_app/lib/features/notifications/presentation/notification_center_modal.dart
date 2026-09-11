@@ -83,7 +83,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
@@ -130,7 +129,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                     'টেস্ট পুশ',
                     style: TextStyle(
                       fontSize: 11.5,
-                      fontFamily: 'HindSiliguri',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -153,7 +151,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                       'সব পড়া হয়েছে',
                       style: TextStyle(
                         fontSize: 13,
-                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -194,7 +191,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                 child: Text(
                   'নোটিফিকেশন লোড করা যায়নি',
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white60 : Colors.black54,
                   ),
                 ),
@@ -226,7 +222,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                           ),
                         ),
@@ -282,7 +277,6 @@ class _NotificationCenterModalState extends ConsumerState<NotificationCenterModa
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            fontFamily: 'HindSiliguri',
             color: isSelected
                 ? Colors.white
                 : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
@@ -367,7 +361,6 @@ class _NotificationCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF111827),
                             ),
                           ),
@@ -390,7 +383,6 @@ class _NotificationCard extends StatelessWidget {
                       notification.body,
                       style: TextStyle(
                         fontSize: 13.5,
-                        fontFamily: 'HindSiliguri',
                         height: 1.4,
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
                       ),
@@ -400,7 +392,6 @@ class _NotificationCard extends StatelessWidget {
                       _formatTime(notification.createdAt),
                       style: TextStyle(
                         fontSize: 11.5,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
                       ),
                     ),

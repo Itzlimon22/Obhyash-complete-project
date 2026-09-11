@@ -17,6 +17,7 @@ import {
 import { getPublicLeaderboard, getStudentLiveExamDetails } from "@/services/live-exam-student-service";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { LiveExam, LiveExamAttempt } from "@/lib/types";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 
 interface LiveExamLeaderboardViewProps {
   exam: LiveExam;
@@ -107,7 +108,7 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
         {onViewSolutions && (
           <button
             onClick={onViewSolutions}
-            className="self-start sm:self-auto flex items-center gap-2 px-5 py-2.5 bg-[#0B6B42] hover:bg-[#095937] text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-800/20"
+            className="self-start sm:self-auto flex items-center gap-2 px-5 py-2.5 bg-[#12544F] hover:bg-[#0D3E3A] text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-[#12544F]/20 cursor-pointer active:scale-98"
           >
             <FileText className="w-4 h-4" />
             <span>সমাধান ও ব্যাখ্যা</span>
@@ -117,11 +118,11 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
 
       {/* Student's Own Performance Spotlight */}
       {userAttempt && (
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 rounded-3xl p-5 sm:p-6 text-white shadow-xl shadow-emerald-900/20 mb-8">
+        <div className="bg-gradient-to-r from-[#12544F] via-[#0E423E] to-[#092328] rounded-3xl p-5 sm:p-6 text-white shadow-xl shadow-[#12544F]/20 mb-8 border border-white/20">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-2xl border border-white/30 shrink-0">
-                #{userRank}
+              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-2xl border border-white/30 shrink-0 tabular-nums">
+                #{BanglaNameHelper.toBanglaNumeral(userRank)}
               </div>
               <div>
                 <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider">আপনার অবস্থান</span>
@@ -129,7 +130,7 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
                   {user?.user_metadata?.full_name || "আপনি"}
                 </h3>
                 <p className="text-xs text-emerald-100/90 font-medium">
-                  মোট {leaderboard.length} জন পরীক্ষার্থীর মধ্যে {userRank}ম স্থান
+                  মোট {BanglaNameHelper.toBanglaNumeral(leaderboard.length)} জন পরীক্ষার্থীর মধ্যে {BanglaNameHelper.toBanglaNumeral(userRank)}ম স্থান
                 </p>
               </div>
             </div>
@@ -137,15 +138,15 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
             <div className="grid grid-cols-3 gap-3 bg-white/10 backdrop-blur-sm p-3.5 rounded-2xl border border-white/15 text-center">
               <div>
                 <span className="text-[11px] text-emerald-200 font-semibold">প্রাপ্ত নম্বর</span>
-                <p className="text-lg font-black text-white">{userAttempt.score ?? 0}</p>
+                <p className="text-lg font-black text-white tabular-nums">{BanglaNameHelper.toBanglaNumeral(userAttempt.score ?? 0)}</p>
               </div>
               <div className="border-x border-white/20 px-2">
                 <span className="text-[11px] text-emerald-200 font-semibold">সঠিক</span>
-                <p className="text-lg font-black text-emerald-300">{userAttempt.correct_count ?? 0}</p>
+                <p className="text-lg font-black text-emerald-300 tabular-nums">{BanglaNameHelper.toBanglaNumeral(userAttempt.correct_count ?? 0)}</p>
               </div>
               <div>
                 <span className="text-[11px] text-emerald-200 font-semibold">ভুল</span>
-                <p className="text-lg font-black text-rose-300">{userAttempt.wrong_count ?? 0}</p>
+                <p className="text-lg font-black text-rose-300 tabular-nums">{BanglaNameHelper.toBanglaNumeral(userAttempt.wrong_count ?? 0)}</p>
               </div>
             </div>
           </div>

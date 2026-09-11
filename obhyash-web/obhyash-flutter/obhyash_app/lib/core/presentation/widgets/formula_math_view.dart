@@ -120,7 +120,6 @@ class FormulaMathView extends StatelessWidget {
             clause,
             style: TextStyle(
               fontSize: fontSize,
-              fontFamily: 'HindSiliguri',
               color: textColor,
             ),
           ),
@@ -180,7 +179,6 @@ class _BengaliMathClauseRenderer extends StatelessWidget {
   Widget _renderToken(_ClauseToken token) {
     final bengaliStyle = TextStyle(
       fontSize: fontSize,
-      fontFamily: 'HindSiliguri',
       fontWeight: FontWeight.w600,
       color: textColor,
     );
@@ -579,7 +577,6 @@ class _BengaliFractionWidget extends StatelessWidget {
       clean,
       style: TextStyle(
         fontSize: subFontSize,
-        fontFamily: 'HindSiliguri',
         fontWeight: FontWeight.w600,
         color: textColor,
         height: 1.2,
@@ -632,7 +629,6 @@ class _FormulaChemicalArrowWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: fontSize * 0.75,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: textColor,
                   height: 1.1,
                 ),
@@ -654,7 +650,6 @@ class _FormulaChemicalArrowWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: fontSize * 0.70,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'HindSiliguri',
                   color: textColor.withValues(alpha: 0.85),
                   height: 1.1,
                 ),

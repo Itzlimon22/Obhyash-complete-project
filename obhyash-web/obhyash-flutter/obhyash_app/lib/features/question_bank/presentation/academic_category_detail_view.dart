@@ -80,7 +80,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
         title: Text(
           pageTitle,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 17.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF111827),
@@ -194,7 +193,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
                     title,
                     maxLines: 1,
                     style: const TextStyle(
-                      fontFamily: 'HindSiliguri',
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -275,7 +273,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
               child: const Text(
                 'শীঘ্রই আসছে',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF3B82F6),
@@ -289,7 +286,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
               '$subjectTitle এর একাডেমিক অংশ প্রস্তুত হচ্ছে',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -303,7 +299,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
               'আমরা এই বিষয়ের বোর্ড প্রশ্ন (MCQ, CQ, ক ও খ প্রশ্নাবলী) সাজানোর কাজ করছি। খুব শীঘ্রই ফিচারটি সবার জন্য উন্মুক্ত করা হবে!',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
@@ -322,7 +317,6 @@ class AcademicCategoryDetailView extends StatelessWidget {
               label: const Text(
                 'ফিরে যান',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),

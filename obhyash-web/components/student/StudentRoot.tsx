@@ -92,6 +92,7 @@ interface StudentRootProps {
   toggleTheme: () => void;
   onLogout: () => void;
   subjects?: { id: string; name: string; [key: string]: unknown }[];
+  initialTab?: string;
 }
 
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -104,6 +105,7 @@ export default function StudentRoot({
   toggleTheme,
   onLogout,
   subjects = [],
+  initialTab = "dashboard",
 }: StudentRootProps) {
   const router = useRouter();
   // ... (keeping existing hooks and state)
@@ -250,6 +252,7 @@ export default function StudentRoot({
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
+    if (initialTab && initialTab !== "dashboard") return initialTab;
     if (typeof window !== "undefined") {
       const pathname = window.location.pathname;
       // Strip leading slash
@@ -264,7 +267,7 @@ export default function StudentRoot({
       if (validTabs.includes(path)) return path;
       return sessionStorage.getItem("obhyash_active_tab") || "dashboard";
     }
-    return "dashboard";
+    return initialTab || "dashboard";
   });
 
   // IDs parsed from the initial URL (for deep-link restoration)

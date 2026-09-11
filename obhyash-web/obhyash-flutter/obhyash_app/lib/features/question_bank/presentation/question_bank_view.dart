@@ -803,7 +803,6 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -821,7 +820,6 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                         Text(
                           paper,
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: Colors.white.withValues(alpha: 0.92),
@@ -1013,7 +1011,6 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: textColor,

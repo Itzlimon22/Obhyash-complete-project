@@ -180,7 +180,6 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
@@ -219,7 +218,6 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
                           ),
                         ),
@@ -283,7 +281,6 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 12,
-                                        fontFamily: 'HindSiliguri',
                                         fontWeight: isSelected
                                             ? FontWeight.w700
                                             : FontWeight.w600,
@@ -320,14 +317,12 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                 enabled: !_alreadyReported,
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
                 decoration: InputDecoration(
                   hintText: 'মন্তব্য বা বিস্তারিত লেখো (ঐচ্ছিক)...',
                   hintStyle: TextStyle(
                     fontSize: 12,
-                    fontFamily: 'HindSiliguri',
                     color: isDark
                         ? const Color(0xFF71717A)
                         : const Color(0xFFA1A1AA),
@@ -384,7 +379,6 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
                                 : const Color(0xFF64748B),
@@ -407,11 +401,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                           foregroundColor: _alreadyReported
                               ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                               : Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
                           ),
-                        ),
                         child: _isSubmitting
                             ? const SizedBox(
                                 width: 20,
@@ -426,7 +416,6 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
                                   color: _alreadyReported
                                       ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
                                       : Colors.white,

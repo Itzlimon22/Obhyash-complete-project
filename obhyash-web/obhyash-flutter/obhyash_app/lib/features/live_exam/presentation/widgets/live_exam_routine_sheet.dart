@@ -704,7 +704,6 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : Colors.black87,
                         ),
                         maxLines: 1,
@@ -772,8 +771,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -782,7 +780,6 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               '${item.date} (${item.dayName}) • ${item.time}',
                               style: TextStyle(
                                 fontSize: 11.5,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                               ),
                             ),
@@ -806,8 +803,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ),
                     ],
@@ -847,7 +843,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF004633),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          
                         ),
                         onPressed: () => Navigator.pop(context),
                         child: const Text('ঠিক আছে', style: TextStyle(fontWeight: FontWeight.bold)),

@@ -35,7 +35,7 @@ class _OtherUser {
   });
 
   factory _OtherUser.fromJson(Map<String, dynamic> j) => _OtherUser(
-    id: j['id'] as String,
+    id: j['id']?.toString() ?? '',
     name: j['name'] as String? ?? 'অজানা',
     institute: j['institute'] as String? ?? '',
     level: j['level'] as String? ?? 'Rookie',
@@ -365,13 +365,32 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       final supabase = Supabase.instance.client;
       final myId = supabase.auth.currentUser?.id;
 
-      final profileData = await supabase
-          .from('public_profiles')
-          .select(
-            'id, name, institute, level, xp, exams_taken, streak, avatar_url, gender',
-          )
-          .eq('id', widget.userId)
-          .single();
+      Map<String, dynamic>? profileData;
+      try {
+        profileData = await supabase
+            .from('public_profiles')
+            .select('*')
+            .eq('id', widget.userId)
+            .maybeSingle();
+      } catch (e) {
+        debugPrint('UserProfileView: public_profiles error: $e');
+      }
+
+      if (profileData == null) {
+        try {
+          profileData = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', widget.userId)
+              .maybeSingle();
+        } catch (e) {
+          debugPrint('UserProfileView: users table fallback error: $e');
+        }
+      }
+
+      if (profileData == null) {
+        throw Exception('User profile not found for id: ${widget.userId}');
+      }
 
       final user = _OtherUser.fromJson(profileData);
       final targetA = await _fetchUserAnalytics(widget.userId, user);
@@ -409,7 +428,8 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('UserProfileView _fetch failed: $e\n$stack');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -454,13 +474,12 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                   style: TextStyle(
                     fontSize: 16,
                     color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: _fetch,
-                  child: const Text('আবার চেষ্টা করো', style: TextStyle(fontFamily: 'HindSiliguri')),
+                  child: const Text('আবার চেষ্টা করো', style: TextStyle()),
                 ),
               ],
             ),
@@ -636,8 +655,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -656,8 +674,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF10B981),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ),
                     ],
@@ -670,8 +687,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -697,8 +713,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFFF59E0B),
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ],
                   ),
@@ -846,8 +861,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                    fontFamily: 'HindSiliguri',
-                  ),
+                    ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -867,8 +881,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
                         color: badgeTextColor,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -884,8 +897,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             )
           else ...[
             const SizedBox(height: 4),
@@ -901,8 +913,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF10B981),
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -913,8 +924,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             fontSize: 15.5,
                             fontWeight: FontWeight.w900,
                             color: Color(0xFF10B981),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ),
                     ],
@@ -936,8 +946,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -950,8 +959,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             fontSize: 15.5,
                             fontWeight: FontWeight.w900,
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ),
                     ],
@@ -1006,8 +1014,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
               Row(
                 children: [
@@ -1058,8 +1065,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         );
                       },
@@ -1118,8 +1124,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
       ],
     );

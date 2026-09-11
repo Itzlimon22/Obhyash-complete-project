@@ -944,7 +944,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isSelected
                   ? Colors.white
                   : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569)),
@@ -1006,7 +1005,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: Colors.white,
                     letterSpacing: 0.4,
                   ),
@@ -1023,7 +1021,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: AppColors.mint,
                   ),
                 ),
@@ -1042,7 +1039,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: const TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: Colors.white,
                   height: 1,
                 ),
@@ -1053,7 +1049,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w500,
-                  fontFamily: 'HindSiliguri',
                   color: Colors.white70,
                 ),
               ),
@@ -1066,7 +1061,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.normal,
-              fontFamily: 'HindSiliguri',
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.35,
             ),
@@ -1169,7 +1163,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.normal,
-              fontFamily: 'HindSiliguri',
               color: textSub,
             ),
           ),
@@ -1180,7 +1173,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: textPrimary,
               height: 1.1,
             ),
@@ -1192,7 +1184,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.normal,
-              fontFamily: 'HindSiliguri',
               color: textSub,
             ),
             maxLines: 1,
@@ -1216,7 +1207,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       style: TextStyle(
         fontSize: 15.5,
         fontWeight: FontWeight.w600,
-        fontFamily: 'HindSiliguri',
         color: textPrimary,
       ),
     );
@@ -1302,7 +1292,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w800,
-                            fontFamily: 'HindSiliguri',
                             color: g.color,
                           ),
                         ),
@@ -1330,7 +1319,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             style: TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? Colors.white : const Color(0xFF1E293B),
                             ),
                           ),
@@ -1344,7 +1332,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
                       color: textPrimary,
                       letterSpacing: -0.2,
                     ),
@@ -1356,7 +1343,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w500,
-                      fontFamily: 'HindSiliguri',
                       color: textSub,
                       height: 1.45,
                     ),
@@ -1397,7 +1383,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -1412,7 +1397,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'HindSiliguri',
                     color: AppColors.deepBlue,
                   ),
                 ),
@@ -1427,7 +1411,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               child: Center(
                 child: Text(
                   'কোনো টাইমলাইন তথ্য নেই',
-                  style: TextStyle(fontFamily: 'HindSiliguri'),
+                  style: TextStyle(),
                 ),
               ),
             )
@@ -1479,7 +1463,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white54 : Colors.black54,
                               ),
                             ),
@@ -1559,7 +1542,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -1568,7 +1550,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
                   color: textSub,
                 ),
               ),
@@ -1582,7 +1563,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               child: Center(
                 child: Text(
                   'কোনো পরীক্ষা দেওয়া হয়নি',
-                  style: TextStyle(fontFamily: 'HindSiliguri'),
+                  style: TextStyle(),
                 ),
               ),
             )
@@ -1623,7 +1604,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w800,
-                                fontFamily: 'HindSiliguri',
                                 color: textPrimary,
                               ),
                             ),
@@ -1633,7 +1613,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'HindSiliguri',
                               color: badgeColor,
                             ),
                           ),
@@ -1709,7 +1688,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             style: TextStyle(
               fontSize: 15.5,
               fontWeight: FontWeight.w800,
-              fontFamily: 'HindSiliguri',
               color: textPrimary,
             ),
           ),
@@ -1764,7 +1742,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                fontFamily: 'HindSiliguri',
                 color: color,
               ),
             ),
@@ -1775,7 +1752,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white70 : const Color(0xFF334155),
               ),
             ),
@@ -1815,7 +1791,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: textPrimary,
                 ),
               ),
@@ -1824,7 +1799,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: AppColors.deepBlue,
                 ),
               ),
@@ -1872,7 +1846,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'HindSiliguri',
                         color: isUnlocked ? textPrimary : textSub,
                       ),
                       textAlign: TextAlign.center,
@@ -1885,7 +1858,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                       style: TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: isUnlocked ? ach.accentColor : textSub,
                       ),
                       textAlign: TextAlign.center,
@@ -1921,7 +1893,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'HindSiliguri',
                 color: textPrimary,
               ),
             ),
@@ -1931,7 +1902,6 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
-                fontFamily: 'HindSiliguri',
                 color: textSub,
                 height: 1.4,
               ),
@@ -1944,17 +1914,14 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 backgroundColor: AppColors.deepGreen,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                
               ),
               child: const Text(
                 'পরীক্ষা শুরু করো',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             ),
           ],

@@ -720,7 +720,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                           style: TextStyle(
                                             fontSize: isSubRoute ? 16.5 : 19.5,
                                             fontWeight: FontWeight.w700,
-                                            fontFamily: 'HindSiliguri',
                                             letterSpacing: -0.2,
                                             color: isDark
                                                 ? Colors.white
@@ -1085,7 +1084,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       Text(
                                         'লেজেন্ডস লিগ',
                                         style: TextStyle(
-                                          fontFamily: 'HindSiliguri',
                                           fontSize: 15.5,
                                           fontWeight: FontWeight.w900,
                                           color: Color(0xFFEF4444),
@@ -1187,8 +1185,7 @@ class _HeaderTabBtn extends StatelessWidget {
                 : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
             fontSize: 13.0,
             fontWeight: active ? FontWeight.w600 : FontWeight.normal,
-            fontFamily: 'HindSiliguri',
-          ),
+            ),
         ),
       ),
     );
@@ -1231,7 +1228,6 @@ class _HeaderUnderlineTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                fontFamily: 'HindSiliguri',
                 letterSpacing: -0.2,
                 color: isActive ? activeColor : inactiveColor,
               ),

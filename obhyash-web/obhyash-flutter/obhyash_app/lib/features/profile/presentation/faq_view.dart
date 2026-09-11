@@ -179,7 +179,6 @@ class _FaqViewState extends State<FaqView> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -189,7 +188,6 @@ class _FaqViewState extends State<FaqView> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                     ),
                   ),
@@ -207,14 +205,12 @@ class _FaqViewState extends State<FaqView> {
                         _expandedIndex = null;
                       }),
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                         fontSize: 16,
                       ),
                       decoration: InputDecoration(
                         hintText: 'প্রশ্ন খুঁজুন... (যেমন: ওএমআর, পেমেন্ট, রেজাল্ট)',
                         hintStyle: TextStyle(
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                           fontSize: 14,
                         ),
@@ -276,7 +272,6 @@ class _FaqViewState extends State<FaqView> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                   ),
                 ),
@@ -296,7 +291,6 @@ class _FaqViewState extends State<FaqView> {
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                fontFamily: 'HindSiliguri',
                                 color: isSelected
                                     ? Colors.white
                                     : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569)),
@@ -340,7 +334,6 @@ class _FaqViewState extends State<FaqView> {
                   'কোনো প্রশ্ন পাওয়া যায়নি!',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                   ),
                 ),
@@ -398,7 +391,6 @@ class _FaqViewState extends State<FaqView> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
@@ -419,7 +411,6 @@ class _FaqViewState extends State<FaqView> {
                               style: TextStyle(
                                 fontSize: 13,
                                 height: 1.5,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
                               ),
                             ),
@@ -488,7 +479,6 @@ class _SupportActionCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
@@ -497,7 +487,6 @@ class _SupportActionCard extends StatelessWidget {
               sublabel,
               style: TextStyle(
                 fontSize: 12,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
               ),
               maxLines: 1,

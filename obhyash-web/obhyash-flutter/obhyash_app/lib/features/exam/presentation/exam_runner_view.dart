@@ -121,7 +121,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
                   ),
                 ),
@@ -132,7 +131,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                   ),
                 ),
@@ -162,7 +160,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
@@ -232,7 +229,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
@@ -243,7 +239,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                   ),
                 ),
@@ -268,7 +263,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF4B5563),
                             ),
                           ),
@@ -305,7 +299,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Colors.white,
                             ),
                           ),
@@ -352,7 +345,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
@@ -381,7 +373,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             'উত্তর দেওয়া',
                             style: TextStyle(
                               fontSize: 12,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF71717A),
@@ -411,7 +402,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             'বাকি আছে',
                             style: TextStyle(
                               fontSize: 12,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF71717A),
@@ -460,7 +450,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFD4D4D8)
                                   : const Color(0xFF4B5563),
@@ -499,7 +488,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
                               color: Colors.white,
                             ),
                           ),
@@ -816,7 +804,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                                 style: TextStyle(
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w800,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFE4E4E7)
                                       : const Color(0xFF0F172A),
@@ -828,7 +815,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF64748B),
@@ -930,21 +916,17 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                     foregroundColor: Colors.white,
-                    elevation: 0,
                     minimumSize: const Size(0, 38),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 24),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    
                   ),
                   child: const Text(
                     'জমা দাও',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14.5,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
                 ),
               ],
@@ -1035,7 +1017,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            fontFamily: 'HindSiliguri',
             color: textPrimary,
           ),
         ),
@@ -1104,7 +1085,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w600,
-                                fontFamily: 'HindSiliguri',
                                 color: textPrimary,
                               ),
                             ),
@@ -1127,7 +1107,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFF4ADE80)
                                     : const Color(0xFF004633),
@@ -1175,7 +1154,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFFD4D4D8)
                                         : const Color(0xFF334155),
@@ -1277,7 +1255,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
                               color: textPrimary,
                             ),
                           ),
@@ -1347,11 +1324,8 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF12544F), // Solid Viridian Forest
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                      
                       ),
-                      elevation: 0,
-                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
@@ -1362,8 +1336,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                           style: TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                       ],
                     ),
@@ -1405,7 +1378,6 @@ class _StatCell extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
-              fontFamily: 'HindSiliguri',
               color: subColor,
               height: 1.2,
             ),
@@ -1419,7 +1391,6 @@ class _StatCell extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: textColor,
               height: 1.1,
             ),
@@ -1524,7 +1495,6 @@ class _RuleItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isWarning
                           ? const Color(0xFFEF4444)
                           : textPrimary,
@@ -1535,7 +1505,6 @@ class _RuleItem extends StatelessWidget {
                     desc,
                     style: TextStyle(
                       fontSize: 12.5,
-                      fontFamily: 'HindSiliguri',
                       color: textSub,
                       height: 1.4,
                     ),

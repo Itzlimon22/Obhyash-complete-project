@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'button_3d_theme.dart';
 
 class AppColors {
   // Brand Strict Palette (Custom Defined)
@@ -66,11 +67,12 @@ class AppTheme {
     );
   }
 
-  static TextTheme _applyHindSiliguri(TextTheme theme) {
+  static TextTheme _applyDualFontStack(TextTheme theme) {
+    final interFont = GoogleFonts.inter().fontFamily;
     TextStyle apply(TextStyle? style) {
       final s = style ?? const TextStyle();
       return s.copyWith(
-        fontFamily: 'HindSiliguri',
+        fontFamily: interFont,
         fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
       );
     }
@@ -95,15 +97,15 @@ class AppTheme {
   }
 
   static ThemeData get lightTheme {
-    final baseTextTheme = _applyHindSiliguri(
+    final baseTextTheme = _applyDualFontStack(
       _bumpTextTheme(
-        GoogleFonts.hindSiliguriTextTheme(ThemeData.light().textTheme),
+        GoogleFonts.interTextTheme(ThemeData.light().textTheme),
       ),
     );
 
     return ThemeData(
       brightness: Brightness.light,
-      fontFamily: 'HindSiliguri',
+      fontFamily: GoogleFonts.inter().fontFamily,
       fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFFFAFAF9),
@@ -138,19 +140,37 @@ class AppTheme {
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: AppColors.viridianForest,
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(
-            fontFamily: 'HindSiliguri',
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+        style: ButtonStyle(
+          elevation: const WidgetStatePropertyAll(0),
+          backgroundColor: const WidgetStatePropertyAll(AppColors.viridianForest),
+          foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          textStyle: const WidgetStatePropertyAll(
+            TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+          shape: WidgetStateProperty.resolveWith<OutlinedBorder>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return const Button3DShapeBorder(
+                depth: 1.0,
+                borderRadius: 14.0,
+                shadowColor: AppColors.brandGreenDark,
+              );
+            }
+            return const Button3DShapeBorder(
+              depth: 4.5,
+              borderRadius: 14.0,
+              shadowColor: AppColors.brandGreenDark,
+            );
+          }),
+          padding: WidgetStateProperty.resolveWith<EdgeInsetsGeometry>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return const EdgeInsets.only(top: 17, bottom: 11, left: 20, right: 20);
+            }
+            return const EdgeInsets.only(top: 14, bottom: 14, left: 20, right: 20);
+          }),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -245,15 +265,15 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final baseTextTheme = _applyHindSiliguri(
+    final baseTextTheme = _applyDualFontStack(
       _bumpTextTheme(
-        GoogleFonts.hindSiliguriTextTheme(ThemeData.dark().textTheme),
+        GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
       ),
     );
     
     return ThemeData(
       brightness: Brightness.dark,
-      fontFamily: 'HindSiliguri',
+      fontFamily: GoogleFonts.inter().fontFamily,
       fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
       primaryColor: AppColors.viridianForest,
       scaffoldBackgroundColor: const Color(0xFF000000), // OLED Pure Black
@@ -326,19 +346,37 @@ class AppTheme {
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: AppColors.viridianForest,
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(
-            fontFamily: 'HindSiliguri',
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+        style: ButtonStyle(
+          elevation: const WidgetStatePropertyAll(0),
+          backgroundColor: const WidgetStatePropertyAll(AppColors.viridianForest),
+          foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          textStyle: const WidgetStatePropertyAll(
+            TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+          shape: WidgetStateProperty.resolveWith<OutlinedBorder>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return const Button3DShapeBorder(
+                depth: 1.0,
+                borderRadius: 14.0,
+                shadowColor: AppColors.brandGreenDark,
+              );
+            }
+            return const Button3DShapeBorder(
+              depth: 4.5,
+              borderRadius: 14.0,
+              shadowColor: AppColors.brandGreenDark,
+            );
+          }),
+          padding: WidgetStateProperty.resolveWith<EdgeInsetsGeometry>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return const EdgeInsets.only(top: 17, bottom: 11, left: 20, right: 20);
+            }
+            return const EdgeInsets.only(top: 14, bottom: 14, left: 20, right: 20);
+          }),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(

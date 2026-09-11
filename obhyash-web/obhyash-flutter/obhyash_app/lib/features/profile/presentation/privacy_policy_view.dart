@@ -74,7 +74,6 @@ class PrivacyPolicyView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
@@ -85,7 +84,6 @@ class PrivacyPolicyView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.45,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                     ),
                   ),
@@ -101,7 +99,6 @@ class PrivacyPolicyView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.normal,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                       ),
                     ),
@@ -191,7 +188,6 @@ class PrivacyPolicyView extends StatelessWidget {
                 'প্রশ্ন বা সহায়তার জন্য লিখুন: support@obhyash.com',
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                 ),
               ),
@@ -259,7 +255,6 @@ class _PolicyCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
@@ -288,7 +283,6 @@ class _PolicyCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.45,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
                       ),
                     ),

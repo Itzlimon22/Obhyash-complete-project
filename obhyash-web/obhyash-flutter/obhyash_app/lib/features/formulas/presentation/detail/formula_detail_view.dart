@@ -153,7 +153,6 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white70 : Colors.black87,
                   ),
                 ),
@@ -161,11 +160,11 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                 ElevatedButton.icon(
                   onPressed: _loadChapter,
                   icon: const Icon(LucideIcons.refreshCw, size: 16),
-                  label: const Text('পুনরায় চেষ্টা করুন', style: TextStyle(fontFamily: 'HindSiliguri')),
+                  label: const Text('পুনরায় চেষ্টা করুন', style: TextStyle()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF059669),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    
                   ),
                 ),
               ],
@@ -194,7 +193,6 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
         title: Text(
           _chapter?.chapterName ?? 'সূত্র তালিকা',
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -261,14 +259,12 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                         onChanged: (val) => setState(() => _searchQuery = val),
                         style: TextStyle(
                           fontSize: 14.5,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF111827),
                         ),
                         decoration: InputDecoration(
                           hintText: 'সূত্র বা টপিক খুঁজুন...',
                           hintStyle: TextStyle(
                             fontSize: 13.5,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
                           ),
                           border: InputBorder.none,
@@ -309,7 +305,6 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                               'কোনো সূত্র পাওয়া যায়নি',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white60 : Colors.black54,
                               ),
                             ),
@@ -455,7 +450,6 @@ class _BookFormulaCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
                     height: 1.35,
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
@@ -481,7 +475,6 @@ class _BookFormulaCard extends StatelessWidget {
                     text: description,
                     style: TextStyle(
                       fontSize: 14.5,
-                      fontFamily: 'HindSiliguri',
                       height: 1.6,
                       fontWeight: FontWeight.w500,
                       color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),

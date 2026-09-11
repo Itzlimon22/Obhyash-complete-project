@@ -81,7 +81,7 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
           wasBookmarked
               ? 'বুকমার্ক থেকে সরানো হয়েছে'
               : 'বুকমার্কে সংরক্ষণ করা হয়েছে 📌',
-          style: const TextStyle(fontFamily: 'HindSiliguri', fontSize: 13),
+          style: const TextStyle(fontSize: 13),
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
@@ -181,7 +181,6 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A),
                         ),
                       ),
@@ -219,7 +218,7 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
           ? const Center(
               child: Text(
                 'কোনো প্রশ্ন পাওয়া যায়নি।',
-                style: TextStyle(fontFamily: 'HindSiliguri', fontSize: 16),
+                style: TextStyle(fontSize: 16),
               ),
             )
           : ListView.builder(
@@ -281,7 +280,6 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                                     style: TextStyle(
                                       fontSize: 15.5,
                                       fontWeight: FontWeight.w800,
-                                      fontFamily: 'HindSiliguri',
                                       color: isDark
                                           ? const Color(0xFFE4E4E7)
                                           : const Color(0xFF0F172A),
@@ -293,7 +291,6 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                                     style: TextStyle(
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w600,
-                                      fontFamily: 'HindSiliguri',
                                       color: isDark
                                           ? const Color(0xFFA1A1AA)
                                           : const Color(0xFF64748B),

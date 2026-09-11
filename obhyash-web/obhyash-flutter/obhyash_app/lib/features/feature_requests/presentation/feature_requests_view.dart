@@ -416,7 +416,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            fontFamily: 'HindSiliguri',
             color: isSelected
                 ? (isDark ? Colors.white : const Color(0xFF111827))
                 : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280)),
@@ -447,7 +446,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
@@ -456,7 +454,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             'তোমার আইডিয়া বা ফিচারের প্রস্তাব আমাদের সাথে শেয়ার করো।',
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
             ),
           ),
@@ -468,7 +465,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF374151),
             ),
           ),
@@ -482,7 +478,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 label: Text(
                   cat.label,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isSelected
@@ -519,7 +514,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF374151),
             ),
           ),
@@ -528,14 +522,12 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             controller: _titleController,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : Colors.black87,
             ),
             decoration: InputDecoration(
               hintText: 'যেমন: ওএমআর শীটে ভুল উত্তর দ্রুত রিভিউর সুবিধা',
               hintStyle: TextStyle(
                 fontSize: 13,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -567,7 +559,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF374151),
             ),
           ),
@@ -577,14 +568,12 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
             maxLines: 4,
             style: TextStyle(
               fontSize: 16,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : Colors.black87,
             ),
             decoration: InputDecoration(
               hintText: 'ফিচারটি কীভাবে কাজ করবে এবং এটি কেন দরকার তা লেখো...',
               hintStyle: TextStyle(
                 fontSize: 13,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -619,11 +608,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
               child: _isLoading
                   ? const SizedBox(
                       width: 20,
@@ -638,8 +623,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
             ),
           ),
@@ -680,7 +664,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
@@ -690,7 +673,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
               ),
             ),
@@ -709,7 +691,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
                   color: Color(0xFF059669),
                 ),
               ),
@@ -757,7 +738,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF111827),
                       ),
                     ),
@@ -774,7 +754,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? statusCfg.darkText : statusCfg.text,
                       ),
                     ),
@@ -788,7 +767,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 req.description,
                 style: TextStyle(
                   fontSize: 13,
-                  fontFamily: 'HindSiliguri',
                   height: 1.4,
                   color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF4B5563),
                 ),
@@ -812,7 +790,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF111827),
                         ),
                       ),
@@ -821,7 +798,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                           req.adminFeedback!,
                           style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
                           ),
                         ),
@@ -836,7 +812,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 '${req.category} • ${DateFormat('dd MMM, yyyy').format(req.createdAt)}',
                 style: TextStyle(
                   fontSize: 12,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
                 ),
               ),
@@ -858,7 +833,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            fontFamily: 'HindSiliguri',
             color: isDark ? Colors.white : const Color(0xFF111827),
           ),
         ),
@@ -867,7 +841,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
           'যেসব নতুন ফিচার নিয়ে আমরা কাজ করছি:',
           style: TextStyle(
             fontSize: 13,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
           ),
         ),
@@ -909,7 +882,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
@@ -926,7 +898,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'HindSiliguri',
                             color: isDark ? statusCfg.darkText : statusCfg.text,
                           ),
                         ),
@@ -938,7 +909,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                     item['description']!,
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
                     ),
                   ),
@@ -978,7 +948,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
@@ -988,7 +957,6 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.5,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
               ),
             ),
@@ -998,9 +966,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
@@ -1008,8 +974,7 @@ class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             ),
           ],

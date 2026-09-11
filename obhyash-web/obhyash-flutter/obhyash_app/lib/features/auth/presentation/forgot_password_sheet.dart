@@ -94,7 +94,6 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
               const Text(
                 'পাসওয়ার্ড ভুলে গেছেন?',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -104,7 +103,6 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
               const Text(
                 'তোমার ইমেইল ঠিকানা দাও। আমরা একটি পাসওয়ার্ড রিসেট লিংক পাঠাবো।',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
                   fontSize: 13,
                   color: Color(0xFFA1A1AA),
                 ),
@@ -148,11 +146,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF059669), // Deep Green
                     foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
                   child: _isLoading
                       ? const SizedBox(
                           height: 24,
@@ -167,8 +161,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                            ),
                         ),
                 ),
               ),

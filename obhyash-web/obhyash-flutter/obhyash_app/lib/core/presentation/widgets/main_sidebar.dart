@@ -177,7 +177,6 @@ class MainSidebar extends StatelessWidget {
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
-                            fontFamily: 'HindSiliguri',
                             height: 1.1,
                           ),
                         ),
@@ -270,7 +269,6 @@ class MainSidebar extends StatelessWidget {
                                 label,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'HindSiliguri',
                                   fontWeight: isActive
                                       ? FontWeight.w600
                                       : FontWeight.normal,

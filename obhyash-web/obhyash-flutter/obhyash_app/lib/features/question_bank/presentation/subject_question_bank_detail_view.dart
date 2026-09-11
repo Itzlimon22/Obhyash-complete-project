@@ -180,7 +180,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
         title: Text(
           title,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 17.5,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -309,7 +308,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
                     child: const Text(
                       'শীঘ্রই আসছে',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -326,7 +324,6 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontFamily: 'HindSiliguri',
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,

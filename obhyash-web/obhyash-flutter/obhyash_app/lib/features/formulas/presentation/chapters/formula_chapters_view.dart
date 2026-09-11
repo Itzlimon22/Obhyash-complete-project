@@ -75,7 +75,6 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
           child: Text(
             'ডেটা লোড করা যায়নি',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white70 : Colors.black54,
             ),
           ),
@@ -102,7 +101,6 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
         title: Text(
           _subject!.subjectName,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -199,7 +197,6 @@ class _ChapterTile extends StatelessWidget {
                     'অধ্যায় ${chapter.chapterNumber}',
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
                     ),
                   ),
@@ -209,7 +206,6 @@ class _ChapterTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),

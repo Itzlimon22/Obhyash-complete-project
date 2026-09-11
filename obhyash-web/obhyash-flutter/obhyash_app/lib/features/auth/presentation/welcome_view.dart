@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/presentation/widgets/app_button_3d.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 
 class OnboardingSlide {
@@ -200,7 +201,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    fontFamily: 'HindSiliguri',
                                     color: slide.accentColor,
                                   ),
                                 ),
@@ -218,7 +218,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                               style: const TextStyle(
                                 fontSize: 18.5,
                                 fontWeight: FontWeight.w800,
-                                fontFamily: 'HindSiliguri',
                                 height: 1.3,
                                 color: Colors.white,
                                 letterSpacing: -0.2,
@@ -263,82 +262,39 @@ class _WelcomeViewState extends State<WelcomeView> {
                   children: [
                     Row(
                       children: [
-                        // Secondary Button: Titanium Slate Login
+                        // Secondary Button: Titanium Slate 3D Login
                         Expanded(
                           flex: 4,
-                          child: SizedBox(
-                            height: 50,
-                            child: OutlinedButton(
-                              onPressed: () => context.push('/login'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: surfaceBorder, width: 1.2),
-                                backgroundColor: surfaceCard,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text(
-                                'লগইন',
-                                style: TextStyle(
-                                  fontSize: 15.5,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
-                                ),
-                              ),
-                            ),
+                          child: AppButton3D(
+                            text: 'লগইন',
+                            onPressed: () => context.push('/login'),
+                            baseColor: surfaceCard,
+                            shadowColor: const Color(0xFF09090B),
+                            textColor: Colors.white,
+                            height: 48,
+                            borderRadius: 14,
+                            depth: 4,
+                            fontSize: 15.5,
+                            border: Border.all(color: surfaceBorder, width: 1.0),
                           ),
                         ),
 
                         const SizedBox(width: 12),
 
-                        // Primary Button: Dark Pine Green with clean glow
+                        // Primary 3D Button: Pine Green with Deepest Green 3D Base
                         Expanded(
                           flex: 6,
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [brandGreen, Color(0xFF00664B)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: const Color(0xFF059669).withValues(alpha: 0.4)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: brandGreen.withValues(alpha: 0.35),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () => context.push('/signup'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'শুরু করুন',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily: 'HindSiliguri',
-                                    ),
-                                  ),
-                                  SizedBox(width: 6),
-                                  Icon(LucideIcons.arrowRight, size: 16),
-                                ],
-                              ),
-                            ),
+                          child: AppButton3D(
+                            text: 'শুরু করুন',
+                            suffixIcon: const Icon(LucideIcons.arrowRight, size: 16, color: Colors.white),
+                            onPressed: () => context.push('/signup'),
+                            baseColor: brandGreen, // Preserved exact current green
+                            shadowColor: const Color(0xFF002219), // Deepest green 3D base
+                            textColor: Colors.white,
+                            height: 48,
+                            borderRadius: 14,
+                            depth: 5,
+                            fontSize: 16,
                           ),
                         ),
                       ],
@@ -353,7 +309,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
                           color: Color(0xFF71717A),
                           letterSpacing: 0.3,
                         ),
@@ -435,7 +390,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: textMuted,
                   ),
                 ),
@@ -446,8 +400,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: textMuted,
-                  fontFamily: 'HindSiliguri',
-                ),
+                  ),
               ),
             ],
           ),
@@ -457,7 +410,6 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              fontFamily: 'HindSiliguri',
               height: 1.35,
               color: Colors.white,
             ),
@@ -503,7 +455,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
                     color: Colors.white,
                   ),
                 ),
@@ -548,7 +499,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
                       color: Colors.white,
                     ),
                   ),
@@ -563,7 +513,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
                       color: Colors.white,
                     ),
                   ),
@@ -571,7 +520,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                     'মোট ৪৫টি পরীক্ষায় ৮২০টি সঠিক',
                     style: TextStyle(
                       fontSize: 9,
-                      fontFamily: 'HindSiliguri',
                       color: textMuted,
                     ),
                   ),
@@ -617,7 +565,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
                     ),
@@ -657,7 +604,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                           day,
                           style: const TextStyle(
                             fontSize: 8,
-                            fontFamily: 'HindSiliguri',
                             color: textMuted,
                           ),
                         ),
@@ -709,7 +655,6 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
                     color: Colors.white70,
                   ),
                 ),
@@ -757,7 +702,6 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              fontFamily: 'HindSiliguri',
               color: isSelected ? Colors.white : textMuted,
             ),
           ),
@@ -791,7 +735,6 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: Colors.white,
               ),
             ),
@@ -821,7 +764,6 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: textMuted,
               ),
             ),

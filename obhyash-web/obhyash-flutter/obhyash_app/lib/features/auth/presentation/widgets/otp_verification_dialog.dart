@@ -227,7 +227,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'HindSiliguri',
                         color: textColor,
                       ),
                     ),
@@ -236,7 +235,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                       'নিরাপত্তা স্বার্থে ওটিপি কোডটি যাচাই করো',
                       style: TextStyle(
                         fontSize: 12.5,
-                        fontFamily: 'HindSiliguri',
                         color: subTextColor,
                       ),
                     ),
@@ -276,7 +274,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                   targetLabel,
                   style: TextStyle(
                     fontSize: 13,
-                    fontFamily: 'HindSiliguri',
                     color: subTextColor,
                   ),
                 ),
@@ -306,7 +303,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                     style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
                       color: isEmail ? const Color(0xFF3B82F6) : const Color(0xFF059669),
                     ),
                   ),
@@ -384,7 +380,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                     _errorMessage!,
                     style: const TextStyle(
                       fontSize: 12.5,
-                      fontFamily: 'HindSiliguri',
                       fontWeight: FontWeight.w600,
                       color: Color(0xFFEF4444),
                     ),
@@ -403,11 +398,8 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
               backgroundColor: const Color(0xFF064E3B),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              
               ),
-              elevation: 0,
-            ),
             child: _isVerifying
                 ? const SizedBox(
                     height: 20,
@@ -422,8 +414,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
           ),
 
@@ -445,7 +436,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                         'আবার পাঠানো যাবে: $_cooldown সেকেন্ড পর',
                         style: TextStyle(
                           fontSize: 13,
-                          fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.w600,
                           color: subTextColor,
                         ),
@@ -473,7 +463,6 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF059669),
                       ),
                     ),

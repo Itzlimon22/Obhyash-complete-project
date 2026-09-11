@@ -135,7 +135,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: textColor,
                   ),
                 ),
@@ -183,7 +182,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'HindSiliguri',
                               color: Colors.white,
                             ),
                           ),
@@ -195,7 +193,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                       widget.appliedCoupon!.description,
                       style: TextStyle(
                         fontSize: 12.5,
-                        fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFF86EFAC) : const Color(0xFF16A34A),
                       ),
                     ),
@@ -207,7 +204,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                         label: const Text(
                           'কুপন বাতিল / রিমুভ করো',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF991B1B),
                           ),
@@ -236,7 +232,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                 decoration: InputDecoration(
                   hintText: 'যেমন: PIONEER',
                   hintStyle: TextStyle(
-                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white30 : Colors.black26,
                   ),
                   filled: true,
@@ -296,7 +291,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
                         color: subColor,
                       ),
                     ),
@@ -333,11 +327,8 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                     backgroundColor: const Color(0xFF004633),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    
                     ),
-                    elevation: 2,
-                  ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -346,8 +337,7 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                       SizedBox(width: 8),
                       Icon(LucideIcons.arrowRight, size: 18),

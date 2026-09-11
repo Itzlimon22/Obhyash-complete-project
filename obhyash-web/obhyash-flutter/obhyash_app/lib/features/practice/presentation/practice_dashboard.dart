@@ -863,15 +863,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             style: ElevatedButton.styleFrom(
               backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
               foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
-              elevation: 0,
               side: BorderSide(
                 color: isDark
                     ? const Color(0xFF27272A)
                     : const Color(0xFFE2E8F0),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              
             ),
             icon: isLoadingMore
                 ? const SizedBox(
@@ -892,8 +889,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
           ),
         ),
@@ -993,10 +989,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               disabledBackgroundColor: isDark
                   ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
               minimumSize: const Size(0, 36),
             ),
@@ -1010,7 +1002,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
                 fontSize: 16,
               ),
             ),
@@ -1108,7 +1099,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A),
                 height: 1.45,
               ),
@@ -1150,7 +1140,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: TextStyle(
                 fontSize: 15.5,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
@@ -1162,7 +1151,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 12.5,
-                fontFamily: 'HindSiliguri',
                 color: Color(0xFFA3A3A3),
               ),
             ),
@@ -1183,7 +1171,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
                     color: Colors.white,
                   ),
                 ),

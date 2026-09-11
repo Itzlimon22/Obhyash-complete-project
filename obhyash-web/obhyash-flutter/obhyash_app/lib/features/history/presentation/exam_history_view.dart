@@ -1055,7 +1055,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
@@ -1066,7 +1065,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           '${BanglaNameHelper.formatSubject(record.subject, record.subjectLabel)} (${DateFormat('d MMM yyyy').format(record.createdAt)}) পরীক্ষার ফলাফলটি মুছে ফেলা হবে। তুমি কি নিশ্চিত?',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
             height: 1.4,
           ),
@@ -1078,7 +1076,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               'না, থাক',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
                 color: isDark
                     ? const Color(0xFFA1A1AA)
                     : const Color(0xFF6B7280),
@@ -1090,17 +1087,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
               ),
-            ),
             child: const Text(
               'মুছে ফেলো',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
-              ),
+                ),
             ),
           ),
         ],
@@ -1184,7 +1176,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
@@ -1195,7 +1186,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           'এই প্রশ্নটি তোমার তালিকা থেকে সরানো হবে। তুমি কি নিশ্চিত?',
           style: TextStyle(
             fontSize: 14,
-            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
             height: 1.4,
           ),
@@ -1210,7 +1200,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             child: Text(
               'বাতিল',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? const Color(0xFF9CA3AF)
@@ -1223,16 +1212,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             child: const Text(
               'মুছে ফেলো',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1340,7 +1324,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF6B7280),
@@ -1366,8 +1349,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                             'সকল বিষয়',
                             style: TextStyle(
                               fontSize: 13,
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         ),
                         ..._subjectList.map((s) {
@@ -1381,8 +1363,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                               '$emoji ${s.value}',
                               style: const TextStyle(
                                 fontSize: 13,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1427,7 +1408,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF6B7280),
@@ -1453,8 +1433,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                             'সকল অধ্যায়',
                             style: TextStyle(
                               fontSize: 13,
-                              fontFamily: 'HindSiliguri',
-                            ),
+                              ),
                           ),
                         ),
                         ..._chapterList.map(
@@ -1464,8 +1443,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                               c,
                               style: const TextStyle(
                                 fontSize: 13,
-                                fontFamily: 'HindSiliguri',
-                              ),
+                                ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1527,7 +1505,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
                           color: _filterDate != null
                               ? (isDark
                                     ? const Color(0xFF34D399)
@@ -1716,7 +1693,6 @@ class _ExamsTab extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
@@ -1741,15 +1717,12 @@ class _ExamsTab extends StatelessWidget {
                     foregroundColor: isDark
                         ? Colors.white
                         : const Color(0xFF0F172A),
-                    elevation: 0,
                     side: BorderSide(
                       color: isDark
                           ? const Color(0xFF27272A)
                           : const Color(0xFFE2E8F0),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    
                   ),
                   icon: isLoadingMore
                       ? const SizedBox(
@@ -1770,8 +1743,7 @@ class _ExamsTab extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      fontFamily: 'HindSiliguri',
-                    ),
+                      ),
                   ),
                 ),
               ),
@@ -1826,7 +1798,6 @@ class _ExamsTab extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-              fontFamily: 'HindSiliguri',
               height: 1.1,
             ),
             maxLines: 1,
@@ -2024,7 +1995,6 @@ class _ExamCardState extends State<_ExamCard> {
                           style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF111827),
@@ -2047,7 +2017,6 @@ class _ExamCardState extends State<_ExamCard> {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF111827),
@@ -2072,7 +2041,6 @@ class _ExamCardState extends State<_ExamCard> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.normal,
-                              fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? const Color(0xFFA1A1AA)
                                   : const Color(0xFF71717A),
@@ -2099,7 +2067,6 @@ class _ExamCardState extends State<_ExamCard> {
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFFE4E4E7)
                                     : const Color(0xFF3F3F46),
@@ -2134,7 +2101,6 @@ class _ExamCardState extends State<_ExamCard> {
                                   style: TextStyle(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'HindSiliguri',
                                     color: isDark
                                         ? const Color(0xFFE4E4E7)
                                         : const Color(0xFF3F3F46),
@@ -2269,15 +2235,12 @@ class _QuestionsTab extends StatelessWidget {
                       foregroundColor: isDark
                           ? Colors.white
                           : const Color(0xFF0F172A),
-                      elevation: 0,
                       side: BorderSide(
                         color: isDark
                             ? const Color(0xFF27272A)
                             : const Color(0xFFE2E8F0),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      
                     ),
                     icon: isLoadingMore
                         ? const SizedBox(
@@ -2300,8 +2263,7 @@ class _QuestionsTab extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13.5,
-                        fontFamily: 'HindSiliguri',
-                      ),
+                        ),
                     ),
                   ),
                 ),
@@ -2362,7 +2324,6 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
@@ -2372,7 +2333,6 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: Color(0xFFA3A3A3),
             ),
           ),
@@ -2408,7 +2368,6 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
@@ -2418,7 +2377,6 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              fontFamily: 'HindSiliguri',
               color: Color(0xFFA3A3A3),
             ),
           ),
@@ -2436,7 +2394,6 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'HindSiliguri',
                   color: Colors.white,
                 ),
               ),
@@ -2631,7 +2588,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF111827),
@@ -2641,7 +2597,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           'নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখো',
                           style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFFA1A1AA)
                                 : const Color(0xFF6B7280),
@@ -2764,7 +2719,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF111827),
@@ -2803,7 +2757,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
                                       : const Color(0xFF9CA3AF),
@@ -2903,7 +2856,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                                     fontWeight: (isSelected || isCurrentToday)
                                         ? FontWeight.bold
                                         : FontWeight.normal,
-                                    fontFamily: 'HindSiliguri',
                                     color: textCol,
                                   ),
                                 ),
@@ -2954,7 +2906,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF6B7280),
@@ -2974,21 +2925,14 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         backgroundColor: const Color(0xFF004633),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        shadowColor: const Color(
-                          0xFF10B981,
-                        ).withValues(alpha: 0.3),
+                        
                       ),
                       child: const Text(
                         'ফিল্টার প্রয়োগ করো',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
+                          ),
                       ),
                     ),
                   ),
@@ -3037,7 +2981,6 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontFamily: 'HindSiliguri',
             color: isSelected
                 ? (isClear
                       ? (isDark ? Colors.white : Colors.black87)

@@ -163,9 +163,8 @@ class _DailySpacedRepetitionCardState extends State<DailySpacedRepetitionCard> {
               backgroundColor: Colors.purpleAccent,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
-              shadowColor: Colors.purple.withValues(alpha: 0.4),
+              
+              
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
