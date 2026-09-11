@@ -3195,13 +3195,7 @@ export const hscSubjects: Subject[] = [
       },
     ],
   },
-  {
-    id: 'hsc_math_general',
-    name: 'গণিত',
-    icon: Sigma,
-    group: 'Humanities',
-    chapters: [{ id: 'math_gen_ch1', name: 'বাস্তব সংখ্যা', topics: [] }],
-  },
+
   {
     id: 'hsc_mental_ability',
     name: 'মানসিক দক্ষতা',

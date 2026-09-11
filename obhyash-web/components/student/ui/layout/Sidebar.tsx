@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   LayoutDashboard,
   FileEdit,
@@ -9,7 +9,6 @@ import {
   PenTool,
   Trophy,
   BarChart2,
-  Gift,
   Newspaper,
   BookOpen,
   ChevronRight,
@@ -17,8 +16,11 @@ import {
   Moon,
   LogOut,
   ChevronLeft,
+  Sigma,
+  Gift,
 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
+import { isUserPro } from "@/lib/subscription-utils";
 import UserAvatar from "../common/UserAvatar";
 
 export interface SidebarProps {
@@ -46,18 +48,76 @@ export const Sidebar: React.FC<SidebarProps> = ({
   toggleTheme,
   user,
 }) => {
-  // ── Navigation Menu Items ──────────────────────────────────────────────────
+  const isPro = useMemo(() => isUserPro(user), [user]);
+
+  // ── Exact 10 Menu Items from Flutter main_sidebar.dart ──
   const menuItems = [
-    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, svgIcon: "/dashboard-icons/fire_streak.svg" },
-    { id: "setup", label: "পরীক্ষা", icon: FileEdit, svgIcon: "/dashboard-icons/exam_pencil.svg" },
-    { id: "live_exam", label: "লাইভ পরীক্ষা", icon: Radio, svgIcon: "/dashboard-icons/live_exam.svg" },
-    { id: "question_bank", label: "প্রশ্ন ব্যাংক", icon: BookOpen, svgIcon: "/dashboard-icons/help_question.svg" },
-    { id: "history", label: "ইতিহাস", icon: History, svgIcon: "/dashboard-icons/history_clock.svg" },
-    { id: "practice", label: "অনুশীলন", icon: PenTool, svgIcon: "/dashboard-icons/practice_target.svg" },
-    { id: "leaderboard", label: "লিডারবোর্ড", icon: Trophy, svgIcon: "/dashboard-icons/leaderboard_trophy.svg" },
-    { id: "analysis", label: "এনালাইসিস", icon: BarChart2, svgIcon: "/dashboard-icons/analytics.svg" },
-    { id: "referral", label: "রেফারেল", icon: Gift, svgIcon: "/dashboard-icons/referral_gift.svg" },
-    { id: "blog", label: "ব্লগ", icon: Newspaper, svgIcon: "/dashboard-icons/feature_lightbulb.svg" },
+    {
+      id: "dashboard",
+      label: "ড্যাশবোর্ড",
+      icon: LayoutDashboard,
+      svg: "/dashboard-icons/fire_streak.svg",
+    },
+    {
+      id: "setup",
+      label: "পরীক্ষা",
+      icon: FileEdit,
+      svg: "/dashboard-icons/exam_pencil.svg",
+    },
+    {
+      id: "live_exam",
+      label: "লাইভ পরীক্ষা",
+      icon: Radio,
+      svg: "/dashboard-icons/live_exam.svg",
+    },
+    {
+      id: "question_bank",
+      label: "প্রশ্ন ব্যাংক",
+      icon: BookOpen,
+      svg: "/dashboard-icons/help_question.svg",
+    },
+    {
+      id: "history",
+      label: "ইতিহাস",
+      icon: History,
+      svg: "/dashboard-icons/history_clock.svg",
+    },
+    {
+      id: "practice",
+      label: "অনুশীলন",
+      icon: PenTool,
+      svg: "/dashboard-icons/practice_target.svg",
+    },
+    {
+      id: "leaderboard",
+      label: "লিডারবোর্ড",
+      icon: Trophy,
+      svg: "/dashboard-icons/leaderboard_trophy.svg",
+    },
+    {
+      id: "analysis",
+      label: "এনালাইসিস",
+      icon: BarChart2,
+      svg: "/dashboard-icons/analytics.svg",
+    },
+    {
+      id: "formulas",
+      label: "ফর্মুলা",
+      icon: Sigma,
+      svg: "/dashboard-icons/formulas.svg",
+    },
+    {
+      id: "referral",
+      label: "রেফার ও রিওয়ার্ড",
+      icon: Gift,
+      svg: "/dashboard-icons/referral_gift.svg",
+    },
+    {
+      id: "blog",
+      label: "ব্লগ",
+      icon: Newspaper,
+      svg: "/dashboard-icons/feature_lightbulb.svg",
+    },
   ];
 
   const handleItemClick = (id: string) => {
@@ -80,10 +140,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* ── Sidebar / Drawer (Width: 250px, Background: #0C0A09 / white) ── */}
+      {/* ── Drawer (Width: 250px, Background: #000000 OLED Black / white matching Flutter 1:1) ── */}
       <aside
         className={`
-          fixed lg:static top-0 left-0 h-full bg-white dark:bg-[#0C0A09] border-r border-[#F5F5F5] dark:border-[#1C1C1E] z-[60] 
+          fixed lg:static top-0 left-0 h-full bg-white dark:bg-[#000000] border-r border-[#E5E7EB] dark:border-[#2C2C2C] z-[60] 
           transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] transform shadow-2xl lg:shadow-none flex flex-col justify-between
           select-none font-['HindSiliguri',sans-serif]
           ${isOpen ? "translate-x-0 w-[250px]" : "-translate-x-full lg:translate-x-0"}
@@ -91,11 +151,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         <div className="flex flex-col h-full overflow-hidden">
-          {/* ── 1. Brand Logo & Title (Matching Flutter MainSidebar Header: h-16, px-5) ── */}
+          {/* ── Brand Header (Matching Flutter: h-16 / 64px, px-5 / 20px, border-b) ── */}
           <div
             className={`h-16 flex items-center ${
               isCollapsed ? "justify-center px-2" : "justify-start px-5"
-            } border-b border-[#F5F5F5] dark:border-[#1C1C1E] shrink-0`}
+            } border-b border-[#E5E7EB] dark:border-[#2C2C2C] shrink-0`}
           >
             <div
               className="flex items-center gap-3 cursor-pointer group"
@@ -104,18 +164,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 if (window.innerWidth < 1024) onClose();
               }}
             >
-              {/* Emerald Green Logo Box (36x36, rounded-lg, #059669) */}
-              <div className="w-9 h-9 bg-[#059669] rounded-[8px] flex items-center justify-center text-white shadow-[0_2px_4px_rgba(4,120,87,0.2)] group-hover:scale-105 transition-transform shrink-0">
-                <BookOpen size={20} className="stroke-[2.2]" />
+              {/* Logo: 38x38 with borderRadius 10 (Matching Flutter 1:1) */}
+              <div className="w-[38px] h-[38px] rounded-[10px] overflow-hidden shrink-0 flex items-center justify-center bg-[#059669]">
+                <img
+                  src="/obhyash_logo.svg"
+                  alt="Obhyash Logo"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLElement;
+                    target.style.display = "none";
+                  }}
+                />
               </div>
 
-              {/* Brand Text Column */}
+              {/* Brand Text Column (Matching Flutter 1:1) */}
               {!isCollapsed && (
                 <div className="flex flex-col justify-center text-left leading-none">
-                  <span className="text-[13px] font-bold text-[#A3A3A3] dark:text-[#737373] uppercase tracking-[2px] font-sans">
+                  <span className="text-[11px] font-semibold text-[#A3A3A3] dark:text-[#737373] tracking-[1.8px] font-sans">
                     OBHYASH
                   </span>
-                  <span className="text-[22px] font-bold text-[#000000] dark:text-white font-['Anek_Bangla',sans-serif] leading-[1.1] mt-0.5">
+                  <span className="text-[17px] font-semibold text-[#000000] dark:text-white font-['Anek_Bangla',sans-serif] leading-[1.1] mt-1">
                     অভ্যাস
                   </span>
                 </div>
@@ -123,14 +191,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* ── 2. Navigation Items ── */}
-          <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+          {/* ── Navigation (ListView.builder in Flutter: px-3 py-5, bottom 4 padding per item) ── */}
+          <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto custom-scrollbar">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive =
                 activeTab === item.id ||
+                (item.id === "question_bank" && (activeTab === "question-bank" || activeTab === "question_bank")) ||
                 (item.id === "practice" && activeTab === "bookmarks") ||
-                (item.id === "formulas" && activeTab === "formulas");
+                (item.id === "formulas" && activeTab === "formulas") ||
+                (item.id === "leaderboard" && (activeTab === "legends-league" || activeTab === "legends_league"));
 
               return (
                 <button
@@ -138,14 +208,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => handleItemClick(item.id)}
                   className={`
                     w-full flex items-center ${
-                      isCollapsed ? "justify-center p-2" : "gap-3 px-3.5 py-2.5"
-                    } rounded-[14px] transition-all duration-200 group text-left cursor-pointer relative
+                      isCollapsed ? "justify-center p-2" : "gap-3 px-3 py-[9px]"
+                    } rounded-[12px] transition-all duration-300 group text-left cursor-pointer relative
                     ${
                       isActive
                         ? isCollapsed
-                          ? "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 shadow-xs"
-                          : "bg-[#059669] text-white shadow-[0_2px_6px_rgba(5,150,105,0.25)] font-semibold"
-                        : "text-[#525252] dark:text-[#E5E5E5] hover:bg-[#F5F5F5] dark:hover:bg-[#1C1C1E] font-semibold"
+                          ? "bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-500/50"
+                          : "bg-[#12544F] dark:bg-[#092328] text-white border border-[#12544F] dark:border-[#2C2C2C]"
+                        : "text-[#525252] dark:text-[#E5E5E5] hover:bg-[#F5F5F5] dark:hover:bg-[#1C1C1E] border border-transparent"
                     }
                   `}
                   title={isCollapsed ? item.label : undefined}
@@ -153,36 +223,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {isCollapsed ? (
                     <span className="relative flex items-center justify-center">
                       <img
-                        src={item.svgIcon}
+                        src={item.svg}
                         alt={item.label}
-                        className={`w-7 h-7 object-contain drop-shadow-xs transition-transform duration-200 ${
-                          isActive ? "scale-115 drop-shadow-md" : "group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                        className={`w-7 h-7 object-contain transition-transform duration-200 ${
+                          isActive ? "scale-105" : "group-hover:scale-105 opacity-85 group-hover:opacity-100"
                         }`}
                       />
                       {isActive && (
-                        <span className="absolute -right-1 -top-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0C0A09]" />
+                        <span className="absolute -right-1 -top-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#000000]" />
                       )}
                     </span>
                   ) : (
                     <>
-                      <span
-                        className={`shrink-0 transition-transform duration-200 ${
-                          isActive ? "" : "group-hover:scale-110"
-                        }`}
-                      >
-                        <Icon
-                          size={20}
-                          className={
-                            isActive
-                              ? "text-white stroke-[2.2]"
-                              : "text-[#525252] dark:text-[#A3A3A3] group-hover:text-neutral-900 dark:group-hover:text-white stroke-[2]"
-                          }
+                      <div className="w-7 h-7 shrink-0 flex items-center justify-center">
+                        <img
+                          src={item.svg}
+                          alt={item.label}
+                          className={`w-7 h-7 object-contain ${
+                            isActive ? "brightness-125" : "opacity-85 group-hover:opacity-100"
+                          }`}
                         />
-                      </span>
+                      </div>
 
                       <span
-                        className={`text-[16px] font-['Anek_Bangla',sans-serif] font-semibold tracking-[0.2px] truncate ${
-                          isActive ? "text-white font-semibold" : "text-[#525252] dark:text-[#E5E5E5]"
+                        className={`text-[14px] font-['Anek_Bangla',sans-serif] tracking-[0.2px] truncate ${
+                          isActive
+                            ? "font-semibold text-white"
+                            : "font-normal text-[#525252] dark:text-[#E5E5E5]"
                         }`}
                       >
                         {item.label}
@@ -194,11 +261,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </nav>
 
-          {/* ── 3. Bottom Section (Matching Flutter: p-4, bg #FAFAFA/50 / #171717/50, border-t) ── */}
-          <div className="p-4 border-t border-[#F5F5F5] dark:border-[#1C1C1E] bg-[#FAFAFA]/50 dark:bg-[#171717]/50 space-y-3 shrink-0">
-            {/* User Profile Card */}
+          {/* ── Bottom Section (Matching Flutter: p-4 / 16px, bg #FAFAFA / #000000, border-t #E5E7EB / #2C2C2C) ── */}
+          <div className="p-4 border-t border-[#E5E7EB] dark:border-[#2C2C2C] bg-[#FAFAFA] dark:bg-[#000000] space-y-3 shrink-0">
+            {/* User Button (Matching Flutter 1:1) */}
             {user && (
               <button
+                type="button"
                 onClick={() => {
                   onTabChange("settings");
                   if (window.innerWidth < 1024) onClose();
@@ -207,24 +275,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   w-full flex items-center ${
                     isCollapsed ? "justify-center p-1.5" : "gap-3 p-2.5"
                   } rounded-[12px] 
-                  bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A]
-                  shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:border-[#059669]/60 dark:hover:border-[#059669]/60 
+                  ${
+                    activeTab === "settings" || activeTab === "profile"
+                      ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500/40 dark:border-emerald-600/40 ring-1 ring-emerald-500/20"
+                      : "bg-white dark:bg-[#092328] border-[#E5E7EB] dark:border-[#2C2C2C]"
+                  } border
                   transition-all duration-200 text-left group cursor-pointer
                 `}
                 title={isCollapsed ? `${user.name} - Settings & Profile` : undefined}
               >
-                <UserAvatar
-                  user={user}
-                  size="sm"
-                  className="w-9 h-9 rounded-full ring-[1.5px] ring-white dark:ring-[#1C1C1E] group-hover:scale-105 transition-transform shrink-0"
-                />
+                <div className="relative shrink-0">
+                  <UserAvatar
+                    user={user}
+                    size="sm"
+                    className="w-9 h-9 rounded-full ring-[1.5px] ring-white"
+                  />
+                </div>
 
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <p className="text-[16px] font-bold text-[#000000] dark:text-white truncate leading-tight font-['Anek_Bangla',sans-serif]">
+                    <p className="text-[14px] font-semibold text-[#000000] dark:text-white truncate leading-tight font-['Anek_Bangla',sans-serif]">
                       {user.name || "শিক্ষার্থী"}
                     </p>
-                    <p className="text-[13px] font-medium text-[#737373] dark:text-[#A3A3A3] truncate leading-tight mt-0.5">
+                    <p className="text-[11.5px] font-normal text-[#737373] dark:text-[#A3A3A3] truncate leading-tight mt-0.5">
                       Settings & Profile
                     </p>
                   </div>
@@ -233,13 +306,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!isCollapsed && (
                   <ChevronRight
                     size={16}
-                    className="text-[#A3A3A3] group-hover:text-[#059669] transition-colors shrink-0"
+                    className="text-[#A3A3A3] shrink-0"
                   />
                 )}
               </button>
             )}
 
-            {/* Actions Row (Theme Toggle, Logout, Collapse) */}
+            {/* Actions Row (Matching Flutter 1:1) */}
             <div
               className={`flex ${
                 isCollapsed ? "flex-col gap-2" : "justify-between items-center"
@@ -247,13 +320,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               {/* Theme Toggle Button */}
               <button
+                type="button"
                 onClick={toggleTheme}
-                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#737373] hover:text-[#000000] dark:hover:text-white transition-all shadow-xs cursor-pointer"
+                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] text-[#737373] hover:text-[#000000] dark:hover:text-white transition-all cursor-pointer shadow-xs border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
                 title={isDarkMode ? "লাইট মোড চালু করো" : "ডার্ক মোড চালু করো"}
                 aria-label="Theme toggle"
               >
                 {isDarkMode ? (
-                  <Sun size={20} className="text-amber-400" />
+                  <Sun size={20} />
                 ) : (
                   <Moon size={20} />
                 )}
@@ -261,11 +335,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               {/* Logout Button */}
               <button
+                type="button"
                 onClick={() => {
                   if (window.innerWidth < 1024) onClose();
                   onLogout();
                 }}
-                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#737373] hover:text-[#B91C1C] hover:bg-[#E11D48]/10 transition-all shadow-xs cursor-pointer"
+                className="p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] text-[#737373] hover:text-[#B91C1C] hover:bg-[#E11D48]/20 transition-all cursor-pointer shadow-xs border border-transparent"
                 title="লগআউট করো"
                 aria-label="Logout"
               >
@@ -274,10 +349,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               {/* Desktop Collapse Toggle */}
               <button
+                type="button"
                 onClick={toggleCollapse}
-                className="hidden lg:flex p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] border border-[#E5E5E5] dark:border-[#27272A] text-[#A3A3A3] hover:text-[#000000] dark:hover:text-white transition-all shadow-xs cursor-pointer"
-                title={isCollapsed ? "Expand" : "Collapse"}
-                aria-label="Collapse"
+                className="hidden lg:flex p-2 rounded-[8px] bg-white dark:bg-[#1C1C1E] text-[#737373] hover:text-[#000000] dark:hover:text-white transition-all cursor-pointer shadow-xs border border-transparent"
+                title={isCollapsed ? "প্রসারিত করো" : "সংকোচন করো"}
+                aria-label="Collapse sidebar"
               >
                 <ChevronLeft
                   size={20}

@@ -170,8 +170,6 @@ export function getCategoriesForSubject(subjectId: string, subjectName: string =
   ];
 }
 
-import AcademicCategoryDetailView from "./AcademicCategoryDetailView";
-
 interface SubjectCategoryDetailViewProps {
   subject: {
     id: string;
@@ -184,17 +182,33 @@ interface SubjectCategoryDetailViewProps {
   onSelectCategory?: (category: CategoryItem) => void;
 }
 
+import AcademicCategoryDetailView from "./AcademicCategoryDetailView";
+import AcademicSectionDetailView from "./AcademicSectionDetailView";
+
 export default function SubjectCategoryDetailView({
   subject,
   onBack,
   showHeader = true,
   onSelectCategory,
 }: SubjectCategoryDetailViewProps) {
-  const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
+  const [selectedSection, setSelectedSection] = useState<CategoryItem | null>(null);
   const [showAcademicView, setShowAcademicView] = useState(false);
 
   const paperClean = subject.paper ? subject.paper.split(" ")[0] : "";
   const displayTitle = paperClean ? `${subject.name} ${paperClean}` : subject.name;
+
+  if (selectedSection) {
+    return (
+      <AcademicSectionDetailView
+        subject={subject}
+        section={{
+          ...selectedSection,
+          count: selectedSection.count || 50,
+        }}
+        onBack={() => setSelectedSection(null)}
+      />
+    );
+  }
 
   if (showAcademicView) {
     return (
@@ -245,7 +259,7 @@ export default function SubjectCategoryDetailView({
                     setShowAcademicView(true);
                   }
                 } else {
-                  setSelectedCategory(cat);
+                  setSelectedSection(cat);
                 }
               }}
               className={`group relative aspect-[1.25/1] rounded-[24px] sm:rounded-[28px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3.5 sm:p-4.5 flex flex-col justify-between`}
@@ -276,68 +290,6 @@ export default function SubjectCategoryDetailView({
           ))}
         </div>
       </div>
-
-      {/* ── Category Detail Modal ── */}
-      {selectedCategory && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setSelectedCategory(null)}
-        >
-          <div
-            className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-3xl p-6 border border-neutral-200 dark:border-[#27272A] shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white font-['Anek_Bangla']">
-                {displayTitle} - {selectedCategory.title}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory(null)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-[#27272A] text-neutral-500 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="relative w-28 h-28 mx-auto my-2">
-              <Image
-                src={selectedCategory.svgIcon}
-                alt={selectedCategory.title}
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-['HindSiliguri'] text-center mt-2">
-              {selectedCategory.title} সেগমেন্টের বিগত ২০ বছরের বোর্ড ও বিশ্ববিদ্যালয় ভর্তি পরীক্ষার সকল প্রশ্ন সমাধানসহ সাজানো রয়েছে।
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedCategory(null);
-                  if (typeof window !== "undefined") {
-                    window.location.href = "/practice";
-                  }
-                }}
-                className="flex-1 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm sm:text-base text-center transition-all cursor-pointer shadow-md active:scale-98 flex items-center justify-center gap-2"
-              >
-                <PenTool size={16} />
-                অনুশীলন শুরু করো
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory(null)}
-                className="px-5 py-3 rounded-xl bg-neutral-100 dark:bg-[#27272A] hover:bg-neutral-200 dark:hover:bg-[#323238] text-neutral-700 dark:text-neutral-200 font-semibold text-sm transition-all cursor-pointer"
-              >
-                বন্ধ করো
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

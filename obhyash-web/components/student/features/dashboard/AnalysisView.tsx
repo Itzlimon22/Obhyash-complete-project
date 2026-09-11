@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { usePersistedState } from "@/hooks/use-persisted-state";
 import { motion } from "framer-motion";
 import {
@@ -36,7 +36,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ExamResult } from "@/lib/types";
+import { ExamResult, UserProfile } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AnalysisSkeleton } from "@/components/student/ui/common/Skeletons";
@@ -69,7 +69,8 @@ export interface StudyGuideline {
   tag: string;
   title: string;
   description: string;
-  icon: React.ElementType;
+  iconName: string;
+  icon?: any;
   metric?: string;
 }
 
@@ -81,8 +82,41 @@ export interface AchievementBadge {
   accentColor: string;
   bgLight: string;
   borderLight: string;
-  icon: React.ElementType;
+  iconName: string;
+  icon?: any;
 }
+
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  trophy: Trophy,
+  target: Target,
+  zap: Zap,
+  timer: Timer,
+  hourglass: Hourglass,
+  alert: AlertTriangle,
+  award: Award,
+  medal: Medal,
+  crown: Crown,
+};
+
+const resolveGuidelineIcon = (g: StudyGuideline): React.ComponentType<{ size?: number; className?: string }> => {
+  if (typeof g.icon === "function" || (g.icon && typeof g.icon === "object" && "$$typeof" in g.icon)) {
+    return g.icon;
+  }
+  if (g.iconName && ICON_MAP[g.iconName]) {
+    return ICON_MAP[g.iconName];
+  }
+  return Trophy;
+};
+
+const resolveAchievementIcon = (ach: AchievementBadge): React.ComponentType<{ size?: number; className?: string }> => {
+  if (typeof ach.icon === "function" || (ach.icon && typeof ach.icon === "object" && "$$typeof" in ach.icon)) {
+    return ach.icon;
+  }
+  if (ach.iconName && ICON_MAP[ach.iconName]) {
+    return ICON_MAP[ach.iconName];
+  }
+  return Award;
+};
 
 export interface OverallAnalyticsData {
   totalExams: number;
@@ -107,75 +141,137 @@ export interface OverallAnalyticsData {
 }
 
 interface AnalysisViewProps {
+  currentUser?: UserProfile | null;
   history?: ExamResult[];
   onSubjectClick?: (subject: string) => void;
   onStartExam?: () => void;
 }
 
 export const AnalysisView: React.FC<AnalysisViewProps> = ({
+  currentUser,
   history = [],
   onSubjectClick,
   onStartExam,
 }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [timeFilter, setTimeFilter] = usePersistedState<"all" | "month" | "week">(
     "analysis_time_filter",
     "all"
   );
 
-  const { user, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   const supabase = useMemo(() => createClient(), []);
+
+  // Priority resolution for user ID: passed currentUser > authUser > first history entry
+  const activeUserId = currentUser?.id || authUser?.id || history?.[0]?.user_id;
 
   // Fetch or Compute Analytics Data
   const { data: analytics, isLoading } = useSWR(
-    !authLoading && (history?.length > 0 || user?.id)
-      ? ["overall_analytics_v2", user?.id || history?.[0]?.user_id, timeFilter]
+    activeUserId
+      ? ["overall_analytics_v4", activeUserId, timeFilter]
       : null,
     async () => {
-      const uid = user?.id || history?.[0]?.user_id;
-      if (!uid) return null;
-
-      let dateFilter = new Date();
-      if (timeFilter === "week") {
-        dateFilter.setDate(dateFilter.getDate() - 7);
-      } else if (timeFilter === "month") {
-        dateFilter.setMonth(dateFilter.getMonth() - 1);
-      } else {
-        dateFilter = new Date("1970-01-01");
-      }
+      if (!activeUserId) return null;
 
       let examList: any[] = [];
 
       try {
-        const { data: rawData, error } = await supabase
+        let query = supabase
           .from("exam_results")
           .select(
-            "id, score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, created_at, subject, status, negative_marking, submission_type"
+            "id, score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, created_at, subject, subject_label, status, negative_marking, submission_type"
           )
-          .eq("user_id", uid)
-          .neq("submission_type", "started")
-          .gte("date", dateFilter.toISOString())
-          .order("date", { ascending: true });
+          .eq("user_id", activeUserId)
+          .neq("submission_type", "started");
+
+        if (timeFilter === "week") {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          query = query.gte("created_at", weekAgo.toISOString());
+        } else if (timeFilter === "month") {
+          const monthAgo = new Date();
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          query = query.gte("created_at", monthAgo.toISOString());
+        }
+
+        const { data: rawData, error } = await query.order("created_at", { ascending: true });
 
         if (!error && rawData && rawData.length > 0) {
           examList = rawData;
         } else if (history && history.length > 0) {
+          let dateLimit: Date | null = null;
+          if (timeFilter === "week") {
+            dateLimit = new Date();
+            dateLimit.setDate(dateLimit.getDate() - 7);
+          } else if (timeFilter === "month") {
+            dateLimit = new Date();
+            dateLimit.setMonth(dateLimit.getMonth() - 1);
+          }
+
           examList = history.filter((h) => {
-            const hDate = new Date(h.date || (h as any).created_at || "");
-            return hDate >= dateFilter && (h as any).submissionType !== "started" && (h as any).submission_type !== "started";
+            const isStarted =
+              (h as any).submissionType === "started" ||
+              (h as any).submission_type === "started";
+            if (isStarted) return false;
+            if (dateLimit) {
+              const hDate = new Date(h.date || (h as any).created_at || "");
+              return hDate >= dateLimit;
+            }
+            return true;
           });
         }
       } catch (err) {
         console.warn("[AnalysisView] Error querying exam_results:", err);
         if (history && history.length > 0) {
+          let dateLimit: Date | null = null;
+          if (timeFilter === "week") {
+            dateLimit = new Date();
+            dateLimit.setDate(dateLimit.getDate() - 7);
+          } else if (timeFilter === "month") {
+            dateLimit = new Date();
+            dateLimit.setMonth(dateLimit.getMonth() - 1);
+          }
+
           examList = history.filter((h) => {
-            const hDate = new Date(h.date || (h as any).created_at || "");
-            return hDate >= dateFilter && (h as any).submissionType !== "started" && (h as any).submission_type !== "started";
+            const isStarted =
+              (h as any).submissionType === "started" ||
+              (h as any).submission_type === "started";
+            if (isStarted) return false;
+            if (dateLimit) {
+              const hDate = new Date(h.date || (h as any).created_at || "");
+              return hDate >= dateLimit;
+            }
+            return true;
           });
         }
       }
 
       if (!examList || examList.length === 0) {
-        return null;
+        return {
+          totalExams: 0,
+          avgScore: 0,
+          avgAccuracy: 0,
+          totalTime: 0,
+          totalQuestions: 0,
+          totalCorrect: 0,
+          totalWrong: 0,
+          totalSkipped: 0,
+          avgTimePerQuestion: 0,
+          highestScore: 0,
+          lowestScore: 0,
+          totalNegativeDeduction: 0,
+          masteryIndex: 0,
+          masteryTier: "নতুন শুরু (Kickstart)",
+          masterySubtitle: "নিয়মিত টেস্ট দিয়ে নিজের বেসিক ও নির্ভুলতা বাড়াও।",
+          subjectData: [],
+          timelineData: [],
+          guidelines: [],
+          achievements: [],
+        } as OverallAnalyticsData;
       }
 
       // Compute calculations matching Flutter 1:1
@@ -318,7 +414,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(best.accuracy))}% নির্ভুলতা`,
           description:
             "এই বিষয়ে তোমার নির্ভুলতা সবচেয়ে বেশি! নিয়মিত রিভিশন বজায় রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।",
-          icon: Trophy,
+          iconName: "trophy",
         });
 
         if (subjectData.length > 1) {
@@ -333,7 +429,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
               metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(worst.accuracy))}% নির্ভুলতা`,
               description:
                 "অধ্যায়ের মূল সূত্র ও গুরুত্বপূর্ণ কনসেপ্টগুলো প্রতিদিন অন্তত ১০ মিনিট অনুশীলন করে দুর্বলতা কাটিয়ে ওঠো।",
-              icon: AlertTriangle,
+              iconName: "alert",
             });
           }
         }
@@ -351,7 +447,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
             metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(avgTimePerQuestion))} সে./প্রশ্ন`,
             description:
               "প্রশ্নের উত্তর করার গতি চমৎকার। তবে তাড়াহুড়ো এড়িয়ে প্রতিটি প্রশ্নের অপশন মনোযোগ দিয়ে পড়ার অভ্যাস করো।",
-            icon: Zap,
+            iconName: "zap",
           });
         } else if (avgTimePerQuestion <= 50) {
           guidelines.push({
@@ -363,7 +459,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
             metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(avgTimePerQuestion))} সে./প্রশ্ন`,
             description:
               "প্রতি প্রশ্নে গড় সময় পরীক্ষার জন্য নিখুঁত ও আদর্শ। এই ইতিবাচক রিদম ধরে রাখো।",
-            icon: Timer,
+            iconName: "timer",
           });
         } else {
           guidelines.push({
@@ -375,7 +471,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
             metric: `${BanglaNameHelper.toBanglaNumeral(Math.round(avgTimePerQuestion))} সে./প্রশ্ন`,
             description:
               "নিয়মিত প্র্যাকটিস ও শর্টকাট টেকনিক কাজে লাগিয়ে প্রশ্ন সমাধানের সময় আরও কিছুটা কমিয়ে আনো।",
-            icon: Hourglass,
+            iconName: "hourglass",
           });
         }
       }
@@ -390,7 +486,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           title: "নেগেটিভ মার্কিং পুনরুদ্ধার",
           metric: `+${BanglaNameHelper.toBanglaNumeral(totalNegativeDeduction.toFixed(1))} নম্বর সুযোগ`,
           description: `ভুল উত্তরের কারণে মোট ${BanglaNameHelper.toBanglaNumeral(totalWrong)}টি প্রশ্নে নম্বর কেটেছে। নিশ্চিত না হয়ে আন্দাজে দাগানো কমালেই স্কোর অনেক বাড়বে।`,
-          icon: Target,
+          iconName: "target",
         });
       }
 
@@ -404,7 +500,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#004633",
           bgLight: "bg-emerald-500/10",
           borderLight: "border-emerald-500/30",
-          icon: Award,
+          iconName: "award",
         },
         {
           id: "ten",
@@ -414,7 +510,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#1D4ED8",
           bgLight: "bg-blue-500/10",
           borderLight: "border-blue-500/30",
-          icon: Medal,
+          iconName: "medal",
         },
         {
           id: "fifty",
@@ -424,7 +520,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#0B132B",
           bgLight: "bg-indigo-500/10",
           borderLight: "border-indigo-500/30",
-          icon: Crown,
+          iconName: "crown",
         },
         {
           id: "score80",
@@ -434,7 +530,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#059669",
           bgLight: "bg-emerald-500/10",
           borderLight: "border-emerald-500/30",
-          icon: Award,
+          iconName: "award",
         },
         {
           id: "score90",
@@ -444,7 +540,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#2563EB",
           bgLight: "bg-sky-500/10",
           borderLight: "border-sky-500/30",
-          icon: Zap,
+          iconName: "zap",
         },
         {
           id: "perfect",
@@ -454,7 +550,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           accentColor: "#B91C1C",
           bgLight: "bg-rose-500/10",
           borderLight: "border-rose-500/30",
-          icon: Trophy,
+          iconName: "trophy",
         },
       ];
 
@@ -496,7 +592,8 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
     return `${BanglaNameHelper.toBanglaNumeral(secs)} সেকেন্ড`;
   };
 
-  if (isLoading) return <AnalysisSkeleton />;
+  const isActuallyLoading = isLoading || (!activeUserId && authLoading);
+  if (isActuallyLoading) return <AnalysisSkeleton />;
 
   if (!analytics || analytics.totalExams === 0) {
     return (
@@ -512,7 +609,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </p>
         <button
           onClick={onStartExam}
-          className="px-6 py-2.5 rounded-xl bg-[#004633] hover:bg-[#003728] text-white font-bold text-sm shadow-md transition-all active:scale-95"
+          className="px-6 py-2.5 rounded-xl bg-[#004633] hover:bg-[#003728] text-white font-bold text-sm shadow-md transition-all active:scale-95 cursor-pointer"
         >
           পরীক্ষা শুরু করো 🚀
         </button>
@@ -524,7 +621,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   const unlockedCount = a.achievements.filter((e) => e.unlocked).length;
 
   return (
-    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-3 flex flex-col gap-4 font-sans">
+    <div className="w-full flex flex-col gap-5 font-sans pb-16">
       {/* ── 1. HEADER & TIME FILTER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#141416] p-4 rounded-2xl border border-neutral-200/80 dark:border-[#27272A] shadow-sm">
         <div>
@@ -664,7 +761,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
 
           <div className="flex flex-col gap-3">
             {a.guidelines.map((g, idx) => {
-              const IconComponent = g.icon;
+              const IconComponent = resolveGuidelineIcon(g);
               return (
                 <div
                   key={idx}
@@ -737,9 +834,11 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           <div className="h-44 flex items-center justify-center text-xs text-neutral-400">
             কোনো টাইমলাইন তথ্য নেই
           </div>
+        ) : !mounted ? (
+          <div className="h-48 sm:h-56 w-full min-h-[200px] animate-pulse bg-neutral-100 dark:bg-neutral-800/40 rounded-xl" />
         ) : (
-          <div className="h-48 sm:h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-48 sm:h-56 w-full min-h-[200px]">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
               <AreaChart
                 data={a.timelineData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -771,7 +870,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                 />
                 <Tooltip
                   content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
+                    if (active && payload && payload.length > 0 && payload[0]?.payload) {
                       const data = payload[0].payload as TimelinePoint;
                       return (
                         <div className="p-2.5 rounded-xl bg-neutral-900/95 text-white border border-neutral-700 text-xs shadow-xl backdrop-blur-md">
@@ -932,7 +1031,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {a.achievements.map((ach) => {
-            const IconComp = ach.icon;
+            const IconComp = resolveAchievementIcon(ach);
             return (
               <div
                 key={ach.id}

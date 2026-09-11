@@ -15,15 +15,58 @@ interface MathRendererProps {
   block?: boolean;
 }
 
+const mathMLTags = [
+  "math",
+  "semantics",
+  "mrow",
+  "mo",
+  "mi",
+  "mn",
+  "annotation",
+  "annotation-xml",
+  "mstyle",
+  "mfrac",
+  "msqrt",
+  "mroot",
+  "msub",
+  "msup",
+  "msubsup",
+  "mtable",
+  "mtr",
+  "mtd",
+  "mtext",
+  "mspace",
+  "mpadded",
+  "mover",
+  "munder",
+  "munderover",
+  "svg",
+  "path",
+  "g",
+  "line",
+];
+
 const sanitizeSchema = {
   ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), ...mathMLTags],
   attributes: {
     ...defaultSchema.attributes,
-    span: [...(defaultSchema.attributes?.span ?? []), "className", "style"],
+    span: [...(defaultSchema.attributes?.span ?? []), "className", "style", "aria-hidden"],
     div: [...(defaultSchema.attributes?.div ?? []), "className", "style"],
     table: [...(defaultSchema.attributes?.table ?? []), "className", "style"],
-    th: [...(defaultSchema.attributes?.th ?? []), "className", "style"],
-    td: [...(defaultSchema.attributes?.td ?? []), "className", "style"],
+    thead: [...(defaultSchema.attributes?.thead ?? []), "className", "style"],
+    tbody: [...(defaultSchema.attributes?.tbody ?? []), "className", "style"],
+    tr: [...(defaultSchema.attributes?.tr ?? []), "className", "style"],
+    th: [...(defaultSchema.attributes?.th ?? []), "className", "style", "colSpan", "rowSpan", "align", "scope"],
+    td: [...(defaultSchema.attributes?.td ?? []), "className", "style", "colSpan", "rowSpan", "align"],
+    math: ["xmlns", "display"],
+    annotation: ["encoding"],
+    svg: ["xmlns", "viewBox", "width", "height", "style", "className"],
+    path: ["d", "style", "className"],
+    g: ["fill", "stroke"],
+    line: ["x1", "y1", "x2", "y2", "stroke", "strokeWidth"],
+    sup: ["className"],
+    sub: ["className"],
   },
 };
 
@@ -51,7 +94,13 @@ function cleanPipesAndDelimiters(text: string): string {
     if (trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.split("|").length > 2) {
       return line;
     }
-    return line.replace(/\s*\|\s*/g, "\n\n");
+    // Only convert pipes used as text delimiters between Bengali words, NEVER inside math or math symbols
+    return line.replace(/(?<=[\u0980-\u09FF\s])\|(?=[\u0980-\u09FF\s])/g, (match, offset, str) => {
+      const prefix = str.slice(0, offset);
+      const dollarCount = (prefix.match(/\$/g) || []).length;
+      if (dollarCount % 2 !== 0) return "|";
+      return "\n\n";
+    });
   });
   return cleaned.join("\n");
 }
@@ -115,8 +164,8 @@ function wrapLatexExpressionsInBengaliText(str: string): string {
   // Normalize consecutive dollar signs (e.g. $$$$ -> \n\n)
   let s = str.replace(/\${3,}/g, "\n\n");
 
-  // Format dimensional brackets like [MLT^{-2}], [M], [LT^{-1}], [T] into math
-  s = s.replace(/(?<!\$)(?:\[[A-Za-z0-9\s\+\-\*\/\^\{\}\_\\]+\])(?!\$)/g, (match) => {
+  // Format dimensional brackets like [MLT^{-2}], [M], [LT^{-1}], [T] into math (ignore markdown links [text](url))
+  s = s.replace(/(?<!\$)(?:\[[A-Za-z0-9\s\+\-\*\/\^\{\}\_\\]+\])(?!\$)(?!\()/g, (match) => {
     return `$${match}$`;
   });
 
@@ -322,7 +371,7 @@ function BaseMathRenderer({ text, block = false }: MathRendererProps) {
 
   return (
     <div
-      className={`prose prose-sm max-w-none dark:prose-invert font-['HindSiliguri']
+      className={`prose prose-sm max-w-none dark:prose-invert font-sans
         prose-p:leading-relaxed prose-p:my-2
         prose-li:my-1 prose-ul:my-2 prose-ol:my-2
         prose-table:my-3 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2
@@ -331,7 +380,7 @@ function BaseMathRenderer({ text, block = false }: MathRendererProps) {
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
         rehypePlugins={[
-          rehypeKatex,
+          [rehypeKatex, { throwOnError: false, strict: false, trust: true }],
           rehypeRaw,
           [rehypeSanitize, sanitizeSchema],
         ]}
@@ -340,18 +389,24 @@ function BaseMathRenderer({ text, block = false }: MathRendererProps) {
             <p {...props} className={block ? "block mb-2.5 leading-relaxed text-[#2E2621] dark:text-[#F4F4F5]" : "inline leading-relaxed"} />
           ),
           table: ({ node, ...props }) => (
-            <div className="overflow-x-auto my-3 rounded-xl border border-[#E2D7C9] dark:border-[#27272A] bg-white/60 dark:bg-[#121214]/60 shadow-xs">
-              <table {...props} className="w-full text-left border-collapse text-sm" />
+            <div className="overflow-x-auto my-3 rounded-xl border border-[#E2D7C9] dark:border-[#27272A] bg-white/80 dark:bg-[#121214]/80 shadow-xs max-w-full">
+              <table {...props} className="w-full text-left border-collapse text-sm min-w-full" />
             </div>
           ),
           thead: ({ node, ...props }) => (
             <thead {...props} className="bg-[#F3ECE4] dark:bg-[#1E1E22] text-[#42352B] dark:text-[#F4F4F5] font-bold border-b border-[#E2D7C9] dark:border-[#27272A]" />
           ),
+          tbody: ({ node, ...props }) => (
+            <tbody {...props} className="divide-y divide-[#F0EAE1] dark:divide-[#1E1E22]" />
+          ),
+          tr: ({ node, ...props }) => (
+            <tr {...props} className="hover:bg-amber-500/5 dark:hover:bg-white/5 transition-colors" />
+          ),
           th: ({ node, ...props }) => (
             <th {...props} className="px-3.5 py-2.5 font-bold text-[14px] sm:text-[15px]" />
           ),
           td: ({ node, ...props }) => (
-            <td {...props} className="border-b border-[#F0EAE1] dark:border-[#1E1E22] px-3.5 py-2 text-[14px] sm:text-[15px] text-[#2E2621] dark:text-[#E4E4E7]" />
+            <td {...props} className="px-3.5 py-2 text-[14px] sm:text-[15px] text-[#2E2621] dark:text-[#E4E4E7]" />
           ),
           ul: ({ node, ...props }) => (
             <ul {...props} className="list-disc list-inside space-y-1.5 my-2 text-[#2E2621] dark:text-[#F4F4F5]" />

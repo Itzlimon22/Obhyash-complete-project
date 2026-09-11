@@ -287,23 +287,18 @@ export const useExamEngine = () => {
   }, [examDetails]);
 
   const beginTimer = useCallback((durationOverride?: number) => {
-    const duration =
+    const rawDuration =
       durationOverride ||
       (examDetailsRef.current?.durationMinutes
         ? examDetailsRef.current.durationMinutes * 60
         : 0);
 
-    if (duration > 0) {
-      console.log('⏱️ [ExamEngine] Starting timer with duration:', duration);
-      targetEndTimeRef.current = Date.now() + duration * 1000;
-      setTimeLeft(duration);
-      setAppState(AppState.ACTIVE);
-    } else {
-      console.warn(
-        '⚠️ [ExamEngine] Cannot start timer: No duration. Details:',
-        examDetailsRef.current,
-      );
-    }
+    const duration = rawDuration > 0 ? rawDuration : 25 * 60;
+
+    console.log('⏱️ [ExamEngine] Starting timer with duration:', duration);
+    targetEndTimeRef.current = Date.now() + duration * 1000;
+    setTimeLeft(duration);
+    setAppState(AppState.ACTIVE);
   }, []);
 
   /**

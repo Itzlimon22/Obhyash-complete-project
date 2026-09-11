@@ -31,7 +31,7 @@ export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto my-6 px-2 font-['HindSiliguri']">
+    <div className="w-full max-w-2xl mx-auto my-6 px-2 font-sans">
       <div className="flex items-end justify-center gap-2 sm:gap-4 pt-8 pb-4">
         {/* ── SECOND PLACE (SILVER) ── */}
         {second ? (

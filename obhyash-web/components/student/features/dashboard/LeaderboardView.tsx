@@ -170,6 +170,7 @@ export interface InstituteRank {
 }
 
 interface LeaderboardViewProps {
+  currentUser?: UserProfile | null;
   onUserClick?: (user: UserProfile, rank: number) => void;
   onLegendsLeagueClick?: () => void;
 }
@@ -177,13 +178,14 @@ interface LeaderboardViewProps {
 const PAGE_SIZE = 20;
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
+  currentUser: propUser,
   onUserClick,
   onLegendsLeagueClick,
 }) => {
   const supabase = useMemo(() => createClient(), []);
 
   // ── States ─────────────────────────────────────────────────────────────────
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(propUser || null);
   const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("college");
   const [selectedLevel, setSelectedLevel] = useState<string>("Explorer");
   const [timeframe, setTimeframe] = useState<"monthly" | "all_time">("monthly");
@@ -594,7 +596,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   }, [instituteRankings, searchCollegeQuery]);
 
   return (
-    <div className="w-full flex flex-col gap-4 font-['HindSiliguri',sans-serif]">
+    <div className="w-full flex flex-col gap-4 font-sans">
       {/* ── 1. Top View Mode Tabs (র‍্যাংকিং, আমার প্রতিষ্ঠান, সব প্রতিষ্ঠান) ── */}
       <div className="bg-white dark:bg-[#0C0A09] p-1.5 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] shadow-sm">
         <div className="grid grid-cols-3 gap-1 bg-neutral-100 dark:bg-[#141416] p-1 rounded-xl">

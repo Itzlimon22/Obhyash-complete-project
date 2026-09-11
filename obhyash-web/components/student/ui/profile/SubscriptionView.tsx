@@ -127,6 +127,22 @@ export const SubscriptionView: React.FC = () => {
 
   useEffect(() => {
     loadData();
+
+    // Check payment return status from URL query params
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+      if (status === 'success') {
+        toast.success('🎉 অভিনন্দন! আপনার পেমেন্ট সফল হয়েছে এবং প্রো সাবস্ক্রিপশন সক্রিয় হয়েছে।');
+        // Clean URL parameters without reloading
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      } else if (status === 'failed' || status === 'cancel') {
+        toast.error('পেমেন্ট প্রক্রিয়া সম্পন্ন হয়নি বা বাতিল করা হয়েছে।');
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
   }, []);
 
   const handleApplyCoupon = (code: string): boolean => {
@@ -231,7 +247,7 @@ export const SubscriptionView: React.FC = () => {
     : 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto py-2 font-sans pb-16">
       {/* ── 1. Active Subscription Banner (with Day Count & Stacking Info) ── */}
       {activeSubscription && (
         <div className="mb-6 p-4.5 rounded-[22px] bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-950/40 dark:via-amber-900/20 bg-white dark:bg-[#18181B] border border-amber-200/80 dark:border-amber-900/50 shadow-xs flex items-center gap-3.5">

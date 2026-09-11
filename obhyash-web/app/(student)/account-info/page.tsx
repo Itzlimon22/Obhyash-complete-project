@@ -1,15 +1,13 @@
-'use client';
+import { getStudentPageData } from '@/services/student-page-data';
+import DashboardClient from '../dashboard/DashboardClient';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-export default function AccountInfoAliasPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    sessionStorage.setItem('obhyash_active_tab', 'account-info');
-    router.replace('/dashboard');
-  }, [router]);
-
-  return null;
+export default async function AccountInfoRoutePage() {
+  const { userProfile, subjects } = await getStudentPageData();
+  return (
+    <DashboardClient
+      user={userProfile}
+      subjects={subjects}
+      initialTab="account-info"
+    />
+  );
 }

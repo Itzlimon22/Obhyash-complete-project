@@ -185,10 +185,43 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     return mistakesList.filter((q) => isDue(String(q.id), reviewedMap)).length;
   }, [mistakesList, reviewedMap]);
 
-  // ── Active Base List ──
+  // ── User Stream Detection (Strict SSC vs HSC Separation) ──
+  const isSSC = useMemo(() => {
+    const anyUser = effectiveUser as any;
+    const rawStream = (
+      anyUser?.stream ||
+      anyUser?.level ||
+      anyUser?.user_metadata?.stream ||
+      anyUser?.user_metadata?.level ||
+      ""
+    )
+      .toString()
+      .toUpperCase();
+    return rawStream.includes("SSC");
+  }, [effectiveUser]);
+
+  // ── Active Base List (Filtered by Stream) ──
   const baseList = useMemo(() => {
-    return activeTab === "mistakes" ? mistakesList : bookmarkedQuestionsList;
-  }, [activeTab, mistakesList, bookmarkedQuestionsList]);
+    const rawList = activeTab === "mistakes" ? mistakesList : bookmarkedQuestionsList;
+    return rawList.filter((q) => {
+      const subId = (q.subject || "").toLowerCase();
+      const subLabel = (q.subjectLabel || "").toLowerCase();
+      if (isSSC) {
+        if (subId.startsWith("hsc_") || subLabel.includes("hsc")) return false;
+      } else {
+        if (
+          subId.startsWith("ssc_") ||
+          subId === "math" ||
+          subId === "general_math" ||
+          subLabel.includes("ssc") ||
+          subLabel === "সাধারণ গণিত"
+        ) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [activeTab, mistakesList, bookmarkedQuestionsList, isSSC]);
 
   // ── Available Subjects for Filter Pills ──
   const availableSubjects = useMemo(() => {
@@ -348,7 +381,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     currentList.length > 0 && currentList.every((q) => selectedIds.has(String(q.id)));
 
   return (
-    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-1 sm:px-3 py-2 sm:py-3 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full flex flex-col font-sans pb-16">
       {/* ── 1. Top Stat Row (Matching Flutter _StatBox 1:1) ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
         {/* Box 1: মোট ভুল (Red) */}

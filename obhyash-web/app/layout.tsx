@@ -12,17 +12,18 @@ import ReferralCatcher from "@/components/ReferralCatcher";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-// ✅ Configure Inter (English text)
+// ✅ Configure Inter (English, numbers, units, badges, UI elements)
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
-// ✅ Configure Hind Siliguri (Bengali text)
+// ✅ Configure Hind Siliguri (Bengali Unicode fallback)
 const hindSiliguri = Hind_Siliguri({
-  variable: "--font-anek",
-  subsets: ["bengali", "latin"],
+  variable: "--font-hind",
+  subsets: ["bengali"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });

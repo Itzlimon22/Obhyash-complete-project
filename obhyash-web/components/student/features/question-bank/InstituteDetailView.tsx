@@ -8,6 +8,8 @@ import {
   Sparkles,
   ChevronRight,
   BookOpen,
+  Landmark,
+  School,
 } from "lucide-react";
 import ExamSetDetailView from "./ExamSetDetailView";
 
@@ -44,6 +46,7 @@ export interface InstituteCardItem {
   bgColor: string;
   textColor: string;
   bubbleColor: string;
+  isBoard?: boolean;
 }
 
 import { Question } from "@/lib/types";
@@ -60,8 +63,71 @@ interface InstituteDetailViewProps {
  */
 export function getInstituteExamSets(instituteId: string): InstituteExamSet[] {
   const sets: InstituteExamSet[] = [];
+  const id = instituteId.toLowerCase();
 
-  switch (instituteId) {
+  if (id.startsWith("board_")) {
+    for (let yr = 2024; yr >= 2015; yr--) {
+      sets.push({
+        id: `${id}_${yr}_mcq`,
+        title: `এসএসসি ${yr} বহুনির্বাচনী`,
+        year: `${yr}`,
+        questionCount: 30,
+        questionLabel: "৩০টি প্রশ্ন",
+        durationMinutes: 30,
+        durationLabel: "৩০ মিনিট",
+        type: "mcq",
+      });
+      sets.push({
+        id: `${id}_${yr}_cq`,
+        title: `এসএসসি ${yr} সৃজনশীল`,
+        year: `${yr}`,
+        questionCount: 11,
+        questionLabel: "১১টি প্রশ্ন",
+        durationMinutes: 150,
+        durationLabel: "২ ঘণ্টা ৩০ মিনিট",
+        type: "written",
+      });
+    }
+    return sets;
+  }
+
+  if (id.startsWith("school_")) {
+    for (const yr of [2024, 2023, 2022]) {
+      sets.push({
+        id: `${id}_${yr}_test_mcq`,
+        title: `টেস্ট পরীক্ষা ${yr} (MCQ)`,
+        year: `${yr}`,
+        questionCount: 30,
+        questionLabel: "৩০টি প্রশ্ন",
+        durationMinutes: 30,
+        durationLabel: "৩০ মিনিট",
+        type: "mcq",
+      });
+      sets.push({
+        id: `${id}_${yr}_model_mcq`,
+        title: `মডেল টেস্ট ${yr} (MCQ)`,
+        year: `${yr}`,
+        questionCount: 30,
+        questionLabel: "৩০টি প্রশ্ন",
+        durationMinutes: 30,
+        durationLabel: "৩০ মিনিট",
+        type: "mcq",
+      });
+      sets.push({
+        id: `${id}_${yr}_cq`,
+        title: `টেস্ট পরীক্ষা ${yr} (সৃজনশীল)`,
+        year: `${yr}`,
+        questionCount: 11,
+        questionLabel: "১১টি প্রশ্ন",
+        durationMinutes: 150,
+        durationLabel: "২ ঘণ্টা ৩০ মিনিট",
+        type: "written",
+      });
+    }
+    return sets;
+  }
+
+  switch (id) {
     case "buet":
       // 2025-26 (Upcoming / Latest Model)
       sets.push({
@@ -452,10 +518,16 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
   onStartExam,
 }) => {
   const [selectedExamSet, setSelectedExamSet] = useState<InstituteExamSet | null>(null);
+  const [typeFilter, setTypeFilter] = useState<"all" | "mcq" | "written">("all");
 
   const allSets = useMemo(() => {
-    return getInstituteExamSets(institute.id);
-  }, [institute.id]);
+    const rawSets = getInstituteExamSets(institute.id);
+    if (typeFilter === "all") return rawSets;
+    if (typeFilter === "mcq") {
+      return rawSets.filter((s) => s.type === "mcq" || s.type === "combined");
+    }
+    return rawSets.filter((s) => s.type === "written");
+  }, [institute.id, typeFilter]);
 
   if (selectedExamSet) {
     return (
@@ -483,11 +555,17 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
           </button>
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-white shadow-xs p-1 flex items-center justify-center shrink-0">
-              <img
-                src={institute.logo}
-                alt={institute.name}
-                className="w-full h-full object-contain"
-              />
+              {institute.logo ? (
+                <img
+                  src={institute.logo}
+                  alt={institute.name}
+                  className="w-full h-full object-contain"
+                />
+              ) : institute.isBoard ? (
+                <Landmark size={20} className="text-[#1E3A8A]" />
+              ) : (
+                <School size={20} className="text-[#065F46]" />
+              )}
             </div>
             <h1 className="text-lg sm:text-xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
               {institute.name} প্রশ্নব্যাংক
@@ -506,11 +584,17 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
         <div className="relative z-10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2.5 shadow-md flex items-center justify-center shrink-0">
-              <img
-                src={institute.logo}
-                alt={institute.name}
-                className="w-full h-full object-contain"
-              />
+              {institute.logo ? (
+                <img
+                  src={institute.logo}
+                  alt={institute.name}
+                  className="w-full h-full object-contain"
+                />
+              ) : institute.isBoard ? (
+                <Landmark size={36} className="text-[#1E3A8A]" />
+              ) : (
+                <School size={36} className="text-[#065F46]" />
+              )}
             </div>
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-xs text-[11px] font-bold tracking-wide uppercase mb-1.5">
@@ -528,9 +612,31 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
 
           <div className="hidden sm:flex flex-col items-end text-right shrink-0">
             <span className="text-3xl font-black">{allSets.length}টি</span>
-            <span className="text-xs text-white/80 font-medium">বিগত বছরের সেট</span>
+            <span className="text-xs text-white/80 font-medium">প্রশ্ন সেট</span>
           </div>
         </div>
+      </div>
+
+      {/* ── Set Type Filter Buttons ── */}
+      <div className="flex items-center gap-2 pt-1">
+        {[
+          { id: "all", label: "সকল সেট" },
+          { id: "mcq", label: "MCQ প্রশ্ন" },
+          { id: "written", label: "লিখিত / সৃজনশীল" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setTypeFilter(tab.id as any)}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none ${
+              typeFilter === tab.id
+                ? "bg-[#12544F] text-white shadow-xs"
+                : "bg-neutral-100 dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border border-neutral-200/80 dark:border-[#27272A] hover:text-neutral-900 dark:hover:text-white"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* ── Serial-wise Exam Cards (Matching User Reference with Swapped Sides & Distinct Icons) ── */}

@@ -1,2 +1,2 @@
-import DashboardPage from '../dashboard/page';
-export default DashboardPage;
+import LegendsLeagueRoutePage from '../legends-league/page';
+export default LegendsLeagueRoutePage;

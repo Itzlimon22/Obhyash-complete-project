@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
-import { ArrowLeft, Flame } from 'lucide-react';
+import { ArrowLeft, Flame, Menu, Crown } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import StreakDialog from '../common/StreakDialog';
 import { UserProfile, Notification } from '@/lib/types';
+import { BanglaNameHelper } from '@/lib/bangla-name-helper';
+import { isUserPro } from '@/lib/subscription-utils';
 import {
   getNotifications,
   getUnreadNotificationCount,
@@ -188,7 +190,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   };
 
   return (
-    <div className="h-screen w-full bg-[#FAFAF9] dark:bg-[#0C0A09] flex transition-colors overflow-hidden font-['HindSiliguri',sans-serif]">
+    <div className="h-screen w-full bg-[#FAFAF9] dark:bg-[#0C0A09] flex transition-colors overflow-hidden font-sans">
       {/* ── Sidebar Component ── */}
       <Sidebar
         activeTab={activeTab}
@@ -208,12 +210,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         {customHeader ? (
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
-          <header
-            className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 z-30 shrink-0 sticky top-0 transition-all duration-300 select-none"
-          >
-            {/* ── Left / Center: Back Button + (Title OR Header Tabs) ── */}
-            <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
-              {activeTab !== 'dashboard' && (
+          <header className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
+            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
+            {/* ── Left / Center: Back / Menu Button + (Title OR Header Tabs) ── */}
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              {activeTab === 'dashboard' ? (
+                /* Mobile hamburger on Dashboard */
+                <button
+                  type="button"
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="lg:hidden w-9 h-9 rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] border border-neutral-200/90 dark:border-[#27272A] hover:bg-neutral-200/80 dark:hover:bg-[#2C2C2E] text-neutral-800 dark:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs"
+                  aria-label="Open navigation menu"
+                  title="মেনু খুলুন"
+                >
+                  <Menu size={18} className="stroke-[2.2]" />
+                </button>
+              ) : (
+                /* Back button on other screens */
                 <button
                   type="button"
                   onClick={() => {
@@ -263,18 +276,31 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               ) : null}
             </div>
 
-            {/* ── Right: Streak + Notification + Divider + User Avatar ── */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* ── Right: Legends League + Streak + Notification + Divider + User Avatar ── */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {/* Legends League shortcut on Leaderboard tab (Matching Flutter 1:1) */}
+              {activeTab === 'leaderboard' && (
+                <button
+                  type="button"
+                  onClick={() => onTabChange('legends-league')}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-extrabold text-xs animate-pulse hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
+                  title="লেজেন্ডস লিগ দেখুন"
+                >
+                  <Crown size={14} className="shrink-0" />
+                  <span className="hidden sm:inline font-['Anek_Bangla',sans-serif]">লেজেন্ডস লিগ</span>
+                </button>
+              )}
+
               {/* Streak Badge */}
               <button
                 type="button"
                 onClick={() => setIsStreakDialogOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
+                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
                 title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
               >
-                <Flame size={20} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
-                <span className="text-base sm:text-lg font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
-                  {user?.streakCount || 0}
+                <Flame size={19} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
+                <span className="text-sm sm:text-base font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
+                  {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
                 </span>
               </button>
 
@@ -301,11 +327,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               {/* Divider */}
               <div className="w-[1px] h-6 bg-neutral-200 dark:bg-[#27272A] mx-0.5" />
 
-              {/* Profile Avatar */}
+              {/* Profile Avatar with Pro Indicator */}
               <button
                 type="button"
                 onClick={() => onTabChange('settings')}
-                className="flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-[#059669]/40 transition-all cursor-pointer group shrink-0"
+                className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-emerald-500/40 transition-all cursor-pointer group shrink-0"
                 title="প্রোফাইল ও সেটিংস"
               >
                 <UserAvatar
@@ -313,7 +339,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   size="md"
                   className="w-9 h-9 ring-1 ring-neutral-200 dark:ring-[#27272A] shadow-xs"
                 />
+                {isUserPro(user) && (
+                  <span className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-amber-400 text-amber-950 rounded-full shadow-xs">
+                    <Crown size={8} />
+                  </span>
+                )}
               </button>
+            </div>
             </div>
           </header>
         )}
@@ -323,10 +355,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           className={`flex-1 overflow-y-auto ${
             noPadding
               ? 'pb-24 lg:pb-0'
-              : 'px-3 sm:px-5 md:px-6 py-4 sm:py-6 pb-28 lg:pb-10'
+              : 'py-5 sm:py-6 md:py-8 pb-28 lg:pb-12'
           } relative scroll-smooth`}
         >
-          <div className="w-full max-w-7xl mx-auto flex flex-col">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col">
             {children}
           </div>
         </main>

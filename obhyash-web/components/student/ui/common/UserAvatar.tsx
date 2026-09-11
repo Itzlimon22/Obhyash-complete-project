@@ -17,6 +17,7 @@ interface UserAvatarProps {
   className?: string;
   showBorder?: boolean;
   isPro?: boolean;
+  priority?: boolean;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
@@ -25,6 +26,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   className = '',
   showBorder = false,
   isPro: isProProp,
+  priority = false,
 }) => {
   const [customAvatarError, setCustomAvatarError] = useState(false);
   const [fallbackAvatarError, setFallbackAvatarError] = useState(false);
@@ -72,6 +74,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
           src={currentSrc}
           alt={user.name || 'User'}
           fill
+          priority={priority}
           unoptimized={currentSrc.includes('dicebear.com')}
           sizes={getSizesAttribute(size)}
           className="object-cover"

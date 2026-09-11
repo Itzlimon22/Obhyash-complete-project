@@ -1,2 +1,2 @@
-import DashboardPage from '../dashboard/page';
-export default DashboardPage;
+import QuestionBankRoutePage from "../question_bank/page";
+export default QuestionBankRoutePage;

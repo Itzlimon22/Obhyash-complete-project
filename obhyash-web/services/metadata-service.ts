@@ -130,10 +130,29 @@ export const getSubjects = async (
       error ? `Error: ${error.message}` : '',
     );
     if (!error && data) {
-      // Optional Subject Filtering Logic
+      // Filter and sanitize subjects
+      const isHscContext = !stream || stream.toLowerCase().includes('hsc');
       const filteredData = data.filter((subject: Subject) => {
         const subName = (subject.name_en || subject.name || '').toLowerCase();
         const subId = (subject.id || '').toLowerCase();
+        const subStream = (subject.stream || subject.level || '').toLowerCase();
+
+        // Always exclude obsolete / bogus hsc_math_general
+        if (subId === 'hsc_math_general') return false;
+
+        // For HSC students, exclude SSC subjects and plain "গণিত" (General Math is only SSC)
+        if (isHscContext) {
+          if (subName === 'গণিত' || subName === 'ssc সাধারণ গণিত' || subId === 'ssc_math') {
+            return false;
+          }
+          if (subStream.includes('ssc') && !subStream.includes('hsc')) {
+            return false;
+          }
+          // Pure admission subjects (like mental ability, GK) should only appear if stream is Admission
+          if (stream && stream.toLowerCase() === 'hsc' && subStream.includes('admission') && !subStream.includes('hsc')) {
+            return false;
+          }
+        }
 
         const isBiology =
           subName.includes('biology') || subId.includes('biology') || subName.includes('জীববিজ্ঞান');
@@ -215,6 +234,8 @@ export const getSubjects = async (
   await new Promise((r) => setTimeout(r, 200));
 
   // Transform MOCK metadata to array
+  const isSsc = stream && stream.toLowerCase().includes('ssc');
+  const mathName = isSsc ? 'সাধারণ গণিত' : 'উচ্চতর গণিত';
   const subjects = Object.keys(SUBJECT_METADATA).map((key) => ({
     id: key,
     name:
@@ -223,7 +244,7 @@ export const getSubjects = async (
         : key === 'Chemistry'
           ? 'রসায়ন'
           : key === 'Math'
-            ? 'গণিত'
+            ? mathName
             : key,
     label:
       key === 'Physics'
@@ -231,7 +252,7 @@ export const getSubjects = async (
         : key === 'Chemistry'
           ? 'রসায়ন (Chemistry)'
           : key === 'Math'
-            ? 'গণিত (Math)'
+            ? `${mathName} (Math)`
             : key,
     icon: SUBJECT_ICONS[key] || '📘',
     group: ['Physics', 'Chemistry', 'Math', 'Biology'].includes(key)

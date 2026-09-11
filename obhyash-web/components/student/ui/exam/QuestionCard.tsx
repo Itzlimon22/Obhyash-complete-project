@@ -344,7 +344,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {isExplanationOpen && (
               <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] border-t border-[#E8DFD3] dark:border-[#27272A] text-[#2E2621] dark:text-[#F4F4F5] text-[15px] sm:text-base leading-relaxed animate-in fade-in duration-200">
                 {question.explanation && (
-                  <MathRenderer text={question.explanation} />
+                  <MathRenderer text={question.explanation} block={true} />
                 )}
                 {question.explanationImageUrl && (
                   <img

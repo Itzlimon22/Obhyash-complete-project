@@ -183,7 +183,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-sans flex flex-col select-none">
       {/* ── 1. Top Sticky Exam Header (Matching Flutter Exactly) ── */}
       <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
         <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between gap-3">
@@ -326,7 +326,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             onClick={() => setShowSubmitModal(false)}
             aria-hidden="true"
           />
-          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-['HindSiliguri']">
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
             <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-4">
               খাতা জমা দিবে?
             </h3>
@@ -390,7 +390,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             onClick={() => setShowExitModal(false)}
             aria-hidden="true"
           />
-          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-['HindSiliguri']">
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
             <div className="w-14 h-14 rounded-full bg-[#EA580C]/15 border border-[#EA580C]/30 flex items-center justify-center mx-auto mb-3.5 text-[#F97316]">
               <AlertTriangle size={28} />
             </div>
@@ -431,7 +431,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       {/* Cheating / Window Blur Warning Modal */}
       {showCheatingWarning && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-red-500/30 z-10 animate-in zoom-in-95 duration-200 text-center font-['HindSiliguri']">
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-red-500/30 z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
             <div className="w-14 h-14 rounded-full bg-[#DC2626]/15 border border-[#DC2626]/30 flex items-center justify-center mx-auto mb-3.5 text-[#EF4444]">
               <AlertTriangle size={28} />
             </div>

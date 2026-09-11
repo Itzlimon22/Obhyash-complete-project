@@ -58,6 +58,7 @@ export interface ResultViewProps {
   };
   onRetryWrongAnswers?: (wrongQuestions: Question[]) => void;
   onReexam?: () => void;
+  showHeader?: boolean;
 }
 
 export const ResultView: React.FC<ResultViewProps> = ({
@@ -76,6 +77,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
   onToggleTheme,
   isDarkMode = false,
   onReexam,
+  showHeader = true,
 }) => {
   const [reviewFilter, setReviewFilter] = useState<
     'all' | 'correct' | 'wrong' | 'skipped'
@@ -276,40 +278,47 @@ export const ResultView: React.FC<ResultViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col">
-      {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar) ── */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-        <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between">
-          {/* Left Close / Back Button */}
-          <button
-            type="button"
-            onClick={onRestart}
-            title={isHistoryMode ? 'পিছনে যাও' : 'বন্ধ করো'}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-colors cursor-pointer"
-          >
-            {isHistoryMode ? <ArrowLeft size={20} /> : <X size={20} />}
-          </button>
+    <div
+      className={cn(
+        "w-full text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col",
+        showHeader ? "min-h-screen bg-[#FAFAFA] dark:bg-[#000000]" : "py-1 sm:py-2"
+      )}
+    >
+      {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar, only if standalone) ── */}
+      {showHeader && (
+        <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
+          <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between">
+            {/* Left Close / Back Button */}
+            <button
+              type="button"
+              onClick={onRestart}
+              title={isHistoryMode ? 'পিছনে যাও' : 'বন্ধ করো'}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-colors cursor-pointer"
+            >
+              {isHistoryMode ? <ArrowLeft size={20} /> : <X size={20} />}
+            </button>
 
-          {/* Centered Page Title */}
-          <h1 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
-            পরীক্ষার ফলাফল
-          </h1>
+            {/* Centered Page Title */}
+            <h1 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+              পরীক্ষার ফলাফল
+            </h1>
 
-          {/* Right Action / Theme Toggle */}
-          <div className="w-9 h-9 flex items-center justify-center">
-            {onToggleTheme && (
-              <button
-                type="button"
-                onClick={onToggleTheme}
-                title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
-                className="w-8 h-8 rounded-lg bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:bg-[#E2E8F0] dark:hover:bg-white/10 transition-colors cursor-pointer"
-              >
-                {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
-              </button>
-            )}
+            {/* Right Action / Theme Toggle */}
+            <div className="w-9 h-9 flex items-center justify-center">
+              {onToggleTheme && (
+                <button
+                  type="button"
+                  onClick={onToggleTheme}
+                  title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
+                  className="w-8 h-8 rounded-lg bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:bg-[#E2E8F0] dark:hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* ── Main Content Container ── */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">

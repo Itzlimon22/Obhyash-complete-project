@@ -1,153 +1,143 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
   <defs>
-    <!-- Deepest Emerald Green Tile Gradient -->
-    <linearGradient id="tileBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#056149" />
-      <stop offset="50%" stop-color="#034533" />
-      <stop offset="100%" stop-color="#01281E" />
+    <!-- Deepest Midnight Forest Emerald Background -->
+    <linearGradient id="deepestBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#021C12" />
+      <stop offset="40%" stop-color="#01120B" />
+      <stop offset="100%" stop-color="#000805" />
     </linearGradient>
 
-    <!-- Top Border Highlight Sheen -->
-    <linearGradient id="tileBorderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#10B981" />
-      <stop offset="40%" stop-color="#059669" />
-      <stop offset="100%" stop-color="#011B14" />
+    <radialGradient id="ambientGlow" cx="50%" cy="46%" r="55%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.18" />
+      <stop offset="50%" stop-color="#059669" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Squircle Border Gradient -->
+    <linearGradient id="squircleBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#059669" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#064E3B" stop-opacity="0.4" />
     </linearGradient>
 
-    <!-- Deep Red Hardcover Book Base Gradient -->
-    <linearGradient id="deepRedBookCover" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#E11D48" />
-      <stop offset="40%" stop-color="#BE123C" />
-      <stop offset="100%" stop-color="#881337" />
-    </linearGradient>
-
-    <!-- White Page Gradient -->
-    <linearGradient id="pageWhiteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+    <!-- Infinity Loop 1: Crisp Pure White & Platinum -->
+    <linearGradient id="whiteRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="100%" stop-color="#F1F5F9" />
+      <stop offset="45%" stop-color="#F8FAFC" />
+      <stop offset="80%" stop-color="#E2E8F0" />
+      <stop offset="100%" stop-color="#94A3B8" />
     </linearGradient>
 
-    <!-- Pen Body Deep Red Gradient -->
-    <linearGradient id="penRedGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#F43F5E" />
-      <stop offset="40%" stop-color="#BE123C" />
+    <!-- Infinity Loop 2: Deep Crimson / Ruby Accent -->
+    <linearGradient id="deepRedRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB7185" />
+      <stop offset="30%" stop-color="#E11D48" />
+      <stop offset="70%" stop-color="#BE123C" />
       <stop offset="100%" stop-color="#881337" />
     </linearGradient>
 
-    <!-- Pen Body Obsidian Black Gradient -->
-    <linearGradient id="penBlackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#3F3F46" />
-      <stop offset="40%" stop-color="#18181B" />
-      <stop offset="100%" stop-color="#09090B" />
+    <!-- Emerald Jade Glow Loop -->
+    <linearGradient id="emeraldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6EE7B7" />
+      <stop offset="40%" stop-color="#10B981" />
+      <stop offset="80%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
     </linearGradient>
 
-    <!-- Gold Accent Gradient -->
-    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FEF08A" />
-      <stop offset="40%" stop-color="#FACC15" />
-      <stop offset="100%" stop-color="#CA8A04" />
-    </linearGradient>
+    <!-- Red Energy Core Glow -->
+    <radialGradient id="redCoreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE4E6" />
+      <stop offset="30%" stop-color="#F43F5E" />
+      <stop offset="70%" stop-color="#E11D48" />
+      <stop offset="100%" stop-color="#9F1239" stop-opacity="0" />
+    </radialGradient>
 
-    <!-- Drop Shadow Filter for Chorcha Claymorphism -->
-    <filter id="chorchaShadow" x="-10%" y="-10%" width="120%" height="130%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000000" flood-opacity="0.65" />
+    <!-- Drop Shadows for 3D Overlaps -->
+    <filter id="ribbonShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.4" />
     </filter>
 
-    <filter id="elementShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity="0.5" />
+    <filter id="coreGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- ── 1. Base 3D Claymorphic Green Badge (Chorcha Style 3D Tile) ── -->
-  <!-- 3D Bottom Lip / Base Shadow Block -->
-  <rect x="36" y="52" width="440" height="424" rx="120" fill="#00160F" />
-  <!-- Main Face with Border -->
-  <rect x="36" y="36" width="440" height="424" rx="120" fill="url(#tileBgGrad)" stroke="url(#tileBorderGrad)" stroke-width="14" filter="url(#chorchaShadow)" />
+  <!-- App Icon Base Squircle -->
+  <rect width="512" height="512" rx="116" fill="url(#deepestBg)" stroke="url(#squircleBorder)" stroke-width="3" />
+  <rect width="512" height="512" rx="116" fill="url(#ambientGlow)" />
 
-  <!-- Glossy Highlight Curve on Top Shoulder (Signature Chorcha Sheen) -->
-  <path d="M 88 120 C 88 72 124 48 184 48 L 328 48 C 172 68 96 160 88 260 Z" fill="#FFFFFF" opacity="0.18" />
+  <!-- Background Decorative Precision Tech Ring (Subtle) -->
+  <circle cx="256" cy="256" r="170" stroke="#059669" stroke-width="1.2" stroke-opacity="0.2" stroke-dasharray="8 6" />
+  <circle cx="256" cy="256" r="140" stroke="#10B981" stroke-width="1" stroke-opacity="0.12" />
 
-  <!-- ── 2. The 3D Open Book (Deep Red + White Combine) ── -->
-  <g transform="translate(0, 10)" filter="url(#elementShadow)">
-    <!-- Book Hardbound Cover 3D Depth / Bottom Edge (Deep Red) -->
-    <path d="M 104 330 C 174 308 244 322 256 342 C 268 322 338 308 408 330 L 408 356 C 338 334 268 348 256 368 C 244 348 174 334 104 356 Z" fill="#4C0519" />
+  <!-- ====================================================================== -->
+  <!-- 3D INFINITY MÖBIUS LOOP OF HABIT + BENGALI 'অ' (OBHYASH) MONOGRAM     -->
+  <!-- ====================================================================== -->
+  <g filter="url(#ribbonShadow)">
 
-    <!-- Book Hardbound Cover Face (Deep Red) -->
-    <path d="M 104 318 C 174 296 244 310 256 330 C 268 310 338 296 408 318 L 408 338 C 338 316 268 330 256 350 C 244 330 174 316 104 338 Z" fill="url(#deepRedBookCover)" />
+    <!-- 1. Under-Layer: Deep Red Arc (Left Loop Foundation of 'অ') -->
+    <path d="M 190 320 C 120 320 90 270 90 216 C 90 156 140 120 200 120 C 250 120 280 155 305 190 L 335 235 C 365 280 400 320 440 320 C 470 320 490 295 490 256 C 490 205 450 180 400 180" 
+          stroke="url(#deepRedRibbon)" 
+          stroke-width="38" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          opacity="0.95" />
 
-    <!-- 3D Page Stack Thickness Block -->
-    <path d="M 108 306 C 174 286 242 298 256 318 L 256 332 C 242 312 174 300 108 320 Z" fill="#CBD5E1" />
-    <path d="M 404 306 C 338 286 270 298 256 318 L 256 332 C 270 312 338 300 404 320 Z" fill="#CBD5E1" />
+    <!-- 2. Mid-Layer: Emerald Wave ('অ' Head Curl & Infinity Bridge) -->
+    <path d="M 120 210 C 120 170 150 144 195 144 C 242 144 278 180 310 226 L 338 266 C 368 308 402 334 442 334 C 476 334 496 308 496 264 C 496 210 454 172 396 172 C 342 172 300 210 266 256" 
+          stroke="url(#emeraldRibbon)" 
+          stroke-width="32" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
 
-    <!-- Left Open Page Surface (Crisp White) -->
-    <path d="M 112 196 C 176 174 244 190 256 216 L 256 320 C 244 298 176 286 112 306 Z" fill="url(#pageWhiteGrad)" stroke="#E2E8F0" stroke-width="2" />
+    <!-- 3. Top-Layer: Solid Pure White Möbius Ribbon (The Spine & Letterform 'অ') -->
+    <!-- Continuous graceful ribbon weaving over the red and emerald bridges -->
+    <path d="M 160 160 C 130 160 112 184 112 216 C 112 258 145 298 202 298 C 265 298 312 238 350 190 C 382 148 416 126 450 126 C 484 126 502 152 502 186 C 502 230 466 276 408 276 C 345 276 295 214 256 168 C 228 135 195 116 156 116 C 118 116 84 146 84 198 C 84 262 134 326 214 326 C 298 326 364 246 414 186" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="26" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
 
-    <!-- Right Open Page Surface (Crisp White) -->
-    <path d="M 400 196 C 336 174 268 190 256 216 L 256 320 C 268 298 336 286 400 306 Z" fill="url(#pageWhiteGrad)" stroke="#E2E8F0" stroke-width="2" />
+    <!-- 4. Bengali 'অ' Vertical Stem & Right Wing Anchor (Pure White + Platinum) -->
+    <path d="M 374 126 L 374 386" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="28" 
+          stroke-linecap="round" />
 
-    <!-- Deep Red Center Ribbon Bookmark -->
-    <path d="M 252 216 L 260 216 L 260 376 L 256 368 L 252 376 Z" fill="#BE123C" />
+    <!-- Top Horizontal Matra Header (Sleek aerodynamic bar) -->
+    <path d="M 280 126 L 440 126" 
+          stroke="url(#whiteRibbon)" 
+          stroke-width="24" 
+          stroke-linecap="round" />
 
-    <!-- Subtle Page Content Lines -->
-    <g stroke="#94A3B8" stroke-width="4.5" stroke-linecap="round" opacity="0.6">
-      <line x1="148" y1="234" x2="228" y2="244" />
-      <line x1="144" y1="256" x2="228" y2="266" />
-      <line x1="150" y1="278" x2="216" y2="286" />
+    <!-- 5. Central Deep Red Catalyst Node (Inner Spark) -->
+    <circle cx="256" cy="256" r="18" fill="url(#redCoreGlow)" filter="url(#coreGlowFilter)" />
+    <circle cx="256" cy="256" r="10" fill="#FFFFFF" />
 
-      <line x1="284" y1="244" x2="364" y2="234" />
-      <line x1="284" y1="266" x2="368" y2="256" />
-      <line x1="296" y1="286" x2="362" y2="278" />
-    </g>
+    <!-- 6. Specular Glass Highlights (3D Lustre) -->
+    <path d="M 145 154 C 175 140 215 150 250 185" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.9" />
+    <path d="M 374 140 L 374 240" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.8" />
+    <path d="M 430 148 C 455 148 472 165 472 190" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.75" />
+
+    <!-- Sparkle Flare on Top Stem -->
+    <polygon points="374,116 377,124 385,126 377,128 374,136 371,128 363,126 371,124" fill="#FFFFFF" />
   </g>
 
-  <!-- ── 3. Chunky 3D Pen (Deep Red + Obsidian Black + Gold Nib) ── -->
-  <g transform="translate(256, 216) rotate(-16)" filter="url(#elementShadow)">
-    <!-- Pen Upper Cap Finial (Gold) -->
-    <rect x="-10" y="-128" width="20" height="7" rx="3.5" fill="url(#goldAccent)" />
-
-    <!-- Pen Upper Cap Body (Deep Red Lacquer) -->
-    <rect x="-13" y="-121" width="26" height="72" rx="4" fill="url(#penRedGrad)" />
-    <!-- Pen Cap Specular Highlight -->
-    <rect x="-9" y="-117" width="5" height="64" rx="2.5" fill="#FFFFFF" opacity="0.45" />
-
-    <!-- Pen Golden Clip -->
-    <rect x="13" y="-114" width="6" height="54" rx="3" fill="url(#goldAccent)" />
-    <circle cx="16" cy="-60" r="4.5" fill="url(#goldAccent)" />
-
-    <!-- Luxury Gold Center Ring -->
-    <rect x="-15" y="-49" width="30" height="12" rx="3" fill="url(#goldAccent)" stroke="#78350F" stroke-width="1.2" />
-
-    <!-- Pen Lower Main Barrel (Glossy Obsidian Black) -->
-    <rect x="-13" y="-37" width="26" height="84" rx="3" fill="url(#penBlackGrad)" />
-    <!-- Pen Black Barrel Specular Streak -->
-    <rect x="-9" y="-33" width="5" height="76" rx="2.5" fill="#FFFFFF" opacity="0.3" />
-
-    <!-- Lower Gold Grip Ring -->
-    <rect x="-12" y="47" width="24" height="8" rx="2" fill="url(#goldAccent)" />
-
-    <!-- Pen Grip Section (Deep Red) -->
-    <polygon points="-12,55 12,55 9,88 -9,88" fill="url(#penRedGrad)" />
-    <!-- Grip Highlight -->
-    <polygon points="-8,57 -4,57 -3,85 -7,85" fill="#FFFFFF" opacity="0.35" />
-
-    <!-- Fountain Gold Nib -->
-    <polygon points="-9,88 9,88 0,126" fill="url(#goldAccent)" stroke="#78350F" stroke-width="1" />
-    <!-- Nib Central Breather & Slit -->
-    <circle cx="0" cy="102" r="2.2" fill="#09090B" />
-    <line x1="0" y1="104" x2="0" y2="124" stroke="#09090B" stroke-width="1.5" />
-  </g>
-
-  <!-- ── 4. Floating Golden Sparkle Stars ── -->
-  <!-- Main Star (Top Right) -->
-  <g transform="translate(376, 120)">
-    <polygon points="0,-22 6,-6 22,0 6,6 0,22 -6,6 -22,0 -6,-6" fill="url(#goldAccent)" />
-  </g>
-  <!-- Mini Star (Left) -->
-  <g transform="translate(136, 134)">
-    <polygon points="0,-15 4,-4 15,0 4,4 0,15 -4,4 -15,0 -4,-4" fill="url(#goldAccent)" />
-  </g>
-  <!-- Tiny Diamond Sparkle at Nib -->
-  <g transform="translate(296, 334)">
-    <polygon points="0,-12 3,-3 12,0 3,3 0,12 -3,3 -12,0 -3,-3" fill="#FFFFFF" />
-  </g>
+  <!-- Bottom Brand Text (Subtle Minimalist Accent) -->
+  <text x="256" y="445" 
+        text-anchor="middle" 
+        font-family="'HindSiliguri', 'Outfit', sans-serif" 
+        font-size="28" 
+        font-weight="900" 
+        letter-spacing="4" 
+        fill="#FFFFFF">OBHYASH</text>
+  <text x="256" y="475" 
+        text-anchor="middle" 
+        font-family="'HindSiliguri', sans-serif" 
+        font-size="14" 
+        font-weight="700" 
+        letter-spacing="6" 
+        fill="#10B981">অভ্যাস • নিরন্তর প্রস্তুতি</text>
 </svg>

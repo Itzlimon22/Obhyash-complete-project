@@ -403,7 +403,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const selectedSubData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="w-full max-w-4xl xl:max-w-5xl mx-auto px-1 sm:px-3 py-2 sm:py-4 select-none font-['HindSiliguri']">
+    <div className="w-full max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-5 select-none font-['HindSiliguri']">
       <div className="flex flex-col gap-3">
         {/* 1. Subject Selector Card */}
         <CardContainer
@@ -411,21 +411,21 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           icon={BookOpen}
         >
           {isLoadingData ? (
-            <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800/60 animate-pulse rounded-xl" />
+            <div className="h-11 w-full bg-neutral-100 dark:bg-neutral-800/60 animate-pulse rounded-xl" />
           ) : (
             <button
               type="button"
               onClick={() => setShowSubjectModal(true)}
               className={cn(
-                "w-full flex items-center justify-between px-3.5 py-3 rounded-xl border transition-all duration-200 outline-none text-left",
+                "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left",
                 selectedSubject
-                  ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-sm"
+                  ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
                   : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700"
               )}
             >
               <span
                 className={cn(
-                  "text-base font-bold truncate",
+                  "text-sm sm:text-base font-bold truncate",
                   selectedSubject
                     ? "text-[#0F172A] dark:text-white"
                     : "text-[#94A3B8] dark:text-[#71717A] font-normal"
@@ -464,15 +464,15 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   onClick={() => setShowChapterModal(true)}
                   disabled={chapters.length === 0 && selectedSubject !== null}
                   className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-3 rounded-xl border transition-all duration-200 outline-none text-left",
+                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left",
                     selectedChapters.size > 0
-                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-sm"
+                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
                       : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A]"
                   )}
                 >
                   <span
                     className={cn(
-                      "text-base truncate",
+                      "text-sm sm:text-base truncate",
                       selectedChapters.size > 0
                         ? "text-[#0F172A] dark:text-white font-bold"
                         : "text-[#94A3B8] dark:text-[#71717A] font-normal"
@@ -501,15 +501,15 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   onClick={() => setShowTopicModal(true)}
                   disabled={selectedChapters.size === 0 || topics.length === 0}
                   className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-3 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50",
+                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50",
                     selectedTopics.size > 0
-                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-sm"
+                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
                       : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A]"
                   )}
                 >
                   <span
                     className={cn(
-                      "text-base truncate",
+                      "text-sm sm:text-base truncate",
                       selectedTopics.size > 0
                         ? "text-[#0F172A] dark:text-white font-bold"
                         : "text-[#94A3B8] dark:text-[#71717A] font-normal"
@@ -687,7 +687,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           icon={MinusCircle}
           tooltip={"-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা"}
         >
-          <div className="p-1 rounded-2xl bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] grid grid-cols-3 gap-1">
+          <div className="p-1 rounded-xl bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] grid grid-cols-3 gap-1">
             {[
               { val: 0.0, label: "০ (নেই)" },
               { val: 0.25, label: "-০.২৫ মার্ক" },
@@ -700,9 +700,9 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   type="button"
                   onClick={() => setNegativeMarking(val)}
                   className={cn(
-                    "py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
+                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200",
                     isSelected
-                      ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-sm"
+                      ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
                       : "text-[#64748B] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
                   )}
                 >
@@ -714,7 +714,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </CardContainer>
 
         {/* 8. Live Blueprint Capsule Summary */}
-        <div className="my-2 p-3.5 rounded-2xl bg-[#FFFBEB] dark:bg-[#22160E] border border-[#FDE68A] dark:border-[#D97706]/35 shadow-sm shadow-[#B45309]/5 flex items-center justify-around text-center">
+        <div className="my-1.5 p-3 rounded-xl bg-[#FFFBEB] dark:bg-[#22160E] border border-[#FDE68A] dark:border-[#D97706]/35 shadow-xs flex items-center justify-around text-center">
           <div className="flex items-center gap-1.5">
             <HelpCircle size={14} className="text-[#38BDF8]" />
             <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
@@ -750,17 +750,17 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </div>
         </div>
 
-        {/* 9. Start Button - Deep Green */}
+        {/* 9. Start Button - Clean, proportionate CTA */}
         <button
           type="button"
           onClick={handleStartExam}
           disabled={isStarting || isExternalLoading}
-          className="w-full py-4 px-6 rounded-2xl bg-[#004633] hover:bg-[#003828] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none text-white font-black text-lg shadow-lg shadow-[#004633]/30 transition-all flex items-center justify-center gap-2 mt-1 mb-8"
+          className="w-full h-12 sm:h-13 rounded-xl bg-[#004633] hover:bg-[#003828] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-base sm:text-lg shadow-md shadow-[#004633]/25 transition-all flex items-center justify-center gap-2 mt-2 mb-6"
         >
           {isStarting || isExternalLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <span>শুরু করো</span>
+            <span>পরীক্ষা শুরু করো</span>
           )}
         </button>
       </div>
@@ -843,10 +843,10 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className="p-4 sm:p-5 rounded-[18px] bg-white dark:bg-[#131316] border border-[#E2E8F0] dark:border-[#222226] shadow-sm flex flex-col gap-3.5">
+    <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#131316] border border-[#E2E8F0] dark:border-[#222226] shadow-xs flex flex-col gap-2.5 sm:gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <h2 className="text-[17px] font-black text-[#0F172A] dark:text-white font-['HindSiliguri']">
+          <h2 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white font-['HindSiliguri']">
             {title}
           </h2>
           {tooltip && (
@@ -858,7 +858,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
                 onClick={() => setShowTooltip(!showTooltip)}
                 className="text-[#94A3B8] dark:text-[#71717A] hover:text-[#0F172A] dark:hover:text-white p-0.5"
               >
-                <Info size={15} />
+                <Info size={14} />
               </button>
               {showTooltip && (
                 <div className="absolute left-0 top-6 z-50 w-56 p-2.5 rounded-xl bg-neutral-900 dark:bg-neutral-800 text-white text-xs whitespace-pre-line shadow-xl border border-neutral-700 animate-in fade-in duration-150">
@@ -882,7 +882,7 @@ interface SegmentedGroupProps {
 
 const SegmentedGroup: React.FC<SegmentedGroupProps> = ({ items, selectedItems, onToggle }) => {
   return (
-    <div className="p-1 rounded-2xl bg-[#F1F5F9] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] flex flex-wrap gap-1">
+    <div className="p-1 rounded-xl bg-[#F1F5F9] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] flex flex-wrap gap-1">
       {items.map((item) => {
         const isSelected = selectedItems.has(item);
         return (
@@ -891,9 +891,9 @@ const SegmentedGroup: React.FC<SegmentedGroupProps> = ({ items, selectedItems, o
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              "flex-1 min-w-[70px] py-2.5 px-3 rounded-xl text-sm font-bold transition-all duration-200 text-center font-['HindSiliguri']",
+              "flex-1 min-w-[65px] py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 text-center font-['HindSiliguri']",
               isSelected
-                ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-sm shadow-[#B45309]/10"
+                ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
                 : "text-[#64748B] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
             )}
           >
@@ -928,20 +928,20 @@ const StepperControl: React.FC<StepperControlProps> = ({
         type="button"
         disabled={value <= min}
         onClick={() => onChanged(value - step)}
-        className="w-9 h-9 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
+        className="w-8 h-8 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
       >
-        <span className="text-lg font-bold">−</span>
+        <span className="text-base font-bold">−</span>
       </button>
-      <span className="px-3 text-base font-black text-[#B45309] dark:text-[#FBBF24] font-['HindSiliguri']">
+      <span className="px-2.5 text-sm sm:text-base font-bold text-[#B45309] dark:text-[#FBBF24] font-['HindSiliguri'] min-w-[55px] text-center">
         {value} {unit}
       </span>
       <button
         type="button"
         disabled={value >= max}
         onClick={() => onChanged(value + step)}
-        className="w-9 h-9 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
+        className="w-8 h-8 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
       >
-        <span className="text-lg font-bold">+</span>
+        <span className="text-base font-bold">+</span>
       </button>
     </div>
   );
@@ -959,9 +959,9 @@ const PresetPill: React.FC<PresetPillProps> = ({ label, isSelected, onClick }) =
       type="button"
       onClick={onClick}
       className={cn(
-        "py-2 px-1 rounded-xl text-[13px] font-bold text-center transition-all duration-150 font-['HindSiliguri']",
+        "py-1.5 px-1 rounded-lg text-xs sm:text-sm font-semibold text-center transition-all duration-150 font-['HindSiliguri']",
         isSelected
-          ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-sm"
+          ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
           : "bg-[#F8FAFC] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#A1A1AA] hover:border-neutral-300 dark:hover:border-neutral-700"
       )}
     >

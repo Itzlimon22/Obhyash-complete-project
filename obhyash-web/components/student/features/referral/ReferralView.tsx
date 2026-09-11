@@ -62,7 +62,7 @@ export const ReferralView: React.FC = () => {
   // Claim Code & Lockout State
   const [claimCodeInput, setClaimCodeInput] = useState('');
   const [isClaiming, setIsClaiming] = useState(false);
-  const [hasUsedReferral, setHasUsedReferral] = useState(true);
+  const [hasUsedReferral, setHasUsedReferral] = useState(false);
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
   const [remainingAttempts, setRemainingAttempts] = useState(3);
   const [activeScratchCardId, setActiveScratchCardId] = useState<string | null>(null);
@@ -109,9 +109,7 @@ export const ReferralView: React.FC = () => {
           p_user_id: user.id,
         });
         if (eligRes && typeof eligRes === 'object') {
-          if ((eligRes as any).has_used_referral === true) {
-            setHasUsedReferral(true);
-          }
+          setHasUsedReferral((eligRes as any).has_used_referral === true);
           if (typeof (eligRes as any).remaining_attempts === 'number') {
             setRemainingAttempts((eligRes as any).remaining_attempts);
           }
@@ -119,9 +117,11 @@ export const ReferralView: React.FC = () => {
             startLockoutTimer((eligRes as any).lock_seconds);
           }
         }
-      } catch (_) {}
+      } catch (err) {
+        console.warn('check_referral_eligibility error:', err);
+      }
 
-      // 2. Direct table fallback check
+      // 2. Direct table fallback check for already redeemed
       try {
         const { data: usedCheck } = await supabase
           .from('referral_history')
@@ -136,34 +136,63 @@ export const ReferralView: React.FC = () => {
         console.warn('usedCheck error:', e);
       }
 
-      // 3. Fetch data from /api/referral/me
-      const res = await fetch('/api/referral/me');
-      if (res.ok) {
-        const json = await res.json();
-        if (json.referral?.code) {
-          setCode(json.referral.code);
+      // 3. Direct client query for user's referral code
+      try {
+        const { data: refRow } = await supabase
+          .from('referrals')
+          .select('id, code')
+          .eq('owner_id', user.id)
+          .maybeSingle();
+
+        if (refRow?.code) {
+          setCode(refRow.code);
         }
-        if (json.history) {
-          setHistory(json.history);
-        }
-        if (typeof json.totalApproved === 'number') {
-          setTotalReferrals(json.totalApproved);
-        }
-        if (json.scratchCards) {
-          setScratchCards(json.scratchCards);
-        }
-        if (typeof json.hasUsedReferral === 'boolean') {
-          setHasUsedReferral(json.hasUsedReferral);
-        }
+      } catch (e) {
+        console.warn('direct referral code error:', e);
       }
 
-      // 4. Fetch leaderboard from /api/referral/leaderboard
+      // 4. Fetch enriched data from /api/referral/me with Bearer token
       try {
-        const lbRes = await fetch('/api/referral/leaderboard');
-        if (lbRes.ok) {
-          const lbJson = await lbRes.json();
-          if (Array.isArray(lbJson.leaderboard)) {
-            setLeaderboard(lbJson.leaderboard);
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {};
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+        const res = await fetch('/api/referral/me', { headers });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.referral?.code) {
+            setCode(json.referral.code);
+          }
+          if (json.history) {
+            setHistory(json.history);
+          }
+          if (typeof json.totalApproved === 'number') {
+            setTotalReferrals(json.totalApproved);
+          }
+          if (json.scratchCards) {
+            setScratchCards(json.scratchCards);
+          }
+          if (typeof json.hasUsedReferral === 'boolean') {
+            setHasUsedReferral(json.hasUsedReferral);
+          }
+        }
+      } catch (err) {
+        console.warn('Error fetching /api/referral/me:', err);
+      }
+
+      // 5. Fetch leaderboard
+      try {
+        const { data: lbData } = await supabase.rpc('get_monthly_leaderboard');
+        if (Array.isArray(lbData) && lbData.length > 0) {
+          setLeaderboard(lbData);
+        } else {
+          const lbRes = await fetch('/api/referral/leaderboard');
+          if (lbRes.ok) {
+            const lbJson = await lbRes.json();
+            if (Array.isArray(lbJson.leaderboard)) {
+              setLeaderboard(lbJson.leaderboard);
+            }
           }
         }
       } catch (_) {}
@@ -200,16 +229,24 @@ export const ReferralView: React.FC = () => {
 
     setIsClaiming(true);
     try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
       const deviceId = getDeviceFingerprint();
+
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch('/api/referral/redeem', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ code: input, deviceId }),
       });
 
       const json = await res.json();
 
-      if (res.ok) {
+      if (res.ok && json.success !== false) {
         toast.success(
           json.message || 'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉'
         );

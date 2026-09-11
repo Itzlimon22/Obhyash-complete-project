@@ -61,7 +61,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
 
           {/* RIGHT: Practice Tag */}
           <div className="shrink-0 flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-['HindSiliguri',sans-serif]">
+            <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-sans">
               অনুশীলন
             </span>
           </div>
@@ -71,7 +71,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
       {/* ── Main Question List (Exact same layout as ExamRunner) ── */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-5 pb-28 space-y-5">
         {questions.length === 0 ? (
-          <div className="text-center py-16 text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
+          <div className="text-center py-16 text-neutral-500 dark:text-neutral-400 font-sans">
             কোনো প্রশ্ন পাওয়া যায়নি।
           </div>
         ) : (
@@ -93,7 +93,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
                 {hasMultipleSubjects && isFirstOfSubject && (
                   <div className="flex items-center gap-3 my-6">
                     <div className="flex-1 h-px bg-neutral-200 dark:bg-neutral-800" />
-                    <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-200 font-['HindSiliguri',sans-serif]">
+                    <span className="font-bold text-sm sm:text-base text-neutral-800 dark:text-neutral-200 font-sans">
                       {currentSubjectName}{" "}
                       <span className="text-neutral-400 dark:text-neutral-500 font-normal">
                         ({BanglaNameHelper.toBanglaNumeral(subjectTotalCount)}টি প্রশ্ন)

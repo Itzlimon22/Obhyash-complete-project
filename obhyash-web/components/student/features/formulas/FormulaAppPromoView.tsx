@@ -80,7 +80,7 @@ export const FormulaAppPromoView: React.FC<FormulaAppPromoViewProps> = ({ onBack
   ];
 
   return (
-    <div className="w-full max-w-4xl xl:max-w-5xl mx-auto px-1 sm:px-3 py-2 sm:py-4 font-['HindSiliguri',sans-serif] pb-24">
+    <div className="w-full max-w-4xl mx-auto py-2 font-sans pb-16">
       {/* ── Main Hero Card ── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/40 dark:from-[#18181B] dark:via-[#13201B] dark:to-[#0F1714] border border-emerald-100 dark:border-emerald-900/40 p-6 sm:p-8 md:p-10 shadow-lg shadow-emerald-950/5 mb-6 sm:mb-8">
         {/* Decorative background glow */}

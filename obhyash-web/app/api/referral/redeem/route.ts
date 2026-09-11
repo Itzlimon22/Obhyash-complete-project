@@ -3,19 +3,32 @@ import { createClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export const POST = async (req: Request) => {
-  const supabase = await createClient();
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  let targetUserId: string | undefined;
+
+  // 1. Try Bearer token from Authorization header
+  const authHeader = req.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user: tokenUser } } = await supabaseAdmin.auth.getUser(token);
+    if (tokenUser) targetUserId = tokenUser.id;
+  }
+
+  // 2. Fallback to cookie authentication
+  if (!targetUserId) {
+    try {
+      const supabase = await createClient();
+      const { data: { user: cookieUser } } = await supabase.auth.getUser();
+      if (cookieUser) targetUserId = cookieUser.id;
+    } catch (_) {}
+  }
 
   const body = await req.json().catch(() => ({}));
   const { code, newUserId, deviceId } = body;
-
-  let targetUserId = user?.id;
 
   // If no active session, but newUserId is provided (e.g., during signup), use it
   if (!targetUserId && newUserId) {

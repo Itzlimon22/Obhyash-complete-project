@@ -25,7 +25,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { ExamResult } from "@/lib/types";
+import { ExamResult, UserProfile } from "@/lib/types";
 import { getSubjectAnalysis, SubjectAnalysis } from "@/services/database";
 import { printSubjectReport } from "@/services/print-service";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
@@ -36,12 +36,14 @@ import { cn } from "@/lib/utils";
 interface SubjectReportViewProps {
   subject: string;
   history: ExamResult[];
+  currentUser?: UserProfile | null;
   onBack: () => void;
 }
 
 export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   subject,
   history,
+  currentUser,
   onBack,
 }) => {
   const { user, loading: authLoading } = useAuth();
@@ -50,14 +52,20 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<SubjectAnalysis | null>(null);
 
+  const activeUserId = currentUser?.id || user?.id || history?.[0]?.user_id;
+
   useEffect(() => {
     let isMounted = true;
-    if (authLoading || !user?.id) return;
+    if (!activeUserId && authLoading) return;
+    if (!activeUserId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const analysis = await getSubjectAnalysis(user.id, subject, timeFilter);
+        const analysis = await getSubjectAnalysis(activeUserId, subject, timeFilter);
         if (isMounted) setStats(analysis);
       } catch (error) {
         console.error(error);
@@ -71,7 +79,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [subject, timeFilter, user?.id, authLoading]);
+  }, [subject, timeFilter, activeUserId, authLoading]);
 
   const pieData = stats
     ? [
@@ -101,7 +109,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
 
   if (loading || !stats) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8 flex items-center justify-center font-['HindSiliguri']">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-8 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
           <p className="text-neutral-500 font-bold text-sm">
@@ -115,7 +123,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   const subjectTitle = BanglaNameHelper.formatSubject(subject, subject);
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-1 sm:px-2 py-2 sm:py-4 animate-fade-in transition-colors font-['HindSiliguri'] pb-24">
+    <div className="w-full flex flex-col animate-fade-in transition-colors font-sans pb-16">
       {/* CONTROLS SECTION */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

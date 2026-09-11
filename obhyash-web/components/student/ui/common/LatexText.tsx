@@ -11,14 +11,57 @@ import type { Components } from 'react-markdown';
 import Image from 'next/image';
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
 
-// Allow all attributes KaTeX injects (className, style on span/div) while
-// blocking everything actually dangerous (script, event handlers, etc.).
+const mathMLTags = [
+  'math',
+  'semantics',
+  'mrow',
+  'mo',
+  'mi',
+  'mn',
+  'annotation',
+  'annotation-xml',
+  'mstyle',
+  'mfrac',
+  'msqrt',
+  'mroot',
+  'msub',
+  'msup',
+  'msubsup',
+  'mtable',
+  'mtr',
+  'mtd',
+  'mtext',
+  'mspace',
+  'mpadded',
+  'mover',
+  'munder',
+  'munderover',
+  'svg',
+  'path',
+  'g',
+  'line',
+];
+
+// Allow all attributes KaTeX injects (className, style on span/div) and MathML/table tags
 const sanitizeSchema = {
   ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), ...mathMLTags],
   attributes: {
     ...defaultSchema.attributes,
-    span: [...(defaultSchema.attributes?.span ?? []), 'className', 'style'],
+    span: [...(defaultSchema.attributes?.span ?? []), 'className', 'style', 'aria-hidden'],
     div: [...(defaultSchema.attributes?.div ?? []), 'className', 'style'],
+    table: [...(defaultSchema.attributes?.table ?? []), 'className', 'style'],
+    thead: [...(defaultSchema.attributes?.thead ?? []), 'className', 'style'],
+    tbody: [...(defaultSchema.attributes?.tbody ?? []), 'className', 'style'],
+    tr: [...(defaultSchema.attributes?.tr ?? []), 'className', 'style'],
+    th: [...(defaultSchema.attributes?.th ?? []), 'className', 'style', 'colSpan', 'rowSpan', 'align', 'scope'],
+    td: [...(defaultSchema.attributes?.td ?? []), 'className', 'style', 'colSpan', 'rowSpan', 'align'],
+    math: ['xmlns', 'display'],
+    annotation: ['encoding'],
+    svg: ['xmlns', 'viewBox', 'width', 'height', 'style', 'className'],
+    path: ['d', 'style', 'className'],
+    g: ['fill', 'stroke'],
+    line: ['x1', 'y1', 'x2', 'y2', 'stroke', 'strokeWidth'],
     // sup/sub used for footnotes / chemistry notation
     sup: ['className'],
     sub: ['className'],
@@ -266,7 +309,7 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
         rehypePlugins={[
-          rehypeKatex,
+          [rehypeKatex, { throwOnError: false, strict: false, trust: true }],
           rehypeRaw,
           [rehypeSanitize, sanitizeSchema],
         ]}

@@ -25,6 +25,7 @@ interface ExamInstructionsViewProps {
   config: ExamConfig;
   onStart: () => Promise<boolean>;
   onBack: () => void;
+  showHeader?: boolean;
 }
 
 const toBanglaNumeral = (num: number | string): string => {
@@ -36,6 +37,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   config,
   onStart,
   onBack,
+  showHeader = true,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
@@ -95,22 +97,29 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col font-['HindSiliguri',sans-serif] select-none text-[#0F172A] dark:text-[#F8FAFC]">
-      {/* ── Top App Bar ── */}
-      <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-4 sm:px-6 shadow-xs">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isLoading}
-          aria-label="Back"
-          className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#1E293B] dark:text-[#E2E8F0] hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="flex-1 text-center font-bold text-base sm:text-lg text-[#0F172A] dark:text-white mr-9">
-          পরীক্ষার নির্দেশাবলী
-        </h1>
-      </header>
+    <div
+      className={cn(
+        "w-full flex flex-col font-['HindSiliguri',sans-serif] select-none text-[#0F172A] dark:text-[#F8FAFC]",
+        showHeader ? "min-h-screen bg-[#F4F6F9] dark:bg-[#0A0B0E]" : "py-2 sm:py-4"
+      )}
+    >
+      {/* ── Top App Bar (only if standalone) ── */}
+      {showHeader && (
+        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-4 sm:px-6 shadow-xs">
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={isLoading}
+            aria-label="Back"
+            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#1E293B] dark:text-[#E2E8F0] hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="flex-1 text-center font-bold text-base sm:text-lg text-[#0F172A] dark:text-white mr-9">
+            পরীক্ষার নির্দেশাবলী
+          </h1>
+        </header>
+      )}
 
       {/* ── Main Scrollable Content ── */}
       <main className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 flex justify-center">

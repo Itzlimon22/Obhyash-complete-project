@@ -5,18 +5,31 @@ import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const supabaseAdmin = createSupabaseAdminClient(supabaseUrl, supabaseServiceKey);
+    let user: any = null;
+
+    // 1. Try Bearer token from Authorization header first
+    const authHeader = req.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user: tokenUser } } = await supabaseAdmin.auth.getUser(token);
+      if (tokenUser) user = tokenUser;
+    }
+
+    // 2. Fallback to cookie authentication
+    if (!user) {
+      try {
+        const supabase = await createClient();
+        const { data: { user: cookieUser } } = await supabase.auth.getUser();
+        if (cookieUser) user = cookieUser;
+      } catch (_) {}
+    }
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabaseAdmin = createSupabaseAdminClient(supabaseUrl, supabaseServiceKey);
 
     // 0. Check global referral switch
     let isReferralSystemEnabled = true;
@@ -43,23 +56,37 @@ export const GET = async () => {
       if (ref) {
         referral = ref;
       } else {
-        // Auto-create referral code
+        // Auto-create referral code with retry if collision occurs
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let randCode = '';
-        for (let i = 0; i < 8; i++) {
-          randCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        for (let attempt = 0; attempt < 5; attempt++) {
+          let randCode = '';
+          for (let i = 0; i < 8; i++) {
+            randCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+
+          const { data: createdRef, error: insertErr } = await supabaseAdmin
+            .from('referrals')
+            .insert({
+              owner_id: user.id,
+              code: randCode,
+            })
+            .select('*')
+            .single();
+
+          if (createdRef && !insertErr) {
+            referral = createdRef;
+            break;
+          }
         }
 
-        const { data: createdRef } = await supabaseAdmin
-          .from('referrals')
-          .insert({
-            owner_id: user.id,
-            code: randCode,
-          })
-          .select('*')
-          .single();
-
-        referral = createdRef || { code: randCode, owner_id: user.id };
+        if (!referral) {
+          const { data: existingRef } = await supabaseAdmin
+            .from('referrals')
+            .select('*')
+            .eq('owner_id', user.id)
+            .maybeSingle();
+          if (existingRef) referral = existingRef;
+        }
       }
     } catch (e) {
       console.warn('Error fetching or creating referral:', e);

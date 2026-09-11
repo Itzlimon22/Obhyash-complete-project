@@ -125,8 +125,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
     },
   );
 
+  const isHsc = !user?.stream || user.stream.toUpperCase().includes("HSC");
+
+  const filteredSubjects = useMemo(() => {
+    return (subjects || []).filter((sub: DashboardSubject) => {
+      const subId = (sub.id || "").toLowerCase();
+      const subName = (sub.name || "").trim().toLowerCase();
+      if (subId === "hsc_math_general") return false;
+      if (isHsc && (subName === "গণিত" || subId === "ssc_math")) return false;
+      return true;
+    });
+  }, [subjects, isHsc]);
+
   const subjectStats = useMemo(() => {
-    if (!subjects || subjects.length === 0) {
+    if (!filteredSubjects || filteredSubjects.length === 0) {
       // If subjects list is empty, build from history
       const subjectsMap: Record<
         string,
@@ -134,8 +146,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
       > = {};
 
       history.forEach((exam) => {
-        const subId = exam.subject || "general";
-        const subLabel = BanglaNameHelper.formatSubject(subId, exam.subjectLabel || getSubjectDisplayName(subId));
+        const rawSubId = exam.subject || "general";
+        if (rawSubId === "hsc_math_general") return;
+        const subLabel = BanglaNameHelper.formatSubject(rawSubId, exam.subjectLabel || getSubjectDisplayName(rawSubId));
+        if (isHsc && (subLabel === "গণিত" || rawSubId === "ssc_math")) return;
+
+        const subId = rawSubId;
         if (!subjectsMap[subId]) {
           subjectsMap[subId] = {
             id: subId,
@@ -157,7 +173,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       return Object.values(subjectsMap);
     }
 
-    return subjects.map((sub: DashboardSubject) => {
+    return filteredSubjects.map((sub: DashboardSubject) => {
       const subName = (sub.name || "").toLowerCase();
       const subId = (sub.id || "").toLowerCase();
 
@@ -166,21 +182,43 @@ export const Dashboard: React.FC<DashboardProps> = ({
       let skipped = 0;
       let total = 0;
 
+      const isHigherMathSub =
+        subName.includes("উচ্চতর গণিত") ||
+        subId.includes("higher_math") ||
+        subId.includes("math_1") ||
+        subId.includes("math_2");
+      const isGeneralMathSub =
+        subName === "গণিত" ||
+        subName.includes("সাধারণ গণিত") ||
+        subId === "ssc_math";
+
       history.forEach((exam) => {
         const hSub = (exam.subjectLabel || exam.subject || "").toLowerCase();
         const hSubId = (exam.subject || "").toLowerCase();
+
+        const isMathMatch = isHigherMathSub
+          ? (hSub.includes("উচ্চতর গণিত") ||
+              hSub.includes("higher") ||
+              hSubId.includes("hsc_math") ||
+              hSubId.includes("higher_math") ||
+              (hSub.includes("math") && !hSub.includes("general") && !hSub.includes("সাধারণ")))
+          : isGeneralMathSub
+            ? (hSub.includes("সাধারণ গণিত") || hSubId === "ssc_math" || hSub === "math" || hSub.includes("general_math"))
+            : false;
+
         const isMatch =
           hSubId === subId ||
           hSub.includes(subName) ||
           hSub.includes(subId) ||
-          (subName === "পদার্থবিজ্ঞান" && hSub.includes("physics")) ||
-          (subName === "রসায়ন" && hSub.includes("chemistry")) ||
-          (subName === "গণিত" && hSub.includes("math")) ||
-          (subName === "জীববিজ্ঞান" && hSub.includes("biology")) ||
-          (subName === "বাংলা" && hSub.includes("bangla")) ||
-          (subName === "ইংরেজি" && hSub.includes("english")) ||
-          (subName === "সাধারণ জ্ঞান" && hSub.includes("gk")) ||
-          (subName === "আইসিটি" && hSub.includes("ict"));
+          (subName.includes("পদার্থবিজ্ঞান") && hSub.includes("physics")) ||
+          (subName.includes("রসায়ন") && hSub.includes("chemistry")) ||
+          (subName.includes("রসায়ন") && hSub.includes("chemistry")) ||
+          isMathMatch ||
+          (subName.includes("জীববিজ্ঞান") && hSub.includes("biology")) ||
+          (subName.includes("বাংলা") && hSub.includes("bangla")) ||
+          (subName.includes("ইংরেজি") && hSub.includes("english")) ||
+          (subName.includes("সাধারণ জ্ঞান") && hSub.includes("gk")) ||
+          (subName.includes("আইসিটি") && hSub.includes("ict"));
 
         if (isMatch) {
           correct += exam.correctCount || 0;
@@ -199,7 +237,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         total,
       };
     });
-  }, [subjects, history]);
+  }, [filteredSubjects, history, isHsc]);
 
   if (isLoadingStats && !subjectStats.length) {
     return <DashboardSkeleton />;
@@ -212,7 +250,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       variants={staggerContainer}
       initial="hidden"
       animate="show"
-      className="w-full max-w-5xl xl:max-w-6xl mx-auto px-1 sm:px-2 md:px-3 py-2 sm:py-4 font-['HindSiliguri']"
+      className="w-full flex flex-col font-sans"
     >
       {/* 0. Live In-App Global Broadcast Announcement Banner */}
       <GlobalAnnouncementBanner />

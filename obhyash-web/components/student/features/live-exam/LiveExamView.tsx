@@ -19,6 +19,7 @@ import LiveExamRoutineModal from "./LiveExamRoutineModal";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { cn } from "@/lib/utils";
+import AppLayout from "@/components/student/ui/layout/AppLayout";
 
 export interface LiveExamViewProps {
   commonLayoutProps: any;
@@ -312,7 +313,17 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-6 font-['HindSiliguri']">
+    <AppLayout
+      activeTab="live_exam"
+      {...commonLayoutProps}
+      title="লাইভ মডেল টেস্ট"
+      onBack={() => {
+        if (commonLayoutProps?.onTabChange) {
+          commonLayoutProps.onTabChange("dashboard");
+        }
+      }}
+    >
+      <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-6 font-['HindSiliguri'] pb-24">
       {/* ── Top Header Bar with Routine Modal Trigger ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-7">
         <div>
@@ -460,6 +471,7 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
         onClose={() => setIsRoutineOpen(false)}
       />
     </div>
+  </AppLayout>
   );
 };
 

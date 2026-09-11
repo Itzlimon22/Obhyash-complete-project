@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { getStudentRouteUrl } from "@/lib/routes";
+
 
 // Types & Services
 import {
@@ -107,7 +108,6 @@ export default function StudentRoot({
   subjects = [],
   initialTab = "dashboard",
 }: StudentRootProps) {
-  const router = useRouter();
   // ... (keeping existing hooks and state)
   const engine = useExamEngine();
   // DO NOT call createClient() at component level — use AuthProvider's supabase context instead.
@@ -165,10 +165,10 @@ export default function StudentRoot({
       lastExamConfigRef.current = config;
       setPendingConfig(config);
       setAppState(AppState.INSTRUCTIONS);
+      setActiveTab("exam");
+      sessionStorage.setItem("obhyash_active_tab", "exam");
       if (typeof window !== "undefined") {
         window.history.pushState({ tab: "exam" }, "", "/exam/active");
-        setActiveTab("exam");
-        sessionStorage.setItem("obhyash_active_tab", "exam");
       }
     },
     [setAppState],
@@ -183,7 +183,11 @@ export default function StudentRoot({
 
       // 2. If success, Auto-Start Timer
       if (success && pendingConfig) {
-        beginTimer(pendingConfig.durationMinutes * 60);
+        const safeDuration =
+          pendingConfig.durationMinutes && pendingConfig.durationMinutes > 0
+            ? pendingConfig.durationMinutes
+            : 25;
+        beginTimer(safeDuration * 60);
       } else if (!success) {
         // This usually falls into AppState.ERROR, but engine might throw specifically
         toast.error(
@@ -705,8 +709,9 @@ export default function StudentRoot({
     const onPopState = (e: PopStateEvent) => {
       // Guard: don't navigate away mid-exam
       if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-        // Restore the URL without navigation
-        window.history.pushState({ tab: activeTab }, '', '/' + activeTab);
+        // Restore the canonical URL without triggering a navigation
+        const canonicalUrl = getStudentRouteUrl(activeTab);
+        window.history.pushState({ tab: activeTab }, '', canonicalUrl);
         setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
         return;
       }
@@ -766,10 +771,14 @@ export default function StudentRoot({
 
       setActiveTab(tab);
       sessionStorage.setItem("obhyash_active_tab", tab);
-      if (typeof window !== "undefined" && validTabs.includes(tab)) {
-        // pushState updates the URL bar without a page reload —
-        // safe on all devices including mobile Safari and PWA mode
-        window.history.pushState({ tab }, '', '/' + tab);
+
+      // Use pushState to update the URL bar without triggering a server
+      // navigation — StudentRoot is a persistent SPA shell, so we want
+      // the URL to reflect the current view without re-mounting the component.
+      // getStudentRouteUrl() ensures canonical, consistent paths across tabs.
+      if (typeof window !== "undefined") {
+        const canonicalUrl = getStudentRouteUrl(tab);
+        window.history.pushState({ tab }, "", canonicalUrl);
       }
     }
   };
@@ -1011,6 +1020,8 @@ export default function StudentRoot({
           >
             <ExamHistoryView
               history={examHistory}
+              subjects={subjects}
+              user={effectiveUser}
               onBack={() => handleTabChange("dashboard")}
               onClearHistory={async (ids?: string[]) => {
                 const { clearExamHistory, bulkDeleteExamResults } =
@@ -1074,6 +1085,7 @@ export default function StudentRoot({
             title="লিডারবোর্ড"
           >
             <LeaderboardView
+              currentUser={effectiveUser}
               onLegendsLeagueClick={() => handleTabChange("legends-league")}
               onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
@@ -1199,6 +1211,7 @@ export default function StudentRoot({
             onBack={() => handleTabChange("dashboard")}
           >
             <AnalysisView
+              currentUser={currentUser || effectiveUser}
               history={examHistory}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
@@ -1437,28 +1450,47 @@ export default function StudentRoot({
             />
           </AppLayout>
         );
-      if (activeTab === "subject_report" && selectedSubjectReport)
-        return (
-          <AppLayout
-            activeTab="dashboard"
-            {...commonLayoutProps}
-            title={
-              selectedSubjectReport
-                ? `${BanglaNameHelper.formatSubject(
-                    selectedSubjectReport,
-                    selectedSubjectReport
-                  )} রিপোর্ট`
-                : "বিষয়ভিত্তিক রিপোর্ট"
-            }
-            onBack={() => handleTabChange("dashboard")}
-          >
-            <SubjectReportView
-              subject={selectedSubjectReport}
-              history={examHistory}
+      if (activeTab === "subject_report") {
+        if (selectedSubjectReport) {
+          return (
+            <AppLayout
+              activeTab="analysis"
+              {...commonLayoutProps}
+              title={`${BanglaNameHelper.formatSubject(
+                selectedSubjectReport,
+                selectedSubjectReport
+              )} রিপোর্ট`}
+              onBack={() => handleTabChange("analysis")}
+            >
+              <SubjectReportView
+                subject={selectedSubjectReport}
+                history={examHistory}
+                currentUser={currentUser || effectiveUser}
+                onBack={() => handleTabChange("analysis")}
+              />
+            </AppLayout>
+          );
+        } else {
+          return (
+            <AppLayout
+              activeTab="analysis"
+              {...commonLayoutProps}
+              title="পারফরম্যান্স অ্যানালিটিক্স"
               onBack={() => handleTabChange("dashboard")}
-            />
-          </AppLayout>
-        );
+            >
+              <AnalysisView
+                currentUser={currentUser || effectiveUser}
+                history={examHistory}
+                onSubjectClick={(subject) => {
+                  setSelectedSubjectReport(subject);
+                  setActiveTab("subject_report");
+                }}
+                onStartExam={() => handleTabChange("setup")}
+              />
+            </AppLayout>
+          );
+        }
+      }
     }
 
     // --- Active Exam States ---
@@ -1466,25 +1498,21 @@ export default function StudentRoot({
     if (appState === AppState.INSTRUCTIONS) {
       if (examDetails) {
         // If we have examDetails, it means we just fetched questions and are about to start.
-        // Show loading or skeleton while changing to ACTIVE
         return (
-          <AppLayout
-            activeTab="dashboard"
-            {...commonLayoutProps}
-            title="শুরু হচ্ছে..."
-          >
-            <ResultSkeleton />
-          </AppLayout>
+          <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col items-center justify-center font-['HindSiliguri',sans-serif]">
+            <ExamLoadingSkeleton />
+          </div>
         );
       }
 
-      // Otherwise show Pre-Fetch Instructions
+      // Otherwise show Pre-Fetch Instructions (STANDALONE, WITHOUT SIDEBAR)
       if (pendingConfig) {
         return (
           <ExamInstructionsView
             config={pendingConfig}
             onStart={handleProceedToExam}
             onBack={() => setAppState(AppState.IDLE)}
+            showHeader={true}
           />
         );
       }
@@ -1548,36 +1576,42 @@ export default function StudentRoot({
 
     if (appState === AppState.LOADING) {
       return (
-        <AppLayout
-          activeTab="dashboard"
-          {...commonLayoutProps}
-          title="লোড হচ্ছে..."
-        >
-          <ExamLoadingSkeleton />
-        </AppLayout>
+        <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col font-['HindSiliguri',sans-serif]">
+          {/* Standalone Exam Loading Header */}
+          <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center justify-between px-4 sm:px-6 shadow-xs">
+            <span className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white">
+              প্রশ্ন প্রস্তুত হচ্ছে...
+            </span>
+            <button
+              type="button"
+              onClick={() => setAppState(AppState.IDLE)}
+              className="text-xs sm:text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] hover:text-red-500 transition-colors"
+            >
+              বাতিল করো
+            </button>
+          </header>
+          <div className="flex-1 py-4 sm:py-6">
+            <ExamLoadingSkeleton />
+          </div>
+        </div>
       );
     }
 
     if (isEvaluating) {
       return (
-        <AppLayout
-          activeTab="dashboard"
-          {...commonLayoutProps}
-          title="প্রসেসিং..."
-        >
+        <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col items-center justify-center p-4">
           <ResultSkeleton />
-        </AppLayout>
+        </div>
       );
     }
 
     if (appState === AppState.COMPLETED) {
       return (
-        <ResultView
-          questions={questions}
-          userAnswers={userAnswers}
-          timeTaken={timeTaken}
-          initialBookmarks={flaggedQuestions}
-          onRestart={() => {
+        <AppLayout
+          activeTab={isReviewingHistory ? "history" : "dashboard"}
+          {...commonLayoutProps}
+          title={isReviewingHistory ? "পরীক্ষার ইতিহাস ও ফলাফল" : "পরীক্ষার ফলাফল"}
+          onBack={() => {
             setAppState(AppState.IDLE);
             setIsReviewingHistory(false);
             const targetTab = isReviewingHistory ? "history" : "dashboard";
@@ -1590,58 +1624,79 @@ export default function StudentRoot({
               );
             }
           }}
-          isDarkMode={theme === "dark"}
-          onToggleTheme={toggleTheme}
-          isHistoryMode={isReviewingHistory}
-          negativeMarking={examDetails?.negativeMarking}
-          submissionType={
-            examHistory[examHistory.length - 1]?.submissionType === "script"
-              ? "script"
-              : "digital"
-          }
-          onDownloadQuestionPaper={() =>
-            examDetails && downloadQuestionPaper(examDetails, questions)
-          }
-          onDownloadResultWithExplanations={() =>
-            examDetails && downloadResultWithExplanations(examDetails, questions, userAnswers)
-          }
-          currentUser={currentUser}
-          bookmarkedIds={bookmarkedIds}
-          onToggleBookmark={toggleBookmark}
-          examDetails={examDetails ?? undefined}
-          onRetryWrongAnswers={
-            isReviewingHistory ? undefined : handleRetryWrongAnswers
-          }
-          onReexam={() => {
-            setAppState(AppState.IDLE);
-            setIsReviewingHistory(false);
-            setActiveTab("setup");
-            if (typeof window !== "undefined") {
-              window.history.pushState({ tab: "setup" }, "", "/setup");
+        >
+          <ResultView
+            questions={questions}
+            userAnswers={userAnswers}
+            timeTaken={timeTaken}
+            initialBookmarks={flaggedQuestions}
+            onRestart={() => {
+              setAppState(AppState.IDLE);
+              setIsReviewingHistory(false);
+              const targetTab = isReviewingHistory ? "history" : "dashboard";
+              setActiveTab(targetTab);
+              if (typeof window !== "undefined") {
+                window.history.pushState(
+                  { tab: targetTab },
+                  "",
+                  "/" + targetTab
+                );
+              }
+            }}
+            isDarkMode={theme === "dark"}
+            onToggleTheme={toggleTheme}
+            isHistoryMode={isReviewingHistory}
+            negativeMarking={examDetails?.negativeMarking}
+            submissionType={
+              examHistory[examHistory.length - 1]?.submissionType === "script"
+                ? "script"
+                : "digital"
             }
-          }}
-        />
+            onDownloadQuestionPaper={() =>
+              examDetails && downloadQuestionPaper(examDetails, questions)
+            }
+            onDownloadResultWithExplanations={() =>
+              examDetails && downloadResultWithExplanations(examDetails, questions, userAnswers)
+            }
+            currentUser={currentUser}
+            bookmarkedIds={bookmarkedIds}
+            onToggleBookmark={toggleBookmark}
+            examDetails={examDetails ?? undefined}
+            onRetryWrongAnswers={
+              isReviewingHistory ? undefined : handleRetryWrongAnswers
+            }
+            onReexam={() => {
+              setAppState(AppState.IDLE);
+              setIsReviewingHistory(false);
+              setActiveTab("setup");
+              if (typeof window !== "undefined") {
+                window.history.pushState({ tab: "setup" }, "", "/setup");
+              }
+            }}
+            showHeader={false}
+          />
+        </AppLayout>
       );
     }
 
     if (appState === AppState.ERROR) {
       return (
-        <AppLayout activeTab="dashboard" {...commonLayoutProps} title="ত্রুটি">
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
-            <h2 className="text-2xl font-bold text-red-600 mb-2">
+        <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col items-center justify-center p-4 font-['HindSiliguri',sans-serif]">
+          <div className="w-full max-w-md bg-white dark:bg-[#141417] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 text-center shadow-xl">
+            <h2 className="text-xl font-bold text-red-600 mb-2">
               ত্রুটি হয়েছে
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-              {errorDetails}
+            <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 mb-6">
+              {errorDetails || "পরীক্ষা লোড করতে সমস্যা হয়েছে। অন্য অধ্যায় বা টপিক নির্বাচন করো।"}
             </p>
             <button
               onClick={() => setAppState(AppState.IDLE)}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg"
+              className="w-full py-3 px-6 bg-[#004633] hover:bg-[#003828] text-white font-bold rounded-xl transition cursor-pointer"
             >
               ফিরে যাও
             </button>
           </div>
-        </AppLayout>
+        </div>
       );
     }
 

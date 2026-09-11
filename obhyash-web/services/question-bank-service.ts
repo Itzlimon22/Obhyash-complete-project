@@ -42,7 +42,39 @@ export function getInstituteSearchTags(instituteId: string): string[] {
     case "gst":
     case "agri":
       return ["GST", "গুচ্ছ", "কৃষি গুচ্ছ", "Agri"];
+    case "board_dhaka":
+      return ["DB", "ঢাকা বোর্ড", "Dhaka Board", "Dhaka"];
+    case "board_rajshahi":
+      return ["RB", "রাজশাহী বোর্ড", "Rajshahi Board", "Rajshahi"];
+    case "board_chittagong":
+      return ["CB", "CtgB", "চট্টগ্রাম বোর্ড", "Chittagong Board", "Chittagong", "Chattogram Board"];
+    case "board_comilla":
+      return ["ComB", "CB", "কুমিল্লা বোর্ড", "Comilla Board", "Cumilla Board"];
+    case "board_jessore":
+      return ["JB", "যশোর বোর্ড", "Jessore Board", "Jashore Board"];
+    case "board_sylhet":
+      return ["SB", "সিলেট বোর্ড", "Sylhet Board"];
+    case "board_dinajpur":
+      return ["DinB", "দিনাজপুর বোর্ড", "Dinajpur Board"];
+    case "board_barisal":
+      return ["BB", "বরিশাল বোর্ড", "Barisal Board", "Barishal Board"];
+    case "board_mymensingh":
+      return ["MB", "ময়মনসিংহ বোর্ড", "Mymensingh Board"];
+    case "school_rajuk":
+      return ["রাজউক উত্তরা", "Rajuk", "Rajuk Uttara"];
+    case "school_ideal":
+      return ["আইডিয়াল", "Ideal School", "Ideal"];
+    case "school_viqarunnisa":
+      return ["ভিকারুননিসা", "Viqarunnisa", "VNC"];
+    case "school_cadet":
+      return ["ক্যাডেট কলেজ", "Cadet College", "Cadet"];
+    case "school_st_joseph":
+      return ["সেন্ট জোসেফ", "St. Joseph", "Joseph"];
     default:
+      if (id.startsWith("board_")) {
+        const boardName = id.replace("board_", "");
+        return [instituteId.toUpperCase(), boardName, `${boardName.toUpperCase()} BOARD`];
+      }
       return [instituteId.toUpperCase()];
   }
 }

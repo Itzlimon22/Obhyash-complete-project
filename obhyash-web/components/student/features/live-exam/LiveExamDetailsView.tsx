@@ -149,6 +149,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         }}
         isDarkMode={commonLayoutProps.isDarkMode}
         toggleTheme={commonLayoutProps.toggleTheme}
+        commonLayoutProps={commonLayoutProps}
       />
     );
   }

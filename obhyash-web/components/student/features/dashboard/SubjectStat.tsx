@@ -177,7 +177,7 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
+      <div className="p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-sans">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <BarChart2 className="w-4.5 h-4.5" />
@@ -201,7 +201,7 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
   const attendedData = data.filter((s) => s.total > 0);
 
   return (
-    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
+    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-sans">
       {/* ── Header: BarChart Badge (Viridian Forest) + Title ── */}
       <div className="flex items-center justify-between gap-3 mb-3.5">
         <div className="flex items-center gap-2">

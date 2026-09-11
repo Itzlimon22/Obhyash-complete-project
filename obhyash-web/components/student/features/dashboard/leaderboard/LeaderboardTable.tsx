@@ -72,7 +72,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   };
 
   return (
-    <div className="space-y-4 font-['HindSiliguri']">
+    <div className="space-y-4 font-sans">
       {/* Top 3 Podium */}
       {!isLoading && top3.length > 0 && (
         <LeaderboardPodium

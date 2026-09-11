@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none">
+  <defs>
+    <linearGradient id="champShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E11D48" />
+      <stop offset="50%" stop-color="#BE123C" />
+      <stop offset="100%" stop-color="#881337" />
+    </linearGradient>
+    <linearGradient id="champBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE4E6" />
+      <stop offset="30%" stop-color="#FB7185" />
+      <stop offset="70%" stop-color="#E11D48" />
+      <stop offset="100%" stop-color="#4C0519" />
+    </linearGradient>
+    <linearGradient id="crownGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="40%" stop-color="#FACC15" />
+      <stop offset="100%" stop-color="#CA8A04" />
+    </linearGradient>
+    <filter id="shadowChamp" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#4C0519" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <circle cx="100" cy="104" r="82" fill="#4C0519" />
+  <circle cx="100" cy="98" r="82" fill="url(#champShield)" stroke="url(#champBorder)" stroke-width="7" filter="url(#shadowChamp)" />
+  <circle cx="100" cy="98" r="66" fill="#30030E" stroke="#FB7185" stroke-width="2.5" />
+
+  <!-- Glass Specular Highlight -->
+  <path d="M 40 70 C 50 40 85 24 125 24 C 75 35 45 65 40 70 Z" fill="#FFFFFF" opacity="0.3" />
+
+  <!-- 3D Royal Crown & Laurels Centerpiece -->
+  <g transform="translate(100, 96)">
+    <!-- Golden Crown -->
+    <path d="M -30 18 L -36 -14 L -16 -2 L 0 -22 L 16 -2 L 36 -14 L 30 18 Z" fill="url(#crownGold)" stroke="#A16207" stroke-width="2" />
+    <rect x="-30" y="18" width="60" height="8" rx="2" fill="#CA8A04" />
+
+    <!-- Crown Jewels -->
+    <circle cx="-36" cy="-14" r="3" fill="#38BDF8" />
+    <circle cx="0" cy="-22" r="3.5" fill="#EF4444" />
+    <circle cx="36" cy="-14" r="3" fill="#38BDF8" />
+    <circle cx="-16" cy="22" r="2.5" fill="#EF4444" />
+    <circle cx="0" cy="22" r="3" fill="#10B981" />
+    <circle cx="16" cy="22" r="2.5" fill="#EF4444" />
+  </g>
+</svg>
