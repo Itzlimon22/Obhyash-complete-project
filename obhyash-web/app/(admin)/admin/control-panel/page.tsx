@@ -27,6 +27,9 @@ import {
   Globe,
   ExternalLink,
   Gift,
+  Zap,
+  FileCheck,
+  Phone,
 } from 'lucide-react';
 import { AppConfig } from '@/components/admin/dashboard/system-controls-card';
 
@@ -413,7 +416,192 @@ export default function ControlPanelPage() {
         </div>
       </div>
 
-      {/* ── Section 2: নিরাপত্তা, অ্যান্টি-চিট ও অপব্যবহার রোধ ── */}
+      {/* ── Section 2: পেমেন্ট মেথড ও গেটওয়ে নিয়ন্ত্রণ ── */}
+      <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 space-y-5 shadow-sm">
+        <div className="flex items-center justify-between border-b border-neutral-100 dark:border-zinc-800 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-pink-500/10 text-pink-600 dark:text-pink-400">
+              <CreditCard size={18} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-neutral-900 dark:text-white">
+                ২. পেমেন্ট মেথড ও গেটওয়ে নিয়ন্ত্রণ (Payment Methods Control)
+              </h2>
+              <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+                ডাটাবেজ (app_config) থেকে সরাসরি মোবাইল অ্যাপ ও ওয়েবের পেমেন্ট মেথডসমূহ (Auto, Manual, Google Play) অন/অফ করুন
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Master Switch */}
+        <div
+          className={`p-4 rounded-2xl border transition-all ${
+            config.payments_enabled ?? true
+              ? 'bg-pink-50/50 dark:bg-pink-950/20 border-pink-200 dark:border-pink-900/40'
+              : 'bg-neutral-50 dark:bg-zinc-800/30 border-neutral-200 dark:border-zinc-800'
+          }`}
+        >
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                পেমেন্ট সিস্টেম মাস্টার সুইচ (Master Switch)
+              </span>
+              <span
+                className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
+                  config.payments_enabled ?? true
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                    : 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                }`}
+              >
+                {config.payments_enabled ?? true ? 'সক্রিয় (Active)' : 'বন্ধ (Disabled)'}
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              checked={config.payments_enabled ?? true}
+              onChange={(e) => handleToggle('payments_enabled', e.target.checked)}
+              className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer"
+            />
+          </div>
+          <p className="text-xs text-neutral-500 dark:text-zinc-400">
+            {config.payments_enabled ?? true
+              ? 'প্ল্যাটফর্মে পেমেন্ট সিস্টেম সম্পূর্ণরূপে চালু রয়েছে'
+              : 'জরুরি রক্ষণাবেক্ষণে সকল পেমেন্ট মেথড একসাথে বন্ধ রয়েছে'}
+          </p>
+        </div>
+
+        {/* 3 Granular Payment Method Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Method 1: Automatic Payment */}
+          <div className="p-4 rounded-2xl border bg-neutral-50/60 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                  <Zap size={16} className={config.payment_auto_enabled ?? true ? 'text-pink-600' : 'text-slate-400'} />
+                  অটোমেটিক পেমেন্ট
+                </span>
+                <input
+                  type="checkbox"
+                  checked={config.payment_auto_enabled ?? true}
+                  onChange={(e) => handleToggle('payment_auto_enabled', e.target.checked)}
+                  className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer"
+                />
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
+                {config.payment_auto_enabled ?? true
+                  ? 'উদ্দোক্তাপেমেন্ট (বিকাশ, নগদ, রকেট, কার্ড) তাত্ক্ষণিক সক্রিয়'
+                  : 'অটোমেটিক পেমেন্ট মেথড অ্যাপে প্রদর্শিত হবে না'}
+              </p>
+            </div>
+          </div>
+
+          {/* Method 2: Manual Payment */}
+          <div className="p-4 rounded-2xl border bg-neutral-50/60 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                  <FileCheck size={16} className={config.payment_manual_enabled ?? true ? 'text-emerald-600' : 'text-slate-400'} />
+                  ম্যানুয়াল পেমেন্ট
+                </span>
+                <input
+                  type="checkbox"
+                  checked={config.payment_manual_enabled ?? true}
+                  onChange={(e) => handleToggle('payment_manual_enabled', e.target.checked)}
+                  className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+                />
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
+                {config.payment_manual_enabled ?? true
+                  ? 'Send Money করে TrxID দিয়ে সাবমিশন ফর্ম চালু'
+                  : 'ম্যানুয়াল TrxID পেমেন্ট অপশনটি বন্ধ থাকবে'}
+              </p>
+            </div>
+          </div>
+
+          {/* Method 3: Google In-App Purchase */}
+          <div className="p-4 rounded-2xl border bg-neutral-50/60 dark:bg-zinc-800/30 border-neutral-200/80 dark:border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                  <Smartphone size={16} className={config.payment_google_play_enabled ?? true ? 'text-blue-600' : 'text-slate-400'} />
+                  গুগল ইন-অ্যাপ পারচেজ
+                </span>
+                <input
+                  type="checkbox"
+                  checked={config.payment_google_play_enabled ?? true}
+                  onChange={(e) => handleToggle('payment_google_play_enabled', e.target.checked)}
+                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                />
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
+                {config.payment_google_play_enabled ?? true
+                  ? 'গুগল প্লে স্টোর অফিসিয়াল ডিজিটাল বিলিং চালু'
+                  : 'প্লে কনসোল রিভিউ চলাকালে বা অন্য সময়ে গুগল বিলিং বন্ধ'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Manual Payment Merchant Number input */}
+        <div className="p-4 rounded-2xl border bg-neutral-50/40 dark:bg-zinc-800/20 border-neutral-200/80 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <Phone size={14} className="text-emerald-600" />
+              ম্যানুয়াল পেমেন্ট মার্চেন্ট নম্বর (Official Merchant / Personal Number):
+            </label>
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+              অ্যাপে শিক্ষার্থীরা &quot;কপি করুন&quot; বাটনে চাপলে এই নম্বরটি কপি হবে এবং নির্দেশিকাতে প্রদর্শিত হবে
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={config.manual_payment_merchant_number || '01749591456'}
+              onChange={(e) => setConfig({ ...config, manual_payment_merchant_number: e.target.value })}
+              className="w-44 px-3 py-2 text-sm font-mono font-bold rounded-xl border border-neutral-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <button
+              onClick={() => saveConfig(config)}
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all"
+            >
+              আপডেট
+            </button>
+          </div>
+        </div>
+
+        {/* Google Play Reviewer / Tester Email Guard */}
+        <div className="p-4 rounded-2xl border bg-neutral-50/40 dark:bg-zinc-800/20 border-neutral-200/80 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <ShieldAlert size={14} className="text-blue-600" />
+              গুগল রিভিউয়ার / টেস্টার ইমেইল গার্ড (Google Tester Shield):
+            </label>
+            <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+              এই ইমেইলগুলো দিয়ে লগইন করলে ডাটাবেজে বিকাশ/নগদ অন থাকলেও অ্যাপ স্বয়ংক্রিয়ভাবে <strong>শুধুমাত্র Google Play Billing</strong> দেখাবে
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={
+                config.reviewer_emails ||
+                'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com'
+              }
+              onChange={(e) => setConfig({ ...config, reviewer_emails: e.target.value })}
+              className="w-72 px-3 py-2 text-xs font-mono rounded-xl border border-neutral-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => saveConfig(config)}
+              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all"
+            >
+              সেভ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Section 3: নিরাপত্তা, অ্যান্টি-চিট ও অপব্যবহার রোধ ── */}
       <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between border-b border-neutral-100 dark:border-zinc-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -422,7 +610,7 @@ export default function ControlPanelPage() {
             </div>
             <div>
               <h2 className="text-base font-bold text-neutral-900 dark:text-white">
-                ২. নিরাপত্তা, অ্যান্টি-চিট ও অপব্যবহার রোধ (Security & Anti-Abuse)
+                ৩. নিরাপত্তা, অ্যান্টি-চিট ও অপব্যবহার রোধ (Security & Anti-Abuse)
               </h2>
               <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
                 চরচা (Chorcha) স্ট্যান্ডার্ড প্রোডাকশন সিকিউরিটি — একাউন্ট শেয়ারিং, স্ক্রিনশট পাইরেসি ও নকল প্রতিরোধ
@@ -561,7 +749,7 @@ export default function ControlPanelPage() {
         </div>
       </div>
 
-      {/* ── Section 3: ভার্সন কন্ট্রোল ও মোবাইল ফোর্স আপডেট ── */}
+      {/* ── Section 4: ভার্সন কন্ট্রোল ও মোবাইল ফোর্স আপডেট ── */}
       <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between border-b border-neutral-100 dark:border-zinc-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -570,7 +758,7 @@ export default function ControlPanelPage() {
             </div>
             <div>
               <h2 className="text-base font-bold text-neutral-900 dark:text-white">
-                ৩. মোবাইল ভার্সন কন্ট্রোল ও ফোর্স আপডেট (Mobile App Version Control)
+                ৪. মোবাইল ভার্সন কন্ট্রোল ও ফোর্স আপডেট (Mobile App Version Control)
               </h2>
               <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
                 প্লে স্টোরে নতুন ভার্সন এলে পুরোনো ভার্সন ব্যবহারকারীদের আপডেট বাধ্য করা
@@ -637,7 +825,7 @@ export default function ControlPanelPage() {
         </div>
       </div>
 
-      {/* ── Section 4: গ্লোবাল ইন-অ্যাপ ব্রডকাস্ট ব্যানার ── */}
+      {/* ── Section 5: গ্লোবাল ইন-অ্যাপ ব্রডকাস্ট ব্যানার ── */}
       <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
         <div className="flex items-center justify-between border-b border-neutral-100 dark:border-zinc-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -646,7 +834,7 @@ export default function ControlPanelPage() {
             </div>
             <div>
               <h2 className="text-base font-bold text-neutral-900 dark:text-white">
-                ৪. গ্লোবাল ইন-অ্যাপ ব্রডকাস্ট ব্যানার (Live Announcement Broadcaster)
+                ৫. গ্লোবাল ইন-অ্যাপ ব্রডকাস্ট ব্যানার (Live Announcement Broadcaster)
               </h2>
               <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
                 সকল শিক্ষার্থীর অ্যাপের হোমস্ক্রিনে তাৎক্ষণিক জরুরি বার্তা, নোটিশ বা অফার পাঠানো

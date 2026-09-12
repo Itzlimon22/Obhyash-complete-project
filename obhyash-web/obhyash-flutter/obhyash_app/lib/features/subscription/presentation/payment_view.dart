@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/providers/app_config_provider.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../../core/presentation/widgets/app_icon.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
@@ -13,6 +15,7 @@ import '../domain/coupon_service.dart';
 import 'widgets/coupon_bottom_sheet.dart';
 import 'uddoktapay_webview_screen.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 class SavedPaymentMethod {
   final String id;
@@ -34,17 +37,40 @@ class SavedPaymentMethod {
   }
 }
 
-class PaymentView extends StatefulWidget {
-  final SubscriptionPlan plan;
-  final String? appliedCouponCode;
-
-  const PaymentView({super.key, required this.plan, this.appliedCouponCode});
-
-  @override
-  State<PaymentView> createState() => _PaymentViewState();
+enum PaymentFlowType {
+  automatic,
+  manual,
 }
 
-class _PaymentViewState extends State<PaymentView>
+class PaymentView extends ConsumerStatefulWidget {
+  final SubscriptionPlan plan;
+  final String? appliedCouponCode;
+  final PaymentFlowType flowType;
+
+  const PaymentView({
+    super.key,
+    required this.plan,
+    this.appliedCouponCode,
+    this.flowType = PaymentFlowType.automatic,
+  });
+
+  const PaymentView.auto({
+    super.key,
+    required this.plan,
+    this.appliedCouponCode,
+  }) : flowType = PaymentFlowType.automatic;
+
+  const PaymentView.manual({
+    super.key,
+    required this.plan,
+    this.appliedCouponCode,
+  }) : flowType = PaymentFlowType.manual;
+
+  @override
+  ConsumerState<PaymentView> createState() => _PaymentViewState();
+}
+
+class _PaymentViewState extends ConsumerState<PaymentView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   String _selectedMethod = 'bKash';
@@ -54,7 +80,7 @@ class _PaymentViewState extends State<PaymentView>
   List<SavedPaymentMethod> _savedMethods = [];
   bool _showSuccess = false;
 
-  static const _merchantNumber = '01749591456';
+  String get _merchantNumber => ref.watch(manualPaymentMerchantNumberProvider);
 
   bool _hasPendingPayment = false;
   String? _pendingTrxId;
@@ -62,7 +88,7 @@ class _PaymentViewState extends State<PaymentView>
   bool _isCancellingPending = false;
 
   // Payment Mode: 0 = Instant (Auto), 1 = Manual (TrxID)
-  int _paymentMode = 0;
+  late int _paymentMode;
 
   // Coupon state
   late SubscriptionPlan _currentPlan;
@@ -71,6 +97,7 @@ class _PaymentViewState extends State<PaymentView>
   @override
   void initState() {
     super.initState();
+    _paymentMode = widget.flowType == PaymentFlowType.manual ? 1 : 0;
     _currentPlan = widget.plan;
     if (widget.appliedCouponCode != null && widget.appliedCouponCode!.isNotEmpty) {
       final res = CouponService.validate(widget.appliedCouponCode!, widget.plan.price);
@@ -256,7 +283,7 @@ class _PaymentViewState extends State<PaymentView>
   }
 
   Future<void> _copyNumber() async {
-    await Clipboard.setData(const ClipboardData(text: _merchantNumber));
+    await Clipboard.setData(ClipboardData(text: _merchantNumber));
     if (mounted) {
       AppPopups.success(context, message: 'নম্বর কপি করা হয়েছে!');
     }
@@ -460,7 +487,9 @@ class _PaymentViewState extends State<PaymentView>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'পেমেন্ট প্রসেসিং',
+                    widget.flowType == PaymentFlowType.manual
+                        ? 'ম্যানুয়াল পেমেন্ট (TrxID)'
+                        : 'অটোমেটিক পেমেন্ট',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -491,7 +520,9 @@ class _PaymentViewState extends State<PaymentView>
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'পেমেন্ট সফলভাবে জমা হয়েছে',
+                        widget.flowType == PaymentFlowType.automatic
+                            ? 'প্রো সাবস্ক্রিপশন সফলভাবে সক্রিয় হয়েছে!'
+                            : 'পেমেন্ট সফলভাবে জমা হয়েছে',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -504,7 +535,9 @@ class _PaymentViewState extends State<PaymentView>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
-                          'আমাদের টিম যাচাই করার পর দ্রুত তোমার প্ল্যানটি চালু করে দিবে।',
+                          widget.flowType == PaymentFlowType.automatic
+                              ? 'আপনার অ্যাকাউন্টে সকল প্রিমিয়াম ফিচার আনলক করা হয়েছে।'
+                              : 'আমাদের টিম যাচাই করার পর দ্রুত তোমার প্ল্যানটি চালু করে দিবে।',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
@@ -701,117 +734,6 @@ class _PaymentViewState extends State<PaymentView>
           ),
           const SizedBox(height: 14),
 
-          // ── Payment Mode Segmented Selector ───────────────────────────
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 14),
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _paymentMode = 0),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _paymentMode == 0
-                            ? const Color(0xFF059669)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: _paymentMode == 0
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            LucideIcons.zap,
-                            size: 15,
-                            color: _paymentMode == 0
-                                ? Colors.white
-                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'ইনস্ট্যান্ট (অটো)',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.bold,
-                              color: _paymentMode == 0
-                                  ? Colors.white
-                                  : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _paymentMode = 1),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _paymentMode == 1
-                            ? const Color(0xFF059669)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: _paymentMode == 1
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            LucideIcons.fileText,
-                            size: 15,
-                            color: _paymentMode == 1
-                                ? Colors.white
-                                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'ম্যানুয়াল (TrxID)',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.bold,
-                              color: _paymentMode == 1
-                                  ? Colors.white
-                                  : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           // ── OPTION 0: Instant Online Payment (UddoktaPay) ────────────────
           if (_paymentMode == 0) ...[
             Container(
@@ -931,12 +853,16 @@ class _PaymentViewState extends State<PaymentView>
                         customerEmail: user.email,
                       );
                       if (success == true) {
+                        ref.invalidate(userProfileProvider);
                         if (mounted) {
                           setState(() => _showSuccess = true);
                           AppPopups.success(
                             context,
                             message: '🎉 অভিনন্দন! আপনার প্রো সাবস্ক্রিপশন সফলভাবে চালু হয়েছে!',
                           );
+                          Future.delayed(const Duration(seconds: 2), () {
+                            if (mounted) Navigator.pop(context, true);
+                          });
                         }
                       }
                     },
@@ -1748,7 +1674,7 @@ class _PaymentViewState extends State<PaymentView>
       ),
       (
         q: 'কিভাবে পেমেন্ট সম্পন্ন করবেন?',
-        a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর 01749591456 দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
+        a: '১. আপনার বিকাশ বা নগদ অ্যাপে গিয়ে "Send Money" করুন।\n২. আমাদের অফিসিয়াল মার্চেন্ট নম্বর $_merchantNumber দিন।\n৩. প্যাকেজের নির্ধারিত সঠিক টাকা পাঠান।\n৪. পেমেন্ট সম্পন্ন হলে ফিরতি SMS বা অ্যাপ থেকে TrxID কপি করে "বিস্তারিত" ফর্মে সাবমিট করুন।',
       ),
       (
         q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট প্রিমিয়াম হবে?',
@@ -2680,6 +2606,46 @@ class _FaqTileState extends State<_FaqTile> {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Dedicated Page for Automatic / Instant Payment (UddoktaPay: bKash, Nagad, Cards)
+class AutoPaymentView extends StatelessWidget {
+  final SubscriptionPlan plan;
+  final String? appliedCouponCode;
+
+  const AutoPaymentView({
+    super.key,
+    required this.plan,
+    this.appliedCouponCode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PaymentView.auto(
+      plan: plan,
+      appliedCouponCode: appliedCouponCode,
+    );
+  }
+}
+
+/// Dedicated Page for Manual Payment (bKash / Nagad Send Money & TrxID)
+class ManualPaymentView extends StatelessWidget {
+  final SubscriptionPlan plan;
+  final String? appliedCouponCode;
+
+  const ManualPaymentView({
+    super.key,
+    required this.plan,
+    this.appliedCouponCode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PaymentView.manual(
+      plan: plan,
+      appliedCouponCode: appliedCouponCode,
     );
   }
 }

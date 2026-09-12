@@ -107,3 +107,60 @@ export function getStudentRouteUrl(tab: string): string {
       return '/' + tab;
   }
 }
+
+/**
+ * Logical parent route mapping for hierarchical fallback navigation.
+ * When a user directly visits a deep-link (e.g. bookmarks or shared URL),
+ * pressing "Back" gracefully navigates to its logical parent instead of exiting.
+ */
+export const PARENT_ROUTE_MAP: Record<string, string> = {
+  // Settings & Account Sub-routes
+  'account-info': 'settings',
+  'info': 'settings',
+  'personal': 'settings',
+  'edit-profile': 'settings',
+  'account-linking': 'settings',
+  'delete-account': 'settings',
+  'faq': 'settings',
+  'help': 'settings',
+  'about': 'settings',
+  'privacy': 'settings',
+  'terms': 'settings',
+  'reports': 'settings',
+  'my-subscription': 'settings',
+
+  // Deep Views
+  'user_profile': 'leaderboard',
+  'subject_report': 'dashboard',
+  'history_result': 'history',
+
+  // Feature Sub-routes (Logical parent is Dashboard)
+  'settings': 'dashboard',
+  'profile': 'dashboard',
+  'setup': 'dashboard',
+  'exam': 'dashboard',
+  'live_exam': 'dashboard',
+  'question_bank': 'dashboard',
+  'question-bank': 'dashboard',
+  'history': 'dashboard',
+  'practice': 'dashboard',
+  'leaderboard': 'dashboard',
+  'analysis': 'dashboard',
+  'formulas': 'dashboard',
+  'bookmarks': 'dashboard',
+  'notifications': 'dashboard',
+  'complaint': 'dashboard',
+  'feature-requests': 'dashboard',
+  'subscription': 'dashboard',
+  'upgrade': 'dashboard',
+  'referral': 'dashboard',
+  'legends-league': 'dashboard',
+  'legends_league': 'dashboard',
+};
+
+/**
+ * Gets the logical parent route for any given tab identifier.
+ */
+export function getParentRoute(tab: string): string {
+  return PARENT_ROUTE_MAP[tab] || 'dashboard';
+}

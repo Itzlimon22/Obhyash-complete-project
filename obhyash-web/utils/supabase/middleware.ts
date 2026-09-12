@@ -133,7 +133,15 @@ export async function updateSession(request: NextRequest) {
     const cachedCookie = request.cookies.get('obhyash_role_cache');
     if (cachedCookie?.value) {
       try {
-        const parsed = JSON.parse(cachedCookie.value);
+        let val = cachedCookie.value;
+        if (val.startsWith('%') || val.includes('%22')) {
+          try {
+            val = decodeURIComponent(val);
+          } catch {
+            // fallback to val
+          }
+        }
+        const parsed = JSON.parse(val);
         if (parsed && parsed.role && parsed.userId === user.id) {
           profile = parsed;
         }

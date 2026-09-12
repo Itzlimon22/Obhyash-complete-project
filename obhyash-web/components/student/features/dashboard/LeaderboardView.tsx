@@ -602,37 +602,37 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <div className="grid grid-cols-3 gap-1 bg-neutral-100 dark:bg-[#141416] p-1 rounded-xl">
           <button
             onClick={() => setViewMode("level")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === "level"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
             }`}
           >
-            <Trophy size={18} className={viewMode === "level" ? "text-amber-500" : ""} />
+            <Trophy size={16} className={viewMode === "level" ? "text-amber-500" : ""} />
             <span>র‍্যাংকিং</span>
           </button>
 
           <button
             onClick={() => setViewMode("college")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === "college"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
             }`}
           >
-            <Building2 size={18} className={viewMode === "college" ? "text-emerald-500" : ""} />
+            <Building2 size={16} className={viewMode === "college" ? "text-emerald-500" : ""} />
             <span>আমার {instLabel}</span>
           </button>
 
           <button
             onClick={() => setViewMode("rankings")}
-            className={`py-2.5 px-3 rounded-lg text-sm sm:text-base font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               viewMode === "rankings"
                 ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
                 : "text-neutral-500 hover:text-black dark:hover:text-white"
             }`}
           >
-            <Medal size={18} className={viewMode === "rankings" ? "text-indigo-500" : ""} />
+            <Medal size={16} className={viewMode === "rankings" ? "text-indigo-500" : ""} />
             <span>সব {instLabel}</span>
           </button>
         </div>

@@ -16,13 +16,10 @@ export async function getStudentPageData(): Promise<{
     redirect('/login');
   }
 
-  const { data: dbProfile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  const { data: subjectsData } = await supabase.from('subjects').select('*');
+  const [{ data: dbProfile }, { data: subjectsData }] = await Promise.all([
+    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase.from('subjects').select('*'),
+  ]);
   const subjects = subjectsData || [];
 
   const userProfile: UserProfile = dbProfile

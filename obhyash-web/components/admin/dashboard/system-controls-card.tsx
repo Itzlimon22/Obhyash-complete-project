@@ -38,6 +38,11 @@ export interface AppConfig {
   exam_anti_cheat_enabled?: boolean;
   max_tab_switches_allowed?: number;
   payments_enabled?: boolean;
+  payment_auto_enabled?: boolean;
+  payment_manual_enabled?: boolean;
+  payment_google_play_enabled?: boolean;
+  manual_payment_merchant_number?: string;
+  reviewer_emails?: string;
   leaderboard_enabled?: boolean;
   max_free_exams_per_day?: number;
   update_url?: string;
@@ -113,11 +118,19 @@ export function SystemControlsCard({
           </div>
         </div>
 
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800 animate-in fade-in">
-            <CheckCircle2 size={14} /> সেটিংস সংরক্ষিত হয়েছে
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {saveSuccess && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800 animate-in fade-in">
+              <CheckCircle2 size={14} /> সেটিংস সংরক্ষিত হয়েছে
+            </span>
+          )}
+          <a
+            href="/admin/control-panel"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-700 dark:text-zinc-200 bg-neutral-100 hover:bg-neutral-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-zinc-700 transition-colors"
+          >
+            <Sliders size={13} /> সম্পূর্ণ কন্ট্রোল প্যানেল &rarr;
+          </a>
+        </div>
       </div>
 
       {/* Emergency Platform & Security Control Switches Grid */}

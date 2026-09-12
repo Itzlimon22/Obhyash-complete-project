@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,7 @@ import 'services/anti_piracy_service.dart';
 import 'core/services/shake_feedback_service.dart';
 import 'core/services/device_security_service.dart';
 import 'core/presentation/screens/device_blocked_screen.dart';
+import 'features/subscription/services/in_app_purchase_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,6 +82,9 @@ void main() async {
       authFlowType: AuthFlowType.pkce,
     ),
   );
+
+  // Initialize Google Play In-App Purchase
+  unawaited(InAppPurchaseService().initialize());
 
   runApp(
     ProviderScope(

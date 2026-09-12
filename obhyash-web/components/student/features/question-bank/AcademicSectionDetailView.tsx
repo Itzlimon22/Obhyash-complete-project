@@ -343,7 +343,7 @@ export default function AcademicSectionDetailView({
         </button>
 
         <div className="text-center min-w-0 max-w-[70%]">
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl text-neutral-900 dark:text-white truncate">
+          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white truncate">
             {displayTitle} - {section.title}
           </h1>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">

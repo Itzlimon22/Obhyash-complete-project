@@ -376,7 +376,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
         >
           <ArrowLeft size={18} strokeWidth={2.2} />
         </button>
-        <h1 className="text-lg sm:text-xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight text-center truncate max-w-[70%]">
+        <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight text-center truncate max-w-[70%]">
           {examSet.title}
         </h1>
       </div>

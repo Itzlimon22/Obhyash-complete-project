@@ -17,6 +17,11 @@ class AppConfigModel {
   final bool examAntiCheatEnabled;
   final int maxTabSwitchesAllowed;
   final bool paymentsEnabled;
+  final bool paymentAutoEnabled;
+  final bool paymentManualEnabled;
+  final bool paymentGooglePlayEnabled;
+  final String manualPaymentMerchantNumber;
+  final String reviewerEmails;
   final bool leaderboardEnabled;
   final int maxFreeExamsPerDay;
   final bool referralSystemEnabled;
@@ -42,6 +47,12 @@ class AppConfigModel {
     this.examAntiCheatEnabled = true,
     this.maxTabSwitchesAllowed = 2,
     this.paymentsEnabled = true,
+    this.paymentAutoEnabled = true,
+    this.paymentManualEnabled = true,
+    this.paymentGooglePlayEnabled = true,
+    this.manualPaymentMerchantNumber = '01749591456',
+    this.reviewerEmails =
+        'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
     this.leaderboardEnabled = true,
     this.maxFreeExamsPerDay = 5,
     this.referralSystemEnabled = true,
@@ -78,6 +89,20 @@ class AppConfigModel {
           json['max_tab_switches_allowed'] as int? ?? 2,
       paymentsEnabled:
           json['payments_enabled'] as bool? ?? true,
+      paymentAutoEnabled: json['payment_auto_enabled'] as bool? ??
+          json['auto_payment_enabled'] as bool? ??
+          true,
+      paymentManualEnabled: json['payment_manual_enabled'] as bool? ??
+          json['manual_payment_enabled'] as bool? ??
+          true,
+      paymentGooglePlayEnabled: json['payment_google_play_enabled'] as bool? ??
+          json['google_play_enabled'] as bool? ??
+          true,
+      manualPaymentMerchantNumber:
+          json['manual_payment_merchant_number'] as String? ??
+              '01749591456',
+      reviewerEmails: json['reviewer_emails'] as String? ??
+          'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
       leaderboardEnabled:
           json['leaderboard_enabled'] as bool? ?? true,
       maxFreeExamsPerDay:
@@ -106,6 +131,11 @@ class AppConfigModel {
         'exam_anti_cheat_enabled': examAntiCheatEnabled,
         'max_tab_switches_allowed': maxTabSwitchesAllowed,
         'payments_enabled': paymentsEnabled,
+        'payment_auto_enabled': paymentAutoEnabled,
+        'payment_manual_enabled': paymentManualEnabled,
+        'payment_google_play_enabled': paymentGooglePlayEnabled,
+        'manual_payment_merchant_number': manualPaymentMerchantNumber,
+        'reviewer_emails': reviewerEmails,
         'leaderboard_enabled': leaderboardEnabled,
         'max_free_exams_per_day': maxFreeExamsPerDay,
         'referral_system_enabled': referralSystemEnabled,

@@ -83,7 +83,7 @@ class ForceUpdateScreen extends StatelessWidget {
                     Text(
                       isPlayStore
                           ? 'অভ্যাস অ্যাপের নতুন ফিচার ও দ্রুত পারফরম্যান্স পেতে গুগল প্লে-স্টোর থেকে নতুন ভার্সন (v$minVersion) আপডেট করে নিন।'
-                          : 'অভ্যাস অ্যাপের আরও উন্নত পারফরম্যান্স পেতে অনুগ্রহ করে নতুন APK ভার্সন (v$minVersion) ডাউনলোড ও আপডেট করে নিন।',
+                          : 'অভ্যাস অ্যাপের আরও উন্নত পারফরম্যান্স পেতে অনুগ্রহ করে নতুন ভার্সন (v$minVersion) আপডেট করে নিন।',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -103,7 +103,7 @@ class ForceUpdateScreen extends StatelessWidget {
                         label: Text(
                           isPlayStore
                               ? 'প্লে-স্টোর থেকে আপডেট করুন'
-                              : 'নতুন APK ডাউনলোড ও আপডেট করুন',
+                              : 'নতুন ভার্সন আপডেট করুন',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

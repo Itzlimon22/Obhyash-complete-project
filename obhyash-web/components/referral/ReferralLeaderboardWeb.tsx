@@ -29,9 +29,9 @@ export const ReferralLeaderboardWeb: React.FC = () => {
   }, []);
 
   const getPrizeText = (rank: number) => {
-    if (rank === 1) return 'টি-শার্ট + ১০০০ টাকা';
-    if (rank === 2) return 'টি-শার্ট + ৫০০ টাকা';
-    if (rank === 3) return 'টি-শার্ট + ১০০ টাকা';
+    if (rank === 1) return 'টি-শার্ট + মেগা গিফট বক্স';
+    if (rank === 2) return 'টি-শার্ট + স্পেশাল গিফট বক্স';
+    if (rank === 3) return 'টি-শার্ট + গিফট ভাউচার';
     return 'টি-শার্ট';
   };
 

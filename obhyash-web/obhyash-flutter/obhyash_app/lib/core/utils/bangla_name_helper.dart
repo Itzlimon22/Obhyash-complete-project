@@ -1052,7 +1052,13 @@ class BanglaNameHelper {
           'Physics 2nd Paper', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২',
         ]);
       } else {
-        variants.addAll(['ssc_physics', 'physics', 'পদার্থবিজ্ঞান']);
+        variants.addAll([
+          'ssc_physics', 'physics', 'পদার্থবিজ্ঞান',
+          'hsc_physics_1', 'physics_1', 'physics1', 'physics 1',
+          'Physics 1st Paper', 'পদার্থবিজ্ঞান ১ম পত্র', 'পদার্থবিজ্ঞান ১', 'পদার্থবিজ্ঞান ১ম',
+          'hsc_physics_2', 'physics_2', 'physics2', 'physics 2',
+          'Physics 2nd Paper', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২য় পত্র', 'পদার্থবিজ্ঞান ২',
+        ]);
       }
     } else if (lowerKey.contains('chem') || lowerBangla.contains('রসায়ন') || lowerBangla.contains('রসায়ন')) {
       if (isPaper1) {
@@ -1066,7 +1072,13 @@ class BanglaNameHelper {
           'Chemistry 2nd Paper', 'রসায়ন ২য় পত্র', 'রসায়ন ২য় পত্র', 'রসায়ন ২', 'রসায়ন ২',
         ]);
       } else {
-        variants.addAll(['ssc_chemistry', 'chemistry', 'রসায়ন', 'রসায়ন']);
+        variants.addAll([
+          'ssc_chemistry', 'chemistry', 'রসায়ন', 'রসায়ন',
+          'hsc_chemistry_1', 'chemistry_1', 'chemistry1', 'chemistry 1',
+          'Chemistry 1st Paper', 'রসায়ন ১ম পত্র', 'রসায়ন ১ম পত্র', 'রসায়ন ১', 'রসায়ন ১',
+          'hsc_chemistry_2', 'chemistry_2', 'chemistry2', 'chemistry 2',
+          'Chemistry 2nd Paper', 'রসায়ন ২য় পত্র', 'রসায়ন ২য় পত্র', 'রসায়ন ২', 'রসায়ন ২',
+        ]);
       }
     } else if (lowerKey.contains('higher_math') || lowerBangla.contains('উচ্চতর গণিত')) {
       if (isPaper1) {
@@ -1080,21 +1092,13 @@ class BanglaNameHelper {
           'math_2', 'math2', 'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২',
         ]);
       } else {
-        variants.addAll(['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত']);
-      }
-    } else if (lowerKey.contains('higher_math') || lowerBangla.contains('উচ্চতর গণিত')) {
-      if (isPaper1) {
         variants.addAll([
+          'ssc_higher_math', 'higher_math', 'উচ্চতর গণিত', 'SSC উচ্চতর গণিত',
           'hsc_higher_math_1', 'higher_math_1', 'higher_math1', 'higher_math 1',
           'math_1', 'math1', 'Higher Math 1st Paper', 'উচ্চতর গণিত ১ম পত্র', 'উচ্চতর গণিত ১',
-        ]);
-      } else if (isPaper2) {
-        variants.addAll([
           'hsc_higher_math_2', 'higher_math_2', 'higher_math2', 'higher_math 2',
           'math_2', 'math2', 'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২',
         ]);
-      } else {
-        variants.addAll(['ssc_higher_math', 'higher_math', 'উচ্চতর গণিত', 'SSC উচ্চতর গণিত']);
       }
     } else if (lowerKey.contains('math') || lowerBangla.contains('গণিত')) {
       if (isPaper1) {
@@ -1108,7 +1112,13 @@ class BanglaNameHelper {
           'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'গণিত ২য় পত্র', 'গণিত ২',
         ]);
       } else {
-        variants.addAll(['ssc_math', 'ssc_general_math', 'general_math', 'general-math', 'math', 'সাধারণ গণিত', 'গণিত', 'SSC সাধারণ গণিত', 'SSC গণিত']);
+        variants.addAll([
+          'ssc_math', 'ssc_general_math', 'general_math', 'general-math', 'math', 'সাধারণ গণিত', 'গণিত', 'SSC সাধারণ গণিত', 'SSC গণিত',
+          'hsc_higher_math_1', 'higher_math_1', 'math_1', 'math1', 'math 1',
+          'Higher Math 1st Paper', 'উচ্চতর গণিত ১ম পত্র', 'গণিত ১ম পত্র',
+          'hsc_higher_math_2', 'higher_math_2', 'math_2', 'math2', 'math 2',
+          'Higher Math 2nd Paper', 'উচ্চতর গণিত ২য় পত্র', 'উচ্চতর গণিত ২য় পত্র', 'গণিত ২য় পত্র',
+        ]);
       }
     } else if (lowerKey.contains('bio') || lowerKey.contains('botany') || lowerKey.contains('zoology') || lowerBangla.contains('জীববিজ্ঞান') || lowerBangla.contains('উদ্ভিদ') || lowerBangla.contains('প্রাণি')) {
       if (isPaper1 || lowerKey.contains('botany') || lowerBangla.contains('উদ্ভিদ')) {
@@ -1122,7 +1132,13 @@ class BanglaNameHelper {
           'Biology 2nd Paper', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২', 'প্রাণিবিজ্ঞান', 'প্রাণীবিজ্ঞান',
         ]);
       } else {
-        variants.addAll(['ssc_biology', 'biology', 'জীববিজ্ঞান', 'SSC জীববিজ্ঞান']);
+        variants.addAll([
+          'ssc_biology', 'biology', 'জীববিজ্ঞান', 'SSC জীববিজ্ঞান',
+          'hsc_biology_1', 'biology_1', 'biology1', 'botany', 'hsc_botany',
+          'Biology 1st Paper', 'জীববিজ্ঞান ১ম পত্র', 'জীববিজ্ঞান ১', 'উদ্ভিদবিজ্ঞান',
+          'hsc_biology_2', 'biology_2', 'biology2', 'zoology', 'hsc_zoology',
+          'Biology 2nd Paper', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২য় পত্র', 'জীববিজ্ঞান ২', 'প্রাণিবিজ্ঞান',
+        ]);
       }
     } else if (lowerKey.contains('ict') || lowerBangla.contains('তথ্য') || lowerBangla.contains('আইসিটি')) {
       variants.addAll(['hsc_ict', 'ssc_ict', 'ict', 'তথ্য ও যোগাযোগ প্রযুক্তি', 'তথ্য ও যোগাযোগ প্রযুক্তি (আইসিটি)', 'আইসিটি', 'SSC আইসিটি']);
@@ -1158,7 +1174,11 @@ class BanglaNameHelper {
           'Bangla 2nd Paper', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র', 'বাংলা ২', 'SSC বাংলা ২য় পত্র',
         ]);
       } else {
-        variants.addAll(['ssc_bangla', 'bangla', 'বাংলা', 'SSC বাংলা']);
+        variants.addAll([
+          'ssc_bangla', 'bangla', 'বাংলা', 'SSC বাংলা',
+          'hsc_bangla_1', 'bangla_1', 'Bangla 1st Paper', 'বাংলা ১ম পত্র',
+          'hsc_bangla_2', 'bangla_2', 'Bangla 2nd Paper', 'বাংলা ২য় পত্র', 'বাংলা ২য় পত্র',
+        ]);
       }
     } else if (lowerKey.contains('english') || lowerBangla.contains('ইংরেজি')) {
       if (isPaper1) {
@@ -1169,10 +1189,14 @@ class BanglaNameHelper {
       } else if (isPaper2) {
         variants.addAll([
           'hsc_english_2', 'english_2', 'english2', 'english 2', 'ssc_english_2',
-          'English 2nd Paper', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২', 'SSC ইংরেজি ২য় পত্র',
+          'English 2nd Paper', 'English 2nd', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২', 'SSC ইংরেজি ২য় পত্র',
         ]);
       } else {
-        variants.addAll(['ssc_english', 'english', 'ইংরেজি', 'SSC ইংরেজি']);
+        variants.addAll([
+          'ssc_english', 'english', 'ইংরেজি', 'SSC ইংরেজি',
+          'hsc_english_1', 'english_1', 'English 1st Paper', 'ইংরেজি ১ম পত্র',
+          'hsc_english_2', 'english_2', 'English 2nd Paper', 'English 2nd', 'ইংরেজি ২য় পত্র', 'ইংরেজি ২য় পত্র',
+        ]);
       }
     }
 

@@ -357,12 +357,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           if (isMounted) setUser(session.user);
 
-          if (event === "SIGNED_IN") {
-            const fresh = await fetchProfile(session.user.id);
-            if (fresh && isMounted) setProfile(fresh);
-          } else if (event === "TOKEN_REFRESHED") {
-            const fresh = await fetchProfile(session.user.id);
-            if (fresh && isMounted) setProfile(fresh);
+          if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+            fetchProfile(session.user.id).then((fresh) => {
+              if (fresh && isMounted) setProfile(fresh);
+            });
           } else if (event === "INITIAL_SESSION") {
             if (!initDoneRef.current || !userSetByInit) {
               if (isMounted) setUser(session.user);

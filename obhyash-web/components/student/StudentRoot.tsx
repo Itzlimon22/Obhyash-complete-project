@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { getStudentRouteUrl } from "@/lib/routes";
+import { getStudentRouteUrl, getParentRoute } from "@/lib/routes";
 
 
 // Types & Services
@@ -704,6 +704,172 @@ export default function StudentRoot({
   };
 
 
+  // Session navigation history stack to distinguish in-app clicks from direct landing
+  const navHistoryRef = useRef<string[]>([initialTab || "dashboard"]);
+
+  const handleSelectQuestionBankSubject = useCallback((subj: SubjectCardItem | null) => {
+    setSelectedQuestionBankSubject(subj);
+    setSelectedQuestionBankCategory(null);
+    if (subj && typeof window !== "undefined") {
+      window.history.pushState(
+        { tab: "question_bank", qbView: "subject", subjectId: subj.id },
+        "",
+        `/question-bank?subject=${encodeURIComponent(subj.id)}`
+      );
+    }
+  }, []);
+
+  const handleSelectQuestionBankCategory = useCallback((catId: string | null) => {
+    setSelectedQuestionBankCategory(catId);
+    if (catId && selectedQuestionBankSubject && typeof window !== "undefined") {
+      window.history.pushState(
+        { tab: "question_bank", qbView: "category", subjectId: selectedQuestionBankSubject.id, category: catId },
+        "",
+        `/question-bank?subject=${encodeURIComponent(selectedQuestionBankSubject.id)}&category=${encodeURIComponent(catId)}`
+      );
+    }
+  }, [selectedQuestionBankSubject]);
+
+  const handleSelectQuestionBankInstitute = useCallback((inst: InstituteCardItem | null) => {
+    setSelectedQuestionBankInstitute(inst);
+    if (inst && typeof window !== "undefined") {
+      window.history.pushState(
+        { tab: "question_bank", qbView: "institute", instituteId: inst.id },
+        "",
+        `/question-bank?institute=${encodeURIComponent(inst.id)}`
+      );
+    }
+  }, []);
+
+  const smartBack = useCallback((fallbackTab?: string) => {
+    // 1. Guard: Don't allow accidental back during active exam
+    if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
+      setNavWarning({ isOpen: true, targetTab: null, action: "tab" });
+      return;
+    }
+
+    // 2. If on instructions view, cancel instructions cleanly
+    if (appState === AppState.INSTRUCTIONS) {
+      setAppState(AppState.IDLE);
+      setPendingConfig(null);
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/exam/")) {
+        if (navHistoryRef.current.length > 1) {
+          navHistoryRef.current.pop();
+          window.history.back();
+        } else {
+          setActiveTab("setup");
+          sessionStorage.setItem("obhyash_active_tab", "setup");
+          window.history.replaceState({ tab: "setup" }, "", "/setup");
+        }
+      }
+      return;
+    }
+
+    // 3. If reviewing history or on completed result view
+    if (appState === AppState.COMPLETED) {
+      setAppState(AppState.IDLE);
+      const isHistory = isReviewingHistory;
+      setIsReviewingHistory(false);
+      const target = isHistory ? "history" : "dashboard";
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/history/")) {
+        if (navHistoryRef.current.length > 1) {
+          navHistoryRef.current.pop();
+          window.history.back();
+        } else {
+          setActiveTab("history");
+          sessionStorage.setItem("obhyash_active_tab", "history");
+          window.history.replaceState({ tab: "history" }, "", "/history");
+        }
+      } else {
+        if (navHistoryRef.current.length > 1) {
+          navHistoryRef.current.pop();
+          window.history.back();
+        } else {
+          setActiveTab(target);
+          sessionStorage.setItem("obhyash_active_tab", target);
+          window.history.replaceState({ tab: target }, "", "/" + target);
+        }
+      }
+      return;
+    }
+
+    // 4. Question Bank deep navigation:
+    if (activeTab === "question_bank" || activeTab === "question-bank") {
+      if (selectedQuestionBankInstitute) {
+        setSelectedQuestionBankInstitute(null);
+        if (typeof window !== "undefined" && window.history.state?.qbView) {
+          window.history.back();
+        }
+        return;
+      }
+      if (selectedQuestionBankCategory) {
+        setSelectedQuestionBankCategory(null);
+        if (typeof window !== "undefined" && window.history.state?.qbView === "category") {
+          window.history.back();
+        }
+        return;
+      }
+      if (selectedQuestionBankSubject) {
+        setSelectedQuestionBankSubject(null);
+        if (typeof window !== "undefined" && window.history.state?.qbView) {
+          window.history.back();
+        }
+        return;
+      }
+    }
+
+    // 5. Subject report deep view
+    if (activeTab === "subject_report") {
+      setSelectedSubjectReport(null);
+      if (navHistoryRef.current.length > 1) {
+        navHistoryRef.current.pop();
+        window.history.back();
+      } else {
+        setActiveTab("dashboard");
+        sessionStorage.setItem("obhyash_active_tab", "dashboard");
+        window.history.replaceState({ tab: "dashboard" }, "", "/dashboard");
+      }
+      return;
+    }
+
+    // 6. User profile deep view
+    if (activeTab === "user_profile") {
+      setSelectedUserProfile(null);
+      if (navHistoryRef.current.length > 1) {
+        navHistoryRef.current.pop();
+        window.history.back();
+      } else {
+        setActiveTab("leaderboard");
+        sessionStorage.setItem("obhyash_active_tab", "leaderboard");
+        window.history.replaceState({ tab: "leaderboard" }, "", "/leaderboard");
+      }
+      return;
+    }
+
+    // 7. General in-app back vs direct landing
+    if (navHistoryRef.current.length > 1) {
+      navHistoryRef.current.pop();
+      window.history.back();
+    } else {
+      // Direct landing: fall back to logical parent
+      const target = fallbackTab || getParentRoute(activeTab);
+      setActiveTab(target);
+      sessionStorage.setItem("obhyash_active_tab", target);
+      if (typeof window !== "undefined") {
+        const canonicalUrl = getStudentRouteUrl(target);
+        window.history.replaceState({ tab: target }, "", canonicalUrl);
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+    }
+  }, [
+    appState,
+    isReviewingHistory,
+    activeTab,
+    selectedQuestionBankInstitute,
+    selectedQuestionBankCategory,
+    selectedQuestionBankSubject,
+  ]);
+
   // Browser back/forward button support
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {
@@ -722,10 +888,53 @@ export default function StudentRoot({
         setIsReviewingHistory(false);
       }
 
+      // If user was viewing instructions and pressed browser back
+      if (appState === AppState.INSTRUCTIONS) {
+        setAppState(AppState.IDLE);
+        setPendingConfig(null);
+      }
+
+      // Handle Question Bank deep sub-views state on browser back/forward
+      if (activeTab === "question_bank" || activeTab === "question-bank") {
+        if (!e.state?.qbView) {
+          setSelectedQuestionBankInstitute(null);
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankSubject(null);
+        } else if (e.state.qbView === "subject") {
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankInstitute(null);
+        } else if (e.state.qbView === "institute") {
+          setSelectedQuestionBankCategory(null);
+          setSelectedQuestionBankSubject(null);
+        }
+      }
+
+      // Handle Leaderboard User Profile on browser back
+      if (e.state?.tab !== "user_profile" && activeTab === "user_profile") {
+        setSelectedUserProfile(null);
+      }
+
+      // Handle Subject Report on browser back
+      if (e.state?.tab !== "subject_report" && activeTab === "subject_report") {
+        setSelectedSubjectReport(null);
+      }
+
       const tab = e.state?.tab || window.location.pathname.replace(/^\//, '') || 'dashboard';
       const resolved = validTabs.includes(tab) ? tab : 'dashboard';
       setActiveTab(resolved);
       sessionStorage.setItem('obhyash_active_tab', resolved);
+
+      // Keep navHistory in sync
+      if (navHistoryRef.current.length > 1) {
+        navHistoryRef.current.pop();
+      }
+
+      // Reset scroll on pop
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      const mainContent = document.querySelector('main') || document.getElementById('main-scroll-container');
+      if (mainContent) {
+        mainContent.scrollTo({ top: 0, behavior: 'instant' });
+      }
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -747,41 +956,61 @@ export default function StudentRoot({
     }
   }, []); // only on mount
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = useCallback((tab: string, replace = false) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
       setNavWarning({ isOpen: true, targetTab: tab, action: "tab" });
-    } else {
-      if (appState === AppState.COMPLETED) {
-        setAppState(AppState.IDLE);
-        setIsReviewingHistory(false);
-      }
+      return;
+    }
 
-      if (tab === "question_bank" || tab === "question-bank") {
-        if (activeTab === tab) {
-          // Re-tap resets detail view back to main question bank
-          setSelectedQuestionBankSubject(null);
-          setSelectedQuestionBankCategory(null);
-          setSelectedQuestionBankInstitute(null);
-        }
-      } else {
+    if (appState === AppState.COMPLETED) {
+      setAppState(AppState.IDLE);
+      setIsReviewingHistory(false);
+    }
+
+    if (tab === "question_bank" || tab === "question-bank") {
+      if (activeTab === tab) {
+        // Re-tap resets detail view back to main question bank
         setSelectedQuestionBankSubject(null);
         setSelectedQuestionBankCategory(null);
         setSelectedQuestionBankInstitute(null);
       }
+    } else {
+      setSelectedQuestionBankSubject(null);
+      setSelectedQuestionBankCategory(null);
+      setSelectedQuestionBankInstitute(null);
+    }
 
-      setActiveTab(tab);
-      sessionStorage.setItem("obhyash_active_tab", tab);
+    setActiveTab(tab);
+    sessionStorage.setItem("obhyash_active_tab", tab);
 
-      // Use pushState to update the URL bar without triggering a server
-      // navigation — StudentRoot is a persistent SPA shell, so we want
-      // the URL to reflect the current view without re-mounting the component.
-      // getStudentRouteUrl() ensures canonical, consistent paths across tabs.
-      if (typeof window !== "undefined") {
-        const canonicalUrl = getStudentRouteUrl(tab);
+    // Track internal history stack
+    if (replace) {
+      if (navHistoryRef.current.length > 0) {
+        navHistoryRef.current[navHistoryRef.current.length - 1] = tab;
+      } else {
+        navHistoryRef.current.push(tab);
+      }
+    } else {
+      navHistoryRef.current.push(tab);
+    }
+
+    // Reset page scroll position to top
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      const mainContent = document.querySelector("main") || document.getElementById("main-scroll-container");
+      if (mainContent) {
+        mainContent.scrollTo({ top: 0, behavior: "instant" });
+      }
+
+      const canonicalUrl = getStudentRouteUrl(tab);
+      if (replace) {
+        window.history.replaceState({ tab }, "", canonicalUrl);
+      } else {
         window.history.pushState({ tab }, "", canonicalUrl);
       }
     }
-  };
+  }, [appState, activeTab]);
+
 
   const handleLogoutClick = async () => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
@@ -894,13 +1123,13 @@ export default function StudentRoot({
               activeTab="question_bank"
               {...commonLayoutProps}
               title={`${selectedQuestionBankInstitute.name} প্রশ্নব্যাংক`}
-              onBack={() => setSelectedQuestionBankInstitute(null)}
+              onBack={() => smartBack()}
               hideTitle={false}
               hideBottomNav={true}
             >
               <InstituteDetailView
                 institute={selectedQuestionBankInstitute}
-                onBack={() => setSelectedQuestionBankInstitute(null)}
+                onBack={() => smartBack()}
                 showHeader={false}
                 onStartExam={(examSet, qs) => {
                   const totalMarks =
@@ -944,13 +1173,13 @@ export default function StudentRoot({
                 activeTab="question_bank"
                 {...commonLayoutProps}
                 title={`${displayTitle} - একাডেমিক`}
-                onBack={() => setSelectedQuestionBankCategory(null)}
+                onBack={() => smartBack()}
                 hideTitle={false}
                 hideBottomNav={true}
               >
                 <AcademicCategoryDetailView
                   subject={selectedQuestionBankSubject}
-                  onBack={() => setSelectedQuestionBankCategory(null)}
+                  onBack={() => smartBack()}
                   showHeader={false}
                 />
               </AppLayout>
@@ -962,23 +1191,17 @@ export default function StudentRoot({
               activeTab="question_bank"
               {...commonLayoutProps}
               title={displayTitle}
-              onBack={() => {
-                setSelectedQuestionBankSubject(null);
-                setSelectedQuestionBankCategory(null);
-              }}
+              onBack={() => smartBack()}
               hideTitle={false}
               hideBottomNav={true}
             >
               <SubjectCategoryDetailView
                 subject={selectedQuestionBankSubject}
-                onBack={() => {
-                  setSelectedQuestionBankSubject(null);
-                  setSelectedQuestionBankCategory(null);
-                }}
+                onBack={() => smartBack()}
                 showHeader={false}
                 onSelectCategory={(cat) => {
                   if (cat.id === "academic") {
-                    setSelectedQuestionBankCategory("academic");
+                    handleSelectQuestionBankCategory("academic");
                   }
                 }}
               />
@@ -1004,8 +1227,8 @@ export default function StudentRoot({
               user={currentUser}
               activeHeaderTab={questionBankTab}
               onHeaderTabChange={setQuestionBankTab}
-              onSelectSubject={(sub) => setSelectedQuestionBankSubject(sub)}
-              onSelectInstitute={(inst) => setSelectedQuestionBankInstitute(inst)}
+              onSelectSubject={handleSelectQuestionBankSubject}
+              onSelectInstitute={handleSelectQuestionBankInstitute}
             />
           </AppLayout>
         );
@@ -1017,12 +1240,13 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="ইতিহাস"
+            onBack={() => smartBack("dashboard")}
           >
             <ExamHistoryView
               history={examHistory}
               subjects={subjects}
               user={effectiveUser}
-              onBack={() => handleTabChange("dashboard")}
+              onBack={() => smartBack("dashboard")}
               onClearHistory={async (ids?: string[]) => {
                 const { clearExamHistory, bulkDeleteExamResults } =
                   await import("@/services/database");
@@ -1105,10 +1329,11 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="লেজেন্ডস লীগ"
+            onBack={() => smartBack("leaderboard")}
           >
             <LegendsLeagueView
               currentUser={currentUser}
-              onBack={() => handleTabChange("leaderboard")}
+              onBack={() => smartBack("leaderboard")}
             />
           </AppLayout>
         );
@@ -1120,7 +1345,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="আমার প্রোফাইল"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <MyProfileView
               user={currentUser!}
@@ -1128,7 +1353,7 @@ export default function StudentRoot({
               onEditProfile={() => handleTabChange("personal")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab("subject_report"); // internal-only, no route
+                setActiveTab("subject_report");
               }}
               onViewNotifications={() => handleTabChange("notifications")}
             />
@@ -1142,7 +1367,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="সেটিংস"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <SettingsView
               user={currentUser!}
@@ -1162,7 +1387,7 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="বুকমার্ক করা প্রশ্নসমূহ"
-            onBack={() => handleTabChange("practice")}
+            onBack={() => smartBack("practice")}
           >
             <BookmarksView />
           </AppLayout>
@@ -1175,7 +1400,7 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="ফর্মুলা ও শর্টকাট শিট"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <FormulaAppPromoView />
           </AppLayout>
@@ -1188,7 +1413,7 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="অনুশীলন ও প্র্যাকটিস"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <PracticeDashboard
               history={examHistory}
@@ -1208,14 +1433,14 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="পারফরম্যান্স অ্যানালিটিক্স"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <AnalysisView
               currentUser={currentUser || effectiveUser}
               history={examHistory}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab("subject_report"); // internal-only, no route
+                setActiveTab("subject_report");
               }}
               onStartExam={() => handleTabChange("setup")}
             />
@@ -1229,7 +1454,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অভিযোগ ও পরামর্শ"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <ComplaintView />
           </AppLayout>
@@ -1242,7 +1467,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="নতুন ফিচার প্রস্তাব"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <FeatureRequestsView />
           </AppLayout>
@@ -1255,7 +1480,7 @@ export default function StudentRoot({
             activeTab="dashboard"
             {...commonLayoutProps}
             title="নোটিফিকেশন"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <NotificationsView onNavigate={(tab) => handleTabChange(tab)} />
           </AppLayout>
@@ -1268,11 +1493,11 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট ইনফো"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <AccountInfoView
               user={currentUser}
-              onBack={() => handleTabChange("settings")}
+              onBack={() => smartBack("settings")}
             />
           </AppLayout>
         );
@@ -1284,7 +1509,7 @@ export default function StudentRoot({
             activeTab="referral"
             {...commonLayoutProps}
             title="রেফারেল ও রিওয়ার্ড"
-            onBack={() => handleTabChange("dashboard")}
+            onBack={() => smartBack("dashboard")}
           >
             <ReferralView />
           </AppLayout>
@@ -1297,7 +1522,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="আমাদের সম্পর্কে"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <AboutUsView />
           </AppLayout>
@@ -1310,7 +1535,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="প্রাইভেসি পলিসি"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <PrivacyPolicyView />
           </AppLayout>
@@ -1323,7 +1548,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="ব্যবহারের শর্তাবলী"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <TermsConditionsView />
           </AppLayout>
@@ -1336,7 +1561,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="সাহায্য ও জিজ্ঞাসা"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <FaqPanel onNavigateComplaint={() => handleTabChange("complaint")} />
           </AppLayout>
@@ -1349,7 +1574,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট লিংকিং"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <AccountLinkingPanel user={currentUser} />
           </AppLayout>
@@ -1362,11 +1587,11 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট মুছুন"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <DeleteAccountPanel
               user={currentUser}
-              onBack={() => handleTabChange("settings")}
+              onBack={() => smartBack("settings")}
             />
           </AppLayout>
         );
@@ -1378,13 +1603,13 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="প্রোফাইল সম্পাদনা"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <PersonalDetailsPanel
               user={currentUser!}
               onSave={async (data) => {
                 await handleProfileUpdate(data);
-                handleTabChange("settings");
+                smartBack("settings");
               }}
             />
           </AppLayout>
@@ -1397,7 +1622,7 @@ export default function StudentRoot({
             activeTab="settings"
             {...commonLayoutProps}
             title="রিপোর্টসমূহ"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <ReportsPanel user={currentUser!} />
           </AppLayout>
@@ -1410,7 +1635,7 @@ export default function StudentRoot({
             activeTab="subscription"
             {...commonLayoutProps}
             title="আমার সাবস্ক্রিপশন"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <MySubscriptionPanel onUpgrade={() => handleTabChange("upgrade")} />
           </AppLayout>
@@ -1423,7 +1648,7 @@ export default function StudentRoot({
             activeTab="subscription"
             {...commonLayoutProps}
             title="প্রো সাবস্ক্রিপশন"
-            onBack={() => handleTabChange("settings")}
+            onBack={() => smartBack("settings")}
           >
             <SubscriptionView />
           </AppLayout>
@@ -1438,15 +1663,13 @@ export default function StudentRoot({
                 ? `${selectedUserProfile.name}-এর প্রোফাইল`
                 : "শিক্ষার্থীর প্রোফাইল"
             }
-            onBack={() => handleTabChange("leaderboard")}
+            onBack={() => smartBack("leaderboard")}
           >
             <UserProfileView
               user={selectedUserProfile}
               currentUser={currentUser}
               rank={selectedUserRank}
-              onBack={() => {
-                handleTabChange("leaderboard");
-              }}
+              onBack={() => smartBack("leaderboard")}
             />
           </AppLayout>
         );
@@ -1460,13 +1683,13 @@ export default function StudentRoot({
                 selectedSubjectReport,
                 selectedSubjectReport
               )} রিপোর্ট`}
-              onBack={() => handleTabChange("analysis")}
+              onBack={() => smartBack("analysis")}
             >
               <SubjectReportView
                 subject={selectedSubjectReport}
                 history={examHistory}
                 currentUser={currentUser || effectiveUser}
-                onBack={() => handleTabChange("analysis")}
+                onBack={() => smartBack("analysis")}
               />
             </AppLayout>
           );
@@ -1476,7 +1699,7 @@ export default function StudentRoot({
               activeTab="analysis"
               {...commonLayoutProps}
               title="পারফরম্যান্স অ্যানালিটিক্স"
-              onBack={() => handleTabChange("dashboard")}
+              onBack={() => smartBack("dashboard")}
             >
               <AnalysisView
                 currentUser={currentUser || effectiveUser}
@@ -1511,7 +1734,7 @@ export default function StudentRoot({
           <ExamInstructionsView
             config={pendingConfig}
             onStart={handleProceedToExam}
-            onBack={() => setAppState(AppState.IDLE)}
+            onBack={() => smartBack("setup")}
             showHeader={true}
           />
         );
@@ -1611,38 +1834,14 @@ export default function StudentRoot({
           activeTab={isReviewingHistory ? "history" : "dashboard"}
           {...commonLayoutProps}
           title={isReviewingHistory ? "পরীক্ষার ইতিহাস ও ফলাফল" : "পরীক্ষার ফলাফল"}
-          onBack={() => {
-            setAppState(AppState.IDLE);
-            setIsReviewingHistory(false);
-            const targetTab = isReviewingHistory ? "history" : "dashboard";
-            setActiveTab(targetTab);
-            if (typeof window !== "undefined") {
-              window.history.pushState(
-                { tab: targetTab },
-                "",
-                "/" + targetTab
-              );
-            }
-          }}
+          onBack={() => smartBack(isReviewingHistory ? "history" : "dashboard")}
         >
           <ResultView
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
             initialBookmarks={flaggedQuestions}
-            onRestart={() => {
-              setAppState(AppState.IDLE);
-              setIsReviewingHistory(false);
-              const targetTab = isReviewingHistory ? "history" : "dashboard";
-              setActiveTab(targetTab);
-              if (typeof window !== "undefined") {
-                window.history.pushState(
-                  { tab: targetTab },
-                  "",
-                  "/" + targetTab
-                );
-              }
-            }}
+            onRestart={() => smartBack(isReviewingHistory ? "history" : "dashboard")}
             isDarkMode={theme === "dark"}
             onToggleTheme={toggleTheme}
             isHistoryMode={isReviewingHistory}
@@ -1668,10 +1867,7 @@ export default function StudentRoot({
             onReexam={() => {
               setAppState(AppState.IDLE);
               setIsReviewingHistory(false);
-              setActiveTab("setup");
-              if (typeof window !== "undefined") {
-                window.history.pushState({ tab: "setup" }, "", "/setup");
-              }
+              handleTabChange("setup");
             }}
             showHeader={false}
           />

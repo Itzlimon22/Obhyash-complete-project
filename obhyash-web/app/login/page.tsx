@@ -36,8 +36,16 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  // Handle errors passed via URL
+  // Handle errors passed via URL & prefetch target routes
   useEffect(() => {
+    // Pre-warm dashboard routes so transition is instant upon login
+    try {
+      router.prefetch('/dashboard');
+      router.prefetch('/admin/dashboard');
+    } catch {
+      // non-fatal
+    }
+
     const params = new URLSearchParams(window.location.search);
     const err = params.get('error');
     if (err === 'unregistered_google') {
@@ -49,10 +57,11 @@ export default function LoginPage() {
       setTimeout(() => {
         setError('গুগল লগইন বাতিল বা ব্যর্থ হয়েছে। দয়া করে পুনরায় চেষ্টা করুন।');
       }, 0);
+      window.history.replaceState({}, '', '/login');
     } else if (params.get('logout') === 'true') {
       window.history.replaceState({}, '', '/login');
     }
-  }, []);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,32 +89,18 @@ export default function LoginPage() {
 
         let resolvedEmail: string | null = null;
 
-        // 1. Try RPC get_email_by_phone
+        // Fast phone lookup with limit(1) to avoid multi-row errors and 404 RPC delays
         try {
-          const { data, error: rpcErr } = await supabase.rpc('get_email_by_phone', {
-            p_phone: normalizedPhone,
-          });
-          if (!rpcErr && data) {
-            resolvedEmail = data;
+          const { data: userRows } = await supabase
+            .from('users')
+            .select('email')
+            .or(`phone.eq.${normalizedPhone},phone.eq.+88${normalizedPhone},phone.eq.88${normalizedPhone}`)
+            .limit(1);
+          if (userRows && userRows.length > 0 && userRows[0].email) {
+            resolvedEmail = userRows[0].email;
           }
         } catch {
-          // ignore and fallback
-        }
-
-        // 2. Fallback direct table query
-        if (!resolvedEmail) {
-          try {
-            const { data: userRow } = await supabase
-              .from('users')
-              .select('email')
-              .or(`phone.eq.${normalizedPhone},phone.eq.+88${normalizedPhone},phone.eq.88${normalizedPhone}`)
-              .maybeSingle();
-            if (userRow?.email) {
-              resolvedEmail = userRow.email;
-            }
-          } catch {
-            // ignore
-          }
+          // ignore and proceed
         }
 
         if (!resolvedEmail) {
@@ -138,10 +133,27 @@ export default function LoginPage() {
         return;
       }
 
-      // 2. Login Success! Redirect to /dashboard — middleware handles
-      // role-based forwarding (admin → /admin/dashboard, teacher → /teacher/dashboard).
+      // Login Success!
+      // Set role cache cookie immediately so middleware hits its fast-path (0ms) without querying DB
       if (user) {
-        router.push('/dashboard');
+        const role = (user.user_metadata?.role || user.app_metadata?.role || 'Student').toLowerCase();
+        try {
+          const roleCookieValue = encodeURIComponent(
+            JSON.stringify({ userId: user.id, role, status: 'Active' })
+          );
+          document.cookie = `obhyash_role_cache=${roleCookieValue}; path=/; max-age=180; SameSite=Lax`;
+        } catch {
+          // non-fatal
+        }
+
+        // Redirect immediately
+        if (role === 'admin') {
+          router.replace('/admin/dashboard');
+        } else if (role === 'teacher') {
+          router.replace('/teacher/dashboard');
+        } else {
+          router.replace('/dashboard');
+        }
       } else {
         setLoading(false);
       }

@@ -299,7 +299,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             </button>
 
             {/* Centered Page Title */}
-            <h1 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+            <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white">
               পরীক্ষার ফলাফল
             </h1>
 

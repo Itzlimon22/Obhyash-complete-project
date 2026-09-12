@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   Timer,
@@ -520,6 +520,27 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
   const [selectedExamSet, setSelectedExamSet] = useState<InstituteExamSet | null>(null);
   const [typeFilter, setTypeFilter] = useState<"all" | "mcq" | "written">("all");
 
+  useEffect(() => {
+    const handlePop = () => {
+      if (selectedExamSet) {
+        setSelectedExamSet(null);
+      }
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, [selectedExamSet]);
+
+  const handleOpenExamSet = (set: InstituteExamSet) => {
+    if (typeof window !== "undefined") {
+      window.history.pushState(
+        { tab: "question_bank", qbSubView: "exam_set", setId: set.id },
+        "",
+        window.location.pathname + `?institute=${encodeURIComponent(institute.id)}&set=${encodeURIComponent(set.id)}`
+      );
+    }
+    setSelectedExamSet(set);
+  };
+
   const allSets = useMemo(() => {
     const rawSets = getInstituteExamSets(institute.id);
     if (typeFilter === "all") return rawSets;
@@ -534,7 +555,12 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
       <ExamSetDetailView
         institute={institute}
         examSet={selectedExamSet}
-        onBack={() => setSelectedExamSet(null)}
+        onBack={() => {
+          setSelectedExamSet(null);
+          if (typeof window !== "undefined" && window.history.state?.qbSubView === "exam_set") {
+            window.history.back();
+          }
+        }}
         onTakeExam={onStartExam}
       />
     );
@@ -567,7 +593,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
                 <School size={20} className="text-[#065F46]" />
               )}
             </div>
-            <h1 className="text-lg sm:text-xl font-extrabold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
+            <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
               {institute.name} প্রশ্নব্যাংক
             </h1>
           </div>
@@ -645,7 +671,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
           return (
             <div
               key={set.id}
-              onClick={() => setSelectedExamSet(set)}
+              onClick={() => handleOpenExamSet(set)}
               className="group relative bg-white dark:bg-neutral-900 rounded-2xl p-4 sm:p-5 border border-neutral-200/80 dark:border-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:border-emerald-600/30 dark:hover:border-emerald-500/30 transition-all duration-200 cursor-pointer select-none flex flex-col gap-2.5 active:scale-[0.99]"
             >
               {/* Top: Bold Title + Type Badge */}

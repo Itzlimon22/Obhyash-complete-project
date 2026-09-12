@@ -19,19 +19,27 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: data || {
-        maintenance_mode: false,
-        live_exams_enabled: true,
-        registration_enabled: true,
-        free_trial_enabled: true,
-        referral_system_enabled: true,
-        min_app_version: '1.0.0',
-        latest_app_version: '1.0.0',
-        force_update: false,
-        global_announcement_enabled: false,
-        global_announcement_text: '',
-        global_announcement_type: 'info',
-        global_announcement_target: 'all',
+      data: {
+        payment_auto_enabled: true,
+        payment_manual_enabled: true,
+        payment_google_play_enabled: true,
+        manual_payment_merchant_number: '01749591456',
+        reviewer_emails:
+          'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
+        ...(data || {
+          maintenance_mode: false,
+          live_exams_enabled: true,
+          registration_enabled: true,
+          free_trial_enabled: true,
+          referral_system_enabled: true,
+          min_app_version: '1.0.0',
+          latest_app_version: '1.0.0',
+          force_update: false,
+          global_announcement_enabled: false,
+          global_announcement_text: '',
+          global_announcement_type: 'info',
+          global_announcement_target: 'all',
+        }),
       },
     });
   } catch (err: any) {
@@ -60,18 +68,36 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    // Graceful fallback if database column referral_system_enabled hasn't been migrated yet
-    if (error && error.message?.includes('referral_system_enabled')) {
+    // Graceful fallback if any new database columns haven't been migrated yet
+    if (error) {
+      const potentiallyMissingKeys = [
+        'payment_auto_enabled',
+        'payment_manual_enabled',
+        'payment_google_play_enabled',
+        'manual_payment_merchant_number',
+        'reviewer_emails',
+        'referral_system_enabled',
+      ];
       const fallbackPayload = { ...payload };
-      delete (fallbackPayload as any).referral_system_enabled;
-      const retry = await supabaseAdmin
-        .from('app_config')
-        .upsert(fallbackPayload, { onConflict: 'id' })
-        .select()
-        .single();
-      if (!retry.error) {
-        data = { ...retry.data, referral_system_enabled: body.referral_system_enabled ?? true };
-        error = null;
+      let hadMissing = false;
+
+      for (const key of potentiallyMissingKeys) {
+        if (error.message?.includes(key)) {
+          delete (fallbackPayload as any)[key];
+          hadMissing = true;
+        }
+      }
+
+      if (hadMissing) {
+        const retry = await supabaseAdmin
+          .from('app_config')
+          .upsert(fallbackPayload, { onConflict: 'id' })
+          .select()
+          .single();
+        if (!retry.error) {
+          data = { ...retry.data, ...body };
+          error = null;
+        }
       }
     }
 

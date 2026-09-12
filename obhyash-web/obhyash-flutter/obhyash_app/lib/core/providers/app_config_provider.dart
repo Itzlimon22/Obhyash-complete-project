@@ -106,6 +106,85 @@ final isPaymentsEnabledProvider = Provider<bool>((ref) {
   );
 });
 
+/// Checks if the currently authenticated user is a Google Play Reviewer / Tester account
+final isCurrentUserReviewerProvider = Provider<bool>((ref) {
+  final user = Supabase.instance.client.auth.currentUser;
+  final email = user?.email?.toLowerCase().trim();
+  if (email == null || email.isEmpty) return false;
+
+  final configAsync = ref.watch(appConfigStreamProvider);
+  final reviewerList = configAsync.maybeWhen(
+    data: (config) => config.reviewerEmails.toLowerCase(),
+    orElse: () =>
+        'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
+  );
+
+  final configuredEmails = reviewerList
+      .split(',')
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+
+  // Match explicitly configured emails
+  if (configuredEmails.contains(email)) return true;
+
+  // Match common reviewer email patterns and Google domains
+  if (email.endsWith('@google.com') ||
+      email.contains('google_reviewer') ||
+      email.contains('playtest') ||
+      email.contains('playreview') ||
+      email.contains('review_tester')) {
+    return true;
+  }
+
+  return false;
+});
+
+/// Evaluates if Automatic Payment (UddoktaPay: bKash, Nagad, Cards) is enabled
+final isPaymentAutoEnabledProvider = Provider<bool>((ref) {
+  // If the session is from a Google Reviewer / Tester account, ALWAYS hide third-party payment
+  if (ref.watch(isCurrentUserReviewerProvider)) return false;
+
+  final configAsync = ref.watch(appConfigStreamProvider);
+  return configAsync.maybeWhen(
+    data: (config) => config.paymentsEnabled && config.paymentAutoEnabled,
+    orElse: () => true,
+  );
+});
+
+/// Evaluates if Manual Payment (Send Money + TrxID) is enabled
+final isPaymentManualEnabledProvider = Provider<bool>((ref) {
+  // If the session is from a Google Reviewer / Tester account, ALWAYS hide third-party payment
+  if (ref.watch(isCurrentUserReviewerProvider)) return false;
+
+  final configAsync = ref.watch(appConfigStreamProvider);
+  return configAsync.maybeWhen(
+    data: (config) => config.paymentsEnabled && config.paymentManualEnabled,
+    orElse: () => true,
+  );
+});
+
+/// Evaluates if Google Play In-App Purchase is enabled
+final isPaymentGooglePlayEnabledProvider = Provider<bool>((ref) {
+  // If the session is from a Google Reviewer / Tester account, ALWAYS show Google Play billing
+  if (ref.watch(isCurrentUserReviewerProvider)) return true;
+
+  final configAsync = ref.watch(appConfigStreamProvider);
+  return configAsync.maybeWhen(
+    data: (config) => config.paymentsEnabled && config.paymentGooglePlayEnabled,
+    orElse: () => true,
+  );
+});
+
+/// Dynamic Merchant Number for Manual Payment from app_config
+final manualPaymentMerchantNumberProvider = Provider<String>((ref) {
+  final configAsync = ref.watch(appConfigStreamProvider);
+  return configAsync.maybeWhen(
+    data: (config) => config.manualPaymentMerchantNumber,
+    orElse: () => '01749591456',
+  );
+});
+
 /// Evaluates if Leaderboard is visible globally
 final isLeaderboardEnabledProvider = Provider<bool>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);

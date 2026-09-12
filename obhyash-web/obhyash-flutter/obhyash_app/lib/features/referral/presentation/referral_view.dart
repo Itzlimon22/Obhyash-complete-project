@@ -1377,9 +1377,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
     final border = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
 
     String getPrizeText(int rank) {
-      if (rank == 1) return 'টি-শার্ট + ১০০০ টাকা';
-      if (rank == 2) return 'টি-শার্ট + ৫০০ টাকা';
-      if (rank == 3) return 'টি-শার্ট + ১০০ টাকা';
+      if (rank == 1) return 'টি-শার্ট + মেগা গিফট বক্স';
+      if (rank == 2) return 'টি-শার্ট + স্পেশাল গিফট বক্স';
+      if (rank == 3) return 'টি-শার্ট + গিফট ভাউচার';
       return 'টি-শার্ট';
     }
 

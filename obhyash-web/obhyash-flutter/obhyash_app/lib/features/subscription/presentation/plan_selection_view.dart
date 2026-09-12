@@ -8,8 +8,8 @@ import '../../../core/providers/app_config_provider.dart';
 import '../../../core/utils/app_popups.dart';
 import '../domain/models.dart';
 import '../domain/coupon_service.dart';
-import 'payment_view.dart';
 import 'widgets/coupon_bottom_sheet.dart';
+import 'widgets/payment_method_sheet.dart';
 
 class PlanSelectionView extends ConsumerStatefulWidget {
   final List<SubscriptionPlan>? initialPlans;
@@ -306,13 +306,11 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
       }
     }
 
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        builder: (_) => PaymentView(
-          plan: effectivePlan,
-          appliedCouponCode: _appliedCoupon?.code,
-        ),
-      ),
+    // Show Chorcha-style payment method modal
+    PaymentMethodSheet.show(
+      context: context,
+      plan: effectivePlan,
+      appliedCouponCode: _appliedCoupon?.code,
     );
   }
 
@@ -444,7 +442,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                             ),
                             SizedBox(height: 2),
                             Text(
-                              'বিকাশ ও অন্যান্য পেমেন্ট গেটওয়েতে কাজ চলায় সাময়িকভাবে সাবস্ক্রিপশন ক্রয় বন্ধ রয়েছে। খুব শীঘ্রই পুনরায় চালু হবে।',
+                              'পেমেন্ট গেটওয়েতে রক্ষণাবেক্ষণের কাজ চলায় সাময়িকভাবে সাবস্ক্রিপশন ক্রয় বন্ধ রয়েছে। খুব শীঘ্রই পুনরায় চালু হবে।',
                               style: TextStyle(fontSize: 11, height: 1.35),
                             ),
                           ],
@@ -541,9 +539,13 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                           isDark: isDark,
                           appliedCoupon: _appliedCoupon,
                           onTap: () {
-                            setState(() {
-                              _selectedPlanIndex = index;
-                            });
+                            if (_selectedPlanIndex == index) {
+                              _handlePlanSelect(plan);
+                            } else {
+                              setState(() {
+                                _selectedPlanIndex = index;
+                              });
+                            }
                           },
                         );
                       }),

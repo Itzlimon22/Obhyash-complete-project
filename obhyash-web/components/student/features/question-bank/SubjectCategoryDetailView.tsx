@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -194,6 +194,30 @@ export default function SubjectCategoryDetailView({
   const [selectedSection, setSelectedSection] = useState<CategoryItem | null>(null);
   const [showAcademicView, setShowAcademicView] = useState(false);
 
+  useEffect(() => {
+    const handlePop = () => {
+      if (selectedSection) {
+        setSelectedSection(null);
+      }
+      if (showAcademicView) {
+        setShowAcademicView(false);
+      }
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, [selectedSection, showAcademicView]);
+
+  const handleOpenSection = (cat: CategoryItem) => {
+    if (typeof window !== "undefined") {
+      window.history.pushState(
+        { tab: "question_bank", qbSubView: "section", sectionId: cat.id },
+        "",
+        window.location.pathname + `?subject=${encodeURIComponent(subject.id)}&section=${encodeURIComponent(cat.id)}`
+      );
+    }
+    setSelectedSection(cat);
+  };
+
   const paperClean = subject.paper ? subject.paper.split(" ")[0] : "";
   const displayTitle = paperClean ? `${subject.name} ${paperClean}` : subject.name;
 
@@ -205,7 +229,12 @@ export default function SubjectCategoryDetailView({
           ...selectedSection,
           count: selectedSection.count || 50,
         }}
-        onBack={() => setSelectedSection(null)}
+        onBack={() => {
+          setSelectedSection(null);
+          if (typeof window !== "undefined" && window.history.state?.qbSubView === "section") {
+            window.history.back();
+          }
+        }}
       />
     );
   }
@@ -227,21 +256,21 @@ export default function SubjectCategoryDetailView({
     <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#F8F9FA] dark:bg-[#101012] font-['HindSiliguri',sans-serif] select-none pb-20">
       {/* ── Top Header ── */}
       {showHeader && (
-        <div className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#101012]/90 backdrop-blur-md px-4 py-3 sm:py-4 flex items-center justify-between border-b border-neutral-200/60 dark:border-[#222226]">
+        <div className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#101012]/90 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/60 dark:border-[#222226]">
           <button
             type="button"
             onClick={onBack}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-xs"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-xs"
             aria-label="Back"
           >
-            <ArrowLeft size={22} className="stroke-[2.5]" />
+            <ArrowLeft size={18} className="stroke-[2.2]" />
           </button>
 
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-xl sm:text-2xl text-neutral-900 dark:text-white tracking-tight text-center">
+          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white tracking-tight text-center">
             {displayTitle}
           </h1>
 
-          <div className="w-10" />
+          <div className="w-9" />
         </div>
       )}
 
@@ -259,7 +288,7 @@ export default function SubjectCategoryDetailView({
                     setShowAcademicView(true);
                   }
                 } else {
-                  setSelectedSection(cat);
+                  handleOpenSection(cat);
                 }
               }}
               className={`group relative aspect-[1.25/1] rounded-[24px] sm:rounded-[28px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3.5 sm:p-4.5 flex flex-col justify-between`}

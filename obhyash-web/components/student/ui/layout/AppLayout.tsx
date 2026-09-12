@@ -210,10 +210,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         {customHeader ? (
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
-          <header className="h-[68px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
+          <header className="h-14 sm:h-[60px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
             <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
             {/* ── Left / Center: Back / Menu Button + (Title OR Header Tabs) ── */}
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {activeTab === 'dashboard' ? (
                 /* Mobile hamburger on Dashboard */
                 <button
@@ -247,7 +247,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               )}
 
               {headerTabs ? (
-                <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-1 sm:gap-2">
                   {headerTabs.tabs.map((tab) => {
                     const isActive = headerTabs.activeTabId === tab.id;
                     return (
@@ -255,7 +255,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         key={tab.id}
                         type="button"
                         onClick={() => headerTabs.onTabSelect(tab.id)}
-                        className={`relative py-1.5 px-2 sm:px-3 text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none ${
+                        className={`relative py-1 px-2 sm:px-2.5 text-[13px] sm:text-sm md:text-[15px] font-semibold sm:font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none ${
                           isActive
                             ? "text-[#059669] dark:text-[#10B981]"
                             : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
@@ -263,14 +263,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                       >
                         {tab.label}
                         {isActive && (
-                          <span className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
+                          <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
                         )}
                       </button>
                     );
                   })}
                 </div>
               ) : !hideTitle ? (
-                <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-xl md:text-[21px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
+                <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
                   {title}
                 </h1>
               ) : null}
@@ -283,7 +283,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => onTabChange('legends-league')}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-extrabold text-xs animate-pulse hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
+                  className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-extrabold text-xs animate-pulse hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
                   title="লেজেন্ডস লিগ দেখুন"
                 >
                   <Crown size={14} className="shrink-0" />
@@ -295,11 +295,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => setIsStreakDialogOpen(true)}
-                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
+                className="flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
                 title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
               >
-                <Flame size={19} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
-                <span className="text-sm sm:text-base font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
+                <Flame size={18} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
+                <span className="text-xs sm:text-sm font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
                   {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
                 </span>
               </button>
@@ -325,7 +325,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               </div>
 
               {/* Divider */}
-              <div className="w-[1px] h-6 bg-neutral-200 dark:bg-[#27272A] mx-0.5" />
+              <div className="w-[1px] h-5 bg-neutral-200 dark:bg-[#27272A] mx-0.5" />
 
               {/* Profile Avatar with Pro Indicator */}
               <button

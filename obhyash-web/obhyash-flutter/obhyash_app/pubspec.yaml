@@ -72,6 +72,7 @@ dependencies:
   share_plus: ^13.3.0
   bangla_pdf: ^1.2.0
   shake: ^3.0.0
+  in_app_purchase: ^3.3.0
 
 dev_dependencies:
   flutter_test:

@@ -250,7 +250,7 @@ export const LegendsLeagueView: React.FC<LegendsLeagueViewProps> = ({
               },
               {
                 title: "৬. ১৫ই তারিখ: গ্র্যান্ড রেজাল্ট ও সেলিব্রেশন",
-                desc: "চূড়ান্ত ফলাফল প্রকাশ, বিজয়ীদের প্রোফাইলে সুপ্রিম ব্যাজ আনলক, নগদ প্রাইজ মানি এবং কুরিয়ারে এক্সক্লুসিভ অভ্যাস টি-শার্ট প্রেরণ।",
+                desc: "চূড়ান্ত ফলাফল প্রকাশ, বিজয়ীদের প্রোফাইলে সুপ্রিম ব্যাজ আনলক, এক্সক্লুসিভ চ্যাম্পিয়নশিপ গিফট হ্যাম্পার এবং কুরিয়ারে অফিসিয়াল অভ্যাস টি-শার্ট প্রেরণ।",
                 icon: Gift,
               },
             ].map((rule, idx) => {
@@ -309,7 +309,7 @@ export const LegendsLeagueView: React.FC<LegendsLeagueViewProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-neutral-600 dark:text-[#94A3B8]">
-                  প্রাইজ মানি + ব্র্যান্ডেড টি-শার্ট ও সুপ্রিম সম্মাননা
+                  মেগা গিফট হ্যাম্পার + ব্র্যান্ডেড টি-শার্ট ও সুপ্রিম সম্মাননা
                 </p>
               </div>
             </div>
@@ -317,7 +317,7 @@ export const LegendsLeagueView: React.FC<LegendsLeagueViewProps> = ({
             <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-black/5 dark:border-white/5 space-y-1.5 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
               <div className="flex items-center gap-2">
                 <CheckCircle size={13} className="text-[#10B981]" />
-                <span>💰 নগদ প্রাইজ মানি (Cash Prize)</span>
+                <span>🎁 এক্সক্লুসিভ মেগা গিফট বক্স</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle size={13} className="text-[#10B981]" />
