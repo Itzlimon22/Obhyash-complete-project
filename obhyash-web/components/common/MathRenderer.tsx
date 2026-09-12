@@ -13,6 +13,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 interface MathRendererProps {
   text: string;
   block?: boolean;
+  className?: string;
 }
 
 const mathMLTags = [
@@ -69,6 +70,78 @@ const sanitizeSchema = {
     sub: ["className"],
   },
 };
+
+function healControlCharacters(raw: string): string {
+  let text = raw;
+
+  // \b (backspace \u0008) -> \begin, \bmatrix, \bullet, \binom, \beta, \bar, \boldsymbol
+  text = text
+    .replace(/[\u0008]egin\b/g, '\\begin')
+    .replace(/[\u0008]matrix\b/g, '\\bmatrix')
+    .replace(/[\u0008]ullet\b/g, '\\bullet')
+    .replace(/[\u0008]inom\b/g, '\\binom')
+    .replace(/[\u0008]eta\b/g, '\\beta')
+    .replace(/[\u0008]ar\b/g, '\\bar')
+    .replace(/[\u0008]oldsymbol\b/g, '\\boldsymbol')
+    .replace(/[\u0008]/g, '')
+    // \v (vertical tab \u000b) -> \vec, \vmatrix, \vert
+    .replace(/[\u000b\v]ec\b/g, '\\vec')
+    .replace(/[\u000b\v]ec\{/g, '\\vec{')
+    .replace(/[\u000b\v]matrix\b/g, '\\vmatrix')
+    .replace(/[\u000b\v]ert\b/g, '\\vert')
+    .replace(/[\u000b\v]/g, '')
+    // \t (tab \u0009) -> \text, \times, \theta, \tan, \tau, \to, \tilde
+    .replace(/[\t\u0009]ext\{/g, '\\text{')
+    .replace(/[\t\u0009]imes\b/g, '\\times')
+    .replace(/[\t\u0009]heta\b/g, '\\theta')
+    .replace(/[\t\u0009]an\b/g, '\\tan')
+    .replace(/[\t\u0009]au\b/g, '\\tau')
+    .replace(/[\t\u0009]o\b/g, '\\to')
+    .replace(/[\t\u0009]ilde\{/g, '\\tilde{')
+    // \a (bell \u0007) -> \alpha, \approx
+    .replace(/[\u0007]lpha\b/g, '\\alpha')
+    .replace(/[\u0007]pprox\b/g, '\\approx')
+    .replace(/[\u0007]/g, '')
+    // \f (form feed \u000c) -> \frac, \forall
+    .replace(/[\u000c]rac\b/g, '\\frac')
+    .replace(/[\u000c]orall\b/g, '\\forall')
+    .replace(/[\u000c]/g, '')
+    // Non-printable control characters
+    .replace(/[\u0000-\u0006\u000e-\u001f]/g, '');
+
+  // Auto-heal common LaTeX commands where the backslash was stripped
+  text = text
+    .replace(/(?<=\s|\$|\||^|\()ec\{/g, '\\vec{')
+    .replace(/(?<=\s|\$|\||^|\()hat\{/g, '\\hat{')
+    .replace(/(?<=\s|\$|\||^|\()bar\{/g, '\\bar{')
+    .replace(/(?<=\s|\$|\||^|\()dot\{/g, '\\dot{')
+    .replace(/(?<=\s|\$|\||^|\()ddot\{/g, '\\ddot{')
+    .replace(/(?<=\s|\$|\||^|\()tilde\{/g, '\\tilde{')
+    .replace(/(?<=\s|\$|\||^|\()sqrt\{/g, '\\sqrt{')
+    .replace(/(?<=\s|\$|\||^|\()frac\{/g, '\\frac{')
+    .replace(/(?<=\s|\$|\||^|\()imes(?=\s|[\$\d\w\\\{])/g, '\\times')
+    .replace(/(?<=\s|\$|\||^|\()heta(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\theta')
+    .replace(/(?<=\s|\$|\||^|\()lpha(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\alpha')
+    .replace(/(?<=\s|\$|\||^|\()eta(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\beta')
+    .replace(/(?<=\s|\$|\||^|\()circ(?=\s|[\$\d\w\\\}\,\.\=])/g, '\\circ');
+
+  // Normalize LaTeX bracket syntax \[ ... \] and \( ... \)
+  text = text.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$');
+  text = text.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+
+  // Normalize empty nucleus notation (e.g. \{} -> {} before sub/superscripts in isotopes like {}^{35}_{17}Cl)
+  text = text.replace(/\\\{\}/g, '{}');
+
+  // Matrix row break normalization (e.g. \begin{vmatrix} 1 & 2 \ 3 & 4 \end{vmatrix})
+  text = text.replace(
+    /(\\begin\{(?:v|p|b|B|V)?matrix\}[\s\S]*?\\end\{(?:v|p|b|B|V)?matrix\})/g,
+    (mat) => {
+      return mat.replace(/(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&])/g, ' \\\\ ');
+    }
+  );
+
+  return text;
+}
 
 function unwrapBengaliMathContent(inner: string): string {
   let clean = inner.replace(/\\(?:text|mathrm|textbf|textit)\{([^}]*)\}/g, "$1");
@@ -205,7 +278,7 @@ function extractAndProtectTables(text: string): { textWithoutTables: string; tab
       currentTableLines.push(safeLine);
     } else {
       if (currentTableLines.length > 0) {
-        const placeholder = `___MD_TABLE_${tables.length}___`;
+        const placeholder = `@@TABLEBLOCK${tables.length}@@`;
         tables.push(currentTableLines.join("\n"));
         outputLines.push(placeholder);
         currentTableLines = [];
@@ -215,7 +288,7 @@ function extractAndProtectTables(text: string): { textWithoutTables: string; tab
   }
 
   if (currentTableLines.length > 0) {
-    const placeholder = `___MD_TABLE_${tables.length}___`;
+    const placeholder = `@@TABLEBLOCK${tables.length}@@`;
     tables.push(currentTableLines.join("\n"));
     outputLines.push(placeholder);
   }
@@ -226,7 +299,7 @@ function extractAndProtectTables(text: string): { textWithoutTables: string; tab
 function restoreTables(text: string, tables: string[]): string {
   let result = text;
   tables.forEach((table, index) => {
-    result = result.replace(`___MD_TABLE_${index}___`, `\n\n${table}\n\n`);
+    result = result.replace(`@@TABLEBLOCK${index}@@`, `\n\n${table}\n\n`);
   });
   return result;
 }
@@ -236,8 +309,14 @@ function preprocess(text: string): string {
     return preprocessCache.get(text)!;
   }
 
-  // 1. Normalize literal \n and multiple $$$$
-  let processedText = text.replace(/\\n/g, "\n").replace(/\${3,}/g, "\n\n");
+  // 0. Auto-heal unescaped escape sequences, control characters, brackets, matrices
+  let processedText = healControlCharacters(text);
+
+  // 1. Normalize literal \n, HTML <br>, and multiple $$$$
+  processedText = processedText
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/\${3,}/g, "\n\n");
 
   // Protect Markdown tables from delimiters, step splitting and line restructuring
   const { textWithoutTables, tables } = extractAndProtectTables(processedText);
@@ -245,6 +324,18 @@ function preprocess(text: string): string {
 
   processedText = cleanPipesAndDelimiters(processedText);
   processedText = separateTransitionSteps(processedText);
+
+  // Auto-detect unwrapped LaTeX option / formula strings (e.g. "4 \times 10^{6} ms^{-1}")
+  if (!processedText.includes("$") && !/[\u0980-\u09FF]/.test(processedText)) {
+    const trimmed = processedText.trim();
+    if (
+      trimmed.length > 0 &&
+      (trimmed.includes("\\") ||
+        /\^\{?[0-9\-\+a-zA-Z]+\}?|_\{?[0-9\-\+a-zA-Z]+\}?/.test(trimmed))
+    ) {
+      processedText = `$${trimmed}$`;
+    }
+  }
 
   // 2. Line-by-line single dollar balancing & raw equation wrapping
   const rawLines = processedText.split("\n");
@@ -364,7 +455,7 @@ function preprocess(text: string): string {
   return result;
 }
 
-function BaseMathRenderer({ text, block = false }: MathRendererProps) {
+function BaseMathRenderer({ text, block = false, className = "" }: MathRendererProps) {
   if (!text) return null;
 
   const formattedText = preprocess(text);
@@ -375,7 +466,7 @@ function BaseMathRenderer({ text, block = false }: MathRendererProps) {
         prose-p:leading-relaxed prose-p:my-2
         prose-li:my-1 prose-ul:my-2 prose-ol:my-2
         prose-table:my-3 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2
-        ${block ? "block my-2" : "inline"}`}
+        ${block ? "block my-2" : "inline"} ${className}`}
     >
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}

@@ -17,27 +17,61 @@ class QuestionFormatter {
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n');
 
+    // Extract and protect Markdown tables first so pipes and row newlines are completely preserved
+    final (textWithoutTables, tables) = extractAndProtectTables(text);
+    text = textWithoutTables;
+
     // 0a. Auto-heal unescaped Python/JS escape sequences and control characters
     text = text
-        // \v (vertical tab \u000b) -> \vec
-        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
-        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
-        .replaceAll(RegExp(r'[\u000b\v]'), '')
-        // \a (bell \u0007) -> \alpha, \approx
-        .replaceAll(RegExp(r'[\u0007]lpha\b'), r'\alpha')
-        .replaceAll(RegExp(r'[\u0007]pprox\b'), r'\approx')
-        .replaceAll(RegExp(r'[\u0007]'), '')
-        // \b (backspace \u0008) -> \beta, \bar, \boldsymbol
+        // \b (backspace \u0008) -> \begin, \bmatrix, \bullet, \binom, \beta, \bar, \boldsymbol
+        .replaceAll(RegExp(r'[\u0008]egin\b'), r'\begin')
+        .replaceAll(RegExp(r'[\u0008]matrix\b'), r'\bmatrix')
+        .replaceAll(RegExp(r'[\u0008]ullet\b'), r'\bullet')
+        .replaceAll(RegExp(r'[\u0008]inom\b'), r'\binom')
         .replaceAll(RegExp(r'[\u0008]eta\b'), r'\beta')
         .replaceAll(RegExp(r'[\u0008]ar\b'), r'\bar')
         .replaceAll(RegExp(r'[\u0008]oldsymbol\b'), r'\boldsymbol')
         .replaceAll(RegExp(r'[\u0008]'), '')
+        // \v (vertical tab \u000b) -> \vec, \vmatrix, \vert
+        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
+        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
+        .replaceAll(RegExp(r'[\u000b\v]matrix\b'), r'\vmatrix')
+        .replaceAll(RegExp(r'[\u000b\v]ert\b'), r'\vert')
+        .replaceAll(RegExp(r'[\u000b\v]'), '')
+        // \t (tab \u0009) -> \text, \times, \theta, \tan, \tau, \to, \tilde
+        .replaceAll(RegExp(r'[\t\u0009]ext\{'), r'\text{')
+        .replaceAll(RegExp(r'[\t\u0009]imes\b'), r'\times')
+        .replaceAll(RegExp(r'[\t\u0009]heta\b'), r'\theta')
+        .replaceAll(RegExp(r'[\t\u0009]an\b'), r'\tan')
+        .replaceAll(RegExp(r'[\t\u0009]au\b'), r'\tau')
+        .replaceAll(RegExp(r'[\t\u0009]o\b'), r'\to')
+        .replaceAll(RegExp(r'[\t\u0009]ilde\{'), r'\tilde{')
+        // \a (bell \u0007) -> \alpha, \approx
+        .replaceAll(RegExp(r'[\u0007]lpha\b'), r'\alpha')
+        .replaceAll(RegExp(r'[\u0007]pprox\b'), r'\approx')
+        .replaceAll(RegExp(r'[\u0007]'), '')
         // \f (form feed \u000c) -> \frac, \forall
         .replaceAll(RegExp(r'[\u000c]rac\b'), r'\frac')
         .replaceAll(RegExp(r'[\u000c]orall\b'), r'\forall')
         .replaceAll(RegExp(r'[\u000c]'), '')
         // Non-printable control characters (except standard \n and \t)
         .replaceAll(RegExp(r'[\u0000-\u0006\u000e-\u001f]'), '');
+
+    // Normalize LaTeX bracket syntax \[ ... \] and \( ... \)
+    text = text.replaceAllMapped(RegExp(r'\\\[([\s\S]*?)\\\]'), (m) => '\$\$${m.group(1)}\$\$');
+    text = text.replaceAllMapped(RegExp(r'\\\(([\s\S]*?)\\\)'), (m) => '\$${m.group(1)}\$');
+
+    // Normalize empty nucleus notation (e.g. \{} -> {} before sub/superscripts in isotopes like {}^{35}_{17}Cl)
+    text = text.replaceAll(r'\{}', '{}');
+
+    // Matrix row break normalization (e.g. \begin{vmatrix} 1 & 2 \ 3 & 4 \end{vmatrix})
+    text = text.replaceAllMapped(
+      RegExp(r'(\\begin\{(?:v|p|b|B|V)?matrix\}[\s\S]*?\\end\{(?:v|p|b|B|V)?matrix\})'),
+      (m) {
+        final mat = m.group(1)!;
+        return mat.replaceAllMapped(RegExp(r'(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&])'), (rm) => r' \\ ');
+      },
+    );
 
     // 0b. Auto-heal corrupted LaTeX commands where the backslash was stripped
     text = text
@@ -206,6 +240,11 @@ class QuestionFormatter {
     // Clean up excessive blank lines (max 2)
     text = text.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
 
+    // Restore protected Markdown tables
+    if (tables.isNotEmpty) {
+      text = restoreTables(text, tables);
+    }
+
     return text;
   }
 
@@ -312,5 +351,55 @@ class QuestionFormatter {
     }
 
     return text;
+  }
+
+  /// Extracts Markdown tables and replaces them with unique placeholders
+  /// so that regex sanitization (pipes, punctuation, linebreaks) does not mutate table structures.
+  static (String, List<String>) extractAndProtectTables(String text) {
+    final lines = text.split('\n');
+    final tables = <String>[];
+    final outputLines = <String>[];
+    var currentTableLines = <String>[];
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      final trimmed = line.trim();
+      final isTableLine =
+          trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.split('|').length > 2;
+
+      if (isTableLine) {
+        // Protect pipes inside math formulas in table cells: $|$ -> $\vert $
+        final safeLine = line.replaceAllMapped(RegExp(r'\$([^$]+)\$'), (m) {
+          final math = m.group(1) ?? '';
+          return '\$${math.replaceAll('|', r'\vert ')}\$';
+        });
+        currentTableLines.add(safeLine);
+      } else {
+        if (currentTableLines.isNotEmpty) {
+          final placeholder = '@@TABLEBLOCK${tables.length}@@';
+          tables.add(currentTableLines.join('\n'));
+          outputLines.add(placeholder);
+          currentTableLines = [];
+        }
+        outputLines.add(line);
+      }
+    }
+
+    if (currentTableLines.isNotEmpty) {
+      final placeholder = '@@TABLEBLOCK${tables.length}@@';
+      tables.add(currentTableLines.join('\n'));
+      outputLines.add(placeholder);
+    }
+
+    return (outputLines.join('\n'), tables);
+  }
+
+  /// Restores protected Markdown tables from placeholders with clean boundary spacing
+  static String restoreTables(String text, List<String> tables) {
+    var result = text;
+    for (int i = 0; i < tables.length; i++) {
+      result = result.replaceAll('@@TABLEBLOCK$i@@', '\n\n${tables[i]}\n\n');
+    }
+    return result;
   }
 }

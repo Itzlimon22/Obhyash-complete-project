@@ -249,7 +249,10 @@ String _separateTransitionSteps(String text) {
 }
 
 String _preprocess(String text) {
-  var processedText = QuestionFormatter.format(text);
+  // Extract and protect Markdown tables first so dollar balancing, arrows, etc. don't touch tables
+  final (textWithoutTables, tables) = QuestionFormatter.extractAndProtectTables(text);
+
+  var processedText = QuestionFormatter.format(textWithoutTables);
   processedText = _separateTransitionSteps(processedText);
 
   // Single dollar balancing per line
@@ -620,7 +623,12 @@ String _preprocess(String text) {
     return t;
   }).toList();
 
-  return processedParts.join('');
+  var result = processedParts.join('');
+  if (tables.isNotEmpty) {
+    result = QuestionFormatter.restoreTables(result, tables);
+  }
+
+  return result;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1034,9 +1042,11 @@ class LatexText extends StatelessWidget {
     }
 
     final processed = _preprocess(text);
+    // debugPrint('PROCESSED IN LATEX_TEXT:\n$processed');
 
     return MarkdownBody(
       data: processed,
+      extensionSet: md.ExtensionSet.gitHubFlavored,
       inlineSyntaxes: [
         _ChemArrowSyntax(),
         _DisplayMathSyntax(),
