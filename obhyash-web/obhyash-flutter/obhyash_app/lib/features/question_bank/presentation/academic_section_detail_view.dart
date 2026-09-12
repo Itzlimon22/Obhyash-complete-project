@@ -645,6 +645,9 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       subjectIds.addAll(['ssc_bgs', 'bgs']);
     } else if (cleanId.contains('religion') || cleanId.contains('ধর্ম')) {
       subjectIds.addAll(['ssc_religion', 'religion']);
+    } else if (cleanId.contains('statistics') || cleanId.contains('পরিসংখ্যান')) {
+      final num = cleanId.contains('2') ? '2' : '1';
+      subjectIds.addAll(['hsc_statistics_$num', 'statistics_$num']);
     }
 
     var query = supabase.from('questions').select('*');
@@ -773,16 +776,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
         } catch (_) {}
       }
 
-      // If DB has 0 questions (or questions haven't been uploaded yet), generate curated questions for the selected chapter/topic
-      if (questions.isEmpty) {
-        questions = _generateCuratedQuestions(
-          _subjectId,
-          _sectionId,
-          _selectedChapter?.name ?? (_chapters.isNotEmpty ? _chapters.first.name : '১ম অধ্যায়'),
-          _selectedTopic?.name,
-        );
-      }
-
       if (mounted) {
         setState(() {
           _questions = questions;
@@ -793,16 +786,10 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       }
     } catch (e, st) {
       debugPrint('Error fetching questions: $e\n$st');
-      final questions = _generateCuratedQuestions(
-        _subjectId,
-        _sectionId,
-        _selectedChapter?.name ?? '১ম অধ্যায়',
-        _selectedTopic?.name,
-      );
       if (mounted) {
         setState(() {
-          _questions = questions;
-          _currentOffset = questions.length;
+          _questions = [];
+          _currentOffset = 0;
           _hasMore = false;
           _isLoadingQuestions = false;
         });
@@ -2063,190 +2050,6 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     ];
   }
 
-  List<Question> _generateCuratedQuestions(
-    String subject,
-    String sectionId,
-    String chapterName,
-    String? topicName,
-  ) {
-    final cleanChapter = chapterName.replaceAll(RegExp(r'^\d+[ম্থয়]\s*অধ্যায়[:\s]*'), '');
-    final topicSnippet = topicName != null && topicName.isNotEmpty ? ' [$topicName]' : '';
-
-    if (sectionId == 'cq') {
-      return [
-        Question(
-          id: 'cq_${subject}_1',
-          subject: subject,
-          chapter: cleanChapter,
-          question:
-              '$cleanChapter সংক্রান্ত একটি ব্যবহারিক পরীক্ষায় একটি বস্তুর গতি ও শক্তি পরিমাপ করা হলো। উদ্দীপক অনুসারে $cleanChapter সম্পর্কিত বিভিন্ন তথ্যাদি সংগৃহীত হয়েছে।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 10,
-          examHistory: const [ExamHistory(institute: 'ঢাকা বোর্ড', year: 2023)],
-          explanation:
-              '(ক) জ্ঞানমূলক উত্তর: পাঠ্যবই অনুযায়ী সূত্র ও সংজ্ঞা সুস্পষ্টভাবে সংজ্ঞায়িত।\n\n(খ) অনুধাবনমূলক ব্যাখ্যা: কারণ ও প্রভাবের সম্পর্ক যুক্তিসহ তুলে ধরতে হবে।\n\n(গ) প্রয়োগমূলক সমাধান: সূত্র প্রয়োগ করে প্রয়োজনীয় মান নির্ণয় করা হয়েছে। মান: ১০.৫ একক।\n\n(ঘ) উচ্চতর দক্ষতা: উদ্দীপকের শর্ত সাপেক্ষে গাণিতিক ও তুলনামূলক বিশ্লেষণ নিখুঁতভাবে প্রমাণিত।',
-        ),
-        Question(
-          id: 'cq_${subject}_2',
-          subject: subject,
-          chapter: cleanChapter,
-          question:
-              'ল্যাবরেটরিতে $cleanChapter সংশ্লিষ্ট পরীক্ষণ সম্পন্নকালে পর্যবেক্ষণ থেকে প্রাপ্ত ফলাফল ছকভুক্ত করা হলো।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 10,
-          examHistory: const [ExamHistory(institute: 'চট্টগ্রাম বোর্ড', year: 2023)],
-          explanation:
-              '(ক) মৌলিক রাশি/সংজ্ঞা যথাযথভাবে লেখা হয়েছে।\n(খ) বৈজ্ঞানিক নীতির ভিত্তিতে ব্যাখ্যাকরণ।\n(গ) প্রদত্ত সমীকরণ ব্যবহার করে সমাধান সম্পন্ন হয়েছে।\n(ঘ) বাস্তব পরিবেশের সাথে তত্ত্বের যথার্থতা বিশ্লেষণ।',
-        ),
-      ];
-    } else if (sectionId == 'ka_bhandar') {
-      return [
-        Question(
-          id: 'ka_${subject}_1',
-          subject: subject,
-          chapter: cleanChapter,
-          question: '$cleanChapter অধ্যায়ের মূল ভিত্তি বা মৌলিক নীতিটির সংজ্ঞা দাও।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 1,
-          examHistory: const [ExamHistory(institute: 'ঢাকা বোর্ড', year: 2023)],
-          explanation:
-              'উত্তর: পাঠ্যবই অনুযায়ী—যে প্রাকৃতিক নিয়মের অধীনে উক্ত প্রক্রিয়াটি অপরিবর্তিত থাকে এবং নির্দিষ্ট শর্তাধীনে কার্যকারিতা প্রদর্শন করে, তাকেই উক্ত মূল নীতি বলা হয়।',
-        ),
-        Question(
-          id: 'ka_${subject}_2',
-          subject: subject,
-          chapter: cleanChapter,
-          question: '$cleanChapter সম্পর্কিত প্রধান একক বা ধ্রুবকের মান কত?$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 1,
-          examHistory: const [ExamHistory(institute: 'রাজশাহী বোর্ড', year: 2022)],
-          explanation:
-              'উত্তর: এস.আই (SI) পদ্ধতিতে এর প্রমিত একক এবং ধ্রুবকটির আন্তর্জাতিক মান নির্ধারিত সূত্রে সংজ্ঞায়িত।',
-        ),
-        Question(
-          id: 'ka_${subject}_3',
-          subject: subject,
-          chapter: cleanChapter,
-          question: '$cleanChapter অধ্যায়ে উল্লেখিত প্রধান সূত্রটি বিবৃতি করো।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 1,
-          examHistory: const [ExamHistory(institute: 'যশোর বোর্ড', year: 2023)],
-          explanation:
-              'উত্তর: নির্দিষ্ট তাপমাত্রা ও চাপে কোনো নির্দিষ্ট ব্যবস্থার ফলাফল সর্বদা তার কার্যকরী প্রভাবকের সমানুপাতিক।',
-        ),
-      ];
-    } else if (sectionId == 'kha_bhandar') {
-      return [
-        Question(
-          id: 'kha_${subject}_1',
-          subject: subject,
-          chapter: cleanChapter,
-          question:
-              '$cleanChapter অধ্যায়ের ঘটনাটি দৈনন্দিন জীবনে কীভাবে কার্যকর ব্যাখ্যা করো।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 2,
-          examHistory: const [ExamHistory(institute: 'ঢাকা বোর্ড', year: 2023)],
-          explanation:
-              'মূল বক্তব্য: এটি মূলত পারস্পরিক মিথস্ক্রিয়া এবং শক্তির রূপান্তরের ফলেই সংঘটিত হয়।\n\nব্যাখ্যা: কারণ যখন বাহ্যিক প্রভাবক কাজ করে, তখন অভ্যন্তরীণ প্রতিরোধ বল বিপরীতমুখী প্রতিক্রিয়া সৃষ্টি করে সাম্যাবস্থা রক্ষা করে।',
-        ),
-        Question(
-          id: 'kha_${subject}_2',
-          subject: subject,
-          chapter: cleanChapter,
-          question:
-              'উষ্ণতা বৃদ্ধিতে $cleanChapter সংশ্লিষ্ট মানটির পরিবর্তন ঘটে কেন? ব্যাখ্যা করো।$topicSnippet',
-          options: const [],
-          correctAnswerIndex: 0,
-          points: 2,
-          examHistory: const [ExamHistory(institute: 'দিনাজপুর বোর্ড', year: 2022)],
-          explanation:
-              'মূল বক্তব্য: তাপশক্তি বৃদ্ধির সাথে সাথে কণাগুলোর গতিশক্তি বৃদ্ধি পায়।\n\nব্যাখ্যা: তাপমাত্রা বৃদ্ধি পেলে আন্তঃআণবিক আকর্ষণ বল হ্রাস পায় এবং কণাগুলোর স্পন্দন বৃদ্ধি পেয়ে সামগ্রিক রোধ বা ঘনত্ব হ্রাস পায়।',
-        ),
-      ];
-    } else {
-      // MCQ (Academic, Engineering, Medical, Varsity, etc.)
-      final String fallbackInstitute;
-      final String fallbackExamType;
-      if (sectionId == 'engineering') {
-        fallbackInstitute = 'বুয়েট ভর্তি পরীক্ষা';
-        fallbackExamType = 'Engineering';
-      } else if (sectionId == 'medical') {
-        fallbackInstitute = 'মেডিকেল ভর্তি পরীক্ষা (MAT)';
-        fallbackExamType = 'Medical';
-      } else if (sectionId == 'varsity_ka' || sectionId == 'varsity_kha' || sectionId == 'varsity') {
-        fallbackInstitute = 'ঢাকা বিশ্ববিদ্যালয় (ক ইউনিট)';
-        fallbackExamType = 'Varsity';
-      } else if (sectionId == 'gst') {
-        fallbackInstitute = 'গুচ্ছ জিএসটি ভর্তি পরীক্ষা';
-        fallbackExamType = 'Varsity';
-      } else if (sectionId == 'iba_bup') {
-        fallbackInstitute = 'আইবিএ / বিইউপি ভর্তি পরীক্ষা';
-        fallbackExamType = 'Admission';
-      } else if (sectionId == 'textbook') {
-        final cleanSubj = _subjectId.toLowerCase();
-        if (cleanSubj.contains('physic')) {
-          fallbackInstitute = 'ইসহাক স্যার';
-        } else if (cleanSubj.contains('chem')) {
-          fallbackInstitute = 'হাজারী ও নাগ';
-        } else if (cleanSubj.contains('math')) {
-          fallbackInstitute = 'কেতাব স্যার';
-        } else if (cleanSubj.contains('bio')) {
-          fallbackInstitute = 'হাসান স্যার';
-        } else {
-          fallbackInstitute = 'পাঠ্যবই অনুশীলন';
-        }
-        fallbackExamType = 'Book';
-      } else {
-        fallbackInstitute = 'ঢাকা বোর্ড';
-        fallbackExamType = 'Academic';
-      }
-
-      return [
-        Question(
-          id: '${sectionId}_${subject}_1',
-          subject: subject,
-          chapter: cleanChapter,
-          examType: fallbackExamType,
-          question: '$cleanChapter সম্পর্কিত নিচের কোন বিবৃতিটি সঠিক?$topicSnippet',
-          options: const [
-            'এটি একটি মৌলিক ভেক্টর রাশি',
-            'এর মান সর্বদা ধনাত্মক ও অপরিবর্তনীয়',
-            'প্রযুক্ত বলের সাথে এর সম্পর্ক সরলরেখিক',
-            'উপরের সবগুলোই সঠিক',
-          ],
-          correctAnswerIndex: 2,
-          points: 1,
-          examHistory: [ExamHistory(institute: fallbackInstitute, year: 2023)],
-          explanation:
-              'সঠিক উত্তর (গ)। কারণ পাঠ্যবই অনুযায়ী বলের প্রয়োগে নির্দিষ্ট শর্ত সাপেক্ষে সম্পর্কটি সরাসরি সরলরেখিক বৃদ্ধি নির্দেশ করে।',
-        ),
-        Question(
-          id: '${sectionId}_${subject}_2',
-          subject: subject,
-          chapter: cleanChapter,
-          examType: fallbackExamType,
-          question: '$cleanChapter অধ্যায়ে এস.আই (SI) একক নিচের কোনটি?$topicSnippet',
-          options: const [
-            'kg m s⁻¹',
-            'N m⁻²',
-            'J s⁻¹',
-            'W m⁻¹ K⁻¹',
-          ],
-          correctAnswerIndex: 1,
-          points: 1,
-          examHistory: [ExamHistory(institute: fallbackInstitute, year: 2022)],
-          explanation:
-              'সঠিক উত্তর (খ)। প্রতি একক ক্ষেত্রফলে লম্বভাবে প্রযুক্ত বলের জন্য প্রমিত এস.আই একক হলো N m⁻² (প্যাসকেল)।',
-        ),
-      ];
-    }
-  }
 }
 
 // ── Dropdown Trigger Pill Button ──
