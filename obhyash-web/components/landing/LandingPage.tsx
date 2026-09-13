@@ -1141,113 +1141,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Platform Comparison: Traditional Guidebooks vs Obhyash */}
-      <section className="py-24 bg-white dark:bg-black">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              স্মার্ট প্রস্তুতি
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-950 dark:text-white">
-              প্রচলিত গাইড বই বনাম <span className="text-emerald-600 dark:text-emerald-400">অভ্যাস প্ল্যাটফর্ম</span>
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl">
-            <table className="w-full text-left border-collapse min-w-[640px]">
-              <thead>
-                <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60">
-                  <th className="py-5 px-6 font-bold text-sm text-neutral-700 dark:text-neutral-300 w-2/5">
-                    ফিচার ও সুবিধার তুলনা
-                  </th>
-                  <th className="py-5 px-6 font-bold text-sm text-rose-600 dark:text-rose-400 w-[30%]">
-                    <span className="flex items-center gap-1.5">
-                      <XCircle className="w-4 h-4 shrink-0" />
-                      প্রচলিত গাইড বই / টেস্ট পেপার
-                    </span>
-                  </th>
-                  <th className="py-5 px-6 font-bold text-sm text-emerald-600 dark:text-emerald-400 w-[30%] bg-emerald-50/60 dark:bg-emerald-950/30">
-                    <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      অভ্যাস (Obhyash) প্ল্যাটফর্ম
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/70 text-xs sm:text-sm">
-                {[
-                  {
-                    feature: 'প্রশ্নের পরিধি ও আপডেট',
-                    desc: 'নতুন সিলেবাস ও বোর্ডের পরিবর্তন অনুসারে আপডেট',
-                    trad: 'পুরোনো ছাপা সংস্করণের বই, বছরে একবার আপডেট হয়',
-                    obhyash: '২,০০,০০০+ প্রশ্নব্যাংক ও প্রতিনিয়ত রিয়েল-টাইম আপডেট',
-                  },
-                  {
-                    feature: 'সমাধানের নির্ভরযোগ্যতা',
-                    desc: 'ভুল উত্তর ও রেফারেন্সের নিশ্চয়তা',
-                    trad: 'প্রচুর টাইপো ও ভুল উত্তর, কোনো রেফারেন্স ছাড়াই উত্তর দেওয়া',
-                    obhyash: '১০০% ভেরিফাইড ও মূল পাঠ্যবইয়ের পৃষ্ঠা রেফারেন্সসহ ব্যাখ্যা',
-                  },
-                  {
-                    feature: 'পরীক্ষার অনুভূতি ও টাইমিং',
-                    desc: 'আসল পরীক্ষার মতো টাইম ও নেগেটিভ মার্কিং হিসাব',
-                    trad: 'ঘড়ি দেখে মেলাতে গিয়ে বিভ্রান্তি, নেগেটিভ মার্কিং হিসাবের ঝামেলা',
-                    obhyash: 'কাউন্টডাউন টাইমার, অটো সাবমিশন ও স্বয়ংক্রিয় নেগেটিভ মার্কিং',
-                  },
-                  {
-                    feature: 'দুর্বলতা শনাক্তকরণ (Analytics)',
-                    desc: 'কোন বিষয়ে ও কোন অধ্যায়ে মার্কস কম আসছে',
-                    trad: 'নিজের ভুল বিশ্লেষণ করা প্রায় অসম্ভব, কেবল আন্দাজে পড়া',
-                    obhyash: '৩-মেট্রিক গ্রাফ, বিষয়ভিত্তিক নির্ভুলতা ও দুর্বল চ্যাপ্টার ট্র্যাকার',
-                  },
-                  {
-                    feature: 'ভুল প্রশ্নের রিভিশন ও বুকমার্ক',
-                    desc: 'পরীক্ষার আগের রাতে গুরুত্বপূর্ণ প্রশ্ন রিভিশন',
-                    trad: 'হাজার পৃষ্ঠার দাগানো বই ও খাতার পাতা হাতড়ানো',
-                    obhyash: '১ ক্লিকে বুকমার্ক ও ভুল প্রশ্নের স্বয়ংক্রিয় রিভিশন শিট তৈরি',
-                  },
-                  {
-                    feature: 'পোর্টাবিলিটি ও অ্যাক্সেসিবিলিটি',
-                    desc: 'যেকোনো জায়গায় বসে তাৎক্ষণিক পড়ার সুযোগ',
-                    trad: '৫-১০ কেজির ভারী বই বহন করা অসম্ভব',
-                    obhyash: 'মোবাইল বা ল্যাপটপে পকেটের ভেতর সবসময় সাথে থাকে',
-                  },
-                ].map((row, idx) => (
-                  <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6">
-                      <p className="font-bold text-neutral-900 dark:text-white">{row.feature}</p>
-                      <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5">{row.desc}</p>
-                    </td>
-                    <td className="py-4 px-6 text-neutral-600 dark:text-neutral-400">
-                      <div className="flex items-start gap-2">
-                        <span className="text-rose-500 font-bold shrink-0 mt-0.5">✕</span>
-                        <span>{row.trad}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-neutral-900 dark:text-emerald-200 font-semibold bg-emerald-50/30 dark:bg-emerald-950/15">
-                      <div className="flex items-start gap-2">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
-                        <span className="text-emerald-900 dark:text-emerald-300 font-medium">{row.obhyash}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-10 text-center">
-            <button
-              onClick={onGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#004633]/25 transition-all active:scale-95 cursor-pointer"
-            >
-              আজই স্মার্ট প্রস্তুতি শুরু করো
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* 4. How It Works - Workflow */}
       <section className="py-24 bg-neutral-50 dark:bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
@@ -1411,12 +1304,208 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-24 bg-white dark:bg-black">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+          <div className="text-center mb-16 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <div className="flex items-center gap-0.5 text-amber-500">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <span className="font-sans font-black">৪.৯/৫ রেটিং</span>
+              <span className="opacity-40">•</span>
+              <span>২০,০০০+ শিক্ষার্থীর আস্থা</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white">
+              শিক্ষার্থীদের সাফল্যের অভিজ্ঞতা
+            </h2>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testimonials.map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white dark:bg-[#0c0c0e] p-6 sm:p-7 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Top Bar: Stars + Verified Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-1">
+                      {[...Array(item.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    {item.verified && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>ভেরিফাইড শিক্ষার্থী</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Student Review Quote */}
+                  <p className="text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                    &ldquo;{item.text}&rdquo;
+                  </p>
+                </div>
+
+                {/* Author Info */}
+                <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800/70 flex items-center gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.avatarBg} flex items-center justify-center font-bold text-white text-sm shadow-xs shrink-0`}
+                  >
+                    {item.initial}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-neutral-900 dark:text-white text-sm truncate">
+                        {item.name}
+                      </h4>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 shrink-0">
+                        {item.batch}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate">
+                        {item.college}
+                      </span>
+                      <span className="text-neutral-300 dark:text-neutral-700">•</span>
+                      <span className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                        {item.target}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom Social Proof Highlight */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex flex-wrap items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-neutral-100/80 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400">
+              <span className="flex items-center gap-1.5 font-bold text-neutral-900 dark:text-white">
+                <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                ৯৮% শিক্ষার্থী
+              </span>
+              <span>জানিয়েছেন অভ্যাসের মাধ্যমে নিয়মিত প্র্যাকটিস তাদের পরীক্ষায় সিলি মিসটেক ও ভুল দাগানোর প্রবণতা কমিয়েছে</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Platform Comparison: Traditional Guidebooks vs Obhyash */}
+      <section className="py-24 bg-neutral-50/70 dark:bg-black">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+              স্মার্ট প্রস্তুতি
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-950 dark:text-white">
+              প্রচলিত গাইড বই বনাম <span className="text-emerald-600 dark:text-emerald-400">অভ্যাস প্ল্যাটফর্ম</span>
+            </h2>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl">
+            <table className="w-full text-left border-collapse min-w-[640px]">
+              <thead>
+                <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60">
+                  <th className="py-5 px-6 font-bold text-sm text-neutral-700 dark:text-neutral-300 w-2/5">
+                    ফিচার ও সুবিধার তুলনা
+                  </th>
+                  <th className="py-5 px-6 font-bold text-sm text-rose-600 dark:text-rose-400 w-[30%]">
+                    <span className="flex items-center gap-1.5">
+                      <XCircle className="w-4 h-4 shrink-0" />
+                      প্রচলিত গাইড বই / টেস্ট পেপার
+                    </span>
+                  </th>
+                  <th className="py-5 px-6 font-bold text-sm text-emerald-600 dark:text-emerald-400 w-[30%] bg-emerald-50/60 dark:bg-emerald-950/30">
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      অভ্যাস (Obhyash) প্ল্যাটফর্ম
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/70 text-xs sm:text-sm">
+                {[
+                  {
+                    feature: 'প্রশ্নের পরিধি ও আপডেট',
+                    desc: 'নতুন সিলেবাস ও বোর্ডের পরিবর্তন অনুসারে আপডেট',
+                    trad: 'পুরোনো ছাপা সংস্করণের বই, বছরে একবার আপডেট হয়',
+                    obhyash: '২,০০,০০০+ প্রশ্নব্যাংক ও প্রতিনিয়ত রিয়েল-টাইম আপডেট',
+                  },
+                  {
+                    feature: 'সমাধানের নির্ভরযোগ্যতা',
+                    desc: 'ভুল উত্তর ও রেফারেন্সের নিশ্চয়তা',
+                    trad: 'প্রচুর টাইপো ও ভুল উত্তর, কোনো রেফারেন্স ছাড়াই উত্তর দেওয়া',
+                    obhyash: '১০০% ভেরিফাইড ও মূল পাঠ্যবইয়ের পৃষ্ঠা রেফারেন্সসহ ব্যাখ্যা',
+                  },
+                  {
+                    feature: 'পরীক্ষার অনুভূতি ও টাইমিং',
+                    desc: 'আসল পরীক্ষার মতো টাইম ও নেগেটিভ মার্কিং হিসাব',
+                    trad: 'ঘড়ি দেখে মেলাতে গিয়ে বিভ্রান্তি, নেগেটিভ মার্কিং হিসাবের ঝামেলা',
+                    obhyash: 'কাউন্টডাউন টাইমার, অটো সাবমিশন ও স্বয়ংক্রিয় নেগেটিভ মার্কিং',
+                  },
+                  {
+                    feature: 'দুর্বলতা শনাক্তকরণ (Analytics)',
+                    desc: 'কোন বিষয়ে ও কোন অধ্যায়ে মার্কস কম আসছে',
+                    trad: 'নিজের ভুল বিশ্লেষণ করা প্রায় অসম্ভব, কেবল আন্দাজে পড়া',
+                    obhyash: '৩-মেট্রিক গ্রাফ, বিষয়ভিত্তিক নির্ভুলতা ও দুর্বল চ্যাপ্টার ট্র্যাকার',
+                  },
+                  {
+                    feature: 'ভুল প্রশ্নের রিভিশন ও বুকমার্ক',
+                    desc: 'পরীক্ষার আগের রাতে গুরুত্বপূর্ণ প্রশ্ন রিভিশন',
+                    trad: 'হাজার পৃষ্ঠার দাগানো বই ও খাতার পাতা হাতড়ানো',
+                    obhyash: '১ ক্লিকে বুকমার্ক ও ভুল প্রশ্নের স্বয়ংক্রিয় রিভিশন শিট তৈরি',
+                  },
+                  {
+                    feature: 'পোর্টাবিলিটি ও অ্যাক্সেসিবিলিটি',
+                    desc: 'যেকোনো জায়গায় বসে তাৎক্ষণিক পড়ার সুযোগ',
+                    trad: '৫-১০ কেজির ভারী বই বহন করা অসম্ভব',
+                    obhyash: 'মোবাইল বা ল্যাপটপে পকেটের ভেতর সবসময় সাথে থাকে',
+                  },
+                ].map((row, idx) => (
+                  <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6">
+                      <p className="font-bold text-neutral-900 dark:text-white">{row.feature}</p>
+                      <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5">{row.desc}</p>
+                    </td>
+                    <td className="py-4 px-6 text-neutral-600 dark:text-neutral-400">
+                      <div className="flex items-start gap-2">
+                        <span className="text-rose-500 font-bold shrink-0 mt-0.5">✕</span>
+                        <span>{row.trad}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 text-neutral-900 dark:text-emerald-200 font-semibold bg-emerald-50/30 dark:bg-emerald-950/15">
+                      <div className="flex items-start gap-2">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                        <span className="text-emerald-900 dark:text-emerald-300 font-medium">{row.obhyash}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-10 text-center">
+            <button
+              onClick={onGetStarted}
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#004633]/25 transition-all active:scale-95 cursor-pointer"
+            >
+              আজই স্মার্ট প্রস্তুতি শুরু করো
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="py-24 bg-neutral-50 dark:bg-black"
+        className="py-24 bg-white dark:bg-black"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16 space-y-3">
@@ -1643,97 +1732,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span>প্রো প্ল্যানে আপগ্রেড করো</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-24 bg-neutral-50/40 dark:bg-black">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-16 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <div className="flex items-center gap-0.5 text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <span className="font-sans font-black">৪.৯/৫ রেটিং</span>
-              <span className="opacity-40">•</span>
-              <span>২০,০০০+ শিক্ষার্থীর আস্থা</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white">
-              শিক্ষার্থীদের সাফল্যের অভিজ্ঞতা
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white dark:bg-[#0c0c0e] p-6 sm:p-7 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
-                  {/* Top Bar: Stars + Verified Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-1">
-                      {[...Array(item.rating)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    {item.verified && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>ভেরিফাইড শিক্ষার্থী</span>
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Student Review Quote */}
-                  <p className="text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
-                    &ldquo;{item.text}&rdquo;
-                  </p>
-                </div>
-
-                {/* Author Info */}
-                <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800/70 flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.avatarBg} flex items-center justify-center font-bold text-white text-sm shadow-xs shrink-0`}
-                  >
-                    {item.initial}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-neutral-900 dark:text-white text-sm truncate">
-                        {item.name}
-                      </h4>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 shrink-0">
-                        {item.batch}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate">
-                        {item.college}
-                      </span>
-                      <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                      <span className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
-                        {item.target}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom Social Proof Highlight */}
-          <div className="mt-12 text-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-neutral-100/80 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400">
-              <span className="flex items-center gap-1.5 font-bold text-neutral-900 dark:text-white">
-                <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                ৯৮% শিক্ষার্থী
-              </span>
-              <span>জানিয়েছেন অভ্যাসের মাধ্যমে নিয়মিত প্র্যাকটিস তাদের পরীক্ষায় সিলি মিসটেক ও ভুল দাগানোর প্রবণতা কমিয়েছে</span>
             </div>
           </div>
         </div>
