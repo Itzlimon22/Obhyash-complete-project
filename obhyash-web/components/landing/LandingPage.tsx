@@ -16,6 +16,7 @@ import {
   Trophy,
   Zap,
   Video,
+  Swords,
   HelpCircle,
   GraduationCap,
   MapPin,
@@ -1037,16 +1038,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </p>
               </div>
 
-              {/* 4. 3-Metric Detailed Analytics */}
+              {/* 4. Live Model Test */}
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <BarChart3 className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+                  <Video className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
-                  সঠিকতা ও নেগেটিভ হিসাব
+                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2 flex items-center gap-2">
+                  <span>লাইভ মডেল টেস্ট</span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 text-[10px] font-extrabold uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                    Live
+                  </span>
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
-                  সঠিকতা (%), ব্যয়িত সময় ও নেগেটিভ মার্কিংয়ের নিখুঁত ২-কলাম টেবিল দেখে নিজের অবস্থান স্পষ্ট বোঝো।
+                  একই সময়ে সারা দেশের হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম লাইভ পরীক্ষায় অংশ নিয়ে যাচাই করো জাতীয় মেধাতালিকায় তোমার অবস্থান।
                 </p>
               </div>
 
@@ -1087,18 +1092,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-90">
-              {/* Live Model Test */}
+              {/* Quiz Battle (Battle) */}
               <div className="relative p-6 rounded-2xl bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900/60 dark:to-neutral-800/30 border border-dashed border-neutral-300 dark:border-neutral-700/70 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-xl text-red-600">
-                    <Video className="w-6 h-6" />
+                    <Swords className="w-6 h-6" />
                   </div>
                   <h3 className="font-bold text-neutral-900 dark:text-white">
-                    লাইভ মডেল টেস্ট
+                    কুইজ ব্যাটল (Battle)
                   </h3>
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  একই সময়ে হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম পরীক্ষা।
+                  বন্ধুদের সাথে রিয়েল-টাইমে ১v১ লাইভ কুইজ যুদ্ধে অংশ নিয়ে নিজের মেধার পরীক্ষা নাও।
                 </p>
               </div>
 
