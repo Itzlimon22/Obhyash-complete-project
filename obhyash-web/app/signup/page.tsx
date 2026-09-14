@@ -325,12 +325,13 @@ function SignupForm() {
               role: 'Student',
               status: 'Active',
               avatar_url: getRandomAvatar(formData.gender, data.user.id),
+              is_subscribed: false,
+              subscription_status: 'Inactive',
+              subscription_expires_at: null,
               subscription: {
                 plan: 'Free',
-                expiry: new Date(
-                  Date.now() + 365 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-                status: 'Active',
+                expiry: null,
+                status: 'Inactive',
               },
               xp: 0,
               level: 'Beginner',

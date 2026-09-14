@@ -167,7 +167,7 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
         },
         'redirect_url': 'https://obhyash.paymently.io/success',
         'cancel_url': 'https://obhyash.paymently.io/cancel',
-        'webhook_url': 'https://obhyash.vercel.app/api/payment/uddoktapay/webhook',
+        'webhook_url': 'https://obhyash.com/api/payment/uddoktapay/webhook',
       };
 
       final response = await http.post(
@@ -220,13 +220,48 @@ class _UddoktaPayWebViewScreenState extends State<UddoktaPayWebViewScreen> {
       ..loadRequest(Uri.parse(initialUrl));
   }
 
-  void _checkUrl(String url) {
+  bool _isVerifying = false;
+
+  Future<void> _checkUrl(String url) async {
+    if (_isVerifying) return;
+
     if (url.contains('/success') || url.contains('status=COMPLETED') || url.contains('status=success')) {
+      _isVerifying = true;
       _sessionTimer?.cancel();
-      Navigator.pop(context, true);
+
+      // Extract invoice_id from redirect URL if present
+      String? invoiceId;
+      try {
+        final uri = Uri.parse(url);
+        invoiceId = uri.queryParameters['invoice_id'] ??
+            uri.queryParameters['invoiceId'] ??
+            uri.queryParameters['trx'];
+      } catch (_) {}
+
+      // Trigger instant verification fallback so DB is 100% updated before popping
+      if (invoiceId != null && invoiceId.isNotEmpty) {
+        try {
+          await http
+              .post(
+                Uri.parse('https://obhyash.com/api/payment/uddoktapay/verify'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'invoice_id': invoiceId,
+                  'userId': widget.userId,
+                }),
+              )
+              .timeout(const Duration(seconds: 4));
+        } catch (_) {}
+      }
+
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
     } else if (url.contains('/cancel') || url.contains('status=CANCELLED')) {
       _sessionTimer?.cancel();
-      Navigator.pop(context, false);
+      if (mounted) {
+        Navigator.pop(context, false);
+      }
     }
   }
 

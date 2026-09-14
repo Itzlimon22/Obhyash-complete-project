@@ -556,7 +556,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
             type="button"
             onClick={handleViewQuestions}
             disabled={isLoadingQuestions}
-            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl border border-neutral-300 dark:border-[#2C2C2E] hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] bg-white dark:bg-[#121212] text-neutral-800 dark:text-neutral-100 font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-xs active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
+            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-[12px] bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] text-[#475569] dark:text-[#D4D4D4] shadow-[0_3px_0_#CBD5E1] dark:shadow-[0_3px_0_#121214] active:shadow-[0_1px_0_#CBD5E1] active:translate-y-[2px] font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
           >
             <Eye size={16} className="text-neutral-600 dark:text-neutral-300" />
             <span>প্রশ্ন দেখো</span>
@@ -567,7 +567,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
             type="button"
             onClick={handleStartExam}
             disabled={isLoadingQuestions}
-            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
+            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-[12px] bg-[#12544F] text-white shadow-[0_3.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
           >
             <Play size={15} className="fill-white" />
             <span>পরীক্ষা দাও</span>

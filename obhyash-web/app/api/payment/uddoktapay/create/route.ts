@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse, connection } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -9,7 +9,6 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://obhyash.com';
 
 export async function POST(request: NextRequest) {
   try {
-    await connection();
     const body = await request.json();
     const { userId, planId, planName, amount, customerName, customerEmail, customerPhone } = body;
 
@@ -58,6 +57,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Dynamic URL resolution: preserve active domain/origin for user redirect
+    const origin = request.headers.get('origin') || request.nextUrl.origin;
+    const isLocalhost = origin && (origin.includes('localhost') || origin.includes('127.0.0.1'));
+    const redirectBase = origin || process.env.NEXT_PUBLIC_APP_URL || 'https://obhyash.com';
+    const webhookBase = isLocalhost
+      ? (process.env.NEXT_PUBLIC_APP_URL || 'https://obhyash.com')
+      : redirectBase;
+
     const checkoutEndpoint = `${baseUrl}/checkout-v2`;
     const payload = {
       full_name: name || 'Obhyash Student',
@@ -65,12 +72,14 @@ export async function POST(request: NextRequest) {
       amount: String(amount),
       metadata: {
         user_id: userId,
+        userId: userId,
         plan_id: planId,
+        planId: planId,
         plan_name: planName || 'Pro Plan',
       },
-      redirect_url: `${appUrl}/payment/success`,
-      cancel_url: `${appUrl}/payment/cancel`,
-      webhook_url: `${appUrl}/api/payment/uddoktapay/webhook`,
+      redirect_url: `${redirectBase}/payment/success`,
+      cancel_url: `${redirectBase}/payment/cancel`,
+      webhook_url: `${webhookBase}/api/payment/uddoktapay/webhook`,
     };
 
     const response = await fetch(checkoutEndpoint, {

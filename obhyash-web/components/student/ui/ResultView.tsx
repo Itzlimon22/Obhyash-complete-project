@@ -476,7 +476,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             <button
               type="button"
               onClick={onReexam ? onReexam : () => onRestart()}
-              className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] flex items-center justify-center gap-2 font-['Anek_Bangla',sans-serif] shadow-sm transition-all cursor-pointer select-none touch-manipulation"
+              className="w-full h-[48px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] flex items-center justify-center gap-2 font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none touch-manipulation"
             >
               <RotateCcw size={18} />
               <span>আবার পরীক্ষা দাও</span>

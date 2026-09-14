@@ -19,10 +19,10 @@ class _BlogViewState extends ConsumerState<BlogView> {
   late final WebViewController _controller;
   int _loadingProgress = 0;
   String _pageTitle = 'অভ্যাস ব্লগ';
-  String _currentUrl = 'https://obhyash.vercel.app/blog';
+  String _currentUrl = 'https://obhyash.com/blog';
   bool _canGoBack = false;
 
-  static const _baseBlogUrl = 'https://obhyash.vercel.app/blog';
+  static const _baseBlogUrl = 'https://obhyash.com/blog';
   static const _projectRef = 'ufeepgzheopyaefuyegg';
   static const _authCookieKey = 'sb-$_projectRef-auth-token';
 

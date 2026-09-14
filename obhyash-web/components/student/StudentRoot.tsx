@@ -19,7 +19,7 @@ import {
   downloadResultWithExplanations,
 } from "@/services/download-service";
 import { updateUserProfile } from "@/services/database";
-import { calculateLevel } from "@/lib/utils";
+import { calculateLevel, cn } from "@/lib/utils";
 
 // Hooks
 import { useExamEngine } from "@/hooks/use-exam-engine";
@@ -299,6 +299,7 @@ export default function StudentRoot({
   const [selectedQuestionBankSubject, setSelectedQuestionBankSubject] = useState<SubjectCardItem | null>(null);
   const [selectedQuestionBankCategory, setSelectedQuestionBankCategory] = useState<string | null>(null);
   const [selectedQuestionBankInstitute, setSelectedQuestionBankInstitute] = useState<InstituteCardItem | null>(null);
+  const [historyTab, setHistoryTab] = useState<"exams" | "questions">("exams");
 
   const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
   const isPro = isUserPro(currentUser || effectiveUser);
@@ -1281,8 +1282,38 @@ export default function StudentRoot({
             {...commonLayoutProps}
             title="ইতিহাস"
             onBack={() => smartBack("dashboard")}
+            headerRight={
+              <div className="h-[36px] p-[3px] bg-[#F3F4F6] dark:bg-[#1E1E1E] rounded-[12px] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center shrink-0 select-none">
+                <button
+                  type="button"
+                  onClick={() => setHistoryTab("exams")}
+                  className={cn(
+                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                    historyTab === "exams"
+                      ? "bg-[#12544F] text-white shadow-xs"
+                      : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  পরীক্ষা
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHistoryTab("questions")}
+                  className={cn(
+                    "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                    historyTab === "questions"
+                      ? "bg-[#12544F] text-white shadow-xs"
+                      : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
+                  )}
+                >
+                  প্রশ্ন
+                </button>
+              </div>
+            }
           >
             <ExamHistoryView
+              activeTab={historyTab}
+              onTabChange={setHistoryTab}
               history={examHistory}
               subjects={subjects}
               user={effectiveUser}

@@ -316,7 +316,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             type="button"
             onClick={handleStart}
             disabled={isLoading}
-            className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] shadow-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-['Anek_Bangla',sans-serif]"
+            className="w-full h-[50px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328,0_6px_20px_rgba(18,84,79,0.3)] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-['Anek_Bangla',sans-serif]"
           >
             {isLoading ? (
               <>

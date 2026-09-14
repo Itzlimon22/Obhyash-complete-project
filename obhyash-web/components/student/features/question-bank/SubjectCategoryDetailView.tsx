@@ -304,14 +304,14 @@ export default function SubjectCategoryDetailView({
                 </h2>
               </div>
 
-              {/* Center / Bottom-Right: Rich Generated SVG Vector Art (Bigger) */}
-              <div className="absolute right-0 bottom-0 sm:right-1 sm:bottom-1 z-0 w-24 h-24 sm:w-36 sm:h-36 flex items-center justify-center pointer-events-none">
+              {/* Center / Bottom-Right: Rich Generated SVG Vector Art */}
+              <div className="absolute right-1 bottom-1 sm:right-2 sm:bottom-2 z-0 w-14 h-14 sm:w-20 sm:h-20 md:w-22 md:h-22 flex items-center justify-center pointer-events-none">
                 <div className="relative w-full h-full group-hover:scale-108 group-hover:-translate-y-1 transition-all duration-300">
                   <Image
                     src={cat.svgIcon}
                     alt={cat.title}
                     fill
-                    className="object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
+                    className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
                   />
                 </div>
               </div>

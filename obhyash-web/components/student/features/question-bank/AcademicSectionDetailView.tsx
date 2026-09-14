@@ -464,30 +464,30 @@ export default function AcademicSectionDetailView({
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden"
+                  className="bg-white dark:bg-[#000000] rounded-[16px] border border-[#E5E7EB] dark:border-[#333333] shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none overflow-hidden mb-5"
                 >
                   {/* Header */}
-                  <div className="px-4 py-3 flex items-center justify-between border-b border-neutral-100 dark:border-white/[0.08]">
+                  <div className="px-4 py-3 flex items-center justify-between border-b border-[#F1F5F9] dark:border-[#202024]">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 font-['Anek_Bangla',sans-serif] font-bold text-xs text-neutral-800 dark:text-neutral-200">
+                      <span className="px-2.5 py-1 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] font-['Anek_Bangla',sans-serif] font-bold text-xs text-[#475569] dark:text-[#D4D4D4]">
                         {BanglaNameHelper.toBanglaNumeral(idx + 1)} নং সৃজনশীল প্রশ্ন
                       </span>
                       {q.institutes && q.institutes.length > 0 && (
-                        <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/50">
+                        <span className="px-2 py-[3px] rounded-[6px] text-[11px] font-semibold bg-[#E0F7FA] dark:bg-[#0E3A4A] text-[#006064] dark:text-[#A5F3FC] border border-[#B2EBF2] dark:border-[#164E63]">
                           {q.institutes[0]} {q.years && q.years[0] ? `'${String(q.years[0]).slice(-2)}` : ""}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-semibold text-neutral-500">পূর্ণমান: ১০</span>
+                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">পূর্ণমান: ১০</span>
                   </div>
 
                   {/* Stem / Stimulus */}
                   <div className="p-4">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 mb-1.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 mb-1.5">
                       <FileText size={14} />
                       উদ্দীপক:
                     </div>
-                    <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1E1E22] border border-neutral-200 dark:border-[#2E2E33] text-sm leading-relaxed text-neutral-900 dark:text-neutral-100 font-medium">
+                    <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-sm leading-relaxed text-neutral-900 dark:text-neutral-100 font-medium">
                       <MathRenderer text={q.question} />
                     </div>
 
@@ -512,11 +512,11 @@ export default function AcademicSectionDetailView({
                     </div>
                   </div>
 
-                  {/* Expand Solution Button */}
+                  {/* Expand Solution Button (Warm Book Page Header) */}
                   <button
                     type="button"
                     onClick={() => toggleSolution(q.id)}
-                    className="w-full px-4 py-2.5 flex items-center justify-between bg-neutral-50 dark:bg-[#1E1E22] border-t border-neutral-100 dark:border-[#27272A] text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
+                    className="w-full px-4 py-2.5 flex items-center justify-between bg-[#F3ECE4] dark:bg-[#141416] border-t border-[#E2D7C9] dark:border-[#27272A] text-xs font-bold text-[#42352B] dark:text-[#F4F4F5] hover:opacity-90 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-1.5">
                       <BookOpen size={14} />
@@ -526,7 +526,7 @@ export default function AcademicSectionDetailView({
                   </button>
 
                   {isExpanded && (
-                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed border-t border-neutral-200 dark:border-[#27272A]">
+                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] text-xs sm:text-sm text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed border-t border-[#E8DFD3] dark:border-[#27272A]">
                       <MathRenderer text={q.explanation || ""} block={true} />
                     </div>
                   )}
@@ -537,9 +537,9 @@ export default function AcademicSectionDetailView({
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden"
+                  className="bg-white dark:bg-[#000000] rounded-[16px] border border-[#E5E7EB] dark:border-[#333333] shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none overflow-hidden mb-5"
                 >
-                  <div className="px-4 py-2.5 flex items-center justify-between border-b border-neutral-100 dark:border-white/[0.08]">
+                  <div className="px-4 py-2.5 flex items-center justify-between border-b border-[#F1F5F9] dark:border-[#202024]">
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-0.5 rounded text-[11px] font-bold ${
@@ -553,7 +553,7 @@ export default function AcademicSectionDetailView({
                           : `${BanglaNameHelper.toBanglaNumeral(idx + 1)}. অনুধাবনমূলক প্রশ্ন`}
                       </span>
                       {q.institutes && q.institutes.length > 0 && (
-                        <span className="px-1.5 py-0.5 rounded text-[10.5px] text-neutral-500 bg-neutral-100 dark:bg-neutral-800">
+                        <span className="px-2 py-[3px] rounded-[6px] text-[10.5px] font-semibold bg-[#E0F7FA] dark:bg-[#0E3A4A] text-[#006064] dark:text-[#A5F3FC] border border-[#B2EBF2] dark:border-[#164E63]">
                           {q.institutes[0]} {q.years && q.years[0] ? `'${String(q.years[0]).slice(-2)}` : ""}
                         </span>
                       )}
@@ -561,34 +561,34 @@ export default function AcademicSectionDetailView({
                     <button
                       type="button"
                       onClick={() => toggleBookmark(q.id)}
-                      className="text-neutral-400 hover:text-amber-500 transition cursor-pointer"
+                      className="p-1 rounded text-neutral-400 hover:text-amber-500 transition cursor-pointer"
                       title="বুকমার্ক"
                     >
-                      <Bookmark size={15} className={bookmarkedQuestions.has(q.id) ? "fill-amber-500 text-amber-500" : ""} />
+                      <Bookmark size={16} className={bookmarkedQuestions.has(q.id) ? "fill-amber-500 text-amber-500" : ""} />
                     </button>
                   </div>
 
-                  <div className="p-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-relaxed">
+                  <div className="p-4 text-[16px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5]">
                     <MathRenderer text={q.question} />
                   </div>
 
                   <button
                     type="button"
                     onClick={() => toggleSolution(q.id)}
-                    className="w-full px-4 py-2 flex items-center justify-between bg-neutral-50 dark:bg-[#1E1E22] border-t border-neutral-100 dark:border-[#27272A] text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
+                    className="w-full px-4 py-2.5 flex items-center justify-between bg-[#F3ECE4] dark:bg-[#141416] border-t border-[#E2D7C9] dark:border-[#27272A] text-xs font-bold text-[#42352B] dark:text-[#F4F4F5] hover:opacity-90 transition cursor-pointer"
                   >
                     <div className="flex items-center gap-1.5">
                       <Lightbulb
                         size={14}
-                        className={isKa ? "text-blue-600" : "text-emerald-600"}
+                        className={isKa ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"}
                       />
                       <span>{isExpanded ? "উত্তর সংক্ষেপ করুন" : "উত্তর ও ব্যাখ্যা দেখুন"}</span>
                     </div>
-                    {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                   </button>
 
                   {isExpanded && (
-                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed border-t border-neutral-200 dark:border-[#27272A]">
+                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] text-xs sm:text-sm text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed border-t border-[#E8DFD3] dark:border-[#27272A]">
                       <MathRenderer text={q.explanation || ""} block={true} />
                     </div>
                   )}

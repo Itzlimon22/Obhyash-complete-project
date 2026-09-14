@@ -182,6 +182,8 @@ class UserProfile {
   final bool isSubscribed;
   final String? subscriptionStatus;
   final String? subscriptionExpiresAt;
+  final String? plan;
+  final String? role;
   final String status;
 
   UserProfile({
@@ -219,6 +221,8 @@ class UserProfile {
     this.isSubscribed = false,
     this.subscriptionStatus,
     this.subscriptionExpiresAt,
+    this.plan,
+    this.role,
     this.status = 'Active',
   });
 
@@ -242,6 +246,22 @@ class UserProfile {
   }
 
   bool get isPro {
+    // 1. Role-based bypass for Admins and Moderators
+    final r = (role ?? '').toString().toLowerCase().trim();
+    if (r == 'admin' ||
+        r == 'super admin' ||
+        r == 'superadmin' ||
+        r == 'moderator') {
+      return true;
+    }
+
+    // 2. Strict plan check: Free or Inactive is strictly NOT Pro
+    final p = (plan ?? '').toString().toLowerCase().trim();
+    if (p.isEmpty || p == 'free' || p == 'inactive') {
+      return false;
+    }
+
+    // 3. Expiration check: Must not be null or in the past
     if (subscriptionExpiresAt == null || subscriptionExpiresAt!.isEmpty) {
       return false;
     }
@@ -249,8 +269,10 @@ class UserProfile {
     if (exp == null || exp.isBefore(DateTime.now())) {
       return false;
     }
-    final status = subscriptionStatus?.toString().toLowerCase().trim();
-    return isSubscribed == true || status == 'active';
+
+    // 4. Status check: Must be active
+    final s = subscriptionStatus?.toString().toLowerCase().trim();
+    return isSubscribed == true || s == 'active';
   }
 
   String get displayStudentId {
@@ -295,6 +317,8 @@ class UserProfile {
     bool? isSubscribed,
     String? subscriptionStatus,
     String? subscriptionExpiresAt,
+    String? plan,
+    String? role,
     String? status,
   }) {
     return UserProfile(
@@ -329,6 +353,8 @@ class UserProfile {
       isSubscribed: isSubscribed ?? this.isSubscribed,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      plan: plan ?? this.plan,
+      role: role ?? this.role,
       status: status ?? this.status,
     );
   }
@@ -342,10 +368,22 @@ class UserProfile {
     final expDate = rawExp != null ? DateTime.tryParse(rawExp) : null;
     final bool isExpired = expDate != null && expDate.isBefore(DateTime.now());
 
-    final bool isSub = !isExpired &&
-        expDate != null &&
-        expDate.isAfter(DateTime.now()) &&
-        (json['is_subscribed'] == true || rawStatus == 'active');
+    final rawPlan = (subJson?['plan'] ?? json['plan'] ?? '').toString().trim();
+    final rawPlanLower = rawPlan.toLowerCase();
+    final bool isNotFree = rawPlanLower.isNotEmpty && rawPlanLower != 'free' && rawPlanLower != 'inactive';
+
+    final roleStr = (json['role'] ?? '').toString().toLowerCase().trim();
+    final bool isAdmin = roleStr == 'admin' ||
+        roleStr == 'super admin' ||
+        roleStr == 'superadmin' ||
+        roleStr == 'moderator';
+
+    final bool isSub = isAdmin ||
+        (!isExpired &&
+            expDate != null &&
+            expDate.isAfter(DateTime.now()) &&
+            isNotFree &&
+            (json['is_subscribed'] == true || rawStatus == 'active'));
 
     return UserProfile(
       id: json['id'] as String,
@@ -388,6 +426,8 @@ class UserProfile {
       isSubscribed: isSub,
       subscriptionStatus: subJson?['status'] as String? ?? json['subscription_status'] as String?,
       subscriptionExpiresAt: rawExp,
+      plan: rawPlan,
+      role: json['role'] as String?,
       status: json['status'] as String? ?? 'Active',
     );
   }

@@ -14,9 +14,9 @@ const buttonVariants = cva(
         destructive:
           "bg-[#740A03] text-white shadow-[0_4.5px_0_#3F0502] hover:brightness-105 active:shadow-[0_1px_0_#3F0502] active:translate-y-[3.5px] rounded-[14px] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-[#12544F]/40 dark:border-[#12544F] bg-transparent text-[#12544F] dark:text-[#34D399] rounded-[12px] hover:bg-[#12544F]/5 dark:hover:bg-white/5",
+          "border border-[#12544F]/40 dark:border-[#12544F] bg-transparent text-[#12544F] dark:text-[#34D399] rounded-[12px] hover:bg-[#12544F]/5 dark:hover:bg-white/5 active:scale-[0.98]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-[0_3px_0_hsl(var(--muted-foreground)/0.25)] active:shadow-[0_1px_0_hsl(var(--muted-foreground)/0.25)] active:translate-y-[2px] hover:bg-secondary/80 rounded-[14px]",
+          "bg-[#F1F5F9] dark:bg-[#1C1C1E] text-[#334155] dark:text-[#E4E4E7] border border-[#E2E8F0] dark:border-[#27272A] shadow-[0_3.5px_0_#CBD5E1] dark:shadow-[0_3.5px_0_#121214] active:shadow-[0_1px_0_#CBD5E1] dark:active:shadow-[0_1px_0_#121214] active:translate-y-[2.5px] hover:brightness-105 rounded-[14px]",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-xl",
         link: "text-[#12544F] dark:text-[#34D399] underline-offset-4 hover:underline",

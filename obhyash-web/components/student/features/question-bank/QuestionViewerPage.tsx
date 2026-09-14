@@ -116,7 +116,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
                       [q.id]: optIndex,
                     }));
                   }}
-                  hideMetadata={true}
+                  hideMetadata={false}
                   onReport={() => {
                     alert('রিপোর্ট গ্রহণ করা হয়েছে। আমাদের টিম এটি পর্যালোচনা করবে।');
                   }}

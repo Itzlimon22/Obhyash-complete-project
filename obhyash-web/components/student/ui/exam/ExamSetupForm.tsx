@@ -750,12 +750,12 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </div>
         </div>
 
-        {/* 9. Start Button - Flutter 1:1 Elevated Primary CTA */}
+        {/* 9. Start Button - Flutter 1:1 Elevated Primary 3D CTA */}
         <button
           type="button"
           onClick={handleStartExam}
           disabled={isStarting || isExternalLoading}
-          className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-[16px] shadow-sm transition-all flex items-center justify-center gap-2 mt-2 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif]"
+          className="w-full h-[50px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328,0_6px_20px_rgba(18,84,79,0.25)] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] disabled:opacity-60 disabled:pointer-events-none font-bold text-[16px] transition-all flex items-center justify-center gap-2 mt-2 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif]"
         >
           {isStarting || isExternalLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1224,7 +1224,7 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-base font-['Anek_Bangla',sans-serif] shadow-sm transition touch-manipulation cursor-pointer"
+            className="w-full py-3 px-4 rounded-[14px] bg-[#12544F] text-white shadow-[0_4px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3px] font-bold text-base font-['Anek_Bangla',sans-serif] transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>
@@ -1466,7 +1466,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-base font-['Anek_Bangla',sans-serif] shadow-sm transition touch-manipulation cursor-pointer"
+            className="w-full py-3 px-4 rounded-[14px] bg-[#12544F] text-white shadow-[0_4px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3px] font-bold text-base font-['Anek_Bangla',sans-serif] transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>

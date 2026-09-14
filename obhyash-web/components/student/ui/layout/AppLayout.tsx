@@ -45,6 +45,7 @@ interface AppLayoutProps {
     activeTabId: string;
     onTabSelect: (id: string) => void;
   };
+  headerRight?: ReactNode;
   onRefresh?: () => Promise<void> | void;
 }
 
@@ -98,6 +99,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   hideTitle = false,
   hideBottomNav = false,
   headerTabs,
+  headerRight,
   onRefresh,
 }) => {
   const isSubPage = SUB_PAGES_WITHOUT_BOTTOM_NAV.has(activeTab);
@@ -305,7 +307,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               </div>
 
               {/* ── Right Section: Matches Flutter 1:1 ── */}
-              {activeTab === 'dashboard' ? (
+              {headerRight ? (
+                <div className="flex items-center shrink-0">{headerRight}</div>
+              ) : activeTab === 'dashboard' ? (
                 /* Dashboard Header Right: Streak + Notification + User Avatar */
                 <div className="flex items-center gap-4 shrink-0">
                   {/* Streak Badge (Red Flame + Red Bangla Numeral) */}

@@ -207,6 +207,89 @@ body::after {
   font-feature-settings: 'tnum';
 }
 
+/* --- Flutter AppButton3D Tactile Button Utilities --- */
+.btn-3d-primary {
+  background-color: #12544F;
+  color: #ffffff;
+  box-shadow: 0 4.5px 0 #092328;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: all 0.08s ease-out;
+  user-select: none;
+  touch-action: manipulation;
+}
+.btn-3d-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.btn-3d-primary:active:not(:disabled) {
+  transform: translateY(3.5px);
+  box-shadow: 0 1px 0 #092328;
+}
+.btn-3d-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: 0 2px 0 #092328;
+}
+
+.btn-3d-danger {
+  background-color: #740A03;
+  color: #ffffff;
+  box-shadow: 0 4.5px 0 #3F0502;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: all 0.08s ease-out;
+  user-select: none;
+  touch-action: manipulation;
+}
+.btn-3d-danger:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.btn-3d-danger:active:not(:disabled) {
+  transform: translateY(3.5px);
+  box-shadow: 0 1px 0 #3F0502;
+}
+
+.btn-3d-secondary {
+  background-color: #F1F5F9;
+  color: #334155;
+  box-shadow: 0 3.5px 0 #CBD5E1;
+  border-radius: 14px;
+  font-weight: 600;
+  transition: all 0.08s ease-out;
+  user-select: none;
+  touch-action: manipulation;
+}
+.dark .btn-3d-secondary {
+  background-color: #1C1C1E;
+  color: #E4E4E7;
+  box-shadow: 0 3.5px 0 #121214;
+}
+.btn-3d-secondary:active:not(:disabled) {
+  transform: translateY(2.5px);
+  box-shadow: 0 1px 0 #CBD5E1;
+}
+.dark .btn-3d-secondary:active:not(:disabled) {
+  box-shadow: 0 1px 0 #121214;
+}
+
+.btn-3d-amber {
+  background-color: #D97706;
+  color: #ffffff;
+  box-shadow: 0 4.5px 0 #92400E;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: all 0.08s ease-out;
+  user-select: none;
+  touch-action: manipulation;
+}
+.btn-3d-amber:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.btn-3d-amber:active:not(:disabled) {
+  transform: translateY(3.5px);
+  box-shadow: 0 1px 0 #92400E;
+}
+
 /* KaTeX mathematical typography matching Chorcha MathJax/KaTeX benchmark */
 .katex {
   font-size: 1.05em;

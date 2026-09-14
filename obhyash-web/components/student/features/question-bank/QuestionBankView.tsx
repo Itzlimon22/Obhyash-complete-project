@@ -946,7 +946,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                   {/* 1. Center Top: Official Logo or Board Landmark in White Circular Emblem */}
                   <div className="relative z-10 w-full flex justify-center pt-1 sm:pt-2">
-                    <div className="w-13 h-13 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center justify-center p-2 sm:p-2.5 transition-transform group-hover:scale-105 duration-300">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.1)] flex items-center justify-center p-1.5 sm:p-2 transition-transform group-hover:scale-105 duration-300">
                       {inst.logo ? (
                         <img
                           src={inst.logo}
@@ -956,19 +956,19 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                       ) : (
                         <div className="text-neutral-800 flex items-center justify-center">
                           {inst.isBoard ? (
-                            <Landmark size={24} className="text-[#1E3A8A]" />
+                            <Landmark size={18} className="text-[#1E3A8A]" />
                           ) : (
-                            <School size={24} className="text-[#065F46]" />
+                            <School size={18} className="text-[#065F46]" />
                           )}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* 2. Middle: Large Bold Bengali Institute Name */}
+                  {/* 2. Middle: Bengali Institute Name */}
                   <div className="relative z-10 text-center my-auto">
                     <h2
-                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[15px] sm:text-2xl md:text-[26px] leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
+                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[14px] sm:text-lg md:text-xl leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
                     >
                       {inst.name}
                     </h2>

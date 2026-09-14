@@ -57,12 +57,13 @@ export async function POST(request: Request) {
         optional_subject: profileData.optional_subject || 'Biology',
         role: 'Student',
         status: 'Active',
+        is_subscribed: false,
+        subscription_status: 'Inactive',
+        subscription_expires_at: null,
         subscription: {
           plan: 'Free',
-          expiry: new Date(
-            Date.now() + 365 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          status: 'Active',
+          expiry: null,
+          status: 'Inactive',
         },
         xp: 0,
         level: 'Beginner',

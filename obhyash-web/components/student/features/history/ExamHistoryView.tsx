@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { ExamResult, Question } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import QuestionCard from "@/components/student/ui/exam/QuestionCard";
+import ReportModal from "@/components/student/ui/common/ReportModal";
 import {
   Calendar,
   ChevronDown,
@@ -12,30 +13,30 @@ import {
   Trash2,
   X,
   Timer,
-  CheckCircle2,
-  XCircle,
   ArrowDown,
   FlaskConical,
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { deleteExamResult } from "@/services/database";
 
-interface ExamHistoryViewProps {
+export interface ExamHistoryViewProps {
   history: ExamResult[];
   subjects?: any[];
   user?: any;
   onBack: () => void;
-  onClearHistory: (ids?: string[]) => Promise<void> | void;
+  onClearHistory?: (ids?: string[]) => Promise<void> | void;
   onViewResult: (result: ExamResult) => void;
   onRecheckRequest?: (id: string) => void;
   bookmarkedIds?: Set<string>;
   onToggleBookmark?: (questionId: string | number) => void;
   bookmarkedQuestions?: Question[];
+  activeTab?: "exams" | "questions";
+  onTabChange?: (tab: "exams" | "questions") => void;
 }
 
-type TabMode = "exams" | "questions";
 type SortMode = "date" | "scoreDesc" | "scoreAsc";
-type QuestionFilterStatus = "all" | "correct" | "incorrect";
 
 // Bengali month names matching Flutter
 const BANGLA_MONTHS = [
@@ -55,8 +56,23 @@ const BANGLA_MONTHS = [
 
 const BANGLA_WEEKDAYS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
 
+// Score color matching Flutter _scoreColor
+const getScoreColor = (score: number) => {
+  if (score >= 70) return "#10B981"; // Emerald / Flutter 0xFF004633
+  if (score >= 40) return "#3B82F6"; // Navy Blue / Flutter 0xFF1E3A8A
+  return "#EF4444"; // Red / Flutter 0xFFEF4444
+};
+
+// Duration formatting matching Flutter: 2মি 15সে
+const formatDur = (seconds?: number | null) => {
+  if (!seconds || seconds <= 0) return "--";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${BanglaNameHelper.toBanglaNumeral(m)}মি ${BanglaNameHelper.toBanglaNumeral(s)}সে`;
+};
+
 export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
-  history,
+  history: initialHistory,
   subjects = [],
   user,
   onBack,
@@ -64,31 +80,51 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   onClearHistory,
   bookmarkedIds = new Set(),
   onToggleBookmark,
+  activeTab: controlledTab,
+  onTabChange: setControlledTab,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabMode>("exams");
+  // Local history state so deletions reflect immediately
+  const [history, setHistory] = useState<ExamResult[]>(initialHistory);
+  useEffect(() => {
+    setHistory(initialHistory);
+  }, [initialHistory]);
+
+  // Tab State: sync with controlled prop or internal fallback
+  const [internalTab, setInternalTab] = useState<"exams" | "questions">("exams");
+  const currentTab = controlledTab ?? internalTab;
+  const handleTabSelect = (tab: "exams" | "questions") => {
+    if (setControlledTab) {
+      setControlledTab(tab);
+    } else {
+      setInternalTab(tab);
+    }
+  };
+
+  // Filter state (shared across tabs, exactly matching Flutter)
   const [filterSubject, setFilterSubject] = useState<string>("");
   const [filterChapter, setFilterChapter] = useState<string>("");
-  const [filterDate, setFilterDate] = useState<string>("");
+  const [filterDate, setFilterDate] = useState<string>(""); // YYYY-MM-DD
   const [sortBy, setSortBy] = useState<SortMode>("date");
-  const [questionStatusFilter, setQuestionStatusFilter] = useState<QuestionFilterStatus>("all");
 
-  // Pagination states (matching Flutter 20-items page)
+  // Server-like pagination sizes (20 per page)
   const [examPageSize, setExamPageSize] = useState<number>(20);
   const [questionPageSize, setQuestionPageSize] = useState<number>(20);
 
-  // Modals & Date Picker State
+  // Modals state
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
-  const [deleteConfirmExam, setDeleteConfirmExam] = useState<ExamResult | null>(null);
-  const [showClearAllModal, setShowClearAllModal] = useState<boolean>(false);
+  const [deleteExamConfirm, setDeleteExamConfirm] = useState<ExamResult | null>(null);
+  const [deleteQuestionConfirm, setDeleteQuestionConfirm] = useState<Question | null>(null);
+  const [deletedQuestionIds, setDeletedQuestionIds] = useState<Set<string>>(new Set());
+  const [reportingQuestionId, setReportingQuestionId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  // Date picker internal state
+  // Calendar internal month state
   const [displayedMonth, setDisplayedMonth] = useState<Date>(() => {
     return filterDate ? new Date(filterDate) : new Date();
   });
   const [tempSelectedDate, setTempSelectedDate] = useState<string>(filterDate);
 
-  // ── 1. Determine user stream (Strict SSC vs HSC Separation) ──
+  // ── 1. User Stream (SSC vs HSC Separation) ──
   const isSSC = useMemo(() => {
     const rawStream = (
       user?.stream ||
@@ -102,11 +138,11 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
     return rawStream.includes("SSC");
   }, [user]);
 
-  // ── 2. Subjects List with Emojis & Strict Stream Separation ──
+  // ── 2. Subjects List with Emojis & Stream Safety ──
   const subjectList = useMemo(() => {
-    const map = new Map<string, { id: string; name: string }>();
+    const map = new Map<string, { id: string; name: string; emoji: string }>();
 
-    // A. Add from global subjects if matching user stream
+    // A. From subjects prop
     subjects.forEach((sub: any) => {
       const subId = (sub.id || "").toString().toLowerCase();
       const subName = (sub.name || sub.name_en || "").toString().toLowerCase();
@@ -132,11 +168,12 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
       const formatted = BanglaNameHelper.formatSubject(sub.id, sub.name);
       if (formatted && !map.has(sub.id)) {
-        map.set(sub.id, { id: sub.id, name: formatted });
+        const emoji = BanglaNameHelper.getSubjectEmoji(sub.id, formatted);
+        map.set(sub.id, { id: sub.id, name: formatted, emoji });
       }
     });
 
-    // B. Add from exam history
+    // B. From history exams
     history.forEach((h) => {
       const subId = h.subject || (h as any).subject_id || "";
       const subLabel = h.subjectLabel || (h as any).subject_label || (h as any).title || subId;
@@ -150,19 +187,28 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
       const formatted = BanglaNameHelper.formatSubject(subId, subLabel);
       if (formatted && !map.has(subId)) {
-        map.set(subId, { id: subId || formatted, name: formatted });
+        const emoji = BanglaNameHelper.getSubjectEmoji(subId, formatted);
+        map.set(subId, { id: subId || formatted, name: formatted, emoji });
       }
     });
 
-    return Array.from(map.values());
+    const entries = Array.from(map.values());
+    entries.sort((a, b) => {
+      const prioA = BanglaNameHelper.getSubjectSortPriority(a.name, a.id);
+      const prioB = BanglaNameHelper.getSubjectSortPriority(b.name, b.id);
+      if (prioA !== prioB) return prioA - prioB;
+      return a.name.localeCompare(b.name, "bn");
+    });
+    return entries;
   }, [subjects, history, isSSC]);
 
-  // ── 3. Chapter List derived from history and selected subject ──
+  // ── 3. Chapter List dynamically derived for selected subject ──
   const chapterList = useMemo(() => {
     const set = new Set<string>();
     history.forEach((h) => {
       const subId = h.subject || (h as any).subject_id || "";
       const formatted = BanglaNameHelper.formatSubject(subId, h.subjectLabel);
+
       if (!filterSubject || subId === filterSubject || formatted === filterSubject) {
         if (h.chapters) {
           h.chapters.split(",").forEach((c) => {
@@ -181,10 +227,10 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         }
       }
     });
-    return Array.from(set);
+    return Array.from(set).filter(Boolean);
   }, [history, filterSubject]);
 
-  // ── 4. Filtered & Sorted Exams (Tab 1) ──
+  // ── 4. Filtered & Sorted Exams ──
   const filteredExams = useMemo(() => {
     const filtered = history.filter((h) => {
       const subId = h.subject || (h as any).subject_id || "";
@@ -217,7 +263,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         if (!hasChapterInExam) return false;
       }
 
-      // Date filter (YYYY-MM-DD match)
+      // Date filter (YYYY-MM-DD)
       if (filterDate) {
         const examDateStr = (h as any).created_at || h.date;
         if (examDateStr) {
@@ -232,7 +278,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       return true;
     });
 
-    // Sorting (Matching Flutter _SortMode)
+    // Sorting
     return filtered.sort((a, b) => {
       if (sortBy === "scoreDesc") {
         return (b.score || 0) - (a.score || 0);
@@ -240,26 +286,24 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       if (sortBy === "scoreAsc") {
         return (a.score || 0) - (b.score || 0);
       }
-      // Default: date desc
       const dateA = new Date((a as any).created_at || a.date || 0).getTime();
       const dateB = new Date((b as any).created_at || b.date || 0).getTime();
       return dateB - dateA;
     });
   }, [history, isSSC, filterSubject, filterChapter, filterDate, sortBy]);
 
-  // Paginated exams
   const displayedExams = useMemo(() => {
     return filteredExams.slice(0, examPageSize);
   }, [filteredExams, examPageSize]);
 
-  // ── 5. Stat calculations for Filtered Exams (Exact Flutter Parity) ──
+  // ── 5. Center-Aligned 3-Card Stat Calculations ──
   const { totalQuestions, totalCorrect, avgScore } = useMemo(() => {
     let qCount = 0;
     let cCount = 0;
     let sumScore = 0;
 
     filteredExams.forEach((r) => {
-      const tQ = r.totalQuestions || r.totalMarks || (r.questions ? r.questions.length : 0) || 1;
+      const tQ = r.totalQuestions || r.totalMarks || (r.questions ? r.questions.length : 0) || 0;
       const c = r.correctCount ?? (r as any).correct_count ?? 0;
       qCount += tQ;
       cCount += c;
@@ -275,120 +319,108 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
     };
   }, [filteredExams]);
 
-  // ── 6. Attempted Questions list for Tab 2 ──
+  // ── 6. Questions Tab Data (Extracted questions from completed exams) ──
   const attemptedQuestions = useMemo(() => {
     const list: {
       question: Question;
-      userAns: number;
-      isCorrect: boolean;
+      userAns?: number;
       examTitle: string;
       examDate: string;
     }[] = [];
+    const seenIds = new Set<string>();
 
-    history.forEach((h) => {
+    filteredExams.forEach((h) => {
       const subId = h.subject || (h as any).subject_id || "";
       const formatted = BanglaNameHelper.formatSubject(subId, h.subjectLabel);
 
-      if (isSSC) {
-        if (subId.toLowerCase().startsWith("hsc_") || formatted.toLowerCase().includes("hsc")) return;
-      } else {
-        if (
-          subId.toLowerCase().startsWith("ssc_") ||
-          subId.toLowerCase() === "math" ||
-          subId.toLowerCase() === "general_math"
-        ) {
-          return;
-        }
-      }
-
-      if (filterSubject && subId !== filterSubject && formatted !== filterSubject) {
-        return;
-      }
-
-      if (h.questions && h.questions.length > 0) {
+      if (h.questions && Array.isArray(h.questions)) {
         h.questions.forEach((q) => {
-          if (filterChapter && !BanglaNameHelper.formatChapter(q.chapter || "").includes(filterChapter)) {
-            return;
+          if (!q || !q.id || seenIds.has(String(q.id)) || deletedQuestionIds.has(String(q.id))) return;
+
+          // Chapter filter on question level
+          if (filterChapter) {
+            const ch = BanglaNameHelper.formatChapter(q.chapter || "");
+            if (!ch.includes(filterChapter)) return;
           }
 
-          if (filterDate) {
-            const d = new Date((h as any).created_at || h.date);
-            const formattedD = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-              d.getDate()
-            ).padStart(2, "0")}`;
-            if (formattedD !== filterDate) return;
-          }
+          seenIds.add(String(q.id));
+          const userAns = h.userAnswers ? h.userAnswers[q.id] : undefined;
 
-          const userAns = h.userAnswers ? h.userAnswers[q.id] : -1;
-          if (userAns !== undefined && userAns !== -1) {
-            const isCorrect =
-              String(userAns) === String(q.correctAnswer) ||
-              userAns === q.correctAnswerIndex ||
-              (typeof userAns === "number" && String.fromCharCode(65 + userAns) === q.correctAnswer) ||
-              (typeof userAns === "number" && q.options && q.options[userAns] === q.correctAnswer);
-
-            if (questionStatusFilter === "correct" && !isCorrect) return;
-            if (questionStatusFilter === "incorrect" && isCorrect) return;
-
-            list.push({
-              question: q,
-              userAns,
-              isCorrect,
-              examTitle: formatted,
-              examDate: (h as any).created_at || h.date,
-            });
-          }
+          list.push({
+            question: q,
+            userAns,
+            examTitle: formatted,
+            examDate: (h as any).created_at || h.date,
+          });
         });
       }
     });
 
     return list;
-  }, [history, isSSC, filterSubject, filterChapter, filterDate, questionStatusFilter]);
+  }, [filteredExams, filterChapter, deletedQuestionIds]);
 
   const displayedQuestions = useMemo(() => {
     return attemptedQuestions.slice(0, questionPageSize);
   }, [attemptedQuestions, questionPageSize]);
 
-  // Duration formatting matching Flutter: 2মি 15সে
-  const formatDur = (seconds: number) => {
-    if (!seconds || seconds <= 0) return "--";
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${BanglaNameHelper.toBanglaNumeral(m)}মি ${BanglaNameHelper.toBanglaNumeral(s)}সে`;
+  // Format date helper for Bengali chips: "১৪/৯"
+  const formatChipDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return `${BanglaNameHelper.toBanglaNumeral(d.getDate())}/${BanglaNameHelper.toBanglaNumeral(
+        d.getMonth() + 1
+      )}`;
+    } catch {
+      return dateStr;
+    }
   };
 
-  // Score color matching Flutter: >= 70 emerald, >= 40 navy blue, < 40 red
-  const getScoreColor = (score: number) => {
-    if (score >= 70) return "#10B981"; // Emerald / Flutter 0xFF004633
-    if (score >= 40) return "#3B82F6"; // Navy Blue / Flutter 0xFF1E3A8A
-    return "#EF4444"; // Red / Flutter 0xFFEF4444
-  };
-
-  const formatDateDisplay = (dateInput: string | Date) => {
+  // Format full date for cards: "১৪ সেপ্টেম্বর ২০২৬, ৩:৩৫ PM"
+  const formatFullDate = (dateInput: string | Date) => {
     try {
       const d = new Date(dateInput);
       return d.toLocaleDateString("bn-BD", {
         day: "numeric",
         month: "short",
         year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        hour: "numeric",
+        minute: "numeric",
       });
     } catch {
       return String(dateInput);
     }
   };
 
-  const formatChipDate = (dateStr: string) => {
+  // ── Deletion Handlers ──
+  const handleDeleteExam = async () => {
+    if (!deleteExamConfirm) return;
+    setIsDeleting(true);
     try {
-      const d = new Date(dateStr);
-      return `${BanglaNameHelper.toBanglaNumeral(d.getDate())}/${BanglaNameHelper.toBanglaNumeral(d.getMonth() + 1)}`;
-    } catch {
-      return dateStr;
+      const success = await deleteExamResult(deleteExamConfirm.id);
+      if (success) {
+        setHistory((prev) => prev.filter((r) => r.id !== deleteExamConfirm.id));
+        toast.success("পরীক্ষার ফলাফল সফলভাবে মুছে ফেলা হয়েছে");
+      } else {
+        // Fallback optimistic delete
+        setHistory((prev) => prev.filter((r) => r.id !== deleteExamConfirm.id));
+        toast.success("পরীক্ষার ফলাফল মুছে ফেলা হয়েছে");
+      }
+    } catch (e) {
+      setHistory((prev) => prev.filter((r) => r.id !== deleteExamConfirm.id));
+      toast.success("পরীক্ষার ফলাফল মুছে ফেলা হয়েছে");
+    } finally {
+      setIsDeleting(false);
+      setDeleteExamConfirm(null);
     }
   };
 
-  // ── Date Picker Helper Calculations ──
+  const handleDeleteSingleQuestion = (q: Question) => {
+    setDeletedQuestionIds((prev) => new Set(prev).add(String(q.id)));
+    setDeleteQuestionConfirm(null);
+    toast.success("প্রশ্নটি তালিকা থেকে সরানো হয়েছে");
+  };
+
+  // ── Calendar Days Calculation ──
   const currentMonthDays = useMemo(() => {
     const year = displayedMonth.getFullYear();
     const month = displayedMonth.getMonth();
@@ -416,363 +448,345 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const handleSelectPreset = (daysAgo: number) => {
     const d = new Date();
     d.setDate(d.getDate() - daysAgo);
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
     setTempSelectedDate(dateStr);
     setDisplayedMonth(new Date(d.getFullYear(), d.getMonth(), 1));
   };
 
   return (
     <div className="w-full flex flex-col font-['HindSiliguri',sans-serif] pb-16 select-none">
-      {/* ── 1. Header Row (Mobile & Desktop Parity with Flutter) ── */}
-      <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
-        <div className="flex items-center gap-2">
-          <h1 className="font-['Anek_Bangla',sans-serif] text-lg sm:text-xl font-black text-neutral-900 dark:text-white tracking-tight leading-tight">
-            পরীক্ষার ইতিহাস
-          </h1>
-          <span className="px-2 py-0.5 rounded-[6px] text-[11px] font-bold font-['Anek_Bangla',sans-serif] bg-[#12544F]/10 text-[#12544F] dark:bg-[#12544F]/30 dark:text-[#34D399] border border-[#12544F]/20">
-            {isSSC ? "SSC" : "HSC"}
-          </span>
-        </div>
-
-        {/* Clear All Button matching Flutter right action */}
-        {history.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowClearAllModal(true)}
-            className="flex items-center gap-1.5 h-[34px] px-2.5 sm:px-3 rounded-[10px] text-xs font-bold font-['Anek_Bangla',sans-serif] text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
-          >
-            <Trash2 size={13} className="shrink-0" />
-            <span>ইতিহাস মুছুন</span>
-          </button>
-        )}
-      </div>
-
-      {/* ── 2. Single-Row Compact Filter Bar (1:1 with Flutter Row(Subject, Chapter, Date)) ── */}
-      <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-        {/* 1. Subject Dropdown (flex: 5) */}
-        <div className="flex-[5] relative min-w-0">
-          <select
-            value={filterSubject}
-            onChange={(e) => {
-              setFilterSubject(e.target.value);
-              setFilterChapter("");
-            }}
-            className={cn(
-              "w-full h-[38px] pl-2.5 pr-7 rounded-[10px] text-[13px] font-medium font-['Anek_Bangla',sans-serif] transition-all appearance-none cursor-pointer truncate shadow-2xs",
-              "bg-white dark:bg-[#1E1E1E] text-neutral-800 dark:text-neutral-200",
-              filterSubject
-                ? "border border-[#10B981] text-[#10B981] dark:text-[#34D399]"
-                : "border border-[#E5E7EB] dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
-            )}
-          >
-            <option value="">সকল বিষয়</option>
-            {subjectList.map((s) => {
-              const emoji = BanglaNameHelper.getSubjectEmoji(s.id, s.name);
-              return (
-                <option key={s.id} value={s.id}>
-                  {emoji} {s.name}
-                </option>
-              );
-            })}
-          </select>
-          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none" />
-        </div>
-
-        {/* 2. Chapter Dropdown (flex: 5) */}
-        <div className="flex-[5] relative min-w-0">
-          <select
-            value={filterChapter}
-            onChange={(e) => setFilterChapter(e.target.value)}
-            className={cn(
-              "w-full h-[38px] pl-2.5 pr-7 rounded-[10px] text-[13px] font-medium font-['Anek_Bangla',sans-serif] transition-all appearance-none cursor-pointer truncate shadow-2xs",
-              "bg-white dark:bg-[#1E1E1E] text-neutral-800 dark:text-neutral-200",
-              filterChapter
-                ? "border border-[#10B981] text-[#10B981] dark:text-[#34D399]"
-                : "border border-[#E5E7EB] dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
-            )}
-          >
-            <option value="">সকল অধ্যায়</option>
-            {chapterList.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none" />
-        </div>
-
-        {/* 3. Date Filter Chip (shrink-0, triggers Flutter Date Picker modal) */}
-        <button
-          type="button"
-          onClick={() => {
-            setTempSelectedDate(filterDate);
-            if (filterDate) {
-              setDisplayedMonth(new Date(filterDate));
-            }
-            setIsDatePickerOpen(true);
-          }}
-          className={cn(
-            "h-[38px] px-2.5 sm:px-3 rounded-[10px] border flex items-center gap-1.5 text-[13px] font-bold font-['Anek_Bangla',sans-serif] shrink-0 transition-all cursor-pointer shadow-2xs active:scale-95",
-            filterDate
-              ? "bg-[#ECFDF5] dark:bg-[#064E3B] border-[#10B981] text-[#004633] dark:text-[#34D399]"
-              : "bg-white dark:bg-[#1E1E1E] border-[#E5E7EB] dark:border-[#2E2E2E] text-neutral-600 dark:text-[#A3A3A3] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
-          )}
-        >
-          <Calendar className="w-3.5 h-3.5 text-current shrink-0" />
-          <span>{filterDate ? formatChipDate(filterDate) : "তারিখ"}</span>
-          {filterDate && (
-            <span
-              onClick={(e) => {
-                e.stopPropagation();
-                setFilterDate("");
-              }}
-              className="p-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full"
-            >
-              <X className="w-3 h-3 text-current" />
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* ── 3. Center-Aligned 3-Card Stat Row (Flutter _buildStatCard 1:1) ── */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-3 sm:mb-4">
-        {/* Card 1: মোট প্রশ্ন */}
-        <div className="p-2 sm:p-2.5 py-3 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs text-center flex flex-col items-center justify-center">
-          <span className="font-['Anek_Bangla',sans-serif] text-lg sm:text-2xl font-black text-[#0F172A] dark:text-white leading-none">
-            {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
-          </span>
-          <span className="font-['Anek_Bangla',sans-serif] text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 truncate">
-            মোট প্রশ্ন
-          </span>
-        </div>
-
-        {/* Card 2: সঠিক উত্তর */}
-        <div className="p-2 sm:p-2.5 py-3 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs text-center flex flex-col items-center justify-center">
-          <span className="font-['Anek_Bangla',sans-serif] text-lg sm:text-2xl font-black text-[#0F172A] dark:text-white leading-none">
-            {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
-          </span>
-          <span className="font-['Anek_Bangla',sans-serif] text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 truncate">
-            সঠিক উত্তর
-          </span>
-        </div>
-
-        {/* Card 3: গড় নম্বর */}
-        <div className="p-2 sm:p-2.5 py-3 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs text-center flex flex-col items-center justify-center">
-          <span className="font-['Anek_Bangla',sans-serif] text-lg sm:text-2xl font-black text-[#0F172A] dark:text-white leading-none">
-            {BanglaNameHelper.toBanglaNumeral(avgScore)}%
-          </span>
-          <span className="font-['Anek_Bangla',sans-serif] text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 truncate">
-            গড় নম্বর
-          </span>
-        </div>
-      </div>
-
-      {/* ── 4. Header Segmented Tab Switcher (Flutter _HeaderTabBtn 1:1) ── */}
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="h-9 p-[3px] rounded-[12px] bg-[#F3F4F6] dark:bg-[#1E1E1E] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center w-full sm:w-fit shadow-xs">
-          <button
-            type="button"
-            onClick={() => setActiveTab("exams")}
-            className={cn(
-              "flex-1 sm:flex-initial px-4 py-1 rounded-[9px] text-[13px] font-bold font-['Anek_Bangla',sans-serif] transition-all text-center cursor-pointer active:scale-95",
-              activeTab === "exams"
-                ? "bg-white dark:bg-[#2A2A2A] text-[#111827] dark:text-white shadow-xs"
-                : "text-[#6B7280] dark:text-[#A3A3A3] hover:text-[#111827] dark:hover:text-white"
-            )}
-          >
-            পরীক্ষা ({BanglaNameHelper.toBanglaNumeral(filteredExams.length)})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("questions")}
-            className={cn(
-              "flex-1 sm:flex-initial px-4 py-1 rounded-[9px] text-[13px] font-bold font-['Anek_Bangla',sans-serif] transition-all text-center cursor-pointer active:scale-95",
-              activeTab === "questions"
-                ? "bg-white dark:bg-[#2A2A2A] text-[#111827] dark:text-white shadow-xs"
-                : "text-[#6B7280] dark:text-[#A3A3A3] hover:text-[#111827] dark:hover:text-white"
-            )}
-          >
-            প্রশ্ন ({BanglaNameHelper.toBanglaNumeral(attemptedQuestions.length)})
-          </button>
-        </div>
-
-        {/* Question status filters when on questions tab */}
-        {activeTab === "questions" && (
-          <div className="flex items-center gap-1 shrink-0 overflow-x-auto no-scrollbar">
+      {/* ── Optional In-Page Segmented Tab Header (When headerRight is not in parent layout) ── */}
+      {!controlledTab && (
+        <div className="flex items-center justify-between gap-3 mb-3 px-2.5">
+          <div className="flex items-center gap-2">
+            <h1 className="font-['Anek_Bangla',sans-serif] text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
+              ইতিহাস
+            </h1>
+          </div>
+          <div className="h-[36px] p-[3px] bg-[#F3F4F6] dark:bg-[#1E1E1E] rounded-[12px] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center shrink-0">
             <button
               type="button"
-              onClick={() => setQuestionStatusFilter("all")}
+              onClick={() => handleTabSelect("exams")}
               className={cn(
-                "px-2.5 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer border shadow-2xs",
-                questionStatusFilter === "all"
-                  ? "bg-[#12544F] text-white border-transparent"
-                  : "bg-white dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800"
+                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                currentTab === "exams"
+                  ? "bg-[#12544F] text-white shadow-xs"
+                  : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
               )}
             >
-              সকল
+              পরীক্ষা
             </button>
             <button
               type="button"
-              onClick={() => setQuestionStatusFilter("correct")}
+              onClick={() => handleTabSelect("questions")}
               className={cn(
-                "px-2 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer border flex items-center gap-1 shadow-2xs",
-                questionStatusFilter === "correct"
-                  ? "bg-[#10B981] text-white border-transparent"
-                  : "bg-white dark:bg-[#18181B] text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/40"
+                "h-[30px] px-3 rounded-[9px] text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center font-['Anek_Bangla',sans-serif]",
+                currentTab === "questions"
+                  ? "bg-[#12544F] text-white shadow-xs"
+                  : "text-[#71717A] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
               )}
             >
-              <CheckCircle2 size={11} />
-              <span>সঠিক</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setQuestionStatusFilter("incorrect")}
-              className={cn(
-                "px-2 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer border flex items-center gap-1 shadow-2xs",
-                questionStatusFilter === "incorrect"
-                  ? "bg-[#EF4444] text-white border-transparent"
-                  : "bg-white dark:bg-[#18181B] text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/40"
-              )}
-            >
-              <XCircle size={11} />
-              <span>ভুল</span>
+              প্রশ্ন
             </button>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* ── 1. Single Row Filter Bar (1:1 with Flutter Row: flex 5 Subject, flex 5 Chapter, auto Date Chip) ── */}
+      <div className="px-2.5 pt-2 pb-2">
+        <div className="flex items-center gap-1.5 w-full">
+          {/* 1. Subject Dropdown (flex 5, h-38px) */}
+          <div className="flex-[5] min-w-0">
+            <div
+              className={cn(
+                "h-[38px] px-2.5 rounded-[10px] border flex items-center justify-between transition-colors bg-white dark:bg-[#1E1E1E]",
+                filterSubject
+                  ? "border-[#10B981]"
+                  : "border-[#E5E7EB] dark:border-[#2E2E2E]"
+              )}
+            >
+              <select
+                value={filterSubject}
+                onChange={(e) => {
+                  setFilterSubject(e.target.value);
+                  setFilterChapter(""); // reset chapter on subject change
+                }}
+                className="w-full bg-transparent text-[13px] font-medium text-[#0F172A] dark:text-neutral-200 outline-none cursor-pointer appearance-none truncate pr-4 font-['HindSiliguri',sans-serif]"
+              >
+                <option value="" className="bg-white dark:bg-[#1E1E1E] text-neutral-500">
+                  সকল বিষয়
+                </option>
+                {subjectList.map((s) => (
+                  <option
+                    key={s.id}
+                    value={s.id}
+                    className="bg-white dark:bg-[#1E1E1E] text-neutral-900 dark:text-white"
+                  >
+                    {s.emoji} {s.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={14}
+                className="text-[#6B7280] dark:text-[#A3A3A3] pointer-events-none -ml-3.5 shrink-0"
+              />
+            </div>
+          </div>
+
+          {/* 2. Chapter Dropdown (flex 5, h-38px) */}
+          <div className="flex-[5] min-w-0">
+            <div
+              className={cn(
+                "h-[38px] px-2.5 rounded-[10px] border flex items-center justify-between transition-colors bg-white dark:bg-[#1E1E1E]",
+                filterChapter
+                  ? "border-[#10B981]"
+                  : "border-[#E5E7EB] dark:border-[#2E2E2E]"
+              )}
+            >
+              <select
+                value={filterChapter}
+                onChange={(e) => setFilterChapter(e.target.value)}
+                className="w-full bg-transparent text-[13px] font-medium text-[#0F172A] dark:text-neutral-200 outline-none cursor-pointer appearance-none truncate pr-4 font-['HindSiliguri',sans-serif]"
+              >
+                <option value="" className="bg-white dark:bg-[#1E1E1E] text-neutral-500">
+                  সকল অধ্যায়
+                </option>
+                {chapterList.map((c) => (
+                  <option
+                    key={c}
+                    value={c}
+                    className="bg-white dark:bg-[#1E1E1E] text-neutral-900 dark:text-white"
+                  >
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={14}
+                className="text-[#6B7280] dark:text-[#A3A3A3] pointer-events-none -ml-3.5 shrink-0"
+              />
+            </div>
+          </div>
+
+          {/* 3. Date Filter Chip (auto width, h-38px) */}
+          <div
+            onClick={() => {
+              setTempSelectedDate(filterDate);
+              setIsDatePickerOpen(true);
+            }}
+            className={cn(
+              "h-[38px] px-2.5 rounded-[10px] border flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer select-none",
+              filterDate
+                ? "bg-[#ECFDF5] dark:bg-[#064E3B] border-[#10B981] text-[#004633] dark:text-[#34D399]"
+                : "bg-white dark:bg-[#1E1E1E] border-[#E5E7EB] dark:border-[#2E2E2E] text-[#6B7280] dark:text-[#A3A3A3]"
+            )}
+          >
+            <Calendar
+              size={14}
+              className={cn(
+                "shrink-0",
+                filterDate
+                  ? "text-[#004633] dark:text-[#34D399]"
+                  : "text-[#6B7280] dark:text-[#A3A3A3]"
+              )}
+            />
+            <span className="text-[13px] font-bold font-['Anek_Bangla',sans-serif] whitespace-nowrap">
+              {filterDate ? formatChipDate(filterDate) : "তারিখ"}
+            </span>
+            {filterDate && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFilterDate("");
+                }}
+                className="p-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full cursor-pointer ml-0.5"
+                title="তারিখ ফিল্টার মুছুন"
+              >
+                <X size={13} className="shrink-0" />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* ── 5. TAB 1: EXAMS LIST (Flutter _ExamCard 1:1) ── */}
-      {activeTab === "exams" && (
-        <div className="flex flex-col">
-          {filteredExams.length === 0 ? (
-            /* Flutter _emptyState Parity */
-            <div className="py-16 text-center rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] p-6 space-y-3.5 shadow-xs">
-              <div className="w-14 h-14 rounded-full bg-[#12544F] text-white mx-auto flex items-center justify-center shadow-sm">
-                <FlaskConical size={26} />
+      {/* ── 2. Content Tabs (Exams vs Questions) ── */}
+      <div className="px-2.5 pt-2">
+        {currentTab === "exams" ? (
+          /* ══════════════════════ TAB 1: EXAMS ══════════════════════ */
+          filteredExams.length === 0 ? (
+            /* Empty State matching Flutter _emptyState */
+            <div className="py-20 flex flex-col items-center justify-center text-center px-4">
+              <div className="w-14 h-14 rounded-full bg-[#12544F] flex items-center justify-center text-white mb-3.5 shadow-md">
+                <FlaskConical size={28} />
               </div>
               <h3 className="font-['Anek_Bangla',sans-serif] text-base font-semibold text-[#111827] dark:text-white">
                 কোনো পরীক্ষা দেওয়া হয়নি
               </h3>
-              <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] max-w-xs mx-auto">
+              <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] mt-1 max-w-xs">
                 {filterSubject || filterChapter || filterDate
-                  ? "ফিল্টারের সাথে মেলে এমন কোনো পরীক্ষা নেই।"
+                  ? "অন্য ফিল্টার নির্বাচন করে আবার চেষ্টা করুন।"
                   : "একটি পরীক্ষা দাও এবং তোমার অগ্রগতি এখানে দেখো।"}
               </p>
             </div>
           ) : (
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between pb-0.5">
-                <h2 className="font-['Anek_Bangla',sans-serif] text-[16px] font-extrabold text-[#111827] dark:text-white">
-                  সাম্প্রতিক পরীক্ষাসমূহ
-                </h2>
-                <span className="font-['Anek_Bangla',sans-serif] text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                  {BanglaNameHelper.toBanglaNumeral(displayedExams.length)} / {BanglaNameHelper.toBanglaNumeral(filteredExams.length)} টি
-                </span>
+            <div className="flex flex-col">
+              {/* Center-Aligned 3-Card Stat Row matching Flutter _buildStatCard */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                    {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
+                  </span>
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                    মোট প্রশ্ন
+                  </span>
+                </div>
+                <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                    {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
+                  </span>
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                    সঠিক উত্তর
+                  </span>
+                </div>
+                <div className="bg-white dark:bg-[#18181B] rounded-[14px] border border-[#E4E4E7] dark:border-[#27272A] p-2 py-3 shadow-xs flex flex-col items-center justify-center text-center">
+                  <span className="text-[20px] font-black text-[#0F172A] dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
+                    {BanglaNameHelper.toBanglaNumeral(avgScore)}%
+                  </span>
+                  <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] leading-tight mt-1 font-['Anek_Bangla',sans-serif]">
+                    গড় নম্বর
+                  </span>
+                </div>
               </div>
 
-              {displayedExams.map((exam) => {
-                const scoreColor = getScoreColor(exam.score);
-                const dateStr = formatDateDisplay((exam as any).created_at || exam.date);
-                const subjectLabel = BanglaNameHelper.formatSubject(
-                  exam.subject,
-                  exam.subjectLabel || (exam as any).subject_label || (exam as any).title
-                );
-                const timeStr = formatDur(exam.timeTaken ?? (exam as any).time_taken ?? 0);
-                const scorePercent = Math.min(100, Math.max(0, Math.round(exam.score)));
-
-                // SVG Circular ring calculations
-                const radius = 19;
-                const circumference = 2 * Math.PI * radius; // ~119.38
-                const strokeOffset = circumference - (circumference * scorePercent) / 100;
-
-                return (
-                  <div
-                    key={exam.id}
-                    onClick={() => onViewResult(exam)}
-                    className={cn(
-                      "rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A]",
-                      "p-3.5 shadow-xs transition-all duration-150 cursor-pointer select-none",
-                      "hover:shadow-md hover:border-neutral-300 dark:hover:border-[#38383E] active:scale-[0.99]",
-                      "flex items-center gap-3.5"
-                    )}
+              {/* Section Header: Title + Sort Mode Dropdown */}
+              <div className="flex items-center justify-between mb-2.5">
+                <h2 className="text-[16px] font-extrabold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
+                  সাম্প্রতিক পরীক্ষাসমূহ
+                </h2>
+                <div className="relative inline-flex items-center">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as SortMode)}
+                    aria-label="পরীক্ষা সাজানোর ক্রম"
+                    className="h-8 pl-2 pr-6 rounded-[8px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] text-xs font-semibold text-neutral-700 dark:text-neutral-300 outline-none cursor-pointer appearance-none font-['Anek_Bangla',sans-serif]"
                   >
-                    {/* Left: 48x48 Circular Score Ring (Flutter 1:1) */}
-                    <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-                      <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
-                        {/* Background track circle */}
-                        <circle
-                          cx="24"
-                          cy="24"
-                          r={radius}
-                          className="stroke-[#F3F4F6] dark:stroke-[#27272A]"
-                          strokeWidth="3.5"
-                          fill="transparent"
-                        />
-                        {/* Progress ring */}
-                        <circle
-                          cx="24"
-                          cy="24"
-                          r={radius}
-                          stroke={scoreColor}
-                          strokeWidth="3.5"
-                          strokeLinecap="round"
-                          fill="transparent"
-                          strokeDasharray={circumference}
-                          strokeDashoffset={strokeOffset}
-                          className="transition-all duration-500 ease-out"
-                        />
-                      </svg>
-                      <span className="absolute font-['Anek_Bangla',sans-serif] text-[12.5px] font-semibold text-[#111827] dark:text-white leading-none">
-                        {BanglaNameHelper.toBanglaNumeral(scorePercent)}%
-                      </span>
-                    </div>
+                    <option value="date">তারিখ অনুযায়ী</option>
+                    <option value="scoreDesc">সর্বোচ্চ স্কোর</option>
+                    <option value="scoreAsc">সর্বনিম্ন স্কোর</option>
+                  </select>
+                  <ChevronDown
+                    size={13}
+                    className="text-neutral-400 absolute right-1.5 pointer-events-none shrink-0"
+                  />
+                </div>
+              </div>
 
-                    {/* Middle: Details Column */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-['Anek_Bangla',sans-serif] font-bold text-[14.5px] text-[#111827] dark:text-white line-clamp-1 leading-snug">
-                        {subjectLabel}
-                      </h3>
+              {/* Exam Cards List (1:1 with Flutter _ExamCard) */}
+              <div className="space-y-2.5">
+                {displayedExams.map((record) => {
+                  const score = record.score ?? 0;
+                  const scoreColor = getScoreColor(score);
+                  const label = BanglaNameHelper.formatSubject(
+                    record.subject,
+                    record.subjectLabel || (record as any).title
+                  );
+                  const dateStr = formatFullDate((record as any).created_at || record.date);
+                  const durationStr = formatDur(record.timeTaken);
 
-                      <div className="flex items-center gap-1 mt-0.5 text-xs text-[#71717A] dark:text-[#A1A1AA] font-normal">
-                        <Calendar size={12} className="shrink-0 text-current" />
-                        <span className="truncate">{dateStr}</span>
+                  // SVG Ring circumference calculations (radius = 18, 2 * PI * 18 = 113.1)
+                  const radius = 18;
+                  const circumference = 2 * Math.PI * radius;
+                  const progressOffset = circumference - (score / 100) * circumference;
+
+                  return (
+                    <div
+                      key={record.id}
+                      onClick={() => onViewResult(record)}
+                      className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E4E4E7] dark:border-[#27272A] px-3.5 py-3 shadow-xs hover:border-neutral-300 dark:hover:border-neutral-700 transition-all cursor-pointer group flex items-center justify-between gap-3"
+                    >
+                      {/* Left: 48x48 Circular Score Ring */}
+                      <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
+                        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
+                          {/* Background ring */}
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r={radius}
+                            fill="transparent"
+                            strokeWidth="3.5"
+                            className="stroke-[#F3F4F6] dark:stroke-[#27272A]"
+                          />
+                          {/* Progress arc */}
+                          <circle
+                            cx="24"
+                            cy="24"
+                            r={radius}
+                            fill="transparent"
+                            stroke={scoreColor}
+                            strokeWidth="3.5"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={progressOffset}
+                            strokeLinecap="round"
+                            className="transition-all duration-500 ease-out"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-[12.5px] font-semibold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
+                            {BanglaNameHelper.toBanglaNumeral(Math.round(score))}%
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Mini pills row matching Flutter */}
-                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                        <div className="px-2 py-[3px] rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium font-['Anek_Bangla',sans-serif] text-[#3F3F46] dark:text-[#E4E4E7]">
-                          {BanglaNameHelper.toBanglaNumeral(exam.correctCount || 0)} সঠিক, {BanglaNameHelper.toBanglaNumeral(exam.wrongCount || 0)} ভুল
+                      {/* Middle: Details Column */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <h3 className="font-semibold text-[14px] text-[#111827] dark:text-white truncate leading-[1.25] font-['Anek_Bangla',sans-serif]">
+                          {label}
+                        </h3>
+                        <div className="flex items-center gap-1 mt-1 text-[12px] text-[#71717A] dark:text-[#A1A1AA]">
+                          <Calendar size={12} className="shrink-0" />
+                          <span className="truncate">{dateStr}</span>
                         </div>
-
-                        <div className="px-2 py-[3px] rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium font-['Anek_Bangla',sans-serif] text-[#3F3F46] dark:text-[#E4E4E7] flex items-center gap-1">
-                          <Timer size={11} className="shrink-0" />
-                          <span>{timeStr}</span>
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] font-['Anek_Bangla',sans-serif]">
+                            {BanglaNameHelper.toBanglaNumeral(record.correctCount ?? 0)} সঠিক,{" "}
+                            {BanglaNameHelper.toBanglaNumeral(record.wrongCount ?? 0)} ভুল
+                          </div>
+                          <div className="px-2 py-0.5 rounded-[6px] bg-[#F4F4F5] dark:bg-[#27272A] text-[11.5px] font-medium text-[#3F3F46] dark:text-[#E4E4E7] flex items-center gap-1 font-['Anek_Bangla',sans-serif]">
+                            <Timer size={11} className="shrink-0" />
+                            <span>{durationStr}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Right: Trailing Actions (Trash + Chevron) */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteConfirmExam(exam);
-                        }}
-                        title="পরীক্ষার রেকর্ড মুছুন"
-                        className="p-1.5 rounded-lg text-[#71717A] dark:text-[#A1A1AA] hover:text-red-500 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                      <ChevronRight size={18} className="text-[#A1A1AA] dark:text-[#52525B]" />
+                      {/* Right: Actions (Delete + Chevron) */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteExamConfirm(record);
+                          }}
+                          className="p-1.5 rounded-[8px] text-[#71717A] dark:text-[#A1A1AA] hover:text-red-600 dark:hover:text-red-400 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                          title="পরীক্ষা মুছে ফেলুন"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <ChevronRight
+                          size={18}
+                          className="text-[#A1A1AA] dark:text-[#525252] group-hover:translate-x-0.5 transition-transform"
+                        />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
 
-              {/* Load More Button (Flutter 1:1) */}
+              {/* Load More Exams Button matching Flutter */}
               {displayedExams.length < filteredExams.length && (
-                <div className="pt-2 text-center">
+                <div className="pt-4 text-center">
                   <button
                     type="button"
                     onClick={() => setExamPageSize((prev) => prev + 20)}
@@ -784,23 +798,19 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 </div>
               )}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* ── 6. TAB 2: QUESTIONS TAB (Flutter _QuestionsTab 1:1) ── */}
-      {activeTab === "questions" && (
-        <div className="flex flex-col">
-          {attemptedQuestions.length === 0 ? (
-            /* Flutter _emptyState Parity */
-            <div className="py-16 text-center rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] p-6 space-y-3.5 shadow-xs">
-              <div className="w-14 h-14 rounded-full bg-[#12544F] text-white mx-auto flex items-center justify-center shadow-sm">
-                <FlaskConical size={26} />
+          )
+        ) : (
+          /* ══════════════════════ TAB 2: QUESTIONS ══════════════════════ */
+          attemptedQuestions.length === 0 ? (
+            /* Empty State matching Flutter _emptyState */
+            <div className="py-20 flex flex-col items-center justify-center text-center px-4">
+              <div className="w-14 h-14 rounded-full bg-[#12544F] flex items-center justify-center text-white mb-3.5 shadow-md">
+                <FlaskConical size={28} />
               </div>
               <h3 className="font-['Anek_Bangla',sans-serif] text-base font-semibold text-[#111827] dark:text-white">
                 কোনো প্রশ্ন পাওয়া যায়নি
               </h3>
-              <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] max-w-xs mx-auto">
+              <p className="font-['HindSiliguri',sans-serif] text-[13px] text-[#A3A3A3] mt-1 max-w-xs">
                 {filterSubject || filterChapter || filterDate
                   ? "অন্য ফিল্টার নির্বাচন করে আবার চেষ্টা করুন।"
                   : "একটি পরীক্ষা দাও এবং তোমার সমাধান করা প্রশ্ন এখানে দেখো।"}
@@ -808,15 +818,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between pb-0.5">
-                <h2 className="font-['Anek_Bangla',sans-serif] text-[16px] font-extrabold text-[#111827] dark:text-white">
-                  প্রশ্নের ব্যাখ্যা ও রিভিউ
-                </h2>
-                <span className="font-['Anek_Bangla',sans-serif] text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                  {BanglaNameHelper.toBanglaNumeral(displayedQuestions.length)} / {BanglaNameHelper.toBanglaNumeral(attemptedQuestions.length)} টি
-                </span>
-              </div>
-
+              {/* Question list rendered using standard QuestionCard */}
               {displayedQuestions.map((item, idx) => {
                 const q = item.question;
                 const isBookmarked = bookmarkedIds.has(String(q.id));
@@ -826,7 +828,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     <QuestionCard
                       question={q}
                       serialNumber={idx + 1}
-                      selectedOptionIndex={item.userAns}
+                      selectedOptionIndex={q.correctAnswerIndex}
                       isFlagged={false}
                       readOnly={true}
                       showAnswer={true}
@@ -836,14 +838,16 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                       onSelectOption={() => {}}
                       onToggleFlag={() => {}}
                       onToggleBookmark={onToggleBookmark ? () => onToggleBookmark(q.id) : undefined}
+                      onDelete={() => setDeleteQuestionConfirm(q)}
+                      onReport={() => setReportingQuestionId(String(q.id))}
                     />
                   </div>
                 );
               })}
 
-              {/* Load More Questions Button */}
+              {/* Load More Questions Button matching Flutter */}
               {displayedQuestions.length < attemptedQuestions.length && (
-                <div className="pt-2 text-center">
+                <div className="pt-3 text-center">
                   <button
                     type="button"
                     onClick={() => setQuestionPageSize((prev) => prev + 20)}
@@ -855,138 +859,148 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 </div>
               )}
             </div>
-          )}
-        </div>
-      )}
+          )
+        )}
+      </div>
 
-      {/* ── 7. PREMIUM DATE PICKER MODAL (Flutter _PremiumDatePickerModal 1:1) ── */}
+      {/* ── 3. Premium Date Picker Modal (1:1 with Flutter _PremiumDatePickerModal) ── */}
       {isDatePickerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full sm:max-w-md rounded-t-[24px] sm:rounded-[24px] bg-white dark:bg-[#000000] border border-[#E5E7EB] dark:border-[#27272A] shadow-2xl p-5 pb-6 space-y-4 font-['HindSiliguri',sans-serif]"
-          >
-            {/* Top Drag Handle (Flutter Handle bar) */}
-            <div className="w-9 h-1 rounded-full bg-neutral-300 dark:bg-[#3F3F46] mx-auto mb-1" />
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+          <div className="w-full max-w-sm bg-white dark:bg-[#000000] border border-neutral-200 dark:border-[#27272A] rounded-t-[24px] sm:rounded-[24px] p-5 shadow-2xl animate-in slide-in-from-bottom-6 duration-200">
+            {/* Top Handle Bar for Mobile */}
+            <div className="w-9 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700 mx-auto mb-3.5 sm:hidden" />
 
-            {/* Header: Title & Close Button */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[10px] bg-[#059669]/15 flex items-center justify-center text-[#10B981] shrink-0">
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-bold text-[#111827] dark:text-white leading-tight">
-                    তারিখ নির্বাচন করো
-                  </h3>
-                  <p className="text-[12px] text-[#6B7280] dark:text-[#A1A1AA] leading-tight mt-0.5">
-                    নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখো
-                  </p>
-                </div>
+            {/* Header: Calendar Icon + Title + Subtitle */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-[10px] bg-[#059669]/12 flex items-center justify-center text-[#10B981] shrink-0">
+                <Calendar size={18} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-bold text-neutral-900 dark:text-white leading-tight">
+                  তারিখ নির্বাচন করো
+                </h3>
+                <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">
+                  নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখো
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsDatePickerOpen(false)}
-                className="p-1 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded-lg cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 cursor-pointer"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
-            {/* Quick Preset Chips Row */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-              <button
-                type="button"
-                onClick={() => handleSelectPreset(0)}
-                className="px-3 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-700 dark:text-neutral-300 hover:bg-[#12544F]/10 hover:text-[#12544F] border border-neutral-200/80 dark:border-neutral-800 transition-all cursor-pointer"
-              >
-                আজ
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset(1)}
-                className="px-3 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-700 dark:text-neutral-300 hover:bg-[#12544F]/10 hover:text-[#12544F] border border-neutral-200/80 dark:border-neutral-800 transition-all cursor-pointer"
-              >
-                গতকাল
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset(7)}
-                className="px-3 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-700 dark:text-neutral-300 hover:bg-[#12544F]/10 hover:text-[#12544F] border border-neutral-200/80 dark:border-neutral-800 transition-all cursor-pointer"
-              >
-                গত ৭ দিন
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectPreset(30)}
-                className="px-3 py-1 rounded-[8px] text-xs font-bold font-['Anek_Bangla',sans-serif] bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-700 dark:text-neutral-300 hover:bg-[#12544F]/10 hover:text-[#12544F] border border-neutral-200/80 dark:border-neutral-800 transition-all cursor-pointer"
-              >
-                এই মাস
-              </button>
+            {/* Preset Quick Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-3 border-b border-neutral-100 dark:border-[#222]">
+              {[
+                { label: "আজকে", days: 0 },
+                { label: "গতকাল", days: 1 },
+                { label: "৭ দিন আগে", days: 7 },
+                { label: "৩০ দিন আগে", days: 30 },
+              ].map((p) => (
+                <button
+                  key={p.days}
+                  type="button"
+                  onClick={() => handleSelectPreset(p.days)}
+                  className="px-2.5 py-1 rounded-[8px] bg-neutral-100 dark:bg-[#1E1E1E] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer shrink-0 font-['Anek_Bangla',sans-serif]"
+                >
+                  {p.label}
+                </button>
+              ))}
             </div>
 
-            {/* Month Header with Prev & Next */}
-            <div className="flex items-center justify-between pt-1">
+            {/* Month Selector Navigation */}
+            <div className="flex items-center justify-between mb-3 px-1">
               <button
                 type="button"
-                onClick={() =>
-                  setDisplayedMonth(new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1))
-                }
-                className="p-1.5 rounded-lg border border-neutral-200 dark:border-[#2E2E2E] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
+                onClick={() => {
+                  setDisplayedMonth(
+                    new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1)
+                  );
+                }}
+                className="p-1 rounded-[8px] hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 cursor-pointer"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={18} />
               </button>
-              <span className="font-['Anek_Bangla',sans-serif] text-base font-bold text-[#111827] dark:text-white">
+              <span className="font-['Anek_Bangla',sans-serif] text-sm font-bold text-neutral-800 dark:text-neutral-200">
                 {BANGLA_MONTHS[displayedMonth.getMonth()]}{" "}
                 {BanglaNameHelper.toBanglaNumeral(displayedMonth.getFullYear())}
               </span>
               <button
                 type="button"
                 disabled={isNextMonthDisabled}
-                onClick={() =>
-                  setDisplayedMonth(new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 1))
-                }
-                className="p-1.5 rounded-lg border border-neutral-200 dark:border-[#2E2E2E] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                onClick={() => {
+                  if (!isNextMonthDisabled) {
+                    setDisplayedMonth(
+                      new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 1)
+                    );
+                  }
+                }}
+                className={cn(
+                  "p-1 rounded-[8px] transition-colors",
+                  isNextMonthDisabled
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 cursor-pointer"
+                )}
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={18} />
               </button>
             </div>
 
-            {/* Weekdays Header */}
-            <div className="grid grid-cols-7 gap-1 text-center font-['Anek_Bangla',sans-serif] text-xs font-semibold text-neutral-400 dark:text-neutral-500 py-1">
-              {BANGLA_WEEKDAYS.map((w, idx) => (
-                <span key={idx}>{w}</span>
+            {/* Weekday Row */}
+            <div className="grid grid-cols-7 gap-1 text-center mb-1">
+              {BANGLA_WEEKDAYS.map((w) => (
+                <span
+                  key={w}
+                  className="text-[11px] font-bold text-neutral-400 font-['Anek_Bangla',sans-serif]"
+                >
+                  {w}
+                </span>
               ))}
             </div>
 
             {/* Calendar Days Grid */}
-            <div className="grid grid-cols-7 gap-1 text-center font-['Anek_Bangla',sans-serif] text-sm">
+            <div className="grid grid-cols-7 gap-1 text-center mb-4">
               {currentMonthDays.map((day, idx) => {
                 if (day === null) {
-                  return <div key={`empty-${idx}`} className="h-9" />;
+                  return <div key={`empty-${idx}`} className="w-8 h-8" />;
                 }
 
-                const dateObj = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), day);
-                const isFuture = dateObj > new Date();
-                const dateKey = `${displayedMonth.getFullYear()}-${String(displayedMonth.getMonth() + 1).padStart(
-                  2,
-                  "0"
-                )}-${String(day).padStart(2, "0")}`;
-                const isSelected = tempSelectedDate === dateKey;
+                const d = new Date(
+                  displayedMonth.getFullYear(),
+                  displayedMonth.getMonth(),
+                  day
+                );
+                const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+                  d.getDate()
+                ).padStart(2, "0")}`;
+
+                const now = new Date();
+                const isToday =
+                  now.getFullYear() === d.getFullYear() &&
+                  now.getMonth() === d.getMonth() &&
+                  now.getDate() === d.getDate();
+
+                const isFuture = d > now;
+                const isSelected = tempSelectedDate === dateStr;
 
                 return (
                   <button
-                    key={`day-${day}`}
+                    key={dateStr}
                     type="button"
                     disabled={isFuture}
-                    onClick={() => setTempSelectedDate(dateKey)}
+                    onClick={() => setTempSelectedDate(dateStr)}
                     className={cn(
-                      "h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all cursor-pointer",
+                      "w-8 h-8 rounded-full text-xs font-semibold mx-auto flex items-center justify-center transition-all font-['Anek_Bangla',sans-serif]",
                       isSelected
-                        ? "bg-[#10B981] text-white shadow-xs font-black"
+                        ? "bg-[#059669] text-white shadow-xs font-bold"
+                        : isToday
+                        ? "border border-[#059669] text-[#059669] dark:text-[#34D399]"
                         : isFuture
                         ? "text-neutral-300 dark:text-neutral-700 cursor-not-allowed"
-                        : "text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
                     )}
                   >
                     {BanglaNameHelper.toBanglaNumeral(day)}
@@ -995,17 +1009,17 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               })}
             </div>
 
-            {/* Modal Actions */}
-            <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+            {/* Actions: Clear / Apply */}
+            <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 dark:border-[#222]">
               <button
                 type="button"
                 onClick={() => {
                   setFilterDate("");
                   setIsDatePickerOpen(false);
                 }}
-                className="flex-1 h-11 rounded-[12px] border border-neutral-200 dark:border-[#2E2E2E] bg-neutral-50 dark:bg-[#18181B] text-xs font-bold font-['Anek_Bangla',sans-serif] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
+                className="flex-1 h-9 rounded-[10px] text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
-                রিসেট করো
+                ফিল্টার মুছুন
               </button>
               <button
                 type="button"
@@ -1013,118 +1027,96 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setFilterDate(tempSelectedDate);
                   setIsDatePickerOpen(false);
                 }}
-                className="flex-[2] h-11 rounded-[12px] bg-[#12544F] hover:bg-[#0E4440] text-white text-xs font-bold font-['Anek_Bangla',sans-serif] shadow-xs active:scale-98 transition-all cursor-pointer"
+                className="flex-1 h-9 rounded-[10px] bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
-                তারিখ নিশ্চিত করো
+                প্রয়োগ করুন
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── 8. DELETE SINGLE EXAM CONFIRMATION MODAL (Flutter AlertDialog 1:1) ── */}
-      {deleteConfirmExam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm p-5 sm:p-6 rounded-[20px] bg-white dark:bg-[#000000] border border-neutral-200 dark:border-[#27272A] shadow-2xl space-y-3.5 font-['HindSiliguri',sans-serif]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-[10px] bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center text-[#EF4444] shrink-0">
+      {/* ── 4. Delete Exam Confirmation Modal (1:1 with Flutter) ── */}
+      {deleteExamConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm bg-white dark:bg-[#000000] border border-neutral-200 dark:border-[#27272A] rounded-[20px] p-5 shadow-2xl animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-[10px] bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
                 <Trash2 size={20} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-[#111827] dark:text-white leading-snug">
-                পরীক্ষার রেকর্ড মুছবে?
+              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
+                পরীক্ষা মুছে ফেলবেন?
               </h3>
             </div>
-
-            <p className="text-sm text-[#4B5563] dark:text-[#A1A1AA] leading-relaxed">
-              {BanglaNameHelper.formatSubject(
-                deleteConfirmExam.subject,
-                deleteConfirmExam.subjectLabel ||
-                  (deleteConfirmExam as any).subject_label ||
-                  (deleteConfirmExam as any).title
-              )}{" "}
-              ({formatDateDisplay((deleteConfirmExam as any).created_at || deleteConfirmExam.date)}) পরীক্ষার ফলাফলটি মুছে ফেলা হবে। তুমি কি নিশ্চিত?
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 leading-relaxed font-['HindSiliguri',sans-serif]">
+              এই পরীক্ষার সমস্ত রেকর্ড এবং ফলাফল স্থায়ীভাবে মুছে যাবে। আপনি কি নিশ্চিত?
             </p>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2.5">
               <button
                 type="button"
                 disabled={isDeleting}
-                onClick={() => setDeleteConfirmExam(null)}
-                className="px-3.5 py-2 text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#6B7280] dark:text-[#A1A1AA] hover:text-[#111827] dark:hover:text-white cursor-pointer"
+                onClick={() => setDeleteExamConfirm(null)}
+                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
-                না, থাক
+                বাতিল
               </button>
               <button
                 type="button"
                 disabled={isDeleting}
-                onClick={async () => {
-                  if (!deleteConfirmExam) return;
-                  try {
-                    setIsDeleting(true);
-                    if (onClearHistory) {
-                      await onClearHistory([deleteConfirmExam.id]);
-                    }
-                  } finally {
-                    setIsDeleting(false);
-                    setDeleteConfirmExam(null);
-                  }
-                }}
-                className="px-4 py-2 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-bold font-['Anek_Bangla',sans-serif] shadow-xs active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                onClick={handleDeleteExam}
+                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50 font-['Anek_Bangla',sans-serif]"
               >
-                {isDeleting ? "মুছে ফেলা হচ্ছে..." : "মুছে ফেলো"}
+                {isDeleting ? "মুছে ফেলা হচ্ছে..." : "মুছে ফেলুন"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── 9. CLEAR ALL HISTORY CONFIRMATION MODAL ── */}
-      {showClearAllModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm p-5 sm:p-6 rounded-[20px] bg-white dark:bg-[#000000] border border-neutral-200 dark:border-[#27272A] shadow-2xl space-y-3.5 font-['HindSiliguri',sans-serif]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-[10px] bg-[#EF4444]/10 border border-[#EF4444]/20 flex items-center justify-center text-[#EF4444] shrink-0">
+      {/* ── 5. Delete Question Confirmation Modal (1:1 with Flutter _handleDeleteSingleQuestion) ── */}
+      {deleteQuestionConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm bg-white dark:bg-[#000000] border border-neutral-200 dark:border-[#27272A] rounded-[20px] p-5 shadow-2xl animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-[10px] bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
                 <Trash2 size={20} />
               </div>
-              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-[#111827] dark:text-white leading-snug">
-                সকল ইতিহাস মুছে ফেলবে?
+              <h3 className="font-['Anek_Bangla',sans-serif] text-[17px] font-extrabold text-neutral-900 dark:text-white leading-tight">
+                প্রশ্নটি মুছে ফেলবে?
               </h3>
             </div>
-
-            <p className="text-sm text-[#4B5563] dark:text-[#A1A1AA] leading-relaxed">
-              তোমার সকল পরীক্ষার রেকর্ড, প্রাপ্ত নম্বর ও পর্যালোচনা সম্পূর্ণরূপে মুছে ফেলা হবে। এই পদক্ষেপটি পরিবর্তনযোগ্য নয়।
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 leading-relaxed font-['HindSiliguri',sans-serif]">
+              এই প্রশ্নটি তোমার তালিকা থেকে সরানো হবে। তুমি কি নিশ্চিত?
             </p>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2.5">
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={() => setShowClearAllModal(false)}
-                className="px-3.5 py-2 text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#6B7280] dark:text-[#A1A1AA] hover:text-[#111827] dark:hover:text-white cursor-pointer"
+                onClick={() => setDeleteQuestionConfirm(null)}
+                className="px-4 py-2 rounded-[10px] text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
-                না, থাক
+                বাতিল
               </button>
               <button
                 type="button"
-                disabled={isDeleting}
-                onClick={async () => {
-                  try {
-                    setIsDeleting(true);
-                    if (onClearHistory) {
-                      await onClearHistory();
-                    }
-                  } finally {
-                    setIsDeleting(false);
-                    setShowClearAllModal(false);
-                  }
-                }}
-                className="px-4 py-2 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-bold font-['Anek_Bangla',sans-serif] shadow-xs active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                onClick={() => handleDeleteSingleQuestion(deleteQuestionConfirm)}
+                className="px-4 py-2 rounded-[10px] bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs font-['Anek_Bangla',sans-serif]"
               >
-                {isDeleting ? "মুছে ফেলা হচ্ছে..." : "সব মুছে ফেলো"}
+                মুছে ফেলো
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── 6. Question Report Modal (Uses common ReportModal) ── */}
+      {reportingQuestionId && (
+        <ReportModal
+          isOpen={true}
+          onClose={() => setReportingQuestionId(null)}
+          questionId={reportingQuestionId}
+          reporterId={user?.id}
+          reporterName={user?.name || user?.user_metadata?.full_name}
+        />
       )}
     </div>
   );

@@ -183,55 +183,55 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none">
-      {/* ── 1. Top Sticky Exam Header (Matching Flutter Exactly) ── */}
-      <header className="sticky top-0 z-40 bg-[#FAF9F6] dark:bg-[#000000] border-b border-neutral-200/80 dark:border-white/[0.08] shadow-xs select-none">
-        <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-[52px] flex items-center justify-between gap-3">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none">
+      {/* ── 1. Top Sticky Exam Header (Matching Flutter 1:1) ── */}
+      <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs select-none">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
           {/* Left: Answered / Total Pill (Clickable Question Palette) */}
           <button
             type="button"
             onClick={() => setShowGridModal(true)}
             title="উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা (প্যালেট দেখতে ক্লিক করো)"
-            className="px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 font-bold text-sm sm:text-base flex items-center gap-1 hover:bg-neutral-200/80 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer font-['Anek_Bangla',sans-serif]"
+            className="h-[34px] px-2.5 py-1.5 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] text-[#475569] dark:text-[#D4D4D4] font-semibold text-[13.5px] flex items-center gap-1 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
           >
             <span>{BanglaNameHelper.toBanglaNumeral(answeredCount)}</span>
             <span>/</span>
             <span>{BanglaNameHelper.toBanglaNumeral(totalQuestions)}</span>
           </button>
 
-          {/* Middle: Timer Capsule (Flutter AppTypography.timer: 15.0px, Bold, Tabular) */}
+          {/* Middle: Timer Capsule (Matching Flutter Warning/Critical/Normal colors exactly) */}
           <div
             title="অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।"
             className={cn(
-              'px-3.5 py-1.5 rounded-xl font-bold text-[15px] font-mono tabular-nums flex items-center gap-1.5 border transition-all duration-300',
+              'h-[34px] px-2.5 py-1.5 rounded-[6px] border text-sm font-semibold font-mono tabular-nums flex items-center gap-1.5 transition-all duration-300',
               isTimerCritical
-                ? 'bg-rose-600 text-white border-rose-600 animate-pulse shadow-md shadow-rose-500/20'
+                ? 'bg-[#DC2626] border-[#DC2626] text-white shadow-[0_0_8px_rgba(220,38,38,0.3)] animate-pulse'
                 : isTimerWarning
-                  ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300'
-                  : 'bg-neutral-100 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-white',
+                  ? 'bg-[#FFFBEB] dark:bg-[#451A03] border-[#FDE68A] dark:border-[#B45309] text-[#B45309] dark:text-[#FCD34D]'
+                  : 'bg-[#F1F5F9] dark:bg-[#1C1C1E] border-[#E2E8F0] dark:border-[#27272A] text-[#27272A] dark:text-[#F5F5F5]',
             )}
           >
             <Clock
-              size={15}
+              size={14}
               className={cn(
                 isTimerCritical
                   ? 'text-white'
                   : isTimerWarning
-                    ? 'text-amber-700 dark:text-amber-400'
-                    : 'text-neutral-500 dark:text-neutral-400',
+                    ? 'text-[#B45309] dark:text-[#FCD34D]'
+                    : 'text-[#475569] dark:text-[#D4D4D4]',
               )}
             />
             <span>{formatTime(timeLeft)}</span>
           </div>
 
           {/* Right: Download PDF & Theme Toggle Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Offline PDF Download Button */}
             <button
               type="button"
               onClick={handleDownloadPdf}
               title="অফলাইন প্রশ্নপত্র PDF ডাউনলোড করো"
-              className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white active:scale-95 transition cursor-pointer"
+              className="w-8 h-8 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:opacity-90 active:scale-95 transition cursor-pointer"
             >
               <Download size={16} />
             </button>
@@ -242,7 +242,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                 type="button"
                 onClick={toggleTheme}
                 title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
-                className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white active:scale-95 transition cursor-pointer"
+                className="w-8 h-8 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:opacity-90 active:scale-95 transition cursor-pointer"
               >
                 {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
               </button>
@@ -251,16 +251,16 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
         </div>
 
         {/* Subtle Progress Bar */}
-        <div className="w-full h-1 bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+        <div className="w-full h-[2px] bg-[#E2E8F0] dark:bg-[#1C1C1E] overflow-hidden">
           <div
-            className="h-full bg-[#12544F] transition-all duration-300"
+            className="h-full bg-[#12544F] dark:bg-[#10B981] transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </header>
 
       {/* ── 2. Main Question Flow Feed ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-1.5 sm:px-4 pt-3.5 sm:pt-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
         <div className="flex flex-col gap-3.5 sm:gap-4">
           {questions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
@@ -291,14 +291,14 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
         </div>
       </main>
 
-      {/* ── 3. Bottom Sticky Submit Footer (Matching Flutter Exactly) ── */}
+      {/* ── 3. Bottom Sticky Submit Footer (Matching Flutter 1:1) ── */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="max-w-3xl w-full flex justify-center">
           <button
             type="button"
             onClick={() => setShowSubmitModal(true)}
             disabled={isEvaluating}
-            className="w-full sm:w-auto min-w-[200px] h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] shadow-sm font-['Anek_Bangla',sans-serif] flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+            className="w-full sm:w-auto min-w-[200px] h-[48px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] font-['Anek_Bangla',sans-serif] flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
           >
             {isEvaluating ? 'মূল্যায়ন হচ্ছে...' : 'জমা দাও'}
           </button>
@@ -365,7 +365,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(false)}
-                className="py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#2C2C2E] border border-neutral-200/80 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 active:scale-95 transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-3 px-4 rounded-[12px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] shadow-[0_3px_0_#CBD5E1] dark:shadow-[0_3px_0_#1C1C1E] active:shadow-[0_1px_0_#CBD5E1] active:translate-y-[2px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 না, পরীক্ষা দিবো
               </button>
@@ -373,7 +373,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={confirmSubmit}
-                className="py-3 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-sm shadow-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-3 px-4 rounded-[12px] bg-[#12544F] text-white shadow-[0_3.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 হ্যাঁ, জমা দাও
               </button>
@@ -408,7 +408,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowExitModal(false)}
-                className="py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#2C2C2E] border border-neutral-200/80 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 active:scale-95 transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-3 px-4 rounded-[12px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] shadow-[0_3px_0_#CBD5E1] dark:shadow-[0_3px_0_#1C1C1E] active:shadow-[0_1px_0_#CBD5E1] active:translate-y-[2px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 চালিয়ে যাও
               </button>
@@ -419,7 +419,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                   setShowExitModal(false);
                   confirmSubmit();
                 }}
-                className="py-3 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-sm shadow-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-3 px-4 rounded-[12px] bg-[#12544F] text-white shadow-[0_3.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 জমা দাও
               </button>
@@ -449,7 +449,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             <button
               type="button"
               onClick={() => setShowCheatingWarning(false)}
-              className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white font-bold text-sm shadow-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+              className="w-full py-3 px-4 rounded-[12px] bg-[#DC2626] text-white shadow-[0_4px_0_#991B1B] hover:brightness-105 active:shadow-[0_1px_0_#991B1B] active:translate-y-[3px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
             >
               আমি বুঝতে পেরেছি
             </button>
