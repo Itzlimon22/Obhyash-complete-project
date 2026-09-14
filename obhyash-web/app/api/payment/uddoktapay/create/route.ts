@@ -5,7 +5,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const apiKey = process.env.UDDOKTAPAY_API_KEY!;
 const baseUrl = process.env.UDDOKTAPAY_BASE_URL || 'https://obhyash.paymently.io/api';
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://obhyash.vercel.app';
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://obhyash.com';
 
 export async function POST(request: NextRequest) {
   try {

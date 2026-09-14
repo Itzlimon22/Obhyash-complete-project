@@ -29,6 +29,7 @@ const hindSiliguri = Hind_Siliguri({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://obhyash.com"),
   title: {
     template: "%s | Obhyash",
     default: "Obhyash - The Smart Exam Platform for Students",
