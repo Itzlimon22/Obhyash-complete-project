@@ -330,16 +330,16 @@ export default function AcademicSectionDetailView({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#F8F9FA] dark:bg-[#101012] font-['HindSiliguri',sans-serif] select-none pb-24">
+    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#FAF9F6] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-24">
       {/* ── Top Header Bar ── */}
-      <div className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#101012]/90 backdrop-blur-md px-4 py-3 sm:py-4 flex items-center justify-between border-b border-neutral-200/60 dark:border-[#222226]">
+      <div className="sticky top-0 z-40 bg-[#FAF9F6]/90 dark:bg-[#000000]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
         <button
           type="button"
           onClick={onBack}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-xs"
+          className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-2xs"
           aria-label="Back"
         >
-          <ArrowLeft size={22} className="stroke-[2.5]" />
+          <ArrowLeft size={18} className="stroke-[2.2]" />
         </button>
 
         <div className="text-center min-w-0 max-w-[70%]">
@@ -351,11 +351,11 @@ export default function AcademicSectionDetailView({
           </p>
         </div>
 
-        <div className="w-10" />
+        <div className="w-9" />
       </div>
 
       {/* ── Filter Bar: Chapter & Topic Dropdowns ── */}
-      <div className="px-4 py-3 bg-white dark:bg-[#18181B] border-b border-neutral-200/60 dark:border-[#27272A] shadow-xs">
+      <div className="px-4 py-3 bg-white dark:bg-[#121212] border-b border-neutral-200/80 dark:border-white/[0.08] shadow-xs">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {/* Chapter Filter Dropdown */}
           <div className="relative flex items-center">
@@ -372,10 +372,10 @@ export default function AcademicSectionDetailView({
                 setSelectedChapterId(e.target.value);
                 setSelectedTopicId("all");
               }}
-              className={`w-full pl-11 pr-8 py-2 text-xs sm:text-sm font-semibold rounded-full border appearance-none cursor-pointer transition ${
+              className={`w-full pl-11 pr-8 py-2 text-xs sm:text-sm font-semibold rounded-xl border appearance-none cursor-pointer transition ${
                 selectedChapterId !== "all"
                   ? "border-emerald-300 dark:border-emerald-700/60 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300"
-                  : "border-neutral-200 dark:border-[#27272A] bg-neutral-50 dark:bg-[#141416] text-neutral-800 dark:text-neutral-200"
+                  : "border-neutral-200/80 dark:border-white/[0.08] bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200"
               }`}
             >
               <option value="all">সকল অধ্যায় ({chapters.length}টি)</option>
@@ -401,10 +401,10 @@ export default function AcademicSectionDetailView({
               value={selectedTopicId}
               disabled={selectedChapterId === "all" || topics.length === 0}
               onChange={(e) => setSelectedTopicId(e.target.value)}
-              className={`w-full pl-11 pr-8 py-2 text-xs sm:text-sm font-semibold rounded-full border appearance-none cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`w-full pl-11 pr-8 py-2 text-xs sm:text-sm font-semibold rounded-xl border appearance-none cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed ${
                 selectedTopicId !== "all"
                   ? "border-emerald-300 dark:border-emerald-700/60 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300"
-                  : "border-neutral-200 dark:border-[#27272A] bg-neutral-50 dark:bg-[#141416] text-neutral-800 dark:text-neutral-200"
+                  : "border-neutral-200/80 dark:border-white/[0.08] bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200"
               }`}
             >
               <option value="all">
@@ -464,10 +464,10 @@ export default function AcademicSectionDetailView({
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200 dark:border-[#27272A] shadow-xs overflow-hidden"
+                  className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden"
                 >
                   {/* Header */}
-                  <div className="px-4 py-3 flex items-center justify-between border-b border-neutral-100 dark:border-[#27272A]">
+                  <div className="px-4 py-3 flex items-center justify-between border-b border-neutral-100 dark:border-white/[0.08]">
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 font-['Anek_Bangla',sans-serif] font-bold text-xs text-neutral-800 dark:text-neutral-200">
                         {BanglaNameHelper.toBanglaNumeral(idx + 1)} নং সৃজনশীল প্রশ্ন
@@ -537,9 +537,9 @@ export default function AcademicSectionDetailView({
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200 dark:border-[#27272A] shadow-xs overflow-hidden"
+                  className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden"
                 >
-                  <div className="px-4 py-2.5 flex items-center justify-between border-b border-neutral-100 dark:border-[#27272A]">
+                  <div className="px-4 py-2.5 flex items-center justify-between border-b border-neutral-100 dark:border-white/[0.08]">
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-0.5 rounded text-[11px] font-bold ${

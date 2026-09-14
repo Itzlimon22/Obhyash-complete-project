@@ -80,42 +80,42 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   const getSubjectIcon = (subjectStr: string) => {
     const s = subjectStr.toLowerCase();
     if (s.includes('physics') || s.includes('পদার্থ'))
-      return <Atom className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+      return <Atom className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />;
     if (s.includes('chem') || s.includes('রসায়ন') || s.includes('রসায়ন'))
       return (
-        <FlaskConical className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+        <FlaskConical className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />
       );
     if (s.includes('bio') || s.includes('জীব'))
-      return <Dna className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+      return <Dna className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />;
     if (s.includes('math') || s.includes('গণিত'))
       return (
-        <Calculator className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+        <Calculator className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />
       );
     if (s.includes('ict') || s.includes('তথ্য'))
-      return <Binary className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
-    return <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+      return <Binary className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />;
+    return <BookOpen className="w-5 h-5 text-[#12544F] dark:text-[#34D399]" />;
   };
 
   return (
     <div
       className={cn(
-        "w-full flex flex-col font-['HindSiliguri',sans-serif] select-none text-[#0F172A] dark:text-[#F8FAFC]",
-        showHeader ? "min-h-screen bg-[#F4F6F9] dark:bg-[#0A0B0E]" : "py-2 sm:py-4"
+        "w-full flex flex-col select-none text-neutral-900 dark:text-white",
+        showHeader ? "min-h-screen bg-[#FAF9F6] dark:bg-[#000000]" : "py-2 sm:py-4"
       )}
     >
       {/* ── Top App Bar (only if standalone) ── */}
       {showHeader && (
-        <header className="sticky top-0 z-30 h-[52px] bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] flex items-center px-3.5 sm:px-6 shadow-xs select-none">
+        <header className="sticky top-0 z-30 h-[52px] bg-[#FAF9F6] dark:bg-[#000000] border-b border-neutral-200/80 dark:border-white/[0.08] flex items-center px-3.5 sm:px-6 shadow-xs select-none">
           <button
             type="button"
             onClick={onBack}
             disabled={isLoading}
             aria-label="Back"
-            className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center shadow-xs active:scale-95 text-neutral-800 dark:text-neutral-100 hover:opacity-80 transition cursor-pointer shrink-0"
           >
-            <ArrowLeft size={22} className="stroke-[2.2]" />
+            <ArrowLeft size={18} className="stroke-[2.2]" />
           </button>
-          <h1 className="flex-1 text-center font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] mr-6">
+          <h1 className="flex-1 text-center font-['Anek_Bangla',sans-serif] font-bold text-[18px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] mr-9">
             পরীক্ষার নির্দেশাবলী
           </h1>
         </header>
@@ -125,7 +125,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       <main className="flex-1 overflow-y-auto px-1.5 sm:px-4 py-3 sm:py-6 flex justify-center">
         <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-24">
           {/* ── Card 1: Subject & Scope Accordion ── */}
-          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none overflow-hidden transition-all">
+          <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden transition-all">
             <button
               type="button"
               onClick={() => setIsAccordionOpen((prev) => !prev)}
@@ -133,20 +133,20 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             >
               {/* Left: Icon & Subject Title */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-11 h-11 rounded-[14px] bg-[#FAF5FF] dark:bg-[#251833] border border-[#F3E8FF] dark:border-[#3B2252] flex items-center justify-center shrink-0">
+                <div className="w-11 h-11 rounded-[14px] bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F]/20 dark:border-[#12544F]/30 flex items-center justify-center shrink-0">
                   {getSubjectIcon(config.subject || config.subjectLabel || '')}
                 </div>
-                <h2 className="font-bold text-base sm:text-[17px] text-[#0F172A] dark:text-white truncate">
+                <h2 className="font-bold text-base sm:text-[17px] text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
                   {formattedSubject}
                 </h2>
               </div>
 
               {/* Right: Pill with Chapter Count & Chevron */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#1E2028] border border-[#E2E8F0] dark:border-[#2D303B] text-[#334155] dark:text-[#CBD5E1] text-xs sm:text-sm font-semibold shrink-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm font-semibold shrink-0 font-['Anek_Bangla',sans-serif]">
                 <span>{chapterCountLabel}</span>
                 <ChevronDown
                   className={cn(
-                    'w-4 h-4 text-[#64748B] dark:text-[#94A3B8] transition-transform duration-200',
+                    'w-4 h-4 text-neutral-400 dark:text-neutral-500 transition-transform duration-200',
                     isAccordionOpen && 'rotate-180',
                   )}
                 />
@@ -155,12 +155,12 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
             {/* Accordion Expandable Chapters List */}
             {isAccordionOpen && (
-              <div className="px-4 pb-4 pt-1 border-t border-[#F1F5F9] dark:border-[#1F2026] flex flex-col gap-2 animate-in fade-in duration-200">
-                <p className="text-xs font-semibold text-[#64748B] dark:text-[#94A3B8] pt-2">
+              <div className="px-4 pb-4 pt-1 border-t border-neutral-100 dark:border-white/[0.06] flex flex-col gap-2 animate-in fade-in duration-200">
+                <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 pt-2 font-['Anek_Bangla',sans-serif]">
                   অন্তর্ভুক্ত অধ্যায়সমূহ:
                 </p>
                 {cleanChapters.length === 0 ? (
-                  <div className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A1B22] text-xs text-[#64748B] dark:text-[#94A3B8]">
+                  <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#18181B] text-xs text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
                     সম্পূর্ণ সিলেবাসের সকল অধ্যায় অন্তর্ভুক্ত।
                   </div>
                 ) : (
@@ -168,9 +168,9 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                     {cleanChapters.map((chapter, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-2.5 p-2 rounded-xl bg-[#F8FAFC] dark:bg-[#181920] border border-[#E2E8F0]/60 dark:border-[#272935] text-xs sm:text-sm font-medium text-[#1E293B] dark:text-[#E2E8F0]"
+                        className="flex items-center gap-2.5 p-2 rounded-xl bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-medium text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]"
                       >
-                        <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold text-[11px] flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-[#12544F]/15 dark:bg-[#12544F]/30 text-[#12544F] dark:text-[#34D399] font-bold text-[11px] flex items-center justify-center shrink-0">
                           {toBanglaNumeral(idx + 1)}
                         </span>
                         <span className="truncate">{chapter}</span>
@@ -183,56 +183,56 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
           </div>
 
           {/* ── Card 2: 4-Column Stat Ribbon ── */}
-          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] py-4 px-2 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none grid grid-cols-4 divide-x divide-[#F1F5F9] dark:divide-[#27272A] text-center">
+          <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] py-4 px-2 shadow-xs grid grid-cols-4 divide-x divide-neutral-100 dark:divide-white/[0.08] text-center">
             {/* Stat 1: সময়সীমা */}
             <div className="flex flex-col items-center justify-center px-1">
-              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+              <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
                 সময়সীমা
               </span>
-              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+              <span className="font-bold text-[13px] sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                 {durationStr} মিনিট
               </span>
             </div>
 
             {/* Stat 2: মোট প্রশ্ন */}
             <div className="flex flex-col items-center justify-center px-1">
-              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+              <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
                 মোট প্রশ্ন
               </span>
-              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+              <span className="font-bold text-[13px] sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                 {totalQStr}টি MCQ
               </span>
             </div>
 
             {/* Stat 3: নেগেটিভ */}
             <div className="flex flex-col items-center justify-center px-1">
-              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+              <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
                 নেগেটিভ
               </span>
-              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+              <span className="font-bold text-[13px] sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                 {negMarkStr}
               </span>
             </div>
 
             {/* Stat 4: পূর্ণমান */}
             <div className="flex flex-col items-center justify-center px-1">
-              <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
+              <span className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-medium mb-1 font-['Anek_Bangla',sans-serif]">
                 পূর্ণমান
               </span>
-              <span className="font-bold text-[13px] sm:text-base text-[#0F172A] dark:text-white leading-tight">
+              <span className="font-bold text-[13px] sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                 {totalMarksStr} নম্বর
               </span>
             </div>
           </div>
 
           {/* ── Card 3: Important Instructions Timeline Card ── */}
-          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] p-5 sm:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none">
+          <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] p-5 sm:p-6 shadow-xs">
             {/* Header */}
             <div className="flex items-center gap-2.5 mb-6">
-              <div className="w-8 h-8 rounded-[10px] bg-[#ECFDF5] dark:bg-[#064E3B]/30 flex items-center justify-center text-[#059669] dark:text-[#34D399]">
+              <div className="w-8 h-8 rounded-[10px] bg-[#12544F]/10 dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base sm:text-lg text-[#0F172A] dark:text-white">
+              <h3 className="font-bold text-base sm:text-lg text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
                 গুরুত্বপূর্ণ নির্দেশনাবলী
               </h3>
             </div>
@@ -240,18 +240,18 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             {/* Timeline Items */}
             <div className="relative flex flex-col gap-6 pl-1">
               {/* Timeline Connector Line */}
-              <div className="absolute left-[19px] top-6 bottom-6 w-[2px] bg-[#E2E8F0] dark:bg-[#22242D]" />
+              <div className="absolute left-[19px] top-6 bottom-6 w-[2px] bg-neutral-200/80 dark:bg-white/[0.08]" />
 
               {/* Item 1: সঠিক উত্তর নির্বাচন */}
               <div className="relative flex items-start gap-3.5 z-10">
-                <div className="w-10 h-10 rounded-[12px] bg-[#ECFDF5] dark:bg-[#064E3B]/40 text-[#10B981] dark:text-[#34D399] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                <div className="w-10 h-10 rounded-[12px] bg-[#ECFDF5] dark:bg-[#064E3B]/40 text-[#10B981] dark:text-[#34D399] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121212] shadow-xs">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                     সঠিক উত্তর নির্বাচন
                   </h4>
-                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                  <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
                     প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর
                     দাও। একবার অপশন সিলেক্ট করলে তা লক হয়ে যাবে।
                   </p>
@@ -260,14 +260,14 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
               {/* Item 2: টাইমার ও স্বয়ংক্রিয় সাবমিট */}
               <div className="relative flex items-start gap-3.5 z-10">
-                <div className="w-10 h-10 rounded-[12px] bg-[#EFF6FF] dark:bg-[#1E3A8A]/40 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                <div className="w-10 h-10 rounded-[12px] bg-[#EFF6FF] dark:bg-[#1E3A8A]/40 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121212] shadow-xs">
                   <Timer className="w-5 h-5" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                     টাইমার ও স্বয়ংক্রিয় সাবমিট
                   </h4>
-                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                  <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
                     স্ক্রিনের শীর্ষে কাউন্টডাউন থাকবে। সময় শেষ হলে পরীক্ষা
                     নিজেই সাবমিট হয়ে রেজাল্ট দেখাবে।
                   </p>
@@ -276,14 +276,14 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
               {/* Item 3: প্রশ্ন প্যালেট জাম্প */}
               <div className="relative flex items-start gap-3.5 z-10">
-                <div className="w-10 h-10 rounded-[12px] bg-[#F5F3FF] dark:bg-[#4C1D95]/40 text-[#8B5CF6] dark:text-[#A78BFA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                <div className="w-10 h-10 rounded-[12px] bg-[#F5F3FF] dark:bg-[#4C1D95]/40 text-[#8B5CF6] dark:text-[#A78BFA] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121212] shadow-xs">
                   <LayoutGrid className="w-5 h-5" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white leading-tight">
+                  <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
                     প্রশ্ন প্যালেট জাম্প
                   </h4>
-                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                  <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
                     উপরের প্রশ্ন নম্বরে ট্যাপ করে সরাসরি যেকোনো প্রশ্নে চলে যাও।
                   </p>
                 </div>
@@ -291,14 +291,14 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
               {/* Item 4: অ্যাপ ত্যাগ সতর্কতা */}
               <div className="relative flex items-start gap-3.5 z-10">
-                <div className="w-10 h-10 rounded-[12px] bg-[#FEF2F2] dark:bg-[#7F1D1D]/40 text-[#EF4444] dark:text-[#F87171] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121318] shadow-xs">
+                <div className="w-10 h-10 rounded-[12px] bg-[#FEF2F2] dark:bg-[#7F1D1D]/40 text-[#EF4444] dark:text-[#F87171] flex items-center justify-center shrink-0 border-2 border-white dark:border-[#121212] shadow-xs">
                   <AlertTriangle className="w-5 h-5" />
                 </div>
                 <div className="flex-1 pt-0.5">
-                  <h4 className="font-bold text-sm sm:text-base text-[#EF4444] dark:text-[#F87171] leading-tight">
+                  <h4 className="font-bold text-sm sm:text-base text-[#EF4444] dark:text-[#F87171] leading-tight font-['Anek_Bangla',sans-serif]">
                     অ্যাপ ত্যাগ সতর্কতা
                   </h4>
-                  <p className="text-xs sm:text-[13px] text-[#64748B] dark:text-[#94A3B8] leading-relaxed mt-1">
+                  <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1 font-['HindSiliguri',sans-serif]">
                     পরীক্ষা চলাকালে অ্যাপ থেকে বের বা ব্যাকগ্রাউন্ডে গেলে
                     পরীক্ষা অকার্যকর হতে পারে।
                   </p>
@@ -310,13 +310,13 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </main>
 
       {/* ── Fixed Bottom CTA Bar ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#1E232B] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="w-full max-w-lg">
           <button
             type="button"
             onClick={handleStart}
             disabled={isLoading}
-            className="w-full py-3.5 sm:py-4 px-6 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] shadow-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-['Anek_Bangla',sans-serif]"
           >
             {isLoading ? (
               <>

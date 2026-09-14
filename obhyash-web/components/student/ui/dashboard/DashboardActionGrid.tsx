@@ -72,7 +72,7 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 font-['HindSiliguri']">
+    <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 font-anek">
       {actions.map((action, idx) => {
         return (
           <button
@@ -98,8 +98,8 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
               />
             </div>
 
-            {/* Title (Flutter: 13px, w600) */}
-            <span className="text-[13px] font-semibold text-[#18181B] dark:text-white truncate w-full text-center">
+            {/* Title (Flutter: 13px, w600 Anek Bangla) */}
+            <span className="text-[13px] font-semibold font-['Anek_Bangla',sans-serif] text-[#18181B] dark:text-white truncate w-full text-center">
               {action.title}
             </span>
           </button>

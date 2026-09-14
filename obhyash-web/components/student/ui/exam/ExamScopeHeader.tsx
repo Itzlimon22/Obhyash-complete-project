@@ -45,10 +45,10 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
   return (
     <div
       className={cn(
-        "my-2 rounded-2xl border transition-all duration-200 overflow-hidden font-['HindSiliguri']",
+        "my-2 rounded-[16px] border transition-all duration-200 overflow-hidden font-['HindSiliguri']",
         isExpanded
-          ? "bg-white dark:bg-[#141417] border-emerald-500/40 dark:border-emerald-600/40 shadow-md shadow-emerald-900/5"
-          : "bg-white dark:bg-[#141417] border-neutral-200 dark:border-[#27272A] shadow-sm",
+          ? "bg-white dark:bg-[#121212] border-[#12544F]/40 dark:border-[#12544F]/40 shadow-xs"
+          : "bg-white dark:bg-[#121212] border-neutral-200/80 dark:border-white/[0.08] shadow-xs",
         className
       )}
     >
@@ -56,19 +56,19 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-3.5 py-3 flex items-center justify-between gap-3 text-left hover:bg-neutral-50/60 dark:hover:bg-neutral-800/40 transition select-none"
+        className="w-full px-3.5 py-3 flex items-center justify-between gap-3 text-left hover:bg-neutral-50/60 dark:hover:bg-neutral-800/40 transition select-none cursor-pointer"
       >
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           {/* Emoji Badge */}
-          <div className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-[#1F1F24] border border-neutral-200 dark:border-[#2E2E33] flex items-center justify-center text-base shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-base shrink-0">
             {emoji || "📖"}
           </div>
 
           <div className="min-w-0 flex-1">
-            <h4 className="text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
+            <h4 className="font-['Anek_Bangla',sans-serif] text-base font-bold text-neutral-900 dark:text-white truncate leading-tight">
               {BanglaNameHelper.formatSubject(subjectName, subjectName)}
             </h4>
-            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
               <span className="truncate">{chapterCountLabel}</span>
               {cleanTopics.length > 0 && (
                 <>
@@ -84,10 +84,10 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <div
             className={cn(
-              "px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1",
+              "px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1 font-['Anek_Bangla',sans-serif]",
               isExpanded
-                ? "bg-emerald-50 dark:bg-[#064E3B]/50 border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300"
-                : "bg-neutral-100 dark:bg-[#1F1F24] border-neutral-200 dark:border-[#2E2E33] text-neutral-700 dark:text-neutral-300"
+                ? "bg-[#12544F]/10 dark:bg-[#12544F]/25 border-[#12544F]/30 text-[#12544F] dark:text-[#2DD4BF]"
+                : "bg-neutral-100 dark:bg-neutral-800 border-neutral-200/80 dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300"
             )}
           >
             <span>{chapterCountLabel}</span>
@@ -101,18 +101,18 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
 
       {/* ── Expanded Content (Chapters & Topics Pills) ── */}
       {isExpanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-neutral-100 dark:border-neutral-800/80 flex flex-col gap-3 animate-in fade-in duration-200">
+        <div className="px-4 pb-4 pt-1 border-t border-neutral-100 dark:border-white/[0.08] flex flex-col gap-3 animate-in fade-in duration-200">
           {/* Chapters List */}
           {cleanChapters.length > 0 ? (
             <div>
-              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
                 অধ্যায়সমূহ ({BanglaNameHelper.toBanglaNumeral(cleanChapters.length)}টি)
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {cleanChapters.map((ch, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#1C1C20] border border-neutral-200 dark:border-[#2A2A30] text-neutral-800 dark:text-neutral-200 text-xs font-semibold"
+                    className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 text-xs font-semibold font-['Anek_Bangla',sans-serif]"
                   >
                     {ch}
                   </span>
@@ -128,14 +128,14 @@ export const ExamScopeHeader: React.FC<ExamScopeHeaderProps> = ({
           {/* Topics List (if any) */}
           {cleanTopics.length > 0 && (
             <div>
-              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 block mb-1.5 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
                 টপিকসমূহ ({BanglaNameHelper.toBanglaNumeral(cleanTopics.length)}টি)
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {cleanTopics.map((top, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-[11px] font-medium"
+                    className="px-2 py-0.5 rounded-md bg-[#12544F]/10 dark:bg-[#12544F]/25 border border-[#12544F]/20 dark:border-[#12544F]/30 text-[#12544F] dark:text-[#2DD4BF] text-[11px] font-medium font-['Anek_Bangla',sans-serif]"
                   >
                     {top}
                   </span>

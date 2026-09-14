@@ -21,7 +21,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
     <div className="w-full max-w-3xl mx-auto px-1.5 sm:px-4 py-2 sm:py-5 space-y-3 sm:space-y-4 pb-28 font-['HindSiliguri',sans-serif] animate-in fade-in duration-300">
       {/* ── Top Sticky Header Skeleton ── */}
       {!hideHeader && (
-        <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 p-2.5 sm:p-3 flex items-center justify-between shadow-xs">
+        <div className="rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] p-2.5 sm:p-3 flex items-center justify-between shadow-xs">
           {/* Answered / Total Pill */}
           <div className="h-8 w-14 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
 
@@ -37,24 +37,24 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
       )}
 
       {/* ── Dynamic Fetching Banner ── */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#121215] border border-emerald-500/20 dark:border-emerald-500/20 shadow-xs flex items-center gap-3">
+      <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-emerald-500/20 dark:border-emerald-500/20 shadow-xs flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center shrink-0">
           <div className="w-4 h-4 border-2 border-emerald-600 dark:border-emerald-400 border-t-transparent rounded-full animate-spin" />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white leading-tight">
+          <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white leading-tight font-['Anek_Bangla',sans-serif]">
             প্রশ্নপত্র প্রস্তুত হচ্ছে...
           </h4>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-0.5 font-['HindSiliguri',sans-serif]">
             সিলেবাস ও মানবণ্টন অনুযায়ী প্রশ্ন সাজানো হচ্ছে
           </p>
         </div>
       </div>
 
       {/* ── Question Card Skeleton 1 ── */}
-      <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 p-3.5 sm:p-5 shadow-xs space-y-3.5">
+      <div className="rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] p-3.5 sm:p-5 shadow-xs space-y-3.5">
         {/* Header Row: Circle ID + info */}
-        <div className="flex items-center justify-between pb-2.5 border-b border-neutral-100 dark:border-neutral-800/80">
+        <div className="flex items-center justify-between pb-2.5 border-b border-neutral-100 dark:border-white/[0.06]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse shrink-0" />
             <div className="space-y-1">
@@ -76,7 +76,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
           {['w-[65%]', 'w-[80%]', 'w-[70%]', 'w-[60%]'].map((width, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-neutral-200/70 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40"
+              className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-neutral-200/70 dark:border-white/[0.06] bg-neutral-50/70 dark:bg-white/[0.02]"
             >
               <div className="flex items-center gap-2.5 flex-1 min-w-0">
                 <div className="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-800 shrink-0 animate-pulse" />
@@ -89,9 +89,9 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
       </div>
 
       {/* ── Question Card Skeleton 2 ── */}
-      <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 p-3.5 sm:p-5 shadow-xs space-y-3.5 opacity-70">
+      <div className="rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] p-3.5 sm:p-5 shadow-xs space-y-3.5 opacity-70">
         {/* Header Row: Circle ID + info */}
-        <div className="flex items-center justify-between pb-2.5 border-b border-neutral-100 dark:border-neutral-800/80">
+        <div className="flex items-center justify-between pb-2.5 border-b border-neutral-100 dark:border-white/[0.06]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse shrink-0" />
             <div className="space-y-1">
@@ -113,7 +113,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
           {['w-[75%]', 'w-[55%]', 'w-[85%]', 'w-[65%]'].map((width, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-neutral-200/70 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900/40"
+              className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-neutral-200/70 dark:border-white/[0.06] bg-neutral-50/70 dark:bg-white/[0.02]"
             >
               <div className="flex items-center gap-2.5 flex-1 min-w-0">
                 <div className="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-800 shrink-0 animate-pulse" />
@@ -126,7 +126,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
       </div>
 
       {/* ── Fixed Bottom Footer Skeleton ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-[#E2E8F0] dark:border-[#27272A] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="max-w-3xl w-full flex justify-center">
           <div className="w-full sm:w-64 h-12 rounded-xl bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
         </div>

@@ -73,22 +73,22 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'group px-5 py-4 cursor-pointer relative overflow-hidden transition-all duration-150 active:bg-neutral-100 dark:active:bg-neutral-800',
+        'group px-4 sm:px-5 py-3.5 sm:py-4 cursor-pointer relative overflow-hidden transition-all duration-150 active:bg-neutral-100 dark:active:bg-neutral-800',
         !notification.is_read
-          ? 'bg-emerald-50/30 dark:bg-emerald-950/10'
+          ? 'bg-[#12544F]/6 dark:bg-[#12544F]/12'
           : 'hover:bg-neutral-50 dark:hover:bg-neutral-900/50',
       )}
     >
-      {/* Unread indicator bar — deep green */}
+      {/* Unread indicator bar — Viridian Forest #12544F */}
       {!notification.is_read && (
-        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-700" />
+        <div className="absolute left-0 top-0 bottom-0 w-[3.5px] bg-[#12544F] dark:bg-[#34D399]" />
       )}
 
       <div className="flex items-start gap-3.5 relative z-10">
-        {/* Square icon badge */}
+        {/* Square icon badge (42x42, rounded-[13px] matching Flutter) */}
         <div
           className={cn(
-            'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-200 group-hover:scale-105 group-active:scale-95',
+            'flex-shrink-0 w-10.5 h-10.5 rounded-[13px] flex items-center justify-center shadow-2xs transition-transform duration-200 group-hover:scale-105 group-active:scale-95',
             config.bgColor,
             config.textColor,
           )}
@@ -101,27 +101,27 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-start justify-between gap-2 mb-1">
             <h4
               className={cn(
-                'text-[13px] font-bold leading-snug flex-1',
+                "text-[14px] font-bold leading-snug flex-1 font-['Anek_Bangla',sans-serif] truncate",
                 !notification.is_read
-                  ? 'text-neutral-900 dark:text-white'
-                  : 'text-neutral-600 dark:text-neutral-400',
+                  ? "text-neutral-900 dark:text-white"
+                  : "text-neutral-600 dark:text-neutral-400",
               )}
             >
               {notification.title}
             </h4>
-            <span className="text-[10px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap flex-shrink-0 mt-px">
+            <span className="text-[11px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap flex-shrink-0 mt-px font-['Anek_Bangla',sans-serif]">
               {getRelativeTime(notification.created_at)}
             </span>
           </div>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+          <p className="text-[12.5px] text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2 font-['HindSiliguri',sans-serif]">
             {notification.message}
           </p>
 
           {/* Unread dot */}
           {!notification.is_read && (
-            <div className="mt-2 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 flex-shrink-0" />
-              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-500">
+            <div className="mt-1.5 flex items-center gap-1.5 font-['Anek_Bangla',sans-serif]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#12544F] dark:bg-[#34D399] flex-shrink-0" />
+              <span className="text-[10.5px] font-bold text-[#12544F] dark:text-[#34D399]">
                 নতুন
               </span>
             </div>

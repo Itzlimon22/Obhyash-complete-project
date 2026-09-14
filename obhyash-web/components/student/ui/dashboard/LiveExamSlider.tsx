@@ -192,14 +192,14 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
   const questionsText = `${BanglaNameHelper.toBanglaNumeral(currentExam.totalQuestions || 25)} টি প্রশ্ন`;
 
   return (
-    <div className="w-full my-1 sm:my-2 font-['HindSiliguri']">
+    <div className="w-full my-1 sm:my-2 font-sans">
       <div
         onClick={() => onExamClick && onExamClick(currentExam.id, currentExam.category)}
-        className="w-full rounded-2xl bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group select-none relative"
+        className="w-full rounded-2xl bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all cursor-pointer group select-none relative"
       >
         {/* Row 1: Title & Arrow */}
         <div className="flex items-center justify-between gap-3 mb-2.5">
-          <h3 className="text-sm sm:text-[15px] font-semibold text-[#0F172A] dark:text-white truncate group-hover:text-[#12544F] dark:group-hover:text-[#34D399] transition-colors">
+          <h3 className="text-sm sm:text-[15px] font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white truncate group-hover:text-[#12544F] dark:group-hover:text-[#34D399] transition-colors">
             {currentExam.title}
           </h3>
           <div className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 group-hover:text-[#12544F] dark:group-hover:text-emerald-400 transition-colors shrink-0">
@@ -215,7 +215,7 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
           )}
         >
           {/* Status & Countdown */}
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap font-['Anek_Bangla',sans-serif]">
             <div className={cn("flex items-center gap-1 font-bold shrink-0", statusColor)}>
               <StatusIcon size={13} className={isOngoing ? "animate-pulse" : ""} />
               <span>{statusText}</span>
@@ -227,7 +227,7 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
           </div>
 
           {/* Tags */}
-          <div className="flex items-center gap-1.5 shrink-0 text-[11px] sm:text-xs font-semibold text-neutral-600 dark:text-neutral-400 self-end sm:self-auto">
+          <div className="flex items-center gap-1.5 shrink-0 text-[11px] sm:text-xs font-semibold font-['Anek_Bangla',sans-serif] text-neutral-600 dark:text-neutral-400 self-end sm:self-auto">
             <span>{questionsText}</span>
             <span>•</span>
             <span>{durationText}</span>

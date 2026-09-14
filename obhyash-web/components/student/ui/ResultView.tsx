@@ -281,25 +281,25 @@ export const ResultView: React.FC<ResultViewProps> = ({
     <div
       className={cn(
         "w-full text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col",
-        showHeader ? "min-h-screen bg-[#FAFAF9] dark:bg-[#000000]" : "py-1 sm:py-2"
+        showHeader ? "min-h-screen bg-[#FAF9F6] dark:bg-[#000000]" : "py-1 sm:py-2"
       )}
     >
       {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar, only if standalone) ── */}
       {showHeader && (
-        <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] shadow-xs select-none">
+        <header className="sticky top-0 z-40 bg-[#FAF9F6] dark:bg-[#000000] border-b border-neutral-200/80 dark:border-white/[0.08] shadow-xs select-none">
           <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-[52px] flex items-center justify-between">
             {/* Left Close / Back Button */}
             <button
               type="button"
               onClick={onRestart}
               title={isHistoryMode ? 'পিছনে যাও' : 'বন্ধ করো'}
-              className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+              className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition active:scale-95 cursor-pointer shrink-0"
             >
-              {isHistoryMode ? <ArrowLeft size={22} className="stroke-[2.2]" /> : <X size={22} />}
+              {isHistoryMode ? <ArrowLeft size={18} className="stroke-[2.2]" /> : <X size={18} />}
             </button>
 
             {/* Centered Page Title */}
-            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px]">
+            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[18px] leading-none text-neutral-900 dark:text-white">
               পরীক্ষার ফলাফল
             </h1>
 
@@ -310,9 +310,9 @@ export const ResultView: React.FC<ResultViewProps> = ({
                   type="button"
                   onClick={onToggleTheme}
                   title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
-                  className="w-8 h-8 rounded-lg bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-center text-[#475569] dark:text-[#D4D4D4] hover:bg-[#E2E8F0] dark:hover:bg-white/10 transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors active:scale-95 cursor-pointer"
                 >
-                  {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+                  {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
                 </button>
               )}
             </div>
@@ -321,15 +321,15 @@ export const ResultView: React.FC<ResultViewProps> = ({
       )}
 
       {/* ── Main Content Container ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-1.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-2 sm:px-4 pt-3.5 sm:pt-4 pb-20 flex flex-col gap-3.5 sm:gap-4">
         {/* ── 2. Top Action Buttons (PDF Downloads) ── */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
           {/* Button 1: প্রশ্নপত্র */}
           <button
             type="button"
             onClick={handleDownloadPaper}
             title="শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো"
-            className="py-3 px-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#12544F] dark:border-[#27272A] text-[#12544F] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#12544F]/5 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+            className="h-[46px] rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif] font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
           >
             <Download size={16} />
             <span>প্রশ্নপত্র</span>
@@ -340,7 +340,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             type="button"
             onClick={handleDownloadSolution}
             title="প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো"
-            className="py-3 px-4 rounded-[14px] bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F] dark:border-[#059669]/40 text-[#12544F] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#12544F]/15 dark:hover:bg-[#059669]/30 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+            className="h-[46px] rounded-xl bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F]/30 dark:border-[#12544F]/40 text-[#12544F] dark:text-[#2DD4BF] font-['Anek_Bangla',sans-serif] font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-[#12544F]/15 dark:hover:bg-[#12544F]/30 transition-all shadow-xs cursor-pointer active:scale-[0.98]"
           >
             <Check size={16} className="stroke-[3]" />
             <span>ফলাফল ও ব্যাখ্যা</span>
@@ -370,22 +370,22 @@ export const ResultView: React.FC<ResultViewProps> = ({
         />
 
         {/* ── 5. Answer Review Section Header ── */}
-        <div className="pt-2">
-          <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-3">
+        <div className="pt-1 sm:pt-2">
+          <h3 className="font-['Anek_Bangla',sans-serif] text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-2.5">
             উত্তরপত্র পর্যালোচনা
           </h3>
 
           {/* Filter Chips Pill Row */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
             {/* Filter: সব */}
             <button
               type="button"
               onClick={() => setReviewFilter('all')}
               className={cn(
-                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer',
+                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'all'
-                  ? 'bg-[#E2E8F0] dark:bg-[#27272A] text-neutral-900 dark:text-white shadow-xs'
-                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+                  ? 'bg-[#12544F] text-white shadow-xs'
+                  : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
               )}
             >
               সব ({questions.length})
@@ -396,13 +396,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('correct')}
               className={cn(
-                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'correct'
-                  ? 'bg-[#D1FAE5] dark:bg-[#064E3B]/60 text-[#065F46] dark:text-[#34D399] border border-[#10B981]'
-                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
               )}
             >
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
               <span>সঠিক ({stats.correctCount})</span>
             </button>
 
@@ -411,13 +411,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('wrong')}
               className={cn(
-                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'wrong'
-                  ? 'bg-[#FEE2E2] dark:bg-[#7F1D1D]/40 text-[#991B1B] dark:text-[#F87171] border border-[#EF4444]'
-                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+                  ? 'bg-red-600 text-white shadow-xs'
+                  : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
               )}
             >
-              <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
+              <span className="w-2 h-2 rounded-full bg-red-400" />
               <span>ভুল ({stats.wrongCount})</span>
             </button>
 
@@ -426,13 +426,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
               type="button"
               onClick={() => setReviewFilter('skipped')}
               className={cn(
-                'px-4 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer',
+                "px-3.5 py-1.5 rounded-full font-['Anek_Bangla',sans-serif] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer active:scale-95",
                 reviewFilter === 'skipped'
-                  ? 'bg-[#F1F5F9] dark:bg-[#27272A] text-neutral-900 dark:text-white border border-[#94A3B8]'
-                  : 'bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#94A3B8] hover:bg-neutral-100 dark:hover:bg-[#202024]',
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800',
               )}
             >
-              <span className="w-2 h-2 rounded-full bg-[#94A3B8]" />
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
               <span>স্কিপ ({stats.skippedCount})</span>
             </button>
           </div>
@@ -441,7 +441,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         {/* ── 6. Virtualized Question Cards Review List ── */}
         <div className="flex flex-col gap-3 sm:gap-4 mt-1">
           {filteredQuestions.length === 0 ? (
-            <div className="p-8 text-center rounded-[18px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 font-bold">
+            <div className="p-8 text-center rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-500 dark:text-neutral-400 font-['Anek_Bangla',sans-serif] font-bold">
               এই ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি।
             </div>
           ) : (
@@ -476,7 +476,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             <button
               type="button"
               onClick={onReexam ? onReexam : () => onRestart()}
-              className="w-full py-3.5 px-6 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] flex items-center justify-center gap-2 transition-all cursor-pointer touch-manipulation"
+              className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-[16px] flex items-center justify-center gap-2 font-['Anek_Bangla',sans-serif] shadow-sm transition-all cursor-pointer select-none touch-manipulation"
             >
               <RotateCcw size={18} />
               <span>আবার পরীক্ষা দাও</span>

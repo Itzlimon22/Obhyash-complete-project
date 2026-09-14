@@ -380,9 +380,9 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
   return (
     <div className="w-full flex flex-col font-sans pb-16">
-      {/* ── Page Header with Title & Clear All Action ── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
-        <div>
+      {/* ── Page Header with Title (Desktop) & Clear All Action ── */}
+      <div className="flex items-center justify-between gap-3 mb-3 sm:mb-5">
+        <div className="hidden sm:block">
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
               পরীক্ষার ইতিহাস
@@ -392,7 +392,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             </span>
           </div>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-            তোমার পূর্ববর্তী সকল পরীক্ষার বিস্তারিত ফলাফল ও প্রশ্নভিত্তিক পর্যালোচনা
+            তোমার পূর্ববর্তী সকল পরীক্ষার বিস্তারিত ফলাফল ও পর্যালোচনা
           </p>
         </div>
 
@@ -400,16 +400,16 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           <button
             type="button"
             onClick={() => setShowClearAllModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer shadow-sm active:scale-95"
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer shadow-2xs active:scale-95"
           >
             <Trash2 size={14} />
-            <span>সকল ইতিহাস মুছুন</span>
+            <span>ইতিহাস মুছুন</span>
           </button>
         )}
       </div>
 
       {/* ── 1. Filter Bar: Subject | Chapter | Date | Sort (Matching Flutter 1:1) ── */}
-      <div className="bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] rounded-2xl p-3 sm:p-3.5 mb-4 sm:mb-5 shadow-sm space-y-2.5">
+      <div className="bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-[#27272A] rounded-2xl p-3 sm:p-3.5 mb-3.5 sm:mb-5 shadow-xs space-y-2.5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
           {/* 1. Subject Dropdown */}
           <div className="relative">
@@ -421,7 +421,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               }}
               className={cn(
                 "w-full h-[40px] pl-3 pr-8 rounded-xl text-xs sm:text-sm font-semibold transition-all appearance-none cursor-pointer truncate",
-                "bg-neutral-50 dark:bg-[#121214] text-neutral-800 dark:text-neutral-200",
+                "bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200",
                 filterSubject
                   ? "border border-emerald-500 text-emerald-700 dark:text-emerald-300"
                   : "border border-neutral-200 dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
@@ -447,7 +447,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               onChange={(e) => setFilterChapter(e.target.value)}
               className={cn(
                 "w-full h-[40px] pl-3 pr-8 rounded-xl text-xs sm:text-sm font-semibold transition-all appearance-none cursor-pointer truncate",
-                "bg-neutral-50 dark:bg-[#121214] text-neutral-800 dark:text-neutral-200",
+                "bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200",
                 filterChapter
                   ? "border border-emerald-500 text-emerald-700 dark:text-emerald-300"
                   : "border border-neutral-200 dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
@@ -470,7 +470,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 "w-full h-[40px] px-3 rounded-xl flex items-center justify-between cursor-pointer text-xs sm:text-sm font-semibold transition-all select-none border",
                 filterDate
                   ? "bg-[#12544F]/10 dark:bg-[#12544F]/30 border-[#12544F] text-[#12544F] dark:text-[#34D399]"
-                  : "bg-neutral-50 dark:bg-[#121214] border-neutral-200 dark:border-[#2E2E2E] text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
+                  : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200 dark:border-[#2E2E2E] text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
               )}
             >
               <div className="flex items-center gap-2 truncate">
@@ -507,12 +507,12 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             </label>
           </div>
 
-          {/* 4. Sort Mode Dropdown (Date, Score High, Score Low) */}
+          {/* 4. Sort Mode Dropdown */}
           <div className="relative">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortMode)}
-              className="w-full h-[40px] pl-3 pr-8 rounded-xl text-xs sm:text-sm font-semibold transition-all appearance-none cursor-pointer truncate bg-neutral-50 dark:bg-[#121214] text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
+              className="w-full h-[40px] pl-3 pr-8 rounded-xl text-xs sm:text-sm font-semibold transition-all appearance-none cursor-pointer truncate bg-neutral-50 dark:bg-[#18181B] text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-[#2E2E2E] hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
             >
               <option value="date">তারিখ (সর্বশেষ আগে)</option>
               <option value="scoreDesc">নম্বর (সর্বোচ্চ আগে)</option>
@@ -531,7 +531,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               placeholder="বিষয় বা অধ্যায় খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 pl-8 pr-3 rounded-lg text-xs bg-neutral-50 dark:bg-[#121214] border border-neutral-200 dark:border-[#2E2E2E] text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-emerald-500"
+              className="w-full h-8 pl-8 pr-3 rounded-lg text-xs bg-neutral-50 dark:bg-[#18181B] border border-neutral-200 dark:border-[#2E2E2E] text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-emerald-500"
             />
             {searchQuery && (
               <button
@@ -561,33 +561,51 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         </div>
       </div>
 
-      {/* ── 2. Compact 3-Card Stat Row (Matching Flutter _buildStatCard 1:1) ── */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3.5 mb-4 sm:mb-6">
-        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
-          <span className="text-[20px] font-black text-neutral-900 dark:text-white tabular-nums leading-tight">
-            {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
-          </span>
-          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
-            মোট প্রশ্ন
-          </span>
+      {/* ── 2. Stat Row (Matching Flutter _buildStatsRow 1:1) ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 mb-3.5 sm:mb-5">
+        {/* Card 1: Total Exams */}
+        <div className="p-3 sm:p-4 rounded-[14px] sm:rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-[#27272A] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <BookOpen size={20} />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[11px] sm:text-xs font-medium text-neutral-500 dark:text-neutral-400 block truncate">
+              মোট পরীক্ষা
+            </span>
+            <span className="text-lg sm:text-2xl font-bold text-neutral-900 dark:text-white tabular-nums leading-tight block mt-0.5">
+              {BanglaNameHelper.toBanglaNumeral(filteredExams.length)}
+            </span>
+          </div>
         </div>
 
-        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
-          <span className="text-[20px] font-black text-emerald-600 dark:text-emerald-400 tabular-nums leading-tight">
-            {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
-          </span>
-          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
-            সঠিক উত্তর
-          </span>
+        {/* Card 2: Average Score */}
+        <div className="p-3 sm:p-4 rounded-[14px] sm:rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-[#27272A] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <Sparkles size={20} />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[11px] sm:text-xs font-medium text-neutral-500 dark:text-neutral-400 block truncate">
+              গড় স্কোর
+            </span>
+            <span className="text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums leading-tight block mt-0.5">
+              {BanglaNameHelper.toBanglaNumeral(avgScore)}%
+            </span>
+          </div>
         </div>
 
-        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
-          <span className="text-[20px] font-black text-[#12544F] dark:text-[#34D399] tabular-nums leading-tight">
-            {BanglaNameHelper.toBanglaNumeral(avgScore)}%
-          </span>
-          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
-            গড় নম্বর
-          </span>
+        {/* Card 3: Total Questions (Tablet/Desktop) */}
+        <div className="hidden sm:flex p-3 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-[#27272A] shadow-xs items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 size={20} />
+          </div>
+          <div className="min-w-0">
+            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 block truncate">
+              সঠিক উত্তর
+            </span>
+            <span className="text-2xl font-bold text-teal-700 dark:text-teal-300 tabular-nums leading-tight block mt-0.5">
+              {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -694,11 +712,6 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
               {displayedExams.map((exam) => {
                 const scoreColor = getScoreColor(exam.score);
-                const radius = 18;
-                const circumference = 2 * Math.PI * radius;
-                const strokeDashoffset =
-                  circumference - (Math.min(100, Math.max(0, exam.score)) / 100) * circumference;
-
                 const dateStr = formatDateDisplay((exam as any).created_at || exam.date);
                 const subjectLabel = BanglaNameHelper.formatSubject(
                   exam.subject,
@@ -712,96 +725,113 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     key={exam.id}
                     onClick={() => onViewResult(exam)}
                     className={cn(
-                      "group p-3 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A]",
-                      "hover:border-neutral-300 dark:hover:border-neutral-700 shadow-xs transition-all duration-200 cursor-pointer",
-                      "flex items-center justify-between gap-3 select-none"
+                      "group rounded-[14px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-[#27272A]",
+                      "p-3.5 sm:p-4 shadow-xs transition-all duration-200 cursor-pointer select-none",
+                      "hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm"
                     )}
                   >
-                    {/* Left: Score Ring (48x48) matching Flutter */}
-                    <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
-                      <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-                        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 44 44">
-                          <circle
-                            cx="22"
-                            cy="22"
-                            r={radius}
-                            className="stroke-neutral-100 dark:stroke-[#27272A]"
-                            strokeWidth="3.5"
-                            fill="transparent"
-                          />
-                          <circle
-                            cx="22"
-                            cy="22"
-                            r={radius}
-                            stroke={scoreColor}
-                            strokeWidth="3.5"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            strokeLinecap="round"
-                            fill="transparent"
-                            className="transition-all duration-500 ease-out"
-                          />
-                        </svg>
-                        <span className="absolute text-xs sm:text-[13px] font-black text-neutral-900 dark:text-white tabular-nums">
-                          {Math.round(exam.score)}%
-                        </span>
-                      </div>
-
-                      {/* Middle: Details Center Aligned */}
+                    {/* ── Top Row: Subject & Date on Left, Status Badge & Delete on Right (Flutter 1:1) ── */}
+                    <div className="flex items-start justify-between gap-2.5">
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                          <span>{emoji}</span>
-                          <span className="truncate">{subjectLabel}</span>
-                        </h4>
-
-                        <div className="flex items-center gap-1.5 mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-                          <Calendar size={12} className="shrink-0" />
-                          <span className="truncate">{dateStr}</span>
-                          {exam.chapters && (
-                            <span className="hidden sm:inline-block text-neutral-400 dark:text-neutral-500 truncate">
-                              • {BanglaNameHelper.formatChapter(exam.chapters)}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-2 flex-wrap">
-                          <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#27272A] text-neutral-700 dark:text-neutral-300 text-[11px] sm:text-xs font-semibold">
-                            {BanglaNameHelper.toBanglaNumeral(exam.correctCount || 0)} সঠিক,{" "}
-                            {BanglaNameHelper.toBanglaNumeral(exam.wrongCount || 0)} ভুল
-                          </span>
-
-                          <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#27272A] text-neutral-700 dark:text-neutral-300 text-[11px] sm:text-xs font-semibold flex items-center gap-1">
-                            <Timer size={11} className="shrink-0" />
-                            <span>{timeStr}</span>
-                          </span>
-
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-base">{emoji}</span>
+                          <h4 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white truncate leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            {subjectLabel}
+                          </h4>
                           {exam.examType && (
-                            <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] sm:text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800/40">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
                               {exam.examType}
                             </span>
                           )}
                         </div>
+
+                        <div className="flex items-center gap-1.5 mt-1.5 text-xs text-neutral-400 dark:text-neutral-400 font-medium">
+                          <Calendar size={13} className="shrink-0 text-neutral-400" />
+                          <span className="truncate">{dateStr}</span>
+                          {exam.chapters && (
+                            <span className="hidden sm:inline-block text-neutral-400 dark:text-neutral-400 truncate">
+                              • {BanglaNameHelper.formatChapter(exam.chapters)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right Side: Score Badge & Delete Action */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className="px-2.5 py-1 rounded-[6px] text-xs font-bold border tabular-nums leading-none"
+                          style={{
+                            backgroundColor: `${scoreColor}15`,
+                            borderColor: `${scoreColor}40`,
+                            color: scoreColor,
+                          }}
+                        >
+                          {Math.round(exam.score)}%
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirmExam(exam);
+                          }}
+                          title="পরীক্ষার রেকর্ড মুছুন"
+                          className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer"
+                        >
+                          <Trash2 size={15} />
+                        </button>
                       </div>
                     </div>
 
-                    {/* Right: Trailing Actions (Delete + Chevron) */}
-                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                    {/* ── Divider (Flutter 1:1) ── */}
+                    <div className="border-t border-neutral-100 dark:border-[#222225] my-3" />
+
+                    {/* ── Bottom Row: Mini Stats & Action Button (Flutter 1:1) ── */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3.5 sm:gap-6">
+                        {/* Score */}
+                        <div className="flex flex-col">
+                          <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 dark:text-neutral-400">
+                            স্কোর
+                          </span>
+                          <span className="text-[13px] sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 tabular-nums">
+                            {BanglaNameHelper.toBanglaNumeral(exam.score)}/{BanglaNameHelper.toBanglaNumeral(exam.totalMarks || exam.totalQuestions)}
+                          </span>
+                        </div>
+
+                        {/* Correct */}
+                        <div className="flex flex-col">
+                          <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 dark:text-neutral-400">
+                            সঠিক
+                          </span>
+                          <span className="text-[13px] sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                            {BanglaNameHelper.toBanglaNumeral(exam.correctCount || 0)}/{BanglaNameHelper.toBanglaNumeral(exam.totalQuestions)}
+                          </span>
+                        </div>
+
+                        {/* Time */}
+                        <div className="flex flex-col">
+                          <span className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 dark:text-neutral-400">
+                            সময়
+                          </span>
+                          <span className="text-[13px] sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 tabular-nums">
+                            {timeStr}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Button: ফলাফল দেখুন ➜ */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteConfirmExam(exam);
+                          onViewResult(exam);
                         }}
-                        title="পরীক্ষার রেকর্ড মুছুন"
-                        className="p-2 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer"
+                        className="px-3 py-1.5 rounded-[10px] bg-neutral-100 dark:bg-[#1E1E22] hover:bg-neutral-200 dark:hover:bg-[#28282E] text-neutral-800 dark:text-neutral-200 font-bold text-xs flex items-center gap-1 transition-all shadow-2xs group-hover:bg-[#12544F] group-hover:text-white cursor-pointer"
                       >
-                        <Trash2 size={16} />
+                        <span>ফলাফল দেখুন</span>
+                        <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                       </button>
-
-                      <ChevronRight
-                        size={18}
-                        className="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 transition-transform group-hover:translate-x-0.5"
-                      />
                     </div>
                   </div>
                 );
@@ -1002,7 +1032,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       {/* ── 6. DELETE CONFIRMATION MODAL (Single Exam) ── */}
       {deleteConfirmExam && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-2xl space-y-4">
+          <div className="w-full max-w-md p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#2C2C2E] shadow-2xl space-y-4 font-['HindSiliguri',sans-serif]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800/50 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
                 <Trash2 size={20} />
@@ -1034,7 +1064,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 type="button"
                 disabled={isDeleting}
                 onClick={() => setDeleteConfirmExam(null)}
-                className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-[#2C2C2E] text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] transition-all cursor-pointer"
               >
                 বাতিল
               </button>
@@ -1066,7 +1096,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       {/* ── 7. CLEAR ALL HISTORY CONFIRMATION MODAL ── */}
       {showClearAllModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-2xl space-y-4">
+          <div className="w-full max-w-md p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#2C2C2E] shadow-2xl space-y-4 font-['HindSiliguri',sans-serif]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800/50 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
                 <Trash2 size={20} />
@@ -1090,7 +1120,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 type="button"
                 disabled={isDeleting}
                 onClick={() => setShowClearAllModal(false)}
-                className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 dark:bg-[#2C2C2E] text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-[#3A3A3C] transition-all cursor-pointer"
               >
                 বাতিল
               </button>

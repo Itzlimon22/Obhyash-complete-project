@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Inter, Hind_Siliguri } from "next/font/google";
+import { Inter, Hind_Siliguri, Anek_Bangla } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Toaster } from "sonner";
@@ -20,11 +20,19 @@ const inter = Inter({
   display: "swap",
 });
 
-// ✅ Configure Hind Siliguri (Bengali Unicode fallback)
+// ✅ Configure Hind Siliguri (Bengali Unicode body text)
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind",
   subsets: ["bengali"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+// ✅ Configure Anek Bangla (1:1 with Flutter App Typography for titles, cards, badges & numerals)
+const anekBangla = Anek_Bangla({
+  variable: "--font-anek",
+  subsets: ["bengali"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -99,7 +107,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hindSiliguri.variable}`}
+      className={`${inter.variable} ${hindSiliguri.variable} ${anekBangla.variable}`}
       suppressHydrationWarning
     >
       <head>

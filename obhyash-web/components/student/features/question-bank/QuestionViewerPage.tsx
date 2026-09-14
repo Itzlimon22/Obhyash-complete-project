@@ -33,35 +33,35 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
   const answeredCount = Object.keys(selectedAnswers).length;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif]">
+    <div className="min-h-screen bg-[#FAF9F6] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif]">
       {/* ── Top AppBar (Exact same structure as ExamRunner) ── */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] shadow-2xs">
-        <div className="max-w-4xl mx-auto px-1.5 sm:px-4 h-14 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-white/[0.08] shadow-2xs">
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 h-14 flex items-center justify-between gap-3">
           {/* LEFT: Back Button + Answered/Total Pill */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={onBack}
-              className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 transition-colors cursor-pointer"
+              className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer active:scale-95 shadow-2xs"
               aria-label="Back"
             >
               <ArrowLeft size={18} />
             </button>
-            <div className="px-2.5 py-1 rounded-md bg-neutral-100 dark:bg-neutral-900 text-xs sm:text-sm font-semibold text-neutral-600 dark:text-neutral-300">
+            <div className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 shadow-2xs">
               {BanglaNameHelper.toBanglaNumeral(answeredCount)} / {BanglaNameHelper.toBanglaNumeral(questions.length)}
             </div>
           </div>
 
           {/* MIDDLE: Title badge */}
           <div className="min-w-0 max-w-[50%] sm:max-w-[60%]">
-            <div className="px-3 py-1 rounded-md bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif] truncate text-center">
+            <div className="px-3 py-1 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif] truncate text-center shadow-2xs">
               {examSet.title}
             </div>
           </div>
 
           {/* RIGHT: Practice Tag */}
           <div className="shrink-0 flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-sans">
+            <span className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-sans">
               অনুশীলন
             </span>
           </div>

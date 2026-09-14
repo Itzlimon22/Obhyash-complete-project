@@ -247,14 +247,14 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto py-2 font-sans pb-16">
       {/* ── Top Filter Tabs & Mark All Read Action (1:1 with Flutter) ── */}
-      <div className="py-2.5 flex items-center justify-between gap-2">
+      <div className="py-2.5 flex items-center justify-between gap-2 font-['Anek_Bangla',sans-serif]">
         <div className="flex items-center gap-2">
           {/* All Filter Tab */}
           <button
             type="button"
             onClick={() => setFilter('all')}
             className={`
-              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer
+              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none
               ${
                 filter === 'all'
                   ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-xs'
@@ -270,7 +270,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
             type="button"
             onClick={() => setFilter('unread')}
             className={`
-              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer
+              px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none
               ${
                 filter === 'unread'
                   ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-xs'
@@ -287,7 +287,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
           <button
             type="button"
             onClick={handleMarkAllAsRead}
-            className="px-3 py-1.5 rounded-xl bg-[#E6F0EC] dark:bg-[#12544F]/30 border border-[#12544F]/30 text-[#12544F] dark:text-[#34D399] text-xs font-bold flex items-center gap-1.5 hover:bg-[#d5e7e0] dark:hover:bg-[#12544F]/50 transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-[#E6F0EC] dark:bg-[#12544F]/30 border border-[#12544F]/30 text-[#12544F] dark:text-[#34D399] text-xs font-bold flex items-center gap-1.5 hover:bg-[#d5e7e0] dark:hover:bg-[#12544F]/50 transition-colors cursor-pointer select-none"
           >
             <CheckCheck className="w-3.5 h-3.5" />
             <span>সব পড়ুন</span>
@@ -304,7 +304,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
               className="p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200/80 dark:border-[#27272A] animate-pulse space-y-2.5"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 shrink-0" />
+                <div className="w-10.5 h-10.5 rounded-[13px] bg-neutral-200 dark:bg-neutral-800 shrink-0" />
                 <div className="flex-1 space-y-1.5">
                   <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
                   <div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
@@ -314,7 +314,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
           ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="py-20 text-center flex flex-col items-center justify-center">
+        <div className="py-20 text-center flex flex-col items-center justify-center font-['Anek_Bangla',sans-serif]">
           <div className="w-18 h-18 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] flex items-center justify-center text-neutral-400 dark:text-neutral-500 mb-3.5">
             <BellOff className="w-8 h-8" />
           </div>
@@ -365,7 +365,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <h4
                         className={`
-                          text-[15px] leading-snug truncate
+                          text-[15.5px] leading-snug truncate font-['Anek_Bangla',sans-serif]
                           ${
                             notif.is_read
                               ? 'font-semibold text-neutral-700 dark:text-neutral-300'
@@ -381,12 +381,12 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
                       )}
                     </div>
 
-                    <p className="text-[13.5px] text-neutral-600 dark:text-[#A1A1AA] leading-relaxed mb-2.5">
+                    <p className="text-[13.5px] text-neutral-600 dark:text-[#A1A1AA] leading-relaxed mb-2.5 font-['HindSiliguri',sans-serif]">
                       {notif.message}
                     </p>
 
                     {/* Bottom Status & Quick Action Row */}
-                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-[#71717A]">
+                    <div className="flex items-center justify-between text-xs text-neutral-400 dark:text-[#71717A] font-['Anek_Bangla',sans-serif]">
                       <div className="flex items-center gap-1.5 font-medium">
                         <Clock className="w-3.5 h-3.5" />
                         <span>{formatDateDistance(notif.created_at)}</span>
@@ -424,12 +424,12 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
 
           {/* Load More Button */}
           {hasMore && (
-            <div className="py-4 text-center">
+            <div className="py-4 text-center font-['Anek_Bangla',sans-serif]">
               <button
                 type="button"
                 onClick={() => fetchNotifs(page + 1, true)}
                 disabled={isLoadingMore}
-                className="px-6 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-900 dark:text-white font-bold text-xs sm:text-sm shadow-xs hover:bg-neutral-50 dark:hover:bg-[#202024] transition-all cursor-pointer disabled:opacity-50"
+                className="px-6 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-neutral-900 dark:text-white font-bold text-xs sm:text-sm shadow-xs hover:bg-neutral-50 dark:hover:bg-[#202024] transition-all cursor-pointer disabled:opacity-50 active:scale-95"
               >
                 {isLoadingMore ? 'লোড হচ্ছে...' : 'আরও দেখুন'}
               </button>

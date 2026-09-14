@@ -5,7 +5,7 @@ import { ChevronDown, ArrowRight, BarChart2 } from "lucide-react";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { cn } from "@/lib/utils";
 
-interface SubjectData {
+export interface SubjectData {
   id?: string;
   name: string;
   correct: number;
@@ -14,7 +14,7 @@ interface SubjectData {
   total: number;
 }
 
-interface SubjectStatProps {
+export interface SubjectStatProps {
   data: SubjectData[];
   onSubjectClick?: (subject: string) => void;
   isLoading?: boolean;
@@ -68,7 +68,7 @@ const SubjectItem: React.FC<{
           />
           <h4
             className={cn(
-              "font-semibold text-sm sm:text-[14.5px] truncate transition-colors",
+              "font-bold font-['Anek_Bangla',sans-serif] text-sm sm:text-[14.5px] truncate transition-colors",
               isOpen
                 ? "text-[#12544F] dark:text-[#34D399]"
                 : "text-neutral-900 dark:text-neutral-100"
@@ -81,7 +81,7 @@ const SubjectItem: React.FC<{
         <div className="flex items-center gap-2.5 shrink-0">
           <div
             className={cn(
-              "px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums",
+              "px-2 py-0.5 rounded-lg text-xs font-bold font-['Anek_Bangla',sans-serif] tabular-nums",
               accBadgeClass
             )}
           >
@@ -103,7 +103,7 @@ const SubjectItem: React.FC<{
       {isOpen && (
         <div className="px-3.5 pb-4 pt-1 border-t border-neutral-100 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-900/30">
           {/* 3 Metric Chips: সঠিক, ভুল, স্কিপড */}
-          <div className="grid grid-cols-3 gap-2 py-3">
+          <div className="grid grid-cols-3 gap-2 py-3 font-['Anek_Bangla',sans-serif]">
             <div className="bg-white dark:bg-[#151518] p-2.5 rounded-xl border border-neutral-100 dark:border-neutral-800 text-center shadow-2xs">
               <span className="block text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-wider">
                 সঠিক
@@ -150,14 +150,14 @@ const SubjectItem: React.FC<{
 
           {/* Detailed Report Button */}
           {onClick && (
-            <div className="flex justify-center mt-1">
+            <div className="flex justify-center mt-1 font-['Anek_Bangla',sans-serif]">
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onClick();
                 }}
-                className="text-xs font-bold text-[#12544F] hover:text-[#092328] dark:text-[#34D399] dark:hover:text-[#6EE7B7] flex items-center justify-center gap-1.5 transition-colors px-4 py-2 rounded-xl bg-[#E6F0EC] dark:bg-[#12544F]/20 hover:bg-[#12544F]/25 w-full cursor-pointer"
+                className="text-xs font-bold text-[#12544F] hover:text-[#092328] dark:text-[#34D399] dark:hover:text-[#6EE7B7] flex items-center justify-center gap-1.5 transition-colors px-4 py-2 rounded-xl bg-[#E6F0EC] dark:bg-[#12544F]/20 hover:bg-[#12544F]/25 w-full cursor-pointer active:scale-[0.98]"
               >
                 <span>বিস্তারিত রিপোর্ট দেখো</span>
                 <ArrowRight size={13} />
@@ -177,12 +177,12 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-sans">
+      <div className="p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs font-sans">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <BarChart2 className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15.5px] font-semibold text-neutral-900 dark:text-white">
+          <h3 className="text-sm sm:text-[15.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white">
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>
@@ -201,14 +201,14 @@ export const SubjectStat: React.FC<SubjectStatProps> = ({
   const attendedData = data.filter((s) => s.total > 0);
 
   return (
-    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-sans">
+    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs font-sans">
       {/* ── Header: BarChart Badge (Viridian Forest) + Title ── */}
       <div className="flex items-center justify-between gap-3 mb-3.5">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <BarChart2 className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15.5px] font-semibold text-neutral-900 dark:text-white leading-tight">
+          <h3 className="text-sm sm:text-[15.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white leading-tight">
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>

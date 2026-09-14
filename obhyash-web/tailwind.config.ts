@@ -106,9 +106,14 @@ const config = {
           'Roboto',
           'sans-serif',
         ],
-        bengali: [
-          'var(--font-hind)',
+        anek: [
           'var(--font-anek)',
+          "'Anek Bangla'",
+          'sans-serif',
+        ],
+        bengali: [
+          'var(--font-anek)',
+          'var(--font-hind)',
           'var(--font-inter)',
           'system-ui',
           'sans-serif',

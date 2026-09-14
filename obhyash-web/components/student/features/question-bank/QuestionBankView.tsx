@@ -826,7 +826,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 ? "শিক্ষা বোর্ড বা স্কুল খুঁজুন..."
                 : "বিশ্ববিদ্যালয় বা ইনস্টিটিউট খুঁজুন..."
             }
-            className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-hidden focus:ring-2 focus:ring-[#12544F]/50 transition-all shadow-2xs"
+            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-hidden focus:ring-2 focus:ring-[#12544F]/50 transition-all shadow-xs"
           />
           {searchQuery && (
             <button
@@ -874,7 +874,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 <div
                   key={item.id}
                   onClick={() => onSelectSubject && onSelectSubject(item)}
-                  className="group relative rounded-[20px] sm:rounded-[26px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/10 select-none flex flex-col justify-between p-3.5 sm:p-5 touch-manipulation"
+                  className="group relative rounded-[16px] sm:rounded-[24px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/10 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation"
                 >
                   {/* Background Gradient */}
                   <div
@@ -934,7 +934,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 <div
                   key={inst.id}
                   onClick={() => onSelectInstitute && onSelectInstitute(inst)}
-                  className={`group relative rounded-[20px] sm:rounded-[26px] overflow-hidden aspect-[1.12/1] sm:aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/20 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation ${inst.bgColor}`}
+                  className={`group relative rounded-[16px] sm:rounded-[24px] overflow-hidden aspect-[1.12/1] sm:aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/20 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation ${inst.bgColor}`}
                 >
                   {/* Decorative Corner Bubbles matching mobile app */}
                   <div
@@ -968,7 +968,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                   {/* 2. Middle: Large Bold Bengali Institute Name */}
                   <div className="relative z-10 text-center my-auto">
                     <h2
-                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-lg sm:text-2xl md:text-[26px] leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
+                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[15px] sm:text-2xl md:text-[26px] leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
                     >
                       {inst.name}
                     </h2>

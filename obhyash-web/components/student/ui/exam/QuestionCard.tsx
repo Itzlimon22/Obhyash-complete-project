@@ -81,10 +81,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       id={`question-${question.id}`}
       className={cn(
-        "relative mb-3.5 sm:mb-5 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] border transition-all duration-200 font-['HindSiliguri',sans-serif]",
+        "relative mb-3.5 sm:mb-5 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#121212] border transition-all duration-200 font-['HindSiliguri',sans-serif]",
         isFlagged
           ? 'border-[#FB923C] ring-2 ring-[#FB923C]/30 shadow-md'
-          : 'border-[#E5E7EB] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none',
+          : 'border-neutral-200/80 dark:border-white/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none',
       )}
     >
       {/* ── Top Question Section ── */}
@@ -213,11 +213,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           const isCorrect = isCorrectAnswer(idx);
 
           // ── Flutter-Matching State Colors ──
-          let boxBg = 'bg-[#F8F9FA] dark:bg-[#1F1F1F]';
+          let boxBg = 'bg-neutral-50/70 dark:bg-[#18181B]';
           let boxBorder =
-            'border-[#E5E7EB] dark:border-[#333333] hover:border-[#D1D5DB] dark:hover:border-[#525252]';
+            'border-neutral-200/80 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-neutral-700';
           let bulletBg = 'bg-transparent dark:bg-transparent';
-          let bulletBorder = 'border-[#D1D5DB] dark:border-[#525252]';
+          let bulletBorder = 'border-neutral-300 dark:border-neutral-700';
           let bulletText = 'text-[#475569] dark:text-[#E4E4E7]';
           let optionTextColor = 'text-[#0F172A] dark:text-[#F4F4F5]';
           let isBold = false;
@@ -342,11 +342,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       {/* ── Explanation Panel (Matching Flutter Warm Book Page Theme) ── */}
       {showFeedback &&
         (question.explanation || question.explanationImageUrl) && (
-          <div className="mx-3 sm:mx-4 mb-3 sm:mb-4 rounded-[12px] border border-[#E2D7C9] dark:border-[#27272A] overflow-hidden">
+          <div className="mx-3 sm:mx-4 mb-3 sm:mb-4 rounded-[12px] border border-[#E2D7C9] dark:border-white/[0.08] overflow-hidden">
             {/* Toggle Header */}
             <div
               onClick={() => setIsExplanationOpen(!isExplanationOpen)}
-              className="px-3.5 py-2.5 bg-[#F3ECE4] dark:bg-[#141416] flex items-center justify-between cursor-pointer select-none transition-colors"
+              className="px-3.5 py-2.5 bg-[#F3ECE4] dark:bg-[#1A1A1E] flex items-center justify-between cursor-pointer select-none transition-colors"
             >
               <div className="flex items-center gap-2 text-[#42352B] dark:text-[#F4F4F5] font-bold text-[16.5px] leading-[1.35]">
                 <BookOpen size={16} />
@@ -354,7 +354,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               </div>
 
               {/* Chevron Box */}
-              <div className="w-6 h-6 rounded-md bg-[#E7DDD0] dark:bg-[#1E1E22] flex items-center justify-center text-[#42352B] dark:text-[#F4F4F5]">
+              <div className="w-6 h-6 rounded-md bg-[#E7DDD0] dark:bg-[#26262B] flex items-center justify-center text-[#42352B] dark:text-[#F4F4F5]">
                 {isExplanationOpen ? (
                   <ChevronUp size={14} />
                 ) : (
@@ -365,7 +365,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
             {/* Explanation Content (Flutter: 14.5px, w400, line-height 1.6) */}
             {isExplanationOpen && (
-              <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] border-t border-[#E8DFD3] dark:border-[#27272A] text-[#2E2621] dark:text-[#F4F4F5] text-[14.5px] leading-[1.6] animate-in fade-in duration-200">
+              <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] border-t border-[#E8DFD3] dark:border-white/[0.08] text-[#2E2621] dark:text-[#F4F4F5] text-[14.5px] leading-[1.6] animate-in fade-in duration-200">
                 {question.explanation && (
                   <MathRenderer text={question.explanation} block={true} />
                 )}

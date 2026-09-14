@@ -574,7 +574,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
           <button
             type="button"
             onClick={onBack}
-            className="absolute left-0 w-10 h-10 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer"
+            className="absolute left-0 w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
             aria-label="Back"
           >
             <ArrowLeft size={18} strokeWidth={2.2} />
@@ -602,7 +602,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
 
       {/* ── Institute Hero Summary Card ── */}
       <div
-        className={`relative overflow-hidden rounded-3xl p-5 sm:p-6 text-white shadow-lg ${institute.bgColor}`}
+        className={`relative overflow-hidden rounded-[20px] sm:rounded-[24px] p-4 sm:p-6 text-white shadow-md ${institute.bgColor}`}
       >
         <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/15 blur-md pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-white/15 blur-md pointer-events-none" />
@@ -657,7 +657,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
             className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none ${
               typeFilter === tab.id
                 ? "bg-[#12544F] text-white shadow-xs"
-                : "bg-neutral-100 dark:bg-[#18181B] text-neutral-600 dark:text-neutral-400 border border-neutral-200/80 dark:border-[#27272A] hover:text-neutral-900 dark:hover:text-white"
+                : "bg-white dark:bg-[#121212] text-neutral-600 dark:text-neutral-400 border border-neutral-200/80 dark:border-white/[0.08] hover:text-neutral-900 dark:hover:text-white"
             }`}
           >
             {tab.label}
@@ -672,7 +672,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
             <div
               key={set.id}
               onClick={() => handleOpenExamSet(set)}
-              className="group relative bg-white dark:bg-neutral-900 rounded-2xl p-4 sm:p-5 border border-neutral-200/80 dark:border-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:border-emerald-600/30 dark:hover:border-emerald-500/30 transition-all duration-200 cursor-pointer select-none flex flex-col gap-2.5 active:scale-[0.99]"
+              className="group relative bg-white dark:bg-[#121212] rounded-[16px] p-3.5 sm:p-4 border border-neutral-200/80 dark:border-white/[0.08] shadow-xs hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 cursor-pointer select-none flex flex-col gap-2 active:scale-[0.98]"
             >
               {/* Top: Bold Title + Type Badge */}
               <div className="flex items-center justify-between gap-2">

@@ -384,7 +384,7 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
   const isAllCompleted = quests.length > 0 && completedCount === quests.length;
 
   return (
-    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
+    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs font-sans">
       {/* ── Header: Zap Badge + Title + Subtitle Badge ── */}
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
@@ -392,19 +392,19 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
             <Zap className="w-4.5 h-4.5" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-[15px] font-semibold text-[#18181B] dark:text-white leading-tight">
+            <h3 className="text-sm sm:text-[15px] font-bold font-['Anek_Bangla',sans-serif] text-[#18181B] dark:text-white leading-tight">
               আজকের মিশন
             </h3>
-            <span className="text-[11.5px] text-neutral-500 dark:text-neutral-400">
+            <span className="text-[11.5px] text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
               মিশন সম্পন্ন করে XP রিওয়ার্ড জিতুন
             </span>
           </div>
         </div>
 
-        {/* Completion Pill */}
+        {/* Completion Pill (Flutter 1:1) */}
         <div
           className={cn(
-            "px-2.5 py-1 rounded-xl text-xs font-bold shrink-0 transition-colors",
+            "px-2.5 py-1 rounded-xl text-xs font-bold font-['Anek_Bangla',sans-serif] shrink-0 transition-colors",
             isAllCompleted
               ? "bg-[#12544F]/15 dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#34D399] border border-[#12544F]/30"
               : "bg-neutral-100 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300"
@@ -441,17 +441,17 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
                       className="w-2 h-2 rounded-full shrink-0"
                       style={{ backgroundColor: quest.deepColor }}
                     />
-                    <h4 className="text-xs sm:text-[13.5px] font-bold text-neutral-900 dark:text-white truncate">
+                    <h4 className="text-xs sm:text-[13.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white truncate">
                       {quest.title}
                     </h4>
                   </div>
-                  <p className="text-[11.5px] text-neutral-500 dark:text-neutral-400 line-clamp-1 leading-snug">
+                  <p className="text-[11.5px] text-neutral-500 dark:text-neutral-400 line-clamp-1 leading-snug font-['HindSiliguri',sans-serif]">
                     {quest.description}
                   </p>
                 </div>
 
                 {/* Right Action / XP Badge */}
-                <div className="shrink-0">
+                <div className="shrink-0 font-['Anek_Bangla',sans-serif]">
                   {quest.isClaimed ? (
                     <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-[#27272A] text-neutral-500 dark:text-neutral-400 text-xs font-bold">
                       <CheckCircle2 size={13} className="text-emerald-500" />
@@ -464,7 +464,7 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
                       className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#12544F] hover:bg-[#0D3E3A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer animate-pulse shrink-0 touch-manipulation"
                     >
                       <Sparkles size={12} />
-                      <span>দাবি <span className="hidden sm:inline">করো</span> (+{BanglaNameHelper.toBanglaNumeral(quest.xpReward)})</span>
+                      <span>দাবি (+{BanglaNameHelper.toBanglaNumeral(quest.xpReward)})</span>
                     </button>
                   ) : (
                     <div
@@ -492,7 +492,7 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
                     }}
                   />
                 </div>
-                <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 tabular-nums shrink-0">
+                <span className="text-[11.5px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-600 dark:text-neutral-400 tabular-nums shrink-0">
                   {BanglaNameHelper.toBanglaNumeral(quest.current)}/
                   {BanglaNameHelper.toBanglaNumeral(quest.target)}
                 </span>

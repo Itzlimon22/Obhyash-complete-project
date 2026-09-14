@@ -182,20 +182,20 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-sm font-['HindSiliguri']">
+    <div className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] shadow-xs font-sans">
       {/* ── Header: Calendar Icon (Viridian Forest) + Title + Flame Badge (Royal Mulberry) ── */}
       <div className="flex items-center justify-between gap-3 mb-3.5">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-[#E6F0EC] dark:bg-[#12544F]/20 flex items-center justify-center text-[#12544F] dark:text-[#34D399]">
             <Calendar className="w-4.5 h-4.5" />
           </div>
-          <h3 className="text-sm sm:text-[15px] font-semibold text-[#18181B] dark:text-white leading-tight">
+          <h3 className="text-sm sm:text-[15px] font-bold font-['Anek_Bangla',sans-serif] text-[#18181B] dark:text-white leading-tight">
             গত ৩০ দিনের অ্যাক্টিভিটি
           </h3>
         </div>
 
-        {/* Streak Badge (Royal Mulberry #601D49) */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#601D49]/15 dark:bg-[#601D49]/25 border border-[#601D49]/30 text-[#601D49] dark:text-[#F472B6] text-xs font-bold shrink-0">
+        {/* Streak Badge (Royal Mulberry #601D49, Flutter 1:1) */}
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#601D49]/15 dark:bg-[#601D49]/25 border border-[#601D49]/30 text-[#601D49] dark:text-[#F472B6] text-xs font-bold font-['Anek_Bangla',sans-serif] shrink-0">
           <span className="text-xs">🔥</span>
           <span>{BanglaNameHelper.toBanglaNumeral(streakCount)} দিন</span>
         </div>

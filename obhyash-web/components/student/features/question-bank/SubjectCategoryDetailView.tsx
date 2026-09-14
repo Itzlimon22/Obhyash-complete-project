@@ -253,14 +253,14 @@ export default function SubjectCategoryDetailView({
   const categories = getCategoriesForSubject(subject.id, subject.name);
 
   return (
-    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#F8F9FA] dark:bg-[#101012] font-['HindSiliguri',sans-serif] select-none pb-20">
+    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#FAF9F6] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-20">
       {/* ── Top Header ── */}
       {showHeader && (
-        <div className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#101012]/90 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/60 dark:border-[#222226]">
+        <div className="sticky top-0 z-40 bg-[#FAF9F6]/90 dark:bg-[#000000]/90 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
           <button
             type="button"
             onClick={onBack}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-xs"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-2xs"
             aria-label="Back"
           >
             <ArrowLeft size={18} className="stroke-[2.2]" />
@@ -276,7 +276,7 @@ export default function SubjectCategoryDetailView({
 
       {/* ── 2 Per Row Category Cards Grid ── */}
       <div className="px-3.5 sm:px-6 py-4 sm:py-6">
-        <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6">
           {categories.map((cat) => (
             <div
               key={cat.id}
@@ -291,21 +291,21 @@ export default function SubjectCategoryDetailView({
                   handleOpenSection(cat);
                 }
               }}
-              className={`group relative aspect-[1.25/1] rounded-[24px] sm:rounded-[28px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3.5 sm:p-4.5 flex flex-col justify-between`}
+              className={`group relative aspect-[1.25/1] rounded-[16px] sm:rounded-[24px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3 sm:p-4.5 flex flex-col justify-between`}
             >
               {/* Ambient Glow */}
               <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
               <div className="absolute -left-6 -top-6 w-20 h-20 rounded-full bg-black/10 blur-lg pointer-events-none" />
 
               {/* Top Left: Card Title */}
-              <div className="relative z-10 text-left pt-3 sm:pt-4 pl-1">
-                <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-xl sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+              <div className="relative z-10 text-left pt-2 sm:pt-4 pl-0.5 sm:pl-1">
+                <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
                   {cat.title}
                 </h2>
               </div>
 
               {/* Center / Bottom-Right: Rich Generated SVG Vector Art (Bigger) */}
-              <div className="absolute right-0 bottom-0 sm:right-1 sm:bottom-1 z-0 w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center pointer-events-none">
+              <div className="absolute right-0 bottom-0 sm:right-1 sm:bottom-1 z-0 w-24 h-24 sm:w-36 sm:h-36 flex items-center justify-center pointer-events-none">
                 <div className="relative w-full h-full group-hover:scale-108 group-hover:-translate-y-1 transition-all duration-300">
                   <Image
                     src={cat.svgIcon}

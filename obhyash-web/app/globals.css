@@ -89,10 +89,6 @@
     touch-action: manipulation;
   }
 
-  :root {
-    --font-anek: var(--font-hind);
-  }
-
   html {
     font-size: 16px;
     scroll-behavior: smooth;

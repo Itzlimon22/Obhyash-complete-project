@@ -371,7 +371,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="absolute left-0 w-10 h-10 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer"
+          className="absolute left-0 w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
           aria-label="Back"
         >
           <ArrowLeft size={18} strokeWidth={2.2} />
@@ -382,7 +382,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
       </div>
 
       {/* ── Header Badge Card ── */}
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 sm:p-5 border border-neutral-200/80 dark:border-neutral-800 shadow-sm flex items-center gap-4">
+      <div className="bg-white dark:bg-[#121212] rounded-[16px] p-4 sm:p-5 border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex items-center gap-4">
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200/60 dark:border-neutral-700/60 p-2 shadow-xs flex items-center justify-center shrink-0">
           <img
             src={institute.logo}
@@ -419,7 +419,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
           পরীক্ষার তথ্যাবলি
         </h3>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 sm:p-5 shadow-xs">
+        <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs">
           <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 divide-x divide-neutral-100 dark:divide-neutral-800">
             {/* Column 1 */}
             <div className="space-y-3 sm:space-y-3.5 pr-2">
@@ -522,7 +522,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
           বিষয়ভিত্তিক নম্বর বণ্টন
         </h3>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 sm:p-5 shadow-xs">
+        <div className="bg-white dark:bg-[#121212] rounded-[16px] border border-neutral-200/80 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs">
           <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3.5 sm:gap-y-4">
             {distributions.map((item, idx) => {
               const IconComp = item.icon;
@@ -549,16 +549,16 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
       </div>
 
       {/* ── Bottom Fixed Action Bar: ২ টি বাটন (প্রশ্ন দেখো, পরীক্ষা দাও) ── */}
-      <div className="pt-4 pb-2 sticky bottom-0 z-20 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-t border-neutral-200/80 dark:border-neutral-800 -mx-4 px-4 sm:-mx-6 sm:px-6">
-        <div className="flex gap-3 max-w-4xl mx-auto">
+      <div className="pt-3 pb-2 sticky bottom-0 z-20 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] -mx-4 px-4 sm:-mx-6 sm:px-6">
+        <div className="flex gap-2.5 sm:gap-3 max-w-4xl mx-auto">
           {/* Button 1: প্রশ্ন দেখো (View Questions) */}
           <button
             type="button"
             onClick={handleViewQuestions}
             disabled={isLoadingQuestions}
-            className="flex-1 py-3 px-4 rounded-xl border-2 border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 font-bold text-sm sm:text-base transition-all cursor-pointer shadow-xs active:scale-98 flex items-center justify-center gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
+            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl border border-neutral-300 dark:border-[#2C2C2E] hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] bg-white dark:bg-[#121212] text-neutral-800 dark:text-neutral-100 font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-xs active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
           >
-            <Eye size={18} className="text-neutral-600 dark:text-neutral-300" />
+            <Eye size={16} className="text-neutral-600 dark:text-neutral-300" />
             <span>প্রশ্ন দেখো</span>
           </button>
 
@@ -567,9 +567,9 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
             type="button"
             onClick={handleStartExam}
             disabled={isLoadingQuestions}
-            className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base transition-all cursor-pointer shadow-md shadow-emerald-600/20 active:scale-98 flex items-center justify-center gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
+            className="flex-1 py-2.5 sm:py-3 px-3.5 sm:px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 font-['HindSiliguri',sans-serif] disabled:opacity-50"
           >
-            <Play size={18} className="fill-white" />
+            <Play size={15} className="fill-white" />
             <span>পরীক্ষা দাও</span>
           </button>
         </div>

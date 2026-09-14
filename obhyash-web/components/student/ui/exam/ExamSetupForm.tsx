@@ -417,25 +417,25 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               type="button"
               onClick={() => setShowSubjectModal(true)}
               className={cn(
-                "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left",
+                "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer",
                 selectedSubject
-                  ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
-                  : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A] hover:border-neutral-300 dark:hover:border-neutral-700"
+                  ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
+                  : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-neutral-700"
               )}
             >
               <span
                 className={cn(
-                  "text-sm sm:text-base font-bold truncate",
+                  "text-sm sm:text-base font-bold truncate font-['Anek_Bangla',sans-serif]",
                   selectedSubject
-                    ? "text-[#0F172A] dark:text-white"
-                    : "text-[#94A3B8] dark:text-[#71717A] font-normal"
+                    ? "text-[#12544F] dark:text-[#34D399]"
+                    : "text-neutral-400 dark:text-neutral-500 font-normal"
                 )}
               >
                 {selectedSubData ? selectedSubData.label : "বিষয় নির্বাচন করো..."}
               </span>
               <ChevronDown
                 size={18}
-                className="text-[#64748B] dark:text-[#A1A1AA] shrink-0 ml-2"
+                className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
               />
             </button>
           )}
@@ -456,7 +456,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="flex flex-col gap-3">
               {/* Chapter Dropdown Trigger */}
               <div>
-                <label className="block text-sm font-bold text-[#737373] dark:text-[#A3A3A3] mb-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
                   অধ্যায়
                 </label>
                 <button
@@ -464,18 +464,18 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   onClick={() => setShowChapterModal(true)}
                   disabled={chapters.length === 0 && selectedSubject !== null}
                   className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left",
+                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left cursor-pointer",
                     selectedChapters.size > 0
-                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
-                      : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A]"
+                      ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
+                      : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08]"
                   )}
                 >
                   <span
                     className={cn(
-                      "text-sm sm:text-base truncate",
+                      "text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif]",
                       selectedChapters.size > 0
-                        ? "text-[#0F172A] dark:text-white font-bold"
-                        : "text-[#94A3B8] dark:text-[#71717A] font-normal"
+                        ? "text-[#12544F] dark:text-[#34D399] font-bold"
+                        : "text-neutral-400 dark:text-neutral-500 font-normal"
                     )}
                   >
                     {selectedChapters.size === 0
@@ -486,14 +486,14 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   </span>
                   <ChevronDown
                     size={18}
-                    className="text-[#64748B] dark:text-[#A1A1AA] shrink-0 ml-2"
+                    className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
                   />
                 </button>
               </div>
 
               {/* Topic Dropdown Trigger */}
               <div>
-                <label className="block text-sm font-bold text-[#737373] dark:text-[#A3A3A3] mb-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5 font-['Anek_Bangla',sans-serif]">
                   টপিক
                 </label>
                 <button
@@ -501,18 +501,18 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   onClick={() => setShowTopicModal(true)}
                   disabled={selectedChapters.size === 0 || topics.length === 0}
                   className={cn(
-                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50",
+                    "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all duration-200 outline-none text-left disabled:opacity-50 cursor-pointer",
                     selectedTopics.size > 0
-                      ? "bg-[#FFFBEB] dark:bg-[#2E1A0D]/35 border-[#F59E0B]/60 dark:border-[#D97706]/50 shadow-xs"
-                      : "bg-[#F8FAFC] dark:bg-[#161619] border-[#E2E8F0] dark:border-[#27272A]"
+                      ? "bg-[#12544F]/5 dark:bg-[#12544F]/15 border-[#12544F] dark:border-[#34D399]/60 shadow-xs"
+                      : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08]"
                   )}
                 >
                   <span
                     className={cn(
-                      "text-sm sm:text-base truncate",
+                      "text-sm sm:text-base truncate font-['Anek_Bangla',sans-serif]",
                       selectedTopics.size > 0
-                        ? "text-[#0F172A] dark:text-white font-bold"
-                        : "text-[#94A3B8] dark:text-[#71717A] font-normal"
+                        ? "text-[#12544F] dark:text-[#34D399] font-bold"
+                        : "text-neutral-400 dark:text-neutral-500 font-normal"
                     )}
                   >
                     {selectedTopics.size === 0
@@ -523,7 +523,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   </span>
                   <ChevronDown
                     size={18}
-                    className="text-[#64748B] dark:text-[#A1A1AA] shrink-0 ml-2"
+                    className="text-neutral-400 dark:text-neutral-500 shrink-0 ml-2"
                   />
                 </button>
               </div>
@@ -585,7 +585,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         >
           <div className="flex flex-col gap-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-base font-bold text-[#64748B] dark:text-[#A1A1AA]">
+              <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
                 মোট প্রশ্ন:
               </span>
               <StepperControl
@@ -651,7 +651,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         >
           <div className="flex flex-col gap-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-base font-bold text-[#64748B] dark:text-[#A1A1AA]">
+              <span className="text-sm sm:text-base font-bold text-neutral-600 dark:text-neutral-400 font-['Anek_Bangla',sans-serif]">
                 মোট সময়:
               </span>
               <StepperControl
@@ -687,7 +687,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           icon={MinusCircle}
           tooltip={"-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা"}
         >
-          <div className="p-1 rounded-xl bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] grid grid-cols-3 gap-1">
+          <div className="p-1 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] grid grid-cols-3 gap-1">
             {[
               { val: 0.0, label: "০ (নেই)" },
               { val: 0.25, label: "-০.২৫ মার্ক" },
@@ -700,10 +700,10 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   type="button"
                   onClick={() => setNegativeMarking(val)}
                   className={cn(
-                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200",
+                    "py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 font-['Anek_Bangla',sans-serif] cursor-pointer",
                     isSelected
-                      ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
-                      : "text-[#64748B] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   )}
                 >
                   {label}
@@ -714,48 +714,48 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </CardContainer>
 
         {/* 8. Live Blueprint Capsule Summary */}
-        <div className="my-1.5 px-2 py-2.5 sm:p-3 rounded-xl bg-[#FFFBEB] dark:bg-[#22160E] border border-[#FDE68A] dark:border-[#D97706]/35 shadow-xs flex items-center justify-around text-center">
+        <div className="my-1.5 px-3 py-3 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex items-center justify-around text-center">
           <div className="flex items-center gap-1.5">
-            <HelpCircle size={14} className="text-[#38BDF8]" />
-            <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
+            <HelpCircle size={15} className="text-sky-500 shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               {questionCount}টি প্রশ্ন
             </span>
           </div>
 
-          <div className="w-[1px] h-3.5 bg-[#FDE68A] dark:bg-[#D97706]/25" />
+          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
 
           <div className="flex items-center gap-1.5">
-            <Clock size={14} className="text-[#FBBF24]" />
-            <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
+            <Clock size={15} className="text-amber-500 shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               {durationMinutes} মিনিট
             </span>
           </div>
 
-          <div className="w-[1px] h-3.5 bg-[#FDE68A] dark:bg-[#D97706]/25" />
+          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
 
           <div className="flex items-center gap-1.5">
-            <MinusCircle size={14} className="text-[#F87171]" />
-            <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
+            <MinusCircle size={15} className="text-rose-500 shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               {negativeMarking === 0 ? "০ মার্ক" : `-${negativeMarking}`}
             </span>
           </div>
 
-          <div className="w-[1px] h-3.5 bg-[#FDE68A] dark:bg-[#D97706]/25" />
+          <div className="w-[1px] h-4 bg-neutral-200 dark:bg-white/[0.08]" />
 
           <div className="flex items-center gap-1.5">
-            <Zap size={14} className="text-[#A78BFA]" />
-            <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
+            <Zap size={15} className="text-purple-500 shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 font-['Anek_Bangla',sans-serif]">
               +{questionCount * 2} XP
             </span>
           </div>
         </div>
 
-        {/* 9. Start Button - Clean, proportionate CTA */}
+        {/* 9. Start Button - Flutter 1:1 Elevated Primary CTA */}
         <button
           type="button"
           onClick={handleStartExam}
           disabled={isStarting || isExternalLoading}
-          className="w-full h-12 sm:h-13 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-[16px] tracking-[0.2px] transition-all flex items-center justify-center gap-2 mt-2 mb-6"
+          className="w-full h-[52px] rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-[16px] shadow-sm transition-all flex items-center justify-center gap-2 mt-2 mb-6 cursor-pointer font-['Anek_Bangla',sans-serif]"
         >
           {isStarting || isExternalLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -843,10 +843,10 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#131316] border border-[#E2E8F0] dark:border-[#222226] shadow-xs flex flex-col gap-2.5 sm:gap-3">
+    <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex flex-col gap-2.5 sm:gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <h2 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white font-['HindSiliguri']">
+          <h2 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
             {title}
           </h2>
           {tooltip && (
@@ -856,7 +856,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 onClick={() => setShowTooltip(!showTooltip)}
-                className="text-[#94A3B8] dark:text-[#71717A] hover:text-[#0F172A] dark:hover:text-white p-0.5"
+                className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-0.5"
               >
                 <Info size={14} />
               </button>
@@ -882,7 +882,7 @@ interface SegmentedGroupProps {
 
 const SegmentedGroup: React.FC<SegmentedGroupProps> = ({ items, selectedItems, onToggle }) => {
   return (
-    <div className="p-1 rounded-xl bg-[#F1F5F9] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] flex flex-wrap gap-1">
+    <div className="p-1 rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] flex flex-wrap gap-1">
       {items.map((item) => {
         const isSelected = selectedItems.has(item);
         return (
@@ -891,10 +891,10 @@ const SegmentedGroup: React.FC<SegmentedGroupProps> = ({ items, selectedItems, o
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              "flex-1 min-w-[65px] py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 text-center font-['HindSiliguri']",
+              "flex-1 min-w-[65px] py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all duration-200 text-center font-['Anek_Bangla',sans-serif] cursor-pointer",
               isSelected
-                ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
-                : "text-[#64748B] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white"
+                ? "bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95"
+                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
             )}
           >
             {item}
@@ -923,23 +923,23 @@ const StepperControl: React.FC<StepperControlProps> = ({
   onChanged,
 }) => {
   return (
-    <div className="flex items-center rounded-xl bg-[#F1F5F9] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] overflow-hidden p-0.5">
+    <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] overflow-hidden p-0.5">
       <button
         type="button"
         disabled={value <= min}
         onClick={() => onChanged(value - step)}
-        className="w-8 h-8 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
+        className="w-8 h-8 flex items-center justify-center text-[#12544F] dark:text-[#34D399] disabled:text-neutral-300 dark:disabled:text-neutral-700 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition active:scale-95 cursor-pointer disabled:cursor-not-allowed"
       >
         <span className="text-base font-bold">−</span>
       </button>
-      <span className="px-2.5 text-sm sm:text-base font-bold text-[#B45309] dark:text-[#FBBF24] font-['HindSiliguri'] min-w-[55px] text-center">
+      <span className="px-2.5 text-sm sm:text-base font-bold text-[#12544F] dark:text-[#34D399] font-['Anek_Bangla',sans-serif] min-w-[55px] text-center">
         {value} {unit}
       </span>
       <button
         type="button"
         disabled={value >= max}
         onClick={() => onChanged(value + step)}
-        className="w-8 h-8 flex items-center justify-center text-[#B45309] dark:text-[#FEF3C7] disabled:text-[#CBD5E1] dark:disabled:text-[#3F3F46] hover:bg-neutral-200 dark:hover:bg-neutral-800/80 rounded-lg transition"
+        className="w-8 h-8 flex items-center justify-center text-[#12544F] dark:text-[#34D399] disabled:text-neutral-300 dark:disabled:text-neutral-700 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition active:scale-95 cursor-pointer disabled:cursor-not-allowed"
       >
         <span className="text-base font-bold">+</span>
       </button>
@@ -959,10 +959,10 @@ const PresetPill: React.FC<PresetPillProps> = ({ label, isSelected, onClick }) =
       type="button"
       onClick={onClick}
       className={cn(
-        "py-1.5 px-1 rounded-lg text-xs sm:text-sm font-semibold text-center transition-all duration-150 font-['HindSiliguri']",
+        "py-1.5 px-1 rounded-lg text-xs sm:text-sm font-bold text-center transition-all duration-150 font-['Anek_Bangla',sans-serif] cursor-pointer",
         isSelected
-          ? "bg-[#B45309] dark:bg-[#3B2314] text-white dark:text-[#FEF3C7] border border-[#B45309] dark:border-[#D97706]/60 shadow-xs"
-          : "bg-[#F8FAFC] dark:bg-[#161619] border border-[#E2E8F0] dark:border-[#27272A] text-[#64748B] dark:text-[#A1A1AA] hover:border-neutral-300 dark:hover:border-neutral-700"
+          ? "bg-[#12544F] text-white border border-[#12544F] shadow-xs active:scale-95"
+          : "bg-neutral-50 dark:bg-[#18181B] border border-neutral-200/80 dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
       )}
     >
       {label}
@@ -1003,19 +1003,19 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
         type: "compulsory" as SubjectCategoryType,
         title: BanglaNameHelper.getCategoryTitle("compulsory"),
         items: compulsory,
-        color: "bg-[#3B82F6]",
+        color: "bg-blue-500",
       },
       {
         type: "core" as SubjectCategoryType,
         title: BanglaNameHelper.getCategoryTitle("core"),
         items: core,
-        color: "bg-[#10B981]",
+        color: "bg-[#12544F]",
       },
       {
         type: "elective" as SubjectCategoryType,
         title: BanglaNameHelper.getCategoryTitle("elective"),
         items: elective,
-        color: "bg-[#8B5CF6]",
+        color: "bg-purple-500",
       },
     ] as const
   ).filter((s) => s.items.length > 0);
@@ -1023,18 +1023,18 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#000000] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200 dark:border-neutral-800 z-10 animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
         {/* Drag handle */}
-        <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-800 rounded-full mx-auto my-3" />
+        <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto my-3" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-100 dark:border-neutral-800">
-          <h3 className="text-xl font-black text-[#0F172A] dark:text-white font-['HindSiliguri']">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
+          <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
             বিষয় নির্বাচন করো
           </h3>
           <button
             onClick={onClose}
-            className="text-[#64748B] dark:text-[#A1A1AA] hover:text-neutral-900 dark:hover:text-white p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+            className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-white p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -1043,15 +1043,15 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-4">
           {sections.length === 0 ? (
-            <div className="text-center py-8 text-[#64748B] dark:text-[#A1A1AA] text-base font-['HindSiliguri']">
+            <div className="text-center py-8 text-neutral-500 text-base font-['Anek_Bangla',sans-serif]">
               কোনো বিষয় পাওয়া যায়নি
             </div>
           ) : (
-            sections.map((sec, secIdx) => (
+            sections.map((sec) => (
               <div key={sec.type} className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 mb-1">
                   <div className={cn("w-1 h-3.5 rounded-full", sec.color)} />
-                  <span className="text-xs font-bold text-[#64748B] dark:text-[#A1A1AA] uppercase tracking-wider font-['HindSiliguri']">
+                  <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-['Anek_Bangla',sans-serif]">
                     {sec.title}
                   </span>
                 </div>
@@ -1064,17 +1064,17 @@ const SubjectDropdownModal: React.FC<SubjectDropdownModalProps> = ({
                       type="button"
                       onClick={() => onSelect(sub.id)}
                       className={cn(
-                        "w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all text-left font-['HindSiliguri']",
+                        "w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
                         isSelected
-                          ? "bg-[#B45309] dark:bg-[#3B2314] border-[#B45309] dark:border-[#D97706]/60 text-white dark:text-[#FEF3C7] shadow-sm"
-                          : "bg-[#FAFAFA] dark:bg-[#141416] border-[#E2E8F0] dark:border-[#27272A] text-[#334155] dark:text-[#D4D4D8] hover:border-neutral-300 dark:hover:border-neutral-700"
+                          ? "bg-[#12544F] border-[#12544F] text-white shadow-sm active:scale-[0.99]"
+                          : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700"
                       )}
                     >
                       <span className="text-base font-bold">{sub.label}</span>
                       {isSelected && (
                         <CheckCircle2
                           size={20}
-                          className="text-white dark:text-[#FBBF24] shrink-0 ml-2"
+                          className="text-white shrink-0 ml-2"
                         />
                       )}
                     </button>
@@ -1136,13 +1136,13 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#141417] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200 dark:border-neutral-800 z-10 animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
         {/* Drag handle */}
         <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto my-3" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
-          <h3 className="text-lg font-black text-[#0F172A] dark:text-white font-['HindSiliguri'] truncate mr-2">
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] truncate mr-2">
             {title}
           </h3>
 
@@ -1152,10 +1152,10 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
               type="button"
               onClick={toggleSelectAll}
               className={cn(
-                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-['HindSiliguri']",
+                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-['Anek_Bangla',sans-serif] cursor-pointer",
                 isAllSelected
-                  ? "bg-[#ECFDF5] dark:bg-[#064E3B] border-[#A7F3D0] dark:border-[#059669] text-[#047857] dark:text-[#34D399]"
-                  : "bg-[#F1F5F9] dark:bg-[#1F1F24] border-[#E2E8F0] dark:border-[#2E2E33] text-[#334155] dark:text-[#E4E4E7]"
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
+                  : "bg-neutral-100 dark:bg-[#2C2C2E] border-neutral-200 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300"
               )}
             >
               {isAllSelected ? <CheckCheck size={13} /> : <Check size={13} />}
@@ -1164,7 +1164,7 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
 
             <button
               onClick={onClose}
-              className="text-[#64748B] dark:text-[#A1A1AA] p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="text-neutral-400 dark:text-neutral-500 p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -1174,7 +1174,7 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
           {items.length === 0 ? (
-            <div className="text-center py-8 text-[#64748B] dark:text-[#A1A1AA] text-base font-['HindSiliguri']">
+            <div className="text-center py-8 text-neutral-500 text-base font-['Anek_Bangla',sans-serif]">
               কোনো অধ্যায় পাওয়া যায়নি
             </div>
           ) : (
@@ -1189,24 +1189,24 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
                   type="button"
                   onClick={() => toggleSelection(id)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['HindSiliguri']",
+                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
                     isSelected
-                      ? "bg-[#12544F] dark:bg-[#12544F] border-[#12544F] dark:border-[#12544F] text-white dark:text-[#E6FFFA]"
-                      : "bg-transparent dark:bg-[#18181B] border-[#E2E8F0] dark:border-[#27272A] text-[#334155] dark:text-[#D4D4D8] hover:border-neutral-300 dark:hover:border-neutral-700"
+                      ? "bg-[#12544F]/10 dark:bg-[#12544F]/20 border-[#12544F] dark:border-[#34D399]/60 text-[#12544F] dark:text-[#34D399]"
+                      : "bg-neutral-50 dark:bg-[#18181B] border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700"
                   )}
                 >
                   <div
                     className={cn(
                       "w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition",
                       isSelected
-                        ? "bg-white dark:bg-[#10B981] border-white dark:border-[#10B981]"
-                        : "border-[#CBD5E1] dark:border-[#52525B] bg-transparent"
+                        ? "bg-[#12544F] dark:bg-[#34D399] border-[#12544F] dark:border-[#34D399]"
+                        : "border-neutral-300 dark:border-neutral-600 bg-transparent"
                     )}
                   >
                     {isSelected && (
                       <Check
                         size={13}
-                        className="text-[#12544F] dark:text-black stroke-[3]"
+                        className="text-white dark:text-black stroke-[3]"
                       />
                     )}
                   </div>
@@ -1220,11 +1220,11 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-neutral-800">
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-white/[0.08]">
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] active:scale-[0.98] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition touch-manipulation cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-base font-['Anek_Bangla',sans-serif] shadow-sm transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>
@@ -1318,13 +1318,13 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#141417] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200 dark:border-neutral-800 z-10 animate-in slide-in-from-bottom duration-300">
+      <div className="relative w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[82vh] border border-neutral-200/80 dark:border-[#2C2C2E] z-10 animate-in slide-in-from-bottom duration-300">
         {/* Drag handle */}
         <div className="sm:hidden w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto my-3" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
-          <h3 className="text-lg font-black text-[#0F172A] dark:text-white font-['HindSiliguri'] truncate mr-2">
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.08]">
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] truncate mr-2">
             টপিক নির্বাচন করো
           </h3>
 
@@ -1333,10 +1333,10 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
               type="button"
               onClick={toggleSelectAll}
               className={cn(
-                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-['HindSiliguri']",
+                "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition font-['Anek_Bangla',sans-serif] cursor-pointer",
                 isAllSelected
-                  ? "bg-[#ECFDF5] dark:bg-[#064E3B] border-[#A7F3D0] dark:border-[#059669] text-[#047857] dark:text-[#34D399]"
-                  : "bg-[#F1F5F9] dark:bg-[#1F1F24] border-[#E2E8F0] dark:border-[#2E2E33] text-[#334155] dark:text-[#E4E4E7]"
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
+                  : "bg-neutral-100 dark:bg-[#2C2C2E] border-neutral-200 dark:border-[#3A3A3C] text-neutral-700 dark:text-neutral-300"
               )}
             >
               {isAllSelected ? <CheckCheck size={13} /> : <Check size={13} />}
@@ -1345,7 +1345,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
 
             <button
               onClick={onClose}
-              className="text-[#64748B] dark:text-[#A1A1AA] p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="text-neutral-400 dark:text-neutral-500 p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -1355,7 +1355,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
         {/* Collapsible List */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {visibleChapters.length === 0 ? (
-            <div className="text-center py-8 text-[#64748B] dark:text-[#A1A1AA] text-base font-['HindSiliguri']">
+            <div className="text-center py-8 text-neutral-500 text-base font-['Anek_Bangla',sans-serif]">
               কোনো টপিক পাওয়া যায়নি
             </div>
           ) : (
@@ -1372,27 +1372,27 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
                   className={cn(
                     "rounded-2xl border transition-all overflow-hidden",
                     selectedCount > 0
-                      ? "border-[#CBD5E1] dark:border-[#3F3F46] bg-white dark:bg-[#141416]"
-                      : "border-[#E2E8F0] dark:border-[#27272A] bg-white dark:bg-[#141416]"
+                      ? "border-neutral-300 dark:border-white/[0.12] bg-white dark:bg-[#18181B]"
+                      : "border-neutral-200/80 dark:border-white/[0.08] bg-white dark:bg-[#18181B]"
                   )}
                 >
                   {/* Chapter Header */}
                   <div
                     onClick={() => toggleExpand(chapter.id)}
-                    className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/40 select-none font-['HindSiliguri']"
+                    className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-neutral-50 dark:hover:bg-white/[0.03] select-none font-['Anek_Bangla',sans-serif]"
                   >
                     <div className="flex items-center gap-2 flex-1 truncate mr-2">
                       <ChevronDown
                         size={18}
                         className={cn(
-                          "text-[#64748B] dark:text-[#A1A1AA] transition-transform shrink-0",
+                          "text-neutral-400 dark:text-neutral-500 transition-transform shrink-0",
                           isExpanded && "rotate-180"
                         )}
                       />
-                      <span className="font-bold text-base text-[#0F172A] dark:text-white truncate">
+                      <span className="font-bold text-base text-neutral-900 dark:text-white truncate">
                         <MathRenderer text={chapter.name} />
                       </span>
-                      <span className="text-xs text-[#64748B] dark:text-[#A1A1AA] shrink-0">
+                      <span className="text-xs text-neutral-500 shrink-0">
                         ({selectedCount}/{chapterTopics.length})
                       </span>
                     </div>
@@ -1405,9 +1405,9 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
                         toggleChapterAll(chapter.id, chapterTopics);
                       }}
                       className={cn(
-                        "px-2 py-1 rounded-md text-xs font-bold border transition",
+                        "px-2 py-1 rounded-md text-xs font-bold border transition cursor-pointer",
                         isAllInChapterSelected
-                          ? "bg-[#ECFDF5] dark:bg-[#064E3B] border-[#059669] text-[#047857] dark:text-[#34D399]"
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
                           : "bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400"
                       )}
                     >
@@ -1417,7 +1417,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
 
                   {/* Expanded Topics List */}
                   {isExpanded && (
-                    <div className="p-3 pt-0 flex flex-col gap-1.5 border-t border-neutral-100 dark:border-neutral-800/60 mt-1">
+                    <div className="p-3 pt-0 flex flex-col gap-1.5 border-t border-neutral-100 dark:border-white/[0.06] mt-1">
                       {chapterTopics.map((topic) => {
                         const isSelected = currentSelected.has(topic.id);
                         return (
@@ -1426,24 +1426,24 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
                             type="button"
                             onClick={() => toggleTopic(topic.id)}
                             className={cn(
-                              "w-full flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left font-['HindSiliguri']",
+                              "w-full flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left font-['Anek_Bangla',sans-serif] cursor-pointer",
                               isSelected
-                                ? "bg-[#12544F] dark:bg-[#12544F] border-[#12544F] dark:border-[#12544F] text-white dark:text-[#E6FFFA]"
-                                : "bg-transparent border-[#E2E8F0] dark:border-[#27272A] text-[#334155] dark:text-[#D4D4D8] hover:border-neutral-300 dark:hover:border-neutral-700"
+                                ? "bg-[#12544F]/10 dark:bg-[#12544F]/20 border-[#12544F] dark:border-[#34D399]/60 text-[#12544F] dark:text-[#34D399]"
+                                : "bg-transparent border-neutral-200/80 dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700"
                             )}
                           >
                             <div
                               className={cn(
                                 "w-4 h-4 rounded border flex items-center justify-center shrink-0 transition",
                                 isSelected
-                                  ? "bg-white dark:bg-[#10B981] border-white dark:border-[#10B981]"
-                                  : "border-[#CBD5E1] dark:border-[#52525B] bg-transparent"
+                                  ? "bg-[#12544F] dark:bg-[#34D399] border-[#12544F] dark:border-[#34D399]"
+                                  : "border-neutral-300 dark:border-neutral-600 bg-transparent"
                               )}
                             >
                               {isSelected && (
                                 <Check
                                   size={11}
-                                  className="text-[#12544F] dark:text-black stroke-[3]"
+                                  className="text-white dark:text-black stroke-[3]"
                                 />
                               )}
                             </div>
@@ -1462,11 +1462,11 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-neutral-800">
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-white/[0.08]">
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] active:scale-[0.98] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition touch-manipulation cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#12544F] hover:bg-[#0E423E] active:scale-[0.98] text-white font-bold text-base font-['Anek_Bangla',sans-serif] shadow-sm transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>
