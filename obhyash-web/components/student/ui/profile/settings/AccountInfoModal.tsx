@@ -99,24 +99,24 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white dark:bg-[#1C1C1E] rounded-t-[28px] sm:rounded-[28px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#2C2C2E] font-['HindSiliguri',sans-serif] relative"
+        className="w-full max-w-md bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#27272A] font-['Anek_Bangla',sans-serif] relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}
-        <div className="w-11 h-1 bg-black/10 dark:bg-[#3A3A3C] rounded-full mx-auto mb-4" />
+        <div className="w-11 h-1.5 bg-black/15 dark:bg-white/20 rounded-full mx-auto mb-4" />
 
         {/* Title & Subtitle */}
         <div className="text-center mb-6">
-          <h3 className="text-xl font-bold text-neutral-900 dark:text-white leading-tight">
+          <h3 className="text-[18px] font-bold text-neutral-900 dark:text-white leading-tight">
             অ্যাকাউন্ট ইনফো
           </h3>
-          <p className="text-[13px] text-neutral-500 dark:text-[#94A3B8] mt-1">
+          <p className="font-['HindSiliguri',sans-serif] text-[13px] text-neutral-500 dark:text-[#94A3B8] mt-1">
             সাপোর্ট বা অ্যাডমিনের সহায়তার জন্য প্রয়োজনীয় তথ্য
           </p>
         </div>
 
         {/* Info Rows */}
-        <div className="space-y-3.5 mb-6">
+        <div className="space-y-3 mb-6">
           {infoRows.map((row) => {
             const Icon = row.icon;
             const isCopied = copiedKey === row.key;
@@ -124,11 +124,11 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
               <div
                 key={row.key}
                 onClick={() => copySingle(row.label, row.value, row.key)}
-                className="flex items-center justify-between p-2 rounded-2xl hover:bg-neutral-50 dark:hover:bg-[#2C2C2E] transition-colors cursor-pointer group"
+                className="flex items-center justify-between p-2.5 rounded-[16px] hover:bg-neutral-50 dark:hover:bg-[#202024] transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-3.5 min-w-0">
                   {/* Teal circular icon */}
-                  <div className="w-11 h-11 rounded-full bg-[#0D9488] flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <div className="w-11 h-11 rounded-full bg-[#12544F] flex items-center justify-center text-white shrink-0 shadow-xs">
                     <Icon className="w-5 h-5" />
                   </div>
 
@@ -153,10 +153,10 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
                       e.stopPropagation();
                       copySingle(row.label, row.value, row.key);
                     }}
-                    className="p-2 rounded-lg text-neutral-400 dark:text-[#64748B] hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors"
+                    className="p-2 rounded-[10px] text-neutral-400 dark:text-[#64748B] hover:text-[#12544F] dark:hover:text-[#34D399] hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors"
                   >
                     {isCopied ? (
-                      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <Check className="w-4 h-4 text-[#12544F] dark:text-[#34D399]" />
                     ) : (
                       <Copy className="w-4 h-4" />
                     )}
@@ -169,11 +169,12 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
 
         {/* Big Green Copy Button */}
         <button
+          type="button"
           onClick={copyAll}
-          className="w-full h-[52px] rounded-[16px] bg-[#047857] hover:bg-[#065f46] text-white font-bold text-base flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer active:scale-[0.99]"
+          className="w-full h-12 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold text-[15px] flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-[0.98]"
         >
           <span>Copy</span>
-          <Copy className="w-[18px] h-[18px]" />
+          <Copy className="w-4 h-4" />
         </button>
       </div>
     </div>

@@ -278,15 +278,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const hasBatch = Boolean(user.batch && user.batch.trim().length > 0);
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 py-2 font-sans pb-16">
+    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 py-2 font-['Anek_Bangla',sans-serif] pb-16">
       {/* ── 1. Profile Card (1:1 with Flutter SettingsView) ── */}
-      <div className="rounded-[20px] border border-[#E5E5E5] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-[0_2px_8px_rgba(0,0,0,0.03)] overflow-hidden">
+      <div className="rounded-[20px] border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#18181B] shadow-xs overflow-hidden">
         {/* Deep Green Gradient Header (Matching Flutter 1:1) */}
         <div className="w-full pt-7 pb-6 px-5 flex flex-col items-center text-center text-white bg-gradient-to-br from-[#064E3B] to-[#047857] dark:from-[#064E3B] dark:to-[#022C22]">
-          <div className="ring-[3px] ring-white/30 rounded-full shadow-lg">
+          <div className="ring-[3px] ring-white/30 rounded-full shadow-md">
             <UserAvatar user={user} size="2xl" priority className="w-20 h-20" />
           </div>
-          <h2 className="text-[16px] font-semibold text-white leading-tight mt-3">
+          <h2 className="text-[17px] sm:text-[18px] font-bold text-white leading-tight mt-3">
             {user.name || 'শিক্ষার্থী'}
           </h2>
           {user.email && (
@@ -297,19 +297,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* Info Chips & 4 Action Buttons */}
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-3.5">
           {/* Info Chips (Matching Flutter _InfoChip) */}
           <div className="flex flex-col gap-2">
             {(hasPhone || hasInstitute) && (
               <div className="flex items-center gap-2">
                 {hasPhone && (
-                  <div className="flex-1 min-w-0 px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12px] font-normal flex items-center justify-center gap-1.5 truncate">
+                  <div className="flex-1 min-w-0 px-3 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12.5px] font-medium flex items-center justify-center gap-1.5 truncate">
                     <span className="text-[12px] shrink-0">📞</span>
                     <span className="truncate">{user.phone}</span>
                   </div>
                 )}
                 {hasInstitute && (
-                  <div className="flex-1 min-w-0 px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12px] font-normal flex items-center justify-center gap-1.5 truncate">
+                  <div className="flex-1 min-w-0 px-3 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12.5px] font-medium flex items-center justify-center gap-1.5 truncate">
                     <span className="text-[12px] shrink-0">🏫</span>
                     <span className="truncate">{user.institute}</span>
                   </div>
@@ -318,7 +318,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             )}
 
             {hasBatch && (
-              <div className="w-full px-2.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12px] font-normal flex items-center justify-center gap-1.5 truncate">
+              <div className="w-full px-3 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] text-[12.5px] font-medium flex items-center justify-center gap-1.5 truncate">
                 <span className="text-[12px] shrink-0">📅</span>
                 <span className="truncate">
                   {user.batch?.toLowerCase().includes('ব্যাচ')
@@ -330,15 +330,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           {/* 4 Action Buttons Row (Matching Flutter _ActionBtn) */}
-          <div className="flex items-center gap-1.5 pt-1">
+          <div className="flex items-center gap-2 pt-0.5">
             {/* 1. Profile */}
             <button
               type="button"
               onClick={() => onNavigate?.('profile')}
-              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-95"
+              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:bg-neutral-200/80 dark:hover:bg-[#323236] transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-[0.97]"
             >
               <User size={16} />
-              <span className="text-[12px] font-medium leading-none">
+              <span className="text-[12.5px] font-bold leading-none">
                 প্রোফাইল
               </span>
             </button>
@@ -347,10 +347,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="button"
               onClick={() => onNavigate?.('personal')}
-              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-95"
+              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:bg-neutral-200/80 dark:hover:bg-[#323236] transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-[0.97]"
             >
               <Pencil size={16} />
-              <span className="text-[12px] font-medium leading-none">
+              <span className="text-[12.5px] font-bold leading-none">
                 এডিট
               </span>
             </button>
@@ -359,10 +359,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="button"
               onClick={() => setShowAccountInfoModal(true)}
-              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:brightness-95 transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-95"
+              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#374151] dark:text-[#E4E4E7] hover:bg-neutral-200/80 dark:hover:bg-[#323236] transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-[0.97]"
             >
               <Info size={16} />
-              <span className="text-[12px] font-medium leading-none">
+              <span className="text-[12.5px] font-bold leading-none">
                 ইনফো
               </span>
             </button>
@@ -371,10 +371,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="button"
               onClick={() => onNavigate?.('referral')}
-              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#FFF1F2] dark:bg-[#881337]/20 border border-[#FECDD3] dark:border-[#7F1D1D]/50 text-[#EF4444] hover:bg-rose-100 dark:hover:bg-[#881337]/30 transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-95"
+              className="flex-1 py-[9px] px-1 rounded-[10px] bg-[#FFF1F2] dark:bg-[#881337]/20 border border-[#FECDD3] dark:border-[#7F1D1D]/50 text-[#EF4444] hover:bg-rose-100 dark:hover:bg-[#881337]/30 transition-all flex flex-col items-center justify-center gap-[3px] cursor-pointer active:scale-[0.97]"
             >
               <Gift size={16} />
-              <span className="text-[12px] font-medium leading-none">
+              <span className="text-[12.5px] font-bold leading-none">
                 রেফার
               </span>
             </button>
@@ -404,7 +404,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     key={iIdx}
                     type="button"
                     onClick={() => handleItemClick(item)}
-                    className="w-full px-[14px] py-[11px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-[0_1px_4px_rgba(0,0,0,0.02)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.1)] flex items-center justify-between gap-3.5 text-left hover:bg-neutral-50/80 dark:hover:bg-[#202024] transition-all cursor-pointer group active:scale-[0.99]"
+                    className="w-full px-[14px] py-[11px] rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-2xs flex items-center justify-between gap-3.5 text-left hover:bg-neutral-50/80 dark:hover:bg-[#202024] transition-all cursor-pointer group active:scale-[0.99]"
                   >
                     <div className="flex items-center gap-[14px] min-w-0 flex-1">
                       {/* SVG or Lucide Icon (38x38 matching Flutter) */}
@@ -422,16 +422,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                           className={`w-[38px] h-[38px] rounded-[10px] flex items-center justify-center shrink-0 ${
                             item.danger
                               ? 'bg-rose-500/10 dark:bg-rose-500/20 text-[#EF4444]'
-                              : 'bg-[#059669]/10 dark:bg-[#059669]/20 text-[#059669] dark:text-[#34D399]'
+                              : 'bg-[#12544F]/10 dark:bg-[#12544F]/20 text-[#12544F] dark:text-[#34D399]'
                           }`}
                         >
                           <Icon size={18} />
                         </div>
                       )}
 
-                      {/* Item Label (Matching Flutter fontSize: 14, fontWeight: FontWeight.w500) */}
+                      {/* Item Label */}
                       <span
-                        className={`text-[14px] font-medium truncate ${
+                        className={`text-[14.5px] font-semibold truncate ${
                           item.danger
                             ? 'text-[#EF4444]'
                             : 'text-[#111827] dark:text-white'
@@ -443,7 +443,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
                     {/* Right Circular Pill Chevron (Matching Flutter shape: BoxShape.circle) */}
                     {!isAction && (
-                      <div className="w-[23px] h-[23px] rounded-full bg-[#F3F4F6] dark:bg-[#27272A] flex items-center justify-center shrink-0">
+                      <div className="w-[24px] h-[24px] rounded-full bg-[#F3F4F6] dark:bg-[#27272A] flex items-center justify-center shrink-0">
                         <ChevronRight
                           size={15}
                           className="text-[#71717A] dark:text-[#A1A1AA]"
@@ -482,20 +482,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           onClick={() => setShowLogoutModal(false)}
         >
           <div
-            className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[20px] border border-neutral-200 dark:border-[#27272A] p-6 shadow-2xl font-['HindSiliguri',sans-serif]"
+            className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] border border-[#E5E7EB] dark:border-[#27272A] p-6 shadow-2xl font-['Anek_Bangla',sans-serif]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+            <h3 className="text-[18px] font-bold text-neutral-900 dark:text-white">
               লগ আউট
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-2">
+            <p className="font-['HindSiliguri',sans-serif] text-sm text-neutral-600 dark:text-neutral-300 mt-2">
               তুমি কি নিশ্চিতভাবে লগ আউট করতে চাও?
             </p>
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-end gap-2.5 mt-6">
               <button
                 type="button"
                 onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-[12px] text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
               >
                 বাতিল
               </button>
@@ -505,7 +505,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   setShowLogoutModal(false);
                   onLogout?.();
                 }}
-                className="px-4 py-2 rounded-lg text-sm font-bold text-[#B91C1C] hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                className="px-5 py-2.5 rounded-[12px] text-sm font-bold bg-[#DC2626] hover:bg-[#B91C1C] text-white transition-all active:scale-[0.98] shadow-xs cursor-pointer"
               >
                 লগ আউট
               </button>

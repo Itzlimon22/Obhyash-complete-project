@@ -187,13 +187,13 @@ export const FeatureRequestsView: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-2 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Sticky Segmented Top Tabs (1:1 with Flutter _buildTabItem) ── */}
       <div className="sticky top-0 z-20 py-2 -mx-2 px-2 flex justify-center bg-[#F9FAFB]/90 dark:bg-[#0F0F11]/90 backdrop-blur-md">
-        <div className="w-full p-1 rounded-[12px] bg-[#E5E7EB] dark:bg-[#18181B] flex items-center gap-1 shadow-xs">
+        <div className="w-full p-1 rounded-[14px] bg-[#F1F5F9] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] flex items-center gap-1 shadow-xs font-['Anek_Bangla',sans-serif]">
           {/* New Request Tab */}
           <button
             type="button"
             onClick={() => setSelectedTabIndex(0)}
             className={`
-              flex-1 py-2.5 px-3 rounded-[9px] text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer
+              flex-1 py-2.5 px-3 rounded-[10px] text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98
               ${
                 selectedTabIndex === 0
                   ? 'bg-white dark:bg-[#27272A] text-[#111827] dark:text-white shadow-xs font-bold'
@@ -212,7 +212,7 @@ export const FeatureRequestsView: React.FC = () => {
               fetchMyRequests();
             }}
             className={`
-              flex-1 py-2.5 px-3 rounded-[9px] text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer
+              flex-1 py-2.5 px-3 rounded-[10px] text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98
               ${
                 selectedTabIndex === 1
                   ? 'bg-white dark:bg-[#27272A] text-[#111827] dark:text-white shadow-xs font-bold'
@@ -231,12 +231,12 @@ export const FeatureRequestsView: React.FC = () => {
 
       {/* ── 2. Success Screen (1:1 with Flutter _buildSuccessState) ── */}
       {isSuccess ? (
-        <div className="my-6 bg-white dark:bg-[#18181B] rounded-[16px] p-7 sm:p-8 border border-[#E5E7EB] dark:border-[#27272A] text-center space-y-4 shadow-sm">
+        <div className="my-6 bg-white dark:bg-[#18181B] rounded-[20px] p-7 sm:p-8 border border-[#E5E7EB] dark:border-[#27272A] text-center space-y-4 shadow-xs">
           <div className="w-16 h-16 bg-[#ECFDF5] dark:bg-[#059669]/20 rounded-full flex items-center justify-center mx-auto text-[#059669]">
             <Check className="w-8 h-8 stroke-[2.5]" />
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-lg sm:text-xl font-black text-[#111827] dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
               প্রস্তাব সফলভাবে জমা হয়েছে!
             </h2>
             <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A1A1AA] max-w-md mx-auto leading-relaxed">
@@ -247,7 +247,7 @@ export const FeatureRequestsView: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="px-6 py-2.5 rounded-[10px] bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm transition-all shadow-xs cursor-pointer"
+              className="px-6 py-2.5 rounded-[12px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold font-['Anek_Bangla',sans-serif] text-sm active:scale-[0.98] transition-all shadow-xs cursor-pointer"
             >
               আরেকটি প্রস্তাব দাও
             </button>
@@ -258,7 +258,7 @@ export const FeatureRequestsView: React.FC = () => {
                 setSelectedTabIndex(1);
                 fetchMyRequests();
               }}
-              className="px-5 py-2.5 rounded-[10px] border border-[#CBD5E1] dark:border-[#3F3F46] text-[#111827] dark:text-white font-bold text-sm hover:bg-neutral-50 dark:hover:bg-[#27272A] transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-[12px] border border-[#CBD5E1] dark:border-[#3F3F46] text-[#111827] dark:text-white font-bold font-['Anek_Bangla',sans-serif] text-sm hover:bg-neutral-50 dark:hover:bg-[#27272A] active:scale-[0.98] transition-colors cursor-pointer"
             >
               আমার তালিকা
             </button>
@@ -268,9 +268,9 @@ export const FeatureRequestsView: React.FC = () => {
         /* ── 3. New Request Form & Upcoming Roadmap (1:1 with Flutter) ── */
         <div className="space-y-6 pt-2">
           {/* Form Container */}
-          <div className="p-5 sm:p-6 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-xs space-y-4">
+          <div className="p-5 sm:p-6 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-xs space-y-4">
             <div>
-              <h2 className="text-[17px] font-bold text-[#111827] dark:text-white">
+              <h2 className="text-[18px] font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
                 অ্যাপে নতুন কী দেখতে চাও?
               </h2>
               <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-1">
@@ -281,7 +281,7 @@ export const FeatureRequestsView: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Category ChoiceChips */}
               <div>
-                <label className="text-[13px] font-semibold text-[#374151] dark:text-[#A1A1AA] block mb-2">
+                <label className="text-[13px] font-bold font-['Anek_Bangla',sans-serif] text-[#374151] dark:text-[#A1A1AA] block mb-2">
                   ক্যাটাগরি নির্বাচন করো
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -293,10 +293,10 @@ export const FeatureRequestsView: React.FC = () => {
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
                         className={`
-                          px-3 py-1.5 rounded-[8px] text-[13px] font-medium border transition-all cursor-pointer
+                          px-3.5 py-1.5 rounded-full text-[13px] font-bold font-['Anek_Bangla',sans-serif] border transition-all cursor-pointer active:scale-95
                           ${
                             isSelected
-                              ? 'bg-[#059669] text-white border-[#059669] font-bold'
+                              ? 'bg-[#12544F] text-white border-[#12544F] shadow-xs'
                               : 'bg-[#F3F4F6] dark:bg-[#27272A] text-[#4B5563] dark:text-[#D4D4D8] border-[#E5E7EB] dark:border-[#3F3F46] hover:border-neutral-400'
                           }
                         `}
@@ -310,7 +310,7 @@ export const FeatureRequestsView: React.FC = () => {
 
               {/* Title Input */}
               <div>
-                <label className="text-[13px] font-semibold text-[#374151] dark:text-[#A1A1AA] block mb-1.5">
+                <label className="text-[13px] font-bold font-['Anek_Bangla',sans-serif] text-[#374151] dark:text-[#A1A1AA] block mb-1.5">
                   ফিচারের নাম / সংক্ষিপ্ত বিবরণ
                 </label>
                 <input
@@ -318,13 +318,13 @@ export const FeatureRequestsView: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="যেমন: ওএমআর শীটে ভুল উত্তর দ্রুত রিভিউর সুবিধা"
-                  className="w-full px-3.5 py-2.5 rounded-[10px] bg-[#FAFAFA] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#111827] dark:text-white text-sm focus:outline-none focus:border-[#059669] transition-colors placeholder:text-[#9CA3AF] dark:placeholder:text-[#71717A]"
+                  className="w-full px-3.5 py-3 rounded-[14px] bg-[#FAFAFA] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#111827] dark:text-white text-sm font-['Anek_Bangla',sans-serif] focus:outline-none focus:border-[#12544F] transition-colors placeholder:text-[#9CA3AF] dark:placeholder:text-[#71717A]"
                 />
               </div>
 
               {/* Description TextArea */}
               <div>
-                <label className="text-[13px] font-semibold text-[#374151] dark:text-[#A1A1AA] block mb-1.5">
+                <label className="text-[13px] font-bold font-['Anek_Bangla',sans-serif] text-[#374151] dark:text-[#A1A1AA] block mb-1.5">
                   বিস্তারিত বিবরণ
                 </label>
                 <textarea
@@ -332,7 +332,7 @@ export const FeatureRequestsView: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="ফিচারটি কীভাবে কাজ করবে এবং এটি কেন দরকার তা লেখো..."
-                  className="w-full px-3.5 py-2.5 rounded-[10px] bg-[#FAFAFA] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#111827] dark:text-white text-sm focus:outline-none focus:border-[#059669] transition-colors placeholder:text-[#9CA3AF] dark:placeholder:text-[#71717A] resize-none leading-relaxed"
+                  className="w-full px-3.5 py-3 rounded-[14px] bg-[#FAFAFA] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#111827] dark:text-white text-sm focus:outline-none focus:border-[#12544F] transition-colors placeholder:text-[#9CA3AF] dark:placeholder:text-[#71717A] resize-none leading-relaxed"
                 />
               </div>
 
@@ -340,7 +340,7 @@ export const FeatureRequestsView: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11.5 rounded-[10px] bg-[#059669] hover:bg-[#047857] text-white font-bold text-base transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full h-[52px] rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold font-['Anek_Bangla',sans-serif] text-base active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isLoading ? (
                   <span>জমা হচ্ছে...</span>
@@ -354,7 +354,7 @@ export const FeatureRequestsView: React.FC = () => {
           {/* ── Upcoming Features (Roadmap Section) ── */}
           <div className="space-y-3 pt-2">
             <div>
-              <h3 className="text-[17px] font-bold text-[#111827] dark:text-white">
+              <h3 className="text-[18px] font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
                 আসন্ন ফিচারসমূহ
               </h3>
               <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] mt-0.5">
@@ -369,14 +369,14 @@ export const FeatureRequestsView: React.FC = () => {
                 return (
                   <div
                     key={idx}
-                    className="p-3.5 sm:p-4 rounded-[12px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-2xs space-y-1"
+                    className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-xs space-y-1"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-sm font-bold text-[#111827] dark:text-white truncate">
+                      <h4 className="text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white truncate">
                         {item.title}
                       </h4>
                       <span
-                        className={`px-2 py-0.5 rounded-[6px] text-[11px] font-bold shrink-0 ${statusCfg.bgLight} ${statusCfg.bgDark} ${statusCfg.textLight} ${statusCfg.textDark}`}
+                        className={`px-2 py-0.5 rounded-[6px] text-[11px] font-bold font-['Anek_Bangla',sans-serif] shrink-0 ${statusCfg.bgLight} ${statusCfg.bgDark} ${statusCfg.textLight} ${statusCfg.textDark}`}
                       >
                         {item.status}
                       </span>
@@ -398,7 +398,7 @@ export const FeatureRequestsView: React.FC = () => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="p-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] animate-pulse space-y-2"
+                  className="p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] animate-pulse space-y-2"
                 >
                   <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
                   <div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
@@ -406,8 +406,8 @@ export const FeatureRequestsView: React.FC = () => {
               ))}
             </div>
           ) : myRequests.length === 0 ? (
-            <div className="p-8 sm:p-10 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] text-center space-y-3 shadow-2xs">
-              <h3 className="text-base font-bold text-[#111827] dark:text-white">
+            <div className="p-8 sm:p-10 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] text-center space-y-3 shadow-xs">
+              <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
                 কোনো প্রস্তাব পাওয়া যায়নি
               </h3>
               <p className="text-[13px] text-[#6B7280] dark:text-[#A1A1AA] max-w-sm mx-auto">
@@ -416,7 +416,7 @@ export const FeatureRequestsView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedTabIndex(0)}
-                className="px-4 py-2 rounded-[8px] border border-[#059669] text-[#059669] font-bold text-[13px] hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer"
+                className="px-5 py-2.5 rounded-[12px] bg-[#12544F] text-white font-bold font-['Anek_Bangla',sans-serif] text-[13px] hover:bg-[#0E4440] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
               >
                 নতুন প্রস্তাব দাও
               </button>
@@ -430,29 +430,29 @@ export const FeatureRequestsView: React.FC = () => {
                 return (
                   <div
                     key={req.id}
-                    className="p-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-2xs space-y-2"
+                    className="p-4 sm:p-5 rounded-[20px] bg-white dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[#27272A] shadow-xs space-y-2"
                   >
                     {/* Header Row: Title & Status Badge */}
                     <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm sm:text-base font-bold text-[#111827] dark:text-white">
+                      <h4 className="text-sm sm:text-base font-bold font-['Anek_Bangla',sans-serif] text-[#111827] dark:text-white">
                         {req.title}
                       </h4>
                       <span
-                        className={`px-2 py-0.5 rounded-[6px] text-[11px] font-bold shrink-0 ${statusCfg.bgLight} ${statusCfg.bgDark} ${statusCfg.textLight} ${statusCfg.textDark}`}
+                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold font-['Anek_Bangla',sans-serif] shrink-0 ${statusCfg.bgLight} ${statusCfg.bgDark} ${statusCfg.textLight} ${statusCfg.textDark}`}
                       >
                         {statusCfg.label}
                       </span>
                     </div>
 
                     {/* Description */}
-                    <p className="text-[13px] text-[#4B5563] dark:text-[#D4D4D8] leading-relaxed">
+                    <p className="text-[13px] sm:text-sm text-[#4B5563] dark:text-[#D4D4D8] leading-relaxed">
                       {req.description}
                     </p>
 
                     {/* Admin Feedback (if present) */}
                     {req.admin_feedback && (
-                      <div className="p-2.5 rounded-[8px] bg-[#F3F4F6] dark:bg-[#27272A] text-xs text-[#4B5563] dark:text-[#A1A1AA] space-y-0.5">
-                        <strong className="text-[#111827] dark:text-white font-bold">
+                      <div className="p-3 rounded-[12px] bg-[#F3F4F6] dark:bg-[#27272A] text-xs text-[#4B5563] dark:text-[#A1A1AA] space-y-0.5">
+                        <strong className="text-[#111827] dark:text-white font-bold font-['Anek_Bangla',sans-serif]">
                           এডমিন ফিডব্যাক:{' '}
                         </strong>
                         <span>{req.admin_feedback}</span>
@@ -460,7 +460,7 @@ export const FeatureRequestsView: React.FC = () => {
                     )}
 
                     {/* Footer: Category & Date */}
-                    <div className="text-xs text-[#9CA3AF] dark:text-[#71717A] pt-1">
+                    <div className="text-xs font-medium font-['Anek_Bangla',sans-serif] text-[#9CA3AF] dark:text-[#71717A] pt-1">
                       {req.category} •{' '}
                       {new Date(req.created_at).toLocaleDateString('bn-BD', {
                         day: 'numeric',

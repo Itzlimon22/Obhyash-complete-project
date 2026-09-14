@@ -18,10 +18,10 @@ interface AboutUsViewProps {
   initialPolicy?: string;
 }
 
-export const AboutUsView: React.FC<AboutUsViewProps> = () => {
-  const cardBgClass =
-    'bg-white dark:bg-[#18181B] rounded-[18px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
+const cardContainerClass =
+  'bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
 
+export const AboutUsView: React.FC<AboutUsViewProps> = () => {
   return (
     <div className="w-full max-w-4xl mx-auto px-1 sm:px-3 py-3 font-['HindSiliguri',sans-serif] pb-24">
       {/* ── 1. Hero Branding Banner (1:1 with Flutter) ── */}
@@ -30,14 +30,14 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
           <Flame className="w-10 h-10" />
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-black text-[#0F172A] dark:text-white leading-tight">
+        <h2 className="text-2xl sm:text-3xl font-black font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white leading-tight">
           Obhyash (অভ্যাস)
         </h2>
-        <p className="text-sm sm:text-base font-bold text-[#10B981] mt-1">
+        <p className="text-sm sm:text-base font-bold font-['Anek_Bangla',sans-serif] text-[#10B981] mt-1">
           স্মার্ট প্রস্তুতি, নিশ্চিত সাফল্য
         </p>
 
-        <div className="mt-3.5 inline-block px-3 py-1 rounded-full bg-white dark:bg-[#27272A] border border-[#CBD5E1] dark:border-[#3F3F46] text-xs font-bold text-[#475569] dark:text-[#A1A1AA]">
+        <div className="mt-3.5 inline-block px-3 py-1 rounded-full bg-white dark:bg-[#27272A] border border-[#CBD5E1] dark:border-[#3F3F46] text-xs font-bold font-['Anek_Bangla',sans-serif] text-[#475569] dark:text-[#A1A1AA]">
           📱 App Version: 1.0.0 (Official)
         </div>
       </div>
@@ -45,28 +45,28 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
       {/* ── 2. 3 Stats Counter Row (1:1 with Flutter) ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
         <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-center shadow-2xs">
-          <span className="text-base sm:text-lg font-black text-[#3B82F6] block">
+          <span className="text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] text-[#3B82F6] block">
             ৫০,০০০+
           </span>
-          <span className="text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
+          <span className="text-[11px] sm:text-xs font-semibold font-['Anek_Bangla',sans-serif] text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
             মানসম্মত প্রশ্ন
           </span>
         </div>
 
         <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-center shadow-2xs">
-          <span className="text-base sm:text-lg font-black text-[#10B981] block">
+          <span className="text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] text-[#10B981] block">
             বিস্তারিত
           </span>
-          <span className="text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
+          <span className="text-[11px] sm:text-xs font-semibold font-['Anek_Bangla',sans-serif] text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
             ব্যাখ্যা ও ট্রিকস
           </span>
         </div>
 
         <div className="p-3.5 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] text-center shadow-2xs">
-          <span className="text-base sm:text-lg font-black text-[#F59E0B] block">
+          <span className="text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] text-[#F59E0B] block">
             তাত্ক্ষণিক
           </span>
-          <span className="text-[11px] sm:text-xs font-semibold text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
+          <span className="text-[11px] sm:text-xs font-semibold font-['Anek_Bangla',sans-serif] text-[#64748B] dark:text-[#A1A1AA] block mt-0.5">
             মেধাতালিকা
           </span>
         </div>
@@ -78,7 +78,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
           <div className="p-1.5 rounded-lg bg-[#059669]/10 text-[#059669]">
             <Target className="w-4 h-4" />
           </div>
-          <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
+          <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
             আমাদের ভিশন ও লক্ষ্য
           </h3>
         </div>
@@ -93,7 +93,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
           <div className="p-1.5 rounded-lg bg-[#10B981]/10 text-[#10B981]">
             <Zap className="w-4 h-4" />
           </div>
-          <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
+          <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
             অ্যাপের বিশেষত্বসমূহ
           </h3>
         </div>
@@ -133,7 +133,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
                   <Icon className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] dark:text-white">
+                  <h4 className="text-sm font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
                     {item.title}
                   </h4>
                   <p className="text-xs text-[#64748B] dark:text-[#A1A1AA] mt-0.5 leading-snug">
@@ -148,7 +148,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
 
       {/* ── 5. Connect & Support (1:1 with Flutter) ── */}
       <div className={cardContainerClass}>
-        <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white mb-3">
+        <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white mb-3">
           আমাদের সাথে যোগাযোগ
         </h3>
 
@@ -157,12 +157,12 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
             href="https://obhyash.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3 rounded-xl bg-neutral-50 dark:bg-[#27272A] flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#323238] transition-colors"
+            className="p-3 rounded-[14px] bg-neutral-50 dark:bg-[#27272A] flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#323238] active:scale-[0.99] transition-all"
           >
             <div className="flex items-center gap-3">
               <Globe className="w-4.5 h-4.5 text-[#059669]" />
               <div>
-                <span className="text-xs font-bold text-[#0F172A] dark:text-white block">
+                <span className="text-xs font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white block">
                   অফিসিয়াল ওয়েবসাইট
                 </span>
                 <span className="text-xs text-[#10B981] font-semibold">
@@ -175,12 +175,14 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
 
           <a
             href="mailto:support@obhyash.com"
-            className="p-3 rounded-xl bg-neutral-50 dark:bg-[#27272A] flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#323238] transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 rounded-[14px] bg-neutral-50 dark:bg-[#27272A] flex items-center justify-between hover:bg-neutral-100 dark:hover:bg-[#323238] active:scale-[0.99] transition-all"
           >
             <div className="flex items-center gap-3">
               <Mail className="w-4.5 h-4.5 text-[#059669]" />
               <div>
-                <span className="text-xs font-bold text-[#0F172A] dark:text-white block">
+                <span className="text-xs font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white block">
                   ইমেইল সাপোর্ট
                 </span>
                 <span className="text-xs text-[#10B981] font-semibold">
@@ -195,18 +197,15 @@ export const AboutUsView: React.FC<AboutUsViewProps> = () => {
 
       {/* ── Copyright Footer ── */}
       <div className="text-center pt-2">
-        <p className="text-xs text-neutral-400 dark:text-neutral-500">
+        <p className="text-xs font-['Anek_Bangla',sans-serif] text-neutral-400 dark:text-neutral-500">
           © 2026 Obhyash Technologies. All rights reserved.
         </p>
-        <p className="text-[11px] font-semibold text-[#059669] mt-0.5">
+        <p className="text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-[#059669] mt-0.5">
           Made with ❤️ for Bangladeshi Students
         </p>
       </div>
     </div>
   );
 };
-
-const cardContainerClass =
-  'bg-white dark:bg-[#18181B] rounded-[18px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
 
 export default AboutUsView;

@@ -13,7 +13,7 @@ import {
 
 export const TermsConditionsView: React.FC = () => {
   const cardContainerClass =
-    'bg-white dark:bg-[#18181B] rounded-[18px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
+    'bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
 
   const TERMS = [
     {
@@ -93,14 +93,14 @@ export const TermsConditionsView: React.FC = () => {
           <Scale className="w-7 h-7" />
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white">
+        <h2 className="text-xl sm:text-2xl font-black font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
           ব্যবহারের শর্তাবলী
         </h2>
         <p className="text-xs sm:text-sm text-[#475569] dark:text-[#A1A1AA] mt-1.5 leading-relaxed max-w-md mx-auto">
           Obhyash প্ল্যাটফর্ম ও মোবাইল অ্যাপ ব্যবহারের সার্বিক নীতিমালা ও নিয়মাবলী।
         </p>
 
-        <div className="mt-3 inline-block px-3 py-1 rounded-full bg-[#E2E8F0] dark:bg-[#27272A] text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA]">
+        <div className="mt-3 inline-block px-3 py-1 rounded-full bg-[#E2E8F0] dark:bg-[#27272A] text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-[#64748B] dark:text-[#A1A1AA]">
           নিয়মাবলি কার্যকর: ২০২৩-২০২৬
         </div>
       </div>
@@ -117,7 +117,7 @@ export const TermsConditionsView: React.FC = () => {
               >
                 <Icon className="w-4 h-4" />
               </div>
-              <h3 className="text-sm sm:text-base font-extrabold text-[#0F172A] dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
                 {t.title}
               </h3>
             </div>
@@ -143,7 +143,7 @@ export const TermsConditionsView: React.FC = () => {
           শর্ত সংক্রান্ত যেকোনো প্রয়োজনে লিখুন:{' '}
           <a
             href="mailto:support@obhyash.com"
-            className="text-[#0284C7] font-bold hover:underline"
+            className="text-[#0284C7] font-bold font-['Anek_Bangla',sans-serif] hover:underline"
           >
             support@obhyash.com
           </a>

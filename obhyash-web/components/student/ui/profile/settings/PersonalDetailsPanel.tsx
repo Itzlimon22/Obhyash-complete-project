@@ -201,15 +201,15 @@ export default function PersonalDetailsPanel({
   const isBatchLocked = false; // For now user is not restricted to change batch
 
   const cardContainerClass =
-    'bg-white dark:bg-[#18181B] rounded-[16px] border border-[#F5F5F5] dark:border-[#1C1C1E] shadow-2xs overflow-hidden mb-6';
+    'bg-white dark:bg-[#18181B] rounded-[20px] border border-[#E5E7EB] dark:border-[#27272A] shadow-xs overflow-hidden mb-5';
   const sectionHeaderClass =
-    'px-5 py-4 border-b border-[#F5F5F5] dark:border-[#1C1C1E] text-[17px] font-bold text-[#111827] dark:text-white font-["HindSiliguri",sans-serif]';
+    'px-5 py-4 border-b border-[#F5F5F5] dark:border-[#27272A] text-[16px] font-bold text-[#111827] dark:text-white font-["Anek_Bangla",sans-serif]';
   const labelClass =
-    'block text-[13px] font-semibold text-[#4B5563] dark:text-[#A3A3A3] mb-1.5 font-["HindSiliguri",sans-serif]';
+    'block text-[13.5px] font-semibold text-[#4B5563] dark:text-[#A3A3A3] mb-1.5 font-["Anek_Bangla",sans-serif]';
   const inputClass =
-    'w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E5E5] dark:border-[#1C1C1E] bg-[#FAFAFA] dark:bg-[#0A0A0A] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#10B981] transition-colors font-["HindSiliguri",sans-serif]';
+    'w-full px-4 py-3 rounded-[14px] border border-[#E5E5E5] dark:border-[#27272A] bg-[#FAFAFA] dark:bg-[#121214] text-sm sm:text-[15px] text-neutral-900 dark:text-white focus:outline-none focus:border-[#12544F] dark:focus:border-[#10B981] transition-colors font-["Anek_Bangla",sans-serif]';
   const selectClass =
-    'w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E5E5] dark:border-[#1C1C1E] bg-[#FAFAFA] dark:bg-[#0A0A0A] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#10B981] transition-colors font-["HindSiliguri",sans-serif] cursor-pointer';
+    'w-full px-4 py-3 rounded-[14px] border border-[#E5E5E5] dark:border-[#27272A] bg-[#FAFAFA] dark:bg-[#121214] text-sm sm:text-[15px] text-neutral-900 dark:text-white focus:outline-none focus:border-[#12544F] dark:focus:border-[#10B981] transition-colors font-["Anek_Bangla",sans-serif] cursor-pointer';
 
   return (
     <div className="w-full max-w-4xl mx-auto font-['HindSiliguri',sans-serif] pb-16">
@@ -224,12 +224,12 @@ export default function PersonalDetailsPanel({
               user={{ ...user, avatarUrl }}
               size="2xl"
               showBorder
-              className="border-2.5 border-[#059669] shadow-xs"
+              className="border-2.5 border-[#12544F] shadow-xs"
             />
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-[17px] font-extrabold text-[#111827] dark:text-white">
+            <h3 className="text-[17px] font-bold text-[#111827] dark:text-white font-['Anek_Bangla',sans-serif]">
               প্রোফাইল ছবি
             </h3>
             <p className="text-[13px] text-[#6B7280] dark:text-[#A3A3A3] mt-0.5 leading-snug">
@@ -238,7 +238,7 @@ export default function PersonalDetailsPanel({
             <button
               type="button"
               onClick={() => setShowAvatarPicker(true)}
-              className="mt-2.5 px-3.5 py-1.5 rounded-[10px] border border-[#059669] text-[#059669] text-[13px] font-bold flex items-center gap-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer"
+              className="mt-2.5 px-3.5 py-1.5 rounded-[10px] border border-[#12544F] text-[#12544F] dark:text-[#34D399] font-['Anek_Bangla',sans-serif] text-[13px] font-bold flex items-center gap-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors cursor-pointer active:scale-95"
             >
               <Camera className="w-3.5 h-3.5" />
               <span>ছবি পরিবর্তন করো</span>
@@ -623,7 +623,7 @@ export default function PersonalDetailsPanel({
           type="button"
           onClick={() => handleSubmit()}
           disabled={isSaving}
-          className="w-full py-3.5 px-6 rounded-[12px] bg-[#059669] hover:bg-[#047857] text-white font-extrabold text-base shadow-sm shadow-[#059669]/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-60 cursor-pointer"
+          className="w-full py-4 px-6 rounded-[14px] bg-[#12544F] hover:bg-[#0E4440] text-white font-bold text-[16px] font-['Anek_Bangla',sans-serif] shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
         >
           {isSaving ? (
             <>

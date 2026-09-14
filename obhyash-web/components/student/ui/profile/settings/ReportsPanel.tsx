@@ -123,40 +123,40 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
       {allReports.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {/* Pending */}
-          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <div className="p-3 sm:p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
             <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-1.5">
               <Clock className="w-4 h-4" />
             </div>
-            <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums leading-none">
+            <span className="text-xl sm:text-2xl font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white tabular-nums leading-none">
               {pendingCount}
             </span>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mt-1">
+            <span className="text-xs font-bold font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 mt-1">
               অপেক্ষমান
             </span>
           </div>
 
           {/* Resolved */}
-          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <div className="p-3 sm:p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
             <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-1.5">
               <CheckCircle2 className="w-4 h-4" />
             </div>
-            <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums leading-none">
+            <span className="text-xl sm:text-2xl font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white tabular-nums leading-none">
               {resolvedCount}
             </span>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mt-1">
+            <span className="text-xs font-bold font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 mt-1">
               গৃহীত
             </span>
           </div>
 
           {/* Ignored */}
-          <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <div className="p-3 sm:p-4 rounded-[20px] bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
             <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mb-1.5">
               <XCircle className="w-4 h-4" />
             </div>
-            <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums leading-none">
+            <span className="text-xl sm:text-2xl font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white tabular-nums leading-none">
               {ignoredCount}
             </span>
-            <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mt-1">
+            <span className="text-xs font-bold font-['Anek_Bangla',sans-serif] text-neutral-500 dark:text-neutral-400 mt-1">
               বাতিল
             </span>
           </div>
@@ -165,7 +165,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
 
       {/* ── Status Filter Pills ── */}
       {allReports.length > 0 && (
-        <div className="p-1 rounded-2xl bg-neutral-100 dark:bg-[#000000] border border-neutral-200 dark:border-[#1C1C1E] grid grid-cols-4 gap-1 shadow-xs">
+        <div className="p-1 rounded-[16px] bg-neutral-100 dark:bg-[#000000] border border-neutral-200 dark:border-[#1C1C1E] grid grid-cols-4 gap-1 shadow-xs">
           {[
             { id: '' as StatusFilter, label: 'সব' },
             { id: 'pending' as StatusFilter, label: 'অপেক্ষমান' },
@@ -178,10 +178,10 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                 key={tab.id}
                 onClick={() => setStatusFilter(tab.id)}
                 className={`
-                  py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition-all text-center cursor-pointer truncate
+                  py-2 px-1 rounded-[12px] text-xs sm:text-sm font-bold font-['Anek_Bangla',sans-serif] transition-all text-center cursor-pointer truncate
                   ${
                     isSelected
-                      ? 'bg-white dark:bg-[#27272A] text-neutral-900 dark:text-white shadow-xs font-black'
+                      ? 'bg-white dark:bg-[#27272A] text-neutral-900 dark:text-white shadow-xs'
                       : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
                   }
                 `}
@@ -292,7 +292,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                   >
                     {/* Status Icon */}
                     <div
-                      className="p-2.5 sm:p-3 rounded-2xl shrink-0"
+                      className="p-2.5 sm:p-3 rounded-[16px] shrink-0"
                       style={{
                         backgroundColor: `${statusConfig.color}15`,
                         color: statusConfig.color,
@@ -304,26 +304,26 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                     {/* Report Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <h4 className="text-base sm:text-lg font-black text-neutral-900 dark:text-white truncate">
+                        <h4 className="text-base sm:text-lg font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white truncate">
                           {formatSubject(report.question?.subject)}
                         </h4>
                         <span
-                          className={`text-xs font-bold px-2.5 py-0.5 rounded-full border shrink-0 ${statusConfig.bg}`}
+                          className={`text-xs font-bold font-['Anek_Bangla',sans-serif] px-2.5 py-0.5 rounded-full border shrink-0 ${statusConfig.bg}`}
                         >
                           {statusConfig.label}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-bold mb-2">
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-semibold font-['Anek_Bangla',sans-serif] mb-2">
                         <CalendarDays className="w-3.5 h-3.5" />
                         <span>{formatDate(report.created_at)}</span>
                       </div>
 
                       <div className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
-                        <span className="text-neutral-400 font-medium mr-1">
+                        <span className="text-neutral-400 font-medium mr-1 font-['Anek_Bangla',sans-serif]">
                           কারণ:
                         </span>
-                        <span className="font-bold text-neutral-800 dark:text-neutral-200">
+                        <span className="font-bold font-['Anek_Bangla',sans-serif] text-neutral-800 dark:text-neutral-200">
                           {REASON_LABELS[report.reason] || report.reason}
                         </span>
                       </div>
@@ -347,7 +347,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                         <button
                           type="button"
                           onClick={() => setViewQuestionReport(report)}
-                          className="w-full py-3 px-4 rounded-xl bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/50 text-sky-700 dark:text-sky-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-sky-100/60 dark:hover:bg-sky-950/60 transition-colors cursor-pointer"
+                          className="w-full py-3 px-4 rounded-[14px] bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/50 text-sky-700 dark:text-sky-400 font-bold font-['Anek_Bangla',sans-serif] text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-sky-100/60 dark:hover:bg-sky-950/60 active:scale-[0.98] transition-all cursor-pointer"
                         >
                           <FileSearch className="w-4 h-4" />
                           <span>সম্পূর্ণ প্রশ্ন ও অপশন দেখো</span>
@@ -356,11 +356,11 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
 
                       {/* User Comment Bubble */}
                       <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 px-1">
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-400 px-1">
                           <User className="w-3 h-3" />
                           <span>তুমি</span>
                         </div>
-                        <div className="p-3.5 rounded-2xl rounded-tr-xs bg-neutral-100 dark:bg-[#27272A] border border-neutral-200/60 dark:border-[#3F3F46] text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm leading-relaxed">
+                        <div className="p-3.5 rounded-[16px] rounded-tr-xs bg-neutral-100 dark:bg-[#27272A] border border-neutral-200/60 dark:border-[#3F3F46] text-neutral-800 dark:text-neutral-200 text-xs sm:text-sm leading-relaxed">
                           {report.description && report.description.trim()
                             ? report.description
                             : 'কোনো বিবরণ নেই'}
@@ -370,11 +370,11 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                       {/* Reference Image */}
                       {report.image_url && (
                         <div className="space-y-1">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 px-1">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-400 px-1">
                             <ImageIcon className="w-3 h-3" />
                             <span>রেফারেন্স ছবি</span>
                           </div>
-                          <div className="w-48 h-32 rounded-xl overflow-hidden border border-neutral-200 dark:border-[#3F3F46]">
+                          <div className="w-48 h-32 rounded-[14px] overflow-hidden border border-neutral-200 dark:border-[#3F3F46]">
                             <img
                               src={report.image_url}
                               alt="Report reference"
@@ -387,22 +387,22 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                       {/* Admin Feedback Bubble */}
                       {report.admin_comment && report.admin_comment.trim() ? (
                         <div className="space-y-1 pt-1">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 px-1">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-emerald-600 dark:text-emerald-400 px-1">
                             <ShieldCheck className="w-3.5 h-3.5" />
                             <span>অ্যাডমিন</span>
                           </div>
-                          <div className="p-3.5 rounded-2xl rounded-tl-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 text-xs sm:text-sm leading-relaxed font-medium">
+                          <div className="p-3.5 rounded-[16px] rounded-tl-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 text-xs sm:text-sm leading-relaxed font-medium">
                             {report.admin_comment}
                           </div>
                         </div>
                       ) : report.status !== 'Resolved' &&
                         report.status !== 'Ignored' ? (
                         <div className="space-y-1 pt-1">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 px-1">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-neutral-400 px-1">
                             <Bot className="w-3.5 h-3.5" />
                             <span>সিস্টেম</span>
                           </div>
-                          <div className="p-3.5 rounded-2xl rounded-tl-xs bg-neutral-100/70 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm italic leading-relaxed">
+                          <div className="p-3.5 rounded-[16px] rounded-tl-xs bg-neutral-100/70 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm italic leading-relaxed">
                             তোমার রিপোর্টটি টিমের কাছে পাঠানো হয়েছে। খুব
                             শীঘ্রই রিভিউ করা হবে।
                           </div>
@@ -421,7 +421,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
               <button
                 onClick={() => setSize(size + 1)}
                 disabled={isLoading || isValidating}
-                className="w-full py-3 rounded-2xl bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272A] dark:hover:bg-[#3F3F46] text-neutral-800 dark:text-white font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full py-3 rounded-[14px] bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272A] dark:hover:bg-[#3F3F46] text-neutral-800 dark:text-white font-bold font-['Anek_Bangla',sans-serif] text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
               >
                 {isLoading || isValidating ? (
                   <span>লোড হচ্ছে...</span>
@@ -441,11 +441,11 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
           onClick={() => setViewQuestionReport(null)}
         >
           <div
-            className="w-full max-w-xl bg-white dark:bg-[#141210] rounded-t-[28px] sm:rounded-[28px] p-5 sm:p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] max-h-[85vh] flex flex-col"
+            className="w-full max-w-xl bg-white dark:bg-[#18181B] rounded-t-[28px] sm:rounded-[24px] p-5 sm:p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle bar */}
-            <div className="w-10 h-1 bg-black/10 dark:bg-white/20 rounded-full mx-auto mb-3" />
+            <div className="w-11 h-1.5 bg-black/15 dark:bg-white/20 rounded-full mx-auto mb-3" />
 
             {/* Header */}
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-100 dark:border-[#27272A]">
@@ -453,7 +453,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                 <div className="p-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
                   <HelpCircle className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-bold font-['Anek_Bangla',sans-serif] text-neutral-900 dark:text-white">
                   সম্পূর্ণ প্রশ্ন
                 </h3>
               </div>

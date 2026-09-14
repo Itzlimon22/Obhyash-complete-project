@@ -12,7 +12,7 @@ import {
 
 export const PrivacyPolicyView: React.FC = () => {
   const cardContainerClass =
-    'bg-white dark:bg-[#18181B] rounded-[18px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
+    'bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-4';
 
   const POLICIES = [
     {
@@ -73,14 +73,14 @@ export const PrivacyPolicyView: React.FC = () => {
           <ShieldCheck className="w-7 h-7" />
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white">
+        <h2 className="text-xl sm:text-2xl font-black font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
           গোপনীয়তা ও নিরাপত্তা নীতি
         </h2>
         <p className="text-xs sm:text-sm text-[#475569] dark:text-[#A1A1AA] mt-1.5 leading-relaxed max-w-md mx-auto">
           তোমার ব্যক্তিগত ও একাডেমিক তথ্যের শতভাগ নিরাপত্তা আমাদের সর্বোচ্চ অগ্রাধিকার।
         </p>
 
-        <div className="mt-3 inline-block px-3 py-1 rounded-full bg-[#E2E8F0] dark:bg-[#27272A] text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA]">
+        <div className="mt-3 inline-block px-3 py-1 rounded-full bg-[#E2E8F0] dark:bg-[#27272A] text-[11px] font-bold font-['Anek_Bangla',sans-serif] text-[#64748B] dark:text-[#A1A1AA]">
           সর্বশেষ হালনাগাদ: ১৫ আগস্ট, ২০২৬
         </div>
       </div>
@@ -97,7 +97,7 @@ export const PrivacyPolicyView: React.FC = () => {
               >
                 <Icon className="w-4 h-4" />
               </div>
-              <h3 className="text-sm sm:text-base font-extrabold text-[#0F172A] dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold font-['Anek_Bangla',sans-serif] text-[#0F172A] dark:text-white">
                 {p.title}
               </h3>
             </div>
@@ -123,7 +123,7 @@ export const PrivacyPolicyView: React.FC = () => {
           প্রশ্ন বা সহায়তার জন্য লিখুন:{' '}
           <a
             href="mailto:support@obhyash.com"
-            className="text-[#059669] font-bold hover:underline"
+            className="text-[#059669] font-bold font-['Anek_Bangla',sans-serif] hover:underline"
           >
             support@obhyash.com
           </a>
