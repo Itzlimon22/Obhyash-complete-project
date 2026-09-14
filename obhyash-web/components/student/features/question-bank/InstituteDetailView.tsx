@@ -562,6 +562,7 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
           }
         }}
         onTakeExam={onStartExam}
+        showHeader={showHeader}
       />
     );
   }

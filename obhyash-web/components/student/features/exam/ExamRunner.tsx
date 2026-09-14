@@ -260,7 +260,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       </header>
 
       {/* ── 2. Main Question Flow Feed ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
         <div className="flex flex-col gap-3.5 sm:gap-4">
           {questions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
@@ -292,13 +292,13 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       </main>
 
       {/* ── 3. Bottom Sticky Submit Footer (Matching Flutter 1:1) ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-t border-neutral-200/80 dark:border-white/[0.08] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#000000] border-t border-[#E5E7EB] dark:border-[#2C2C2C] px-4 py-2 sm:py-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex justify-center items-center shadow-sm">
         <div className="max-w-3xl w-full flex justify-center">
           <button
             type="button"
             onClick={() => setShowSubmitModal(true)}
             disabled={isEvaluating}
-            className="w-full sm:w-auto min-w-[200px] h-[48px] rounded-[14px] bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] font-bold text-[16px] font-['Anek_Bangla',sans-serif] flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+            className="h-[38px] min-h-[38px] px-6 py-[7px] rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-[14.5px] font-['Anek_Bangla',sans-serif] flex items-center justify-center transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
           >
             {isEvaluating ? 'মূল্যায়ন হচ্ছে...' : 'জমা দাও'}
           </button>
@@ -365,7 +365,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(false)}
-                className="py-3 px-4 rounded-[12px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] shadow-[0_3px_0_#CBD5E1] dark:shadow-[0_3px_0_#1C1C1E] active:shadow-[0_1px_0_#CBD5E1] active:translate-y-[2px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 না, পরীক্ষা দিবো
               </button>
@@ -373,7 +373,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={confirmSubmit}
-                className="py-3 px-4 rounded-[12px] bg-[#12544F] text-white shadow-[0_3.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-['Anek_Bangla',sans-serif]"
               >
                 হ্যাঁ, জমা দাও
               </button>
@@ -408,7 +408,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowExitModal(false)}
-                className="py-3 px-4 rounded-[12px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] shadow-[0_3px_0_#CBD5E1] dark:shadow-[0_3px_0_#1C1C1E] active:shadow-[0_1px_0_#CBD5E1] active:translate-y-[2px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#F1F5F9] dark:bg-[#2C2C2E] border border-[#E2E8F0] dark:border-[#3A3A3C] text-[#475569] dark:text-[#D4D4D4] hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-[0.98] font-semibold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
               >
                 চালিয়ে যাও
               </button>
@@ -419,7 +419,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                   setShowExitModal(false);
                   confirmSubmit();
                 }}
-                className="py-3 px-4 rounded-[12px] bg-[#12544F] text-white shadow-[0_3.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] font-bold text-sm transition cursor-pointer font-['Anek_Bangla',sans-serif]"
+                className="py-2.5 px-4 rounded-[8px] bg-[#12544F] text-white hover:brightness-110 active:scale-[0.98] font-semibold text-sm transition cursor-pointer shadow-sm font-['Anek_Bangla',sans-serif]"
               >
                 জমা দাও
               </button>

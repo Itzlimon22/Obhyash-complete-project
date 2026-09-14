@@ -50,6 +50,9 @@ interface AppLayoutProps {
 }
 
 const SUB_PAGES_WITHOUT_BOTTOM_NAV = new Set([
+  'setup',
+  'exam_setup',
+  'exam-setup',
   'notifications',
   'bookmarks',
   'legends-league',
@@ -254,8 +257,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <header className="h-[52px] bg-white/95 dark:bg-[#000000] backdrop-blur-xl border-b border-[#F3F4F6] dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
             <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
               {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
-                {activeTab !== 'dashboard' && (
+              <div className={`flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2 ${headerTabs ? 'justify-center' : ''}`}>
+                {(onBack || (activeTab !== 'dashboard' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'profile')) && (
                   /* Back button on sub-screens matching Flutter minimal arrow */
                   <button
                     type="button"
@@ -277,7 +280,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 )}
 
                 {headerTabs ? (
-                  <div className="flex items-center gap-1 sm:gap-2 min-w-0 overflow-x-auto no-scrollbar py-0.5">
+                  <div className="flex items-center justify-center gap-6 min-w-0 overflow-x-auto no-scrollbar py-0.5">
                     {headerTabs.tabs.map((tab) => {
                       const isActive = headerTabs.activeTabId === tab.id;
                       return (
@@ -285,16 +288,24 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           key={tab.id}
                           type="button"
                           onClick={() => headerTabs.onTabSelect(tab.id)}
-                          className={`relative py-1 px-1.5 sm:px-2.5 text-[12.5px] sm:text-sm md:text-[15px] font-semibold sm:font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none shrink-0 ${
-                            isActive
-                              ? "text-[#059669] dark:text-[#10B981]"
-                              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
-                          }`}
+                          className="group flex flex-col items-center cursor-pointer select-none shrink-0"
                         >
-                          {tab.label}
-                          {isActive && (
-                            <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
-                          )}
+                          <span
+                            className={`text-[15.5px] tracking-[-0.2px] font-['Anek_Bangla',sans-serif] transition-colors ${
+                              isActive
+                                ? "font-semibold text-[#0F172A] dark:text-white"
+                                : "font-medium text-[#64748B] dark:text-[#A1A1AA] group-hover:text-[#0F172A] dark:group-hover:text-white"
+                            }`}
+                          >
+                            {tab.label}
+                          </span>
+                          <span
+                            className={`w-full h-[3px] rounded-full mt-[3px] transition-all ${
+                              isActive
+                                ? "bg-[#004633] dark:bg-[#10B981]"
+                                : "bg-transparent"
+                            }`}
+                          />
                         </button>
                       );
                     })}

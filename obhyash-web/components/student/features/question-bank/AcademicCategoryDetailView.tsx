@@ -57,6 +57,7 @@ interface AcademicCategoryDetailViewProps {
   };
   onBack: () => void;
   showHeader?: boolean;
+  onSelectSection?: (section: AcademicItem) => void;
 }
 
 import AcademicSectionDetailView from "./AcademicSectionDetailView";
@@ -65,6 +66,7 @@ export default function AcademicCategoryDetailView({
   subject,
   onBack,
   showHeader = true,
+  onSelectSection,
 }: AcademicCategoryDetailViewProps) {
   const [selectedSection, setSelectedSection] = useState<AcademicItem | null>(null);
 
@@ -74,6 +76,7 @@ export default function AcademicCategoryDetailView({
         subject={subject}
         section={selectedSection}
         onBack={() => setSelectedSection(null)}
+        showHeader={showHeader}
       />
     );
   }
@@ -109,7 +112,13 @@ export default function AcademicCategoryDetailView({
           {ACADEMIC_SECTIONS.map((sec) => (
             <div
               key={sec.id}
-              onClick={() => setSelectedSection(sec)}
+              onClick={() => {
+                if (onSelectSection) {
+                  onSelectSection(sec);
+                } else {
+                  setSelectedSection(sec);
+                }
+              }}
               className={`group relative aspect-[1.25/1] rounded-[16px] sm:rounded-[24px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${sec.gradient} p-3 sm:p-4.5 flex flex-col justify-between`}
             >
               {/* Ambient Glow */}

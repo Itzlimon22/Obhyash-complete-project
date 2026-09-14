@@ -51,12 +51,14 @@ interface AcademicSectionDetailViewProps {
     count?: number;
   };
   onBack: () => void;
+  showHeader?: boolean;
 }
 
 export default function AcademicSectionDetailView({
   subject,
   section,
   onBack,
+  showHeader = true,
 }: AcademicSectionDetailViewProps) {
   const [chapters, setChapters] = useState<ChapterItem[]>([]);
   const [topics, setTopics] = useState<TopicItem[]>([]);
@@ -332,27 +334,29 @@ export default function AcademicSectionDetailView({
   return (
     <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#FAF9F6] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-24">
       {/* ── Top Header Bar ── */}
-      <div className="sticky top-0 z-40 bg-[#FAF9F6]/90 dark:bg-[#000000]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
-        <button
-          type="button"
-          onClick={onBack}
-          className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-2xs"
-          aria-label="Back"
-        >
-          <ArrowLeft size={18} className="stroke-[2.2]" />
-        </button>
+      {showHeader && (
+        <div className="sticky top-0 z-40 bg-[#FAF9F6]/90 dark:bg-[#000000]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all cursor-pointer active:scale-95 shadow-2xs"
+            aria-label="Back"
+          >
+            <ArrowLeft size={18} className="stroke-[2.2]" />
+          </button>
 
-        <div className="text-center min-w-0 max-w-[70%]">
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white truncate">
-            {displayTitle} - {section.title}
-          </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-            {section.subtitle}
-          </p>
+          <div className="text-center min-w-0 max-w-[70%]">
+            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white truncate">
+              {displayTitle} - {section.title}
+            </h1>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+              {section.subtitle}
+            </p>
+          </div>
+
+          <div className="w-9" />
         </div>
-
-        <div className="w-9" />
-      </div>
+      )}
 
       {/* ── Filter Bar: Chapter & Topic Dropdowns ── */}
       <div className="px-4 py-3 bg-white dark:bg-[#121212] border-b border-neutral-200/80 dark:border-white/[0.08] shadow-xs">

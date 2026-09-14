@@ -7,6 +7,7 @@ import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import {
   Bookmark,
   Flag,
+  AlertTriangle,
   ChevronDown,
   ChevronUp,
   CheckCircle2,
@@ -31,6 +32,8 @@ export interface QuestionCardProps {
   onToggleBookmark?: () => void;
   onDelete?: () => void;
   hideMetadata?: boolean;
+  alwaysShowSourceTag?: boolean;
+  showReport?: boolean;
   initiallyExpanded?: boolean;
 }
 
@@ -51,19 +54,36 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onToggleBookmark,
   onDelete,
   hideMetadata = false,
+  alwaysShowSourceTag = false,
+  showReport = false,
   initiallyExpanded = false,
 }) => {
   const [isExplanationOpen, setIsExplanationOpen] = useState(
     showFeedback && initiallyExpanded,
   );
 
-  // Parse institute/year/author tags (e.g. CU-18, DB-24)
+  // Parse institute/year/author tags matching Flutter QuestionCard logic
   const sourceTags = React.useMemo(() => {
+    const examHist = question.exam_history || question.examHistory;
+    if (examHist && examHist.length > 0) {
+      const first = examHist[0];
+      if (typeof first === 'object' && first?.institute) {
+        const yr = Number(first.year) > 0 ? ` '${String(Number(first.year) % 100).padStart(2, '0')}` : '';
+        return `${first.institute}${yr}`;
+      }
+    }
+    const insts = question.institutes || (question.institute ? [question.institute] : []);
+    const yrs = question.years || (question.year ? [question.year] : []);
+    if (insts.length > 0 && insts[0]) {
+      const inst = insts[0];
+      const yrNum = yrs.length > 0 ? Number(yrs[0]) : 0;
+      const yr = yrNum > 0 ? ` '${String(yrNum % 100).padStart(2, '0')}` : '';
+      return `${inst}${yr}`;
+    }
     return BanglaNameHelper.formatQuestionSource({
-      institutes:
-        question.institutes || (question.institute ? [question.institute] : []),
-      years: question.years || (question.year ? [question.year] : []),
-      examHistory: question.exam_history || question.examHistory || [],
+      institutes: insts,
+      years: yrs,
+      examHistory: examHist || [],
     });
   }, [question]);
 
@@ -124,12 +144,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         )}
 
-        {/* ── Tags + Action Buttons Row (Below Question Text) ── */}
+        {/* ── Tags + Action Buttons Row (Below Question Text - Matching Flutter 1:1) ── */}
         <div className="mt-2.5 flex items-center justify-between gap-2">
           {/* Left: Source Tag & Flagged Badge */}
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
             {/* Unified Source Tag (Board / University & Year - Short Form e.g. DB '24) */}
-            {!hideMetadata && sourceTags && (readOnly || showFeedback || showAnswer) && (
+            {!hideMetadata && sourceTags && (alwaysShowSourceTag || readOnly || showFeedback || showAnswer || true) && (
               <span className="inline-flex items-center px-2 py-[3px] rounded-[6px] bg-[#E0F7FA] dark:bg-[#0E3A4A] border border-[#B2EBF2] dark:border-[#164E63] text-[11px] font-semibold text-[#006064] dark:text-[#A5F3FC] leading-none tracking-tight">
                 {sourceTags}
               </span>
@@ -143,27 +163,29 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
           </div>
 
-          {/* Right: Actions (Flag during exam, Bookmark, Report) */}
+          {/* Right: Actions (Flag, Bookmark, Delete, Report) */}
           <div className="flex items-center gap-1 shrink-0">
             {/* Flag Button (during active exam) */}
             {onToggleFlag && !showFeedback && (
               <button
                 type="button"
-                onClick={onToggleFlag}
-                title={isFlagged ? 'ফ্ল্যাগ বাতিল করো' : 'রিভিউর জন্য চিহ্নিত করো'}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFlag();
+                }}
+                title={isFlagged ? 'চিহ্নিত বাতিল করো' : 'রিভিউর জন্য চিহ্নিত করো'}
                 className={cn(
-                  'px-2 py-1 rounded-[6px] text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer',
+                  'p-1.5 rounded-[6px] transition-colors cursor-pointer flex items-center justify-center',
                   isFlagged
                     ? 'text-[#D97706] dark:text-[#FBBF24] bg-[#FEF3C7] dark:bg-[#78350F]/40'
-                    : 'text-[#9CA3AF] dark:text-[#525252] hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60',
+                    : 'text-[#9CA3AF] dark:text-[#525252] hover:text-[#D97706] dark:hover:text-[#FBBF24] hover:bg-neutral-100 dark:hover:bg-neutral-800/60',
                 )}
               >
-                <Flag size={14} className={isFlagged ? 'fill-[#D97706] dark:fill-[#FBBF24]' : ''} />
-                <span className="text-[11px]">{isFlagged ? 'চিহ্নিত' : 'ফ্ল্যাগ'}</span>
+                <Flag size={18} className={isFlagged ? 'fill-[#D97706] dark:fill-[#FBBF24]' : ''} />
               </button>
             )}
 
-            {/* Bookmark Button */}
+            {/* Bookmark Button (Matching Flutter QuestionCard _IconBtn) */}
             {onToggleBookmark && (
               <button
                 type="button"
@@ -172,7 +194,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   onToggleBookmark();
                 }}
                 title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-                className="p-1.5 rounded-[6px] text-[#9CA3AF] dark:text-[#525252] hover:text-[#F59E0B] dark:hover:text-[#F59E0B] hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[6px] text-[#9CA3AF] dark:text-[#525252] hover:text-[#F59E0B] dark:hover:text-[#F59E0B] hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition-colors cursor-pointer flex items-center justify-center"
               >
                 <Bookmark
                   size={18}
@@ -194,14 +216,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   onDelete();
                 }}
                 title="প্রশ্নটি মুছে ফেলো"
-                className="p-1.5 rounded-[6px] text-[#DC2626] dark:text-[#EF4444]/85 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[6px] text-[#DC2626] dark:text-[#EF4444]/85 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer flex items-center justify-center"
               >
                 <Trash2 size={17} />
               </button>
             )}
 
-            {/* Report Button (in review mode) */}
-            {onReport && (readOnly || showFeedback) && (
+            {/* Report Button (Matching Flutter QuestionCard _IconBtn) */}
+            {onReport && (readOnly || showFeedback || showReport || true) && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -209,9 +231,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   onReport();
                 }}
                 title="রিপোর্ট করো"
-                className="p-1.5 rounded-[6px] text-[#9CA3AF] dark:text-[#525252] hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[6px] text-[#9CA3AF] dark:text-[#525252] hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer flex items-center justify-center"
               >
-                <Flag size={18} />
+                {onToggleFlag && !showFeedback ? <AlertTriangle size={18} /> : <Flag size={18} />}
               </button>
             )}
           </div>

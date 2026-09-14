@@ -506,9 +506,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {/* Demo Exam Link in Desktop Header */}
             <Link
               href="/demo"
-              className="px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 font-bold text-sm flex items-center gap-1.5 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-all shadow-xs"
+              className="px-3.5 py-1.5 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white font-bold text-sm flex items-center gap-1.5 shadow-[0_3px_0_#94A3B8] dark:shadow-[0_3px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[2px] transition-all cursor-pointer select-none"
             >
-              <Flame className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <Flame className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-300" />
               <span>ডেমো পরীক্ষা</span>
             </Link>
 
@@ -546,8 +546,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <div className="md:hidden flex items-center gap-2">
             <Link
               href="/demo"
-              className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] flex items-center gap-1 shadow-xs"
+              className="px-2.5 py-1 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white font-bold text-[11px] flex items-center gap-1 shadow-[0_2.5px_0_#94A3B8] dark:shadow-[0_2.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[1.5px] transition-all cursor-pointer select-none"
             >
+              <Flame className="w-3 h-3 text-neutral-600 dark:text-neutral-300" />
               <span>ডেমো</span>
             </Link>
 
@@ -584,20 +585,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row lg:items-start items-center gap-12 lg:gap-16">
           {/* Left Content */}
           <div className="lg:w-1/2 text-center lg:text-left space-y-8 animate-fade-in-up">
-            {/* Specialization Pills */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider shadow-xs">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                HSC & SSC স্পেশাল
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-300 text-xs font-bold">
-                মেডিকেল, বুয়েট ও ঢাবি এডমিশন
-              </span>
-            </div>
-
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 dark:text-white leading-tight">
               ভুল থেকেই শুরু হোক <br />
               <span className="text-red-600 dark:text-red-500">
@@ -620,30 +607,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
               <Link
                 href="/demo"
-                className="sm:w-auto w-full px-5 py-3 bg-white dark:bg-black border-2 border-[#12544F]/40 dark:border-[#12544F]/60 text-[#12544F] dark:text-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 rounded-[14px] font-bold text-sm sm:text-base transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
+                className="sm:w-auto w-full px-6 py-3 bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#94A3B8] dark:shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer select-none"
               >
-                <Flame className="w-4 h-4 text-emerald-600" />
+                <Flame className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
                 <span>ডেমো পরীক্ষা দাও</span>
               </Link>
-            </div>
-
-            {/* Social Proof & App Trust */}
-            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-semibold text-neutral-600 dark:text-neutral-400">
-              <div className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/80 px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-700/60 shadow-xs">
-                <div className="flex text-amber-500">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                </div>
-                <span className="font-bold text-neutral-900 dark:text-white">৪.৯/৫</span>
-                <span>• ২০,০০০+ শিক্ষার্থী</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>ওয়েব ও অ্যান্ড্রয়েড অ্যাপ সাপোর্ট</span>
-              </div>
             </div>
           </div>
 

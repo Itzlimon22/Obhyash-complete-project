@@ -76,6 +76,7 @@ import LiveExamView from "@/components/student/features/live-exam/LiveExamView";
 import QuestionBankView, { SubjectCardItem, InstituteCardItem } from "@/components/student/features/question-bank/QuestionBankView";
 import SubjectCategoryDetailView from "@/components/student/features/question-bank/SubjectCategoryDetailView";
 import AcademicCategoryDetailView from "@/components/student/features/question-bank/AcademicCategoryDetailView";
+import AcademicSectionDetailView from "@/components/student/features/question-bank/AcademicSectionDetailView";
 import InstituteDetailView from "@/components/student/features/question-bank/InstituteDetailView";
 // import InstructionsView from '@/components/student/ui/InstructionsView'; // Deprecated in new flow
 import { ExamInstructionsView } from "@/components/student/features/exam/ExamInstructionsView";
@@ -298,6 +299,14 @@ export default function StudentRoot({
   const [questionBankTab, setQuestionBankTab] = useState<"institution" | "subject">("institution");
   const [selectedQuestionBankSubject, setSelectedQuestionBankSubject] = useState<SubjectCardItem | null>(null);
   const [selectedQuestionBankCategory, setSelectedQuestionBankCategory] = useState<string | null>(null);
+  const [selectedQuestionBankSection, setSelectedQuestionBankSection] = useState<{
+    id: string;
+    title: string;
+    subtitle: string;
+    gradient?: string;
+    svgIcon?: string;
+    count?: number;
+  } | null>(null);
   const [selectedQuestionBankInstitute, setSelectedQuestionBankInstitute] = useState<InstituteCardItem | null>(null);
   const [historyTab, setHistoryTab] = useState<"exams" | "questions">("exams");
 
@@ -712,6 +721,7 @@ export default function StudentRoot({
   const handleSelectQuestionBankSubject = useCallback((subj: SubjectCardItem | null) => {
     setSelectedQuestionBankSubject(subj);
     setSelectedQuestionBankCategory(null);
+    setSelectedQuestionBankSection(null);
     if (subj && typeof window !== "undefined") {
       window.history.pushState(
         { tab: "question_bank", qbView: "subject", subjectId: subj.id },
@@ -797,6 +807,13 @@ export default function StudentRoot({
 
     // 4. Question Bank deep navigation:
     if (activeTab === "question_bank" || activeTab === "question-bank") {
+      if (selectedQuestionBankSection) {
+        setSelectedQuestionBankSection(null);
+        if (typeof window !== "undefined" && window.history.state?.qbSubView === "section") {
+          window.history.back();
+        }
+        return;
+      }
       if (selectedQuestionBankInstitute) {
         setSelectedQuestionBankInstitute(null);
         if (typeof window !== "undefined" && window.history.state?.qbView) {
@@ -974,11 +991,13 @@ export default function StudentRoot({
         // Re-tap resets detail view back to main question bank
         setSelectedQuestionBankSubject(null);
         setSelectedQuestionBankCategory(null);
+        setSelectedQuestionBankSection(null);
         setSelectedQuestionBankInstitute(null);
       }
     } else {
       setSelectedQuestionBankSubject(null);
       setSelectedQuestionBankCategory(null);
+      setSelectedQuestionBankSection(null);
       setSelectedQuestionBankInstitute(null);
     }
 
@@ -1130,6 +1149,7 @@ export default function StudentRoot({
             activeTab={activeTab}
             {...commonLayoutProps}
             title="নতুন পরীক্ষা"
+            hideBottomNav={true}
           >
             <ExamSetupContainer
               onStartExam={handleStartExam}
@@ -1208,6 +1228,27 @@ export default function StudentRoot({
             ? `${selectedQuestionBankSubject.name} ${paperClean}`
             : selectedQuestionBankSubject.name;
 
+          // If a section is selected (e.g. MCQ, CQ, Board, Textbook)
+          if (selectedQuestionBankSection) {
+            return (
+              <AppLayout
+                activeTab="question_bank"
+                {...commonLayoutProps}
+                title={`${displayTitle} - ${selectedQuestionBankSection.title}`}
+                onBack={() => setSelectedQuestionBankSection(null)}
+                hideTitle={false}
+                hideBottomNav={true}
+              >
+                <AcademicSectionDetailView
+                  subject={selectedQuestionBankSubject}
+                  section={selectedQuestionBankSection}
+                  onBack={() => setSelectedQuestionBankSection(null)}
+                  showHeader={false}
+                />
+              </AppLayout>
+            );
+          }
+
           if (selectedQuestionBankCategory === "academic") {
             return (
               <AppLayout
@@ -1222,6 +1263,7 @@ export default function StudentRoot({
                   subject={selectedQuestionBankSubject}
                   onBack={() => smartBack()}
                   showHeader={false}
+                  onSelectSection={(sec) => setSelectedQuestionBankSection(sec)}
                 />
               </AppLayout>
             );
@@ -1243,6 +1285,15 @@ export default function StudentRoot({
                 onSelectCategory={(cat) => {
                   if (cat.id === "academic") {
                     handleSelectQuestionBankCategory("academic");
+                  } else {
+                    setSelectedQuestionBankSection({
+                      id: cat.id,
+                      title: cat.title,
+                      subtitle: cat.subtitle,
+                      gradient: cat.gradient,
+                      svgIcon: cat.svgIcon,
+                      count: cat.count || 50,
+                    });
                   }
                 }}
               />

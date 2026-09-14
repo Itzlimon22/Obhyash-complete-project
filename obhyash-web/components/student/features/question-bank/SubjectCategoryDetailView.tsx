@@ -235,6 +235,7 @@ export default function SubjectCategoryDetailView({
             window.history.back();
           }
         }}
+        showHeader={showHeader}
       />
     );
   }

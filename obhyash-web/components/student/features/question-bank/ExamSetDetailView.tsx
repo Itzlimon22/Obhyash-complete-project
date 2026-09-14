@@ -35,6 +35,7 @@ interface ExamSetDetailViewProps {
   examSet: InstituteExamSet;
   onBack: () => void;
   onTakeExam?: (examSet: InstituteExamSet, questions: Question[]) => void;
+  showHeader?: boolean;
 }
 
 interface SubjectDistribution {
@@ -272,6 +273,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
   examSet,
   onBack,
   onTakeExam,
+  showHeader = true,
 }) => {
   const [viewMode, setViewMode] = useState<"details" | "read">("details");
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
@@ -346,6 +348,7 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
         questions={fetchedQuestions}
         onBack={() => setViewMode("details")}
         onTakeExam={handleStartExam}
+        showHeader={showHeader}
       />
     );
   }
@@ -367,19 +370,21 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
         </div>
       )}
       {/* ── Top Bar with Back Button & Centered Title ── */}
-      <div className="relative flex items-center justify-center min-h-[44px]">
-        <button
-          type="button"
-          onClick={onBack}
-          className="absolute left-0 w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
-          aria-label="Back"
-        >
-          <ArrowLeft size={18} strokeWidth={2.2} />
-        </button>
-        <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight text-center truncate max-w-[70%]">
-          {examSet.title}
-        </h1>
-      </div>
+      {showHeader && (
+        <div className="relative flex items-center justify-center min-h-[44px]">
+          <button
+            type="button"
+            onClick={onBack}
+            className="absolute left-0 w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
+            aria-label="Back"
+          >
+            <ArrowLeft size={18} strokeWidth={2.2} />
+          </button>
+          <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight text-center truncate max-w-[70%]">
+            {examSet.title}
+          </h1>
+        </div>
+      )}
 
       {/* ── Header Badge Card ── */}
       <div className="bg-white dark:bg-[#121212] rounded-[16px] p-4 sm:p-5 border border-neutral-200/80 dark:border-white/[0.08] shadow-xs flex items-center gap-4">

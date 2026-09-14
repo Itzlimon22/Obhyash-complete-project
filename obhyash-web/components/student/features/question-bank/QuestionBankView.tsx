@@ -8,8 +8,6 @@ import {
   Building2,
   ArrowRight,
   Check,
-  Search,
-  X,
   Landmark,
   School,
   Sparkles,
@@ -723,7 +721,6 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
     user?.level?.toLowerCase().includes("ssc")
   );
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedDivision, setSelectedDivision] = useState<string>("all");
 
   const optionalSubject = (user?.optional_subject || "").trim().toLowerCase();
@@ -732,16 +729,8 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
   // Filtered Subjects based strictly on user stream
   const filteredSubjects = useMemo(() => {
     const sourceList = isSSC ? SSC_SUBJECTS : HSC_SUBJECTS;
-    const query = searchQuery.trim().toLowerCase();
 
     return sourceList.filter((subject) => {
-      // Search query filter
-      if (query) {
-        const matchesName = subject.name.toLowerCase().includes(query);
-        const matchesPaper = subject.paper.toLowerCase().includes(query);
-        if (!matchesName && !matchesPaper) return false;
-      }
-
       // SSC division filter
       if (isSSC) {
         if (selectedDivision !== "all") {
@@ -788,57 +777,15 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
       return true;
     });
-  }, [isSSC, searchQuery, selectedDivision, userDivision, optionalSubject]);
+  }, [isSSC, selectedDivision, userDivision, optionalSubject]);
 
   // Filtered Institutes based strictly on user stream
   const filteredInstitutes = useMemo(() => {
-    const sourceList = isSSC ? SSC_INSTITUTES : ADMISSION_INSTITUTES;
-    const query = searchQuery.trim().toLowerCase();
-
-    if (!query) return sourceList;
-
-    return sourceList.filter((inst) => {
-      const matchesName = inst.name.toLowerCase().includes(query);
-      const matchesFull = inst.fullName.toLowerCase().includes(query);
-      const matchesId = inst.id.toLowerCase().includes(query);
-      return matchesName || matchesFull || matchesId;
-    });
-  }, [isSSC, searchQuery]);
+    return isSSC ? SSC_INSTITUTES : ADMISSION_INSTITUTES;
+  }, [isSSC]);
 
   return (
     <div className="w-full flex flex-col font-sans pb-16">
-      {/* ── Top Bar: Search Filter ── */}
-      <div className="mb-5 sm:mb-6 flex items-center justify-between gap-4">
-        {/* Real-time Search Input */}
-        <div className="relative w-full max-w-md">
-          <Search
-            size={17}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              activeHeaderTab === "subject"
-                ? "বিষয় বা পত্র খুঁজুন..."
-                : isSSC
-                ? "শিক্ষা বোর্ড বা স্কুল খুঁজুন..."
-                : "বিশ্ববিদ্যালয় বা ইনস্টিটিউট খুঁজুন..."
-            }
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-hidden focus:ring-2 focus:ring-[#12544F]/50 transition-all shadow-xs"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-            >
-              <X size={15} />
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* ── Sub-Filter for SSC Divisions (only visible for SSC students) ── */}
       {isSSC && activeHeaderTab === "subject" && (
