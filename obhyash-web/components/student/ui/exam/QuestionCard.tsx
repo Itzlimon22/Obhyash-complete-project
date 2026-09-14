@@ -81,17 +81,106 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       id={`question-${question.id}`}
       className={cn(
-        "relative mb-4 sm:mb-5 scroll-mt-24 rounded-[18px] bg-white dark:bg-[#000000] border transition-all duration-200 font-['HindSiliguri',sans-serif]",
+        "relative mb-3.5 sm:mb-5 scroll-mt-24 rounded-2xl bg-white dark:bg-[#0D0D10] border transition-all duration-200 font-['HindSiliguri',sans-serif]",
         isFlagged
           ? 'border-[#FB923C] ring-2 ring-[#FB923C]/30 shadow-md'
-          : 'border-[#E5E7EB] dark:border-[#262626] shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-none',
+          : 'border-[#E5E7EB] dark:border-[#26262A] shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none',
       )}
     >
       {/* ── Top Question Section ── */}
-      <div className="p-4 sm:p-5">
+      <div className="p-3.5 sm:p-5">
+        {/* ── Flutter-Matching Header Row: Circle ID + Info (Left) & Actions (Right) ── */}
+        <div className="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-[#F1F5F9] dark:border-[#202024]">
+          {/* Left: Circle Serial Number + "প্রশ্ন ১" + "১ নম্বর" */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            {serialNumber !== undefined && (
+              <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700/60 flex items-center justify-center shrink-0">
+                <span className="font-bold text-xs text-neutral-700 dark:text-neutral-200">
+                  {BanglaNameHelper.toBanglaNumeral(serialNumber)}
+                </span>
+              </div>
+            )}
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400">
+                  প্রশ্ন {serialNumber !== undefined ? BanglaNameHelper.toBanglaNumeral(serialNumber) : ''}
+                </span>
+                <span className="text-[11px] font-bold text-[#004633] dark:text-[#10B981]">
+                  • {BanglaNameHelper.toBanglaNumeral(question.points || 1)} নম্বর
+                </span>
+                {/* Source Tag if available and review mode */}
+                {!hideMetadata && sourceTags && (readOnly || showFeedback || showAnswer) && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-300 text-[10px] font-bold">
+                    {sourceTags}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Actions (Flag, Bookmark, Report) */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Flag Button (during active exam) */}
+            {onToggleFlag && !showFeedback && (
+              <button
+                type="button"
+                onClick={onToggleFlag}
+                title={isFlagged ? 'ফ্ল্যাগ বাতিল করো' : 'রিভিউর জন্য ফ্ল্যাগ করো'}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer',
+                  isFlagged
+                    ? 'bg-[#FEF3C7] dark:bg-[#78350F]/40 text-[#D97706] dark:text-[#FBBF24] border border-[#FDE68A] dark:border-[#92400E]'
+                    : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/60',
+                )}
+              >
+                <Flag size={13} className={isFlagged ? 'fill-[#D97706]' : ''} />
+                <span className="text-[11px]">{isFlagged ? 'চিহ্নিত' : 'ফ্ল্যাগ'}</span>
+              </button>
+            )}
+
+            {/* Bookmark Button */}
+            {onToggleBookmark && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark();
+                }}
+                title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
+                className={cn(
+                  'p-1.5 rounded-lg transition-colors cursor-pointer',
+                  isBookmarked
+                    ? 'text-amber-500 hover:text-amber-600 dark:text-amber-400'
+                    : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/60',
+                )}
+              >
+                <Bookmark
+                  size={16}
+                  className={cn(isBookmarked && 'fill-amber-500 text-amber-500')}
+                />
+              </button>
+            )}
+
+            {/* Report Button (in review mode) */}
+            {onReport && (readOnly || showFeedback) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReport();
+                }}
+                title="ভুল প্রশ্ন রিপোর্ট করো"
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+              >
+                <Flag size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Stimulus / Passage (উদ্দীপক) if present */}
         {question.passage && (
-          <div className="mb-3.5 p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
+          <div className="mb-3 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
             <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block mb-1 uppercase tracking-wider">
               উদ্দীপক
             </span>
@@ -99,13 +188,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         )}
 
-        {/* Question Text with Serial Number */}
-        <div className="text-[16px] sm:text-[17px] font-bold text-[#111827] dark:text-[#F5F5F5] leading-relaxed mb-3">
-          {serialNumber !== undefined && (
-            <span className="mr-1.5 font-bold">
-              {BanglaNameHelper.toBanglaNumeral(serialNumber)}.
-            </span>
-          )}
+        {/* Question Text */}
+        <div className="text-[15.5px] sm:text-[17px] font-bold text-[#111827] dark:text-[#F5F5F5] leading-relaxed mb-1">
           <MathRenderer text={question.question} />
         </div>
 
@@ -119,91 +203,22 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             />
           </div>
         )}
-
-        {/* ── Source Tag (CU-18) + Bookmark + Report Action Row ── */}
-        <div className="flex items-center justify-between gap-2 pt-1">
-          {/* Institute / Board Tag (e.g. CU-18) */}
-          {!hideMetadata && sourceTags && (readOnly || showFeedback || showAnswer) ? (
-            <div className="inline-flex items-center px-2.5 py-0.5 rounded-[6px] bg-[#E0F7FA] dark:bg-[#0E3A4A] border border-[#B2EBF2] dark:border-[#164E63] text-[#006064] dark:text-[#A5F3FC] text-xs font-bold tracking-wide">
-              {sourceTags}
-            </div>
-          ) : (
-            <div />
-          )}
-
-          {/* Right Action Icons: Flag/Review, Bookmark, Report */}
-          <div className="flex items-center gap-1.5 ml-auto">
-            {/* Flag Button (during active exam) */}
-            {onToggleFlag && !showFeedback && (
-              <button
-                type="button"
-                onClick={onToggleFlag}
-                title={isFlagged ? 'ফ্ল্যাগ বাতিল করো' : 'রিভিউর জন্য ফ্ল্যাগ করো'}
-                className={cn(
-                  'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer',
-                  isFlagged
-                    ? 'bg-[#FEF3C7] dark:bg-[#78350F]/40 text-[#D97706] dark:text-[#FBBF24] border border-[#FDE68A] dark:border-[#92400E]'
-                    : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800',
-                )}
-              >
-                <Flag size={13} className={isFlagged ? 'fill-[#D97706]' : ''} />
-                <span>{isFlagged ? 'চিহ্নিত' : 'ফ্ল্যাগ'}</span>
-              </button>
-            )}
-
-            {/* Bookmark Button */}
-            {onToggleBookmark && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleBookmark();
-                }}
-                title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-                className="p-1 rounded-lg text-[#9CA3AF] dark:text-[#525252] hover:text-[#1E3A8A] dark:hover:text-[#38BDF8] transition-colors cursor-pointer"
-              >
-                <Bookmark
-                  size={18}
-                  className={cn(
-                    isBookmarked &&
-                      'fill-[#1E3A8A] text-[#1E3A8A] dark:fill-[#38BDF8] dark:text-[#38BDF8]',
-                  )}
-                />
-              </button>
-            )}
-
-            {/* Report Button (Flag icon in review mode) */}
-            {onReport && (readOnly || showFeedback) && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReport();
-                }}
-                title="ভুল প্রশ্ন রিপোর্ট করো"
-                className="p-1 rounded-lg text-[#9CA3AF] dark:text-[#525252] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
-              >
-                <Flag size={18} />
-              </button>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* ── Options List Section: 1-Column on Mobile, 2x2 Grid on Desktop ── */}
-      <div className="px-3 pb-3 sm:px-4 sm:pb-4 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5">
+      <div className="px-2.5 pb-3 sm:px-4 sm:pb-4 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5">
         {question.options.map((option, idx) => {
           const banglaIndex = BANGLA_INDICES[idx] || `${idx + 1}`;
           const isSelected = isUserSelected(idx);
           const isCorrect = isCorrectAnswer(idx);
 
           // ── Flutter-Matching State Colors ──
-          let boxBg = 'bg-[#F8F9FA] dark:bg-[#1F1F1F]';
+          let boxBg = 'bg-[#F8F9FA] dark:bg-[#18181C]';
           let boxBorder =
-            'border-[#E5E7EB] dark:border-[#333333] hover:border-[#D1D5DB] dark:hover:border-[#474747]';
-          let bulletBg = 'bg-transparent';
-          let bulletBorder = 'border-[#D1D5DB] dark:border-[#525252]';
-          let bulletText = 'text-[#475569] dark:text-[#E4E4E7]';
+            'border-[#E5E7EB] dark:border-[#2A2A2E] hover:border-[#D1D5DB] dark:hover:border-[#404046]';
+          let bulletBg = 'bg-neutral-100 dark:bg-neutral-800';
+          let bulletBorder = 'border-neutral-200 dark:border-neutral-700';
+          let bulletText = 'text-neutral-700 dark:text-neutral-300';
           let optionTextColor = 'text-[#0F172A] dark:text-[#F4F4F5]';
           let isBold = false;
           let trailingBadge: React.ReactNode = null;
@@ -211,9 +226,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           if (showFeedback || showAnswer) {
             if (isCorrect) {
               // Deep Rich Green Correct Styling
-              boxBg = 'bg-[#D1FAE5] dark:bg-[#064E3B]/50';
+              boxBg = 'bg-[#D1FAE5] dark:bg-[#064E3B]/40';
               boxBorder =
-                'border-[#047857] dark:border-[#10B981] shadow-xs border-[1.8px]';
+                'border-[#047857] dark:border-[#10B981] shadow-xs border-[1.5px]';
               bulletBg = 'bg-[#047857] dark:bg-[#059669]';
               bulletBorder = 'border-[#047857] dark:border-[#059669]';
               bulletText = 'text-white';
@@ -227,7 +242,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               );
             } else if (isSelected && !isCorrect) {
               // Crimson for Wrong Selected
-              boxBg = 'bg-[#FEF2F2] dark:bg-[#7F1D1D]/20';
+              boxBg = 'bg-[#FEF2F2] dark:bg-[#7F1D1D]/25';
               boxBorder =
                 'border-[#FCA5A5] dark:border-[#B91C1C] border-[1.5px]';
               bulletBg = 'bg-[#DC2626]';
@@ -245,12 +260,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           } else {
             // Active Exam Mode:
             if (isSelected) {
-              boxBg = 'bg-[#E5E7EB] dark:bg-[#27272A]';
-              boxBorder = 'border-[#9CA3AF] dark:border-[#525252] border-[1.5px]';
-              bulletBg = 'bg-[#1F2937] dark:bg-[#E5E5E5]';
-              bulletBorder = 'border-[#1F2937] dark:border-[#E5E5E5]';
-              bulletText = 'text-white dark:text-[#1F2937]';
-              optionTextColor = 'text-[#111827] dark:text-white';
+              boxBg = 'bg-[#004633]/5 dark:bg-[#004633]/25';
+              boxBorder = 'border-[#004633] dark:border-[#10B981] border-[1.5px] shadow-xs';
+              bulletBg = 'bg-[#004633] dark:bg-[#059669]';
+              bulletBorder = 'border-[#004633] dark:border-[#059669]';
+              bulletText = 'text-white';
+              optionTextColor = 'text-[#004633] dark:text-[#A7F3D0]';
               isBold = true;
             }
           }
@@ -265,7 +280,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               disabled={readOnly || showFeedback || isLocked}
               onClick={() => onSelectOption && onSelectOption(idx)}
               className={cn(
-                'w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group',
+                'w-full flex items-center justify-between gap-2.5 px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl border transition-all text-left group touch-manipulation',
                 boxBg,
                 boxBorder,
                 !readOnly &&
@@ -275,16 +290,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 isLocked && !showFeedback && !showAnswer && isSelected && 'cursor-default',
               )}
             >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
                 {/* Circular Badge Indicator (ক, খ, গ, ঘ) */}
                 <div
                   className={cn(
-                    'w-[26px] h-[26px] rounded-full border flex items-center justify-center text-[13px] font-bold shrink-0 transition-colors',
+                    'w-7 h-7 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
                     bulletBg,
                     bulletBorder,
                     bulletText,
-                    bulletBg === 'bg-transparent' &&
-                      'shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
                   )}
                 >
                   <span>{banglaIndex}</span>
@@ -293,7 +306,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 {/* Option Text & Math Formula */}
                 <div
                   className={cn(
-                    'flex-1 min-w-0 text-[15px] sm:text-[16px] leading-snug',
+                    'flex-1 min-w-0 text-[14.5px] sm:text-[16px] leading-snug',
                     optionTextColor,
                     isBold ? 'font-bold' : 'font-medium',
                   )}
@@ -309,8 +322,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 </div>
               </div>
 
-              {/* Trailing Feedback Icon (Review mode) */}
-              {trailingBadge}
+              {/* Right: Radio Button Circle or Trailing Feedback Icon */}
+              <div className="shrink-0 ml-1.5">
+                {showFeedback || showAnswer ? (
+                  trailingBadge
+                ) : isSelected ? (
+                  <div className="w-5 h-5 rounded-full border-2 border-[#004633] dark:border-[#10B981] flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#004633] dark:bg-[#10B981]" />
+                  </div>
+                ) : (
+                  <div className="w-5 h-5 rounded-full border border-neutral-300 dark:border-neutral-600 flex items-center justify-center group-hover:border-neutral-400 dark:group-hover:border-neutral-500 transition-colors" />
+                )}
+              </div>
             </button>
           );
         })}

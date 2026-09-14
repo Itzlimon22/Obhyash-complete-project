@@ -186,7 +186,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-sans flex flex-col select-none">
       {/* ── 1. Top Sticky Exam Header (Matching Flutter Exactly) ── */}
       <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-        <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between gap-3">
+        <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-14 flex items-center justify-between gap-3">
           {/* Left: Answered / Total Pill (Clickable Question Palette) */}
           <button
             type="button"
@@ -260,8 +260,8 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       </header>
 
       {/* ── 2. Main Question Flow Feed ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-4 pt-4 sm:pt-6 pb-28">
-        <div className="flex flex-col gap-4">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-2.5 sm:px-4 pt-3.5 sm:pt-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+        <div className="flex flex-col gap-3.5 sm:gap-4">
           {questions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
             const isFlagged = flaggedQuestions.has(question.id);
@@ -292,13 +292,13 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       </main>
 
       {/* ── 3. Bottom Sticky Submit Footer (Matching Flutter Exactly) ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-[#E2E8F0] dark:border-[#27272A] p-3 sm:p-4 flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-[#E2E8F0] dark:border-[#27272A] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="max-w-3xl w-full flex justify-center">
           <button
             type="button"
             onClick={() => setShowSubmitModal(true)}
             disabled={isEvaluating}
-            className="w-full sm:w-auto px-14 py-3.5 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.99] text-white font-bold text-base sm:text-lg shadow-md shadow-[#004633]/25 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-14 py-3.5 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.98] text-white font-bold text-base sm:text-lg shadow-md shadow-[#004633]/25 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
           >
             {isEvaluating ? 'মূল্যায়ন হচ্ছে...' : 'জমা দাও'}
           </button>

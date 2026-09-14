@@ -868,13 +868,13 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
       {/* ── TAB 1: SUBJECT-WISE (বিষয় ভিত্তিক) ── */}
       {activeHeaderTab === "subject" && (
         <div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
             {filteredSubjects.map((item) => {
               return (
                 <div
                   key={item.id}
                   onClick={() => onSelectSubject && onSelectSubject(item)}
-                  className="group relative rounded-[26px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/10 select-none flex flex-col justify-between p-4 sm:p-5"
+                  className="group relative rounded-[20px] sm:rounded-[26px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/10 select-none flex flex-col justify-between p-3.5 sm:p-5 touch-manipulation"
                 >
                   {/* Background Gradient */}
                   <div
@@ -894,21 +894,21 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                   {/* Top-Left: Bengali Subject Name & Paper */}
                   <div className="relative z-10 text-left">
-                    <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                    <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
                       {item.name}
                     </h2>
-                    <p className="font-['HindSiliguri',sans-serif] text-xs sm:text-sm font-medium text-white/90 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                    <p className="font-['HindSiliguri',sans-serif] text-[11px] sm:text-sm font-medium text-white/90 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
                       {item.paper}
                     </p>
                   </div>
 
                   {/* Bottom: Action Indicator */}
                   <div className="relative z-10 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-white/75 bg-black/30 backdrop-blur-xs px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10.5px] sm:text-[11px] font-semibold text-white/80 bg-black/30 backdrop-blur-xs px-2 sm:px-2.5 py-0.5 rounded-full">
                       অধ্যায়ভিত্তিক
                     </span>
-                    <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight size={14} />
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ArrowRight size={13} />
                     </div>
                   </div>
                 </div>
@@ -928,13 +928,13 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
       {/* ── TAB 2: INSTITUTION-WISE (প্রতিষ্ঠান ভিত্তিক) ── */}
       {activeHeaderTab === "institution" && (
         <div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
             {filteredInstitutes.map((inst) => {
               return (
                 <div
                   key={inst.id}
                   onClick={() => onSelectInstitute && onSelectInstitute(inst)}
-                  className={`group relative rounded-[26px] overflow-hidden aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 select-none flex flex-col justify-between p-3.5 sm:p-5 ${inst.bgColor}`}
+                  className={`group relative rounded-[20px] sm:rounded-[26px] overflow-hidden aspect-[1.12/1] sm:aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/20 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation ${inst.bgColor}`}
                 >
                   {/* Decorative Corner Bubbles matching mobile app */}
                   <div
@@ -946,7 +946,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
 
                   {/* 1. Center Top: Official Logo or Board Landmark in White Circular Emblem */}
                   <div className="relative z-10 w-full flex justify-center pt-1 sm:pt-2">
-                    <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center justify-center p-2.5 transition-transform group-hover:scale-105 duration-300">
+                    <div className="w-13 h-13 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] flex items-center justify-center p-2 sm:p-2.5 transition-transform group-hover:scale-105 duration-300">
                       {inst.logo ? (
                         <img
                           src={inst.logo}
@@ -956,9 +956,9 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                       ) : (
                         <div className="text-neutral-800 flex items-center justify-center">
                           {inst.isBoard ? (
-                            <Landmark size={28} className="text-[#1E3A8A]" />
+                            <Landmark size={24} className="text-[#1E3A8A]" />
                           ) : (
-                            <School size={28} className="text-[#065F46]" />
+                            <School size={24} className="text-[#065F46]" />
                           )}
                         </div>
                       )}
@@ -968,7 +968,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                   {/* 2. Middle: Large Bold Bengali Institute Name */}
                   <div className="relative z-10 text-center my-auto">
                     <h2
-                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-xl sm:text-2xl md:text-[26px] leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
+                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-lg sm:text-2xl md:text-[26px] leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
                     >
                       {inst.name}
                     </h2>

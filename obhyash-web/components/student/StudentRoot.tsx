@@ -86,6 +86,7 @@ import ExamHistoryView from "@/components/student/features/history/ExamHistoryVi
 import ResultView from "@/components/student/ui/ResultView";
 import ResultSkeleton from "@/components/student/ui/results/ResultSkeleton";
 import ExamLoadingSkeleton from "@/components/student/ui/exam/ExamLoadingSkeleton";
+import { X } from "lucide-react";
 
 interface StudentRootProps {
   user: UserProfile;
@@ -1799,22 +1800,33 @@ export default function StudentRoot({
 
     if (appState === AppState.LOADING) {
       return (
-        <div className="min-h-screen w-full bg-[#F4F6F9] dark:bg-[#0A0B0E] flex flex-col font-['HindSiliguri',sans-serif]">
-          {/* Standalone Exam Loading Header */}
-          <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center justify-between px-4 sm:px-6 shadow-xs">
-            <span className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-white">
-              প্রশ্ন প্রস্তুত হচ্ছে...
-            </span>
-            <button
-              type="button"
-              onClick={() => setAppState(AppState.IDLE)}
-              className="text-xs sm:text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] hover:text-red-500 transition-colors"
-            >
-              বাতিল করো
-            </button>
+        <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#000000] flex flex-col font-['HindSiliguri',sans-serif]">
+          {/* Top Exam Header Skeleton (Matching ExamRunner sticky header exactly, without text) */}
+          <header className="sticky top-0 z-30 h-14 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
+            <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-full flex items-center justify-between gap-3">
+              {/* Left: Answered/Total Pill Skeleton */}
+              <div className="h-8 w-14 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
+
+              {/* Middle: Timer Capsule Skeleton */}
+              <div className="h-8 w-24 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
+
+              {/* Right: Actions Skeleton + Cancel Icon Button */}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+                <button
+                  type="button"
+                  onClick={() => setAppState(AppState.IDLE)}
+                  title="বাতিল করো"
+                  aria-label="বাতিল করো"
+                  className="w-8 h-8 rounded-lg bg-[#F1F5F9] dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] flex items-center justify-center text-[#64748B] dark:text-[#94A3B8] hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/50 transition-colors cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
           </header>
-          <div className="flex-1 py-4 sm:py-6">
-            <ExamLoadingSkeleton />
+          <div className="flex-1 py-2 sm:py-4">
+            <ExamLoadingSkeleton hideHeader={true} />
           </div>
         </div>
       );

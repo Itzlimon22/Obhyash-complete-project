@@ -461,10 +461,10 @@ export const DailyQuestsCard: React.FC<DailyQuestsCardProps> = ({ userId }) => {
                     <button
                       onClick={() => handleClaim(quest)}
                       disabled={isClaiming === quest.id}
-                      className="px-3 py-1.5 rounded-xl bg-[#12544F] hover:bg-[#0D3E3A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer animate-pulse"
+                      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#12544F] hover:bg-[#0D3E3A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer animate-pulse shrink-0 touch-manipulation"
                     >
                       <Sparkles size={12} />
-                      <span>দাবি করো (+{BanglaNameHelper.toBanglaNumeral(quest.xpReward)} XP)</span>
+                      <span>দাবি <span className="hidden sm:inline">করো</span> (+{BanglaNameHelper.toBanglaNumeral(quest.xpReward)})</span>
                     </button>
                   ) : (
                     <div

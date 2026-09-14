@@ -1142,163 +1142,193 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 4. How It Works - Workflow */}
-      <section className="py-24 bg-neutral-50 dark:bg-black relative overflow-hidden">
+      <section className="py-24 bg-white dark:bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
-          <div className="text-center mb-16 space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white">
-              কিভাবে শুরু করবেন?
+          <div className="text-center mb-12 sm:mb-16 space-y-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
+              শুরু করা খুবই সহজ
             </h2>
+            <p className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400 font-medium">
+              মাত্র ৩ ধাপে প্র্যাকটিস শুরু।
+            </p>
           </div>
 
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6">
-            {/* Animated Connecting Stream Line (Desktop) */}
-            <div className="hidden md:block absolute top-10 sm:top-12 left-[18%] right-[18%] h-1 z-0 pointer-events-none">
-              {/* Base Dashed Line */}
-              <div className="w-full h-0.5 border-t-2 border-dashed border-neutral-300 dark:border-neutral-700/80 mt-0.5" />
+          <div className="rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-neutral-100/40 dark:bg-[#121316] p-4 sm:p-6 lg:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
+              {/* Card 1: ফ্রি অ্যাকাউন্ট খুলুন */}
+              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                      1
+                    </span>
+                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                      ধাপ 1
+                    </span>
+                  </div>
 
-              {/* Energy Laser Beam Traveling across the line */}
-              <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden">
-                <div
-                  className="w-36 h-full bg-gradient-to-r from-transparent via-emerald-400 to-transparent"
-                  style={{
-                    animation: 'flowBeam 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
-                  }}
-                />
-              </div>
+                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                    {/* SVG Illustration 1: Laptop with User Avatar & Password dots */}
+                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Screen Bezel */}
+                      <rect x="28" y="24" width="104" height="62" rx="8" stroke="#1E293B" strokeWidth="4" fill="#F8FAFC" />
+                      
+                      {/* Laptop Base */}
+                      <path d="M14 88C14 86 15.6 84 18 84H142C144.4 84 146 86 146 88V91C146 94.3 143.3 97 140 97H20C16.7 97 14 94.3 14 91V88Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="4" strokeLinejoin="round" />
+                      <path d="M68 84H92" stroke="#1E293B" strokeWidth="3.5" strokeLinecap="round" />
 
-              {/* Glowing Travelling Photon Dot */}
-              <div
-                className="absolute top-[-3px] w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#10B981]"
-                style={{
-                  animation: 'flowBeam 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
-                }}
-              />
-            </div>
+                      {/* Password Input Pill */}
+                      <rect x="44" y="52" width="72" height="20" rx="10" fill="#F43F5E" stroke="#1E293B" strokeWidth="3" />
+                      {/* Password Dots */}
+                      <circle cx="68" cy="62" r="3.5" fill="white" style={{ animation: 'dotPulse 1.6s ease-in-out infinite', animationDelay: '0s' }} />
+                      <circle cx="80" cy="62" r="3.5" fill="white" style={{ animation: 'dotPulse 1.6s ease-in-out infinite', animationDelay: '0.25s' }} />
+                      <circle cx="92" cy="62" r="3.5" fill="white" style={{ animation: 'dotPulse 1.6s ease-in-out infinite', animationDelay: '0.5s' }} />
 
-            {/* Step 1 */}
-            <div className="relative z-10 flex flex-col items-center text-center group cursor-pointer transition-transform duration-300 hover:-translate-y-1.5">
-              <div className="relative mb-6">
-                {/* Sonar Ripple Ring */}
-                <div
-                  className="absolute inset-0 rounded-full border-2 border-emerald-400/50 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '0s',
-                  }}
-                />
-                {/* Secondary Ripple */}
-                <div
-                  className="absolute inset-0 rounded-full border border-emerald-400/30 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '1.5s',
-                  }}
-                />
+                      {/* Top Floating Avatar Badge */}
+                      <g style={{ animation: 'floatAvatar 3s ease-in-out infinite', transformOrigin: '80px 24px' }}>
+                        <circle cx="80" cy="24" r="16" fill="#10B981" stroke="#1E293B" strokeWidth="4" />
+                        <circle cx="80" cy="19" r="5" fill="white" stroke="#1E293B" strokeWidth="2.5" />
+                        <path d="M72 31C72 26.5 75.5 25 80 25C84.5 25 88 26.5 88 31" fill="white" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
 
-                {/* Main Circle */}
-                <div
-                  className="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-neutral-900 rounded-full border-3 sm:border-4 border-emerald-500 dark:border-emerald-500/80 flex items-center justify-center shadow-xl shadow-emerald-500/20 group-hover:scale-110 transition-all duration-300 relative z-10"
-                  style={{
-                    animation: 'pulseGlowEmerald 3s ease-in-out infinite',
-                    animationDelay: '0s',
-                  }}
-                >
-                  <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
-                    ১
-                  </span>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                    ফ্রি অ্যাকাউন্ট খুলুন
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                    Google দিয়ে এক ক্লিকে শুরু।
+                  </p>
                 </div>
               </div>
 
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                অ্যাকাউন্ট খোলো
-              </h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm max-w-xs px-2 leading-relaxed">
-                গুগল বা ইমেইল দিয়ে মাত্র ১০ সেকেন্ডে ফ্রি রেজিস্ট্রেশন করো।
-              </p>
-            </div>
+              {/* Card 2: বিষয় বেছে নিন */}
+              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                      2
+                    </span>
+                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                      ধাপ 2
+                    </span>
+                  </div>
 
-            {/* Step 2 */}
-            <div className="relative z-10 flex flex-col items-center text-center group cursor-pointer transition-transform duration-300 hover:-translate-y-1.5">
-              <div className="relative mb-6">
-                {/* Sonar Ripple Ring */}
-                <div
-                  className="absolute inset-0 rounded-full border-2 border-red-500/50 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '1s',
-                  }}
-                />
-                {/* Secondary Ripple */}
-                <div
-                  className="absolute inset-0 rounded-full border border-red-500/30 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '2.5s',
-                  }}
-                />
+                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                    {/* SVG Illustration 2: 3 Subject Cards with Pointing Hand */}
+                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Left Green Card */}
+                      <g transform="translate(26, 26)">
+                        <rect width="28" height="40" rx="5" fill="#10B981" stroke="#1E293B" strokeWidth="3.5" />
+                        <line x1="7" y1="13" x2="21" y2="13" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="7" y1="21" x2="21" y2="21" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                      </g>
 
-                {/* Main Circle */}
-                <div
-                  className="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-neutral-900 rounded-full border-3 sm:border-4 border-red-500 dark:border-red-500/80 flex items-center justify-center shadow-xl shadow-red-500/20 group-hover:scale-110 transition-all duration-300 relative z-10"
-                  style={{
-                    animation: 'pulseGlowRed 3s ease-in-out infinite',
-                    animationDelay: '1s',
-                  }}
-                >
-                  <span className="text-xl sm:text-2xl font-black text-red-600 dark:text-red-400 transition-transform duration-300 group-hover:scale-110">
-                    ২
-                  </span>
+                      {/* Right Purple Card */}
+                      <g transform="translate(106, 26)">
+                        <rect width="28" height="40" rx="5" fill="#6366F1" stroke="#1E293B" strokeWidth="3.5" />
+                        <line x1="7" y1="13" x2="21" y2="13" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="7" y1="21" x2="21" y2="21" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                      </g>
+
+                      {/* Center Orange Card (Active) */}
+                      <g style={{ animation: 'popCard 2.4s ease-in-out infinite', transformOrigin: '80px 45px' }}>
+                        <rect x="66" y="22" width="28" height="44" rx="5" fill="#F59E0B" stroke="#1E293B" strokeWidth="3.5" />
+                        <line x1="73" y1="35" x2="87" y2="35" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="73" y1="45" x2="87" y2="45" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                        {/* Ripple circle under tap point */}
+                        <circle cx="80" cy="58" r="9" fill="#FBBF24" opacity="0.4" style={{ animation: 'rippleTouch 2.4s ease-out infinite' }} />
+                      </g>
+
+                      {/* Pointing Hand Cursor */}
+                      <g style={{ animation: 'tapFinger 2.4s ease-in-out infinite', transformOrigin: '80px 75px' }}>
+                        <path d="M73 105V88C73 88 73 84 77 84C81 84 81 88 81 88V105" fill="#FED7AA" stroke="#1E293B" strokeWidth="3.5" strokeLinejoin="round" />
+                        <path d="M77 85V54C77 51.5 81 51.5 81 54V76" fill="#FED7AA" stroke="#1E293B" strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
+                        <path d="M81 72C84 72 86 74 86 77C86 80 84 82 81 82" fill="#FED7AA" stroke="#1E293B" strokeWidth="3.5" />
+                        <path d="M81 80C85 80 87 82 87 85C87 88 84 89 81 89" fill="#FED7AA" stroke="#1E293B" strokeWidth="3.5" />
+                        <path d="M73 76C70 76 68 78 68 81C68 84 71 86 74 86" fill="#FED7AA" stroke="#1E293B" strokeWidth="3.5" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                    বিষয় বেছে নিন
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                    সিলেবাস অনুযায়ী সাবজেক্ট সিলেক্ট।
+                  </p>
                 </div>
               </div>
 
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1.5 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                পরীক্ষা দাও
-              </h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm max-w-xs px-2 leading-relaxed">
-                অ্যাপে বা খাতায় পরীক্ষা দিয়ে সাথে সাথেই উত্তরপত্র আপলোড করো।
-              </p>
-            </div>
+              {/* Card 3: প্র্যাকটিস শুরু করুন */}
+              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                      3
+                    </span>
+                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                      ধাপ 3
+                    </span>
+                  </div>
 
-            {/* Step 3 */}
-            <div className="relative z-10 flex flex-col items-center text-center group cursor-pointer transition-transform duration-300 hover:-translate-y-1.5">
-              <div className="relative mb-6">
-                {/* Sonar Ripple Ring */}
-                <div
-                  className="absolute inset-0 rounded-full border-2 border-emerald-400/50 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '2s',
-                  }}
-                />
-                {/* Secondary Ripple */}
-                <div
-                  className="absolute inset-0 rounded-full border border-emerald-400/30 pointer-events-none"
-                  style={{
-                    animation: 'rippleSonar 3s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-                    animationDelay: '0.5s',
-                  }}
-                />
+                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                    {/* SVG Illustration 3: Test with clicking cursor & sparks */}
+                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Laptop Screen Bezel */}
+                      <rect x="28" y="24" width="104" height="62" rx="8" stroke="#1E293B" strokeWidth="4" fill="#F8FAFC" />
+                      
+                      {/* Laptop Base */}
+                      <path d="M14 88C14 86 15.6 84 18 84H142C144.4 84 146 86 146 88V91C146 94.3 143.3 97 140 97H20C16.7 97 14 94.3 14 91V88Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="4" strokeLinejoin="round" />
+                      <path d="M68 84H92" stroke="#1E293B" strokeWidth="3.5" strokeLinecap="round" />
 
-                {/* Main Circle */}
-                <div
-                  className="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-neutral-900 rounded-full border-3 sm:border-4 border-emerald-500 dark:border-emerald-500/80 flex items-center justify-center shadow-xl shadow-emerald-500/20 group-hover:scale-110 transition-all duration-300 relative z-10"
-                  style={{
-                    animation: 'pulseGlowEmerald 3s ease-in-out infinite',
-                    animationDelay: '2s',
-                  }}
-                >
-                  <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
-                    ৩
-                  </span>
+                      {/* Clipboard / Test Form */}
+                      <rect x="52" y="14" width="56" height="64" rx="5" fill="white" stroke="#1E293B" strokeWidth="3.5" />
+                      <rect x="68" y="10" width="24" height="8" rx="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2.5" />
+                      <circle cx="80" cy="14" r="1.5" fill="#1E293B" />
+
+                      {/* Question Line */}
+                      <line x1="60" y1="28" x2="100" y2="28" stroke="#94A3B8" strokeWidth="3" strokeLinecap="round" />
+
+                      {/* Option A (Active Green) */}
+                      <rect x="58" y="36" width="44" height="12" rx="4" fill="#10B981" stroke="#1E293B" strokeWidth="2" />
+                      <path d="M63 42L66 45L72 39" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <line x1="76" y1="42" x2="96" y2="42" stroke="white" strokeWidth="2" strokeLinecap="round" />
+
+                      {/* Option B */}
+                      <rect x="58" y="52" width="44" height="12" rx="4" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="1.5" />
+                      <circle cx="66" cy="58" r="3" stroke="#94A3B8" strokeWidth="1.5" />
+                      <line x1="74" y1="58" x2="94" y2="58" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
+
+                      {/* Feedback Sparkles */}
+                      <g style={{ animation: 'sparkleBurst 2.4s ease-in-out infinite', transformOrigin: '52px 42px' }}>
+                        <path d="M52 38L53.5 41.5L57 43L53.5 44.5L52 48L50.5 44.5L47 43L50.5 41.5L52 38Z" fill="#F59E0B" />
+                      </g>
+                      <g style={{ animation: 'sparkleBurst 2.4s ease-in-out infinite', animationDelay: '0.4s', transformOrigin: '48px 54px' }}>
+                        <path d="M48 50L49.2 52.8L52 54L49.2 55.2L48 58L46.8 55.2L44 54L46.8 52.8L48 50Z" fill="#FBBF24" />
+                      </g>
+
+                      {/* Cursor Clicking Option */}
+                      <g style={{ animation: 'clickCursor 2.4s ease-in-out infinite', transformOrigin: '82px 48px' }}>
+                        <path d="M82 46L94 62L87 62.5L91 71L87 73L83 64.5L77 68L82 46Z" fill="#2563EB" stroke="#1E293B" strokeWidth="2.5" strokeLinejoin="round" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                    প্র্যাকটিস শুরু করুন
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                    প্রশ্ন সলভ করে সাথে সাথে ফিডব্যাক।
+                  </p>
                 </div>
               </div>
-
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                ফলাফল দেখো
-              </h3>
-              <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm max-w-xs px-2 leading-relaxed">
-                সঠিকতা ও নেগেটিভ মার্কিংয়ের নিখুঁত রিপোর্ট দেখে নিজের দুর্বলতাগুলো কাটিয়ে ওঠো।
-              </p>
             </div>
           </div>
         </div>
@@ -2009,6 +2039,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
           0% { top: 0%; }
           50% { top: 100%; }
           100% { top: 0%; }
+        }
+        @keyframes floatAvatar {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes dotPulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.85); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes tapFinger {
+          0%, 100% { transform: translateY(5px); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes popCard {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-4px) scale(1.06); }
+        }
+        @keyframes rippleTouch {
+          0% { transform: scale(0.3); opacity: 0.9; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes clickCursor {
+          0%, 100% { transform: translate(3px, 3px); }
+          50% { transform: translate(0px, 0px) scale(0.92); }
+        }
+        @keyframes sparkleBurst {
+          0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.2; }
+          50% { transform: scale(1.25) rotate(25deg); opacity: 1; }
         }
         @keyframes flowBeam {
           0% { transform: translateX(-100%); opacity: 0; }

@@ -403,8 +403,8 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const selectedSubData = subjects.find((s) => s.id === selectedSubject);
 
   return (
-    <div className="w-full max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-5 select-none font-['HindSiliguri']">
-      <div className="flex flex-col gap-3">
+    <div className="w-full max-w-xl mx-auto px-0 sm:px-4 py-2 sm:py-5 select-none font-['HindSiliguri']">
+      <div className="flex flex-col gap-2.5 sm:gap-3">
         {/* 1. Subject Selector Card */}
         <CardContainer
           title="বিষয় নির্বাচন"
@@ -714,7 +714,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </CardContainer>
 
         {/* 8. Live Blueprint Capsule Summary */}
-        <div className="my-1.5 p-3 rounded-xl bg-[#FFFBEB] dark:bg-[#22160E] border border-[#FDE68A] dark:border-[#D97706]/35 shadow-xs flex items-center justify-around text-center">
+        <div className="my-1.5 px-2 py-2.5 sm:p-3 rounded-xl bg-[#FFFBEB] dark:bg-[#22160E] border border-[#FDE68A] dark:border-[#D97706]/35 shadow-xs flex items-center justify-around text-center">
           <div className="flex items-center gap-1.5">
             <HelpCircle size={14} className="text-[#38BDF8]" />
             <span className="text-xs font-bold text-[#78350F] dark:text-[#FEF3C7]">
@@ -843,7 +843,7 @@ const CardContainer: React.FC<CardContainerProps> = ({ title, tooltip, children 
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#131316] border border-[#E2E8F0] dark:border-[#222226] shadow-xs flex flex-col gap-2.5 sm:gap-3">
+    <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#131316] border border-[#E2E8F0] dark:border-[#222226] shadow-xs flex flex-col gap-2.5 sm:gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <h2 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white font-['HindSiliguri']">
@@ -1220,11 +1220,11 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-100 dark:border-neutral-800">
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-neutral-800">
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] active:scale-[0.98] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>
@@ -1462,11 +1462,11 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-100 dark:border-neutral-800">
+        <div className="p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] border-t border-neutral-100 dark:border-neutral-800">
           <button
             type="button"
             onClick={() => onSave(currentSelected)}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#B45309] hover:bg-[#92400E] active:scale-[0.98] text-white font-bold text-base font-['HindSiliguri'] shadow-sm transition touch-manipulation cursor-pointer"
           >
             সংরক্ষণ করো ({currentSelected.size})
           </button>

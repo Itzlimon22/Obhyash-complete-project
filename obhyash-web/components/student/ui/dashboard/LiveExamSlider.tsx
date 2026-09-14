@@ -210,24 +210,24 @@ export const LiveExamSlider: React.FC<LiveExamSliderProps> = ({ onExamClick }) =
         {/* Row 2: Bottom Strip (Matches Flutter LiveExamSlider bottom banner) */}
         <div
           className={cn(
-            "rounded-xl px-2.5 sm:px-3 py-1.5 flex items-center justify-between gap-2 text-xs transition-colors",
+            "rounded-xl px-2.5 sm:px-3 py-1.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-xs transition-colors",
             bottomStripBg
           )}
         >
           {/* Status & Countdown */}
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <div className={cn("flex items-center gap-1 font-bold shrink-0", statusColor)}>
               <StatusIcon size={13} className={isOngoing ? "animate-pulse" : ""} />
               <span>{statusText}</span>
             </div>
-            <span className="text-neutral-400 dark:text-neutral-600 font-bold">•</span>
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate text-[11.5px] sm:text-xs">
+            <span className="text-neutral-400 dark:text-neutral-600 font-bold hidden xs:inline">•</span>
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300 text-[11.5px] sm:text-xs">
               {timeRemainingText}
             </span>
           </div>
 
           {/* Tags */}
-          <div className="flex items-center gap-1.5 shrink-0 text-[11px] sm:text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+          <div className="flex items-center gap-1.5 shrink-0 text-[11px] sm:text-xs font-semibold text-neutral-600 dark:text-neutral-400 self-end sm:self-auto">
             <span>{questionsText}</span>
             <span>•</span>
             <span>{durationText}</span>

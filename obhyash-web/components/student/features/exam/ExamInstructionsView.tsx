@@ -105,7 +105,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
     >
       {/* ── Top App Bar (only if standalone) ── */}
       {showHeader && (
-        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-4 sm:px-6 shadow-xs">
+        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-2.5 sm:px-6 shadow-xs">
           <button
             type="button"
             onClick={onBack}
@@ -122,7 +122,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       )}
 
       {/* ── Main Scrollable Content ── */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 flex justify-center">
+      <main className="flex-1 overflow-y-auto px-2.5 sm:px-4 py-3 sm:py-6 flex justify-center">
         <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-24">
           {/* ── Card 1: Subject & Scope Accordion ── */}
           <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] overflow-hidden transition-all">
@@ -310,7 +310,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </main>
 
       {/* ── Fixed Bottom CTA Bar ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#111216]/95 backdrop-blur-md border-t border-[#E5E9F0] dark:border-[#1F2026] p-3.5 sm:p-4 flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#111216]/95 backdrop-blur-md border-t border-[#E5E9F0] dark:border-[#1F2026] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="w-full max-w-lg">
           <button
             type="button"

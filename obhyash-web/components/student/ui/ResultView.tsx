@@ -287,7 +287,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
       {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar, only if standalone) ── */}
       {showHeader && (
         <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-          <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-14 flex items-center justify-between">
+          <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-14 flex items-center justify-between">
             {/* Left Close / Back Button */}
             <button
               type="button"
@@ -321,7 +321,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
       )}
 
       {/* ── Main Content Container ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-3.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
         {/* ── 2. Top Action Buttons (PDF Downloads) ── */}
         <div className="grid grid-cols-2 gap-3">
           {/* Button 1: প্রশ্নপত্র */}
@@ -472,11 +472,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
         {/* ── 7. Bottom Action: আবার পরীক্ষা দাও (Only shown when not in history mode) ── */}
         {!isHistoryMode && (
-          <div className="pt-2 pb-6">
+          <div className="pt-2 pb-[max(2rem,env(safe-area-inset-bottom))]">
             <button
               type="button"
               onClick={onReexam ? onReexam : () => onRestart()}
-              className="w-full py-3.5 px-6 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.99] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-md shadow-[#004633]/25 transition-all cursor-pointer"
+              className="w-full py-3.5 px-6 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.98] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-md shadow-[#004633]/25 transition-all cursor-pointer touch-manipulation"
             >
               <RotateCcw size={18} />
               <span>আবার পরীক্ষা দাও</span>

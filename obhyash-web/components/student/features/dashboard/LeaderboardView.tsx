@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Search,
   CheckCircle2,
+  BarChart2,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { UserProfile } from "@/lib/types";
@@ -48,10 +49,10 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     label: "লিজেন্ড",
     minXP: 15000,
     maxXP: 999999999,
-    xpRange: "15K+ XP",
-    startColor: "from-red-500",
-    endColor: "to-red-700",
-    textColor: "text-red-500",
+    xpRange: "১৫K+ XP",
+    startColor: "from-[#EF4444]",
+    endColor: "to-[#991B1B]",
+    textColor: "text-[#EF4444]",
     badgeBg: "bg-red-500/10 text-red-500 border-red-500/30",
     icon: Crown,
     svgBadge: "/leaderboard-levels/level_5_legend.svg",
@@ -61,11 +62,11 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     label: "টাইটান",
     minXP: 7000,
     maxXP: 14999,
-    xpRange: "7K–15K XP",
-    startColor: "from-purple-500",
-    endColor: "to-purple-700",
-    textColor: "text-purple-500",
-    badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+    xpRange: "৭K–১৫K XP",
+    startColor: "from-[#F59E0B]",
+    endColor: "to-[#B45309]",
+    textColor: "text-[#F59E0B]",
+    badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
     icon: GraduationCap,
     svgBadge: "/leaderboard-levels/level_4_titan.svg",
   },
@@ -74,11 +75,11 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     label: "ওয়ারিয়র",
     minXP: 3000,
     maxXP: 6999,
-    xpRange: "3K–7K XP",
-    startColor: "from-amber-500",
-    endColor: "to-amber-700",
-    textColor: "text-amber-500",
-    badgeBg: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+    xpRange: "৩K–৭K XP",
+    startColor: "from-[#8B5CF6]",
+    endColor: "to-[#6D28D9]",
+    textColor: "text-[#8B5CF6]",
+    badgeBg: "bg-purple-500/10 text-purple-500 border-purple-500/30",
     icon: Shield,
     svgBadge: "/leaderboard-levels/level_3_warrior.svg",
   },
@@ -87,10 +88,10 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     label: "স্কাউট",
     minXP: 1000,
     maxXP: 2999,
-    xpRange: "1K–3K XP",
-    startColor: "from-sky-500",
-    endColor: "to-sky-700",
-    textColor: "text-sky-500",
+    xpRange: "১K–৩K XP",
+    startColor: "from-[#0284C7]",
+    endColor: "to-[#0369A1]",
+    textColor: "text-[#0284C7]",
     badgeBg: "bg-sky-500/10 text-sky-500 border-sky-500/30",
     icon: Zap,
     svgBadge: "/leaderboard-levels/level_2_scout.svg",
@@ -100,10 +101,10 @@ export const LEADERBOARD_LEVELS: LevelInfo[] = [
     label: "রুকি",
     minXP: 0,
     maxXP: 999,
-    xpRange: "0–1K XP",
-    startColor: "from-emerald-500",
-    endColor: "to-emerald-700",
-    textColor: "text-emerald-500",
+    xpRange: "০–১K XP",
+    startColor: "from-[#10B981]",
+    endColor: "to-[#047857]",
+    textColor: "text-[#10B981]",
     badgeBg: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
     icon: Sprout,
     svgBadge: "/leaderboard-levels/level_1_rookie.svg",
@@ -186,7 +187,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
   // ── States ─────────────────────────────────────────────────────────────────
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(propUser || null);
-  const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("college");
+  const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("level");
   const [selectedLevel, setSelectedLevel] = useState<string>("Explorer");
   const [timeframe, setTimeframe] = useState<"monthly" | "all_time">("monthly");
   const [batchFilter, setBatchFilter] = useState<"all" | "my_batch">("all");
@@ -595,272 +596,278 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     return instituteRankings.filter((r) => r.institute.toLowerCase().includes(q));
   }, [instituteRankings, searchCollegeQuery]);
 
+  const renderRankBadge = (rank: number) => {
+    if (rank === 1) return <span className="text-xl sm:text-2xl select-none leading-none">🥇</span>;
+    if (rank === 2) return <span className="text-xl sm:text-2xl select-none leading-none">🥈</span>;
+    if (rank === 3) return <span className="text-xl sm:text-2xl select-none leading-none">🥉</span>;
+    return (
+      <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-[#27272A] flex items-center justify-center text-xs font-black text-neutral-600 dark:text-neutral-400 tabular-nums shrink-0">
+        {toBengaliNum(rank)}
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full flex flex-col gap-4 font-sans">
-      {/* ── 1. Top View Mode Tabs (র‍্যাংকিং, আমার প্রতিষ্ঠান, সব প্রতিষ্ঠান) ── */}
-      <div className="bg-white dark:bg-[#0C0A09] p-1.5 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] shadow-sm">
-        <div className="grid grid-cols-3 gap-1 bg-neutral-100 dark:bg-[#141416] p-1 rounded-xl">
-          <button
-            onClick={() => setViewMode("level")}
-            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              viewMode === "level"
-                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
-                : "text-neutral-500 hover:text-black dark:hover:text-white"
-            }`}
-          >
-            <Trophy size={16} className={viewMode === "level" ? "text-amber-500" : ""} />
-            <span>র‍্যাংকিং</span>
-          </button>
+    <div className="w-full flex flex-col gap-3.5 sm:gap-4 font-sans pb-4">
+      {/* ── 1. Top View Mode Tabs (র‍্যাংকিং, আমার প্রতিষ্ঠান, সব প্রতিষ্ঠান - Matching Flutter 1:1) ── */}
+      <div className="w-full bg-[#F3F4F6] dark:bg-[#141416] p-1 rounded-2xl border border-neutral-200/90 dark:border-[#27272A] flex gap-1 select-none">
+        <button
+          type="button"
+          onClick={() => setViewMode("level")}
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+            viewMode === "level"
+              ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
+              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+          }`}
+        >
+          র‍্যাংকিং
+        </button>
 
-          <button
-            onClick={() => setViewMode("college")}
-            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              viewMode === "college"
-                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
-                : "text-neutral-500 hover:text-black dark:hover:text-white"
-            }`}
-          >
-            <Building2 size={16} className={viewMode === "college" ? "text-emerald-500" : ""} />
-            <span>আমার {instLabel}</span>
-          </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("college")}
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+            viewMode === "college"
+              ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
+              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+          }`}
+        >
+          আমার {instLabel}
+        </button>
 
-          <button
-            onClick={() => setViewMode("rankings")}
-            className={`py-2 px-2.5 rounded-lg text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              viewMode === "rankings"
-                ? "bg-white dark:bg-[#1C1C1E] text-black dark:text-white shadow-sm"
-                : "text-neutral-500 hover:text-black dark:hover:text-white"
-            }`}
-          >
-            <Medal size={16} className={viewMode === "rankings" ? "text-indigo-500" : ""} />
-            <span>সব {instLabel}</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setViewMode("rankings")}
+          className={`flex-1 py-2 px-2 text-xs sm:text-sm font-['Anek_Bangla',sans-serif] font-bold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+            viewMode === "rankings"
+              ? "bg-[#059669] text-white shadow-md shadow-emerald-600/30"
+              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+          }`}
+        >
+          সব {instLabel}
+        </button>
       </div>
 
       {/* ── 2. LEVEL RANKINGS VIEW ────────────────────────────────────────── */}
       {viewMode === "level" && (
-        <>
-          {/* Level Selector Carousel Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
-            {LEADERBOARD_LEVELS.map((lvl) => {
-              const Icon = lvl.icon;
-              const isSelected = selectedLevel === lvl.id;
-              const isUserLevel = myCalculatedLevel === lvl.id;
-              const count = levelCounts[lvl.id] || 0;
+        <div className="flex flex-col gap-3">
+          {/* Level Selector (Horizontal Scrolling Carousel Matching Flutter 1:1) */}
+          <div className="w-full overflow-x-auto no-scrollbar py-2 -mx-0.5 px-0.5 select-none">
+            <div className="flex items-center gap-2.5 min-w-max pb-1">
+              {LEADERBOARD_LEVELS.map((lvl) => {
+                const isSelected = selectedLevel === lvl.id;
+                const isUserLevel = myCalculatedLevel === lvl.id;
 
-              return (
-                <button
-                  key={lvl.id}
-                  onClick={() => setSelectedLevel(lvl.id)}
-                  className={`
-                    relative p-3.5 rounded-2xl border transition-all duration-200 text-left flex flex-col justify-between cursor-pointer
-                    ${
-                      isSelected
-                        ? "bg-white dark:bg-[#161412] border-emerald-500 ring-2 ring-emerald-500/30 shadow-md"
-                        : "bg-white dark:bg-[#12100E] border-neutral-200 dark:border-[#1C1C1E] hover:border-neutral-300 dark:hover:border-neutral-700"
-                    }
-                  `}
-                >
-                  {/* Top: 3D Level Crest + Count Badge */}
-                  <div className="flex items-center justify-between mb-2">
-                    <img
-                      src={lvl.svgBadge}
-                      alt={lvl.label}
-                      className="w-10 h-10 object-contain drop-shadow-md transition-transform group-hover:scale-105"
-                    />
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-300">
-                      {toBengaliNum(count)} জন
-                    </span>
-                  </div>
-
-                  {/* Level Name & Threshold */}
-                  <div>
-                    <h4 className="text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
-                      {lvl.label}
-                    </h4>
-                    <p className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 mt-0.5">
-                      {lvl.xpRange}
-                    </p>
-                  </div>
-
-                  {/* Your Level Badge */}
-                  {isUserLevel && (
-                    <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-center border border-emerald-200 dark:border-emerald-800/40">
-                      আপনার স্তর
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Filters Bar: Batch Filter & Timeframe Selector */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E]">
-            {/* Batch Filter */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-neutral-500 font-['Anek_Bangla',sans-serif]">ব্যাচ:</span>
-              <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
-                <button
-                  onClick={() => setBatchFilter("all")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
-                    batchFilter === "all"
-                      ? "bg-white dark:bg-[#27272A] text-black dark:text-white shadow-xs"
-                      : "text-neutral-500"
-                  }`}
-                >
-                  সকল ব্যাচ
-                </button>
-                {currentUser?.batch && (
+                return (
                   <button
-                    onClick={() => setBatchFilter("my_batch")}
-                    className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
-                      batchFilter === "my_batch"
-                        ? "bg-white dark:bg-[#27272A] text-emerald-600 dark:text-emerald-400 shadow-xs"
-                        : "text-neutral-500"
+                    key={lvl.id}
+                    type="button"
+                    onClick={() => setSelectedLevel(lvl.id)}
+                    className={`relative w-[96px] sm:w-[108px] h-[118px] p-2.5 rounded-[20px] flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer select-none shrink-0 ${
+                      isSelected
+                        ? `bg-gradient-to-br ${lvl.startColor} ${lvl.endColor} text-white shadow-lg shadow-black/20 border-2 border-white/40 scale-[1.02]`
+                        : "bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] text-neutral-800 dark:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-2xs"
                     }`}
                   >
-                    আমার ব্যাচ ({currentUser.batch})
+                    {isUserLevel && (
+                      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-600 border border-white dark:border-black shadow-xs whitespace-nowrap">
+                        আপনার স্তর
+                      </div>
+                    )}
+
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 mb-1.5 flex items-center justify-center">
+                      <img
+                        src={lvl.svgBadge}
+                        alt={lvl.label}
+                        className="w-full h-full object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                      />
+                    </div>
+
+                    <h4
+                      className={`font-['Anek_Bangla',sans-serif] font-black text-[13.5px] leading-tight ${
+                        isSelected ? "text-white" : "text-neutral-900 dark:text-neutral-100"
+                      }`}
+                    >
+                      {lvl.label}
+                    </h4>
+
+                    <span
+                      className={`text-[9.5px] font-bold mt-0.5 tracking-tight ${
+                        isSelected
+                          ? "text-white/90"
+                          : "text-neutral-400 dark:text-neutral-500"
+                      }`}
+                    >
+                      {lvl.xpRange}
+                    </span>
                   </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Batch & Timeline Header (Directly under Level Selector Matching Flutter) */}
+          <div className="flex items-center justify-between px-0.5 py-1">
+            {/* Left: User Batch Badge */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-[#1F1F23] border border-neutral-200 dark:border-[#2E2E33] shadow-2xs">
+              <GraduationCap size={14} className="text-indigo-500 shrink-0" />
+              <span className="text-[12px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                {currentUser?.batch || "HSC 2026"}
+              </span>
+            </div>
+
+            {/* Right: Timeframe Selector Pill (মাসিক / লাইফটাইম) */}
+            <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-[#1F1F23] border border-neutral-200 dark:border-[#2E2E33] p-0.5 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setTimeframe("monthly")}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  timeframe === "monthly"
+                    ? "bg-white dark:bg-[#2C2C30] text-blue-600 dark:text-blue-400 shadow-xs"
+                    : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                }`}
+              >
+                <Calendar size={13} className="shrink-0" />
+                <span>মাসিক</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTimeframe("all_time")}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  timeframe === "all_time"
+                    ? "bg-white dark:bg-[#2C2C30] text-amber-600 dark:text-amber-400 shadow-xs"
+                    : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                }`}
+              >
+                <Crown size={13} className="shrink-0" />
+                <span>লাইফটাইম</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Podium Section (শীর্ষ ৩ Matching Flutter Stepped Platforms) */}
+          {!isLoading && top3Users.length >= 3 && (
+            <div className="bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] rounded-2xl p-3 sm:p-4 mb-1 shadow-2xs">
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <span className="text-base sm:text-lg">🏆</span>
+                <h3 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                  শীর্ষ ৩
+                </h3>
+              </div>
+
+              <div className="flex items-end justify-center gap-2 pt-2">
+                {/* 2nd Place (Silver - Left) */}
+                {top3Users[1] && (
+                  <div
+                    onClick={() => onUserClick?.(top3Users[1] as any, 2)}
+                    className="flex-1 flex flex-col items-center cursor-pointer group active:scale-95 transition-all select-none"
+                  >
+                    <div className="relative mb-1 flex flex-col items-center">
+                      <div className="w-13 h-13 sm:w-15 sm:h-15 rounded-full p-0.5 ring-2 ring-blue-500/80 shadow-md">
+                        <UserAvatar user={top3Users[1] as any} size="md" className="w-full h-full" />
+                      </div>
+                    </div>
+
+                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[85px] sm:max-w-[110px] font-['Anek_Bangla',sans-serif]">
+                      {top3Users[1].name.split(" ")[0]}
+                    </h4>
+                    <span className="text-[11px] font-black text-[#2563EB] dark:text-[#60A5FA] mb-1.5 tabular-nums">
+                      {toBengaliNum(top3Users[1].xp)} XP
+                    </span>
+
+                    {/* Stepped platform (height 66px matching Flutter) */}
+                    <div className="w-full h-[66px] rounded-t-xl bg-gradient-to-b from-blue-500/25 to-blue-700/5 border-t-[2.5px] border-t-blue-500 border-x border-blue-400/30 flex flex-col items-center justify-center shadow-inner">
+                      <span className="text-xl leading-none mb-1">🥈</span>
+                      <span className="text-[11.5px] font-black text-[#2563EB] dark:text-[#60A5FA] font-['Anek_Bangla',sans-serif]">
+                        ২য়
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 1st Place (Gold - Center Taller matching Flutter) */}
+                {top3Users[0] && (
+                  <div
+                    onClick={() => onUserClick?.(top3Users[0] as any, 1)}
+                    className="flex-1 flex flex-col items-center cursor-pointer group active:scale-95 transition-all select-none z-10 -mt-3"
+                  >
+                    <div className="relative mb-1 flex flex-col items-center">
+                      <span className="text-lg leading-none animate-bounce mb-0.5">👑</span>
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full p-0.5 ring-[2.5px] ring-amber-400 shadow-lg shadow-amber-500/20">
+                        <UserAvatar user={top3Users[0] as any} size="lg" className="w-full h-full" />
+                      </div>
+                    </div>
+
+                    <h4 className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white text-center truncate max-w-[95px] sm:max-w-[130px] font-['Anek_Bangla',sans-serif]">
+                      {top3Users[0].name.split(" ")[0]}
+                    </h4>
+                    <span className="text-[11px] sm:text-xs font-black text-[#D97706] dark:text-[#F59E0B] mb-1.5 tabular-nums">
+                      {toBengaliNum(top3Users[0].xp)} XP
+                    </span>
+
+                    {/* Stepped platform (height 86px matching Flutter) */}
+                    <div className="w-full h-[86px] rounded-t-xl bg-gradient-to-b from-amber-500/30 to-amber-700/5 border-t-[2.5px] border-t-amber-500 border-x border-amber-400/30 flex flex-col items-center justify-center shadow-inner">
+                      <span className="text-2xl leading-none mb-1">🏆</span>
+                      <span className="text-xs font-black text-[#D97706] dark:text-[#F59E0B] font-['Anek_Bangla',sans-serif]">
+                        ১ম
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3rd Place (Bronze - Right) */}
+                {top3Users[2] && (
+                  <div
+                    onClick={() => onUserClick?.(top3Users[2] as any, 3)}
+                    className="flex-1 flex flex-col items-center cursor-pointer group active:scale-95 transition-all select-none"
+                  >
+                    <div className="relative mb-1 flex flex-col items-center">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full p-0.5 ring-2 ring-orange-500/80 shadow-md">
+                        <UserAvatar user={top3Users[2] as any} size="md" className="w-full h-full" />
+                      </div>
+                    </div>
+
+                    <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white text-center truncate max-w-[80px] sm:max-w-[100px] font-['Anek_Bangla',sans-serif]">
+                      {top3Users[2].name.split(" ")[0]}
+                    </h4>
+                    <span className="text-[11px] font-black text-[#EA580C] dark:text-[#FB923C] mb-1.5 tabular-nums">
+                      {toBengaliNum(top3Users[2].xp)} XP
+                    </span>
+
+                    {/* Stepped platform (height 52px matching Flutter) */}
+                    <div className="w-full h-[52px] rounded-t-xl bg-gradient-to-b from-orange-500/25 to-orange-700/5 border-t-[2.5px] border-t-orange-500 border-x border-orange-400/30 flex flex-col items-center justify-center shadow-inner">
+                      <span className="text-lg leading-none mb-1">🥉</span>
+                      <span className="text-[11.5px] font-black text-[#EA580C] dark:text-[#FB923C] font-['Anek_Bangla',sans-serif]">
+                        ৩য়
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
-
-            {/* Timeframe Filter (Monthly vs All-time) */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-neutral-500 font-['Anek_Bangla',sans-serif]">সময়কাল:</span>
-              <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] p-0.5 border border-neutral-200 dark:border-neutral-800">
-                <button
-                  onClick={() => setTimeframe("monthly")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
-                    timeframe === "monthly"
-                      ? "bg-[#059669] text-white shadow-xs"
-                      : "text-neutral-500 hover:text-black dark:hover:text-white"
-                  }`}
-                >
-                  মাসিক র‍্যাংকিং
-                </button>
-                <button
-                  onClick={() => setTimeframe("all_time")}
-                  className={`px-3 py-1 text-xs font-bold font-['Anek_Bangla',sans-serif] rounded-lg transition-all cursor-pointer ${
-                    timeframe === "all_time"
-                      ? "bg-[#059669] text-white shadow-xs"
-                      : "text-neutral-500 hover:text-black dark:hover:text-white"
-                  }`}
-                >
-                  সর্বকালীন (All Time)
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* User Progress Banner (When viewing own level) */}
-          {currentUser && isOnOwnLevel && (
-            <div
-              onClick={() => onUserClick?.(currentUser, myRank)}
-              className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-neutral-50 to-white dark:from-emerald-950/20 dark:via-[#12100E] dark:to-[#12100E] border border-emerald-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:border-emerald-500/40 transition-all"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="relative">
-                  <UserAvatar user={currentUser} size="md" className="w-12 h-12 ring-2 ring-emerald-500" />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-extrabold shadow-xs">
-                    {toBengaliNum(myRank || 1)}
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
-                      {currentUser.name || "শিক্ষার্থী"}
-                    </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500 text-white font-bold">
-                      {myLevelInfo.label}
-                    </span>
-                  </div>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-                    বর্তমান অবস্থান: <strong className="text-emerald-600 dark:text-emerald-400 font-bold font-['Anek_Bangla',sans-serif]">{myRank > 0 ? `${toBengaliNum(myRank)}ম স্থান` : "তালিকায় অন্তর্ভুক্ত"}</strong> • {toBengaliNum(myEffectiveXp)} XP
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress to next level */}
-              {nextLevelInfo && (
-                <div className="w-full sm:w-64 flex flex-col gap-1.5">
-                  <div className="flex justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                    <span>পরবর্তী স্তর: <strong className="text-neutral-900 dark:text-white">{nextLevelInfo.label}</strong></span>
-                    <span>{toBengaliNum(nextLevelInfo.minXP - myEffectiveXp)} XP বাকি</span>
-                  </div>
-                  <div className="w-full h-2.5 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
-                      style={{ width: `${levelProgressPercent}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           )}
 
-          {/* Top 3 Podium Section */}
-          {!isLoading && top3Users.length >= 3 && (
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-6 pb-2">
-              {/* 2nd Place (Silver) */}
-              <div
-                onClick={() => onUserClick?.(top3Users[1] as any, 2)}
-                className="bg-white dark:bg-[#12100E] p-3 sm:p-4 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] flex flex-col items-center text-center relative group cursor-pointer hover:border-neutral-400 transition-all"
-              >
-                <div className="w-6 h-6 rounded-full bg-slate-300 text-slate-800 text-xs font-extrabold flex items-center justify-center absolute -top-3 shadow-md">
-                  ২
-                </div>
-                <UserAvatar user={top3Users[1] as any} size="md" className="w-11 h-11 sm:w-14 sm:h-14 ring-2 ring-slate-300 mb-2" />
-                <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
-                  {top3Users[1].name}
-                </h4>
-                <p className="text-[11px] text-neutral-400 truncate w-full">{top3Users[1].institute}</p>
-                <div className="mt-2 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs font-extrabold">
-                  {toBengaliNum(top3Users[1].xp)} XP
-                </div>
-              </div>
-
-              {/* 1st Place (Gold - Taller & Highlighted) */}
-              <div
-                onClick={() => onUserClick?.(top3Users[0] as any, 1)}
-                className="bg-gradient-to-b from-amber-500/10 to-white dark:to-[#141210] p-4 sm:p-5 rounded-2xl border-2 border-amber-400 dark:border-amber-500/50 flex flex-col items-center text-center relative group cursor-pointer shadow-lg shadow-amber-500/10 -mt-4 transition-all"
-              >
-                <div className="w-8 h-8 rounded-full bg-amber-400 text-amber-950 text-sm font-black flex items-center justify-center absolute -top-4 shadow-md">
-                  <Crown size={16} className="stroke-[2.5]" />
-                </div>
-                <UserAvatar user={top3Users[0] as any} size="lg" className="w-14 h-14 sm:w-16 sm:h-16 ring-4 ring-amber-400 mb-2 mt-1" />
-                <h4 className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
-                  {top3Users[0].name}
-                </h4>
-                <p className="text-xs text-neutral-400 truncate w-full">{top3Users[0].institute}</p>
-                <div className="mt-2.5 px-3 py-1 rounded-full bg-amber-400 text-amber-950 text-xs sm:text-sm font-black shadow-xs">
-                  {toBengaliNum(top3Users[0].xp)} XP
-                </div>
-              </div>
-
-              {/* 3rd Place (Bronze) */}
-              <div
-                onClick={() => onUserClick?.(top3Users[2] as any, 3)}
-                className="bg-white dark:bg-[#12100E] p-3 sm:p-4 rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] flex flex-col items-center text-center relative group cursor-pointer hover:border-neutral-400 transition-all"
-              >
-                <div className="w-6 h-6 rounded-full bg-amber-700 text-amber-100 text-xs font-extrabold flex items-center justify-center absolute -top-3 shadow-md">
-                  ৩
-                </div>
-                <UserAvatar user={top3Users[2] as any} size="md" className="w-11 h-11 sm:w-14 sm:h-14 ring-2 ring-amber-700 mb-2" />
-                <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white truncate w-full font-['Anek_Bangla',sans-serif]">
-                  {top3Users[2].name}
-                </h4>
-                <p className="text-[11px] text-neutral-400 truncate w-full">{top3Users[2].institute}</p>
-                <div className="mt-2 px-2.5 py-0.5 rounded-full bg-amber-900/10 text-amber-800 dark:text-amber-300 text-xs font-extrabold">
-                  {toBengaliNum(top3Users[2].xp)} XP
-                </div>
-              </div>
+          {/* Leaderboard Table List (Card Rows Matching Flutter 1:1) */}
+          <div className="bg-white dark:bg-[#141416] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-2xs">
+            {/* Card Title Bar */}
+            <div className="px-4 py-3 bg-neutral-50 dark:bg-[#18181B] border-b border-neutral-200/90 dark:border-[#27272A] flex items-center justify-between">
+              <h3 className="font-black text-sm sm:text-base text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif]">
+                {currentSelectedLevelInfo.label} র‍্যাঙ্কিং
+              </h3>
+              <BarChart2 size={16} className="text-neutral-500 dark:text-neutral-400 shrink-0" />
             </div>
-          )}
 
-          {/* Leaderboard Table List */}
-          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
+            {/* Column Headers */}
+            {users.length > 0 && !isLoading && (
+              <div className="px-4 py-2 border-b border-neutral-100 dark:border-[#1E1E22] flex items-center text-[11px] font-bold text-neutral-400 dark:text-neutral-500 tracking-wider">
+                <span className="w-9 shrink-0">RANK</span>
+                <span className="w-10 shrink-0" />
+                <span className="flex-1 ml-2">STUDENT</span>
+                <span className="text-right shrink-0">XP</span>
+              </div>
+            )}
+
             {isLoading ? (
               <div className="p-6">
                 <LeaderboardSkeleton />
@@ -868,11 +875,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             ) : users.length === 0 ? (
               <div className="p-12 text-center text-neutral-400 flex flex-col items-center gap-2">
                 <Trophy size={36} className="text-neutral-300 dark:text-neutral-700" />
-                <p className="text-base font-bold font-['Anek_Bangla',sans-serif]">এই স্তরে এখনও কোন শিক্ষার্থী যুক্ত হয়নি</p>
-                <p className="text-xs">পরীক্ষায় অংশগ্রহণ করে প্রথম স্থান অর্জন করুন!</p>
+                <p className="text-base font-bold font-['Anek_Bangla',sans-serif]">
+                  এই স্তরে এখনও কোনো শিক্ষার্থী যুক্ত হয়নি
+                </p>
+                <p className="text-xs">পরীক্ষায় অংশ নিয়ে প্রথম স্থান অর্জন করুন!</p>
               </div>
             ) : (
-              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+              <div className="p-1.5 flex flex-col gap-1">
                 {users.map((user) => {
                   const isMe = user.id === currentUser?.id;
 
@@ -881,71 +890,65 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       key={user.id}
                       onClick={() => onUserClick?.(user as any, user.rank)}
                       className={`
-                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors cursor-pointer group
+                        rounded-2xl p-2.5 sm:p-3 flex items-center justify-between gap-2.5 transition-all cursor-pointer group active:scale-[0.99]
                         ${
                           isMe
-                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
-                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                            ? "bg-red-50/80 dark:bg-[#450a0a]/30 border-1.5 border-red-500/60 shadow-xs"
+                            : "bg-white dark:bg-[#1F1F23] border border-neutral-100 dark:border-[#2E2E33] hover:bg-neutral-50 dark:hover:bg-[#27272A]"
                         }
                       `}
                     >
-                      {/* Rank + Avatar + Name & Institute */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        {/* Rank Badge */}
-                        <div
-                          className={`
-                            w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center text-xs sm:text-sm font-black shrink-0
-                            ${
-                              user.rank === 1
-                                ? "bg-amber-400 text-amber-950"
-                                : user.rank === 2
-                                ? "bg-slate-300 text-slate-800"
-                                : user.rank === 3
-                                ? "bg-amber-700 text-amber-100"
-                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
-                            }
-                          `}
-                        >
-                          {toBengaliNum(user.rank)}
+                      {/* Left: Rank Badge + Avatar + Details */}
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="w-9 flex items-center justify-center shrink-0">
+                          {renderRankBadge(user.rank)}
                         </div>
 
-                        {/* Avatar */}
-                        <UserAvatar user={user as any} size="sm" className="w-10 h-10 shrink-0" />
+                        <UserAvatar
+                          user={user as any}
+                          size="md"
+                          className={`w-9.5 h-9.5 sm:w-10 sm:h-10 shrink-0 ${
+                            isMe ? "ring-2 ring-red-400" : ""
+                          }`}
+                        />
 
-                        {/* Name & Institute */}
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-[15px] sm:text-[16px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                            <h4
+                              className={`text-[13px] sm:text-[14px] font-bold truncate font-['Anek_Bangla',sans-serif] ${
+                                isMe
+                                  ? "text-red-700 dark:text-red-400 font-extrabold"
+                                  : "text-neutral-900 dark:text-white"
+                              }`}
+                            >
                               {user.name}
                             </h4>
                             {isMe && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
-                                আপনি
+                              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-extrabold shadow-2xs shrink-0">
+                                তুমি
                               </span>
                             )}
                             {user.is_pro && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500 text-black font-extrabold flex items-center gap-0.5">
-                                <Crown size={10} /> PRO
+                              <span className="text-[9px] px-1 py-0.2 rounded-md bg-amber-400 text-amber-950 font-black flex items-center gap-0.5 shrink-0 shadow-2xs">
+                                <Crown size={9} /> PRO
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-neutral-400 truncate max-w-[200px] sm:max-w-[320px]">
-                            {user.institute} {user.batch ? `• ${user.batch}` : ""}
+
+                          <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+                            {user.institute || "শিক্ষাপ্রতিষ্ঠান"} {user.batch ? `• ${user.batch}` : ""}
                           </p>
                         </div>
                       </div>
 
-                      {/* Right: XP Badge & Chevron */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="text-right">
-                          <div className="text-sm sm:text-base font-extrabold text-[#059669] dark:text-[#10B981] font-['Anek_Bangla',sans-serif]">
-                            {toBengaliNum(user.xp)} XP
-                          </div>
-                          <div className="text-[11px] text-neutral-400 font-medium">
-                            {toBengaliNum(user.exams_taken || 0)} পরীক্ষা
-                          </div>
+                      {/* Right: XP Formatted */}
+                      <div className="text-right shrink-0">
+                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif] tabular-nums">
+                          {toBengaliNum(user.xp)} XP
                         </div>
-                        <ChevronRight size={16} className="text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
+                        <div className="text-[10px] text-neutral-400 font-medium">
+                          {toBengaliNum(user.exams_taken || 0)} পরীক্ষা
+                        </div>
                       </div>
                     </div>
                   );
@@ -955,52 +958,95 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
             {/* Load More Button */}
             {hasMore && !isLoading && (
-              <div className="p-4 border-t border-neutral-100 dark:border-[#1C1C1E] bg-neutral-50 dark:bg-[#12100E] text-center">
+              <div className="p-3 border-t border-neutral-100 dark:border-[#27272A] bg-neutral-50 dark:bg-[#18181B] text-center">
                 <button
+                  type="button"
                   onClick={() => fetchLevelUsers(true)}
                   disabled={isLoadingMore}
-                  className="px-6 py-2.5 rounded-xl bg-white dark:bg-[#1C1C1E] border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-white font-['Anek_Bangla',sans-serif] font-bold text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 cursor-pointer"
+                  className="px-6 py-2 rounded-xl bg-white dark:bg-[#1C1C1E] border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-white font-['Anek_Bangla',sans-serif] font-bold text-xs sm:text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 cursor-pointer active:scale-95 shadow-2xs"
                 >
                   {isLoadingMore ? "লোড হচ্ছে..." : "আরও লোড করুন"}
                 </button>
               </div>
             )}
           </div>
-        </>
+
+          {/* ── Sticky User Rank Card at bottom (Matching Flutter _StickyUserRankCard 1:1) ── */}
+          {currentUser && (
+            <div className="sticky bottom-0 z-20 -mx-1 px-1 py-1 bg-white/95 dark:bg-[#0C0A09]/95 backdrop-blur-md border-t border-neutral-200/80 dark:border-[#27272A] shadow-lg rounded-t-2xl">
+              <div
+                onClick={() => onUserClick?.(currentUser, myRank)}
+                className="rounded-xl p-2.5 bg-neutral-100 dark:bg-[#1F1F23] border border-neutral-200/90 dark:border-[#2E2E33] shadow-xs flex items-center justify-between gap-2.5 cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-600 transition-all active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 flex items-center justify-center shrink-0">
+                    {renderRankBadge(myRank || 0)}
+                  </div>
+                  <UserAvatar
+                    user={currentUser}
+                    size="sm"
+                    className="w-8.5 h-8.5 shrink-0 ring-1 ring-neutral-200 dark:ring-neutral-700"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        {currentUser.name || "শিক্ষার্থী"}
+                      </h4>
+                      <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-neutral-200 dark:bg-[#2E2E33] text-neutral-700 dark:text-neutral-300 font-bold border border-neutral-300 dark:border-[#3F3F46]">
+                        তুমি
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] text-neutral-500 dark:text-neutral-400 truncate">
+                      {isOnOwnLevel
+                        ? currentUser.institute || "আমার প্রোফাইল"
+                        : `${myLevelInfo.label} স্তর • ${currentUser.institute || "আমার প্রোফাইল"}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <span className="text-xs sm:text-sm font-black text-neutral-900 dark:text-neutral-100 tabular-nums font-['Anek_Bangla',sans-serif]">
+                    {toBengaliNum(myEffectiveXp)} XP
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* ── 3. MY COLLEGE LEADERBOARD VIEW ───────────────────────────────── */}
       {viewMode === "college" && (
-        <div className="flex flex-col gap-4">
-          {/* Header Card */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                <Building2 size={15} />
-                <span>আমার শিক্ষা প্রতিষ্ঠান</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] mt-1">
+        <div className="flex flex-col gap-3">
+          {/* Header Card (Matching Flutter) */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-50 dark:bg-[#0A1F17] border border-emerald-300 dark:border-[#059669] flex items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xl shrink-0">🏫</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-emerald-800 dark:text-emerald-400 font-['Anek_Bangla',sans-serif] truncate">
                 {currentUser?.institute || "শিক্ষা প্রতিষ্ঠান নির্ধারিত নেই"}
               </h2>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] text-sm font-bold text-neutral-700 dark:text-neutral-300">
-              মোট শিক্ষার্থী: {toBengaliNum(collegeUsers.length)} জন
+            <div className="px-2.5 py-1 rounded-xl bg-white/80 dark:bg-[#141416] text-xs font-bold text-emerald-800 dark:text-emerald-300 shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+              {toBengaliNum(collegeUsers.length)} জন
             </div>
           </div>
 
           {/* College Student List */}
-          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#141416] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-2xs">
             {isLoadingCollege ? (
               <div className="p-6">
                 <LeaderboardSkeleton />
               </div>
             ) : collegeUsers.length === 0 ? (
-              <div className="p-12 text-center text-neutral-400">
-                <Building2 size={36} className="mx-auto mb-2 text-neutral-400" />
-                <p className="font-bold font-['Anek_Bangla',sans-serif]">আপনার প্রতিষ্ঠানের আর কোন শিক্ষার্থী পাওয়া যায়নি</p>
+              <div className="p-12 text-center text-neutral-400 flex flex-col items-center gap-2">
+                <span className="text-4xl mb-1">🏫</span>
+                <p className="font-bold text-sm sm:text-base font-['Anek_Bangla',sans-serif] text-neutral-700 dark:text-neutral-300">
+                  তোমার প্রতিষ্ঠান থেকে এখনো কেউ যোগ দেয়নি
+                </p>
+                <p className="text-xs text-neutral-400">বন্ধুদের আমন্ত্রণ জানাও!</p>
               </div>
             ) : (
-              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+              <div className="p-1.5 flex flex-col gap-1">
                 {collegeUsers.map((user) => {
                   const isMe = user.id === currentUser?.id;
 
@@ -1009,52 +1055,54 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       key={user.id}
                       onClick={() => onUserClick?.(user as any, user.rank)}
                       className={`
-                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors cursor-pointer group
+                        rounded-2xl p-2.5 sm:p-3 flex items-center justify-between gap-2.5 transition-all cursor-pointer group active:scale-[0.99]
                         ${
                           isMe
-                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
-                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                            ? "bg-red-50/80 dark:bg-[#450a0a]/30 border-1.5 border-red-500/60 shadow-xs"
+                            : "bg-white dark:bg-[#1F1F23] border border-neutral-100 dark:border-[#2E2E33] hover:bg-neutral-50 dark:hover:bg-[#27272A]"
                         }
                       `}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`
-                            w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0
-                            ${
-                              user.rank === 1
-                                ? "bg-amber-400 text-amber-950"
-                                : user.rank === 2
-                                ? "bg-slate-300 text-slate-800"
-                                : user.rank === 3
-                                ? "bg-amber-700 text-amber-100"
-                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
-                            }
-                          `}
-                        >
-                          {toBengaliNum(user.rank)}
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="w-9 flex items-center justify-center shrink-0">
+                          {renderRankBadge(user.rank)}
                         </div>
-                        <UserAvatar user={user as any} size="sm" className="w-10 h-10 shrink-0" />
-                        <div className="min-w-0">
+
+                        <UserAvatar
+                          user={user as any}
+                          size="md"
+                          className={`w-9.5 h-9.5 sm:w-10 sm:h-10 shrink-0 ${
+                            isMe ? "ring-2 ring-red-400" : ""
+                          }`}
+                        />
+
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-[15px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                            <h4
+                              className={`text-[13px] sm:text-[14px] font-bold truncate font-['Anek_Bangla',sans-serif] ${
+                                isMe
+                                  ? "text-red-700 dark:text-red-400 font-extrabold"
+                                  : "text-neutral-900 dark:text-white"
+                              }`}
+                            >
                               {user.name}
                             </h4>
                             {isMe && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
-                                আপনি
+                              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-gradient-to-r from-red-500 to-red-700 text-white font-extrabold shadow-2xs shrink-0">
+                                তুমি
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-neutral-400">{user.batch || "ব্যাচ নির্ধারিত নেই"}</p>
+                          <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+                            {user.batch || "ব্যাচ নির্ধারিত নেই"} • {user.level || "শিক্ষার্থী"}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <div className="text-base font-extrabold text-[#059669] dark:text-[#10B981] font-['Anek_Bangla',sans-serif]">
+                      <div className="text-right shrink-0">
+                        <div className="text-[13.5px] sm:text-[14.5px] font-black text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif] tabular-nums">
                           {toBengaliNum(user.xp)} XP
                         </div>
-                        <div className="text-xs text-neutral-400">{user.level}</div>
                       </div>
                     </div>
                   );
@@ -1067,21 +1115,21 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
       {/* ── 4. ALL INSTITUTES NATIONAL RANKINGS ──────────────────────────── */}
       {viewMode === "rankings" && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {/* Search Box */}
           <div className="relative">
-            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
             <input
               type="text"
               value={searchCollegeQuery}
               onChange={(e) => setSearchCollegeQuery(e.target.value)}
               placeholder="শিক্ষা প্রতিষ্ঠানের নাম দিয়ে খুঁজুন..."
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-[#12100E] border border-neutral-200 dark:border-[#1C1C1E] text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-['Anek_Bangla',sans-serif]"
+              className="w-full pl-9.5 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#141416] border border-neutral-200/90 dark:border-[#27272A] text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#059669]/50 font-['Anek_Bangla',sans-serif] shadow-2xs"
             />
           </div>
 
           {/* Rankings List */}
-          <div className="bg-white dark:bg-[#0C0A09] rounded-2xl border border-neutral-200 dark:border-[#1C1C1E] overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#141416] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-2xs">
             {isLoadingRankings ? (
               <div className="p-6">
                 <LeaderboardSkeleton />
@@ -1091,7 +1139,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 <p className="font-bold font-['Anek_Bangla',sans-serif]">কোন শিক্ষা প্রতিষ্ঠান পাওয়া যায়নি</p>
               </div>
             ) : (
-              <div className="divide-y divide-neutral-100 dark:divide-[#1C1C1E]">
+              <div className="p-1.5 flex flex-col gap-1">
                 {filteredInstituteRankings.map((inst, index) => {
                   const rank = index + 1;
 
@@ -1099,51 +1147,38 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     <div
                       key={inst.institute}
                       className={`
-                        p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-colors
+                        rounded-2xl p-2.5 sm:p-3 flex items-center justify-between gap-2.5 transition-all
                         ${
                           inst.isMyCollege
-                            ? "bg-emerald-50/70 dark:bg-emerald-950/20"
-                            : "hover:bg-neutral-50 dark:hover:bg-[#141210]"
+                            ? "bg-emerald-50/70 dark:bg-[#0A1F17] border-1.5 border-emerald-500/50 shadow-xs"
+                            : "bg-white dark:bg-[#1F1F23] border border-neutral-100 dark:border-[#2E2E33] hover:bg-neutral-50 dark:hover:bg-[#27272A]"
                         }
                       `}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`
-                            w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0
-                            ${
-                              rank === 1
-                                ? "bg-amber-400 text-amber-950"
-                                : rank === 2
-                                ? "bg-slate-300 text-slate-800"
-                                : rank === 3
-                                ? "bg-amber-700 text-amber-100"
-                                : "bg-neutral-100 dark:bg-[#1C1C1E] text-neutral-600 dark:text-neutral-400"
-                            }
-                          `}
-                        >
-                          {toBengaliNum(rank)}
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="w-9 flex items-center justify-center shrink-0">
+                          {renderRankBadge(rank)}
                         </div>
 
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-[15px] sm:text-[16px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
+                            <h4 className="text-[13px] sm:text-[14px] font-bold text-neutral-900 dark:text-white truncate font-['Anek_Bangla',sans-serif]">
                               {inst.institute}
                             </h4>
                             {inst.isMyCollege && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500 text-white font-bold">
-                                আপনার প্রতিষ্ঠান
+                              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-white font-extrabold shrink-0 shadow-2xs">
+                                তোমার প্রতিষ্ঠান
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-neutral-400">
+                          <p className="text-[11px] text-neutral-400 truncate mt-0.5">
                             শিক্ষার্থী: {toBengaliNum(inst.studentCount)} জন • সেরা র‍্যাংক: {toBengaliNum(inst.bestRank)}ম
                           </p>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="text-base font-extrabold text-indigo-600 dark:text-indigo-400 font-['Anek_Bangla',sans-serif]">
+                        <div className="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 font-['Anek_Bangla',sans-serif] tabular-nums">
                           {toBengaliNum(inst.points)} পয়েন্ট
                         </div>
                       </div>

@@ -222,11 +222,12 @@ export const DailyStreakCard: React.FC<DailyStreakCardProps> = ({
                 key={idx}
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
+                onClick={() => setHoveredIndex((prev) => (prev === idx ? null : idx))}
                 className={cn(
-                  "relative aspect-square rounded-[6px] transition-all cursor-pointer",
+                  "relative aspect-square rounded-[6px] transition-all cursor-pointer touch-manipulation",
                   boxColorClass,
                   isToday ? "ring-1.5 ring-[#12544F] ring-offset-1 dark:ring-offset-[#18181B]" : "",
-                  "hover:scale-115 hover:z-10"
+                  "hover:scale-115 active:scale-110 hover:z-10"
                 )}
               >
                 {/* Tooltip on Hover */}

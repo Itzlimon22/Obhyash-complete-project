@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   Sigma,
   Gift,
+  X,
 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
 import { isUserPro } from "@/lib/subscription-utils";
@@ -134,27 +135,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* ── Mobile Backdrop Overlay ── */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 touch-none"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* ── Drawer (Width: 250px, Background: #000000 OLED Black / white matching Flutter 1:1) ── */}
+      {/* ── Drawer (Width: 260px on mobile, 250px on desktop) ── */}
       <aside
         className={`
-          fixed lg:static top-0 left-0 h-full bg-white dark:bg-[#000000] border-r border-[#E5E7EB] dark:border-[#2C2C2C] z-[60] 
+          fixed lg:static top-0 left-0 h-full h-[100dvh] bg-white dark:bg-[#000000] border-r border-[#E5E7EB] dark:border-[#2C2C2C] z-[60] 
           transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] transform shadow-2xl lg:shadow-none flex flex-col justify-between
-          select-none font-['HindSiliguri',sans-serif]
-          ${isOpen ? "translate-x-0 w-[250px]" : "-translate-x-full lg:translate-x-0"}
+          select-none font-['HindSiliguri',sans-serif] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
+          ${isOpen ? "translate-x-0 w-[265px]" : "-translate-x-full lg:translate-x-0"}
           ${isCollapsed ? "lg:w-[72px]" : "lg:w-[250px]"}
         `}
       >
         <div className="flex flex-col h-full overflow-hidden">
           {/* ── Brand Header (Matching Flutter: h-16 / 64px, px-5 / 20px, border-b) ── */}
           <div
-            className={`h-16 flex items-center ${
-              isCollapsed ? "justify-center px-2" : "justify-start px-5"
+            className={`h-16 flex items-center justify-between ${
+              isCollapsed ? "px-2" : "px-4 sm:px-5"
             } border-b border-[#E5E7EB] dark:border-[#2C2C2C] shrink-0`}
           >
             <div
@@ -189,10 +190,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Mobile Close Button */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="lg:hidden p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+              aria-label="Close menu"
+            >
+              <X size={19} />
+            </button>
           </div>
 
           {/* ── Navigation (ListView.builder in Flutter: px-3 py-5, bottom 4 padding per item) ── */}
-          <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto custom-scrollbar">
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto overscroll-contain custom-scrollbar">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -262,7 +273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
 
           {/* ── Bottom Section (Matching Flutter: p-4 / 16px, bg #FAFAFA / #000000, border-t #E5E7EB / #2C2C2C) ── */}
-          <div className="p-4 border-t border-[#E5E7EB] dark:border-[#2C2C2C] bg-[#FAFAFA] dark:bg-[#000000] space-y-3 shrink-0">
+          <div className="p-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-[#E5E7EB] dark:border-[#2C2C2C] bg-[#FAFAFA] dark:bg-[#000000] space-y-3 shrink-0">
             {/* User Button (Matching Flutter 1:1) */}
             {user && (
               <button

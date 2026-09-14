@@ -221,7 +221,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pointer-events-none">
       <nav
         aria-label="Mobile Navigation"
-        className="pointer-events-auto w-full bg-white/95 dark:bg-[#0A0D10]/95 backdrop-blur-[20px] rounded-t-[22px] border-t border-[#E5E7EB] dark:border-[#1E232B] shadow-[0_-5px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-5px_20px_rgba(0,0,0,0.40)] px-2 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]"
+        className="pointer-events-auto w-full bg-white/95 dark:bg-[#0A0D10]/95 backdrop-blur-[20px] rounded-t-[22px] border-t border-[#E5E7EB] dark:border-[#1E232B] shadow-[0_-5px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-5px_20px_rgba(0,0,0,0.40)] px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] select-none"
       >
         <div className="h-[58px] flex items-center justify-around">
           {items.map((item) => {
@@ -239,10 +239,10 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             return (
               <motion.button
                 key={item.id}
-                whileTap={{ scale: 0.90 }}
+                whileTap={{ scale: 0.88 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                 onClick={() => handleTap(item)}
-                className={`flex-1 flex flex-col items-center justify-center py-1 select-none transition-colors duration-200 outline-none ${
+                className={`flex-1 flex flex-col items-center justify-center py-1 select-none transition-colors duration-200 outline-none touch-manipulation cursor-pointer ${
                   isActive
                     ? 'text-[#047857] dark:text-[#059669]'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#374151] dark:hover:text-[#D1D5DB]'
@@ -256,7 +256,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   {isActive ? item.filledIcon : item.outlineIcon}
                 </div>
                 <span
-                  className={`text-[12px] mt-[3px] tracking-[0.1px] transition-all duration-200 ${
+                  className={`text-[12px] mt-[3px] tracking-[0.1px] font-['Anek_Bangla',sans-serif] transition-all duration-200 ${
                     isActive ? 'font-bold' : 'font-medium'
                   }`}
                 >
