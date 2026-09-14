@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/dashboard/presentation/dashboard_view.dart';
 import '../features/auth/presentation/login_view.dart';
 import '../features/auth/presentation/update_password_view.dart';
+import '../features/auth/presentation/splash_view.dart';
 
 import '../features/auth/presentation/signup_view.dart';
 import '../features/auth/presentation/welcome_view.dart';
@@ -79,6 +80,13 @@ CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
   );
 }
 
+/// Tracks application launch state to ensure startup animations only run on fresh cold start.
+class AppLaunchTracker {
+  /// True if the initial cold-start splash animation has completed.
+  /// When true, navigating or resuming the app will never re-trigger the splash animation.
+  static bool hasCompletedColdLaunch = false;
+}
+
 // Global navigator keys
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -97,9 +105,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/welcome',
+    initialLocation: AppLaunchTracker.hasCompletedColdLaunch ? '/' : '/splash',
     refreshListenable: _GoRouterRefreshStream(authStateStream),
     redirect: (context, state) {
+      final isSplash = state.matchedLocation == '/splash';
+      if (isSplash) {
+        // If the cold-start launch animation has already run, do not stay on /splash
+        if (AppLaunchTracker.hasCompletedColdLaunch) {
+          final session = Supabase.instance.client.auth.currentSession;
+          return session != null ? '/' : '/welcome';
+        }
+        return null; // let splash finish its launch animation
+      }
+
       final session = Supabase.instance.client.auth.currentSession;
       final isAuth = session != null;
       final isLoggingIn =
@@ -117,6 +135,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) => _fadeRoute(const SplashView(), state),
+      ),
       GoRoute(
         path: '/welcome',
         parentNavigatorKey: rootNavigatorKey,
