@@ -612,7 +612,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="sm:w-auto w-full px-6 py-3 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-[#004633]/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                className="sm:w-auto w-full px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
               >
                 বিনামূল্যে শুরু করো
                 <ArrowRight className="w-4 h-4" />
@@ -620,7 +620,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
               <Link
                 href="/demo"
-                className="sm:w-auto w-full px-5 py-3 bg-white dark:bg-black border-2 border-[#004633]/40 dark:border-emerald-500/60 text-[#004633] dark:text-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 rounded-xl font-bold text-sm sm:text-base transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
+                className="sm:w-auto w-full px-5 py-3 bg-white dark:bg-black border-2 border-[#12544F]/40 dark:border-[#12544F]/60 text-[#12544F] dark:text-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 rounded-[14px] font-bold text-sm sm:text-base transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap shadow-sm"
               >
                 <Flame className="w-4 h-4 text-emerald-600" />
                 <span>ডেমো পরীক্ষা দাও</span>
@@ -1523,7 +1523,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <div className="mt-10 text-center">
             <button
               onClick={onGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#004633]/25 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-sm shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all cursor-pointer"
             >
               আজই স্মার্ট প্রস্তুতি শুরু করো
               <ArrowRight className="w-4 h-4" />
@@ -1757,7 +1757,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={onGetStarted}
-                className="w-full sm:w-auto px-6 py-3 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-xs shadow-md shadow-[#004633]/25 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
+                className="w-full sm:w-auto px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs shadow-[0_3.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 <span>প্রো প্ল্যানে আপগ্রেড করো</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -2016,7 +2016,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Mobile Sticky Floating CTA Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 shadow-2xl flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-[#004633] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+          <div className="w-9 h-9 rounded-xl bg-[#12544F] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
             অ
           </div>
           <div className="truncate">
@@ -2027,7 +2027,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
         <button
           onClick={onGetStarted}
-          className="px-4 py-2.5 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-xs shadow-md shadow-[#004633]/25 active:scale-95 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+          className="px-4 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[12px] font-bold text-xs shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
         >
           <span>শুরু করো</span>
           <ArrowRight className="w-3.5 h-3.5" />

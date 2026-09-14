@@ -278,13 +278,15 @@ export const getUserReports = async (
 
       if (questionsData) {
         const questionMap = new Map(
-          questionsData.map((q: { id: unknown }) => [q.id, q]),
+          questionsData.map((q: { id: unknown }) => [String(q.id), q]),
         );
 
         // Map questions back to reports
         return reports.map((report: { question_id: unknown }) => ({
           ...report,
-          question: questionMap.get(Number(report.question_id)) || null,
+          question: report.question_id
+            ? questionMap.get(String(report.question_id)) || null
+            : null,
         })) as unknown as Report[];
       }
     }

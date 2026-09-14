@@ -1327,10 +1327,11 @@ export default function StudentRoot({
       if (activeTab === "legends-league" || activeTab === "legends_league") {
         return (
           <AppLayout
-            activeTab={activeTab}
+            activeTab="legends-league"
             {...commonLayoutProps}
             title="লেজেন্ডস লীগ"
             onBack={() => smartBack("leaderboard")}
+            hideBottomNav={true}
           >
             <LegendsLeagueView
               currentUser={currentUser}
@@ -1385,10 +1386,11 @@ export default function StudentRoot({
       if (activeTab === "bookmarks") {
         return (
           <AppLayout
-            activeTab={activeTab}
+            activeTab="bookmarks"
             {...commonLayoutProps}
             title="বুকমার্ক করা প্রশ্নসমূহ"
             onBack={() => smartBack("practice")}
+            hideBottomNav={true}
           >
             <BookmarksView />
           </AppLayout>
@@ -1452,10 +1454,11 @@ export default function StudentRoot({
       if (activeTab === "complaint") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="complaint"
             {...commonLayoutProps}
             title="অভিযোগ ও পরামর্শ"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <ComplaintView />
           </AppLayout>
@@ -1465,10 +1468,11 @@ export default function StudentRoot({
       if (activeTab === "feature-requests") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="feature-requests"
             {...commonLayoutProps}
             title="নতুন ফিচার প্রস্তাব"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <FeatureRequestsView />
           </AppLayout>
@@ -1478,10 +1482,11 @@ export default function StudentRoot({
       if (activeTab === "notifications") {
         return (
           <AppLayout
-            activeTab="dashboard"
+            activeTab="notifications"
             {...commonLayoutProps}
             title="নোটিফিকেশন"
             onBack={() => smartBack("dashboard")}
+            hideBottomNav={true}
           >
             <NotificationsView onNavigate={(tab) => handleTabChange(tab)} />
           </AppLayout>
@@ -1491,10 +1496,11 @@ export default function StudentRoot({
       if (activeTab === "info" || activeTab === "account-info") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="account-info"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট ইনফো"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <AccountInfoView
               user={currentUser}
@@ -1511,6 +1517,7 @@ export default function StudentRoot({
             {...commonLayoutProps}
             title="রেফারেল ও রিওয়ার্ড"
             onBack={() => smartBack("dashboard")}
+            hideBottomNav={true}
           >
             <ReferralView />
           </AppLayout>
@@ -1520,10 +1527,11 @@ export default function StudentRoot({
       if (activeTab === "about") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="about"
             {...commonLayoutProps}
             title="আমাদের সম্পর্কে"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <AboutUsView />
           </AppLayout>
@@ -1533,10 +1541,11 @@ export default function StudentRoot({
       if (activeTab === "privacy") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="privacy"
             {...commonLayoutProps}
             title="প্রাইভেসি পলিসি"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <PrivacyPolicyView />
           </AppLayout>
@@ -1546,10 +1555,11 @@ export default function StudentRoot({
       if (activeTab === "terms") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="terms"
             {...commonLayoutProps}
             title="ব্যবহারের শর্তাবলী"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <TermsConditionsView />
           </AppLayout>
@@ -1559,10 +1569,11 @@ export default function StudentRoot({
       if (activeTab === "faq" || activeTab === "help") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="faq"
             {...commonLayoutProps}
             title="সাহায্য ও জিজ্ঞাসা"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <FaqPanel onNavigateComplaint={() => handleTabChange("complaint")} />
           </AppLayout>
@@ -1572,10 +1583,11 @@ export default function StudentRoot({
       if (activeTab === "account-linking" && currentUser) {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="account-linking"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট লিংকিং"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <AccountLinkingPanel user={currentUser} />
           </AppLayout>
@@ -1585,10 +1597,11 @@ export default function StudentRoot({
       if (activeTab === "delete-account" && currentUser) {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="delete-account"
             {...commonLayoutProps}
             title="অ্যাকাউন্ট মুছুন"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <DeleteAccountPanel
               user={currentUser}
@@ -1601,10 +1614,11 @@ export default function StudentRoot({
       if (activeTab === "personal" || activeTab === "edit-profile") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="personal"
             {...commonLayoutProps}
             title="প্রোফাইল সম্পাদনা"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <PersonalDetailsPanel
               user={currentUser!}
@@ -1620,10 +1634,11 @@ export default function StudentRoot({
       if (activeTab === "reports") {
         return (
           <AppLayout
-            activeTab="settings"
+            activeTab="reports"
             {...commonLayoutProps}
             title="রিপোর্টসমূহ"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <ReportsPanel user={currentUser!} />
           </AppLayout>
@@ -1633,10 +1648,11 @@ export default function StudentRoot({
       if (activeTab === "my-subscription") {
         return (
           <AppLayout
-            activeTab="subscription"
+            activeTab="my-subscription"
             {...commonLayoutProps}
             title="আমার সাবস্ক্রিপশন"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <MySubscriptionPanel onUpgrade={() => handleTabChange("upgrade")} />
           </AppLayout>
@@ -1650,6 +1666,7 @@ export default function StudentRoot({
             {...commonLayoutProps}
             title="প্রো সাবস্ক্রিপশন"
             onBack={() => smartBack("settings")}
+            hideBottomNav={true}
           >
             <SubscriptionView />
           </AppLayout>
@@ -1657,7 +1674,7 @@ export default function StudentRoot({
       if (activeTab === "user_profile" && selectedUserProfile)
         return (
           <AppLayout
-            activeTab="leaderboard"
+            activeTab="user_profile"
             {...commonLayoutProps}
             title={
               selectedUserProfile.name
@@ -1665,6 +1682,7 @@ export default function StudentRoot({
                 : "শিক্ষার্থীর প্রোফাইল"
             }
             onBack={() => smartBack("leaderboard")}
+            hideBottomNav={true}
           >
             <UserProfileView
               user={selectedUserProfile}
@@ -1678,13 +1696,14 @@ export default function StudentRoot({
         if (selectedSubjectReport) {
           return (
             <AppLayout
-              activeTab="analysis"
+              activeTab="subject_report"
               {...commonLayoutProps}
               title={`${BanglaNameHelper.formatSubject(
                 selectedSubjectReport,
                 selectedSubjectReport
               )} রিপোর্ট`}
               onBack={() => smartBack("analysis")}
+              hideBottomNav={true}
             >
               <SubjectReportView
                 subject={selectedSubjectReport}
@@ -1802,8 +1821,8 @@ export default function StudentRoot({
       return (
         <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#000000] flex flex-col font-['HindSiliguri',sans-serif]">
           {/* Top Exam Header Skeleton (Matching ExamRunner sticky header exactly, without text) */}
-          <header className="sticky top-0 z-30 h-14 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-            <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-full flex items-center justify-between gap-3">
+          <header className="sticky top-0 z-30 h-[52px] bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs select-none">
+            <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-full flex items-center justify-between gap-3">
               {/* Left: Answered/Total Pill Skeleton */}
               <div className="h-8 w-14 bg-neutral-200 dark:bg-neutral-800 rounded-lg animate-pulse" />
 
@@ -1899,7 +1918,7 @@ export default function StudentRoot({
             </p>
             <button
               onClick={() => setAppState(AppState.IDLE)}
-              className="w-full py-3 px-6 bg-[#004633] hover:bg-[#003828] text-white font-bold rounded-xl transition cursor-pointer"
+              className="w-full py-3 px-6 bg-[#12544F] hover:brightness-105 text-white font-bold rounded-[14px] shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition cursor-pointer text-[16px] tracking-[0.2px]"
             >
               ফিরে যাও
             </button>

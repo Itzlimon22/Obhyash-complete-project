@@ -192,7 +192,7 @@ export const FaqPanel: React.FC<FaqPanelProps> = ({ onNavigateComplaint }) => {
                 }}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                   isSelected
-                    ? 'bg-[#004633] text-white border border-[#059669]'
+                    ? 'bg-[#12544F] text-white border border-[#12544F]'
                     : 'bg-white dark:bg-[#18181B] text-[#475569] dark:text-[#A1A1AA] border border-[#E2E8F0] dark:border-[#27272A] hover:bg-neutral-50 dark:hover:bg-[#202024]'
                 }`}
               >

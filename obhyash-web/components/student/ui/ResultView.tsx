@@ -281,25 +281,25 @@ export const ResultView: React.FC<ResultViewProps> = ({
     <div
       className={cn(
         "w-full text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col",
-        showHeader ? "min-h-screen bg-[#FAFAFA] dark:bg-[#000000]" : "py-1 sm:py-2"
+        showHeader ? "min-h-screen bg-[#FAFAF9] dark:bg-[#000000]" : "py-1 sm:py-2"
       )}
     >
       {/* ── 1. Top App Bar (Matching Flutter Scaffold AppBar, only if standalone) ── */}
       {showHeader && (
-        <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-          <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-14 flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] shadow-xs select-none">
+          <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-[52px] flex items-center justify-between">
             {/* Left Close / Back Button */}
             <button
               type="button"
               onClick={onRestart}
               title={isHistoryMode ? 'পিছনে যাও' : 'বন্ধ করো'}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-colors cursor-pointer"
+              className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
             >
-              {isHistoryMode ? <ArrowLeft size={20} /> : <X size={20} />}
+              {isHistoryMode ? <ArrowLeft size={22} className="stroke-[2.2]" /> : <X size={22} />}
             </button>
 
             {/* Centered Page Title */}
-            <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white">
+            <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px]">
               পরীক্ষার ফলাফল
             </h1>
 
@@ -321,7 +321,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
       )}
 
       {/* ── Main Content Container ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-2.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-1.5 sm:px-4 pt-4 sm:pt-5 pb-20 flex flex-col gap-4">
         {/* ── 2. Top Action Buttons (PDF Downloads) ── */}
         <div className="grid grid-cols-2 gap-3">
           {/* Button 1: প্রশ্নপত্র */}
@@ -329,7 +329,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             type="button"
             onClick={handleDownloadPaper}
             title="শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো"
-            className="py-3 px-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#004633] dark:border-[#27272A] text-[#004633] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#004633]/5 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+            className="py-3 px-4 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#12544F] dark:border-[#27272A] text-[#12544F] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#12544F]/5 dark:hover:bg-white/5 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
           >
             <Download size={16} />
             <span>প্রশ্নপত্র</span>
@@ -340,7 +340,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             type="button"
             onClick={handleDownloadSolution}
             title="প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো"
-            className="py-3 px-4 rounded-[14px] bg-[#004633]/10 dark:bg-[#059669]/20 border border-[#004633] dark:border-[#059669]/40 text-[#004633] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#004633]/15 dark:hover:bg-[#059669]/30 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+            className="py-3 px-4 rounded-[14px] bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F] dark:border-[#059669]/40 text-[#12544F] dark:text-[#34D399] font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#12544F]/15 dark:hover:bg-[#059669]/30 transition-all shadow-xs cursor-pointer active:scale-[0.99]"
           >
             <Check size={16} className="stroke-[3]" />
             <span>ফলাফল ও ব্যাখ্যা</span>
@@ -476,7 +476,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
             <button
               type="button"
               onClick={onReexam ? onReexam : () => onRestart()}
-              className="w-full py-3.5 px-6 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.98] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2 shadow-md shadow-[#004633]/25 transition-all cursor-pointer touch-manipulation"
+              className="w-full py-3.5 px-6 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] flex items-center justify-center gap-2 transition-all cursor-pointer touch-manipulation"
             >
               <RotateCcw size={18} />
               <span>আবার পরীক্ষা দাও</span>

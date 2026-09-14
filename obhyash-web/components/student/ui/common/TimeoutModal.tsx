@@ -20,9 +20,9 @@ const TimeoutModal: React.FC<TimeoutModalProps> = ({
         {/* Top accent — red */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-red-600 rounded-t-3xl" />
 
-        <div className="rounded-t-3xl sm:rounded-3xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl px-6 pb-8 pt-5 text-center max-h-[50vh] sm:max-h-none overflow-y-auto">
+        <div className="rounded-t-3xl sm:rounded-3xl bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#2C2C2E] shadow-2xl px-6 pb-8 pt-5 text-center max-h-[50vh] sm:max-h-none overflow-y-auto">
           {/* Drag handle */}
-          <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:hidden" />
+          <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-neutral-300 dark:bg-[#3A3A3C] sm:hidden" />
 
           {/* Clock icon badge */}
           <div className="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-2xl bg-red-600 shadow-md">

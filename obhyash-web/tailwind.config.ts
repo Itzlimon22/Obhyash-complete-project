@@ -20,25 +20,29 @@ const config = {
     extend: {
       colors: {
         // --- 🟢 NEW: Brand Colors ---
-        // --- 🟢 STRICT BRAND PALETTE ---
+        // --- 🟢 STRICT BRAND PALETTE (1:1 with Flutter AppColors) ---
         brand: {
-          50: '#ecfdf5',  // Soft Mint (Backgrounds)
+          50: '#E6F0EC',  // softMint
           100: '#d1fae5',
-          500: '#047857', // Primary Deep Green
-          600: '#065f46',
-          700: '#064e3b',
-          900: '#022c22',
+          500: '#12544F', // viridianForest / brandGreen (Primary)
+          600: '#0E4440',
+          700: '#092328', // deepMidnightTeal / brandGreenDark
+          900: '#06171A',
+          teal: '#12544F',
+          dark: '#092328',
+          mulberry: '#601D49',
+          charcoal: '#2C2C2C',
         },
         danger: {
-          50: '#fef2f2',  // Soft Rose (Backgrounds)
-          500: '#b91c1c', // Primary Deep Red
-          700: '#991b1b',
-          900: '#450a0a',
+          50: '#fef2f2',  // Soft Rose
+          500: '#740A03', // deepCrimson / brandRed
+          700: '#520702',
+          900: '#3F0502',
         },
         warning: {
           50: '#fffbeb',
-          500: '#f59e0b', // Primary Warm Gold
-          700: '#b45309',
+          500: '#601D49', // royalMulberry / warningGold
+          700: '#471436',
         },
         // --- 🟢 NEW: Custom Dark Backgrounds ---
         obsidian: {

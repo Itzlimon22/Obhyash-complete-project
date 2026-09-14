@@ -469,7 +469,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               className={cn(
                 "w-full h-[40px] px-3 rounded-xl flex items-center justify-between cursor-pointer text-xs sm:text-sm font-semibold transition-all select-none border",
                 filterDate
-                  ? "bg-emerald-50 dark:bg-[#064E3B]/40 border-emerald-500 text-[#004633] dark:text-[#34D399]"
+                  ? "bg-[#12544F]/10 dark:bg-[#12544F]/30 border-[#12544F] text-[#12544F] dark:text-[#34D399]"
                   : "bg-neutral-50 dark:bg-[#121214] border-neutral-200 dark:border-[#2E2E2E] text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-[#3E3E3E]"
               )}
             >
@@ -561,32 +561,32 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         </div>
       </div>
 
-      {/* ── 2. Compact 3-Card Stat Row (Matching Flutter _buildStatCard) ── */}
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex flex-col items-center justify-center text-center">
-          <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-            মোট প্রশ্ন
-          </span>
-          <span className="text-lg sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums mt-0.5">
+      {/* ── 2. Compact 3-Card Stat Row (Matching Flutter _buildStatCard 1:1) ── */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3.5 mb-4 sm:mb-6">
+        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <span className="text-[20px] font-black text-neutral-900 dark:text-white tabular-nums leading-tight">
             {BanglaNameHelper.toBanglaNumeral(totalQuestions)}
           </span>
+          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
+            মোট প্রশ্ন
+          </span>
         </div>
 
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex flex-col items-center justify-center text-center">
-          <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-            সঠিক উত্তর
-          </span>
-          <span className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5">
+        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <span className="text-[20px] font-black text-emerald-600 dark:text-emerald-400 tabular-nums leading-tight">
             {BanglaNameHelper.toBanglaNumeral(totalCorrect)}
           </span>
+          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
+            সঠিক উত্তর
+          </span>
         </div>
 
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm flex flex-col items-center justify-center text-center">
-          <span className="text-[11px] sm:text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-            গড় নম্বর
-          </span>
-          <span className="text-lg sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums mt-0.5">
+        <div className="py-3 px-2 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] shadow-xs flex flex-col items-center justify-center text-center">
+          <span className="text-[20px] font-black text-[#12544F] dark:text-[#34D399] tabular-nums leading-tight">
             {BanglaNameHelper.toBanglaNumeral(avgScore)}%
+          </span>
+          <span className="text-[12px] font-semibold text-[#64748B] dark:text-[#A1A1AA] mt-1 truncate max-w-full">
+            গড় নম্বর
           </span>
         </div>
       </div>
@@ -600,7 +600,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             className={cn(
               "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center cursor-pointer",
               activeTab === "exams"
-                ? "bg-[#004633] text-white shadow-sm"
+                ? "bg-[#12544F] text-white shadow-sm"
                 : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
             )}
           >
@@ -611,7 +611,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             className={cn(
               "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center cursor-pointer",
               activeTab === "questions"
-                ? "bg-[#004633] text-white shadow-sm"
+                ? "bg-[#12544F] text-white shadow-sm"
                 : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
             )}
           >
@@ -712,8 +712,8 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     key={exam.id}
                     onClick={() => onViewResult(exam)}
                     className={cn(
-                      "group p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A]",
-                      "hover:border-neutral-300 dark:hover:border-neutral-700 shadow-sm transition-all duration-200 cursor-pointer",
+                      "group p-3 sm:p-4 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A]",
+                      "hover:border-neutral-300 dark:hover:border-neutral-700 shadow-xs transition-all duration-200 cursor-pointer",
                       "flex items-center justify-between gap-3 select-none"
                     )}
                   >
@@ -813,9 +813,9 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setExamPageSize((prev) => prev + 20)}
-                    className="px-5 py-2.5 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] hover:border-emerald-500 dark:hover:border-emerald-500 text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 hover:text-emerald-600 transition-all shadow-sm flex items-center gap-2 mx-auto cursor-pointer"
+                    className="px-5 py-2.5 rounded-[14px] bg-white dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] hover:border-[#12544F] dark:hover:border-[#34D399] text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200 hover:text-[#12544F] dark:hover:text-[#34D399] transition-all shadow-xs flex items-center gap-2 mx-auto cursor-pointer"
                   >
-                    <ArrowDown size={14} className="text-emerald-600" />
+                    <ArrowDown size={14} className="text-[#12544F] dark:text-[#34D399]" />
                     <span>আরও ২০টি পরীক্ষা লোড করো</span>
                   </button>
                 </div>

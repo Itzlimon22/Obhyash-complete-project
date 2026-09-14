@@ -497,7 +497,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
           label: "প্রথম সূচনা",
           description: "প্রথম পরীক্ষা সম্পন্ন",
           unlocked: totalExams >= 1,
-          accentColor: "#004633",
+          accentColor: "#12544F",
           bgLight: "bg-emerald-500/10",
           borderLight: "border-emerald-500/30",
           iconName: "award",
@@ -598,7 +598,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
   if (!analytics || analytics.totalExams === 0) {
     return (
       <div className="max-w-4xl mx-auto px-3 sm:px-6 py-12 flex flex-col items-center justify-center text-center min-h-[60vh] font-sans">
-        <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center text-[#004633] dark:text-emerald-400 mb-4 shadow-sm">
+        <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center text-[#12544F] dark:text-emerald-400 mb-4 shadow-sm">
           <BarChart3 size={32} />
         </div>
         <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-2">
@@ -609,7 +609,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         </p>
         <button
           onClick={onStartExam}
-          className="px-6 py-2.5 rounded-xl bg-[#004633] hover:bg-[#003728] text-white font-bold text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+          className="px-6 py-3 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] transition-all cursor-pointer"
         >
           পরীক্ষা শুরু করো 🚀
         </button>
@@ -657,7 +657,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
       </div>
 
       {/* ── 2. MASTERY HERO CARD (Midnight Navy & Book Deep Green) ── */}
-      <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#0B132B] via-[#0D233A] to-[#004633] border border-emerald-500/30 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#0B132B] via-[#0D233A] to-[#12544F] border border-emerald-500/30 text-white shadow-xl">
         <div className="relative z-10 flex flex-col gap-4">
           {/* Top Row: Tier Pill & Exam Count */}
           <div className="flex items-center justify-between gap-2">
@@ -952,7 +952,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
                     {s.correct > 0 && (
                       <div
                         style={{ width: `${(s.correct / s.total) * 100}%` }}
-                        className="h-full bg-[#004633] dark:bg-emerald-500"
+                        className="h-full bg-[#12544F] dark:bg-emerald-500"
                         title={`সঠিক: ${s.correct}`}
                       />
                     )}
@@ -987,7 +987,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         <div className="grid grid-cols-3 gap-2.5">
           {/* Correct */}
           <div className="p-3 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 flex flex-col items-center justify-center text-center">
-            <span className="text-lg sm:text-2xl font-black text-[#004633] dark:text-emerald-400">
+            <span className="text-lg sm:text-2xl font-black text-[#12544F] dark:text-emerald-400">
               {BanglaNameHelper.toBanglaNumeral(a.totalCorrect)}
             </span>
             <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400 mt-0.5">

@@ -50,19 +50,19 @@ export default function ReferralProgramPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#004633]/20">
+    <div className="min-h-screen bg-slate-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#12544F]/20">
       {/* ── Top Navigation Header ── */}
       <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-neutral-950/80 border-b border-neutral-200/80 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-[#004633] text-white flex items-center justify-center font-black text-base shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[#12544F] text-white flex items-center justify-center font-black text-base shadow-sm">
               অ
             </div>
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest leading-none">
                 OBHYASH
               </span>
-              <span className="text-xl font-black text-[#004633] dark:text-emerald-400 leading-none mt-0.5">
+              <span className="text-xl font-black text-[#12544F] dark:text-emerald-400 leading-none mt-0.5">
                 অভ্যাস
               </span>
             </div>
@@ -71,13 +71,13 @@ export default function ReferralProgramPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:text-[#004633] dark:hover:text-emerald-400 transition-colors"
+              className="px-4 py-2 text-xs sm:text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:text-[#12544F] dark:hover:text-emerald-400 transition-colors"
             >
               লগইন
             </Link>
             <Link
               href="/signup"
-              className="px-4 py-2 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#004633]/20 transition-all hover:scale-105"
+              className="px-4 py-2 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#12544F]/20 transition-all hover:scale-105"
             >
               ফ্রি রেজিস্ট্রেশন
             </Link>
@@ -88,18 +88,18 @@ export default function ReferralProgramPage() {
       {/* ── Hero Section ── */}
       <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden border-b border-neutral-200/80 dark:border-neutral-800/80">
         {/* Subtle Brand Background Glows */}
-        <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-96 h-96 bg-[#004633]/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-96 h-96 bg-[#12544F]/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 -right-32 -translate-y-1/2 w-96 h-96 bg-red-600/5 dark:bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#004633]/10 dark:bg-emerald-950/50 border border-[#004633]/20 dark:border-emerald-800/50 text-[#004633] dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
-            <Gift className="w-3.5 h-3.5 text-[#004633] dark:text-emerald-400" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12544F]/10 dark:bg-emerald-950/50 border border-[#12544F]/20 dark:border-emerald-800/50 text-[#12544F] dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+            <Gift className="w-3.5 h-3.5 text-[#12544F] dark:text-emerald-400" />
             <span>অভ্যাস রেফারেল ও রিওয়ার্ডস প্রোগ্রাম</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-neutral-900 dark:text-white tracking-tight leading-[1.25]">
             বন্ধুকে আমন্ত্রণ জানাও — <br />
-            <span className="text-[#004633] dark:text-emerald-400">
+            <span className="text-[#12544F] dark:text-emerald-400">
               বন্ধু পাবে ১৫ দিন, তুমি পাবে ৭ দিন ও স্ক্র্যাচ কার্ড!
             </span>
           </h1>
@@ -111,7 +111,7 @@ export default function ReferralProgramPage() {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href="/signup"
-              className="px-6 py-3 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-[#004633]/25 transition-all hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-[#12544F]/25 transition-all hover:scale-105 active:scale-95"
             >
               <span>রেফারেল শুরু করো</span>
               <ArrowRight className="w-4 h-4" />
@@ -127,7 +127,7 @@ export default function ReferralProgramPage() {
           {/* Quick Metrics Banner */}
           <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto pt-8 border-t border-neutral-200/80 dark:border-neutral-800">
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-center shadow-xs">
-              <div className="text-xl sm:text-2xl font-black text-[#004633] dark:text-emerald-400">১৫ দিন</div>
+              <div className="text-xl sm:text-2xl font-black text-[#12544F] dark:text-emerald-400">১৫ দিন</div>
               <div className="text-[11px] text-neutral-500 font-semibold mt-0.5">বন্ধুর জন্য ফ্রি প্রো</div>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-center shadow-xs">
@@ -161,10 +161,10 @@ export default function ReferralProgramPage() {
           <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-emerald-200/80 dark:border-emerald-900/40 shadow-lg shadow-emerald-500/5 relative overflow-hidden flex flex-col justify-between">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-[#004633] text-white flex items-center justify-center font-bold text-xl shadow-md">
+                <div className="w-12 h-12 rounded-2xl bg-[#12544F] text-white flex items-center justify-center font-bold text-xl shadow-md">
                   🎁
                 </div>
-                <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-[#004633] dark:text-emerald-300 text-xs font-black uppercase tracking-wider border border-[#004633]/20 dark:border-emerald-800/40">
+                <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-[#12544F] dark:text-emerald-300 text-xs font-black uppercase tracking-wider border border-[#12544F]/20 dark:border-emerald-800/40">
                   তোমার জন্য (Referrer)
                 </span>
               </div>
@@ -197,7 +197,7 @@ export default function ReferralProgramPage() {
             <div className="pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-800">
               <Link
                 href="/login"
-                className="w-full py-2.5 bg-[#004633] hover:bg-[#003828] text-white rounded-xl text-center font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                className="w-full py-2.5 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl text-center font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
               >
                 <span>ড্যাশবোর্ড থেকে রেফারেল লিংক নাও</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -259,7 +259,7 @@ export default function ReferralProgramPage() {
       <section id="how-it-works" className="py-16 bg-neutral-100/70 dark:bg-neutral-900/40 border-y border-neutral-200/80 dark:border-neutral-800/80">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-xl mx-auto mb-14 space-y-2">
-            <span className="text-xs font-bold text-[#004633] dark:text-emerald-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#12544F] dark:text-emerald-400 uppercase tracking-wider">
               সহজ ৪টি ধাপ
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white">
@@ -273,7 +273,7 @@ export default function ReferralProgramPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Step 1 */}
             <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3 relative">
-              <div className="w-8 h-8 rounded-full bg-[#004633] text-white flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-full bg-[#12544F] text-white flex items-center justify-center font-black text-sm">
                 ১
               </div>
               <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">
@@ -299,7 +299,7 @@ export default function ReferralProgramPage() {
 
             {/* Step 3 */}
             <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3 relative">
-              <div className="w-8 h-8 rounded-full bg-[#004633] text-white flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-full bg-[#12544F] text-white flex items-center justify-center font-black text-sm">
                 ৩
               </div>
               <h3 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">
@@ -362,9 +362,9 @@ export default function ReferralProgramPage() {
             <p className="text-xs text-neutral-500 leading-relaxed">গোল্ডেন ব্যাজ + দীর্ঘমেয়াদী মেম্বারশিপ ও মান্থলি লিডারবোর্ড টপ।</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-[#004633]/30 dark:border-emerald-800/60 shadow-xs space-y-2 text-left bg-gradient-to-br from-emerald-50/40 to-white dark:from-emerald-950/20 dark:to-neutral-900">
+          <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-[#12544F]/30 dark:border-emerald-800/60 shadow-xs space-y-2 text-left bg-gradient-to-br from-emerald-50/40 to-white dark:from-emerald-950/20 dark:to-neutral-900">
             <div className="text-2xl">👑</div>
-            <div className="text-xs font-black text-[#004633] dark:text-emerald-400 uppercase tracking-wide">২৫+ জন রেফারেল</div>
+            <div className="text-xs font-black text-[#12544F] dark:text-emerald-400 uppercase tracking-wide">২৫+ জন রেফারেল</div>
             <h4 className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">লিজেন্ড টিয়ার</h4>
             <p className="text-xs text-neutral-500 leading-relaxed">আজীবন প্রিমিয়াম প্রায়োরিটি ও ন্যাশনাল ট্রফি সম্মাননা।</p>
           </div>
@@ -375,7 +375,7 @@ export default function ReferralProgramPage() {
       <section className="py-12 bg-neutral-50 dark:bg-neutral-950 border-y border-neutral-200/80 dark:border-neutral-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 shadow-sm flex flex-col sm:flex-row items-start gap-4">
-            <div className="p-3 rounded-2xl bg-[#004633]/10 text-[#004633] dark:text-emerald-400 shrink-0">
+            <div className="p-3 rounded-2xl bg-[#12544F]/10 text-[#12544F] dark:text-emerald-400 shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div className="space-y-1.5">
@@ -409,7 +409,7 @@ export default function ReferralProgramPage() {
                 key={idx}
                 className={`rounded-2xl border transition-all duration-200 overflow-hidden bg-white dark:bg-neutral-900 ${
                   isOpen
-                    ? 'border-[#004633]/40 dark:border-emerald-600/40 shadow-sm'
+                    ? 'border-[#12544F]/40 dark:border-emerald-600/40 shadow-sm'
                     : 'border-neutral-200/80 dark:border-neutral-800'
                 }`}
               >
@@ -418,12 +418,12 @@ export default function ReferralProgramPage() {
                   className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3"
                 >
                   <h3 className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-white flex items-center gap-2">
-                    <span className="text-[#004633] dark:text-emerald-400 font-mono font-bold">Q.</span>
+                    <span className="text-[#12544F] dark:text-emerald-400 font-mono font-bold">Q.</span>
                     {faq.q}
                   </h3>
                   <ChevronDown
                     className={`w-4 h-4 text-neutral-400 shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-[#004633] dark:text-emerald-400' : ''
+                      isOpen ? 'rotate-180 text-[#12544F] dark:text-emerald-400' : ''
                     }`}
                   />
                 </button>
@@ -439,9 +439,9 @@ export default function ReferralProgramPage() {
       </section>
 
       {/* ── Final CTA Section ── */}
-      <section className="py-14 bg-gradient-to-br from-[#004633]/10 via-white to-red-500/10 dark:from-[#004633]/20 dark:via-black dark:to-red-950/20 border-t border-neutral-200 dark:border-neutral-800 text-center">
+      <section className="py-14 bg-gradient-to-br from-[#12544F]/10 via-white to-red-500/10 dark:from-[#12544F]/20 dark:via-black dark:to-red-950/20 border-t border-neutral-200 dark:border-neutral-800 text-center">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-5">
-          <div className="w-12 h-12 bg-[#004633] text-white rounded-2xl flex items-center justify-center mx-auto text-xl shadow-md">
+          <div className="w-12 h-12 bg-[#12544F] text-white rounded-2xl flex items-center justify-center mx-auto text-xl shadow-md">
             🎁
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white">
@@ -453,7 +453,7 @@ export default function ReferralProgramPage() {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href="/login"
-              className="px-6 py-3 bg-[#004633] hover:bg-[#003828] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#004633]/20 transition-all hover:scale-105"
+              className="px-6 py-3 bg-[#12544F] hover:bg-[#092328] text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-[#12544F]/20 transition-all hover:scale-105"
             >
               লগইন করে রেফারেল ড্যাশবোর্ডে যাও
             </Link>

@@ -26,9 +26,9 @@ const NavigationWarningModal: React.FC<NavigationWarningModalProps> = ({
           {/* Top accent line — red (destructive action) */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-red-600 rounded-t-3xl" />
 
-          <div className="rounded-t-3xl sm:rounded-3xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl px-6 pb-8 pt-5 max-h-[50vh] sm:max-h-none overflow-y-auto">
+          <div className="rounded-t-3xl sm:rounded-3xl bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#2C2C2E] shadow-2xl px-6 pb-8 pt-5 max-h-[50vh] sm:max-h-none overflow-y-auto">
             {/* Drag handle */}
-            <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:hidden" />
+            <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-neutral-300 dark:bg-[#3A3A3C] sm:hidden" />
 
             {/* Icon + Heading */}
             <div className="flex items-start gap-4 mb-4">
@@ -93,9 +93,9 @@ const NavigationWarningModal: React.FC<NavigationWarningModalProps> = ({
               </button>
               <button
                 onClick={onClose}
-                className="w-full py-3.5 rounded-2xl bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 active:scale-[0.98] text-black dark:text-white font-semibold text-sm border border-neutral-300 dark:border-neutral-700 transition-all duration-150"
+                className="w-full py-3.5 rounded-2xl bg-white dark:bg-[#2C2C2E] hover:bg-neutral-100 dark:hover:bg-[#3A3A3C] text-black dark:text-white font-semibold text-sm border border-neutral-300 dark:border-[#3A3A3C] transition-all duration-150 active:scale-[0.98]"
               >
-                না, পরীক্ষা দেবো
+                পরীক্ষায় ফিরে যাও
               </button>
             </div>
           </div>

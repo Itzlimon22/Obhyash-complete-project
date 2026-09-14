@@ -109,7 +109,7 @@ export const ScratchCardModal: React.FC<ScratchCardModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 font-['HindSiliguri',sans-serif]">
-      <div className="w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-neutral-800 text-center relative">
+      <div className="w-full max-w-sm bg-white dark:bg-[#1C1C1E] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#2C2C2E] text-center relative">
         <button
           type="button"
           onClick={onClose}

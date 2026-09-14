@@ -96,11 +96,11 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white dark:bg-[#13151F] rounded-t-[28px] sm:rounded-[28px] p-6 shadow-2xl border border-neutral-200/80 dark:border-white/10 font-['HindSiliguri',sans-serif] max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md bg-white dark:bg-[#1C1C1E] rounded-t-[28px] sm:rounded-[28px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#2C2C2E] font-['HindSiliguri',sans-serif] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}
-        <div className="w-11 h-1 bg-black/10 dark:bg-white/20 rounded-full mx-auto mb-4" />
+        <div className="w-11 h-1 bg-black/10 dark:bg-[#3A3A3C] rounded-full mx-auto mb-4" />
 
         {/* Danger Header Icon & Title */}
         <div className="flex items-center gap-3.5 mb-5">

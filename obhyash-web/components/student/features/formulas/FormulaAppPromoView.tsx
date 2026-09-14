@@ -109,7 +109,7 @@ export const FormulaAppPromoView: React.FC<FormulaAppPromoViewProps> = ({ onBack
               <button
                 type="button"
                 onClick={() => handleDownloadClick("playstore")}
-                className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#004633] hover:bg-[#003728] text-white font-black text-sm sm:text-base shadow-md hover:shadow-lg shadow-emerald-900/20 active:scale-95 transition-all cursor-pointer"
+                className="flex items-center gap-3 px-5 py-3 rounded-[14px] bg-[#12544F] hover:brightness-105 text-white font-bold text-sm sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all cursor-pointer"
               >
                 <Smartphone size={20} />
                 <div className="text-left">
@@ -126,9 +126,9 @@ export const FormulaAppPromoView: React.FC<FormulaAppPromoViewProps> = ({ onBack
               <button
                 type="button"
                 onClick={() => handleDownloadClick("apk")}
-                className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white dark:bg-[#202024] hover:bg-neutral-50 dark:hover:bg-[#27272C] text-neutral-800 dark:text-white border border-neutral-200 dark:border-[#333338] font-bold text-sm sm:text-base shadow-sm active:scale-95 transition-all cursor-pointer"
+                className="flex items-center gap-3 px-5 py-3 rounded-[14px] bg-white dark:bg-[#202024] hover:bg-neutral-50 dark:hover:bg-[#27272C] text-neutral-800 dark:text-white border border-[#12544F]/40 dark:border-[#12544F]/60 font-bold text-sm sm:text-base shadow-sm active:scale-95 transition-all cursor-pointer"
               >
-                <Download size={18} className="text-emerald-600 dark:text-emerald-400" />
+                <Download size={18} className="text-[#12544F] dark:text-emerald-400" />
                 <div className="text-left">
                   <span className="text-[10px] text-neutral-500 dark:text-neutral-400 block leading-none">
                     সরাসরি ইনস্টল
@@ -142,9 +142,9 @@ export const FormulaAppPromoView: React.FC<FormulaAppPromoViewProps> = ({ onBack
           </div>
 
           {/* Right Visual Icon Preview */}
-          <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-1 flex items-center justify-center shadow-2xl shadow-emerald-600/30 shrink-0">
+          <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-3xl bg-gradient-to-tr from-[#12544F] to-teal-400 p-1 flex items-center justify-center shadow-2xl shadow-emerald-600/30 shrink-0">
             <div className="w-full h-full rounded-[22px] bg-white dark:bg-[#18181B] flex flex-col items-center justify-center p-4 text-center gap-2 border border-white/20">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[#004633] dark:text-emerald-400">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-[#12544F] dark:text-emerald-400">
                 <BookOpen size={32} />
               </div>
               <span className="text-xs sm:text-sm font-black text-neutral-900 dark:text-white">

@@ -60,9 +60,9 @@ const ExamTargetModal: React.FC<ExamTargetModalProps> = ({ user, onClose }) => {
       />
 
       {/* Sheet */}
-      <div className="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-neutral-100 dark:border-neutral-800 p-6 animate-slide-up sm:animate-fade-in mx-0 sm:mx-4">
+      <div className="relative w-full sm:max-w-md bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-neutral-100 dark:border-[#2C2C2E] p-6 animate-slide-up sm:animate-fade-in mx-0 sm:mx-4">
         {/* Handle (mobile) */}
-        <div className="w-10 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mx-auto mb-5 sm:hidden" />
+        <div className="w-10 h-1 bg-neutral-200 dark:bg-[#3A3A3C] rounded-full mx-auto mb-5 sm:hidden" />
 
         {/* Header */}
         <div className="text-center mb-6">
@@ -87,7 +87,7 @@ const ExamTargetModal: React.FC<ExamTargetModalProps> = ({ user, onClose }) => {
               className={`flex items-center justify-center p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
                 selected === t.id
                   ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
-                  : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-800/50'
+                  : 'border-neutral-200 dark:border-[#323236] hover:border-neutral-300 dark:hover:border-neutral-600 bg-white dark:bg-[#252528]'
               }`}
             >
               <p

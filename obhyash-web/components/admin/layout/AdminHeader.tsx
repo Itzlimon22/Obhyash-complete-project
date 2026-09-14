@@ -121,7 +121,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-zinc-800/70 border border-transparent hover:border-neutral-200 dark:hover:border-zinc-800 transition-all cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#004633] text-white flex items-center justify-center font-bold text-xs shadow-sm border border-emerald-500/30">
+            <div className="w-8 h-8 rounded-lg bg-[#12544F] text-white flex items-center justify-center font-bold text-xs shadow-sm border border-emerald-500/30">
               {adminName.charAt(0).toUpperCase()}
             </div>
 

@@ -20,22 +20,18 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   return (
     <button
       onClick={handleClick}
-      className={`relative p-1.5 md:p-2 transition-all duration-200 group flex items-center justify-center rounded-xl ${
-        isOpen
-          ? 'text-emerald-700 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30'
-          : 'text-neutral-500 dark:text-neutral-400 hover:text-emerald-700 dark:hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20'
-      }`}
+      className="relative flex items-center justify-center p-0.5 text-neutral-600 dark:text-[#D4D4D4] hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer active:scale-95"
       aria-label="নোটিফিকেশন"
     >
       <Bell
-        className={`w-5 h-5 transition-all duration-200 ${isOpen ? 'scale-110' : 'group-hover:scale-110 group-active:scale-95'}`}
-        strokeWidth={2}
+        size={24}
+        strokeWidth={1.8}
+        className="transition-transform"
       />
 
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white ring-2 ring-white dark:ring-neutral-950 transition-all duration-200 group-hover:scale-110 shadow-md">
+        <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[9.5px] font-bold text-white ring-1.5 ring-white dark:ring-black select-none pointer-events-none">
           {unreadCount > 99 ? '99+' : unreadCount}
-          <span className="absolute inset-0 rounded-full bg-red-600 animate-ping opacity-20" />
         </span>
       )}
     </button>

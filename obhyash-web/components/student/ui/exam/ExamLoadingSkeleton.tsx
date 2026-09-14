@@ -18,7 +18,7 @@ export const ExamLoadingSkeleton: React.FC<ExamLoadingSkeletonProps> = ({
   hideHeader = false,
 }) => {
   return (
-    <div className="w-full max-w-3xl mx-auto px-2.5 sm:px-4 py-2 sm:py-5 space-y-3 sm:space-y-4 pb-28 font-['HindSiliguri',sans-serif] animate-in fade-in duration-300">
+    <div className="w-full max-w-3xl mx-auto px-1.5 sm:px-4 py-2 sm:py-5 space-y-3 sm:space-y-4 pb-28 font-['HindSiliguri',sans-serif] animate-in fade-in duration-300">
       {/* ── Top Sticky Header Skeleton ── */}
       {!hideHeader && (
         <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 p-2.5 sm:p-3 flex items-center justify-between shadow-xs">

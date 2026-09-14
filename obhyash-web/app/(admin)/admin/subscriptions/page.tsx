@@ -2358,7 +2358,7 @@ export default function SubscriptionsPage() {
         {showExtendModal && extendingSubscription && (
           <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
             <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-[#004633] to-[#00664B] text-white">
+              <div className="p-6 bg-gradient-to-br from-[#12544F] to-[#092328] text-white">
                 <div className="flex items-center justify-between mb-1">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/20 border border-emerald-400/30 uppercase tracking-widest text-emerald-200">
                     {extendingSubscription.is_active ? 'Extend Active Plan' : 'Reactivate Plan'}

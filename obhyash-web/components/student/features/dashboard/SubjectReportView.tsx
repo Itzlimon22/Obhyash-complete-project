@@ -151,7 +151,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
           <button
             onClick={handleDownload}
             disabled={stats.totalQuestions === 0}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#004633] hover:bg-[#003627] text-white text-xs font-black rounded-xl shadow-md shadow-emerald-950/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#12544F] hover:brightness-105 text-white text-xs font-bold rounded-[14px] shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <Download size={14} />
             <span>ডাউনলোড রিপোর্ট</span>
@@ -306,7 +306,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
         {/* ALL CHAPTERS BREAKDOWN */}
         <div className="bg-white dark:bg-[#18181B] p-5 rounded-2xl shadow-sm border border-neutral-200/90 dark:border-[#27272A]">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen size={16} className="text-[#004633] dark:text-emerald-400" />
+            <BookOpen size={16} className="text-[#12544F] dark:text-emerald-400" />
             <h3 className="font-black text-sm sm:text-base text-neutral-900 dark:text-white">
               সকল অধ্যায়ের ফলাফল
             </h3>
@@ -318,7 +318,7 @@ export const SubjectReportView: React.FC<SubjectReportViewProps> = ({
               const acc = total > 0 ? Math.round((ch.correct / total) * 100) : 0;
               const barColor =
                 acc >= 75
-                  ? "bg-[#004633]"
+                  ? "bg-[#12544F]"
                   : acc >= 50
                   ? "bg-amber-500"
                   : "bg-red-500";

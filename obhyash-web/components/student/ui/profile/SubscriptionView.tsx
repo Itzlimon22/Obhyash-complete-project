@@ -418,7 +418,7 @@ export const SubscriptionView: React.FC = () => {
             <button
               type="button"
               onClick={handlePaymentInitiate}
-              className="w-full py-4 px-6 rounded-[18px] bg-[#004633] hover:bg-[#003828] text-white font-extrabold text-base flex items-center justify-center gap-3 transition-all shadow-md shadow-[#004633]/25 active:scale-[0.99] cursor-pointer"
+              className="w-full py-4 px-6 rounded-[14px] bg-[#12544F] hover:brightness-105 text-white font-bold text-[16px] tracking-[0.2px] flex items-center justify-center gap-3 transition-all shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] cursor-pointer"
             >
               <span>পেমেন্ট করতে এগিয়ে যান</span>
               <div className="px-2.5 py-0.5 rounded-lg bg-white/20 text-white font-mono text-sm font-bold flex items-center gap-1.5">
@@ -443,7 +443,7 @@ export const SubscriptionView: React.FC = () => {
       {/* ── 3. Unified What's Included Features Showcase (1:1 with Flutter) ── */}
       <div className="bg-white dark:bg-[#18181B] rounded-[22px] p-5 sm:p-6 border border-[#E2E8F0] dark:border-[#27272A] shadow-xs mb-6">
         <div className="flex items-center gap-2.5 mb-5">
-          <div className="p-1.5 rounded-lg bg-[#004633]/10 dark:bg-[#004633]/25 text-[#004633] dark:text-[#34D399]">
+          <div className="p-1.5 rounded-lg bg-[#12544F]/10 dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#34D399]">
             <Crown className="w-4 h-4" />
           </div>
           <h3 className="text-base font-extrabold text-[#0F172A] dark:text-white">
@@ -464,7 +464,7 @@ export const SubscriptionView: React.FC = () => {
             const Icon = item.icon;
             return (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[#004633]/10 dark:bg-[#004633]/20 border border-[#004633]/20 dark:border-[#004633]/40 flex items-center justify-center text-[#004633] dark:text-[#34D399] shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-[#12544F]/10 dark:bg-[#12544F]/20 border border-[#12544F]/20 dark:border-[#12544F]/40 flex items-center justify-center text-[#12544F] dark:text-[#34D399] shrink-0">
                   <Icon className="w-3.5 h-3.5" />
                 </div>
                 <span className="text-sm font-bold text-[#0F172A] dark:text-white">
@@ -510,7 +510,7 @@ export const SubscriptionView: React.FC = () => {
           <div className="grid grid-cols-12 p-4 bg-[#F8FAFC] dark:bg-[#1E1E22] border-b border-[#E2E8F0] dark:border-[#27272A] text-xs font-bold text-neutral-600 dark:text-neutral-300">
             <div className="col-span-6">ফিচারসমূহ</div>
             <div className="col-span-3 text-center">ফ্রি</div>
-            <div className="col-span-3 text-center text-[#004633] dark:text-[#34D399]">
+            <div className="col-span-3 text-center text-[#12544F] dark:text-[#34D399]">
               প্রিমিয়াম
             </div>
           </div>
@@ -535,7 +535,7 @@ export const SubscriptionView: React.FC = () => {
                   )}
                 </div>
 
-                <div className="col-span-3 text-center font-bold text-[#004633] dark:text-[#34D399]">
+                <div className="col-span-3 text-center font-bold text-[#12544F] dark:text-[#34D399]">
                   {typeof row.pro === 'boolean' ? (
                     <Check className="w-4 h-4 text-emerald-600 mx-auto" />
                   ) : (

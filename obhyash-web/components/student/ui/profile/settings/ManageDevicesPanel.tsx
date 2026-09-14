@@ -90,7 +90,7 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
     <div className="space-y-4 animate-fade-in font-['HindSiliguri']">
       {/* Header card */}
       <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/90 dark:border-[#27272A] overflow-hidden shadow-sm">
-        <div className="px-6 py-4 border-b border-[#003627] bg-[#004633] flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[#092328] bg-[#12544F] flex items-center justify-between">
           <div>
             <h3 className="text-base sm:text-lg font-black text-white">লগইন ডিভাইস</h3>
           </div>
@@ -124,13 +124,13 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
                   key={device.id}
                   className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
                     isCurrent
-                      ? "border-[#004633] dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20"
+                      ? "border-[#12544F] dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/20"
                       : "border-neutral-200 dark:border-[#27272A] bg-neutral-50/70 dark:bg-[#141417]"
                   }`}
                 >
                   {/* Icon */}
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-[#004633] text-white" : "bg-neutral-200 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300"}`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-[#12544F] text-white" : "bg-neutral-200 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300"}`}
                   >
                     <DeviceIcon type={device.device_type} />
                   </div>

@@ -33,10 +33,10 @@ type Tab = "overview" | "history";
 const STATUS_CONFIG = {
   paid: {
     label: "পরিশোধিত",
-    bg: "bg-[#004633] text-white",
+    bg: "bg-[#12544F] text-white",
     icon: CheckCircle2,
   },
-  valid: { label: "সফল", bg: "bg-[#004633] text-white", icon: CheckCircle2 },
+  valid: { label: "সফল", bg: "bg-[#12544F] text-white", icon: CheckCircle2 },
   checking: {
     label: "যাচাই হচ্ছে",
     bg: "bg-amber-600 text-white",
@@ -137,7 +137,7 @@ export default function MySubscriptionPanel({
   return (
     <div className="min-h-full flex flex-col font-['HindSiliguri']">
       {/* Header */}
-      <div className="bg-[#004633] px-6 py-4 flex items-center gap-3 rounded-t-2xl">
+      <div className="bg-[#12544F] px-6 py-4 flex items-center gap-3 rounded-t-2xl">
         <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-7 h-7 object-contain drop-shadow-xs shrink-0" />
         <div>
           <h2 className="text-base sm:text-lg font-black text-white">আমার সাবস্ক্রিপশন</h2>
@@ -158,7 +158,7 @@ export default function MySubscriptionPanel({
               className={cn(
                 "flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-black border-b-2 transition-colors",
                 active
-                  ? "border-[#004633] text-[#004633] dark:text-[#4ADE80] dark:border-[#4ADE80]"
+                  ? "border-[#12544F] text-[#12544F] dark:text-[#34D399] dark:border-[#34D399]"
                   : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
               )}
             >
@@ -181,8 +181,8 @@ export default function MySubscriptionPanel({
               </div>
             ) : isFree ? (
               /* Free user CTA */
-              <div className="rounded-2xl border border-dashed border-[#004633]/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-8 flex flex-col items-center text-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#004633] flex items-center justify-center shadow-lg shadow-emerald-950/30">
+              <div className="rounded-2xl border border-dashed border-[#12544F]/40 bg-emerald-50/50 dark:bg-[#12544F]/20 p-8 flex flex-col items-center text-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-[#12544F] flex items-center justify-center shadow-lg shadow-emerald-950/30">
                   <img src="/dashboard-icons/pro_crown.svg" alt="Pro" className="w-8 h-8 object-contain drop-shadow-md" />
                 </div>
                 <div>
@@ -195,7 +195,7 @@ export default function MySubscriptionPanel({
                 </div>
                 <button
                   onClick={onUpgrade}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#004633] text-white text-xs font-black hover:bg-[#003627] active:scale-95 transition-all shadow-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[14px] bg-[#12544F] hover:brightness-105 text-white text-xs font-bold shadow-[0_3.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] transition-all cursor-pointer"
                 >
                   <ArrowUpRight size={15} />
                   <span>এখনই আপগ্রেড করো</span>
@@ -237,7 +237,7 @@ export default function MySubscriptionPanel({
                         </div>
                         <div className="h-2 bg-neutral-100 dark:bg-[#27272A] rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#004633] dark:bg-emerald-500 rounded-full transition-all"
+                            className="h-full bg-[#12544F] dark:bg-emerald-500 rounded-full transition-all"
                             style={{ width: `${progressPct}%` }}
                           />
                         </div>
@@ -246,7 +246,7 @@ export default function MySubscriptionPanel({
 
                     <button
                       onClick={onUpgrade}
-                      className="mt-5 w-full py-2.5 rounded-xl border border-[#004633] text-[#004633] dark:text-[#4ADE80] text-xs font-black hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all flex items-center justify-center gap-2"
+                      className="mt-5 w-full py-2.5 rounded-[12px] border border-[#12544F] text-[#12544F] dark:text-[#34D399] dark:border-[#34D399] text-xs font-bold hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>প্ল্যান রিনিউ বা পরিবর্তন করুন</span>
                       <ArrowUpRight size={14} />

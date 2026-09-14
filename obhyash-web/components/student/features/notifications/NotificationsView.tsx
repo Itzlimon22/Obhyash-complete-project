@@ -287,7 +287,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
           <button
             type="button"
             onClick={handleMarkAllAsRead}
-            className="px-3 py-1.5 rounded-xl bg-[#E6F4EA] dark:bg-[#004633]/30 border border-[#004633]/30 text-[#004633] dark:text-[#4ADE80] text-xs font-bold flex items-center gap-1.5 hover:bg-[#d8edd9] dark:hover:bg-[#004633]/50 transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-[#E6F0EC] dark:bg-[#12544F]/30 border border-[#12544F]/30 text-[#12544F] dark:text-[#34D399] text-xs font-bold flex items-center gap-1.5 hover:bg-[#d5e7e0] dark:hover:bg-[#12544F]/50 transition-colors cursor-pointer"
           >
             <CheckCheck className="w-3.5 h-3.5" />
             <span>সব পড়ুন</span>

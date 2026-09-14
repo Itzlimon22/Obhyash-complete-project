@@ -105,27 +105,27 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
     >
       {/* ── Top App Bar (only if standalone) ── */}
       {showHeader && (
-        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white dark:bg-[#111216] border-b border-[#E5E9F0] dark:border-[#1F2026] flex items-center px-2.5 sm:px-6 shadow-xs">
+        <header className="sticky top-0 z-30 h-[52px] bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] flex items-center px-3.5 sm:px-6 shadow-xs select-none">
           <button
             type="button"
             onClick={onBack}
             disabled={isLoading}
             aria-label="Back"
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#1E293B] dark:text-[#E2E8F0] hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft size={22} className="stroke-[2.2]" />
           </button>
-          <h1 className="flex-1 text-center font-bold text-base sm:text-lg text-[#0F172A] dark:text-white mr-9">
+          <h1 className="flex-1 text-center font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] mr-6">
             পরীক্ষার নির্দেশাবলী
           </h1>
         </header>
       )}
 
       {/* ── Main Scrollable Content ── */}
-      <main className="flex-1 overflow-y-auto px-2.5 sm:px-4 py-3 sm:py-6 flex justify-center">
+      <main className="flex-1 overflow-y-auto px-1.5 sm:px-4 py-3 sm:py-6 flex justify-center">
         <div className="w-full max-w-lg flex flex-col gap-3.5 sm:gap-4 pb-24">
           {/* ── Card 1: Subject & Scope Accordion ── */}
-          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] overflow-hidden transition-all">
+          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none overflow-hidden transition-all">
             <button
               type="button"
               onClick={() => setIsAccordionOpen((prev) => !prev)}
@@ -183,7 +183,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
           </div>
 
           {/* ── Card 2: 4-Column Stat Ribbon ── */}
-          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] py-4 px-2 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] grid grid-cols-4 divide-x divide-[#F1F5F9] dark:divide-[#1F2026] text-center">
+          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] py-4 px-2 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none grid grid-cols-4 divide-x divide-[#F1F5F9] dark:divide-[#27272A] text-center">
             {/* Stat 1: সময়সীমা */}
             <div className="flex flex-col items-center justify-center px-1">
               <span className="text-[11px] sm:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium mb-1">
@@ -226,7 +226,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
           </div>
 
           {/* ── Card 3: Important Instructions Timeline Card ── */}
-          <div className="bg-white dark:bg-[#121318] rounded-[20px] border border-[#E5E9F0] dark:border-[#22242D] p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]">
+          <div className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E5E7EB] dark:border-[#27272A] p-5 sm:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-none">
             {/* Header */}
             <div className="flex items-center gap-2.5 mb-6">
               <div className="w-8 h-8 rounded-[10px] bg-[#ECFDF5] dark:bg-[#064E3B]/30 flex items-center justify-center text-[#059669] dark:text-[#34D399]">
@@ -310,13 +310,13 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </main>
 
       {/* ── Fixed Bottom CTA Bar ── */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#111216]/95 backdrop-blur-md border-t border-[#E5E9F0] dark:border-[#1F2026] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#1E232B] px-2.5 py-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex justify-center shadow-lg">
         <div className="w-full max-w-lg">
           <button
             type="button"
             onClick={handleStart}
             disabled={isLoading}
-            className="w-full py-3.5 sm:py-4 px-6 rounded-[16px] bg-[#004633] hover:bg-[#003828] active:scale-[0.99] text-white font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(0,70,51,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 sm:py-4 px-6 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>

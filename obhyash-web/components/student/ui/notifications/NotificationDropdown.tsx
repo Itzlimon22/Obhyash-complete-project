@@ -63,7 +63,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         }}
         exit={{ opacity: 0, scale: 0.96, y: -8 }}
         transition={{ duration: 0.18 }}
-        className="hidden md:flex md:flex-col absolute top-12 right-0 w-[400px] max-h-[85vh] rounded-2xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-[99] origin-top-right overflow-hidden backdrop-blur-none"
+        className="hidden md:flex md:flex-col absolute top-12 right-0 w-[400px] max-h-[85vh] rounded-2xl bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#2C2C2E] shadow-2xl z-[99] origin-top-right overflow-hidden backdrop-blur-none"
       >
         <DropdownHeader
           unreadCount={unreadCount}
@@ -96,10 +96,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />
 
           {/* Drag handle */}
-          <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex-shrink-0" />
+          <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-[#3A3A3C] flex-shrink-0" />
 
           {/* Header */}
-          <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-[#2C2C2E]">
             <div className="flex justify-between items-center mb-2.5">
               <DialogTitle className="font-bold text-neutral-900 dark:text-white text-[15px] flex items-center gap-2">
                 নোটিফিকেশন

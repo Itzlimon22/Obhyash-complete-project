@@ -33,10 +33,10 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
   const answeredCount = Object.keys(selectedAnswers).length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-black text-neutral-900 dark:text-neutral-100 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif]">
       {/* ── Top AppBar (Exact same structure as ExamRunner) ── */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-black border-b border-neutral-200/80 dark:border-neutral-800 shadow-2xs">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 bg-white dark:bg-[#000000] border-b border-[#E5E7EB] dark:border-[#1E232B] shadow-2xs">
+        <div className="max-w-4xl mx-auto px-1.5 sm:px-4 h-14 flex items-center justify-between gap-3">
           {/* LEFT: Back Button + Answered/Total Pill */}
           <div className="flex items-center gap-2 shrink-0">
             <button
@@ -69,7 +69,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
       </header>
 
       {/* ── Main Question List (Exact same layout as ExamRunner) ── */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-5 pb-28 space-y-5">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-1.5 sm:px-6 py-5 pb-28 space-y-5">
         {questions.length === 0 ? (
           <div className="text-center py-16 text-neutral-500 dark:text-neutral-400 font-sans">
             কোনো প্রশ্ন পাওয়া যায়নি।

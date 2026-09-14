@@ -98,8 +98,8 @@ export const DashboardActionGrid: React.FC<DashboardActionGridProps> = ({
               />
             </div>
 
-            {/* Title */}
-            <span className="text-xs sm:text-[13.5px] font-bold text-[#1F2937] dark:text-[#F3F4F6] truncate w-full text-center tracking-tight">
+            {/* Title (Flutter: 13px, w600) */}
+            <span className="text-[13px] font-semibold text-[#18181B] dark:text-white truncate w-full text-center">
               {action.title}
             </span>
           </button>

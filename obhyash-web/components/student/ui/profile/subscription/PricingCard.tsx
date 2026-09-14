@@ -34,7 +34,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   let containerBorder = "bg-neutral-200 dark:bg-neutral-800 hover:border-indigo-500/50";
   let accentIconBg = "bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400";
   let monthlyText = "৩০ দিন ফুল অ্যাক্সেস • এককালীন পেমেন্ট";
-  let buttonClasses = "bg-[#004633] hover:bg-[#003627] text-white shadow-emerald-950/20";
+  let buttonClasses = "bg-[#12544F] hover:brightness-105 text-white shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px]";
 
   if (isMasterPro) {
     badgeText = "মেগা সেভার 👑 ৫০% সাশ্রয়";
@@ -42,14 +42,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     containerBorder = "bg-gradient-to-b from-amber-500 via-amber-600 to-amber-700 shadow-2xl shadow-amber-500/20";
     accentIconBg = "bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400";
     monthlyText = "প্রতি মাসে মাত্র ৳৯৯ • সেরা লং-টার্ম ভ্যালু!";
-    buttonClasses = "bg-gradient-to-r from-amber-500 to-yellow-500 text-neutral-950 font-black shadow-amber-500/30 hover:brightness-105";
+    buttonClasses = "bg-gradient-to-r from-amber-500 to-yellow-500 text-neutral-950 font-black shadow-[0_4.5px_0_#92400E] active:shadow-[0_1px_0_#92400E] active:translate-y-[3.5px] hover:brightness-105";
   } else if (isTopRankers) {
     badgeText = "জনপ্রিয় 🌟 ৪১% সাশ্রয়";
-    badgeClasses = "bg-gradient-to-r from-[#004633] via-emerald-600 to-teal-600 text-white font-black";
+    badgeClasses = "bg-gradient-to-r from-[#12544F] via-emerald-600 to-teal-600 text-white font-black";
     containerBorder = "bg-gradient-to-b from-emerald-500 via-emerald-600 to-teal-700 shadow-2xl shadow-emerald-500/20";
     accentIconBg = "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400";
     monthlyText = "প্রতি মাসে মাত্র ৳১১৬ • সিজন স্পেশাল!";
-    buttonClasses = "bg-[#004633] hover:bg-[#003627] text-white shadow-emerald-900/30";
+    buttonClasses = "bg-[#12544F] hover:brightness-105 text-white shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px]";
   }
 
   // Calculate dynamic price based on applied coupon
@@ -190,7 +190,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             <button
               onClick={onSelect}
               className={cn(
-                "w-full py-3 rounded-xl font-black text-xs sm:text-sm tracking-wide transition-all shadow-md active:scale-95",
+                "w-full py-3 rounded-[14px] font-bold text-sm tracking-[0.2px] transition-all",
                 isCurrent
                   ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-default"
                   : buttonClasses

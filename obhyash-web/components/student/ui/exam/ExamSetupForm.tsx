@@ -755,7 +755,7 @@ export const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           type="button"
           onClick={handleStartExam}
           disabled={isStarting || isExternalLoading}
-          className="w-full h-12 sm:h-13 rounded-xl bg-[#004633] hover:bg-[#003828] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-base sm:text-lg shadow-md shadow-[#004633]/25 transition-all flex items-center justify-center gap-2 mt-2 mb-6"
+          className="w-full h-12 sm:h-13 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-[16px] tracking-[0.2px] transition-all flex items-center justify-center gap-2 mt-2 mb-6"
         >
           {isStarting || isExternalLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1191,7 +1191,7 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
                   className={cn(
                     "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left font-['HindSiliguri']",
                     isSelected
-                      ? "bg-[#004633] dark:bg-[#003D2C] border-[#004633] dark:border-[#059669] text-white dark:text-[#E6FFFA]"
+                      ? "bg-[#12544F] dark:bg-[#12544F] border-[#12544F] dark:border-[#12544F] text-white dark:text-[#E6FFFA]"
                       : "bg-transparent dark:bg-[#18181B] border-[#E2E8F0] dark:border-[#27272A] text-[#334155] dark:text-[#D4D4D8] hover:border-neutral-300 dark:hover:border-neutral-700"
                   )}
                 >
@@ -1206,7 +1206,7 @@ const MultiSelectModal: React.FC<MultiSelectModalProps> = ({
                     {isSelected && (
                       <Check
                         size={13}
-                        className="text-[#004633] dark:text-black stroke-[3]"
+                        className="text-[#12544F] dark:text-black stroke-[3]"
                       />
                     )}
                   </div>
@@ -1428,7 +1428,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
                             className={cn(
                               "w-full flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left font-['HindSiliguri']",
                               isSelected
-                                ? "bg-[#004633] dark:bg-[#003D2C] border-[#004633] dark:border-[#059669] text-white dark:text-[#E6FFFA]"
+                                ? "bg-[#12544F] dark:bg-[#12544F] border-[#12544F] dark:border-[#12544F] text-white dark:text-[#E6FFFA]"
                                 : "bg-transparent border-[#E2E8F0] dark:border-[#27272A] text-[#334155] dark:text-[#D4D4D8] hover:border-neutral-300 dark:hover:border-neutral-700"
                             )}
                           >
@@ -1443,7 +1443,7 @@ const TopicCollapsibleModal: React.FC<TopicCollapsibleModalProps> = ({
                               {isSelected && (
                                 <Check
                                   size={11}
-                                  className="text-[#004633] dark:text-black stroke-[3]"
+                                  className="text-[#12544F] dark:text-black stroke-[3]"
                                 />
                               )}
                             </div>

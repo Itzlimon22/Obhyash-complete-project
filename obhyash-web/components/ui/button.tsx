@@ -10,16 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[0_4px_0_#064e3b] dark:shadow-[0_4px_0_#022c22] hover:brightness-105 active:shadow-[0_1px_0_#064e3b] dark:active:shadow-[0_1px_0_#022c22] active:translate-y-[3px]",
+          "bg-[#12544F] text-white shadow-[0_4.5px_0_#092328] hover:brightness-105 active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] rounded-[14px]",
         destructive:
-          "bg-destructive text-white shadow-[0_4px_0_#7f1d1d] hover:brightness-105 active:shadow-[0_1px_0_#7f1d1d] active:translate-y-[3px] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "bg-[#740A03] text-white shadow-[0_4.5px_0_#3F0502] hover:brightness-105 active:shadow-[0_1px_0_#3F0502] active:translate-y-[3.5px] rounded-[14px] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border border-border bg-background shadow-[0_3px_0_hsl(var(--border))] active:shadow-[0_1px_0_hsl(var(--border))] active:translate-y-[2px] hover:bg-accent hover:text-accent-foreground",
+          "border border-[#12544F]/40 dark:border-[#12544F] bg-transparent text-[#12544F] dark:text-[#34D399] rounded-[12px] hover:bg-[#12544F]/5 dark:hover:bg-white/5",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-[0_3px_0_hsl(var(--muted-foreground)/0.25)] active:shadow-[0_1px_0_hsl(var(--muted-foreground)/0.25)] active:translate-y-[2px] hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground shadow-[0_3px_0_hsl(var(--muted-foreground)/0.25)] active:shadow-[0_1px_0_hsl(var(--muted-foreground)/0.25)] active:translate-y-[2px] hover:bg-secondary/80 rounded-[14px]",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-xl",
+        link: "text-[#12544F] dark:text-[#34D399] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2 has-[>svg]:px-3",

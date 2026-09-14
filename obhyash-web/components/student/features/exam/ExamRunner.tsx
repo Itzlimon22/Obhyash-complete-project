@@ -185,8 +185,8 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-sans flex flex-col select-none">
       {/* ── 1. Top Sticky Exam Header (Matching Flutter Exactly) ── */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs">
-        <div className="max-w-3xl mx-auto px-2.5 sm:px-4 h-14 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs select-none">
+        <div className="max-w-3xl mx-auto px-3.5 sm:px-4 h-[52px] flex items-center justify-between gap-3">
           {/* Left: Answered / Total Pill (Clickable Question Palette) */}
           <button
             type="button"
@@ -199,11 +199,11 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             <span>{totalQuestions}</span>
           </button>
 
-          {/* Middle: Timer Capsule */}
+          {/* Middle: Timer Capsule (Flutter AppTypography.timer: 15.0px, Bold, Tabular) */}
           <div
             title="অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।"
             className={cn(
-              'px-3.5 py-1.5 rounded-lg font-black text-sm sm:text-base font-mono flex items-center gap-1.5 border transition-all duration-300',
+              'px-3.5 py-1.5 rounded-lg font-bold text-[15px] font-mono tabular-nums flex items-center gap-1.5 border transition-all duration-300',
               isTimerCritical
                 ? 'bg-[#DC2626] text-white border-[#DC2626] animate-pulse shadow-md shadow-red-500/20'
                 : isTimerWarning
@@ -253,14 +253,14 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
         {/* Subtle Progress Bar */}
         <div className="w-full h-1 bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
           <div
-            className="h-full bg-[#004633] transition-all duration-300"
+            className="h-full bg-[#12544F] transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </header>
 
       {/* ── 2. Main Question Flow Feed ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-2.5 sm:px-4 pt-3.5 sm:pt-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-1.5 sm:px-4 pt-3.5 sm:pt-6 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
         <div className="flex flex-col gap-3.5 sm:gap-4">
           {questions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;
@@ -298,7 +298,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             type="button"
             onClick={() => setShowSubmitModal(true)}
             disabled={isEvaluating}
-            className="w-full sm:w-auto px-14 py-3.5 rounded-[12px] bg-[#004633] hover:bg-[#003828] active:scale-[0.98] text-white font-bold text-base sm:text-lg shadow-md shadow-[#004633]/25 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+            className="w-full sm:w-auto px-14 py-3.5 rounded-[14px] bg-[#12544F] hover:brightness-105 shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] text-white font-bold text-[16px] tracking-[0.2px] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
           >
             {isEvaluating ? 'মূল্যায়ন হচ্ছে...' : 'জমা দাও'}
           </button>
@@ -326,13 +326,13 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             onClick={() => setShowSubmitModal(false)}
             aria-hidden="true"
           />
-          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#000000] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
             <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-4">
               খাতা জমা দিবে?
             </h3>
 
             {/* Stats Snapshot Row */}
-            <div className="p-3.5 rounded-[14px] bg-[#F4F4F5] dark:bg-[#27272A]/50 border border-[#E4E4E7] dark:border-[#3F3F46]/40 flex items-center justify-around mb-6">
+            <div className="p-3.5 rounded-[14px] bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] flex items-center justify-around mb-6">
               <div>
                 <span className="text-xs text-[#71717A] dark:text-[#A1A1AA] block mb-0.5">
                   উত্তর দেওয়া
@@ -343,7 +343,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                 </span>
               </div>
 
-              <div className="w-[1px] h-8 bg-[#E4E4E7] dark:bg-[#3F3F46]" />
+              <div className="w-[1px] h-8 bg-[#E4E4E7] dark:border-[#27272A]" />
 
               <div>
                 <span className="text-xs text-[#71717A] dark:text-[#A1A1AA] block mb-0.5">
@@ -365,7 +365,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(false)}
-                className="py-3 px-4 rounded-xl bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#4B5563] dark:text-[#D4D4D8] font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 transition cursor-pointer"
+                className="py-3 px-4 rounded-[14px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#4B5563] dark:text-[#D4D4D8] font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 transition cursor-pointer"
               >
                 না, পরীক্ষা দিবো
               </button>
@@ -373,7 +373,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={confirmSubmit}
-                className="py-3 px-4 rounded-xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-sm shadow-md shadow-[#004633]/25 transition active:scale-95 cursor-pointer"
+                className="py-3 px-4 rounded-[14px] bg-[#12544F] hover:brightness-105 active:translate-y-[2px] text-white font-bold text-sm shadow-[0_3px_0_#092328] transition active:scale-98 cursor-pointer"
               >
                 হ্যাঁ, জমা দাও
               </button>
@@ -390,7 +390,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             onClick={() => setShowExitModal(false)}
             aria-hidden="true"
           />
-          <div className="relative w-full max-w-sm bg-white dark:bg-[#18181B] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#000000] rounded-[24px] p-6 shadow-2xl border border-neutral-200 dark:border-[#27272A] z-10 animate-in zoom-in-95 duration-200 text-center font-sans">
             <div className="w-14 h-14 rounded-full bg-[#EA580C]/15 border border-[#EA580C]/30 flex items-center justify-center mx-auto mb-3.5 text-[#F97316]">
               <AlertTriangle size={28} />
             </div>
@@ -408,7 +408,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowExitModal(false)}
-                className="py-3 px-4 rounded-xl bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#4B5563] dark:text-[#D4D4D8] font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 transition cursor-pointer"
+                className="py-3 px-4 rounded-[14px] bg-[#F3F4F6] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] text-[#4B5563] dark:text-[#D4D4D8] font-bold text-sm hover:bg-neutral-200/70 dark:hover:bg-neutral-700 transition cursor-pointer"
               >
                 চালিয়ে যাও
               </button>
@@ -419,7 +419,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                   setShowExitModal(false);
                   confirmSubmit();
                 }}
-                className="py-3 px-4 rounded-xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-sm shadow-md shadow-[#004633]/25 transition cursor-pointer"
+                className="py-3 px-4 rounded-[14px] bg-[#12544F] hover:brightness-105 text-white font-bold text-sm shadow-[0_3px_0_#092328] transition cursor-pointer"
               >
                 জমা দাও
               </button>

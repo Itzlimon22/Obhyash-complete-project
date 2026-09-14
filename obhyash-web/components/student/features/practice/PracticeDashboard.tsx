@@ -442,7 +442,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           className={cn(
             "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center",
             activeTab === "mistakes"
-              ? "bg-[#004633] text-white shadow-sm"
+              ? "bg-[#12544F] text-white shadow-xs"
               : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
           )}
         >
@@ -457,7 +457,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           className={cn(
             "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center",
             activeTab === "bookmarks"
-              ? "bg-[#004633] text-white shadow-sm"
+              ? "bg-[#12544F] text-white shadow-xs"
               : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
           )}
         >
@@ -465,7 +465,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         </button>
       </div>
 
-      {/* ── 3. Horizontal Subject Filter Pills (Matching Flutter _Pill 1:1) ── */}
+      {/* ── 3. Horizontal Subject Filter Pills ── */}
       {availableSubjects.length > 0 && (
         <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none">
           <button
@@ -474,7 +474,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             className={cn(
               "px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all",
               subjectFilter === "all"
-                ? "bg-[#004633] text-white shadow-sm"
+                ? "bg-[#12544F] text-white shadow-xs"
                 : "bg-white dark:bg-[#1E1E1E] border border-neutral-200 dark:border-[#2E2E2E] text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
             )}
           >
@@ -488,7 +488,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               className={cn(
                 "px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all",
                 subjectFilter === s.key
-                  ? "bg-[#004633] text-white shadow-sm"
+                  ? "bg-[#12544F] text-white shadow-xs"
                   : "bg-white dark:bg-[#1E1E1E] border border-neutral-200 dark:border-[#2E2E2E] text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
               )}
             >
@@ -498,7 +498,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         </div>
       )}
 
-      {/* ── 4. Toolbar (Matching Flutter _buildToolbar 1:1) ── */}
+      {/* ── 4. Toolbar ── */}
       {currentList.length > 0 && (
         <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] shadow-sm mb-4">
           <div className="flex items-center gap-2.5">
@@ -508,7 +508,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               className={cn(
                 "w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer",
                 allSelected
-                  ? "bg-red-600 border-red-600 text-white"
+                  ? "bg-[#12544F] border-[#12544F] text-white"
                   : "border-neutral-300 dark:border-neutral-600 hover:border-neutral-400"
               )}
             >
@@ -527,11 +527,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer",
                 shuffle
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border-emerald-300 dark:border-emerald-700/60"
+                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-[#12544F] border-emerald-300 dark:border-emerald-700/60"
                   : "bg-white dark:bg-[#18181B] border-neutral-200 dark:border-[#27272A] text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
               )}
             >
-              <Shuffle size={13} className={shuffle ? "text-emerald-600" : "text-neutral-400"} />
+              <Shuffle size={13} className={shuffle ? "text-[#12544F]" : "text-neutral-400"} />
               <span>{shuffle ? "র‍্যান্ডম অন" : "র‍্যান্ডম"}</span>
             </button>
 
@@ -541,9 +541,9 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               disabled={selectedIds.size === 0}
               onClick={handleLaunchFlashcard}
               className={cn(
-                "px-4 py-1.5 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer",
+                "px-4 py-1.5 rounded-[12px] text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-[0_3px_0_#092328] active:translate-y-[2px] transition-all cursor-pointer",
                 selectedIds.size > 0
-                  ? "bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95 shadow-emerald-600/20"
+                  ? "bg-[#12544F] hover:brightness-105 text-white active:scale-95"
                   : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed border border-neutral-200 dark:border-neutral-700"
               )}
             >
@@ -557,7 +557,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── 5. Question Cards (Matching Flutter _buildQuestionCard 1:1) ── */}
       {isLoadingBookmarks && activeTab === "bookmarks" ? (
         <div className="py-20 text-center rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 text-[#004633] dark:text-emerald-400 animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#12544F] dark:text-emerald-400 animate-spin" />
           <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400">
             বুকমার্ক করা প্রশ্ন লোড হচ্ছে...
           </p>
@@ -578,7 +578,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           <button
             type="button"
             onClick={onNavigateToMock}
-            className="px-5 py-2.5 bg-[#004633] text-white rounded-xl text-xs font-bold shadow hover:bg-[#003627] transition-all cursor-pointer"
+            className="px-5 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] text-xs font-bold shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] transition-all cursor-pointer"
           >
             মডেল টেস্ট শুরু করো
           </button>

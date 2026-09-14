@@ -138,7 +138,7 @@ export default function LiveExamDashboard() {
             setEditingExam(null);
             setIsModalOpen(true);
           }}
-          className="px-5 py-2.5 bg-[#004633] hover:bg-[#005a42] text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-950/20 flex items-center gap-2 cursor-pointer shrink-0"
+          className="px-5 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] text-xs font-bold transition-all shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] flex items-center gap-2 cursor-pointer shrink-0"
         >
           <Plus size={16} />
           <span>নতুন লাইভ এক্সাম তৈরি</span>

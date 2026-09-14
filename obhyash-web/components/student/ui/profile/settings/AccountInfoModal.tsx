@@ -99,11 +99,11 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white dark:bg-[#13151F] rounded-t-[28px] sm:rounded-[28px] p-6 shadow-2xl border border-neutral-200/80 dark:border-white/10 font-['HindSiliguri',sans-serif] relative"
+        className="w-full max-w-md bg-white dark:bg-[#1C1C1E] rounded-t-[28px] sm:rounded-[28px] p-6 shadow-2xl border border-neutral-200/80 dark:border-[#2C2C2E] font-['HindSiliguri',sans-serif] relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}
-        <div className="w-11 h-1 bg-black/10 dark:bg-white/20 rounded-full mx-auto mb-4" />
+        <div className="w-11 h-1 bg-black/10 dark:bg-[#3A3A3C] rounded-full mx-auto mb-4" />
 
         {/* Title & Subtitle */}
         <div className="text-center mb-6">
@@ -124,7 +124,7 @@ export const AccountInfoModal: React.FC<AccountInfoModalProps> = ({
               <div
                 key={row.key}
                 onClick={() => copySingle(row.label, row.value, row.key)}
-                className="flex items-center justify-between p-2 rounded-2xl hover:bg-neutral-50 dark:hover:bg-[#1E2235] transition-colors cursor-pointer group"
+                className="flex items-center justify-between p-2 rounded-2xl hover:bg-neutral-50 dark:hover:bg-[#2C2C2E] transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-4 min-w-0">
                   {/* Teal circular icon */}

@@ -318,7 +318,7 @@ export const LiveExamRadar: React.FC<{
           </p>
           <Link
             href="/admin/live-exams"
-            className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-[#004633] text-white text-xs font-bold rounded-lg shadow-sm hover:bg-[#005a41] transition-all"
+            className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-[#12544F] text-white text-xs font-bold rounded-lg shadow-sm hover:bg-[#005a41] transition-all"
           >
             <PlusCircle size={13} />
             Schedule New Exam
@@ -417,7 +417,7 @@ export const SmartQuickActions: React.FC = () => {
   return (
     <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-zinc-800/80 rounded-2xl p-5 md:p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 rounded-lg bg-[#004633]/10 text-[#004633] dark:text-emerald-400 border border-emerald-500/20">
+        <div className="p-1.5 rounded-lg bg-[#12544F]/10 text-[#12544F] dark:text-emerald-400 border border-emerald-500/20">
           <Zap className="w-4 h-4" />
         </div>
         <h3 className="text-base font-bold text-neutral-900 dark:text-zinc-100">

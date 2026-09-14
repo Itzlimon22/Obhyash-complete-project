@@ -116,16 +116,16 @@ const ReportModal: React.FC<ReportModalProps> = ({
         className="fixed z-[9999] w-full bottom-0 left-0 right-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-6"
       >
         <div
-          className="relative flex flex-col bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[80dvh] sm:max-h-auto shadow-[0_-4px_40px_rgba(0,0,0,0.18)] sm:shadow-2xl border border-black/[0.06] dark:border-white/[0.06] overflow-hidden animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-300 ease-out"
+          className="relative flex flex-col bg-white dark:bg-[#1C1C1E] rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[80dvh] sm:max-h-auto shadow-[0_-4px_40px_rgba(0,0,0,0.18)] sm:shadow-2xl border border-neutral-200 dark:border-[#2C2C2E] overflow-hidden animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-300 ease-out"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Mobile drag handle */}
           <div className="sm:hidden flex justify-center pt-2 pb-1 shrink-0">
-            <div className="w-8 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+            <div className="w-8 h-1 rounded-full bg-neutral-300 dark:bg-[#3A3A3C]" />
           </div>
 
           {/* Header */}
-          <div className="shrink-0 px-4 sm:px-5 pt-2 sm:pt-4 pb-3 flex items-center gap-2.5 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="shrink-0 px-4 sm:px-5 pt-2 sm:pt-4 pb-3 flex items-center gap-2.5 border-b border-neutral-100 dark:border-[#2C2C2E]">
             <Flag size={16} className="text-red-600 shrink-0" />
             <h2 className="text-base font-bold text-neutral-900 dark:text-white flex-1">
               রিপোর্ট

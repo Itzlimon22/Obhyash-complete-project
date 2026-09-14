@@ -19,6 +19,7 @@ import NotificationDropdown from '../notifications/NotificationDropdown';
 import UserAvatar from '../common/UserAvatar';
 import { supabase } from '@/services/database';
 import { toast } from 'sonner';
+import { PARENT_ROUTE_MAP } from '@/lib/routes';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -45,6 +46,37 @@ interface AppLayoutProps {
   };
 }
 
+const SUB_PAGES_WITHOUT_BOTTOM_NAV = new Set([
+  'notifications',
+  'bookmarks',
+  'legends-league',
+  'legends_league',
+  'subscription',
+  'upgrade',
+  'my-subscription',
+  'complaint',
+  'feature-requests',
+  'about',
+  'privacy',
+  'terms',
+  'faq',
+  'help',
+  'info',
+  'account-info',
+  'account-linking',
+  'delete-account',
+  'personal',
+  'edit-profile',
+  'reports',
+  'user_profile',
+  'subject_report',
+  'referral',
+  'academic_category',
+  'subject_category',
+  'institute_detail',
+  'exam',
+]);
+
 const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   activeTab,
@@ -65,6 +97,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   hideBottomNav = false,
   headerTabs,
 }) => {
+  const isSubPage = SUB_PAGES_WITHOUT_BOTTOM_NAV.has(activeTab);
+  const shouldShowBottomNav = !simpleHeader && !hideBottomNav && !isSubPage;
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -190,10 +225,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   };
 
   return (
-    <div className="h-[100dvh] min-h-[100dvh] w-full bg-[#FAFAF9] dark:bg-[#0C0A09] flex transition-colors overflow-hidden font-sans">
+    <div className="h-[100dvh] min-h-[100dvh] w-full bg-[#FAFAF9] dark:bg-[#000000] flex transition-colors overflow-hidden font-sans">
       {/* ── Sidebar Component ── */}
       <Sidebar
-        activeTab={activeTab}
+        activeTab={PARENT_ROUTE_MAP[activeTab] || activeTab}
         onTabChange={onTabChange}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -206,154 +241,152 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* ── Header Section (Matching Flutter MainLayout Header) ── */}
+        {/* ── Header Section (Matching Flutter 1:1) ── */}
         {customHeader ? (
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
-          <header className="h-14 sm:h-[60px] bg-white/90 dark:bg-[#0C0A09]/85 backdrop-blur-xl border-b border-neutral-200/80 dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
-            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-2.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
-            {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
-            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1 mr-2">
-              {activeTab !== 'dashboard' && (
-                /* Back button on other screens */
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onBack) {
-                      onBack();
-                    } else if (window.history.length > 1) {
-                      window.history.back();
-                    } else {
-                      onTabChange('dashboard');
-                    }
-                  }}
-                  className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-[#1C1C1E] border border-neutral-200/90 dark:border-[#27272A] hover:bg-neutral-200/80 dark:hover:bg-[#2C2C2E] text-neutral-800 dark:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs"
-                  aria-label="Back"
-                  title="ফিরে যাও"
-                >
-                  <ArrowLeft size={18} className="stroke-[2.2]" />
-                </button>
-              )}
-
-              {headerTabs ? (
-                <div className="flex items-center gap-1 sm:gap-2 min-w-0 overflow-x-auto no-scrollbar py-0.5">
-                  {headerTabs.tabs.map((tab) => {
-                    const isActive = headerTabs.activeTabId === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => headerTabs.onTabSelect(tab.id)}
-                        className={`relative py-1 px-1.5 sm:px-2.5 text-[12.5px] sm:text-sm md:text-[15px] font-semibold sm:font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none shrink-0 ${
-                          isActive
-                            ? "text-[#059669] dark:text-[#10B981]"
-                            : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
-                        }`}
-                      >
-                        {tab.label}
-                        {isActive && (
-                          <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : !hideTitle ? (
-                <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white tracking-tight leading-tight truncate">
-                  {title}
-                </h1>
-              ) : null}
-            </div>
-
-            {/* ── Right: Legends League + Streak + Notification + Divider + User Avatar ── */}
-            <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
-              {/* Legends League shortcut on Leaderboard tab (Matching Flutter 1:1) */}
-              {activeTab === 'leaderboard' && (
-                <button
-                  type="button"
-                  onClick={() => onTabChange('legends-league')}
-                  className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-extrabold text-xs animate-pulse hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
-                  title="লেজেন্ডস লিগ দেখুন"
-                >
-                  <Crown size={14} className="shrink-0" />
-                  <span className="hidden sm:inline font-['Anek_Bangla',sans-serif]">লেজেন্ডস লিগ</span>
-                </button>
-              )}
-
-              {/* Streak Badge */}
-              <button
-                type="button"
-                onClick={() => setIsStreakDialogOpen(true)}
-                className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1C1C1E] transition-all cursor-pointer group active:scale-95"
-                title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
-              >
-                <Flame size={17} className="text-[#EF4444] fill-[#EF4444] animate-pulse shrink-0" />
-                <span className="text-xs sm:text-sm font-bold text-[#DC2626] font-['Anek_Bangla',sans-serif] tabular-nums">
-                  {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
-                </span>
-              </button>
-
-              {/* Notification Bell */}
-              <div className="relative" ref={notifRef}>
-                <NotificationBell
-                  unreadCount={unreadCount}
-                  onClick={() => setIsNotifOpen((prev) => !prev)}
-                  isOpen={isNotifOpen}
-                />
-
-                {isNotifOpen && (
-                  <NotificationDropdown
-                    notifications={notifications}
-                    onNotificationClick={handleNotificationClick}
-                    onMarkAllAsRead={handleMarkAllAsRead}
-                    onViewAll={handleViewAllNotifications}
-                    isLoading={notificationsLoading}
-                    onClose={() => setIsNotifOpen(false)}
-                  />
+          <header className="h-[52px] bg-white/95 dark:bg-[#000000] backdrop-blur-xl border-b border-[#F3F4F6] dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
+            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
+              {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2">
+                {activeTab !== 'dashboard' && (
+                  /* Back button on sub-screens matching Flutter minimal arrow */
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onBack) {
+                        onBack();
+                      } else if (typeof window !== 'undefined' && window.history.length > 1) {
+                        window.history.back();
+                      } else {
+                        onTabChange('dashboard');
+                      }
+                    }}
+                    className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+                    aria-label="Back"
+                    title="ফিরে যাও"
+                  >
+                    <ArrowLeft size={22} className="stroke-[2.2]" />
+                  </button>
                 )}
+
+                {headerTabs ? (
+                  <div className="flex items-center gap-1 sm:gap-2 min-w-0 overflow-x-auto no-scrollbar py-0.5">
+                    {headerTabs.tabs.map((tab) => {
+                      const isActive = headerTabs.activeTabId === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => headerTabs.onTabSelect(tab.id)}
+                          className={`relative py-1 px-1.5 sm:px-2.5 text-[12.5px] sm:text-sm md:text-[15px] font-semibold sm:font-bold font-['Anek_Bangla',sans-serif] transition-all cursor-pointer select-none shrink-0 ${
+                            isActive
+                              ? "text-[#059669] dark:text-[#10B981]"
+                              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                          }`}
+                        >
+                          {tab.label}
+                          {isActive && (
+                            <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#059669] dark:bg-[#10B981] animate-in fade-in duration-200" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : !hideTitle ? (
+                  <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
+                    {title}
+                  </h1>
+                ) : null}
               </div>
 
-              {/* Divider */}
-              <div className="w-[1px] h-4.5 bg-neutral-200 dark:bg-[#27272A] mx-0.5 hidden xs:block" />
+              {/* ── Right Section: Matches Flutter 1:1 ── */}
+              {activeTab === 'dashboard' ? (
+                /* Dashboard Header Right: Streak + Notification + User Avatar */
+                <div className="flex items-center gap-4 shrink-0">
+                  {/* Streak Badge (Red Flame + Red Bangla Numeral) */}
+                  <button
+                    type="button"
+                    onClick={() => setIsStreakDialogOpen(true)}
+                    className="flex items-center gap-1.5 text-[#EF4444] transition-transform active:scale-95 cursor-pointer select-none"
+                    title="দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো"
+                  >
+                    <Flame size={23} className="fill-[#EF4444] shrink-0" />
+                    <span className="text-[18.5px] font-bold font-['Anek_Bangla',sans-serif] tabular-nums leading-none">
+                      {BanglaNameHelper.toBanglaNumeral(user?.streakCount || 0)}
+                    </span>
+                  </button>
 
-              {/* Profile Avatar with Pro Indicator */}
-              <button
-                type="button"
-                onClick={() => onTabChange('settings')}
-                className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-emerald-500/40 transition-all cursor-pointer group shrink-0"
-                title="প্রোফাইল ও সেটিংস"
-              >
-                <UserAvatar
-                  user={user}
-                  size="md"
-                  className="w-8.5 h-8.5 sm:w-9 sm:h-9 ring-1 ring-neutral-200 dark:ring-[#27272A] shadow-xs"
-                />
-                {isUserPro(user) && (
-                  <span className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-amber-400 text-amber-950 rounded-full shadow-xs">
-                    <Crown size={8} />
-                  </span>
-                )}
-              </button>
-            </div>
+                  {/* Notification Bell */}
+                  <div className="relative" ref={notifRef}>
+                    <NotificationBell
+                      unreadCount={unreadCount}
+                      onClick={() => setIsNotifOpen((prev) => !prev)}
+                      isOpen={isNotifOpen}
+                    />
+
+                    {isNotifOpen && (
+                      <NotificationDropdown
+                        notifications={notifications}
+                        onNotificationClick={handleNotificationClick}
+                        onMarkAllAsRead={handleMarkAllAsRead}
+                        onViewAll={handleViewAllNotifications}
+                        isLoading={notificationsLoading}
+                        onClose={() => setIsNotifOpen(false)}
+                      />
+                    )}
+                  </div>
+
+                  {/* Profile Avatar with Flutter Pro Sweep Gradient Ring */}
+                  <button
+                    type="button"
+                    onClick={() => onTabChange('settings')}
+                    className="relative flex items-center justify-center rounded-full cursor-pointer shrink-0 transition-transform active:scale-95"
+                    title="প্রোফাইল ও সেটিংস"
+                  >
+                    <UserAvatar
+                      user={user}
+                      size="md"
+                    />
+                  </button>
+                </div>
+              ) : activeTab === 'leaderboard' ? (
+                /* Leaderboard Header Right: Legends League shortcut matching Flutter */
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onTabChange('legends-league')}
+                    className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all cursor-pointer active:scale-95 shadow-xs shrink-0"
+                    title="লেজেন্ডস লিগ দেখুন"
+                  >
+                    <Crown size={14} className="shrink-0" />
+                    <span className="font-['Anek_Bangla',sans-serif]">লেজেন্ডস লীগ</span>
+                  </button>
+                </div>
+              ) : null}
             </div>
           </header>
         )}
 
-        {/* ── Content Body (Uniform left & right padding across all pages) ── */}
+        {/* ── Content Body (Adjusts padding dynamically when bottom nav is hidden) ── */}
         <main
           className={`flex-1 overflow-y-auto overscroll-contain ${
             noPadding
-              ? 'pb-20 lg:pb-0'
-              : 'py-3.5 sm:py-6 md:py-8 pb-[calc(4.75rem+env(safe-area-inset-bottom))] lg:pb-12'
+              ? shouldShowBottomNav
+                ? 'pb-20 lg:pb-0'
+                : 'pb-0'
+              : shouldShowBottomNav
+                ? 'py-3 sm:py-6 md:py-8 pb-[calc(4.75rem+env(safe-area-inset-bottom))] lg:pb-12'
+                : 'py-3 sm:py-6 md:py-8 pb-8 lg:pb-12'
           } relative scroll-smooth`}
         >
-          <div className="w-full max-w-7xl mx-auto px-2.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col">
+          <div className="w-full max-w-7xl mx-auto px-1.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col">
             {children}
           </div>
         </main>
 
-        {/* ── Mobile Bottom Navigation ── */}
-        {!simpleHeader && !hideBottomNav && (
+        {/* ── Mobile Bottom Navigation (Shown only on primary tabs) ── */}
+        {shouldShowBottomNav && (
           <MobileBottomNav
             activeTab={activeTab}
             onTabChange={onTabChange}

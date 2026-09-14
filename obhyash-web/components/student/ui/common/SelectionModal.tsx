@@ -46,7 +46,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl z-10" />
 
         {/* Header */}
-        <div className="rounded-t-3xl sm:rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 px-6 pt-5 pb-4 flex-shrink-0">
+        <div className="rounded-t-3xl sm:rounded-t-3xl bg-white dark:bg-[#1C1C1E] border border-b-0 border-neutral-200 dark:border-[#2C2C2E] px-6 pt-5 pb-4 flex-shrink-0">
           {/* Drag handle */}
           <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:hidden" />
 
@@ -69,7 +69,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
           </div>
 
           {/* Quick actions */}
-          <div className="flex gap-4 mt-4 border-t border-neutral-100 dark:border-neutral-800 pt-3">
+          <div className="flex gap-4 mt-4 border-t border-neutral-100 dark:border-[#2C2C2E] pt-3">
             <button
               onClick={onSelectAll}
               className="text-xs font-bold text-emerald-700 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 px-3 py-1.5 rounded-lg transition-colors"
@@ -87,7 +87,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
         </div>
 
         {/* Scrollable List */}
-        <div className="flex-1 overflow-y-auto bg-white dark:bg-neutral-950 border-x border-neutral-200 dark:border-neutral-800 px-4 py-3 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto bg-white dark:bg-[#1C1C1E] border-x border-neutral-200 dark:border-[#2C2C2E] px-4 py-3 custom-scrollbar">
           {items.length === 0 ? (
             <div className="text-center text-neutral-400 py-12 text-sm flex flex-col items-center gap-2">
               <AlertTriangle className="w-8 h-8 opacity-40" />
@@ -105,7 +105,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
                       'flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-all duration-150',
                       isSelected
                         ? 'bg-emerald-50 dark:bg-emerald-950/30 ring-1 ring-emerald-700/20'
-                        : 'hover:bg-neutral-50 dark:hover:bg-neutral-900',
+                        : 'hover:bg-neutral-50 dark:hover:bg-[#252528]',
                     )}
                   >
                     <div
@@ -138,7 +138,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="rounded-b-none sm:rounded-b-3xl bg-white dark:bg-neutral-950 border border-t-0 border-neutral-200 dark:border-neutral-800 px-6 py-5 flex-shrink-0">
+        <div className="rounded-b-none sm:rounded-b-3xl bg-white dark:bg-[#1C1C1E] border border-t-0 border-neutral-200 dark:border-[#2C2C2E] px-6 py-5 flex-shrink-0">
           <button
             onClick={onClose}
             className="w-full py-3.5 bg-emerald-900 hover:bg-emerald-950 active:scale-[0.98] text-white rounded-2xl font-bold text-sm shadow-md transition-all duration-150"

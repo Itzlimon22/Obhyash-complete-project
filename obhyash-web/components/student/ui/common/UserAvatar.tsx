@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { Crown } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { isUserPro } from '@/lib/subscription-utils';
@@ -95,15 +96,23 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
 
   if (!isPro) return avatarNode;
 
-  // Google Pro Style Multi-Color Gradient Ring
+  // Flutter Pro Style Multi-Color Sweep Gradient Ring (1:1 with Flutter user_avatar.dart)
   return (
     <div
-      className={`relative shrink-0 rounded-full p-[2px] md:p-[2.5px] bg-gradient-to-tr from-[#4285F4] via-[#9B72CB] via-[#D96570] via-[#F4B400] to-[#34A853] shadow-sm ${className}`}
+      className={`relative shrink-0 rounded-full p-[2px] md:p-[2.5px] shadow-sm ${className}`}
+      style={{
+        background:
+          'conic-gradient(from 220deg, #D4AF37, #E8843A, #D94F7E, #9B72CB, #12544F, #34D399, #D4AF37)',
+      }}
       title="Pro Member"
     >
-      <div className="rounded-full bg-white dark:bg-neutral-900 p-[1.5px] flex items-center justify-center">
+      <div className="rounded-full bg-white dark:bg-[#000000] p-[1.5px] flex items-center justify-center">
         {avatarNode}
       </div>
+      {/* Crown Pro Badge - 1:1 with Flutter */}
+      <span className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-[#F59E0B] border-[1.8px] border-black dark:border-black flex items-center justify-center shadow-md select-none pointer-events-none">
+        <Crown size={10} className="text-black stroke-[2.5] fill-black/10" />
+      </span>
     </div>
   );
 };

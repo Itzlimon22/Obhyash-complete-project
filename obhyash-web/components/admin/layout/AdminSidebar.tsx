@@ -226,7 +226,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           }`}
         >
           <Link href="/admin/dashboard" className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#004633] to-[#00664B] border border-emerald-500/30 flex items-center justify-center shadow-md shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#12544F] to-[#092328] border border-emerald-500/30 flex items-center justify-center shadow-md shrink-0">
               <span className="text-white font-black text-sm tracking-tighter font-mono">O</span>
             </div>
 
@@ -310,7 +310,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       ${
                         isActive
                           ? isDark
-                            ? 'bg-[#004633]/30 text-emerald-400 border border-emerald-500/30 shadow-sm'
+                            ? 'bg-[#12544F]/30 text-emerald-400 border border-emerald-500/30 shadow-sm'
                             : 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm'
                           : isDark
                             ? 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 border border-transparent'

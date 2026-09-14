@@ -428,7 +428,7 @@ export default function AdminReportsPage() {
                       >
                         <button
                           onClick={() => setInspectingReport(r)}
-                          className="px-3 py-1.5 bg-[#004633] hover:bg-[#005a42] text-white rounded-xl text-xs font-bold transition flex items-center gap-1 ml-auto cursor-pointer shadow-sm"
+                          className="px-3 py-1.5 bg-[#12544F] hover:brightness-105 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 ml-auto cursor-pointer shadow-sm"
                           title="রিপোর্ট পরিদর্শন ও ইনলাইন ফিক্স"
                         >
                           <Eye size={13} />
