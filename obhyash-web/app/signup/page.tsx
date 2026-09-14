@@ -383,7 +383,7 @@ function SignupForm() {
 
         // If Auto-Confirm is enabled in Supabase, we get a session immediately.
         if (data.session) {
-          router.push('/dashboard');
+          window.location.replace('/dashboard');
           return;
         }
 

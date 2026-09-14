@@ -437,47 +437,55 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     const userId = user?.id;
 
-    // Instant UI feedback
+    // 1. Instant UI & state cleanup
     setUser(null);
     setProfile(null);
     clearCachedProfile();
 
+    if (typeof window !== "undefined") {
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (
+            key.startsWith("sb-") ||
+            key.startsWith("obhyash_") ||
+            key.includes("supabase") ||
+            key.includes("auth") ||
+            key.includes("profile")
+          ) {
+            localStorage.removeItem(key);
+          }
+        });
+        sessionStorage.clear();
+      } catch (e) {}
+
+      // Clear all accessible cookies immediately
+      try {
+        document.cookie.split(";").forEach((cookie) => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+          if (name) {
+            document.cookie = `${name}=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+            document.cookie = `${name}=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+          }
+        });
+      } catch (e) {}
+    }
+
+    // 2. Fire server and Supabase signouts concurrently with a strict 400ms safety timeout
     try {
-      if (typeof window !== "undefined") {
-        try {
-          Object.keys(localStorage).forEach((key) => {
-            if (
-              key.startsWith("sb-") ||
-              key.startsWith("obhyash_") ||
-              key.includes("supabase") ||
-              key.includes("auth") ||
-              key.includes("profile")
-            ) {
-              localStorage.removeItem(key);
-            }
-          });
-          sessionStorage.clear();
-        } catch (e) {}
-
-        document.cookie = "obhyash_role_cache=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      }
-
-      if (userId) {
-        await unregisterCurrentDevice(userId).catch(() => {});
-      }
-
-      // Server-side signout to clear auth cookies
-      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
-
-      // Client-side Supabase signout
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Sign out error:", error);
-      }
+      await Promise.race([
+        Promise.allSettled([
+          userId ? unregisterCurrentDevice(userId) : Promise.resolve(),
+          fetch("/api/auth/signout", { method: "POST" }),
+          supabase.auth.signOut({ scope: "local" }),
+        ]),
+        new Promise((resolve) => setTimeout(resolve, 400)),
+      ]);
     } catch (err) {
       console.error("Signout error in AuthProvider:", err);
     } finally {
-      window.location.replace("/login?logout=true");
+      // 3. Immediate hard navigation to login — never blocks or requires manual refresh
+      window.location.href = "/login?logout=true";
     }
   }, [supabase, user]);
 

@@ -36,16 +36,8 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  // Handle errors passed via URL & prefetch target routes
+  // Handle errors passed via URL
   useEffect(() => {
-    // Pre-warm dashboard routes so transition is instant upon login
-    try {
-      router.prefetch('/dashboard');
-      router.prefetch('/admin/dashboard');
-    } catch {
-      // non-fatal
-    }
-
     const params = new URLSearchParams(window.location.search);
     const err = params.get('error');
     if (err === 'unregistered_google') {
@@ -146,14 +138,19 @@ export default function LoginPage() {
           // non-fatal
         }
 
-        // Redirect immediately
-        if (role === 'admin') {
-          router.replace('/admin/dashboard');
-        } else if (role === 'teacher') {
-          router.replace('/teacher/dashboard');
-        } else {
-          router.replace('/dashboard');
-        }
+        // Redirect immediately via full navigation so server receives fresh cookies
+        const params = new URLSearchParams(window.location.search);
+        const nextParam = params.get('next');
+        const targetUrl =
+          nextParam && nextParam.startsWith('/')
+            ? nextParam
+            : role === 'admin'
+              ? '/admin/dashboard'
+              : role === 'teacher'
+                ? '/teacher/dashboard'
+                : '/dashboard';
+
+        window.location.replace(targetUrl);
       } else {
         setLoading(false);
       }
