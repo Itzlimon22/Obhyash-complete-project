@@ -461,8 +461,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
             className="flex items-center gap-2 cursor-pointer"
             onClick={onGetStarted}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/20">
-              <Flame className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
+              <img
+                src="/obhyash_logo.svg"
+                alt="Obhyash Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col items-start justify-center -space-y-1 select-none">
               <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
@@ -596,20 +600,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
               ২,০০,০০০+ অধ্যায়ভিত্তিক ও বিগত বছরের প্রশ্নব্যাংক, রিয়েল টাইমার এক্সাম, একবার ক্লিকেই অপশন লকিং, মূল পাঠ্যবইয়ের প্রমাণসহ নিখুঁত সমাধান এবং অফলাইন PDF ডাউনলোড—সবকিছু এক প্ল্যাটফর্মে।
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
+            <div className="flex flex-row gap-2.5 sm:gap-3 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="sm:w-auto w-full px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer"
               >
-                বিনামূল্যে শুরু করো
-                <ArrowRight className="w-4 h-4" />
+                <span>শুরু করো</span>
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               <Link
                 href="/demo"
-                className="sm:w-auto w-full px-6 py-3 bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white rounded-[14px] font-bold text-sm sm:text-base shadow-[0_4.5px_0_#94A3B8] dark:shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer select-none"
+                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#94A3B8] dark:shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer select-none"
               >
-                <Flame className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
+                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-600 dark:text-neutral-300" />
                 <span>ডেমো পরীক্ষা দাও</span>
               </Link>
             </div>
@@ -1321,11 +1325,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-none snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-[#0c0c0e] p-6 sm:p-7 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
+                className="w-[85vw] max-w-[340px] md:w-auto md:max-w-none snap-center shrink-0 md:shrink bg-white dark:bg-[#0c0c0e] p-6 sm:p-7 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   {/* Top Bar: Stars + Verified Badge */}
@@ -1393,112 +1397,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Platform Comparison: Traditional Guidebooks vs Obhyash */}
-      <section className="py-24 bg-neutral-50/70 dark:bg-black">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              স্মার্ট প্রস্তুতি
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-950 dark:text-white">
-              প্রচলিত গাইড বই বনাম <span className="text-emerald-600 dark:text-emerald-400">অভ্যাস প্ল্যাটফর্ম</span>
-            </h2>
-          </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl">
-            <table className="w-full text-left border-collapse min-w-[640px]">
-              <thead>
-                <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60">
-                  <th className="py-5 px-6 font-bold text-sm text-neutral-700 dark:text-neutral-300 w-2/5">
-                    ফিচার ও সুবিধার তুলনা
-                  </th>
-                  <th className="py-5 px-6 font-bold text-sm text-rose-600 dark:text-rose-400 w-[30%]">
-                    <span className="flex items-center gap-1.5">
-                      <XCircle className="w-4 h-4 shrink-0" />
-                      প্রচলিত গাইড বই / টেস্ট পেপার
-                    </span>
-                  </th>
-                  <th className="py-5 px-6 font-bold text-sm text-emerald-600 dark:text-emerald-400 w-[30%] bg-emerald-50/60 dark:bg-emerald-950/30">
-                    <span className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      অভ্যাস (Obhyash) প্ল্যাটফর্ম
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/70 text-xs sm:text-sm">
-                {[
-                  {
-                    feature: 'প্রশ্নের পরিধি ও আপডেট',
-                    desc: 'নতুন সিলেবাস ও বোর্ডের পরিবর্তন অনুসারে আপডেট',
-                    trad: 'পুরোনো ছাপা সংস্করণের বই, বছরে একবার আপডেট হয়',
-                    obhyash: '২,০০,০০০+ প্রশ্নব্যাংক ও প্রতিনিয়ত রিয়েল-টাইম আপডেট',
-                  },
-                  {
-                    feature: 'সমাধানের নির্ভরযোগ্যতা',
-                    desc: 'ভুল উত্তর ও রেফারেন্সের নিশ্চয়তা',
-                    trad: 'প্রচুর টাইপো ও ভুল উত্তর, কোনো রেফারেন্স ছাড়াই উত্তর দেওয়া',
-                    obhyash: '১০০% ভেরিফাইড ও মূল পাঠ্যবইয়ের পৃষ্ঠা রেফারেন্সসহ ব্যাখ্যা',
-                  },
-                  {
-                    feature: 'পরীক্ষার অনুভূতি ও টাইমিং',
-                    desc: 'আসল পরীক্ষার মতো টাইম ও নেগেটিভ মার্কিং হিসাব',
-                    trad: 'ঘড়ি দেখে মেলাতে গিয়ে বিভ্রান্তি, নেগেটিভ মার্কিং হিসাবের ঝামেলা',
-                    obhyash: 'কাউন্টডাউন টাইমার, অটো সাবমিশন ও স্বয়ংক্রিয় নেগেটিভ মার্কিং',
-                  },
-                  {
-                    feature: 'দুর্বলতা শনাক্তকরণ (Analytics)',
-                    desc: 'কোন বিষয়ে ও কোন অধ্যায়ে মার্কস কম আসছে',
-                    trad: 'নিজের ভুল বিশ্লেষণ করা প্রায় অসম্ভব, কেবল আন্দাজে পড়া',
-                    obhyash: '৩-মেট্রিক গ্রাফ, বিষয়ভিত্তিক নির্ভুলতা ও দুর্বল চ্যাপ্টার ট্র্যাকার',
-                  },
-                  {
-                    feature: 'ভুল প্রশ্নের রিভিশন ও বুকমার্ক',
-                    desc: 'পরীক্ষার আগের রাতে গুরুত্বপূর্ণ প্রশ্ন রিভিশন',
-                    trad: 'হাজার পৃষ্ঠার দাগানো বই ও খাতার পাতা হাতড়ানো',
-                    obhyash: '১ ক্লিকে বুকমার্ক ও ভুল প্রশ্নের স্বয়ংক্রিয় রিভিশন শিট তৈরি',
-                  },
-                  {
-                    feature: 'পোর্টাবিলিটি ও অ্যাক্সেসিবিলিটি',
-                    desc: 'যেকোনো জায়গায় বসে তাৎক্ষণিক পড়ার সুযোগ',
-                    trad: '৫-১০ কেজির ভারী বই বহন করা অসম্ভব',
-                    obhyash: 'মোবাইল বা ল্যাপটপে পকেটের ভেতর সবসময় সাথে থাকে',
-                  },
-                ].map((row, idx) => (
-                  <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="py-4 px-6">
-                      <p className="font-bold text-neutral-900 dark:text-white">{row.feature}</p>
-                      <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5">{row.desc}</p>
-                    </td>
-                    <td className="py-4 px-6 text-neutral-600 dark:text-neutral-400">
-                      <div className="flex items-start gap-2">
-                        <span className="text-rose-500 font-bold shrink-0 mt-0.5">✕</span>
-                        <span>{row.trad}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-neutral-900 dark:text-emerald-200 font-semibold bg-emerald-50/30 dark:bg-emerald-950/15">
-                      <div className="flex items-start gap-2">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
-                        <span className="text-emerald-900 dark:text-emerald-300 font-medium">{row.obhyash}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-10 text-center">
-            <button
-              onClick={onGetStarted}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-sm shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all cursor-pointer"
-            >
-              আজই স্মার্ট প্রস্তুতি শুরু করো
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Pricing Section */}
       <section
@@ -1610,7 +1509,73 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Mobile Responsive Cards (visible on mobile only) */}
+            <div className="block sm:hidden divide-y divide-neutral-100 dark:divide-neutral-800/80 p-4 space-y-3.5">
+              {[
+                {
+                  feature: 'দৈনিক প্র্যাকটিস ও এক্সাম',
+                  free: '২টি / দিন',
+                  pro: 'সীমাহীন আনলিমিটেড',
+                },
+                {
+                  feature: 'প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স',
+                  free: '❌ সীমিত',
+                  pro: '✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ',
+                },
+                {
+                  feature: '২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট',
+                  free: '❌ নেই',
+                  pro: '✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট',
+                },
+                {
+                  feature: '৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব',
+                  free: 'বেসিক স্কোর',
+                  pro: '✓ সঠিকতা %, ব্যয়িত সময় ও নেগেটিভ টেবিল',
+                },
+                {
+                  feature: 'বুকমার্ক ও ভুল প্রশ্নের রিভিশন শিট',
+                  free: 'সর্বোচ্চ ২৫টি',
+                  pro: '✓ সীমাহীন সেভ ও রিভিশন',
+                },
+                {
+                  feature: 'ডেইলি স্ট্রিক ও লিডারবোর্ড',
+                  free: '✓ সাধারণ',
+                  pro: '✓ প্রো ব্যাজ ও লিডারবোর্ড অগ্রাধিকার',
+                },
+                {
+                  feature: 'বিজ্ঞাপনমুক্ত নিরবচ্ছিন্ন পরিবেশ',
+                  free: 'স্ট্যান্ডার্ড',
+                  pro: '✓ ১০০% বিজ্ঞাপনমুক্ত',
+                },
+              ].map((row, idx) => (
+                <div key={idx} className={idx > 0 ? "pt-3.5" : ""}>
+                  <p className="font-bold text-sm text-neutral-900 dark:text-white mb-2">
+                    {row.feature}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200/70 dark:border-neutral-800 flex flex-col justify-between">
+                      <span className="block text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-1">
+                        ফ্রি (Free)
+                      </span>
+                      <span className="text-neutral-600 dark:text-neutral-300 font-medium">
+                        {row.free}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col justify-between">
+                      <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                        প্রো (Pro)
+                      </span>
+                      <span className="text-emerald-900 dark:text-emerald-200 font-bold">
+                        {row.pro}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop & Tablet Table */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-neutral-200/80 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-neutral-500 bg-neutral-50/50 dark:bg-neutral-950/40">
@@ -1714,12 +1679,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="px-2.5 py-1 rounded-md text-[11px] font-black bg-[#005CA9] text-white shadow-2xs">
                     Upay
                   </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#1A1F71] text-white shadow-2xs">
-                    VISA
-                  </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#EB001B] text-white shadow-2xs">
-                    Mastercard
-                  </span>
                 </div>
               </div>
               <button
@@ -1801,8 +1760,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {/* Brand Column */}
             <div className="space-y-6">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-500/20">
-                  <Flame className="w-6 h-6" />
+                <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
+                  <img
+                    src="/obhyash_logo.svg"
+                    alt="Obhyash Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
                   অভ্যাস
@@ -1981,26 +1944,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </footer>
 
-      {/* Mobile Sticky Floating CTA Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 shadow-2xl flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-[#12544F] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
-            অ
-          </div>
-          <div className="truncate">
-            <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">অভ্যাস প্ল্যাটফর্ম</p>
-            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">২,০০,০০০+ প্রশ্নব্যাংক • ফ্রি</p>
-          </div>
-        </div>
-
-        <button
-          onClick={onGetStarted}
-          className="px-4 py-2.5 bg-[#12544F] hover:brightness-105 text-white rounded-[12px] font-bold text-xs shadow-[0_3px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2px] transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
-        >
-          <span>শুরু করো</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
 
       <style>{`
         @keyframes scan {

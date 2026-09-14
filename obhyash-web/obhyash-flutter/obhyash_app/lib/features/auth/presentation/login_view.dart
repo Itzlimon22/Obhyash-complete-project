@@ -142,31 +142,28 @@ class _LoginViewState extends ConsumerState<LoginView>
                         // Top Brand Icon Badge
                         Center(
                           child: Container(
-                            width: 62,
-                            height: 62,
+                            width: 68,
+                            height: 68,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF004633)
-                                  .withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFF059669)
-                                    .withValues(alpha: 0.4),
-                                width: 1.2,
-                              ),
+                              borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF004633)
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 16,
+                                  color: const Color(0xFF071500)
+                                      .withValues(alpha: 0.5),
+                                  blurRadius: 18,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Icon(
-                                LucideIcons.graduationCap,
-                                size: 32,
-                                color: Color(0xFF10B981),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: SvgPicture.asset(
+                                'assets/images/obhyash_logo.svg',
+                                fit: BoxFit.cover,
+                                placeholderBuilder: (_) => Image.asset(
+                                  'assets/images/app_logo.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),

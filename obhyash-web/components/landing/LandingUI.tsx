@@ -306,21 +306,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
             className="flex items-center gap-2 cursor-pointer"
             onClick={onGetStarted}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
-                />
-              </svg>
+            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
+              <img
+                src="/obhyash_logo.svg"
+                alt="Obhyash Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col items-start justify-center -space-y-1 select-none">
               <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
@@ -410,12 +401,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
               প্রস্তুতির সেরা সঙ্গী।
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
+            <div className="flex flex-row gap-3 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="sm:w-auto w-full px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
+                className="flex-1 sm:flex-initial px-5 sm:px-8 py-3.5 sm:py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs sm:text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
               >
-                বিনামূল্যে শুরু করো
+                <span>শুরু করো</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -1151,11 +1142,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
               দেশের বিভিন্ন প্রান্ত থেকে হাজারো শিক্ষার্থী Obhyash ব্যবহার করছে
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-none snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-translate-y-1 transition-transform duration-300"
+                className="w-[85vw] max-w-[340px] md:w-auto md:max-w-none snap-center shrink-0 md:shrink bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-translate-y-1 transition-transform duration-300"
               >
                 <div className="absolute top-8 right-8 text-neutral-200 dark:text-neutral-800">
                   <svg
@@ -1215,21 +1206,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25"
-                    />
-                  </svg>
+                <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
+                  <img
+                    src="/obhyash_logo.svg"
+                    alt="Obhyash Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex flex-col items-start justify-center -space-y-1 select-none">
                   <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">

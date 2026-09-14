@@ -152,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
             >
               {/* Logo: 32x32 with borderRadius 8 */}
-              <div className="w-[32px] h-[32px] rounded-[8px] overflow-hidden shrink-0 flex items-center justify-center bg-[#059669]">
+              <div className="w-[32px] h-[32px] rounded-[8px] overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-sm">
                 <img
                   src="/obhyash_logo.svg"
                   alt="Obhyash Logo"
