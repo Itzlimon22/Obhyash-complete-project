@@ -1039,12 +1039,51 @@ export default function StudentRoot({
     setNavWarning({ isOpen: false, targetTab: null, action: "tab" });
   };
 
+  const handleGlobalRefresh = async () => {
+    try {
+      if (!currentUser?.id) return;
+      const { fetchUserStreakInfo } = await import("@/services/streak-service");
+      const streakInfo = await fetchUserStreakInfo(currentUser.id);
+      if (streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
+        setCurrentUser((prev) =>
+          prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev
+        );
+      }
+
+      const { getExamHistory, getUserProfile } = await import("@/services/database");
+      const [dbHistory, dbUser] = await Promise.all([
+        getExamHistory(currentUser.id),
+        getUserProfile(currentUser.id),
+      ]);
+
+      if (dbHistory) {
+        setExamHistory(dbHistory);
+      }
+      if (dbUser) {
+        setCurrentUser(dbUser);
+      }
+
+      if (currentUser?.id) {
+        const { getBookmarkedQuestions } = await import("@/services/bookmark-service");
+        const fetchedQs = await getBookmarkedQuestions(currentUser.id);
+        if (fetchedQs) {
+          setBookmarkedQuestions(fetchedQs.filter((q) => bookmarkedIds.has(String(q.id))));
+        }
+      }
+
+      toast.success("ডাটা রিফ্রেশ সম্পন্ন হয়েছে", { id: "pull-to-refresh-toast", duration: 1500 });
+    } catch (err) {
+      console.error("[StudentRoot] Global refresh error:", err);
+    }
+  };
+
   const commonLayoutProps = {
     user: currentUser || undefined,
     onTabChange: handleTabChange,
     onLogout: handleLogoutClick,
     toggleTheme: toggleTheme,
     isDarkMode: theme === "dark",
+    onRefresh: handleGlobalRefresh,
   };
 
   const handleExamSubmit = async (manual = true) => {

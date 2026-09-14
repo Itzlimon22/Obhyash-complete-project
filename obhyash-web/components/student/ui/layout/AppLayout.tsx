@@ -5,6 +5,7 @@ import { ArrowLeft, Flame, Crown } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import StreakDialog from '../common/StreakDialog';
+import AppRefreshIndicator from '@/components/common/AppRefreshIndicator';
 import { UserProfile, Notification } from '@/lib/types';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { isUserPro } from '@/lib/subscription-utils';
@@ -44,6 +45,7 @@ interface AppLayoutProps {
     activeTabId: string;
     onTabSelect: (id: string) => void;
   };
+  onRefresh?: () => Promise<void> | void;
 }
 
 const SUB_PAGES_WITHOUT_BOTTOM_NAV = new Set([
@@ -96,10 +98,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   hideTitle = false,
   hideBottomNav = false,
   headerTabs,
+  onRefresh,
 }) => {
   const isSubPage = SUB_PAGES_WITHOUT_BOTTOM_NAV.has(activeTab);
   const shouldShowBottomNav = !simpleHeader && !hideBottomNav && !isSubPage;
 
+  const mainScrollRef = useRef<HTMLElement | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -370,6 +374,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
         {/* ── Content Body (Adjusts padding dynamically when bottom nav is hidden) ── */}
         <main
+          ref={mainScrollRef}
           className={`flex-1 overflow-y-auto overscroll-contain ${
             noPadding
               ? shouldShowBottomNav
@@ -380,9 +385,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 : 'py-3 sm:py-6 md:py-8 pb-8 lg:pb-12'
           } relative scroll-smooth`}
         >
-          <div className="w-full max-w-7xl mx-auto px-1.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col">
-            {children}
-          </div>
+          <AppRefreshIndicator
+            onRefresh={onRefresh}
+            scrollContainerRef={mainScrollRef}
+            disabled={isLiveExam || activeTab === 'exam'}
+          >
+            <div className="w-full max-w-7xl mx-auto px-1.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col">
+              {children}
+            </div>
+          </AppRefreshIndicator>
         </main>
 
         {/* ── Mobile Bottom Navigation (Shown only on primary tabs) ── */}
