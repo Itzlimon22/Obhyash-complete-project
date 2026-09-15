@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../../core/presentation/widgets/app_icon.dart';
 
@@ -141,24 +142,32 @@ class SettingsView extends ConsumerWidget {
             description: 'Obhyash সম্পর্কে জানো',
             icon: LucideIcons.info,
             svgAsset: 'assets/dashboard-icons/app_icon.svg',
-            type: _ItemType.navigate,
-            route: '/profile/about',
+            type: _ItemType.action,
+            actionId: 'openAbout',
           ),
           _SettingsItem(
             label: 'প্রাইভেসি',
             description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
             icon: LucideIcons.shield,
             svgAsset: 'assets/dashboard-icons/privacy_shield.svg',
-            type: _ItemType.navigate,
-            route: '/profile/privacy',
+            type: _ItemType.action,
+            actionId: 'openPrivacy',
           ),
           _SettingsItem(
             label: 'শর্তাবলী',
             description: 'শর্ত ও বিধিমালা',
             icon: LucideIcons.fileText,
             svgAsset: 'assets/dashboard-icons/terms_doc.svg',
-            type: _ItemType.navigate,
-            route: '/profile/terms',
+            type: _ItemType.action,
+            actionId: 'openTerms',
+          ),
+          _SettingsItem(
+            label: 'রিফান্ড পলিসি',
+            description: 'রিফান্ড ও পেমেন্ট বিধিমালা',
+            icon: LucideIcons.refreshCw,
+            svgAsset: 'assets/dashboard-icons/terms_doc.svg',
+            type: _ItemType.action,
+            actionId: 'openRefund',
           ),
           _SettingsItem(
             label: 'সাহায্য',
@@ -228,7 +237,15 @@ class SettingsView extends ConsumerWidget {
           context.push(item.route!);
         }
       case _ItemType.action:
-        if (item.actionId == 'accountInfo') {
+        if (item.actionId == 'openAbout') {
+          _launchPolicyUrl(context, 'https://obhyash.com/about-us', fallbackRoute: '/profile/about');
+        } else if (item.actionId == 'openPrivacy') {
+          _launchPolicyUrl(context, 'https://obhyash.com/privacy-policy', fallbackRoute: '/profile/privacy');
+        } else if (item.actionId == 'openTerms') {
+          _launchPolicyUrl(context, 'https://obhyash.com/terms-and-conditions', fallbackRoute: '/profile/terms');
+        } else if (item.actionId == 'openRefund') {
+          _launchPolicyUrl(context, 'https://obhyash.com/refund-policy');
+        } else if (item.actionId == 'accountInfo') {
           AccountInfoModal.show(context, user);
         } else if (item.actionId == 'deleteAccount') {
           DeleteAccountModal.show(context, user);
@@ -268,6 +285,28 @@ class SettingsView extends ConsumerWidget {
             }
           }
         }
+    }
+  }
+
+  Future<void> _launchPolicyUrl(
+    BuildContext context,
+    String url, {
+    String? fallbackRoute,
+  }) async {
+    final uri = Uri.parse(url);
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+      if (!launched && fallbackRoute != null && context.mounted) {
+        context.push(fallbackRoute);
+      }
+    } catch (_) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (fallbackRoute != null && context.mounted) {
+          context.push(fallbackRoute);
+        }
+      }
     }
   }
 

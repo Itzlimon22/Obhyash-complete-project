@@ -21,7 +21,6 @@ class AppConfigModel {
   final bool paymentManualEnabled;
   final bool paymentGooglePlayEnabled;
   final String manualPaymentMerchantNumber;
-  final String reviewerEmails;
   final bool leaderboardEnabled;
   final int maxFreeExamsPerDay;
   final bool referralSystemEnabled;
@@ -51,8 +50,6 @@ class AppConfigModel {
     this.paymentManualEnabled = true,
     this.paymentGooglePlayEnabled = true,
     this.manualPaymentMerchantNumber = '01749591456',
-    this.reviewerEmails =
-        'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
     this.leaderboardEnabled = true,
     this.maxFreeExamsPerDay = 5,
     this.referralSystemEnabled = true,
@@ -101,8 +98,6 @@ class AppConfigModel {
       manualPaymentMerchantNumber:
           json['manual_payment_merchant_number'] as String? ??
               '01749591456',
-      reviewerEmails: json['reviewer_emails'] as String? ??
-          'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
       leaderboardEnabled:
           json['leaderboard_enabled'] as bool? ?? true,
       maxFreeExamsPerDay:
@@ -135,7 +130,6 @@ class AppConfigModel {
         'payment_manual_enabled': paymentManualEnabled,
         'payment_google_play_enabled': paymentGooglePlayEnabled,
         'manual_payment_merchant_number': manualPaymentMerchantNumber,
-        'reviewer_emails': reviewerEmails,
         'leaderboard_enabled': leaderboardEnabled,
         'max_free_exams_per_day': maxFreeExamsPerDay,
         'referral_system_enabled': referralSystemEnabled,

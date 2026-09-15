@@ -148,8 +148,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                               borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF071500)
-                                      .withValues(alpha: 0.5),
+                                  color: Colors.white.withValues(alpha: 0.1),
                                   blurRadius: 18,
                                   offset: const Offset(0, 4),
                                 ),
@@ -157,27 +156,33 @@ class _LoginViewState extends ConsumerState<LoginView>
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(18),
-                              child: SvgPicture.asset(
-                                'assets/images/obhyash_logo.svg',
+                              child: Image.asset(
+                                'assets/images/app_logo.png',
+                                width: 68,
+                                height: 68,
                                 fit: BoxFit.cover,
-                                placeholderBuilder: (_) => Image.asset(
-                                  'assets/images/app_logo.png',
-                                  fit: BoxFit.cover,
-                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: SvgPicture.asset(
+                            'assets/images/obhyash_full_logo_dark.svg',
+                            height: 32,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
 
                         // Header Title
                         const Text(
                           'তোমার অ্যাকাউন্টে লগইন করো',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFA1A1AA),
                           ),
                         ),
                         const SizedBox(height: 28),

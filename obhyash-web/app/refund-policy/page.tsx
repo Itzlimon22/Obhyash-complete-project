@@ -8,6 +8,6 @@ export const metadata: Metadata = {
     'Read the official Obhyash Refund Policy. Understand our 48-hour satisfaction guarantee, eligibility criteria, and dispute resolution process.',
 };
 
-export default function RefundPage() {
+export default function RefundPolicyPage() {
   return <PolicyPageShell document={LEGAL_CONTENT.refund} activeSlug="refund" />;
 }

@@ -1862,26 +1862,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <li>
                   <Link
-                    href="/terms"
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    href="/about-us"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                   >
-                    ব্যবহারের শর্তাবলী (Terms)
+                    আমাদের সম্পর্কে (About Us)
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/privacy"
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    href="/privacy-policy"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                   >
-                    গোপনীয়তা নীতি (Privacy)
+                    গোপনীয়তা নীতি (Privacy Policy)
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/refund"
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    href="/terms-and-conditions"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                   >
-                    রিফান্ড পলিসি
+                    ব্যবহারের শর্তাবলী (Terms & Conditions)
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/refund-policy"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                  >
+                    রিফান্ড পলিসি (Refund Policy)
                   </Link>
                 </li>
                 <li>

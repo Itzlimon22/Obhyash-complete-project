@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 
 import '../../../dashboard/domain/models.dart';
 
@@ -450,7 +451,11 @@ class SubjectsProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if (subjectStats.isEmpty) {
+    final validStats = subjectStats
+        .where((s) => BanglaNameHelper.isAcademicSubject(s.id) || BanglaNameHelper.isAcademicSubject(s.name))
+        .toList();
+
+    if (validStats.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -523,7 +528,7 @@ class SubjectsProgressSection extends StatelessWidget {
               ),
           ),
           const SizedBox(height: 16),
-          ...subjectStats.map((stat) {
+          ...validStats.map((stat) {
             final accuracy = _calculateAccuracy(stat);
             final examCount = stat.examsCount > 0
                 ? stat.examsCount

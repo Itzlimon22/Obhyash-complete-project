@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
@@ -311,14 +312,24 @@ class _SignupViewState extends ConsumerState<SignupView>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Brand Logo
+                    Center(
+                      child: SvgPicture.asset(
+                        'assets/images/obhyash_full_logo_dark.svg',
+                        height: 32,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
                     // Header
                     const Text(
                       'রেজিস্ট্রেশন',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                        color: textColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFA1A1AA),
                       ),
                     ),
                     const SizedBox(height: 16),

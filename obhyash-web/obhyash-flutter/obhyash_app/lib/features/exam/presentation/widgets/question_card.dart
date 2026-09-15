@@ -172,12 +172,12 @@ class _QuestionCardState extends State<QuestionCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Serial number + question text (Chorcha Benchmark: 16.5px, w600, 1.5 line-height)
+                // Serial number + question text (16.5px, regular, 1.5 line-height)
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
                     fontSize: 16.5,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.normal,
                     color: isDark
                         ? const Color(0xFFF8FAFC)
                         : const Color(0xFF0F172A),

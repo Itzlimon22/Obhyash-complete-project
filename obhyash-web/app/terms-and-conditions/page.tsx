@@ -8,6 +8,6 @@ export const metadata: Metadata = {
     'Read the official Terms and Conditions of Obhyash. Understand your rights, acceptable use policies, and subscription guidelines.',
 };
 
-export default function TermsPage() {
+export default function TermsAndConditionsPage() {
   return <PolicyPageShell document={LEGAL_CONTENT.terms} activeSlug="terms" />;
 }

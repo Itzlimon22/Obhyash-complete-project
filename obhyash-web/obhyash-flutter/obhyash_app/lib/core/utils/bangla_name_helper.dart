@@ -190,6 +190,83 @@ class BanglaNameHelper {
     return null;
   }
 
+  /// Returns true if the given key/label represents a real academic subject (e.g. Physics, Chemistry),
+  /// and false if it represents an institute (e.g. BUET, RUET, KUET, DU), category, or generic test.
+  static bool isAcademicSubject(String? text) {
+    if (text == null) return false;
+    final lower = text.trim().toLowerCase();
+    if (lower.isEmpty) return false;
+
+    // 1. Definite non-subjects (institutes, faculties, categories, generic test slugs)
+    const nonSubjects = {
+      'buet', 'ruet', 'kuet', 'cuet', 'ckruet', 'iut', 'butex', 'mist',
+      'du', 'ju', 'ru', 'cu', 'sust', 'bup', 'medical', 'matsh', 'agri',
+      'gst', 'dental', 'afmc', 'amc', 'engineering', 'varsity', 'admission',
+      'model_test', 'live_exam', 'all', 'preset', 'custom', 'general',
+      'varsity_ka', 'varsity_kha', 'varsity_a', 'varsity_b', 'varsity_c',
+      'varsity_d', 'du_ka', 'du_kha', 'ju_a', 'ju_d', 'ru_c', 'cu_a',
+      'test', 'exam', 'practice', 'routine',
+    };
+    if (nonSubjects.contains(lower)) return false;
+
+    // 2. Reject institute prefixes and patterns
+    if (lower.startsWith('buet') ||
+        lower.startsWith('ruet') ||
+        lower.startsWith('kuet') ||
+        lower.startsWith('cuet') ||
+        lower.startsWith('ckruet') ||
+        lower.startsWith('du_') ||
+        lower.startsWith('ju_') ||
+        lower.startsWith('ru_') ||
+        lower.startsWith('cu_') ||
+        lower.startsWith('sust') ||
+        lower.startsWith('medical') ||
+        lower.startsWith('gst') ||
+        lower.startsWith('agri') ||
+        lower.startsWith('iut') ||
+        lower.startsWith('butex') ||
+        lower.startsWith('mist') ||
+        lower.startsWith('bup')) {
+      return false;
+    }
+
+    // 3. Reject Bengali institute and admission names
+    if (text.contains('বুয়েট') ||
+        text.contains('রুয়েট') ||
+        text.contains('কুয়েট') ||
+        text.contains('চুয়েট') ||
+        text.contains('মেডিকেল') ||
+        text.contains('ঢাবি') ||
+        text.contains('জাবি') ||
+        text.contains('রাবি') ||
+        text.contains('চবি') ||
+        text.contains('শাবিপ্রবি') ||
+        text.contains('গুচ্ছ') ||
+        text.contains('ইঞ্জিনিয়ারিং') ||
+        text.contains('ইঞ্জি') ||
+        text.contains('ভার্সিটি') ||
+        text.contains('মডেল টেস্ট')) {
+      return false;
+    }
+
+    // 4. Matches academic subject mapping (e.g. physics, chemistry, math, etc.)
+    if (_mapToAcademicSubject(lower) != null) return true;
+
+    // 5. Check Bengali subject keywords
+    const bengaliSubjects = [
+      'পদার্থ', 'রসায়ন', 'রসায়ন', 'গণিত', 'জীব', 'উদ্ভিদ', 'প্রাণি',
+      'বাংলা', 'ইংরেজি', 'আইসিটি', 'তথ্য ও যোগাযোগ', 'হিসাববিজ্ঞান',
+      'ফিন্যান্স', 'ব্যবসায়', 'ব্যবস্থাপনা', 'অর্থনীতি', 'পৌরনীতি',
+      'সমাজবিজ্ঞান', 'ইতিহাস', 'বিজ্ঞান', 'বিশ্বপরিচয়', 'সাধারণ জ্ঞান',
+      'পরিসংখ্যান', 'ভূগোল', 'মনোবিজ্ঞান', 'ইসলাম', 'ধর্ম'
+    ];
+    for (final s in bengaliSubjects) {
+      if (text.contains(s)) return true;
+    }
+
+    return false;
+  }
+
   /// Strips redundant stream/level prefixes like "SSC ", "HSC ", or "(SSC)" from subject names
   static String cleanSubjectTitle(String text) {
     if (text.isEmpty) return '';

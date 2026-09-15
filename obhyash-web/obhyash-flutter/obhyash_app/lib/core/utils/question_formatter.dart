@@ -320,13 +320,12 @@ class QuestionFormatter {
     if (!text.contains(r'\') && !text.contains('^') && !text.contains('_')) return text;
 
     final trimmed = text.trim();
-    // Never wrap if text contains natural language prose (3 or more spaced words)
+
+    // 1. If the whole string is a pure LaTeX formula without dollar signs
     final hasMultipleSpacedWords =
         RegExp(r'[a-zA-Z]{2,}\s+[a-zA-Z]{2,}\s+[a-zA-Z]{2,}').hasMatch(trimmed);
-    if (hasMultipleSpacedWords) return text;
-
-    // If the whole string is a pure LaTeX formula without dollar signs
-    if (!trimmed.contains(r'$') &&
+    if (!hasMultipleSpacedWords &&
+        !trimmed.contains(r'$') &&
         !RegExp(r'[\u0980-\u09FF]').hasMatch(trimmed) &&
         (trimmed.contains(r'\frac') ||
             trimmed.contains(r'\sqrt') ||
@@ -348,6 +347,37 @@ class QuestionFormatter {
             trimmed.contains('^') ||
             trimmed.contains('_'))) {
       return '\$$trimmed\$';
+    }
+
+    // 2. If text contains embedded unescaped LaTeX in Bengali or English questions
+    // Safely parse segments outside existing $...$ so we never double-wrap
+    if (trimmed.contains(r'\') || trimmed.contains('^')) {
+      final parts = text.split(r'$');
+      // Even indices (0, 2, 4...) are OUTSIDE math mode
+      for (int i = 0; i < parts.length; i += 2) {
+        var segment = parts[i];
+        if (segment.contains(r'\') || segment.contains('^')) {
+          segment = segment.replaceAllMapped(
+            RegExp(
+              r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|_)\{?[a-zA-Z0-9\-\+]+\}?)',
+            ),
+            (m) {
+              final token = m.group(0)!;
+              if (token.startsWith(r'\n') ||
+                  token.startsWith(r'\t') ||
+                  token.contains('CHEM_ARROW') ||
+                  token.contains('@') ||
+                  token.startsWith(r'\vert')) {
+                return token;
+              }
+              if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
+              return '\$$token\$';
+            },
+          );
+          parts[i] = segment;
+        }
+      }
+      return parts.join(r'$');
     }
 
     return text;

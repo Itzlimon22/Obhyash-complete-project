@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Obhyash App Logo Preview</title>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@600;700;900&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+  <title>Obhyash New App Icon Preview (White BG + Mark)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Hind+Siliguri:wght@600;700&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -12,95 +12,244 @@
       padding: 0;
     }
     body {
-      background-color: #030705;
+      background: radial-gradient(circle at top, #18231C 0%, #080D0A 100%);
       color: #FFFFFF;
-      font-family: 'Hind Siliguri', 'Outfit', sans-serif;
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 40px 20px;
+      padding: 50px 20px;
     }
     .header {
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 40px;
+      max-width: 650px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34D399;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
     }
     .header h1 {
       font-size: 32px;
-      font-weight: 900;
+      font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #FFFFFF, #A7F3D0, #FB7185);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #FFFFFF;
     }
     .header p {
       color: #94A3B8;
       font-size: 15px;
-      margin-top: 6px;
+      margin-top: 8px;
+      line-height: 1.5;
     }
-    .logo-stage {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      max-width: 900px;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      width: 100%;
+      max-width: 1000px;
     }
+
     .card {
-      background: #08110D;
-      border: 1px solid #162C22;
-      border-radius: 28px;
-      padding: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 30px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+
+    .icon-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Square / Play Store */
+    .icon-playstore {
+      width: 180px;
+      height: 180px;
+      border-radius: 40px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    /* Android Circle */
+    .icon-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    /* Samsung Squircle */
+    .icon-squircle {
+      width: 140px;
+      height: 140px;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    /* iOS Style */
+    .icon-ios {
+      width: 140px;
+      height: 140px;
+      border-radius: 30px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    .icon-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
     .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F1F5F9;
+      margin-top: 22px;
+    }
+    .card-subtitle {
+      font-size: 12.5px;
+      color: #64748B;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* Live Phone Home Screen Mockup */
+    .mockup-container {
+      margin-top: 48px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 30px;
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    .mockup-title {
       font-size: 14px;
       font-weight: 700;
-      color: #34D399;
-      margin-top: 18px;
-      letter-spacing: 1px;
+      color: #94A3B8;
       text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
     }
-    .main-logo {
-      width: 320px;
-      height: 320px;
+    .homescreen-row {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      align-items: flex-start;
     }
-    .medium-logo {
-      width: 160px;
-      height: 160px;
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
-    .small-logo {
-      width: 80px;
-      height: 80px;
+    .app-item .app-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+    .app-item .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .app-item .app-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #E2E8F0;
     }
   </style>
 </head>
 <body>
+
   <div class="header">
-    <h1>অভ্যাস (Obhyash) • The Infinity Loop of Habit</h1>
-    <p>Deepest Midnight Forest Green Background • Pure White • Deep Crimson • Emerald Accents</p>
+    <div class="badge">Updated & Built</div>
+    <h1>Obhyash New App Icon</h1>
+    <p>সলিড হোয়াইট ব্যাকগ্রাউন্ড (`#FFFFFF`) এবং কেন্দ্রে ব্র্যান্ডের অফিশিয়াল ইনফিনিটি লুপ মার্ক (`obhyash_mark`)।</p>
   </div>
 
-  <div class="logo-stage">
+  <div class="grid">
+    <!-- Play Store 512px -->
     <div class="card">
-      <img src="obhyash_logo.svg" alt="Obhyash App Icon 512px" class="main-logo">
-      <div class="card-title">Large App Icon (512x512)</div>
+      <div class="icon-wrapper icon-playstore">
+        <img src="playstore_icon_512.png" alt="Google Play Store Icon">
+      </div>
+      <div class="card-title">Google Play Store</div>
+      <div class="card-subtitle">512 x 512 px (Official Store Spec)</div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-      <div class="card">
-        <img src="obhyash_logo.svg" alt="Obhyash App Icon 160px" class="medium-logo">
-        <div class="card-title">Home Screen (160x160)</div>
+    <!-- Android Circle -->
+    <div class="card">
+      <div class="icon-wrapper icon-circle">
+        <img src="app_logo.png" alt="Android Circle Icon">
       </div>
-      <div class="card">
-        <img src="obhyash_logo.svg" alt="Obhyash App Icon 80px" class="small-logo">
-        <div class="card-title">Dock / Favicon (80x80)</div>
+      <div class="card-title">Pixel / Stock Android</div>
+      <div class="card-subtitle">Circle Adaptive Mask</div>
+    </div>
+
+    <!-- Samsung Squircle -->
+    <div class="card">
+      <div class="icon-wrapper icon-squircle">
+        <img src="app_logo.png" alt="Samsung OneUI Squircle">
+      </div>
+      <div class="card-title">Samsung One UI</div>
+      <div class="card-subtitle">Squircle Adaptive Mask</div>
+    </div>
+
+    <!-- iOS / Rounded Rect -->
+    <div class="card">
+      <div class="icon-wrapper icon-ios">
+        <img src="app_logo.png" alt="iOS App Icon">
+      </div>
+      <div class="card-title">iOS / Xiaomi / App Icon</div>
+      <div class="card-subtitle">Continuous Rounded Corner</div>
+    </div>
+  </div>
+
+  <!-- Mobile Home Screen Context Preview -->
+  <div class="mockup-container">
+    <div class="mockup-title">স্মার্টফোনের হোম স্ক্রিনে দেখতে যেমন লাগবে</div>
+    <div class="homescreen-row">
+      <div class="app-item">
+        <div class="app-icon">
+          <img src="app_logo.png" alt="Obhyash">
+        </div>
+        <span class="app-label">Obhyash</span>
       </div>
     </div>
   </div>
+
 </body>
 </html>

@@ -226,16 +226,20 @@ Future<_UPAnalytics> _fetchUserAnalytics(String userId, [_OtherUser? user]) asyn
       totalCorrect += correct;
       scoreSum += score;
 
-      final prev = subjMap[subject];
-      if (prev == null) {
-        subjMap[subject] = (total: total, correct: correct, wrong: wrong, examsCount: 1);
-      } else {
-        subjMap[subject] = (
-          total: prev.total + total,
-          correct: prev.correct + correct,
-          wrong: prev.wrong + wrong,
-          examsCount: prev.examsCount + 1,
-        );
+      final subjectLabel = row['subject_label'] as String?;
+      if (BanglaNameHelper.isAcademicSubject(subject) ||
+          BanglaNameHelper.isAcademicSubject(subjectLabel)) {
+        final prev = subjMap[subject];
+        if (prev == null) {
+          subjMap[subject] = (total: total, correct: correct, wrong: wrong, examsCount: 1);
+        } else {
+          subjMap[subject] = (
+            total: prev.total + total,
+            correct: prev.correct + correct,
+            wrong: prev.wrong + wrong,
+            examsCount: prev.examsCount + 1,
+          );
+        }
       }
 
       final createdAtStr = row['created_at'] as String?;

@@ -1098,7 +1098,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               text: '**${BanglaNameHelper.toBanglaNumeral(i + 1)}.** ${q.questionText}',
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.normal,
                 color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A),
                 height: 1.45,
               ),

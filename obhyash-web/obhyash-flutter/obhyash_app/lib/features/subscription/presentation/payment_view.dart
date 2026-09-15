@@ -449,6 +449,34 @@ class _PaymentViewState extends ConsumerState<PaymentView>
 
   @override
   Widget build(BuildContext context) {
+    final manualEnabled = ref.watch(isPaymentManualEnabledProvider);
+    final autoEnabled = ref.watch(isPaymentAutoEnabledProvider);
+    final isFlowAllowed = widget.flowType == PaymentFlowType.manual
+        ? manualEnabled
+        : autoEnabled;
+
+    if (!isFlowAllowed) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Payment'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Text(
+              'এই পেমেন্ট মেথডটি বর্তমানে উপলব্ধ নয়।',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, color: Colors.grey),
+            ),
+          ),
+        ),
+      );
+    }
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_button_3d.dart';
 import '../../../core/utils/bangla_name_helper.dart';
@@ -143,6 +144,18 @@ class _WelcomeViewState extends State<WelcomeView> {
         body: SafeArea(
           child: Column(
             children: [
+              // Top Brand Logo
+              Padding(
+                padding: const EdgeInsets.only(top: 14, bottom: 4),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/images/obhyash_full_logo_dark.svg',
+                    height: 28,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+
               // PageView Carousel (Fills upper screen naturally without empty top void)
               Expanded(
                 child: PageView.builder(

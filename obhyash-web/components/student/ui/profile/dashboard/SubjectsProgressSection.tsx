@@ -22,7 +22,38 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectStat | null>(null);
 
-  if (subjectStats.length === 0) {
+  const nonSubjectKeys = [
+    'buet', 'ruet', 'kuet', 'cuet', 'ckruet', 'iut', 'butex', 'mist',
+    'du', 'ju', 'ru', 'cu', 'sust', 'bup', 'medical', 'matsh', 'agri',
+    'gst', 'engineering', 'varsity', 'admission', 'model_test', 'live_exam',
+    'all', 'preset', 'custom', 'general'
+  ];
+
+  const validStats = subjectStats.filter((stat) => {
+    const s = (stat.subject || '').toLowerCase().trim();
+    if (!s) return false;
+    if (nonSubjectKeys.includes(s)) return false;
+    if (nonSubjectKeys.some((k) => s.startsWith(`${k}_`) || s.startsWith(`${k} `))) return false;
+    if (
+      s.includes('বুয়েট') ||
+      s.includes('রুয়েট') ||
+      s.includes('কুয়েট') ||
+      s.includes('চুয়েট') ||
+      s.includes('মেডিকেল') ||
+      s.includes('ঢাবি') ||
+      s.includes('জাবি') ||
+      s.includes('রাবি') ||
+      s.includes('চবি') ||
+      s.includes('শাবিপ্রবি') ||
+      s.includes('গুচ্ছ') ||
+      s.includes('ইঞ্জিনিয়ারিং')
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  if (validStats.length === 0) {
     return (
       <div className="bg-white dark:bg-[#18181b] rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-[#27272a] shadow-sm p-6">
         <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
@@ -84,12 +115,12 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
           বিষয়ভিত্তিক দক্ষতা
         </h3>
         <span className="text-xs text-neutral-500 dark:text-neutral-400">
-          {subjectStats.length}টি বিষয়
+          {validStats.length}টি বিষয়
         </span>
       </div>
 
       <div className="space-y-3">
-        {subjectStats.map((stat) => (
+        {validStats.map((stat) => (
           <div
             key={stat.subject}
             onClick={() => setSelectedSubject(stat)}

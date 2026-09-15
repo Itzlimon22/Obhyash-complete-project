@@ -44,6 +44,10 @@ final _statsExamHistoryProvider = FutureProvider.autoDispose<List<ExamResult>>((
 List<SubjectStats> _computeSubjectStats(List<ExamResult> history) {
   final map = <String, _SubjectAccum>{};
   for (final e in history) {
+    if (!BanglaNameHelper.isAcademicSubject(e.subject) &&
+        !BanglaNameHelper.isAcademicSubject(e.subjectLabel)) {
+      continue;
+    }
     final acc = map.putIfAbsent(
       e.subject,
       () => _SubjectAccum(label: BanglaNameHelper.formatSubject(e.subject, e.subjectLabel)),

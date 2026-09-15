@@ -23,6 +23,7 @@ import {
   LogOut,
   Trash2,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
@@ -159,6 +160,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           actionId: 'terms',
         },
         {
+          label: 'রিফান্ড পলিসি',
+          icon: RefreshCw,
+          svgAsset: '/dashboard-icons/terms_doc.svg',
+          type: 'navigate',
+          actionId: 'refund',
+        },
+        {
           label: 'সাহায্য',
           icon: HelpCircle,
           svgAsset: '/dashboard-icons/help_question.svg',
@@ -246,15 +254,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       return;
     }
     if (item.actionId === 'about') {
-      onNavigate?.('about');
+      window.open('/about-us', '_blank');
       return;
     }
     if (item.actionId === 'privacy') {
-      onNavigate?.('privacy');
+      window.open('/privacy-policy', '_blank');
       return;
     }
     if (item.actionId === 'terms') {
-      onNavigate?.('terms');
+      window.open('/terms-and-conditions', '_blank');
+      return;
+    }
+    if (item.actionId === 'refund') {
+      window.open('/refund-policy', '_blank');
       return;
     }
     if (item.actionId === 'faq') {

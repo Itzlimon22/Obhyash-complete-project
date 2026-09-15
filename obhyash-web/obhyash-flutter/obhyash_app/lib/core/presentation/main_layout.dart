@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/main_sidebar.dart';
 import 'widgets/app_icon.dart';
 import '../constants/app_icons.dart';
@@ -714,18 +715,31 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       child: FittedBox(
                                         fit: BoxFit.scaleDown,
                                         alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          titleText,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                            fontSize: isSubRoute ? 16.5 : 19.5,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: -0.2,
-                                            color: isDark
-                                                ? Colors.white
-                                                : const Color(0xFF111827),
-                                          ),
-                                        ),
+                                        child: (activeTab == 'dashboard' || titleText == 'Obhyash')
+                                            ? SvgPicture.asset(
+                                                isDark
+                                                    ? 'assets/images/obhyash_full_logo_dark.svg'
+                                                    : 'assets/images/obhyash_full_logo.svg',
+                                                height: 26,
+                                                fit: BoxFit.contain,
+                                                placeholderBuilder: (_) => Image.asset(
+                                                  'assets/images/app_logo.png',
+                                                  height: 26,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              )
+                                            : Text(
+                                                titleText,
+                                                maxLines: 1,
+                                                style: TextStyle(
+                                                  fontSize: isSubRoute ? 16.5 : 19.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: -0.2,
+                                                  color: isDark
+                                                      ? Colors.white
+                                                      : const Color(0xFF111827),
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ],

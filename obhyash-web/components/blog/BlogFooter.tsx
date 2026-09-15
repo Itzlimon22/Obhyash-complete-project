@@ -177,26 +177,34 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/privacy"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/about-us"
+                  className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  প্রাইভেসি পলিসি
+                  About Us
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/terms"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/privacy-policy"
+                  className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  শর্তাবলী (Terms)
+                  Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/refund"
-                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/terms-and-conditions"
+                  className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  রিফান্ড পলিসি
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/refund-policy"
+                  className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+                >
+                  Refund Policy
                 </Link>
               </li>
             </ul>

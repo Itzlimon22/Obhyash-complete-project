@@ -59,29 +59,20 @@ class AboutUsView extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(18),
-                    child: SizedBox(
+                    child: Image.asset(
+                      'assets/images/app_logo.png',
                       width: 72,
                       height: 72,
-                      child: SvgPicture.asset(
-                        'assets/images/obhyash_logo.svg',
-                        fit: BoxFit.cover,
-                        placeholderBuilder: (_) => Image.asset(
-                          'assets/images/app_logo.png',
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      fit: BoxFit.cover,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Obhyash (অভ্যাস)',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
+                  SvgPicture.asset(
+                    isDark
+                        ? 'assets/images/obhyash_full_logo_dark.svg'
+                        : 'assets/images/obhyash_full_logo.svg',
+                    height: 32,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 4),
                   const Text(

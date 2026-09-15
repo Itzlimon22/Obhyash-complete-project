@@ -124,65 +124,21 @@ class MainSidebar extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: 38,
-                        height: 38,
-                        child: SvgPicture.asset(
-                          'assets/images/obhyash_logo.svg',
-                          fit: BoxFit.cover,
-                          placeholderBuilder: (_) => Image.asset(
-                            'assets/images/app_logo.png',
-                            width: 38,
-                            height: 38,
-                            fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, stack) => Container(
-                              color: const Color(0xFF059669),
-                              child: const Icon(
-                                LucideIcons.bookOpen,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SvgPicture.asset(
+                    isDark
+                        ? 'assets/images/obhyash_full_logo_dark.svg'
+                        : 'assets/images/obhyash_full_logo.svg',
+                    height: 36,
+                    fit: BoxFit.contain,
+                    placeholderBuilder: (_) => Image.asset(
+                      'assets/images/app_logo.png',
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.contain,
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'OBHYASH',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? const Color(0xFF737373)
-                                : const Color(
-                                    0xFFA3A3A3,
-                                  ),
-                            letterSpacing: 1.8,
-                          ),
-                        ),
-                        Text(
-                          'অভ্যাস',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF000000),
-                            height: 1.1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

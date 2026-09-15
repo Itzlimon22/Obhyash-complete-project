@@ -227,33 +227,12 @@ String _cleanIntraSentenceNewlines(String text) {
   return buffer.toString().replaceAll(placeholder, '\n\n');
 }
 
-String _separateTransitionSteps(String text) {
-  var t = text;
-
-  t = t.replaceAllMapped(
-    RegExp(
-      r'([।\?\!\:\;])\s*(ধরি|মনে করি|প্রদত্ত মানসমূহ|প্রদত্ত তথ্য|দেওয়া আছে|দেয়া আছে|আমরা জানি|জানা আছে|প্রশ্নমতে|শর্তমতে|অর্থাৎ|সুতরাং|অতএব|মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|গণনা করে পাই|সঠিক উত্তর|উত্তর|নোট|টিপস)[\s:\-–—\.]*',
-    ),
-    (m) => '${m.group(1)}\n\n${m.group(2)}: ',
-  );
-
-  t = t.replaceAllMapped(
-    RegExp(
-      r'(\))\s*(মান বসিয়ে পাই|মান বসিয়ে পাই|লব ও হর কাটাকাটি করে|কাটাকাটি করে|হিসাব করে পাই|অতএব|সুতরাং|অর্থাৎ)[\s:\-–—\.]*',
-    ),
-    (m) => '${m.group(1)}\n\n${m.group(2)}: ',
-  );
-
-  t = t.replaceAll(RegExp(r':\s*:\s*'), ': ');
-  return t;
-}
 
 String _preprocess(String text) {
   // Extract and protect Markdown tables first so dollar balancing, arrows, etc. don't touch tables
   final (textWithoutTables, tables) = QuestionFormatter.extractAndProtectTables(text);
 
   var processedText = QuestionFormatter.format(textWithoutTables);
-  processedText = _separateTransitionSteps(processedText);
 
   // Single dollar balancing per line
   final rawLines = processedText.split('\n');
@@ -763,22 +742,6 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
         style: style,
       ),
     );
-
-    // If inline equation contains reaction arrows or is long, wrap in SingleChildScrollView so it never overflows horizontally
-    if (latex.length > 25 ||
-        latex.contains(r'\to') ||
-        latex.contains(r'\rightarrow') ||
-        latex.contains(r'\xrightarrow') ||
-        latex.contains(r'\longrightarrow') ||
-        latex.contains('=')) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: mathWidget,
-        ),
-      );
-    }
 
     return mathWidget;
   }

@@ -8,6 +8,6 @@ export const metadata: Metadata = {
     'Read the official Obhyash Privacy Policy. Learn how we protect student data, uphold user security, and support full account and data deletion rights.',
 };
 
-export default function PrivacyPage() {
+export default function PrivacyPolicyPage() {
   return <PolicyPageShell document={LEGAL_CONTENT.privacy} activeSlug="privacy" />;
 }
