@@ -26,6 +26,11 @@ export async function GET() {
         manual_payment_merchant_number: '01749591456',
         reviewer_emails:
           'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',
+        promo_banner_enabled: true,
+        promo_banner_type: 'auto',
+        promo_banner_title: '',
+        promo_banner_subtitle: '',
+        promo_banner_target: '',
         ...(data || {
           maintenance_mode: false,
           live_exams_enabled: true,
@@ -77,6 +82,11 @@ export async function POST(request: NextRequest) {
         'manual_payment_merchant_number',
         'reviewer_emails',
         'referral_system_enabled',
+        'promo_banner_enabled',
+        'promo_banner_title',
+        'promo_banner_subtitle',
+        'promo_banner_type',
+        'promo_banner_target',
       ];
       const fallbackPayload = { ...payload };
       let hadMissing = false;

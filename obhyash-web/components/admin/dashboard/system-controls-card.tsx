@@ -46,6 +46,11 @@ export interface AppConfig {
   leaderboard_enabled?: boolean;
   max_free_exams_per_day?: number;
   update_url?: string;
+  promo_banner_enabled?: boolean;
+  promo_banner_title?: string;
+  promo_banner_subtitle?: string;
+  promo_banner_type?: string;
+  promo_banner_target?: string;
 }
 
 interface SystemControlsCardProps {

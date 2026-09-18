@@ -62,6 +62,17 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async redirects() {
+    return [
+      // Old /privacy-policy slug → new canonical public /privacy page
+      {
+        source: '/privacy-policy',
+        destination: '/privacy',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     const commonHeaders = [
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../features/dashboard/presentation/dashboard_view.dart';
 import '../features/auth/presentation/login_view.dart';
@@ -21,7 +22,6 @@ import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
 import '../features/profile/presentation/about_us_view.dart';
-import '../features/profile/presentation/privacy_policy_view.dart';
 import '../features/profile/presentation/terms_conditions_view.dart';
 import '../features/profile/presentation/faq_view.dart';
 import '../features/profile/presentation/account_linking_view.dart';
@@ -539,7 +539,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'privacy',
-                    builder: (context, state) => const PrivacyPolicyView(),
+                    builder: (context, state) {
+                      // Redirect to the central public privacy page
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        launchUrl(
+                          Uri.parse('https://obhyash.com/privacy'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (context.canPop()) context.pop();
+                      });
+                      return const SizedBox.shrink();
+                    },
                   ),
                   GoRoute(
                     path: 'terms',

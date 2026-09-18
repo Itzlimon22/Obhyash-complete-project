@@ -13,6 +13,7 @@ import '../utils/global_refresh.dart';
 import '../utils/app_popups.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'widgets/main_bottom_nav.dart';
+import 'widgets/promo_banner_widget.dart';
 import 'widgets/user_avatar.dart';
 import '../../features/dashboard/services/streak_service.dart';
 import 'widgets/streak_dialog.dart';
@@ -1139,25 +1140,32 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         body: widget.navigationShell,
 
         bottomNavigationBar: _shouldShowBottomNav(location)
-            ? MainBottomNav(
-                activeTab:
-                    (activeTab == 'question_bank' ||
-                        activeTab == 'question-bank' ||
-                        activeTab == 'history' ||
-                        activeTab == 'setup' ||
-                        activeTab == 'analysis' ||
-                        activeTab == 'leaderboard' ||
-                        activeTab == 'settings')
-                    ? activeTab
-                    : 'dashboard',
-                onTabChange: _onTabChange,
-                onMenuClick: () {
-                  if (_scaffoldKey.currentState?.isDrawerOpen == true) {
-                    _scaffoldKey.currentState?.closeDrawer();
-                  } else {
-                    _scaffoldKey.currentState?.openDrawer();
-                  }
-                },
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (activeTab == 'dashboard')
+                    const PromoBannerWidget(),
+                  MainBottomNav(
+                    activeTab:
+                        (activeTab == 'question_bank' ||
+                            activeTab == 'question-bank' ||
+                            activeTab == 'history' ||
+                            activeTab == 'setup' ||
+                            activeTab == 'analysis' ||
+                            activeTab == 'leaderboard' ||
+                            activeTab == 'settings')
+                        ? activeTab
+                        : 'dashboard',
+                    onTabChange: _onTabChange,
+                    onMenuClick: () {
+                      if (_scaffoldKey.currentState?.isDrawerOpen == true) {
+                        _scaffoldKey.currentState?.closeDrawer();
+                      } else {
+                        _scaffoldKey.currentState?.openDrawer();
+                      }
+                    },
+                  ),
+                ],
               )
             : null,
       ),

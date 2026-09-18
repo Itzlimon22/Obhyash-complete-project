@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ (API 31) Launch Theme — Light Mode -->
+    <!-- Uses the new SplashScreen API: windowSplashScreenBackground sets the
+         solid color shown during cold start, and windowSplashScreenAnimatedIcon
+         places the adaptive icon foreground in the centre. -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- Splash background: brand white (matches adaptive icon background) -->
+        <item name="android:windowSplashScreenBackground">#FFFFFF</item>
+        <!-- Centred icon: reuse the same adaptive icon foreground -->
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!-- Legacy window background (used until Flutter draws its first frame) -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>

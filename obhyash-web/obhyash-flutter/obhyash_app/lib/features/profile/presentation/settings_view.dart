@@ -240,7 +240,7 @@ class SettingsView extends ConsumerWidget {
         if (item.actionId == 'openAbout') {
           _launchPolicyUrl(context, 'https://obhyash.com/about-us', fallbackRoute: '/profile/about');
         } else if (item.actionId == 'openPrivacy') {
-          _launchPolicyUrl(context, 'https://obhyash.com/privacy-policy', fallbackRoute: '/profile/privacy');
+          _launchPolicyUrl(context, 'https://obhyash.com/privacy', fallbackRoute: '/profile/privacy');
         } else if (item.actionId == 'openTerms') {
           _launchPolicyUrl(context, 'https://obhyash.com/terms-and-conditions', fallbackRoute: '/profile/terms');
         } else if (item.actionId == 'openRefund') {

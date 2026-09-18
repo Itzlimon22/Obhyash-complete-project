@@ -28,9 +28,6 @@ class InAppPurchaseService {
     sku1Month,
     sku3Months,
     sku6Months,
-    'monthly_plan',
-    'admission_pro_3m',
-    'full_session_6m',
   };
 
   final _purchaseStatusController = StreamController<PurchaseResult>.broadcast();

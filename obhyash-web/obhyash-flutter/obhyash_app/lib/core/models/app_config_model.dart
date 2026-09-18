@@ -24,11 +24,16 @@ class AppConfigModel {
   final bool leaderboardEnabled;
   final int maxFreeExamsPerDay;
   final bool referralSystemEnabled;
+  final bool promoBannerEnabled;
+  final String promoBannerTitle;
+  final String promoBannerSubtitle;
+  final String promoBannerType;
+  final String promoBannerTarget;
 
   const AppConfigModel({
     this.maintenanceMode = false,
     this.maintenanceMessage =
-        'অভ্যাস প্ল্যাটফর্মের নিয়মিত রক্ষণাবেক্ষণ চলছে। শীঘ্রই আমরা ফিরে আসছি।',
+        'নিয়মিত রক্ষণাবেক্ষণ চলছে। শীঘ্রই আমরা ফিরে আসছি।',
     this.liveExamsEnabled = true,
     this.registrationEnabled = true,
     this.freeTrialEnabled = true,
@@ -53,25 +58,31 @@ class AppConfigModel {
     this.leaderboardEnabled = true,
     this.maxFreeExamsPerDay = 5,
     this.referralSystemEnabled = true,
+    this.promoBannerEnabled = true,
+    this.promoBannerTitle = '',
+    this.promoBannerSubtitle = '',
+    this.promoBannerType = 'auto',
+    this.promoBannerTarget = '',
   });
 
   factory AppConfigModel.fromJson(Map<String, dynamic> json) {
     return AppConfigModel(
       maintenanceMode: json['maintenance_mode'] as bool? ?? false,
-      maintenanceMessage: json['maintenance_message'] as String? ??
-          'অভ্যাস প্ল্যাটফর্মের নিয়মিত রক্ষণাবেক্ষণ চলছে। শীঘ্রই আমরা ফিরে আসছি।',
+      maintenanceMessage:
+          json['maintenance_message'] as String? ??
+          'নিয়মিত রক্ষণাবেক্ষণ চলছে। শীঘ্রই আমরা ফিরে আসছি।',
       liveExamsEnabled: json['live_exams_enabled'] as bool? ?? true,
       registrationEnabled: json['registration_enabled'] as bool? ?? true,
       freeTrialEnabled: json['free_trial_enabled'] as bool? ?? true,
       minAppVersion: json['min_app_version'] as String? ?? '1.0.0',
       latestAppVersion: json['latest_app_version'] as String? ?? '1.0.0',
       forceUpdate: json['force_update'] as bool? ?? false,
-      updateUrl: json['update_url'] as String? ??
+      updateUrl:
+          json['update_url'] as String? ??
           'https://play.google.com/store/apps/details?id=com.obhyash.app',
       globalAnnouncementEnabled:
           json['global_announcement_enabled'] as bool? ?? false,
-      globalAnnouncementText:
-          json['global_announcement_text'] as String? ?? '',
+      globalAnnouncementText: json['global_announcement_text'] as String? ?? '',
       globalAnnouncementType:
           json['global_announcement_type'] as String? ?? 'info',
       globalAnnouncementTarget:
@@ -80,58 +91,64 @@ class AppConfigModel {
           json['single_device_login_enabled'] as bool? ?? true,
       screenshotProtectionEnabled:
           json['screenshot_protection_enabled'] as bool? ?? true,
-      examAntiCheatEnabled:
-          json['exam_anti_cheat_enabled'] as bool? ?? true,
-      maxTabSwitchesAllowed:
-          json['max_tab_switches_allowed'] as int? ?? 2,
-      paymentsEnabled:
-          json['payments_enabled'] as bool? ?? true,
-      paymentAutoEnabled: json['payment_auto_enabled'] as bool? ??
+      examAntiCheatEnabled: json['exam_anti_cheat_enabled'] as bool? ?? true,
+      maxTabSwitchesAllowed: json['max_tab_switches_allowed'] as int? ?? 2,
+      paymentsEnabled: json['payments_enabled'] as bool? ?? true,
+      paymentAutoEnabled:
+          json['payment_auto_enabled'] as bool? ??
           json['auto_payment_enabled'] as bool? ??
           true,
-      paymentManualEnabled: json['payment_manual_enabled'] as bool? ??
+      paymentManualEnabled:
+          json['payment_manual_enabled'] as bool? ??
           json['manual_payment_enabled'] as bool? ??
           true,
-      paymentGooglePlayEnabled: json['payment_google_play_enabled'] as bool? ??
+      paymentGooglePlayEnabled:
+          json['payment_google_play_enabled'] as bool? ??
           json['google_play_enabled'] as bool? ??
           true,
       manualPaymentMerchantNumber:
-          json['manual_payment_merchant_number'] as String? ??
-              '01749591456',
-      leaderboardEnabled:
-          json['leaderboard_enabled'] as bool? ?? true,
-      maxFreeExamsPerDay:
-          json['max_free_exams_per_day'] as int? ?? 5,
-      referralSystemEnabled:
-          json['referral_system_enabled'] as bool? ?? true,
+          json['manual_payment_merchant_number'] as String? ?? '01749591456',
+      leaderboardEnabled: json['leaderboard_enabled'] as bool? ?? true,
+      maxFreeExamsPerDay: json['max_free_exams_per_day'] as int? ?? 5,
+      referralSystemEnabled: json['referral_system_enabled'] as bool? ?? true,
+      promoBannerEnabled: json['promo_banner_enabled'] as bool? ?? true,
+      promoBannerTitle: json['promo_banner_title'] as String? ?? '',
+      promoBannerSubtitle: json['promo_banner_subtitle'] as String? ?? '',
+      promoBannerType: json['promo_banner_type'] as String? ?? 'auto',
+      promoBannerTarget: json['promo_banner_target'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'maintenance_mode': maintenanceMode,
-        'maintenance_message': maintenanceMessage,
-        'live_exams_enabled': liveExamsEnabled,
-        'registration_enabled': registrationEnabled,
-        'free_trial_enabled': freeTrialEnabled,
-        'min_app_version': minAppVersion,
-        'latest_app_version': latestAppVersion,
-        'force_update': forceUpdate,
-        'update_url': updateUrl,
-        'global_announcement_enabled': globalAnnouncementEnabled,
-        'global_announcement_text': globalAnnouncementText,
-        'global_announcement_type': globalAnnouncementType,
-        'global_announcement_target': globalAnnouncementTarget,
-        'single_device_login_enabled': singleDeviceLoginEnabled,
-        'screenshot_protection_enabled': screenshotProtectionEnabled,
-        'exam_anti_cheat_enabled': examAntiCheatEnabled,
-        'max_tab_switches_allowed': maxTabSwitchesAllowed,
-        'payments_enabled': paymentsEnabled,
-        'payment_auto_enabled': paymentAutoEnabled,
-        'payment_manual_enabled': paymentManualEnabled,
-        'payment_google_play_enabled': paymentGooglePlayEnabled,
-        'manual_payment_merchant_number': manualPaymentMerchantNumber,
-        'leaderboard_enabled': leaderboardEnabled,
-        'max_free_exams_per_day': maxFreeExamsPerDay,
-        'referral_system_enabled': referralSystemEnabled,
-      };
+    'maintenance_mode': maintenanceMode,
+    'maintenance_message': maintenanceMessage,
+    'live_exams_enabled': liveExamsEnabled,
+    'registration_enabled': registrationEnabled,
+    'free_trial_enabled': freeTrialEnabled,
+    'min_app_version': minAppVersion,
+    'latest_app_version': latestAppVersion,
+    'force_update': forceUpdate,
+    'update_url': updateUrl,
+    'global_announcement_enabled': globalAnnouncementEnabled,
+    'global_announcement_text': globalAnnouncementText,
+    'global_announcement_type': globalAnnouncementType,
+    'global_announcement_target': globalAnnouncementTarget,
+    'single_device_login_enabled': singleDeviceLoginEnabled,
+    'screenshot_protection_enabled': screenshotProtectionEnabled,
+    'exam_anti_cheat_enabled': examAntiCheatEnabled,
+    'max_tab_switches_allowed': maxTabSwitchesAllowed,
+    'payments_enabled': paymentsEnabled,
+    'payment_auto_enabled': paymentAutoEnabled,
+    'payment_manual_enabled': paymentManualEnabled,
+    'payment_google_play_enabled': paymentGooglePlayEnabled,
+    'manual_payment_merchant_number': manualPaymentMerchantNumber,
+    'leaderboard_enabled': leaderboardEnabled,
+    'max_free_exams_per_day': maxFreeExamsPerDay,
+    'referral_system_enabled': referralSystemEnabled,
+    'promo_banner_enabled': promoBannerEnabled,
+    'promo_banner_title': promoBannerTitle,
+    'promo_banner_subtitle': promoBannerSubtitle,
+    'promo_banner_type': promoBannerType,
+    'promo_banner_target': promoBannerTarget,
+  };
 }

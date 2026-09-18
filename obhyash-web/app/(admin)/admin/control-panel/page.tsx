@@ -923,6 +923,102 @@ export default function ControlPanelPage() {
           </div>
         )}
       </div>
+
+      {/* ── Section 6: প্রমোশনাল বটম ব্যানার (Floating Promo Banner) ── */}
+      <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800 rounded-3xl p-6 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b border-neutral-100 dark:border-zinc-800 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <Gift size={18} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-neutral-900 dark:text-white">
+                ৬. প্রমোশনাল বটম ব্যানার (Floating Promo Banner)
+              </h2>
+              <p className="text-[11px] text-neutral-500 dark:text-zinc-400">
+                মোবাইল অ্যাপের বটম নেভ বারের উপরে ডিসকাউন্ট, সাবস্ক্রিপশন অফার বা রেফারেল বোনাস প্রচার
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-neutral-700 dark:text-zinc-300">ব্যানার সক্রিয়:</span>
+            <input
+              type="checkbox"
+              checked={config.promo_banner_enabled ?? true}
+              onChange={(e) => handleToggle('promo_banner_enabled', e.target.checked)}
+              className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300">অফার টাইপ</label>
+            <select
+              value={config.promo_banner_type || 'auto'}
+              onChange={(e) => handleToggle('promo_banner_type', e.target.value)}
+              className="w-full text-xs p-3 rounded-xl bg-neutral-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 font-semibold text-neutral-900 dark:text-white"
+            >
+              <option value="auto">অটো (ফ্রিদের সাবস্ক্রিপশন, প্রোদের রেফারেল)</option>
+              <option value="subscription">শুধুমাত্র সাবস্ক্রিপশন অফার</option>
+              <option value="referral">শুধুমাত্র রেফারেল বোনাস</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300">ব্যানার টাইটেল (Title)</label>
+            <input
+              type="text"
+              value={config.promo_banner_title || ''}
+              onChange={(e) => setConfig({ ...config, promo_banner_title: e.target.value })}
+              onBlur={() => saveConfig(config)}
+              placeholder="ডিফল্ট: প্রো সাবস্ক্রিপশনে বিশেষ ছাড়!"
+              className="w-full text-xs p-3 rounded-xl bg-neutral-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-neutral-700 dark:text-zinc-300">সাবটাইটেল / অ্যাকশন টেক্সট</label>
+            <input
+              type="text"
+              value={config.promo_banner_subtitle || ''}
+              onChange={(e) => setConfig({ ...config, promo_banner_subtitle: e.target.value })}
+              onBlur={() => saveConfig(config)}
+              placeholder="ডিফল্ট: আনলক করতে ট্যাপ করো এখানে →"
+              className="w-full text-xs p-3 rounded-xl bg-neutral-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 text-neutral-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Live Preview of Replica Banner */}
+        <div className="pt-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5 block">
+            অ্যাপে যেভাবে বটম ব্যানার প্রদর্শিত হবে (Live Preview):
+          </span>
+          <div className="p-3.5 rounded-2xl bg-[#092328] border border-amber-500/40 text-white flex items-center justify-between gap-3 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white text-lg font-bold shadow-md">
+                ⏰
+              </div>
+              <div>
+                <p className="text-xs font-bold text-white">
+                  {config.promo_banner_title || 'প্রো সাবস্ক্রিপশনে বিশেষ ছাড়!'}
+                </p>
+                <p className="text-[11px] text-zinc-300">
+                  {config.promo_banner_subtitle || 'আনলক করতে ট্যাপ করো এখানে →'}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[9px] text-zinc-400 font-medium">বাকি মাত্র</span>
+              <span className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-black rounded-full shadow">
+                ৪ দিন
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
