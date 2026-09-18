@@ -101,7 +101,7 @@ export async function updateSession(request: NextRequest) {
   const STUDENT_TAB_PATHS = [
     '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
     '/analysis', '/notifications', '/subscription', '/upgrade', '/profile', '/settings',
-    '/referral', '/complaint', '/feature-requests', '/bookmarks', '/about',
+    '/referral', '/complaint', '/feature-requests', '/bookmarks',
     '/account-info', '/account-linking', '/delete-account', '/info',
     '/legends-league', '/legends_league', '/live_exam',
     // Deep links — dynamic sub-paths

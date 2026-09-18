@@ -238,13 +238,13 @@ class SettingsView extends ConsumerWidget {
         }
       case _ItemType.action:
         if (item.actionId == 'openAbout') {
-          _launchPolicyUrl(context, 'https://obhyash.com/about-us', fallbackRoute: '/profile/about');
+          _launchPolicyUrl(context, 'https://obhyash.com/about');
         } else if (item.actionId == 'openPrivacy') {
-          _launchPolicyUrl(context, 'https://obhyash.com/privacy', fallbackRoute: '/profile/privacy');
+          _launchPolicyUrl(context, 'https://obhyash.com/privacy');
         } else if (item.actionId == 'openTerms') {
-          _launchPolicyUrl(context, 'https://obhyash.com/terms-and-conditions', fallbackRoute: '/profile/terms');
+          _launchPolicyUrl(context, 'https://obhyash.com/terms');
         } else if (item.actionId == 'openRefund') {
-          _launchPolicyUrl(context, 'https://obhyash.com/refund-policy');
+          _launchPolicyUrl(context, 'https://obhyash.com/refund');
         } else if (item.actionId == 'accountInfo') {
           AccountInfoModal.show(context, user);
         } else if (item.actionId == 'deleteAccount') {
@@ -290,22 +290,19 @@ class SettingsView extends ConsumerWidget {
 
   Future<void> _launchPolicyUrl(
     BuildContext context,
-    String url, {
-    String? fallbackRoute,
-  }) async {
+    String url,
+  ) async {
     final uri = Uri.parse(url);
     try {
       final launched = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-      if (!launched && fallbackRoute != null && context.mounted) {
-        context.push(fallbackRoute);
+      if (!launched) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       }
     } catch (_) {
       try {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } catch (e) {
-        if (fallbackRoute != null && context.mounted) {
-          context.push(fallbackRoute);
-        }
+        debugPrint('[SettingsView] Error launching url: $e');
       }
     }
   }

@@ -21,8 +21,6 @@ import '../features/feature_requests/presentation/feature_requests_view.dart';
 import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
-import '../features/profile/presentation/about_us_view.dart';
-import '../features/profile/presentation/terms_conditions_view.dart';
 import '../features/profile/presentation/faq_view.dart';
 import '../features/profile/presentation/account_linking_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
@@ -535,12 +533,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'about',
-                    builder: (context, state) => const AboutUsView(),
+                    builder: (context, state) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        launchUrl(
+                          Uri.parse('https://obhyash.com/about'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (context.canPop()) context.pop();
+                      });
+                      return const SizedBox.shrink();
+                    },
                   ),
                   GoRoute(
                     path: 'privacy',
                     builder: (context, state) {
-                      // Redirect to the central public privacy page
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         launchUrl(
                           Uri.parse('https://obhyash.com/privacy'),
@@ -553,7 +559,29 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'terms',
-                    builder: (context, state) => const TermsConditionsView(),
+                    builder: (context, state) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        launchUrl(
+                          Uri.parse('https://obhyash.com/terms'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (context.canPop()) context.pop();
+                      });
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  GoRoute(
+                    path: 'refund',
+                    builder: (context, state) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        launchUrl(
+                          Uri.parse('https://obhyash.com/refund'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                        if (context.canPop()) context.pop();
+                      });
+                      return const SizedBox.shrink();
+                    },
                   ),
                   GoRoute(
                     path: 'faq',
