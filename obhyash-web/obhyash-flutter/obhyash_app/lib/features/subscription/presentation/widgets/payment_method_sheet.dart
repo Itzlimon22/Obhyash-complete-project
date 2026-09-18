@@ -176,9 +176,24 @@ class PaymentMethodSheet extends ConsumerWidget {
                 title: 'In App Purchase',
                 subtitle: 'Google Play Store Billing',
                 badge: _buildGooglePlayBadge(),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  _showGooglePlayPurchaseSheet(context, plan);
+                  final iapService = InAppPurchaseService();
+                  final launched = await iapService.purchasePlan(plan);
+                  if (!launched && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Google Play Billing প্রক্রিয়া চালু হচ্ছে (${iapService.getSkuForPlan(plan)})...',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        backgroundColor: const Color(0xFF0F172A),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
                 },
               ),
             ],
