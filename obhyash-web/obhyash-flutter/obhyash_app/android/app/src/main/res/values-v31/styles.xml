@@ -8,7 +8,7 @@
         <!-- Splash background: brand white (matches adaptive icon background) -->
         <item name="android:windowSplashScreenBackground">#FFFFFF</item>
         <!-- Centred icon: reuse the same adaptive icon foreground -->
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <!-- Legacy window background (used until Flutter draws its first frame) -->
         <item name="android:windowBackground">@drawable/launch_background</item>
     </style>
