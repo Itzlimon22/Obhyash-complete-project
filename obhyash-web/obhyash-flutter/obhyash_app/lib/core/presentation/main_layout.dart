@@ -481,14 +481,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       }
     });
 
-    final isDrawerOpen = _scaffoldKey.currentState?.isDrawerOpen ?? false;
-    final isAtDashboardRoot =
-        widget.navigationShell.currentIndex == 0 &&
-        (location == '/' || location.isEmpty) &&
-        !context.canPop();
-
     return PopScope(
-      canPop: isAtDashboardRoot && !isDrawerOpen,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         if (_scaffoldKey.currentState?.isDrawerOpen == true) {
@@ -502,6 +496,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           widget.navigationShell.goBranch(0);
           context.go('/');
         }
+        // If already at root dashboard, do nothing so back button never exits the app
       },
       child: Scaffold(
         key: _scaffoldKey,
