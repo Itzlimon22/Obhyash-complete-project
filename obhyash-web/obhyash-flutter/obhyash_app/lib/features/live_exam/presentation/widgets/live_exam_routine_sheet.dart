@@ -572,15 +572,15 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     );
 
     final bytes = await pdf.save();
-    final fileName = 'Obhyash_Live_Exam_Routine_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final fileName = 'Obhyash_Routine';
 
     try {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: fileName,
         notificationTitle: categoryTitle.isNotEmpty
-            ? '${formatCategoryTitle(categoryTitle)} রুটিন ও সিলেবাস'
-            : '$categoryTitle রুটিন ও সিলেবাস',
+            ? '${formatCategoryTitle(categoryTitle)} রুটিন'
+            : 'পরীক্ষার রুটিন',
         context: context.mounted ? context : null,
       );
 

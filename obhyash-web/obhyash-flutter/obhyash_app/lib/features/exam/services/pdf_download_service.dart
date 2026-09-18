@@ -7,16 +7,21 @@ import 'package:bangla_pdf/bangla_pdf.dart' as bn;
 import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/utils/question_formatter.dart';
 import '../domain/exam_models.dart';
 
 class PdfDownloadService {
+  /// Unified body font size for Question Stems and Answer Options.
+  /// Ensures perfectly equal, harmonious, and readable typography across all generated PDFs.
+  static const double _fontSizeBody = 8.2;
+
   static String _toBanglaDigits(dynamic number) {
     return BanglaNameHelper.toBanglaNumeral(number);
   }
 
   static String _toSuperscript(String s) {
-    const normal = '0123456789+-=()nNtTyYxX';
-    const superChars = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿᴺᵗᵀʸʸˣˣ';
+    const normal = '0123456789+-=()abcdefghijklmnoprstuvwxyzABDEGHIJKLMNOPRTUVWxX';
+    const superChars = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂˣˣ';
     var res = '';
     for (int i = 0; i < s.length; i++) {
       final idx = normal.indexOf(s[i]);
@@ -32,13 +37,13 @@ class PdfDownloadService {
   }
 
   static String _toSubscript(String s) {
-    const normal = '0123456789+-=()aehijklmnoprstuvx';
-    const subChars = '₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ';
+    const safeNormal = '0123456789+-=()aehijklmnoprstuvx';
+    const safeSub = '₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ';
     var res = '';
     for (int i = 0; i < s.length; i++) {
-      final idx = normal.indexOf(s[i]);
+      final idx = safeNormal.indexOf(s[i]);
       if (idx != -1) {
-        res += subChars[idx];
+        res += safeSub[idx];
       } else {
         res += s[i];
       }
@@ -67,24 +72,36 @@ class PdfDownloadService {
   static String _formatMathForPdf(String raw) {
     if (raw.trim().isEmpty) return '';
 
-    var t = _stripInstituteTags(raw);
+    // First auto-heal control characters, unescaped LaTeX, and formatting via QuestionFormatter
+    var t = QuestionFormatter.autoHealRawLatex(raw);
+    t = _stripInstituteTags(t);
 
-    // 0. Normalize newlines & HTML breaks (NEVER use raw string r'\r' which strips \r from LaTeX like \rightarrow)
+    // 0. Clean math delimiters early so expressions and arrows like \xrightarrow remain contiguous
+    t = t.replaceAll(RegExp(r'\$\$|\$'), '');
+
+    // 0. Normalize newlines & HTML breaks
     t = t
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
         .replaceAll('&nbsp;', ' ')
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n');
 
-    // 0.1 Clean KaTeX chemistry wrappers \ce{...}, \pu{...} early
+    // 0.1 Clean KaTeX chemistry wrappers \ce{...}, \pu{...} early with auto-subscripts
     t = t.replaceAllMapped(
       RegExp(r'\\(?:ce|pu)\{([^{}]*)\}'),
-      (m) => m.group(1)!,
+      (m) {
+        var inner = m.group(1)!;
+        inner = inner.replaceAllMapped(
+          RegExp(r'([A-Za-z\)])(\d+)'),
+          (cm) => '${cm.group(1)}${_toSubscript(cm.group(2)!)}',
+        );
+        return inner;
+      },
     );
 
     // 0.2 Chemistry reaction arrows with conditions: \xrightarrow[below]{above} -> ──[above]──>
     t = t.replaceAllMapped(
-      RegExp(r'\\xrightarrow(?:\[([^\]]*)\])?\{((?:[^{}]*|\{[^{}]*\})*)\}'),
+      RegExp(r'\\?xrightarrow(?:\[([^\]]*)\])?\{((?:[^{}]*|\{[^{}]*\})*)\}'),
       (m) {
         final below = m.group(1)?.trim();
         final above = m.group(2)?.trim();
@@ -125,6 +142,22 @@ class PdfDownloadService {
       RegExp(r'\\?(tan|sin|cos|cot|sec|csc)\^\{?-1\}?', caseSensitive: false),
       (m) => '${m.group(1)}⁻¹',
     );
+
+    // 2.1 Limits, calculus functions, and binomial coefficients
+    t = t.replaceAllMapped(
+      RegExp(r'\\lim_\{?([^{}]+)\}?'),
+      (m) => 'lim(${m.group(1)})',
+    );
+    t = t.replaceAllMapped(
+      RegExp(r'\\binom\{([^{}]+)\}\{([^{}]+)\}'),
+      (m) => '(${m.group(1)} C ${m.group(2)})',
+    );
+    t = t
+        .replaceAll(r'\ln', 'ln')
+        .replaceAll(r'\log', 'log')
+        .replaceAll(r'\det', 'det')
+        .replaceAll(r'\max', 'max')
+        .replaceAll(r'\min', 'min');
 
     // 3. Greek letters & mathematical constants
     final greekMap = {
@@ -200,6 +233,7 @@ class PdfDownloadService {
       r'\notin': '∉',
       r'\cup': '∪',
       r'\cap': '∩',
+      r'\emptyset': '∅',
       r'\forall': '∀',
       r'\exists': '∃',
       r'\nabla': '∇',
@@ -208,6 +242,7 @@ class PdfDownloadService {
       r'\sum': '∑',
       r'\prod': '∏',
       r'\angle': '∠',
+      r'\triangle': '△',
       r'\perp': '⊥',
       r'\parallel': '∥',
       r'\rightarrow': '→',
@@ -230,26 +265,57 @@ class PdfDownloadService {
       t = t.replaceAll(k, v);
     });
 
-    // 5. Fractions: \frac{a}{b} -> (a / b)
-    t = t.replaceAllMapped(
-      RegExp(r'\\frac\{([^{}]*)\}\{([^{}]*)\}'),
-      (m) => '(${m.group(1)} / ${m.group(2)})',
-    );
+    // 4.1 Clean text wrappers \text{...}, \mathrm{...} before parsing fractions
+    int textPasses = 0;
+    while (t.contains(r'\text') || t.contains(r'\mathrm') || t.contains(r'\mathbf')) {
+      final replaced = t.replaceAllMapped(
+        RegExp(r'\\(?:text|mathrm|mathbf|mathit|textnormal|textbf|textit)\{([^{}]*)\}'),
+        (m) => m.group(1)!,
+      );
+      if (replaced == t || ++textPasses > 5) break;
+      t = replaced;
+    }
 
-    // 6. Square root: \sqrt{a} -> √a, \sqrt[n]{a} -> ⁿ√a
+    // 5. Roots & Fractions (iteratively resolve innermost roots and fractions together)
+    final sqrtNRegex = RegExp(r'\\sqrt\[([^\]]*)\]\{([^{}]+)\}');
+    final sqrtRegex = RegExp(r'\\sqrt\{([^{}]+)\}');
+    final fracRegex = RegExp(r'\\(?:d|t)?frac\{([^{}]+)\}\{([^{}]+)\}');
+
+    int mathPasses = 0;
+    while ((t.contains(r'\sqrt') || t.contains(r'\frac') || t.contains(r'\dfrac') || t.contains(r'\tfrac')) &&
+        mathPasses < 10) {
+      final prev = t;
+      // Resolve roots first
+      if (t.contains(r'\sqrt[')) {
+        t = t.replaceAllMapped(sqrtNRegex, (m) {
+          return '${_toSuperscript(m.group(1)!)}√(${m.group(2)})';
+        });
+      }
+      if (t.contains(r'\sqrt')) {
+        t = t.replaceAllMapped(sqrtRegex, (m) {
+          final inner = m.group(1)!.trim();
+          if (inner.contains('+') || inner.contains('-') || inner.contains(' ') || inner.contains('/')) {
+            return '√($inner)';
+          }
+          return '√$inner';
+        });
+      }
+      // Resolve fractions
+      if (t.contains(r'\frac') || t.contains(r'\dfrac') || t.contains(r'\tfrac')) {
+        t = t.replaceAllMapped(fracRegex, (m) {
+          final num = m.group(1)!.trim();
+          final den = m.group(2)!.trim();
+          return '($num / $den)';
+        });
+      }
+      if (t == prev) break;
+      mathPasses++;
+    }
+
+    // Bare fractions without braces like \frac 1 2
     t = t.replaceAllMapped(
-      RegExp(r'\\sqrt\[([^\]]*)\]\{([^{}]*)\}'),
-      (m) => '${_toSuperscript(m.group(1)!)}√(${m.group(2)})',
-    );
-    t = t.replaceAllMapped(
-      RegExp(r'\\sqrt\{([^{}]*)\}'),
-      (m) {
-        final inner = m.group(1)!.trim();
-        if (inner.contains('+') || inner.contains('-') || inner.contains(' ') || inner.contains('/')) {
-          return '√($inner)';
-        }
-        return '√$inner';
-      },
+      RegExp(r'\\(?:d|t)?frac\s*([0-9a-zA-Z])\s*([0-9a-zA-Z])'),
+      (m) => '(${m.group(1)} / ${m.group(2)})',
     );
 
     // 7. Unit vectors & vector arrows: \hat{i} -> î, \vec{A} -> A⃗, \vec{AB} -> AB⃗
@@ -272,13 +338,13 @@ class PdfDownloadService {
 
     // 8. Clean \text{...}, \mathrm{...}, \mathbf{...} before exponents so units like \text{ms}^{-1} become ms⁻¹
     t = t.replaceAllMapped(
-      RegExp(r'\\(?:text|mathrm|mathbf|mathit|textnormal)\{([^{}]*)\}'),
+      RegExp(r'\\(?:text|mathrm|mathbf|mathit|textnormal|textbf|textit)\{([^{}]*)\}'),
       (m) => m.group(1)!,
     );
 
     // 9. Superscripts & powers: x^{2} -> x², 10^{-5} -> 10⁻⁵, ms^-1 -> ms⁻¹
     t = t.replaceAllMapped(
-      RegExp(r'\^\{?([0-9\+\-nNxXtyT]+)\}?'),
+      RegExp(r'\^\{?([0-9\+\-nNxXtyTabcdegijklmoprstuvwzABDEGHIJKLMNOPRTUVW]+)\}?'),
       (m) => _toSuperscript(m.group(1)!),
     );
 
@@ -342,6 +408,7 @@ class PdfDownloadService {
   /// Short options (numbers, short formulas) are placed 4-inline;
   /// medium options are arranged in a neat 2x2 grid;
   /// and long descriptive options are stacked vertically (1 per line).
+  /// All options use the exact same font size as the question stem (_fontSizeBody) for visual parity.
   static pw.Widget _buildOptionsWidget(List<String> rawOptions) {
     if (rawOptions.isEmpty) return pw.SizedBox();
 
@@ -353,13 +420,13 @@ class PdfDownloadService {
     // 1. Very short options (<= 12 chars each): 4 in one row
     if (formattedOptions.length == 4 && maxLen <= 12) {
       return pw.Padding(
-        padding: const pw.EdgeInsets.only(left: 12),
+        padding: const pw.EdgeInsets.only(left: 10),
         child: pw.Row(
           children: List.generate(4, (i) {
             return pw.Expanded(
               child: bn.AutoText(
                 '${optionLetters[i]} ${formattedOptions[i]}',
-                fontSize: 7.6,
+                fontSize: _fontSizeBody,
                 color: PdfColor.fromHex('1E293B'),
               ),
             );
@@ -371,7 +438,7 @@ class PdfDownloadService {
     // 2. Long options (> 26 chars): Stacked vertically (1 per line)
     if (maxLen > 26) {
       return pw.Padding(
-        padding: const pw.EdgeInsets.only(left: 12),
+        padding: const pw.EdgeInsets.only(left: 10),
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: List.generate(formattedOptions.length, (i) {
@@ -379,7 +446,7 @@ class PdfDownloadService {
               padding: const pw.EdgeInsets.only(bottom: 1.5),
               child: bn.AutoText(
                 '${optionLetters[i]} ${formattedOptions[i]}',
-                fontSize: 7.6,
+                fontSize: _fontSizeBody,
                 color: PdfColor.fromHex('1E293B'),
               ),
             );
@@ -390,7 +457,7 @@ class PdfDownloadService {
 
     // 3. Standard medium options: 2x2 Grid
     return pw.Padding(
-      padding: const pw.EdgeInsets.only(left: 12),
+      padding: const pw.EdgeInsets.only(left: 10),
       child: pw.Column(
         children: [
           pw.Row(
@@ -400,7 +467,7 @@ class PdfDownloadService {
                 pw.Expanded(
                   child: bn.AutoText(
                     '${optionLetters[0]} ${formattedOptions[0]}',
-                    fontSize: 7.6,
+                    fontSize: _fontSizeBody,
                     color: PdfColor.fromHex('1E293B'),
                   ),
                 ),
@@ -408,7 +475,7 @@ class PdfDownloadService {
                 pw.Expanded(
                   child: bn.AutoText(
                     '${optionLetters[1]} ${formattedOptions[1]}',
-                    fontSize: 7.6,
+                    fontSize: _fontSizeBody,
                     color: PdfColor.fromHex('1E293B'),
                   ),
                 ),
@@ -422,7 +489,7 @@ class PdfDownloadService {
                 pw.Expanded(
                   child: bn.AutoText(
                     '${optionLetters[2]} ${formattedOptions[2]}',
-                    fontSize: 7.6,
+                    fontSize: _fontSizeBody,
                     color: PdfColor.fromHex('1E293B'),
                   ),
                 ),
@@ -430,7 +497,7 @@ class PdfDownloadService {
                   pw.Expanded(
                     child: bn.AutoText(
                       '${optionLetters[3]} ${formattedOptions[3]}',
-                      fontSize: 7.6,
+                      fontSize: _fontSizeBody,
                       color: PdfColor.fromHex('1E293B'),
                     ),
                   ),
@@ -554,10 +621,11 @@ class PdfDownloadService {
           ? result.subjectLabel!
           : BanglaNameHelper.formatSubject(result.subject),
     );
-    final filename = '${examTitle}_Question_Paper_${DateTime.now().millisecondsSinceEpoch}';
+    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
+    final filename = '${cleanTitle}_Question';
 
     try {
-      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.legacy);
+      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
 
       pw.Font? roboto;
       pw.Font? robotoBold;
@@ -576,6 +644,7 @@ class PdfDownloadService {
       }
 
       final fontFallbacks = <pw.Font>[
+        bn.BanglaPdf.defaultFont,
         ?notoSans,
         ?mathFont,
         ?symbolFont,
@@ -727,20 +796,20 @@ class PdfDownloadService {
                           ),
                         ),
                       ],
-                      // Question Stem
+                      // Question Stem (Same font size as options for visual parity)
                       pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           bn.AutoText(
                             '${_toBanglaDigits(number)}. ',
-                            fontSize: 8.4,
+                            fontSize: _fontSizeBody,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColor.fromHex('0F172A'),
                           ),
                           pw.Expanded(
                             child: bn.AutoText(
                               formattedStem,
-                              fontSize: 8.4,
+                              fontSize: _fontSizeBody,
                               fontWeight: pw.FontWeight.bold,
                               color: PdfColor.fromHex('0F172A'),
                               style: const pw.TextStyle(lineSpacing: 1.35),
@@ -938,7 +1007,7 @@ class PdfDownloadService {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$examTitle প্রশ্নপত্র PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
+        notificationTitle: '$cleanTitle প্রশ্নপত্র',
         context: context.mounted ? context : null,
       );
 
@@ -966,10 +1035,11 @@ class PdfDownloadService {
           ? result.subjectLabel!
           : BanglaNameHelper.formatSubject(result.subject),
     );
-    final filename = '${examTitle}_Solution_Explanation_${DateTime.now().millisecondsSinceEpoch}';
+    final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
+    final filename = '${cleanTitle}_Solution';
 
     try {
-      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.legacy);
+      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
 
       pw.Font? roboto;
       pw.Font? robotoBold;
@@ -988,6 +1058,7 @@ class PdfDownloadService {
       }
 
       final fontFallbacks = <pw.Font>[
+        bn.BanglaPdf.defaultFont,
         ?notoSans,
         ?mathFont,
         ?symbolFont,
@@ -1154,20 +1225,20 @@ class PdfDownloadService {
                           ),
                         ),
                       ],
-                      // Question Stem
+                      // Question Stem (Same font size as options for visual parity)
                       pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           bn.AutoText(
                             '${_toBanglaDigits(number)}. ',
-                            fontSize: 8.4,
+                            fontSize: _fontSizeBody,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColor.fromHex('0F172A'),
                           ),
                           pw.Expanded(
                             child: bn.AutoText(
                               formattedStem,
-                              fontSize: 8.4,
+                              fontSize: _fontSizeBody,
                               fontWeight: pw.FontWeight.bold,
                               color: PdfColor.fromHex('0F172A'),
                               style: const pw.TextStyle(lineSpacing: 1.35),
@@ -1205,7 +1276,7 @@ class PdfDownloadService {
                           children: [
                             bn.AutoText(
                               'সঠিক উত্তর: $correctLetter $correctText',
-                              fontSize: 7.5,
+                              fontSize: 7.8,
                               fontWeight: pw.FontWeight.bold,
                               color: PdfColor.fromHex('15803D'),
                             ),
@@ -1213,7 +1284,7 @@ class PdfDownloadService {
                               pw.SizedBox(height: 1.5),
                               bn.AutoText(
                                 'তোমার উত্তর: $userAnsLetter ${isCorrect ? "✓ (সঠিক)" : "✗ (ভুল)"}',
-                                fontSize: 7.3,
+                                fontSize: 7.6,
                                 fontWeight: pw.FontWeight.bold,
                                 color: isCorrect
                                     ? PdfColor.fromHex('15803D')
@@ -1224,7 +1295,7 @@ class PdfDownloadService {
                               pw.SizedBox(height: 2),
                               bn.AutoText(
                                 'ব্যাখ্যা: ${_formatMathForPdf(q.explanation!)}',
-                                fontSize: 7.2,
+                                fontSize: 7.4,
                                 color: PdfColor.fromHex('334155'),
                                 style: const pw.TextStyle(lineSpacing: 1.3),
                               ),
@@ -1413,7 +1484,7 @@ class PdfDownloadService {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$examTitle ফলাফল ও ব্যাখ্যা PDF ডাউনলোড সম্পন্ন ✅',
+        notificationTitle: '$cleanTitle সমাধান',
         context: context.mounted ? context : null,
       );
 

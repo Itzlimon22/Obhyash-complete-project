@@ -166,7 +166,12 @@ String _unwrapBengaliMathContent(String inner) {
 
   clean = clean.replaceAllMapped(tokenRegex, (m) {
     final token = m.group(0)!;
-    if (token.contains('CHEM_ARROW') || token.contains('@')) return token;
+    if (token.contains('CHEM_ARROW') ||
+        token.contains('@') ||
+        token.startsWith(r'\begin') ||
+        token.startsWith(r'\end')) {
+      return token;
+    }
     // Don't wrap if token contains Bengali
     if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
     return '\$$token\$';
@@ -249,29 +254,31 @@ String _preprocess(String text) {
       });
     }
 
-    final dollarCount = RegExp(r'\$').allMatches(l).length;
-    if (dollarCount % 2 != 0) {
-      if (l.endsWith(r'$')) {
-        final withoutTrailing = l.substring(0, l.length - 1).trim();
-        final colonIdx = withoutTrailing.lastIndexOf(':');
-        if (colonIdx != -1 && colonIdx < withoutTrailing.length - 1) {
-          final prefix = withoutTrailing.substring(0, colonIdx + 1);
-          final math = withoutTrailing.substring(colonIdx + 1).trim();
-          l = '$prefix \$$math\$';
-        } else {
-          final firstBackslash = withoutTrailing.indexOf(r'\');
-          if (firstBackslash != -1) {
-            final prefix = withoutTrailing.substring(0, firstBackslash);
-            final math = withoutTrailing.substring(firstBackslash).trim();
-            l = '$prefix\$$math\$';
-          } else if (withoutTrailing.startsWith('=')) {
-            l = '\$$withoutTrailing\$';
+    if (!l.contains(r'\begin{') && !l.contains(r'\end{')) {
+      final dollarCount = RegExp(r'\$').allMatches(l).length;
+      if (dollarCount % 2 != 0) {
+        if (l.endsWith(r'$')) {
+          final withoutTrailing = l.substring(0, l.length - 1).trim();
+          final colonIdx = withoutTrailing.lastIndexOf(':');
+          if (colonIdx != -1 && colonIdx < withoutTrailing.length - 1) {
+            final prefix = withoutTrailing.substring(0, colonIdx + 1);
+            final math = withoutTrailing.substring(colonIdx + 1).trim();
+            l = '$prefix \$$math\$';
           } else {
-            l = withoutTrailing;
+            final firstBackslash = withoutTrailing.indexOf(r'\');
+            if (firstBackslash != -1) {
+              final prefix = withoutTrailing.substring(0, firstBackslash);
+              final math = withoutTrailing.substring(firstBackslash).trim();
+              l = '$prefix\$$math\$';
+            } else if (withoutTrailing.startsWith('=')) {
+              l = '\$$withoutTrailing\$';
+            } else {
+              l = withoutTrailing;
+            }
           }
+        } else if (l.startsWith(r'$')) {
+          l = '$l\$';
         }
-      } else if (l.startsWith(r'$')) {
-        l = '$l\$';
       }
     }
 
@@ -567,7 +574,7 @@ String _preprocess(String text) {
       final hasEnglishWords =
           RegExp(r'\b[a-zA-Z]{2,}\s+[a-zA-Z]{2,}\b').hasMatch(textWithoutLatexCommands);
 
-      if (hasBengali || hasEnglishWords) {
+      if ((hasBengali || hasEnglishWords) && !cleanInner.contains(r'\begin{')) {
         return _unwrapBengaliMathContent(cleanInner);
       }
 
@@ -1007,6 +1014,11 @@ class LatexText extends StatelessWidget {
     final processed = _preprocess(text);
     // debugPrint('PROCESSED IN LATEX_TEXT:\n$processed');
 
+    final richTextWidget = _tryBuildRichText(processed, effectiveStyle);
+    if (richTextWidget != null) {
+      return richTextWidget;
+    }
+
     return MarkdownBody(
       data: processed,
       extensionSet: md.ExtensionSet.gitHubFlavored,
@@ -1085,3 +1097,155 @@ class LatexText extends StatelessWidget {
     );
   }
 }
+
+Widget? _tryBuildRichText(String text, TextStyle style) {
+  // Complex markdown structures that need MarkdownBody
+  if (text.contains('@@TABLEBLOCK') ||
+      text.contains('![') ||
+      text.contains('```') ||
+      text.contains(r'$$') ||
+      text.contains('|') ||
+      RegExp(r'(?:^|\n)#{1,6}\s').hasMatch(text) ||
+      RegExp(r'(?:^|\n)>\s').hasMatch(text) ||
+      RegExp(r'(?:^|\n)(?:\*|-)\s').hasMatch(text) ||
+      RegExp(r'\[.+?\]\(.+?\)').hasMatch(text)) {
+    return null; // Fall back to MarkdownBody
+  }
+
+  final paragraphs = text.split(RegExp(r'\n\s*\n+'));
+  final widgets = <Widget>[];
+
+  for (int pIdx = 0; pIdx < paragraphs.length; pIdx++) {
+    final paragraph = paragraphs[pIdx].trim();
+    if (paragraph.isEmpty) continue;
+
+    final spans = _parseParagraphSpans(paragraph, style);
+    if (spans.isEmpty) continue;
+
+    widgets.add(Text.rich(
+      TextSpan(children: spans),
+      style: style,
+    ));
+  }
+
+  if (widgets.isEmpty) {
+    return Text(text, style: style);
+  } else if (widgets.length == 1) {
+    return widgets.first;
+  } else {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < widgets.length; i++) ...[
+          if (i > 0) const SizedBox(height: 8),
+          widgets[i],
+        ],
+      ],
+    );
+  }
+}
+
+List<InlineSpan> _parseParagraphSpans(String paragraph, TextStyle style) {
+  final spans = <InlineSpan>[];
+  final tokenRegex = RegExp(
+    r'(\$[^\$\n]+?\$|\*\*[^*]+?\*\*|\*[^*]+?\*|' +
+        RegExp.escape(_kChemArrowPrefix) +
+        r'[^@]*?' +
+        RegExp.escape(_kChemArrowSuffix) +
+        r')',
+  );
+
+  int lastIndex = 0;
+  for (final match in tokenRegex.allMatches(paragraph)) {
+    if (match.start > lastIndex) {
+      spans.add(TextSpan(
+        text: paragraph.substring(lastIndex, match.start),
+        style: style,
+      ));
+    }
+
+    final token = match.group(0)!;
+    if (token.startsWith(r'$') && token.endsWith(r'$')) {
+      final math = token.substring(1, token.length - 1).trim();
+
+      if (RegExp(r'[\u0980-\u09FF]').hasMatch(math)) {
+        spans.add(TextSpan(
+          text: _cleanConditionText(math),
+          style: style,
+        ));
+      } else if (RegExp(
+        r'^(?:ms\^?\{?\-?[123]\}?|ms⁻¹|ms⁻²|m\/s\^?2|m\/s²|m\/s|cm\^?3|m\^?[23]|km\/h|rad\/s|kg|gm|mg|cm|mm|km|nm|s|sec|N|J|W|V|A|K|Pa|Hz)$',
+        caseSensitive: false,
+      ).hasMatch(math)) {
+        String cleanUnit = math
+            .replaceAll(r'ms^{-1}', 'ms⁻¹')
+            .replaceAll('ms^-1', 'ms⁻¹')
+            .replaceAll(r'ms^{-2}', 'ms⁻²')
+            .replaceAll('ms^-2', 'ms⁻²')
+            .replaceAll(r'm/s^2', 'm/s²')
+            .replaceAll(r'm^2', 'm²')
+            .replaceAll(r'm^3', 'm³')
+            .replaceAll(r'cm^3', 'cm³');
+        spans.add(TextSpan(
+          text: cleanUnit,
+          style: style,
+        ));
+      } else {
+        spans.add(WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Math.tex(
+            math,
+            mathStyle: MathStyle.text,
+            textStyle: style,
+            onErrorFallback: (_) => Text(token, style: style),
+          ),
+        ));
+      }
+    } else if (token.startsWith('**') && token.endsWith('**')) {
+      final boldText = token.substring(2, token.length - 2);
+      spans.add(TextSpan(
+        text: boldText,
+        style: style.copyWith(fontWeight: FontWeight.bold),
+      ));
+    } else if (token.startsWith('*') && token.endsWith('*')) {
+      final italicText = token.substring(1, token.length - 1);
+      spans.add(TextSpan(
+        text: italicText,
+        style: style.copyWith(fontStyle: FontStyle.italic),
+      ));
+    } else if (token.startsWith(_kChemArrowPrefix) &&
+        token.endsWith(_kChemArrowSuffix)) {
+      final content = token.substring(
+        _kChemArrowPrefix.length,
+        token.length - _kChemArrowSuffix.length,
+      );
+      final parts = content.split('|');
+      final above = parts.isNotEmpty ? parts[0] : '';
+      final below = parts.length > 1 ? parts[1] : '';
+      final dir = parts.length > 2 ? parts[2] : 'right';
+
+      spans.add(WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: _ChemicalArrowWidget(
+          above: _cleanConditionText(above),
+          below: _cleanConditionText(below),
+          direction: dir,
+          style: style,
+        ),
+      ));
+    }
+
+    lastIndex = match.end;
+  }
+
+  if (lastIndex < paragraph.length) {
+    spans.add(TextSpan(
+      text: paragraph.substring(lastIndex),
+      style: style,
+    ));
+  }
+
+  return spans;
+}
+

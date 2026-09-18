@@ -434,22 +434,13 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF166534),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'O',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     const SizedBox(height: 12),

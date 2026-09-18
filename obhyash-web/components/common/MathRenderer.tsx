@@ -209,11 +209,14 @@ function preprocess(text: string): string {
   processedText = processedText.replace(/\$\s*\\n/g, "\n$");
   processedText = processedText.replace(/(?<=\$)(\s*\\n\s*)+(?=[^\$])/g, " ");
 
-  // 5. Normalize matrix row breaks (replace isolated single backslash with \\\\)
+  // 5. Normalize matrix and tabular environments (clean stray dollars and row breaks)
   processedText = processedText.replace(
-    /(\\begin\{(?:v|p|b|B|V|small)?matrix\}[\s\S]*?\\end\{(?:v|p|b|B|V|small)?matrix\})/g,
-    (mat) => {
-      return mat.replace(/(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&\.\,\(\)\{\}\\])/g, " \\\\ ");
+    /\$*\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?)\}\$*([\s\S]*?)\$*\\end\{\1\}\$*/g,
+    (_full, env, body) => {
+      const cleanBody = body
+        .replace(/\$/g, "")
+        .replace(/(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&\.\,\(\)\{\}\\])/g, " \\\\ ");
+      return `\n\n$$\\begin{${env}}${cleanBody}\\end{${env}}$$\n\n`;
     }
   );
 

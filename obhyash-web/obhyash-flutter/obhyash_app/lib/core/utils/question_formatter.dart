@@ -19,90 +19,7 @@ class QuestionFormatter {
 
     // Extract and protect Markdown tables first so pipes and row newlines are completely preserved
     final (textWithoutTables, tables) = extractAndProtectTables(text);
-    text = textWithoutTables;
-
-    // 0a. Auto-heal unescaped Python/JS escape sequences and control characters
-    text = text
-        // \b (backspace \u0008) -> \begin, \bmatrix, \bullet, \binom, \beta, \bar, \boldsymbol
-        .replaceAll(RegExp(r'[\u0008]egin\b'), r'\begin')
-        .replaceAll(RegExp(r'[\u0008]matrix\b'), r'\bmatrix')
-        .replaceAll(RegExp(r'[\u0008]ullet\b'), r'\bullet')
-        .replaceAll(RegExp(r'[\u0008]inom\b'), r'\binom')
-        .replaceAll(RegExp(r'[\u0008]eta\b'), r'\beta')
-        .replaceAll(RegExp(r'[\u0008]ar\b'), r'\bar')
-        .replaceAll(RegExp(r'[\u0008]oldsymbol\b'), r'\boldsymbol')
-        .replaceAll(RegExp(r'[\u0008]'), '')
-        // \v (vertical tab \u000b) -> \vec, \vmatrix, \vert
-        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
-        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
-        .replaceAll(RegExp(r'[\u000b\v]matrix\b'), r'\vmatrix')
-        .replaceAll(RegExp(r'[\u000b\v]ert\b'), r'\vert')
-        .replaceAll(RegExp(r'[\u000b\v]'), '')
-        // \t (tab \u0009) -> \text, \times, \theta, \tan, \tau, \to, \tilde
-        .replaceAll(RegExp(r'[\t\u0009]ext\{'), r'\text{')
-        .replaceAll(RegExp(r'[\t\u0009]imes\b'), r'\times')
-        .replaceAll(RegExp(r'[\t\u0009]heta\b'), r'\theta')
-        .replaceAll(RegExp(r'[\t\u0009]an\b'), r'\tan')
-        .replaceAll(RegExp(r'[\t\u0009]au\b'), r'\tau')
-        .replaceAll(RegExp(r'[\t\u0009]o\b'), r'\to')
-        .replaceAll(RegExp(r'[\t\u0009]ilde\{'), r'\tilde{')
-        // \a (bell \u0007) -> \alpha, \approx
-        .replaceAll(RegExp(r'[\u0007]lpha\b'), r'\alpha')
-        .replaceAll(RegExp(r'[\u0007]pprox\b'), r'\approx')
-        .replaceAll(RegExp(r'[\u0007]'), '')
-        // \f (form feed \u000c) -> \frac, \forall
-        .replaceAll(RegExp(r'[\u000c]rac\b'), r'\frac')
-        .replaceAll(RegExp(r'[\u000c]orall\b'), r'\forall')
-        .replaceAll(RegExp(r'[\u000c]'), '')
-        // Non-printable control characters (except standard \n and \t)
-        .replaceAll(RegExp(r'[\u0000-\u0006\u000e-\u001f]'), '');
-
-    // Normalize LaTeX bracket syntax \[ ... \] and \( ... \)
-    text = text.replaceAllMapped(RegExp(r'\\\[([\s\S]*?)\\\]'), (m) => '\$\$${m.group(1)}\$\$');
-    text = text.replaceAllMapped(RegExp(r'\\\(([\s\S]*?)\\\)'), (m) => '\$${m.group(1)}\$');
-
-    // Normalize empty nucleus notation (e.g. \{} -> {} before sub/superscripts in isotopes like {}^{35}_{17}Cl)
-    text = text.replaceAll(r'\{}', '{}');
-
-    // Matrix row break normalization (e.g. \begin{vmatrix} 1 & 2 \ 3 & 4 \end{vmatrix})
-    text = text.replaceAllMapped(
-      RegExp(r'(\\begin\{(?:v|p|b|B|V)?matrix\}[\s\S]*?\\end\{(?:v|p|b|B|V)?matrix\})'),
-      (m) {
-        final mat = m.group(1)!;
-        return mat.replaceAllMapped(RegExp(r'(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&])'), (rm) => r' \\ ');
-      },
-    );
-
-    // 0b. Auto-heal corrupted LaTeX commands where the backslash was stripped
-    text = text
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ec\{'), r'\vec{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()hat\{'), r'\hat{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()bar\{'), r'\bar{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()dot\{'), r'\dot{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ddot\{'), r'\ddot{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()tilde\{'), r'\tilde{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()sqrt\{'), r'\sqrt{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()frac\{'), r'\frac{')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()imes(?=\s|[\$\d\w\\\{])'), r'\times')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()heta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\theta')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()lpha(?=\s|[\$\d\w\\\}\,\.\=])'), r'\alpha')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()eta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\beta')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()amma(?=\s|[\$\d\w\\\}\,\.\=])'), r'\gamma')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ambda(?=\s|[\$\d\w\\\}\,\.\=])'), r'\lambda')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()mega(?=\s|[\$\d\w\\\}\,\.\=])'), r'\omega')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()circ(?=\s|[\$\d\w\\\}\,\.\=])'), r'\circ')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()infty(?=\s|[\$\d\w\\\}\,\.\=])'), r'\infty')
-        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()approx(?=\s|[\$\d\w\\\}\,\.\=])'), r'\approx');
-
-    // Auto-heal corrupted LaTeX commands where \r was previously stripped (e.g. \left( ... ight) -> \left( ... \right))
-    text = text.replaceAllMapped(
-      RegExp(r'(\\left\s*[(\[{|.]\s*[^\\)]*?)(?:\\?r?ight|\bight)\s*([)\]}|.])'),
-      (m) => '${m.group(1)}\\right${m.group(2)}',
-    );
-    text = text.replaceAll(RegExp(r'(?<=\s|\(|\{|^)ight\b'), r'\right');
-    text = text.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
-    text = text.replaceAll(RegExp(r'(?<!\\)\bightarrow\b'), r'\rightarrow');
-    text = text.replaceAll(RegExp(r'(?<!\\)\bightleftharpoons\b'), r'\rightleftharpoons');
+    text = autoHealRawLatex(textWithoutTables);
 
     // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols
     text = text.replaceAll(RegExp(r'\\?rightleftharpoons', caseSensitive: false), ' ⇌ ');
@@ -350,34 +267,55 @@ class QuestionFormatter {
     }
 
     // 2. If text contains embedded unescaped LaTeX in Bengali or English questions
-    // Safely parse segments outside existing $...$ so we never double-wrap
+    // Split into existing math blocks ($$...$$ or $...$) and non-math segments so we never double-wrap or corrupt existing math!
     if (trimmed.contains(r'\') || trimmed.contains('^')) {
-      final parts = text.split(r'$');
-      // Even indices (0, 2, 4...) are OUTSIDE math mode
-      for (int i = 0; i < parts.length; i += 2) {
-        var segment = parts[i];
-        if (segment.contains(r'\') || segment.contains('^')) {
-          segment = segment.replaceAllMapped(
-            RegExp(
-              r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|_)\{?[a-zA-Z0-9\-\+]+\}?)',
-            ),
-            (m) {
-              final token = m.group(0)!;
-              if (token.startsWith(r'\n') ||
-                  token.startsWith(r'\t') ||
-                  token.contains('CHEM_ARROW') ||
-                  token.contains('@') ||
-                  token.startsWith(r'\vert')) {
-                return token;
-              }
-              if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
-              return '\$$token\$';
-            },
-          );
-          parts[i] = segment;
+      final mathBlockRegex = RegExp(r'(\$\$[\s\S]*?\$\$|\$[^\$\n]*?\$)');
+      final parts = <String>[];
+      int lastIndex = 0;
+
+      for (final match in mathBlockRegex.allMatches(text)) {
+        if (match.start > lastIndex) {
+          parts.add(text.substring(lastIndex, match.start));
+        }
+        parts.add(match.group(0)!);
+        lastIndex = match.end;
+      }
+      if (lastIndex < text.length) {
+        parts.add(text.substring(lastIndex));
+      }
+
+      final buffer = StringBuffer();
+      for (final part in parts) {
+        if (part.startsWith(r'$')) {
+          buffer.write(part);
+        } else {
+          if (part.contains(r'\') || part.contains('^')) {
+            final wrapped = part.replaceAllMapped(
+              RegExp(
+                r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|_)\{?[a-zA-Z0-9\-\+]+\}?)',
+              ),
+              (m) {
+                final token = m.group(0)!;
+                if (token.startsWith(r'\n') ||
+                    token.startsWith(r'\t') ||
+                    token.startsWith(r'\begin') ||
+                    token.startsWith(r'\end') ||
+                    token.contains('CHEM_ARROW') ||
+                    token.contains('@') ||
+                    token.startsWith(r'\vert')) {
+                  return token;
+                }
+                if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
+                return '\$$token\$';
+              },
+            );
+            buffer.write(wrapped);
+          } else {
+            buffer.write(part);
+          }
         }
       }
-      return parts.join(r'$');
+      return buffer.toString();
     }
 
     return text;
@@ -431,5 +369,109 @@ class QuestionFormatter {
       result = result.replaceAll('@@TABLEBLOCK$i@@', '\n\n${tables[i]}\n\n');
     }
     return result;
+  }
+
+  /// Heals corrupted control characters, unescaped escape sequences, stripped backslashes,
+  /// and missing LaTeX syntax without introducing Markdown math wrappers ($...$).
+  /// Perfect for clean Unicode generation in PDFs.
+  static String autoHealRawLatex(String text) {
+    var res = text
+        // \b (backspace \u0008) -> \begin, \bmatrix, \bullet, \binom, \beta, \bar, \boldsymbol
+        .replaceAll(RegExp(r'[\u0008]egin\b'), r'\begin')
+        .replaceAll(RegExp(r'[\u0008]matrix\b'), r'\bmatrix')
+        .replaceAll(RegExp(r'[\u0008]ullet\b'), r'\bullet')
+        .replaceAll(RegExp(r'[\u0008]inom\b'), r'\binom')
+        .replaceAll(RegExp(r'[\u0008]eta\b'), r'\beta')
+        .replaceAll(RegExp(r'[\u0008]ar\b'), r'\bar')
+        .replaceAll(RegExp(r'[\u0008]oldsymbol\b'), r'\boldsymbol')
+        .replaceAll(RegExp(r'[\u0008]'), '')
+        // \v (vertical tab \u000b) -> \vec, \vmatrix, \vert
+        .replaceAll(RegExp(r'[\u000b\v]ec\b'), r'\vec')
+        .replaceAll(RegExp(r'[\u000b\v]ec\{'), r'\vec{')
+        .replaceAll(RegExp(r'[\u000b\v]matrix\b'), r'\vmatrix')
+        .replaceAll(RegExp(r'[\u000b\v]ert\b'), r'\vert')
+        .replaceAll(RegExp(r'[\u000b\v]'), '')
+        // \t (tab \u0009) -> \text, \times, \theta, \tan, \tau, \to, \tilde
+        .replaceAll(RegExp(r'[\t\u0009]ext\{'), r'\text{')
+        .replaceAll(RegExp(r'[\t\u0009]imes\b'), r'\times')
+        .replaceAll(RegExp(r'[\t\u0009]heta\b'), r'\theta')
+        .replaceAll(RegExp(r'[\t\u0009]an\b'), r'\tan')
+        .replaceAll(RegExp(r'[\t\u0009]au\b'), r'\tau')
+        .replaceAll(RegExp(r'[\t\u0009]o\b'), r'\to')
+        .replaceAll(RegExp(r'[\t\u0009]ilde\{'), r'\tilde{')
+        // \a (bell \u0007) -> \alpha, \approx
+        .replaceAll(RegExp(r'[\u0007]lpha\b'), r'\alpha')
+        .replaceAll(RegExp(r'[\u0007]pprox\b'), r'\approx')
+        .replaceAll(RegExp(r'[\u0007]'), '')
+        // \f (form feed \u000c) -> \frac, \forall
+        .replaceAll(RegExp(r'[\u000c]rac\b'), r'\frac')
+        .replaceAll(RegExp(r'[\u000c]orall\b'), r'\forall')
+        .replaceAll(RegExp(r'[\u000c]'), '')
+        // Non-printable control characters (except standard \n and \t)
+        .replaceAll(RegExp(r'[\u0000-\u0006\u000e-\u001f]'), '');
+
+    // Normalize LaTeX bracket syntax \[ ... \] and \( ... \)
+    res = res.replaceAllMapped(RegExp(r'\\\[([\s\S]*?)\\\]'), (m) => '\$\$${m.group(1)}\$\$');
+    res = res.replaceAllMapped(RegExp(r'\\\(([\s\S]*?)\\\)'), (m) => '\$${m.group(1)}\$');
+
+    // Normalize empty nucleus notation (e.g. \{} -> {} before sub/superscripts in isotopes like {}^{35}_{17}Cl)
+    res = res.replaceAll(r'\{}', '{}');
+
+    // Normalize multiple dollar delimiters ($$$, $$$$, etc.) down to $$
+    res = res.replaceAll(RegExp(r'\${3,}'), r'$$');
+
+    // Matrix and tabular environment auto-healing:
+    // 1. Strip illegal internal dollar signs ($) inside matrix cells and normalize row breaks
+    res = res.replaceAllMapped(
+      RegExp(r'(\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array|align\*?)\}[\s\S]*?\\end\{\2\})'),
+      (m) {
+        final mat = m.group(1)!;
+        var clean = mat.replaceAll(r'$', '');
+        clean = clean.replaceAllMapped(
+          RegExp(r'(?<=[^\\&])\s*\\\s+(?=[0-9a-zA-Z\-\+\&\.\,\(\)\{\}\\])'),
+          (rm) => r' \\ ',
+        );
+        return clean;
+      },
+    );
+
+    // 2. Ensure any bare matrix environment outside $$ is wrapped in clean $$...$$
+    res = res.replaceAllMapped(
+      RegExp(r'(?<!\$)(?<!\\)(\\begin\{((?:v|p|b|B|V|small)?matrix|cases|array)\}[\s\S]*?\\end\{\2\})(?!\$)'),
+      (m) => '\$\$${m.group(1)}\$\$',
+    );
+
+    // Auto-heal corrupted LaTeX commands where the backslash was stripped
+    res = res
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ec\{'), r'\vec{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()hat\{'), r'\hat{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()bar\{'), r'\bar{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()dot\{'), r'\dot{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ddot\{'), r'\ddot{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()tilde\{'), r'\tilde{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()sqrt\{'), r'\sqrt{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()frac\{'), r'\frac{')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()imes(?=\s|[\$\d\w\\\{])'), r'\times')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()heta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\theta')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()lpha(?=\s|[\$\d\w\\\}\,\.\=])'), r'\alpha')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()eta(?=\s|[\$\d\w\\\}\,\.\=])'), r'\beta')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()amma(?=\s|[\$\d\w\\\}\,\.\=])'), r'\gamma')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()ambda(?=\s|[\$\d\w\\\}\,\.\=])'), r'\lambda')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()mega(?=\s|[\$\d\w\\\}\,\.\=])'), r'\omega')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()circ(?=\s|[\$\d\w\\\}\,\.\=])'), r'\circ')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()infty(?=\s|[\$\d\w\\\}\,\.\=])'), r'\infty')
+        .replaceAll(RegExp(r'(?<=\s|\$|\||^|\()approx(?=\s|[\$\d\w\\\}\,\.\=])'), r'\approx');
+
+    // Auto-heal corrupted LaTeX commands where \r was previously stripped (e.g. \left( ... ight) -> \left( ... \right))
+    res = res.replaceAllMapped(
+      RegExp(r'(\\left\s*[(\[{|.]\s*[^\\)]*?)(?:\\?r?ight|\bight)\s*([)\]}|.])'),
+      (m) => '${m.group(1)}\\right${m.group(2)}',
+    );
+    res = res.replaceAll(RegExp(r'(?<=\s|\(|\{|^)ight\b'), r'\right');
+    res = res.replaceAll(RegExp(r'(?<!\\)\bight([)\]}|.])'), r'\right$1');
+    res = res.replaceAll(RegExp(r'(?<!\\)\bightarrow\b'), r'\rightarrow');
+    res = res.replaceAll(RegExp(r'(?<!\\)\bightleftharpoons\b'), r'\rightleftharpoons');
+
+    return res;
   }
 }

@@ -90,7 +90,7 @@ class NotificationService {
       } catch (_) {}
 
       // 3. Local notification settings
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('@drawable/ic_launcher_foreground');
       const iosSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -337,6 +337,7 @@ class NotificationService {
       playSound: true,
       enableVibration: true,
       color: const Color(0xFF059669),
+      largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -405,15 +406,16 @@ class NotificationService {
         title: title,
         body: body,
         scheduledDate: scheduled800,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             channelGeneral,
             'সাধারণ নোটিশ ও টিপস',
             importance: Importance.high,
             priority: Priority.high,
             color: Color(0xFF0284C7),
+            largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
@@ -461,15 +463,16 @@ class NotificationService {
         title: title,
         body: body,
         scheduledDate: scheduled830,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             channelStreak,
             'স্ট্রিক ও পড়ার রিমাইন্ডার',
             importance: Importance.high,
             priority: Priority.high,
             color: Color(0xFFEF4444),
+            largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,

@@ -192,5 +192,36 @@ void main() {
       expect(sciSplit.paper2.isEmpty, isTrue);
       expect(sciSplit.paper1.contains('ssc_general_science'), isTrue);
     });
+
+    test('Heals BUET 10 determinant matrix with corrupted delimiters and unescaped omega', () {
+      const raw = r'২. \omega যদি 1 এর একটি জটিল ঘনমূল হয়, তবে $$$\begin{vmatrix}$ 1 & -$\omega$ & $\omega$^2 \end{vmatrix}$$$ নির্ণায়কটির মান কত';
+      final formatted = QuestionFormatter.format(raw);
+
+      expect(formatted.contains(r'$\omega$'), isTrue, reason: 'Omega should be cleanly wrapped in math mode');
+      expect(formatted.contains(r'$$\begin{vmatrix} 1 & -\omega & \omega^2 \end{vmatrix}$$'), isTrue,
+          reason: 'Determinant matrix should be clean display math with internal dollars stripped');
+      expect(formatted.contains(r'$$$'), isFalse, reason: 'Triple dollars must never appear');
+    });
+
+    test('Preserves and perfectly formats IUT 14 matrix question from database', () {
+      const raw = r'If $$\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix} = -6$$ then $$\begin{vmatrix} 3a & 3b & 3c \\ -d & -e & -f \\ 4g & 4h & 4i \end{vmatrix} = ?$$';
+      final formatted = QuestionFormatter.format(raw);
+
+      expect(formatted.contains(r'$$$'), isFalse, reason: 'Must not corrupt double dollars into triple dollars');
+      expect(formatted.contains(r'$\begin{vmatrix}$'), isFalse, reason: 'Must never put inline dollar around begin');
+      expect(formatted.contains(r'$$\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix} = -6$$'), isTrue);
+    });
+
+    test('Auto-wraps and normalizes naked matrix options without dollars', () {
+      const option1 = r'\begin{pmatrix} 4 & 10 & 18 \end{pmatrix}';
+      final formatted1 = QuestionFormatter.format(option1);
+      expect(formatted1.startsWith(r'$$') || formatted1.startsWith(r'$'), isTrue);
+      expect(formatted1.endsWith(r'$$') || formatted1.endsWith(r'$'), isTrue);
+
+      const option3 = r'\begin{pmatrix} 4 & 5 & 6 \ 8 & 10 & 12 \ 12 & 15 & 18 \end{pmatrix}';
+      final formatted3 = QuestionFormatter.format(option3);
+      expect(formatted3.contains(r'\\'), isTrue, reason: 'Single backslash row breaks must be converted to double backslash');
+      expect(formatted3.contains(r'$$'), isTrue, reason: 'Must be wrapped in display math delimiters');
+    });
   });
 }

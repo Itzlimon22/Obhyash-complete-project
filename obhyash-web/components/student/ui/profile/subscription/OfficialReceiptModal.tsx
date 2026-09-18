@@ -122,6 +122,11 @@ export default function OfficialReceiptModal({
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-neutral-200 pb-5">
               <div>
                 <div className="flex items-center gap-2.5">
+                  <img
+                    src="/app_logo.png"
+                    alt="Obhyash Logo"
+                    className="w-9 h-9 rounded-xl object-cover shadow-sm"
+                  />
                   <div className="px-2.5 py-1 bg-[#004633] text-white font-bold text-base rounded-lg leading-none tracking-wide font-['Anek_Bangla',sans-serif]">
                     অভ্যাস
                   </div>

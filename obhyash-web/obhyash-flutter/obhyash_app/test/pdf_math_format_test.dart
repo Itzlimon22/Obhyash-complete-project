@@ -20,7 +20,6 @@ void main() {
     test('Formats chemical reaction with condition over arrow', () {
       const raw = r'\text{C}_2\text{H}_5\text{OH} \xrightarrow{\text{গাঢ় } \text{H}_2\text{SO}_4, 165-170^\circ\text{C}} \text{CH}_2=\text{CH}_2 + \text{H}_2\text{O}';
       final formatted = PdfDownloadService.formatMathForPdf(raw);
-
       expect(formatted.contains('xrightarrow'), isFalse);
       expect(formatted.contains('165-170°C'), isTrue);
       expect(formatted.contains('H₂SO₄'), isTrue);
@@ -115,6 +114,35 @@ void main() {
 
       expect(list.first.subjectLabel, 'পদার্থবিজ্ঞান');
       expect(list.last.subjectLabel, 'রসায়ন');
+    });
+
+    test('Formats nested fractions and complex math expressions', () {
+      const q = r'E = \frac{\text{hc}}{\lambda}, \quad f = \frac{1}{2\pi\sqrt{LC}}';
+      final formatted = PdfDownloadService.formatMathForPdf(q);
+
+      expect(formatted.contains('frac'), isFalse);
+      expect(formatted.contains('(hc / λ)'), isTrue);
+      expect(formatted.contains('2π'), isTrue);
+      expect(formatted.contains('√LC') || formatted.contains('√(LC)'), isTrue);
+    });
+
+    test('Formats quadratic formula and roots', () {
+      const q = r'x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}, \quad y = \sqrt[3]{8}';
+      final formatted = PdfDownloadService.formatMathForPdf(q);
+
+      expect(formatted.contains(r'\sqrt'), isFalse);
+      expect(formatted.contains('±'), isTrue);
+      expect(formatted.contains('³√(8)'), isTrue);
+    });
+
+    test('Formats limits, integrals, and chemistry ce notation', () {
+      const q = r'\lim_{x \to 0} \frac{\sin x}{x} = 1, \quad \ce{Ca(OH)2 + 2HCl -> CaCl2 + 2H2O}';
+      final formatted = PdfDownloadService.formatMathForPdf(q);
+
+      expect(formatted.contains('lim(x → 0)') || formatted.contains('lim(x→0)') || formatted.contains('lim(x'), isTrue);
+      expect(formatted.contains('Ca(OH)₂'), isTrue);
+      expect(formatted.contains('CaCl₂'), isTrue);
+      expect(formatted.contains('H₂O'), isTrue);
     });
   });
 }

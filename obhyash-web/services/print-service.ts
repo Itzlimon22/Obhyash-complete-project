@@ -713,9 +713,12 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
             ${invoice.status === 'valid' || invoice.status === 'paid' ? '<div class="stamp">PAID & VALID</div>' : ''}
 
             <div class="header">
-                <div class="brand">
-                    <h1>OBHYASH</h1>
-                    <p>Academic Excellence</p>
+                <div class="brand" style="display: flex; align-items: center; gap: 14px;">
+                    <img src="/app_logo.png" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover;" alt="Obhyash Logo" />
+                    <div>
+                        <h1 style="margin: 0; line-height: 1.1;">OBHYASH</h1>
+                        <p style="margin: 2px 0 0; font-size: 11px; color: #059669; font-weight: 700; letter-spacing: 1px;">অভ্যাস এডুকেশন প্ল্যাটফর্ম</p>
+                    </div>
                 </div>
                 <div class="invoice-meta">
                     <div class="invoice-title">RECEIPT</div>
@@ -785,7 +788,7 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
             </div>
 
             <div class="footer">
-                <p><strong>Zenith / Obhyash Education Platform</strong></p>
+                <p><strong>Obhyash Education Platform</strong></p>
                 <p>Level 5, House 42, Road 7/A, Dhanmondi, Dhaka - 1209</p>
                 <p>support@obhyash.com | +880 1409-583992</p>
                 <p style="margin-top: 10px; font-style: italic;">This is a computer-generated receipt.</p>
