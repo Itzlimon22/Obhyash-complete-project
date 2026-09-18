@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:bangla_pdf/bangla_pdf.dart' as bn;
 import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
@@ -943,11 +942,7 @@ class PdfDownloadService {
         context: context.mounted ? context : null,
       );
 
-      if (file != null) {
-        try {
-          await OpenFilex.open(file.path);
-        } catch (_) {}
-      } else {
+      if (file == null) {
         await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
       }
     } catch (e) {
@@ -1422,11 +1417,7 @@ class PdfDownloadService {
         context: context.mounted ? context : null,
       );
 
-      if (file != null) {
-        try {
-          await OpenFilex.open(file.path);
-        } catch (_) {}
-      } else {
+      if (file == null) {
         await Printing.sharePdf(bytes: bytes, filename: '$filename.pdf');
       }
     } catch (e) {

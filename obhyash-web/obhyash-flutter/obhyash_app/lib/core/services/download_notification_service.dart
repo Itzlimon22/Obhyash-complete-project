@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart';
@@ -43,15 +42,6 @@ class DownloadNotificationService {
 
       await _notificationsPlugin.initialize(
         settings: initSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse response) async {
-          final filePath = response.payload;
-          if (filePath != null && filePath.isNotEmpty) {
-            final file = File(filePath);
-            if (await file.exists()) {
-              await OpenFilex.open(filePath);
-            }
-          }
-        },
       );
 
       // Create Notification Channel for Android 8.0+
@@ -191,15 +181,14 @@ class DownloadNotificationService {
         await _notificationsPlugin.show(
           id: notifId,
           title: notificationTitle,
-          body: '$finalFileName\nট্যাপ করে ফাইলটি ওপেন করুন',
+          body: '$finalFileName ডাউনলোড সম্পন্ন হয়েছে',
           notificationDetails: notifDetails,
-          payload: file.path,
         );
       } catch (notifErr) {
         debugPrint('[DownloadNotificationService] Notification error: $notifErr');
       }
 
-      // In-App Toast/SnackBar Feedback with Open Button
+      // In-App Toast/SnackBar Feedback (Clean notification without in-app file opening)
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -232,7 +221,7 @@ class DownloadNotificationService {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'সংরক্ষিত: $finalFileName',
+                        'ফাইলটি আপনার ডিভাইসে সংরক্ষিত হয়েছে: $finalFileName',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -245,15 +234,7 @@ class DownloadNotificationService {
                 ),
               ],
             ),
-            action: SnackBarAction(
-              label: 'ওপেন করুন',
-              textColor: Colors.white,
-              backgroundColor: const Color(0xFF059669),
-              onPressed: () async {
-                await OpenFilex.open(file.path);
-              },
-            ),
-            duration: const Duration(seconds: 5),
+            duration: const Duration(seconds: 4),
           ),
         );
       }

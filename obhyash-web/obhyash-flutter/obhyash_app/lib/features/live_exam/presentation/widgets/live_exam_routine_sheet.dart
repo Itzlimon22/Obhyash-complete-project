@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -585,11 +584,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
         context: context.mounted ? context : null,
       );
 
-      if (file != null) {
-        try {
-          await OpenFilex.open(file.path);
-        } catch (_) {}
-      } else {
+      if (file == null) {
         await Printing.sharePdf(bytes: bytes, filename: fileName);
       }
     } catch (_) {
