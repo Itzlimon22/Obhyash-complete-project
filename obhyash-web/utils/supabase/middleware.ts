@@ -102,7 +102,7 @@ export async function updateSession(request: NextRequest) {
     '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
     '/analysis', '/notifications', '/subscription', '/upgrade', '/profile', '/settings',
     '/referral', '/complaint', '/feature-requests', '/bookmarks',
-    '/account-info', '/account-linking', '/delete-account', '/info',
+    '/account-info', '/account-linking', '/info',
     '/legends-league', '/legends_league', '/live_exam',
     // Deep links — dynamic sub-paths
     '/leaderboard/user', // /leaderboard/user/[userId]
