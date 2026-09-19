@@ -126,12 +126,33 @@ export default function LoginPage() {
       }
 
       // Login Success!
-      // Set role cache cookie immediately so middleware hits its fast-path (0ms) without querying DB
+      // Fetch actual role from public.users so Admin and Teacher accounts redirect properly
       if (user) {
-        const role = (user.user_metadata?.role || user.app_metadata?.role || 'Student').toLowerCase();
+        let role = (user.user_metadata?.role || user.app_metadata?.role || '').toLowerCase();
+        let status = 'Active';
+
+        try {
+          const { data: profileRow } = await supabase
+            .from('users')
+            .select('role, status')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (profileRow?.role) {
+            role = profileRow.role.toLowerCase();
+          }
+          if (profileRow?.status) {
+            status = profileRow.status || 'Active';
+          }
+        } catch {
+          // non-fatal fallback
+        }
+
+        if (!role) role = 'student';
+
         try {
           const roleCookieValue = encodeURIComponent(
-            JSON.stringify({ userId: user.id, role, status: 'Active' })
+            JSON.stringify({ userId: user.id, role, status })
           );
           document.cookie = `obhyash_role_cache=${roleCookieValue}; path=/; max-age=180; SameSite=Lax`;
         } catch {
