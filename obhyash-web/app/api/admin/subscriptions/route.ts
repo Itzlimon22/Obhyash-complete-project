@@ -24,19 +24,19 @@ export async function GET(request: NextRequest) {
       console.warn('Error fetching payment_requests:', e);
     }
 
-    // 2. Safely Fetch UddoktaPay & Online Payment Transactions
+    // 2. Safely Fetch Online Payment Transactions
     let paymentTransactionsRaw: any[] = [];
     try {
       const { data: txs, error: txsError } = await supabaseAdmin
-        .from('payment_transactions')
+        .from('transactions')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
 
       if (!txsError && txs) {
         paymentTransactionsRaw = txs;
       }
     } catch (e) {
-      console.warn('Error fetching payment_transactions:', e);
+      console.warn('Error fetching transactions:', e);
     }
 
     // Collect all user IDs involved in payments
@@ -502,7 +502,7 @@ export async function POST(request: NextRequest) {
           title: 'পেমেন্ট সফল ও প্ল্যান সক্রিয়!',
           message: `আপনার ${planDisplayName} প্ল্যানের পেমেন্ট অনুমোদিত হয়েছে। মেয়াদ: ${expiryDate.toLocaleDateString('bn-BD')} পর্যন্ত।`,
           type: 'success',
-          read: false,
+          is_read: false,
           created_at: now.toISOString(),
         });
       } else if (status === 'Rejected') {
@@ -514,7 +514,7 @@ export async function POST(request: NextRequest) {
             ? `আপনার পেমেন্ট রিকোয়েস্টটি প্রত্যাখ্যাত হয়েছে। কারণ: ${adminNotes}`
             : 'আপনার পেমেন্ট রিকোয়েস্টটি প্রত্যাখ্যাত হয়েছে। সঠিক তথ্য দিয়ে পুনরায় চেষ্টা করুন।',
           type: 'warning',
-          read: false,
+          is_read: false,
           created_at: now.toISOString(),
         });
       }
@@ -597,7 +597,7 @@ export async function POST(request: NextRequest) {
           title: 'প্রিমিয়াম সাবস্ক্রিপশন আপডেট 🎉',
           message: `আপনার ${planTitle} সাবস্ক্রিপশন সফলভাবে ${numDays} দিনের জন্য বাড়ানো হয়েছে। নতুন মেয়াদ: ${newExpiry.toLocaleDateString('bn-BD')}।`,
           type: 'success',
-          read: false,
+          is_read: false,
           created_at: new Date().toISOString(),
         });
       } catch (_) {}
@@ -650,7 +650,7 @@ export async function POST(request: NextRequest) {
           title: 'সাবস্ক্রিপশন স্ট্যাটাস আপডেট ⚠️',
           message: reason,
           type: 'warning',
-          read: false,
+          is_read: false,
           created_at: new Date().toISOString(),
         });
       } catch (_) {}
@@ -674,7 +674,7 @@ export async function POST(request: NextRequest) {
         title,
         message,
         type,
-        read: false,
+        is_read: false,
         created_at: new Date().toISOString(),
       });
 

@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       supabaseAdmin
         .from('users')
         .select('*', { count: 'exact', head: true })
-        .or('plan.eq.pro,plan.eq.premium,is_subscribed.eq.true'),
+        .or('is_subscribed.eq.true,subscription_status.eq.Active,subscription_status.eq.active'),
       // 2. Questions
       supabaseAdmin.from('questions').select('*', { count: 'exact', head: true }),
       supabaseAdmin
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
         .select('*', { count: 'exact', head: true })
         .in('status', ['Pending', 'pending']),
       supabaseAdmin
-        .from('complaints')
+        .from('app_complaints')
         .select('*', { count: 'exact', head: true })
         .in('status', ['Open', 'open', 'Pending', 'pending']),
       // 6. Master App Config
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
       // 7. Recent 50 exam submissions to compute 24h hourly distribution & top subjects
       supabaseAdmin
         .from('exam_results')
-        .select('subject, chapter, created_at, score, total_marks')
+        .select('subject, chapters, created_at, score, total_marks')
         .gte('created_at', todayStart.toISOString())
         .order('created_at', { ascending: false })
         .limit(100),
@@ -109,8 +109,14 @@ export async function GET(request: Request) {
       if (item.subject) {
         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
       }
-      if (item.chapter) {
-        chapterCounts[item.chapter] = (chapterCounts[item.chapter] || 0) + 1;
+      if (item.chapters) {
+        if (Array.isArray(item.chapters)) {
+          item.chapters.forEach((ch: string) => {
+            if (ch) chapterCounts[ch] = (chapterCounts[ch] || 0) + 1;
+          });
+        } else if (typeof item.chapters === 'string') {
+          chapterCounts[item.chapters] = (chapterCounts[item.chapters] || 0) + 1;
+        }
       }
       if (item.created_at) {
         const hour = new Date(item.created_at).getHours();

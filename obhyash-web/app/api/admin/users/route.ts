@@ -233,7 +233,7 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
         supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
         supabaseAdmin.from('users').select('*', { count: 'exact', head: true }).eq('role', 'Student'),
-        supabaseAdmin.from('users').select('subscription, is_subscribed, subscription_status, subscription_expires_at, plan'),
+        supabaseAdmin.from('users').select('subscription, is_subscribed, subscription_status, subscription_expires_at'),
       ]);
 
       totalCount = totalRes.count ?? totalCount;
@@ -318,16 +318,88 @@ export async function PATCH(request: NextRequest) {
       if (!userId || !plan) {
         return NextResponse.json({ success: false, error: 'Missing userId or plan' }, { status: 400 });
       }
-      const expiryIso = expiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const isFree = plan.toLowerCase() === 'free';
+      const subStatus = (status || (isFree ? 'Inactive' : 'Active')).trim();
+      const isSubActive = !isFree && subStatus.toLowerCase() === 'active';
+      const expiryIso = isFree ? null : (expiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());
+
       const { error } = await supabaseAdmin.from('users').update({
-        subscription: { plan, status: 'Active', expiry: expiryIso },
-        is_subscribed: true,
-        subscription_status: 'active',
+        subscription: {
+          plan,
+          status: subStatus,
+          expiry: expiryIso,
+        },
+        is_subscribed: isSubActive,
+        subscription_status: isSubActive ? 'active' : (isFree ? 'inactive' : subStatus.toLowerCase()),
         subscription_expires_at: expiryIso,
-        plan,
       }).eq('id', userId);
+
       if (error) throw error;
+
+      // Log activity
+      try {
+        await supabaseAdmin.from('user_activity_log').insert({
+          user_id: userId,
+          activity_type: 'subscription_update',
+          description: `Admin updated subscription: Plan=${plan}, Status=${subStatus}, Expiry=${expiryIso ? new Date(expiryIso).toLocaleDateString() : 'None'}`,
+          metadata: {
+            plan,
+            status: subStatus,
+            expiry: expiryIso,
+            admin_reason: body.reason || '',
+          },
+        });
+      } catch (_) {}
+
       return NextResponse.json({ success: true, message: `Subscription updated to ${plan}` });
+    }
+
+    if (action === 'update_profile') {
+      if (!userId || !body.payload) {
+        return NextResponse.json({ success: false, error: 'Missing userId or payload' }, { status: 400 });
+      }
+
+      // Filter payload strictly to valid users table columns
+      const allowedCols = [
+        'name', 'email', 'phone', 'role', 'status', 'avatar_url', 'avatar_color',
+        'institute', 'division', 'batch', 'stream', 'target', 'exam_target',
+        'batch_change_count', 'ssc_roll', 'ssc_reg', 'ssc_board', 'ssc_passing_year',
+        'optional_subject', 'gender', 'dob', 'address', 'xp', 'level', 'streak',
+        'daily_exams_goal', 'is_subscribed', 'subscription_status', 'subscription_expires_at',
+        'is_phone_verified', 'is_email_verified'
+      ];
+
+      const cleanPayload: Record<string, any> = {
+        updated_at: new Date().toISOString(),
+      };
+
+      for (const col of allowedCols) {
+        if (body.payload[col] !== undefined) {
+          cleanPayload[col] = body.payload[col];
+        }
+      }
+
+      const { error } = await supabaseAdmin
+        .from('users')
+        .update(cleanPayload)
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Log activity
+      try {
+        await supabaseAdmin.from('user_activity_log').insert({
+          user_id: userId,
+          activity_type: 'ADMIN_PROFILE_UPDATE',
+          description: `Admin updated profile details for user ${cleanPayload.name || cleanPayload.email || userId}`,
+          metadata: {
+            updated_fields: Object.keys(cleanPayload),
+          },
+          created_at: new Date().toISOString(),
+        });
+      } catch (_) {}
+
+      return NextResponse.json({ success: true, message: 'User profile updated successfully' });
     }
 
     if (action === 'bulk_status') {
@@ -346,6 +418,30 @@ export async function PATCH(request: NextRequest) {
       const { error } = await supabaseAdmin.from('users').update({ role }).in('id', userIds);
       if (error) throw error;
       return NextResponse.json({ success: true, message: `${userIds.length} users role updated to ${role}` });
+    }
+
+    if (action === 'bulk_subscription') {
+      if (!Array.isArray(userIds) || userIds.length === 0 || !plan) {
+        return NextResponse.json({ success: false, error: 'Missing userIds or plan' }, { status: 400 });
+      }
+      const isFree = plan.toLowerCase() === 'free';
+      const subStatus = (status || (isFree ? 'Inactive' : 'Active')).trim();
+      const isSubActive = !isFree && subStatus.toLowerCase() === 'active';
+      const expiryIso = isFree ? null : (expiry || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      const { error } = await supabaseAdmin.from('users').update({
+        subscription: {
+          plan,
+          status: subStatus,
+          expiry: expiryIso,
+        },
+        is_subscribed: isSubActive,
+        subscription_status: isSubActive ? 'active' : (isFree ? 'inactive' : subStatus.toLowerCase()),
+        subscription_expires_at: expiryIso,
+      }).in('id', userIds);
+
+      if (error) throw error;
+      return NextResponse.json({ success: true, message: `${userIds.length} users subscription updated to ${plan}` });
     }
 
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });

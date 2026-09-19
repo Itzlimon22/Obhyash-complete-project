@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
+import { X, Calendar, AlertTriangle, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/lib/types';
 
@@ -11,83 +10,113 @@ interface ManageSubscriptionModalProps {
   onUpdate: () => void;
 }
 
+const PLAN_OPTIONS = [
+  { id: 'Free', label: 'Free Plan', days: 0 },
+  { id: '1 Month', label: '১ মাস (1 Month - ৳১৪৯)', days: 30 },
+  { id: '3 Months', label: '৩ মাস (3 Months - ৳৩৪৯)', days: 90 },
+  { id: '6 Months', label: '৬ মাস (6 Months - ৳৫৯৯)', days: 180 },
+  { id: '1 Year', label: '১ বছর (1 Year - ৳৯৯৯)', days: 365 },
+  { id: 'Lifetime', label: 'লাইফটাইম (Lifetime Access)', days: 3650 },
+];
+
 export default function ManageSubscriptionModal({
   isOpen,
   onClose,
   user,
   onUpdate,
 }: ManageSubscriptionModalProps) {
+  const [plan, setPlan] = useState<string>('Free');
   const [status, setStatus] = useState<string>('Active');
-  const [extensionDays, setExtensionDays] = useState<number>(0);
-  const [newExpiry, setNewExpiry] = useState<string>('');
+  const [expiryDate, setExpiryDate] = useState<string>('');
   const [reason, setReason] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user && user.subscription) {
-      setStatus(user.subscription.status || 'Active');
-      setNewExpiry(user.subscription.expiry || new Date().toISOString());
-      setExtensionDays(0);
+    if (user && isOpen) {
+      const currentPlan = user.subscription?.plan || 'Free';
+      const currentStatus = user.subscription?.status || (currentPlan === 'Free' ? 'Inactive' : 'Active');
+      setPlan(currentPlan);
+      setStatus(currentStatus);
       setReason('');
+
+      if (user.subscription?.expiry) {
+        const d = new Date(user.subscription.expiry);
+        if (!isNaN(d.getTime())) {
+          setExpiryDate(d.toISOString().split('T')[0]);
+        } else {
+          setExpiryDate('');
+        }
+      } else {
+        setExpiryDate('');
+      }
     }
   }, [user, isOpen]);
 
-  // Auto-calculate new date when days change
-  useEffect(() => {
-    if (user?.subscription?.expiry && extensionDays !== 0) {
-      const current = new Date(user.subscription.expiry);
-      // Valid date check
-      if (!isNaN(current.getTime())) {
-        current.setDate(current.getDate() + extensionDays);
-        setNewExpiry(current.toISOString());
-      }
+  const handlePlanChange = (newPlan: string) => {
+    setPlan(newPlan);
+    if (newPlan === 'Free') {
+      setStatus('Inactive');
+      setExpiryDate('');
+    } else {
+      setStatus('Active');
+      const opt = PLAN_OPTIONS.find((p) => p.id === newPlan);
+      const days = opt ? opt.days : 30;
+      const target = new Date();
+      target.setDate(target.getDate() + days);
+      setExpiryDate(target.toISOString().split('T')[0]);
     }
-  }, [extensionDays, user]);
+  };
+
+  const handleAddDays = (days: number) => {
+    const base = expiryDate ? new Date(expiryDate) : new Date();
+    const current = isNaN(base.getTime()) ? new Date() : base;
+    current.setDate(current.getDate() + days);
+    setExpiryDate(current.toISOString().split('T')[0]);
+    if (plan === 'Free') {
+      setPlan('1 Month');
+      setStatus('Active');
+    }
+  };
 
   const handleSubmit = async () => {
     if (!user) return;
     setIsLoading(true);
-    const supabase = createClient();
 
     try {
-      // 1. Update User Subscription JSON & Dedicated DB Security Columns
-      const isSubActive = status === 'Active' && new Date(newExpiry) > new Date();
-      const updatedSubscription = {
-        ...user.subscription,
-        status: status,
-        expiry: newExpiry,
-      };
+      const isFree = plan === 'Free';
+      let expiryIso: string | null = null;
+      if (!isFree && expiryDate) {
+        const d = new Date(expiryDate);
+        d.setHours(23, 59, 59, 999);
+        expiryIso = d.toISOString();
+      }
 
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          subscription: updatedSubscription,
-          is_subscribed: isSubActive,
-          subscription_status: status.toLowerCase(),
-          subscription_expires_at: newExpiry,
-        })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      // 2. Log Activity
-      await supabase.from('user_activity_log').insert({
-        user_id: user.id,
-        activity_type: 'subscription_update',
-        description: `Admin updated subscription: Status=${status}, Expiry=${new Date(newExpiry).toLocaleDateString()}`,
-        metadata: {
-          previous_status: user.subscription?.status,
-          new_status: status,
-          admin_reason: reason,
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          action: 'update_subscription',
+          userId: user.id,
+          plan,
+          status: isFree ? 'Inactive' : status,
+          expiry: expiryIso,
+          reason: reason.trim(),
+        }),
       });
 
-      toast.success('Subscription updated successfully');
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update subscription');
+      }
+
+      toast.success(data.message || 'Subscription updated successfully');
       onUpdate();
       onClose();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error updating subscription:', error);
-      toast.error('Failed to update subscription');
+      toast.error(error.message || 'Failed to update subscription');
     } finally {
       setIsLoading(false);
     }
@@ -95,17 +124,20 @@ export default function ManageSubscriptionModal({
 
   if (!isOpen || !user) return null;
 
+  const isFree = plan === 'Free';
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl w-full max-w-md border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl w-full max-w-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
+        <div className="p-5 sm:p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
           <div>
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-emerald-500" />
               Manage Subscription
             </h3>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              for {user.name}
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              for <span className="font-semibold text-neutral-800 dark:text-neutral-200">{user.name}</span> ({user.email || user.phone || 'No contact'})
             </p>
           </div>
           <button
@@ -116,116 +148,149 @@ export default function ManageSubscriptionModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
-          {/* Current Info */}
-          <div className="flex gap-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
+        <div className="p-5 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+          {/* Current Info Banner */}
+          <div className="flex gap-4 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
             <div className="flex-1">
               <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
                 Current Plan
               </p>
-              <p className="font-bold text-emerald-900 dark:text-emerald-100">
+              <p className="font-bold text-sm sm:text-base text-emerald-950 dark:text-emerald-100">
                 {user.subscription?.plan || 'Free'}
               </p>
             </div>
             <div className="flex-1 text-right">
               <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
-                Expiry
+                Current Expiry
               </p>
-              <p className="font-mono text-sm text-emerald-900 dark:text-emerald-100">
+              <p className="font-mono text-xs sm:text-sm text-emerald-950 dark:text-emerald-100 font-medium">
                 {user.subscription?.expiry
-                  ? new Date(user.subscription.expiry).toLocaleDateString()
-                  : 'N/A'}
+                  ? new Date(user.subscription.expiry).toLocaleDateString('bn-BD', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : 'N/A (Free)'}
               </p>
             </div>
           </div>
 
-          {/* Status Change */}
+          {/* Select Subscription Plan */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
-              Subscription Status
+            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+              Select Package / Plan
             </label>
             <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              value={plan}
+              onChange={(e) => handlePlanChange(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
             >
-              <option value="Active">Active</option>
-              <option value="Paused">Paused</option>
-              <option value="Canceled">Canceled</option>
-              <option value="Past Due">Past Due</option>
+              {PLAN_OPTIONS.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Extension */}
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5 flex justify-between">
-              <span>Extend Duration (Days)</span>
-              <span className="text-xs text-neutral-500 font-normal">
-                Adds to current expiry
-              </span>
-            </label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setExtensionDays((d) => d + 7)}
-                className="px-3 py-1.5 text-xs font-medium bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors"
+          {/* Status Change (Only if not Free) */}
+          {!isFree && (
+            <div>
+              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                Subscription Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
               >
-                +7 Days
-              </button>
-              <button
-                onClick={() => setExtensionDays((d) => d + 30)}
-                className="px-3 py-1.5 text-xs font-medium bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors"
-              >
-                +30 Days
-              </button>
-              <input
-                type="number"
-                value={extensionDays}
-                onChange={(e) =>
-                  setExtensionDays(parseInt(e.target.value) || 0)
-                }
-                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm outline-none focus:border-emerald-500"
-              />
-            </div>
-          </div>
-
-          {/* New Expiry Preview */}
-          {extensionDays !== 0 && (
-            <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg">
-              <Clock size={16} />
-              <span>
-                New Expiry:{' '}
-                <strong>{new Date(newExpiry).toLocaleDateString()}</strong>
-              </span>
+                <option value="Active">Active (সক্রিয়)</option>
+                <option value="Paused">Paused (স্থগিত)</option>
+                <option value="Canceled">Canceled (বাতিল)</option>
+                <option value="Past Due">Past Due (মেয়াদোত্তীর্ণ)</option>
+              </select>
             </div>
           )}
 
-          {/* Reason */}
+          {/* Expiry Date & Extension (Only if not Free) */}
+          {!isFree && (
+            <div>
+              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 flex justify-between items-center">
+                <span>Expiration Date</span>
+                <span className="text-xs text-neutral-500 font-normal">মেয়াদ শেষ হওয়ার তারিখ</span>
+              </label>
+
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 mb-2"
+              />
+
+              {/* Quick Extend Buttons */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleAddDays(7)}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                >
+                  +৭ দিন
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddDays(30)}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                >
+                  +১ মাস (+৩০ দিন)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddDays(90)}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                >
+                  +৩ মাস (+৯০ দিন)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddDays(180)}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                >
+                  +৬ মাস (+১৮০ দিন)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Reason Note */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
-              Admin Reason / Note
+            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+              Admin Note / Reason <span className="text-xs font-normal text-neutral-500">(ঐচ্ছিক)</span>
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Why are you changing this?"
-              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none h-20 resize-none"
+              placeholder="সাবস্ক্রিপশন পরিবর্তন বা প্রদানের কারণ (যেমন: বিকাশ পেমেন্ট ভেরিফাইড / গিফট)"
+              className="w-full px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none h-18 resize-none"
             />
           </div>
         </div>
 
-        <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 flex justify-end gap-3">
+        {/* Footer */}
+        <div className="p-4 sm:p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 flex justify-end gap-3">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            className="px-4 py-2.5 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={isLoading}
-            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isLoading ? 'Updating...' : 'Save Changes'}
+            {isLoading ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>

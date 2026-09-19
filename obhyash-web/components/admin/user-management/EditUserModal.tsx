@@ -100,8 +100,7 @@ export default function EditUserModal({
         batch: formData.batch.trim() || null,
         stream: formData.stream || null,
         target: formData.target.trim() || null,
-        goal: formData.goal || null,
-        exam_target: formData.exam_target || null,
+        exam_target: formData.exam_target || formData.goal || null,
         batch_change_count: Number(formData.batch_change_count) || 0,
 
         // SSC
@@ -115,7 +114,6 @@ export default function EditUserModal({
         gender: formData.gender || null,
         dob: formData.dob || null,
         address: formData.address.trim() || null,
-        bio: formData.bio.trim() || null,
 
         // Gamification
         xp: Number(formData.xp) || 0,
@@ -125,25 +123,26 @@ export default function EditUserModal({
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from('users')
-        .update(payload)
-        .eq('id', formData.id);
+      // 1. Dispatch to Server Admin API (uses service role, bypasses RLS safely and logs audit)
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_profile',
+          userId: formData.id,
+          payload,
+        }),
+      });
 
-      if (error) throw error;
-
-      // Log activity
-      try {
-        await supabase.from('user_activity_log').insert({
-          user_id: formData.id,
-          activity_type: 'ADMIN_PROFILE_UPDATE',
-          description: `Admin updated profile details for ${formData.name || formData.email}`,
-          metadata: {
-            updated_fields: Object.keys(payload),
-          },
-          created_at: new Date().toISOString(),
-        });
-      } catch (_) {}
+      const resData = await res.json();
+      if (!resData.success) {
+        // Fallback to client supabase if api returned non-success
+        const { error } = await supabase
+          .from('users')
+          .update(payload)
+          .eq('id', formData.id);
+        if (error) throw new Error(resData.error || error.message);
+      }
 
       toast.success('User profile updated successfully');
       onSuccess();

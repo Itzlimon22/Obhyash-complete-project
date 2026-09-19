@@ -18,13 +18,18 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select('id, name, email, phone, role, plan, is_subscribed, status, created_at, exams_taken, xp')
+      .select('id, name, email, phone, role, subscription, is_subscribed, subscription_status, status, created_at, exams_taken, xp')
       .or(`email.ilike.%${query}%,name.ilike.%${query}%,phone.ilike.%${query}%`)
       .limit(8);
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true, data: data || [] });
+    const formattedData = (data || []).map((u: any) => ({
+      ...u,
+      plan: u.subscription?.plan?.toLowerCase() || (u.is_subscribed ? 'pro' : 'free'),
+    }));
+
+    return NextResponse.json({ success: true, data: formattedData });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, error: err.message || 'User search failed' },
@@ -52,8 +57,18 @@ export async function PATCH(request: NextRequest) {
     };
 
     if (action === 'toggle_plan') {
-      updateFields.plan = value; // 'free' | 'pro' | 'premium'
-      updateFields.is_subscribed = value !== 'free';
+      const isSub = value !== 'free';
+      const planCap = value === 'pro' ? 'Pro' : value === 'premium' ? 'Premium' : 'Free';
+      const expiry = isSub ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null;
+
+      updateFields.is_subscribed = isSub;
+      updateFields.subscription_status = isSub ? 'Active' : 'Inactive';
+      updateFields.subscription = {
+        plan: planCap,
+        status: isSub ? 'Active' : 'Inactive',
+        expiry,
+      };
+      updateFields.subscription_expires_at = expiry;
     } else if (action === 'toggle_role') {
       updateFields.role = value; // 'student' | 'teacher' | 'admin'
     } else if (action === 'toggle_status') {

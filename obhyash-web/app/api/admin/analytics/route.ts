@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       supabaseAdmin
         .from('users')
         .select('*', { count: 'exact', head: true })
-        .or('plan.eq.pro,plan.eq.premium,is_subscribed.eq.true'),
+        .or('is_subscribed.eq.true,subscription_status.eq.Active,subscription_status.eq.active'),
       // 6. All registered users for name & xp mapping
       supabaseAdmin
         .from('users')

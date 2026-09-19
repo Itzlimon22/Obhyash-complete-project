@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
 
       await supabaseAdmin
         .from('live_exams')
-        .update({ total_questions: count || 0, updated_at: new Date().toISOString() })
+        .update({ updated_at: new Date().toISOString() })
         .eq('id', examId);
 
       return NextResponse.json({ success: true, count });
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
 
       await supabaseAdmin
         .from('live_exams')
-        .update({ total_questions: count || 0, updated_at: new Date().toISOString() })
+        .update({ updated_at: new Date().toISOString() })
         .eq('id', examId);
 
       return NextResponse.json({ success: true, count: toAdd.length, total: count });
@@ -323,7 +323,7 @@ export async function POST(request: NextRequest) {
 
         await supabaseAdmin
           .from('live_exams')
-          .update({ total_questions: count || 0, updated_at: new Date().toISOString() })
+          .update({ updated_at: new Date().toISOString() })
           .eq('id', examId);
       }
 
@@ -417,7 +417,7 @@ export async function POST(request: NextRequest) {
 
         await supabaseAdmin
           .from('live_exams')
-          .update({ total_questions: count || 0, updated_at: new Date().toISOString() })
+          .update({ updated_at: new Date().toISOString() })
           .eq('id', examId);
       }
 

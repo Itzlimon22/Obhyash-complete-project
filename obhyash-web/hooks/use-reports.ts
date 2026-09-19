@@ -83,7 +83,7 @@ export const useReports = () => {
         const { error: qError } = await supabase
           .from('questions')
           .update({
-            content: updatedData.question,
+            question: updatedData.question,
             explanation: updatedData.explanation,
           })
           .eq('id', questionId);
