@@ -378,6 +378,9 @@ export async function POST(request: NextRequest) {
 
       const now = new Date();
 
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validReviewedBy = (reviewedBy && isUuid.test(reviewedBy)) ? reviewedBy : null;
+
       // Update payment request status
       const { error: updateReqErr } = await supabaseAdmin
         .from('payment_requests')
@@ -385,7 +388,7 @@ export async function POST(request: NextRequest) {
           status,
           admin_notes: adminNotes || '',
           reviewed_at: now.toISOString(),
-          reviewed_by: reviewedBy || null,
+          reviewed_by: validReviewedBy,
           updated_at: now.toISOString(),
         })
         .eq('id', requestId);
@@ -501,7 +504,8 @@ export async function POST(request: NextRequest) {
           user_id: reqData.user_id,
           title: 'পেমেন্ট সফল ও প্ল্যান সক্রিয়!',
           message: `আপনার ${planDisplayName} প্ল্যানের পেমেন্ট অনুমোদিত হয়েছে। মেয়াদ: ${expiryDate.toLocaleDateString('bn-BD')} পর্যন্ত।`,
-          type: 'success',
+          type: 'system',
+          metadata: { alert_type: 'success' },
           is_read: false,
           created_at: now.toISOString(),
         });
@@ -513,7 +517,8 @@ export async function POST(request: NextRequest) {
           message: adminNotes
             ? `আপনার পেমেন্ট রিকোয়েস্টটি প্রত্যাখ্যাত হয়েছে। কারণ: ${adminNotes}`
             : 'আপনার পেমেন্ট রিকোয়েস্টটি প্রত্যাখ্যাত হয়েছে। সঠিক তথ্য দিয়ে পুনরায় চেষ্টা করুন।',
-          type: 'warning',
+          type: 'system',
+          metadata: { alert_type: 'warning' },
           is_read: false,
           created_at: now.toISOString(),
         });
@@ -580,12 +585,23 @@ export async function POST(request: NextRequest) {
 
       if (updateErr) throw updateErr;
 
-      // Update subscription_history
+      // Update subscription_history (or insert if not exists)
       try {
-        await supabaseAdmin
+        const { data: updatedHist } = await supabaseAdmin
           .from('subscription_history')
           .update({ expires_at: newExpiry.toISOString(), is_active: true })
-          .eq('user_id', targetUserId);
+          .eq('user_id', targetUserId)
+          .select();
+
+        if (!updatedHist || updatedHist.length === 0) {
+          await supabaseAdmin.from('subscription_history').insert({
+            user_id: targetUserId,
+            started_at: new Date().toISOString(),
+            expires_at: newExpiry.toISOString(),
+            is_active: true,
+            created_at: new Date().toISOString(),
+          });
+        }
       } catch (histErr) {
         console.error('Error updating subscription_history on extend:', histErr);
       }
@@ -596,7 +612,8 @@ export async function POST(request: NextRequest) {
           user_id: targetUserId,
           title: 'প্রিমিয়াম সাবস্ক্রিপশন আপডেট 🎉',
           message: `আপনার ${planTitle} সাবস্ক্রিপশন সফলভাবে ${numDays} দিনের জন্য বাড়ানো হয়েছে। নতুন মেয়াদ: ${newExpiry.toLocaleDateString('bn-BD')}।`,
-          type: 'success',
+          type: 'system',
+          metadata: { alert_type: 'success' },
           is_read: false,
           created_at: new Date().toISOString(),
         });
@@ -649,7 +666,8 @@ export async function POST(request: NextRequest) {
           user_id: userId,
           title: 'সাবস্ক্রিপশন স্ট্যাটাস আপডেট ⚠️',
           message: reason,
-          type: 'warning',
+          type: 'system',
+          metadata: { alert_type: 'warning' },
           is_read: false,
           created_at: new Date().toISOString(),
         });
@@ -669,11 +687,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const allowedTypes = ['system', 'announcement', 'exam_result', 'achievement', 'level_up'];
+      const safeType = allowedTypes.includes(type) ? type : 'system';
+
       const { error: notifErr } = await supabaseAdmin.from('notifications').insert({
         user_id: userId,
         title,
         message,
-        type,
+        type: safeType,
+        metadata: { custom_type: type },
         is_read: false,
         created_at: new Date().toISOString(),
       });

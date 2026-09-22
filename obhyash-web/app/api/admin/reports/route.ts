@@ -350,7 +350,8 @@ async function rewardReporter(supabaseAdmin: any, reporterId: string, now: Date)
       title: 'রিপোর্ট গৃহীত ও ১ দিনের প্রো রিওয়ার্ড! 🎁',
       message:
         'আপনার পাঠানো প্রশ্নের ত্রুটি রিপোর্টটি ভেরিফাই করে সমাধান করা হয়েছে। সহযোগিতার জন্য আপনাকে ১ দিনের প্রো সাবস্ক্রিপশন রিওয়ার্ড দেওয়া হয়েছে!',
-      type: 'reward',
+      type: 'system',
+      metadata: { alert_type: 'reward' },
       is_read: false,
       created_at: now.toISOString(),
     });
