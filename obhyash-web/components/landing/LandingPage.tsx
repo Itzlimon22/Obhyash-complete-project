@@ -894,7 +894,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <GraduationCap className="w-5 h-5" />
               </div>
               <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-                ২০,০০০+
+                ৫০০+
               </h3>
               <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
                 সক্রিয় শিক্ষার্থী
@@ -1318,7 +1318,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <span className="font-sans font-black">৪.৯/৫ রেটিং</span>
               <span className="opacity-40">•</span>
-              <span>২০,০০০+ শিক্ষার্থীর আস্থা</span>
+              <span>৫০০+ শিক্ষার্থীর আস্থা</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white">
               শিক্ষার্থীদের সাফল্যের অভিজ্ঞতা
