@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import BlogThemeToggle from './BlogThemeToggle';
 
 export default function BlogHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -58,8 +59,11 @@ export default function BlogHeader() {
           </Link>
         </nav>
 
-        {/* Right: Search icon (mobile) + Dashboard CTA */}
+        {/* Right: Theme Toggle + Search icon (mobile) + Dashboard CTA */}
         <div className="flex items-center gap-2">
+          {/* Blog Theme Toggle */}
+          <BlogThemeToggle />
+
           {/* Search icon — mobile only */}
           <Link
             href="/blog/search"

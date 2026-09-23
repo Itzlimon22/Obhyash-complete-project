@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import BlogHeader from '@/components/blog/BlogHeader';
 import BlogFooter from '@/components/blog/BlogFooter';
+import { BlogThemeProvider } from '@/components/blog/BlogThemeContext';
 
 export const metadata: Metadata = {
   title: {
@@ -43,10 +44,12 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF6F3] dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans tracking-tight">
-      <BlogHeader />
-      <main className="flex-1">{children}</main>
-      <BlogFooter />
-    </div>
+    <BlogThemeProvider>
+      <div className="min-h-screen flex flex-col bg-[#FAF6F3] dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans tracking-tight transition-colors duration-200">
+        <BlogHeader />
+        <main className="flex-1">{children}</main>
+        <BlogFooter />
+      </div>
+    </BlogThemeProvider>
   );
 }

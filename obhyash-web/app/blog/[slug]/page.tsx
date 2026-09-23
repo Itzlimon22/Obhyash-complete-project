@@ -697,11 +697,8 @@ export default async function BlogPostPage({
             {/* Emoji Reactions */}
             <EmojiReactions slug={post.slug} />
 
-            {/* Comments Section */}
-            <CommentSection postSlug={post.slug} />
-
             {/* Share + Save Bar */}
-            <div className="flex flex-wrap items-center gap-2.5 mt-5 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
+            <div className="flex flex-wrap items-center gap-2.5 mt-6 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
               <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-anek">
                 শেয়ার ও সেভ
               </span>
@@ -713,7 +710,7 @@ export default async function BlogPostPage({
             </div>
 
             {/* Author Bio block */}
-            <div className="mt-5 mb-4 p-5 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
+            <div className="mt-6 mb-6 p-5 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
               <div className="flex items-start gap-4">
                 <div className="w-11 h-11 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg">
                   {post.author.initials}
@@ -739,6 +736,11 @@ export default async function BlogPostPage({
 
             {/* Newsletter Subscription */}
             <NewsletterSubscribe />
+
+            {/* Comments Section */}
+            <div className="mt-10">
+              <CommentSection postSlug={post.slug} />
+            </div>
           </article>
         </div>
       </div>
