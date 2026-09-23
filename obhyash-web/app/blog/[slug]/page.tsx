@@ -40,7 +40,6 @@ import 'katex/dist/katex.min.css';
 import ProgressBar from '@/components/blog/ProgressBar';
 import MermaidRenderer from '@/components/blog/MermaidRenderer';
 import SocialShare from '@/components/blog/SocialShare';
-import TableOfContents from '@/components/blog/TableOfContents';
 import CommentSection from '@/components/blog/CommentSection';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
@@ -123,24 +122,6 @@ export default async function BlogPostPage({
     keywords: post.tags.join(', '),
     url: `https://obhyash.com/blog/${post.slug}`,
   };
-
-  // Extract headings for Table of Contents
-  const extractHeadings = (markdown: string) => {
-    const headingRegex = /^(#{2,3})\s+(.+)$/gm;
-    const items = [];
-    let match;
-    while ((match = headingRegex.exec(markdown)) !== null) {
-      const level = match[1].length;
-      const text = match[2].trim();
-      const id = text
-        .toLowerCase()
-        .replace(/[^a-z0-9\u0980-\u09FF]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      items.push({ id, text, level });
-    }
-    return items;
-  };
-  const tocItems = extractHeadings(post.content);
 
   // Custom Markdown Callout components
   const MarkdownComponents = {
@@ -600,46 +581,7 @@ export default async function BlogPostPage({
               ব্লগে ফিরে যাও
             </Link>
 
-            {/* Top Cards: Table of Contents & Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
-              <TableOfContents items={tocItems} />
 
-              {/* Reading info card */}
-              <div className="rounded-2xl bg-[#fafafa] dark:bg-[#111] p-5 space-y-3 font-anek">
-                <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  আর্টিকেল তথ্য
-                </h3>
-                <div className="space-y-3 sm:space-y-4 text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 mt-3 sm:mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> পড়ার সময়
-                    </span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {post.readTime} মিনিট
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />{' '}
-                      প্রকাশিত
-                    </span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {formatDate(post.publishedAt)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> ক্যাটাগরি
-                    </span>
-                    <span
-                      className={`font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs rounded-full border ${categoryStyle}`}
-                    >
-                      {post.category}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Post body */}
             <div className="max-w-[72ch] mx-auto">
