@@ -137,7 +137,15 @@ class _LBUser {
         (rawPlan != null && rawPlan.isNotEmpty && rawPlan != 'free');
 
     final fullXp = (j['xp'] as num?)?.toInt() ?? 0;
-    final mXp = (j['monthly_xp'] as num?)?.toInt() ?? 0;
+    int mXp = (j['monthly_xp'] as num?)?.toInt() ?? 0;
+    final rawResetAt = j['monthly_xp_reset_at'] as String?;
+    if (rawResetAt != null) {
+      final resetDate = DateTime.tryParse(rawResetAt);
+      final now = DateTime.now().toUtc();
+      if (resetDate != null && (now.year > resetDate.year || now.month > resetDate.month)) {
+        mXp = 0;
+      }
+    }
     final effectiveXp = timeframe == 'monthly' ? mXp : fullXp;
     // Level is strictly determined by lifetime XP
     final calculatedLevel = _calculateLevelFromXp(fullXp);
@@ -413,7 +421,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           .from('users')
           .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, batch, role, gender')
           .or('role.ilike.student,role.is.null')
-          .eq('institute', institute)
+          .ilike('institute', institute.trim())
           .order('monthly_xp', ascending: false, nullsFirst: false)
           .order('xp', ascending: false, nullsFirst: false)
           .limit(100);

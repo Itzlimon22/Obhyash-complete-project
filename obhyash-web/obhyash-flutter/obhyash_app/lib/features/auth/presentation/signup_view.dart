@@ -7,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/config/app_config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/otp_verification_dialog.dart';
 
 import '../providers/auth_controller.dart';
@@ -48,7 +47,6 @@ class _SignupViewState extends ConsumerState<SignupView>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _referralController = TextEditingController();
 
   bool _showPassword = false;
 
@@ -72,19 +70,6 @@ class _SignupViewState extends ConsumerState<SignupView>
     ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
     _animController.forward();
     _instituteController.addListener(_onInstituteChanged);
-    _loadReferralCode();
-  }
-
-  Future<void> _loadReferralCode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString('referralCode');
-    if (code != null && code.isNotEmpty) {
-      if (mounted) {
-        setState(() {
-          _referralController.text = code;
-        });
-      }
-    }
   }
 
   @override
@@ -96,7 +81,6 @@ class _SignupViewState extends ConsumerState<SignupView>
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _referralController.dispose();
     _animController.dispose();
     super.dispose();
   }
@@ -258,7 +242,6 @@ class _SignupViewState extends ConsumerState<SignupView>
           examTarget: _examTarget.isEmpty ? null : _examTarget,
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          referralCode: _referralController.text.trim(),
         );
 
     if (!mounted) return;
@@ -1004,15 +987,6 @@ class _SignupViewState extends ConsumerState<SignupView>
           hint: '••••••••',
           isDark: isDark,
           obscureText: !_showPassword,
-        ),
-        const SizedBox(height: 12),
-        _buildInputField(
-          label: 'রেফারেল কোড (অপশনাল)',
-          tooltip: 'বন্ধুর দেয়া কোড ব্যবহার করে ডিসকাউন্ট পেতে পারো',
-          icon: LucideIcons.gift,
-          controller: _referralController,
-          hint: 'কোড থাকলে এখানে লেখো',
-          isDark: isDark,
         ),
       ],
     );

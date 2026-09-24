@@ -58,10 +58,22 @@ export default async function DeleteAccountRoutePage() {
       <div className="max-w-3xl mx-auto w-full">
         {/* Brand Header */}
         <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <span className="text-2xl font-bold tracking-tight text-white">
-              অভ্যাস <span className="text-teal-400 text-lg font-normal">/ Obhyash</span>
-            </span>
+          <Link href="/" className="inline-flex items-center gap-3 mb-4 group">
+            <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] border border-emerald-900/30 shadow-sm group-hover:scale-105 transition-transform duration-200">
+              <img
+                src="/obhyash_logo.svg"
+                alt="Obhyash Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col items-start -space-y-0.5 select-none text-left">
+              <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] leading-none font-sans">
+                OBHYASH
+              </span>
+              <span className="text-xl font-black text-emerald-400 leading-none">
+                অভ্যাস
+              </span>
+            </div>
           </Link>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 text-xs font-semibold uppercase tracking-wider mb-3">
             <Trash2 className="w-3.5 h-3.5" />

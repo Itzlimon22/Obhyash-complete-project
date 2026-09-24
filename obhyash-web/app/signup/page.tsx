@@ -18,7 +18,6 @@ import {
   Loader2,
   Eye,
   EyeOff,
-  Gift,
   ShieldCheck,
   RotateCw,
   X,
@@ -99,21 +98,7 @@ function SignupForm() {
     email: '',
     password: '',
     confirmPassword: '',
-    referralCode: '',
   });
-
-  const [isReferralLocked, setIsReferralLocked] = useState(false);
-
-  useEffect(() => {
-    const refParam = searchParams.get('ref');
-    const savedRef = typeof window !== 'undefined' ? localStorage.getItem('referralCode') : null;
-    const finalRef = refParam || savedRef;
-
-    if (finalRef) {
-      setFormData((prev) => ({ ...prev, referralCode: finalRef }));
-      setIsReferralLocked(true);
-    }
-  }, [searchParams]);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -347,39 +332,6 @@ function SignupForm() {
         if (profileError) {
           console.error('Profile creation error:', profileError);
           toast.error(getErrorMessage(profileError));
-        }
-
-        // Handle referral code redemption
-        if (formData.referralCode) {
-          try {
-            const deviceId = getDeviceFingerprint();
-            const res = await withTimeout(
-              fetch('/api/referral/redeem', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  code: formData.referralCode,
-                  newUserId: data.user.id,
-                  deviceId,
-                }),
-              }),
-              'রেফারেল যাচাই করতে দেরি হচ্ছে। পরে আবার চেষ্টা করো।',
-              10000,
-            );
-            const json = await withTimeout(
-              res.json(),
-              'রেফারেল সার্ভার রেসপন্স পেতে দেরি হচ্ছে।',
-              10000,
-            );
-            if (json.error) {
-              toast.error(json.error);
-            } else {
-              if (typeof window !== 'undefined') localStorage.removeItem('referralCode');
-              toast.success(json.message || 'রেফারেল কোড গৃহীত হয়েছে!');
-            }
-          } catch (e) {
-            console.error('Failed to redeem referral code', e);
-          }
         }
 
         // If Auto-Confirm is enabled in Supabase, we get a session immediately.
@@ -831,34 +783,6 @@ function SignupForm() {
                       />
                     </div>
                   </div>
-
-                  {!isReferralLocked && (
-                    <div className="space-y-1.5 pt-2">
-                      <label className="text-sm font-normal text-emerald-700 dark:text-emerald-400 ml-1 flex items-center gap-1.5">
-                        <Gift className="w-4 h-4" />
-                        রেফারেল কোড (optional)
-                      </label>
-                      <div className="relative group">
-                        <input
-                          type="text"
-                          name="referralCode"
-                          value={formData.referralCode}
-                          onChange={handleChange}
-                          readOnly={isReferralLocked}
-                          placeholder="কোড থাকলে এখানে লেখো"
-                          className={`w-full px-4 text-center tracking-[0.2em] font-bold py-2.5 uppercase border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all md:py-3.5 ${
-                            isReferralLocked
-                              ? 'bg-neutral-100 dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-neutral-500 cursor-not-allowed'
-                              : 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-200'
-                          }`}
-                        />
-                      </div>
-                      <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 ml-1">
-                        রেফারেল কোড ব্যবহার করলে পাবেন ১৫ দিনের{' '}
-                        <b>ফ্রি Premium Subscriptions!</b>
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}

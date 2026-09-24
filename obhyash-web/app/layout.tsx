@@ -8,7 +8,6 @@ import AuthProvider from "@/components/auth/AuthProvider";
 import SWRProvider from "@/components/providers/SWRProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import ReferralCatcher from "@/components/ReferralCatcher";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
@@ -137,7 +136,6 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ThemeProvider>
             <AuthProvider>
-              <ReferralCatcher />
               <NetworkStatusListener />
               <SWRProvider>
                 {children}

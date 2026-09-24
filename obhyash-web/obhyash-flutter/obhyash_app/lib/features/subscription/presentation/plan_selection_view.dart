@@ -42,8 +42,9 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
 
   int get _daysRemaining {
     if (_expiresAt == null) return 0;
-    final diff = _expiresAt!.difference(DateTime.now()).inDays;
-    return diff > 0 ? diff : 0;
+    final diff = _expiresAt!.difference(DateTime.now());
+    if (diff.isNegative) return 0;
+    return (diff.inSeconds / (24 * 3600)).ceil().clamp(0, 9999);
   }
 
   @override
@@ -162,7 +163,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                 if (parsed != null && parsed.isAfter(DateTime.now())) {
                   if (activeSub == null || (expiresAt != null && parsed.isAfter(expiresAt))) {
                     expiresAt = parsed;
-                    final days = parsed.difference(DateTime.now()).inDays.clamp(1, 999);
+                    final days = (parsed.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 999);
                     final planName = h['plan_name']?.toString() ?? 'প্রো সাবস্ক্রিপশন';
                     activeSub = SubscriptionPlan(
                       id: h['id']?.toString() ?? 'sub_hist_active',
@@ -218,7 +219,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
 
             if (isValidActive && activeSub == null) {
               expiresAt = parsedExp;
-              final days = parsedExp.difference(DateTime.now()).inDays.clamp(1, 999);
+              final days = (parsedExp.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 999);
               final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
               final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
               final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')

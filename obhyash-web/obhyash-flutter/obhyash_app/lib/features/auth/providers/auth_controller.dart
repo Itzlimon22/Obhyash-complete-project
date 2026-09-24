@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
-import '../../../core/services/device_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/services/local_exam_cache_service.dart';
 
@@ -202,7 +200,6 @@ class AuthController extends AsyncNotifier<void> {
     String? examTarget,
     required String email,
     required String password,
-    String? referralCode,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -235,35 +232,6 @@ class AuthController extends AsyncNotifier<void> {
             'enrolled_exams': 0,
             'last_active': DateTime.now().toIso8601String(),
           });
-
-          // Handle referral code if provided — uses unified RPC with brute-force,
-          // device-lock, IP rate limiting and anomaly detection built in.
-          if (referralCode != null && referralCode.isNotEmpty) {
-            try {
-              final deviceId = await DeviceService.getDeviceId();
-              final res = await _supabase.rpc('redeem_referral_by_code', params: {
-                'p_code': referralCode.trim().toUpperCase(),
-                'p_user_id': response.user!.id,
-                'p_device_id': deviceId,
-                // p_ip_address intentionally omitted — not available in Flutter;
-                // IP is captured server-side via Supabase Edge Functions if needed.
-              });
-
-              if (res is Map<String, dynamic> && res['success'] == true) {
-                // Clear saved referral code from local storage
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.remove('referralCode');
-                debugPrint('[AuthController] Referral redeemed successfully on signup.');
-              } else {
-                final errMsg = res is Map ? res['error']?.toString() : null;
-                debugPrint('[AuthController] Referral redeem failed on signup: $errMsg');
-                // Non-fatal — signup still succeeds
-              }
-            } catch (refErr) {
-              debugPrint('[AuthController] Referral error on signup: $refErr');
-              // Proceed with signup even if referral fails
-            }
-          }
 
           // Ensure active session exists after registration so user is logged in
           if (_supabase.auth.currentSession == null) {

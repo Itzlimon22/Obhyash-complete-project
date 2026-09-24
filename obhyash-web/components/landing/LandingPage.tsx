@@ -1909,6 +1909,15 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     রেফারেল প্রোগ্রাম 🎁
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/affiliate"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    অ্যাফিলিয়েট প্রোগ্রাম (Affiliate) 💼
+                  </Link>
+                </li>
               </ul>
             </div>
 

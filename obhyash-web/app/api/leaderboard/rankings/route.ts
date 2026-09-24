@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     .or('role.ilike.student,role.is.null')
     .not('institute', 'is', null)
     .neq('institute', '')
-    .order('monthly_xp', { ascending: false, nullsFirst: false })
+    .order(xpCol, { ascending: false, nullsFirst: false })
     .limit(5000);
 
   if (error || !data) {

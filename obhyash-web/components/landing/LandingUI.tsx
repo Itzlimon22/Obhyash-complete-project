@@ -1373,8 +1373,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-red-600 transition-colors">
+                  <a href="/refund-policy" className="hover:text-red-600 transition-colors">
                     রিফান্ড পলিসি
+                  </a>
+                </li>
+                <li>
+                  <a href="/affiliate" className="hover:text-red-600 transition-colors">
+                    অ্যাফিলিয়েট প্রোগ্রাম
                   </a>
                 </li>
               </ul>

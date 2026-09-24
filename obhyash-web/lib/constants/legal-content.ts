@@ -59,140 +59,127 @@ export const LEGAL_CONTENT: {
 
   privacy: {
     title: 'Privacy Policy',
-    subtitle: 'Transparent, Secure, and Comprehensive User Data Protection',
+    subtitle: 'Practices and Policies to Protect User Personal Information',
     lastUpdated: 'September 15, 2026',
     badge: 'Privacy Policy',
     description:
-      'At Obhyash, we hold user privacy and confidentiality as a paramount responsibility. This Privacy Policy details how we collect, process, store, and safeguard your personal and academic information when you use our mobile application and web services.',
+      'This is the privacy policy for Obhyash (obhyash.com and the Obhyash mobile application). This document outlines the practices and policies Obhyash uses to protect the personal information of its users. These include:',
     sections: [
       {
         id: 1,
-        title: '1. Information We Collect',
+        title: 'Privacy',
         content: [
-          'Account & Profile Information: When registering an account, we may collect your full name, email address, phone number, academic institution, HSC/SSC target batch, and profile avatar.',
-          'Academic & Examination Data: We record your practice test results, live examination responses, question attempt timelines, subject scores, XP points, and daily streak progress.',
-          'Technical & Device Information: Basic diagnostic information such as device model, operating system version, unique device identifiers, IP address, and application crash diagnostics are collected to ensure stability and prevent multi-device security fraud.',
+          'Your privacy is of utmost importance to us. We follow stringent procedures to protect the security of the information and data stored on our platform. The information that you have shared with us is stored on secure servers with modern encryption and can be accessed only for authorized official purposes. Any of our team members who violate our privacy or data security policies related to user data are subject to strict disciplinary action, including termination and civil and/or criminal prosecution.',
         ],
       },
       {
         id: 2,
-        title: '2. How We Use Your Information',
+        title: 'Registration',
         content: [
-          'To provide, operate, and enhance your personalized exam preparation experience.',
-          'To calculate and display real-time leaderboard positions and comparative academic analytics.',
-          'To deliver important platform notifications, security alerts, and subscription activation receipts.',
-          'To enforce platform security, anti-cheating protocols, and maintain single-device login integrity during live exams.',
+          'On signing up on Obhyash (via our website or mobile app), users are required to provide certain basic mandatory information such as their full name, email address, password, and academic institution/batch. This information is used to securely authenticate the user’s account and personalize their preparation every time they visit the platform.',
         ],
-        callout:
-          'We strictly do NOT sell, rent, or monetize your personal or academic data to any third-party advertisers or commercial entities under any circumstances.',
       },
       {
         id: 3,
-        title: '3. Third-Party Service Providers',
+        title: 'Information Collection',
         content: [
-          'Supabase Cloud: Used for secure database storage, automated backups, and encrypted token-based authentication.',
-          'Google Play Services & Firebase: Used for application distribution, crash reporting, and cloud messaging notifications.',
-          'Payment Processors: Online transactions are processed through authorized payment gateways (such as UddoktaPay and Google Play In-App Billing). We never store raw credit/debit card numbers or mobile banking PINs on our servers.',
+          'Obhyash collects both anonymous and personally identifiable information from users, including basic profile details, device diagnostic information, and academic practice data, to improve security, analyze learning trends, and administer the platform effectively.',
         ],
       },
       {
         id: 4,
-        title: '4. User Data Deletion & Account Erasure (Google Play Compliant)',
+        title: 'Information Usage',
         content: [
-          'In-App Deletion: Users can permanently delete their account and associated data directly within the Obhyash mobile app or website by navigating to Profile > Settings > Delete Account.',
-          'Email Request: You may also email us directly at support@obhyash.com with the subject line "Request Account Deletion" from your registered email address.',
-          'Deletion Scope: Upon confirmation, your profile data, exam histories, streak records, and authentication credentials will be permanently purged from our primary databases within 30 days, except where retention is legally mandated.',
+          'Information that users provide is used for delivering exams, calculating leaderboards and streak progress, improving platform features, responding to support requests, and communicating important service updates. Obhyash maintains strict policies and does not share, rent, or sell personal information to external advertisers or unauthorized third parties.',
         ],
-        callout:
-          'You have the full legal right to review, update, or permanently delete your stored personal data at any time without fees.',
       },
       {
         id: 5,
-        title: '5. Data Security Measures',
+        title: 'Cookies & Local Storage',
         content: [
-          'All communication between your device and our servers is secured using industry-standard SSL/TLS (HTTPS) encryption.',
-          'Sensitive credentials including passwords are encrypted using secure cryptographic hashing algorithms.',
-          'Access to server infrastructure is restricted to authorized personnel under strict multi-factor authentication protocols.',
+          'Obhyash uses cookies and secure local storage to identify a user’s device or "session" for improving user experience and maintaining seamless login sessions. Users can configure their browser or device settings to clear or restrict cookies, though some interactive features may require session data to operate properly.',
         ],
       },
       {
         id: 6,
-        title: "6. Children's Privacy",
+        title: 'Security Measures',
         content: [
-          'Obhyash is designed primarily for high school, college, and university admission candidates.',
-          'We do not knowingly collect personally identifiable information from children under the age of 13 without verifiable parental or guardian consent. If you believe a child under 13 has provided personal information without consent, contact us immediately at support@obhyash.com for prompt deletion.',
+          'Obhyash has in place appropriate technical and security measures to prevent unauthorized or unlawful access to, or accidental loss of, destruction, or damage to user information. All network transmissions are protected using industry-standard SSL/TLS (HTTPS) encryption, and sensitive credentials are encrypted using cryptographic hashing. Despite these measures, users should note that transmitting information via the internet is never completely immune to risks, and accounts should be kept confidential.',
+          'By using the Obhyash platform and providing personal information, users agree to the terms of Obhyash’s online privacy policy and to its processing of such personal information for the purposes explained in this policy.',
         ],
       },
       {
         id: 7,
-        title: '7. Policy Updates & Contact',
+        title: 'Data Deletion Request',
         content: [
-          'We may periodically update this Privacy Policy to reflect platform improvements or regulatory guidelines. Continued use of Obhyash after updates constitutes acceptance of the modified policy.',
-          'If you have any questions or feedback regarding our privacy practices, please contact our Data Protection desk at support@obhyash.com.',
+          'At Obhyash, we respect your right to privacy and control over your personal information. You can request the deletion of your account and all associated data at any time.',
+          '• Through App Settings: Simply navigate to the settings screen in our app or web portal and click on the "Delete Account" button to permanently delete your account and personal records.',
+          '• Via Email Request: You may also contact us by sending an email from your registered address to support@obhyash.com with the subject line "Request Account Deletion".',
+          'We will process your request promptly and ensure that your data is permanently removed in accordance with relevant data protection laws.',
         ],
       },
     ],
   },
 
   terms: {
-    title: 'Terms & Conditions',
-    subtitle: 'Standard Agreement and User Guidelines for Obhyash',
+    title: 'Terms and Conditions',
+    subtitle: 'User Agreement and Service Guidelines for Obhyash',
     lastUpdated: 'September 15, 2026',
     badge: 'Terms of Service',
     description:
-      'Welcome to Obhyash. By accessing or using our mobile application, web dashboard, or related educational services, you signify that you have read, understood, and agreed to be bound by the following Terms and Conditions.',
+      'Obhyash (obhyash.com and the Obhyash mobile application) is owned and operated by us. This user agreement defines the guidelines and terms for using Obhyash. By accessing or using our platform, you signify your consent to these user guidelines.',
     sections: [
       {
         id: 1,
-        title: '1. User Account & Registration',
+        title: 'Usage of Cookies',
         content: [
-          'Eligibility: You must provide accurate, current, and complete information during registration and keep your profile information updated.',
-          'Account Confidentiality: You are responsible for safeguarding your login credentials and for all activities that occur under your account.',
-          'Single-User Policy: Each account is licensed exclusively for personal, individual use. Account sharing, credential reselling, or unauthorized multi-device sharing is strictly prohibited.',
+          'Our platform makes use of cookies and secure device storage. By browsing Obhyash, you agree to our use of cookies in accordance with Obhyash’s Privacy Policy. Cookies and session storage help us remember user details for each visit and enable key examination functionalities, making your experience more seamless.',
         ],
       },
       {
         id: 2,
-        title: '2. Intellectual Property Rights',
+        title: 'Copyright and Licenses',
         content: [
-          'All software code, question explanations, diagrams, user interfaces, branding, and proprietary question compilations are the exclusive intellectual property of Obhyash and its creators.',
-          'You are granted a limited, personal, non-exclusive, non-transferable license to access study materials for personal exam preparation only.',
-          'No part of the platform content may be scraped, reverse-engineered, reproduced, re-distributed, or commercially exploited without prior written authorization.',
+          'Unless otherwise indicated, Obhyash and/or its licensors hold the copyright and intellectual property rights for all material on Obhyash. All copyright is strictly reserved. You are allowed to access this material from Obhyash exclusively for your personal, non-commercial exam preparation, subject to the restrictions mentioned in these user guidelines.',
         ],
-        callout:
-          'Unauthorized automated scraping or distribution of Obhyash examination databases will result in immediate termination and legal action under the Copyright & Cyber Security Acts.',
       },
       {
         id: 3,
-        title: '3. Examination Conduct & Fair Play',
+        title: 'Prohibitions:',
         content: [
-          'Live examinations and national rankings require strict adherence to fair play standards.',
-          'The use of automated bots, browser extensions, developer tools, or screen capture software to exploit answer keys or artificially manipulate rankings is strictly prohibited.',
-          'Obhyash reserves the right to disqualify scores, suspend accounts, or revoke leaderboard privileges in cases of verified cheating or integrity violations.',
+          '• You must not republish, scrape, or extract question sets or materials from Obhyash.',
+          '• You are prohibited from selling, renting, or sub-licensing content or subscriptions from Obhyash.',
+          '• You are forbidden from reproducing, duplicating, downloading, or copying proprietary examination content from Obhyash.',
+          '• You must not redistribute, broadcast, or circulate platform materials across external channels.',
         ],
       },
       {
         id: 4,
-        title: '4. Subscriptions & Premium Packages',
+        title: 'Fair Use Policy',
         content: [
-          'Certain advanced features, unlimited model tests, and detailed solution archives may require a paid Pro subscription or package pass.',
-          'All fees are clearly stated prior to purchase. Transactions processed via authorized payment partners are subject to our Refund Policy.',
+          'Users must comply with our Fair Use Policy and utilize Obhyash strictly for personal, intended educational purposes. Any misuse, automated scraping, account sharing, or unauthorized access is strictly prohibited. Violating our Fair Use Policy may result in temporary suspension or a permanent ban of your account.',
         ],
       },
       {
         id: 5,
-        title: '5. Limitation of Liability',
+        title: 'Reliability of Content',
         content: [
-          'Obhyash provides study materials and predictive scoring as educational aids. We do not guarantee admission into any specific educational institution or specific board exam outcomes.',
-          'Services are provided on an "as is" and "as available" basis without warranties of uninterrupted availability during scheduled server maintenance.',
+          'Obhyash exerts the utmost effort to ensure the integrity and accuracy of the content on this platform. However, it disclaims all warranties, explicit or implied, regarding the absolute accuracy of the information found on this platform, except as permitted by applicable law.',
         ],
       },
       {
         id: 6,
-        title: '6. Governing Law & Dispute Resolution',
+        title: 'Delivery Time:',
         content: [
-          'These Terms shall be governed and interpreted in accordance with the laws of the People’s Republic of Bangladesh.',
-          'For any disputes or grievances, parties agree to first seek amicable informal resolution by contacting support@obhyash.com.',
+          'Upon payment, you will immediately receive the chosen plan and features activated on your account.',
+        ],
+      },
+      {
+        id: 7,
+        title: 'Limitation of Liability for Content',
+        content: [
+          'While we strive to ensure that the information on this platform is accurate, we do not guarantee its completeness or correctness; nor do we commit to ensuring that the platform remains accessible without interruption or that the material on the platform is updated regularly.',
+          'To the maximum extent permitted by applicable law, Obhyash will not be held responsible for any direct, indirect, or consequential loss or damage of any kind arising from the use of our services.',
         ],
       },
     ],
@@ -200,48 +187,19 @@ export const LEGAL_CONTENT: {
 
   refund: {
     title: 'Refund Policy',
-    subtitle: 'Transparent, Fair, and Timely Payment Protection',
+    subtitle: 'We are sorry you had to visit this page.',
     lastUpdated: 'September 15, 2026',
     badge: 'Refund Policy',
-    description:
-      'We want you to have complete confidence when investing in your education on Obhyash. This Refund Policy outlines the terms and conditions under which refunds are reviewed and issued for subscription purchases and digital goods.',
+    description: 'We are sorry you had to visit this page.',
     sections: [
       {
         id: 1,
-        title: '1. 48-Hour Satisfaction Window',
+        title: 'We are sorry you had to visit this page.',
         content: [
-          'If you purchase an Obhyash Pro subscription and encounter severe technical issues that prevent you from using the service, you may request a full refund within 48 hours of the initial transaction.',
-          'To be eligible, the request must be submitted within 48 hours of purchase along with proof of payment (Transaction ID / TrxID).',
-        ],
-      },
-      {
-        id: 2,
-        title: '2. Eligibility Criteria for Refunds',
-        content: [
-          'Accidental Duplicate Payment: In the event of dual-charging or billing gateway errors for a single subscription, the duplicate amount will be refunded in full.',
-          'Unresolved Service Unavailability: If a paid feature remains inaccessible for more than 72 consecutive hours due to server-side outages and our technical support cannot resolve it.',
-          'Payment Deducted but Subscription Not Activated: If your mobile banking/card was charged but the subscription was not credited, we will either manually activate your plan immediately or issue a complete refund.',
-        ],
-      },
-      {
-        id: 3,
-        title: '3. Non-Refundable Scenarios',
-        content: [
-          'Requests submitted after the 48-hour window from the time of purchase.',
-          'Accounts terminated or suspended due to severe policy violations, cheating in live exams, or unauthorized content distribution.',
-          'Change of mind or lack of personal study time after substantial consumption of premium tests and question solutions.',
-          'In-App Purchases made directly via Apple App Store or Google Play Store must be requested through Google or Apple’s standard customer refund flow according to their store terms.',
-        ],
-        callout:
-          'Please ensure you review the plan details and free sample mock tests before purchasing a subscription.',
-      },
-      {
-        id: 4,
-        title: '4. How to Request a Refund',
-        content: [
-          'Email our dedicated payments desk at support@obhyash.com with the subject line "Refund Request - [Your Registered Email]".',
-          'Include your registered phone number, Date of Transaction, and Payment TrxID/Order ID in your message.',
-          'Our team reviews all refund requests within 24 to 48 business hours. Once approved, the funds are credited back to your original payment method (bKash, Nagad, or Bank Card) within 5 to 7 working days.',
+          'At Obhyash.com, we are committed to providing exceptional value and service.',
+          'By completing your subscription purchase, you acknowledge and agree that the sale is final and non-refundable. We encourage our customers to review all subscription details before finalizing a purchase.',
+          'Our customer support team remains available to assist you with any questions or concerns you may have regarding your subscription.',
+          'By purchasing a subscription, you are agreeing to our terms and conditions and the no-refund policy. Your satisfaction is important to us, and we are here to support you in making the most of your subscription.',
         ],
       },
     ],

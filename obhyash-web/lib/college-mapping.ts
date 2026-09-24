@@ -96,6 +96,30 @@ const COLLEGE_DATA: CollegeEntry[] = [
   },
   { name: 'তোলারাম কলেজ', search: ['tolaram college', 'tolaraam'] },
   {
+    name: 'গভর্নমেন্ট মোহাম্মদপুর মডেল স্কুল অ্যান্ড কলেজ',
+    search: [
+      'government mohammadpur model school and college',
+      'mohammadpur model',
+      'mohammadpur model school and college',
+      'gmmsc',
+    ],
+  },
+  {
+    name: 'সরকারি মুড়াপাড়া কলেজ',
+    search: [
+      'murapara',
+      'murapara college',
+      'govt murapara college',
+      'sorkari murapara college',
+      'sarkari murapara',
+      'সরকারি মুরাপাড়া কলেজ',
+      'সরকারি মুরাপারা কলেজ',
+      'মুরাপাড়া কলেজ',
+      'মুরাপারা কলেজ',
+      'মুড়াপাড়া কলেজ',
+    ],
+  },
+  {
     name: 'গাজীপুর সরকারি কলেজ',
     search: ['gazipur govt college', 'gazipur college'],
   },
@@ -761,22 +785,66 @@ function levenshtein(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
+export function banglaPhoneticFold(text: string): string {
+  let s = text.trim().toLowerCase().replace(/\s+/g, ' ');
+  s = s.replace(/ড\u09BC/g, 'র');
+  s = s.replace(/ঢ\u09BC/g, 'ঢ');
+  s = s.replace(/ড়/g, 'র');
+  s = s.replace(/ঢ়/g, 'ঢ');
+  s = s.replace(/\u09BC/g, ''); // remove remaining nuktas
+  s = s
+    .replace(/ণ/g, 'ন')
+    .replace(/[ষশ]/g, 'স')
+    .replace(/ী/g, 'ি')
+    .replace(/ূ/g, 'ু')
+    .replace(/ৎ/g, 'ত')
+    .replace(/য়/g, 'য');
+  return s;
+}
+
+export function cleanBanglaUnicode(text: string): string {
+  let s = text.trim().replace(/\s+/g, ' ');
+  s = s.replace(/ড\u09BC/g, 'ড়');
+  s = s.replace(/ঢ\u09BC/g, 'ঢ়');
+  s = s.replace(/য\u09BC/g, 'য়');
+  return s;
+}
+
 /**
  * Returns the canonical college name for a raw user input.
- * Uses exact match first, then fuzzy matching with Levenshtein distance <= 3.
- * Falls back to the input itself if no exact or close match is found.
+ * Uses exact match first, then phonetic fold, then fuzzy matching with Levenshtein distance <= 3.
+ * Falls back to cleaned input itself if no exact or close match is found.
  */
 export function getCanonicalCollegeName(input: string): string {
-  const q = input.toLowerCase().trim();
+  const clean = cleanBanglaUnicode(input);
+  const q = clean.toLowerCase();
   if (q.length === 0) return input;
+
+  // Specific common phonetic / abbreviation overrides
+  if (q.includes('murapara') || q.includes('মুরাপাড়া') || q.includes('মুরাপারা') || q.includes('মুড়াপাড়া')) {
+    return 'সরকারি মুড়াপাড়া কলেজ';
+  }
+  if (q === 'ndc' || q.includes('notre dame')) {
+    return 'নটর ডেম কলেজ';
+  }
+  if (q.includes('mohammadpur model')) {
+    return 'গভর্নমেন্ট মোহাম্মদপুর মডেল স্কুল অ্যান্ড কলেজ';
+  }
   
   // 1. Exact Match
   const exactMatch = COLLEGE_DATA.find(
-    (c) => c.name.toLowerCase() === q || c.search.some((s) => s === q)
+    (c) => c.name.toLowerCase() === q || c.search.some((s) => s.toLowerCase() === q)
   );
   if (exactMatch) return exactMatch.name;
+
+  // 2. Generic Bangla phonetic match
+  const foldedQ = banglaPhoneticFold(q);
+  const phoneticMatch = COLLEGE_DATA.find(
+    (c) => banglaPhoneticFold(c.name) === foldedQ || c.search.some((s) => banglaPhoneticFold(s) === foldedQ)
+  );
+  if (phoneticMatch) return phoneticMatch.name;
   
-  // 2. Fuzzy Match (Levenshtein distance)
+  // 3. Fuzzy Match (Levenshtein distance)
   let bestMatch = '';
   let minDistance = Infinity;
 
@@ -801,5 +869,5 @@ export function getCanonicalCollegeName(input: string): string {
   // Threshold depends on length. If query is very short, threshold must be very strict.
   const threshold = q.length < 5 ? 1 : 3;
   
-  return minDistance <= threshold ? bestMatch : input;
+  return minDistance <= threshold ? bestMatch : clean;
 }

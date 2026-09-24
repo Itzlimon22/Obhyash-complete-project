@@ -108,6 +108,30 @@ const _collegeData = [
     'search': ['tolaram college', 'tolaraam'],
   },
   {
+    'name': 'গভর্নমেন্ট মোহাম্মদপুর মডেল স্কুল অ্যান্ড কলেজ',
+    'search': [
+      'government mohammadpur model school and college',
+      'mohammadpur model',
+      'mohammadpur model school and college',
+      'gmmsc',
+    ],
+  },
+  {
+    'name': 'সরকারি মুড়াপাড়া কলেজ',
+    'search': [
+      'murapara',
+      'murapara college',
+      'govt murapara college',
+      'sorkari murapara college',
+      'sarkari murapara',
+      'সরকারি মুরাপাড়া কলেজ',
+      'সরকারি মুরাপারা কলেজ',
+      'মুরাপাড়া কলেজ',
+      'মুরাপারা কলেজ',
+      'মুড়াপাড়া কলেজ',
+    ],
+  },
+  {
     'name': 'গাজীপুর সরকারি কলেজ',
     'search': ['gazipur govt college', 'gazipur college'],
   },
@@ -1106,12 +1130,50 @@ String _toTitleCase(String text) {
   }).join(' ');
 }
 
+String banglaPhoneticFold(String text) {
+  var s = text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  // Handle decomposed nukta (ড + ় -> র, ঢ + ় -> ঢ)
+  s = s.replaceAll('ড\u09BC', 'র');
+  s = s.replaceAll('ঢ\u09BC', 'ঢ');
+  s = s.replaceAll('ড়', 'র');
+  s = s.replaceAll('ঢ়', 'ঢ');
+  s = s.replaceAll('\u09BC', ''); // remove remaining nuktas
+  s = s
+      .replaceAll('ণ', 'ন')
+      .replaceAll('ষ', 'স')
+      .replaceAll('শ', 'স')
+      .replaceAll('ী', 'ি')
+      .replaceAll('ূ', 'ু')
+      .replaceAll('ৎ', 'ত')
+      .replaceAll('য়', 'য');
+  return s;
+}
+
+String cleanBanglaUnicode(String text) {
+  var s = text.trim().replaceAll(RegExp(r'\s+'), ' ');
+  s = s.replaceAll('ড\u09BC', 'ড়');
+  s = s.replaceAll('ঢ\u09BC', 'ঢ়');
+  s = s.replaceAll('য\u09BC', 'য়');
+  return s;
+}
+
 /// Attempts to find the closest official college name for a given raw input.
-/// Uses exact matching, alias matching, and Levenshtein distance for typo tolerance.
+/// Uses exact matching, alias matching, phonetic folding, and Levenshtein distance for typo tolerance.
 String normalizeCollegeName(String input) {
-  final raw = input.trim();
+  final raw = cleanBanglaUnicode(input);
   if (raw.isEmpty) return raw;
   final q = raw.toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  // Direct special pattern checks for common variations
+  if (q.contains('murapara') || q.contains('মুরাপাড়া') || q.contains('মুরাপারা') || q.contains('মুড়াপাড়া')) {
+    return 'সরকারি মুড়াপাড়া কলেজ';
+  }
+  if (q == 'ndc' || q.contains('notre dame')) {
+    return 'নটর ডেম কলেজ';
+  }
+  if (q.contains('mohammadpur model')) {
+    return 'গভর্নমেন্ট মোহাম্মদপুর মডেল স্কুল অ্যান্ড কলেজ';
+  }
 
   // 1. Check for exact match in name or search aliases
   for (final entry in _collegeData) {
@@ -1123,7 +1185,17 @@ String normalizeCollegeName(String input) {
     }
   }
 
-  // 2. Levenshtein fuzzy match
+  // 2. Generic Bangla phonetic match
+  final foldedQ = banglaPhoneticFold(q);
+  for (final entry in _collegeData) {
+    final name = entry['name'] as String;
+    if (banglaPhoneticFold(name) == foldedQ) return name;
+    for (final alias in (entry['search'] as List<String>)) {
+      if (banglaPhoneticFold(alias) == foldedQ) return name;
+    }
+  }
+
+  // 3. Levenshtein fuzzy match
   String? bestMatch;
   int minDistance = 9999;
   
@@ -1156,6 +1228,6 @@ String normalizeCollegeName(String input) {
     return bestMatch;
   }
 
-  // Fallback: title case the raw string if it's English, otherwise keep original
-  return _toTitleCase(raw);
+  // Fallback: clean unicode string, title case if English
+  return RegExp(r'[a-zA-Z]').hasMatch(raw) ? _toTitleCase(raw) : raw;
 }

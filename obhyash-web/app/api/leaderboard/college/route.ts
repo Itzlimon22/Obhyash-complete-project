@@ -41,20 +41,21 @@ export async function GET(req: NextRequest) {
   const nowUtc = new Date();
   const startOfMonthUtc = new Date(Date.UTC(nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), 1));
 
-  if (rpcError || !rows) {
+  if (rpcError || !rows || rows.length === 0) {
     const { data, error } = await supabase
       .from('public_profiles')
       .select('id, name, institute, xp, monthly_xp, monthly_xp_reset_at, level, exams_taken, avatar_url, avatar_color, streak, role')
       .or('role.ilike.student,role.is.null')
-      .eq('institute', institute)
+      .ilike('institute', institute.trim())
       .order('monthly_xp', { ascending: false, nullsFirst: false })
       .order('xp', { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
     if (error || !data) {
-      return NextResponse.json({ error: 'Failed to fetch college leaderboard' }, { status: 500 });
+      if (!rows) return NextResponse.json({ error: 'Failed to fetch college leaderboard' }, { status: 500 });
+    } else {
+      rows = data;
     }
-    rows = data;
   }
 
   const studentRows = (rows || []).filter((u: any) => {

@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../../core/presentation/widgets/app_icon.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/presentation/widgets/celebration_dialog.dart';
 import '../../../core/services/device_service.dart';
@@ -241,6 +242,16 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         debugPrint('[ReferralView] leaderboard fetch error: $e');
       }
 
+      if (!hasUsed && _claimCodeController.text.isEmpty) {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final saved = prefs.getString('referralCode')?.trim();
+          if (saved != null && saved.isNotEmpty) {
+            _claimCodeController.text = saved;
+          }
+        } catch (_) {}
+      }
+
       if (mounted) {
         setState(() {
           _code = code;
@@ -304,6 +315,10 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         if (res['success'] == true) {
           HapticFeedback.heavyImpact();
           _claimCodeController.clear();
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.remove('referralCode');
+          } catch (_) {}
           setState(() {
             _hasUsedReferral = true;
             _isClaiming = false;
