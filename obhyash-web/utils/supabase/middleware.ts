@@ -106,6 +106,7 @@ export async function updateSession(request: NextRequest) {
     '/legends-league', '/legends_league', '/live_exam',
     // Deep links — dynamic sub-paths
     '/leaderboard/user', // /leaderboard/user/[userId]
+    '/leaderboard/user-profile', // /leaderboard/user-profile/[userId]
     '/history/',
     '/exam/',
   ];

@@ -22,6 +22,7 @@ export interface InstituteExamSet {
   durationMinutes: number;
   durationLabel: string;
   type: "mcq" | "written" | "combined";
+  marks?: number;
 }
 
 export function formatDurationMinutes(minutes: number): string {

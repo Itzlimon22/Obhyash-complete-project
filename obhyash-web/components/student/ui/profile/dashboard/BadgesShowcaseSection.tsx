@@ -125,9 +125,14 @@ export const ALL_BADGES: BadgeItem[] = [
 
 interface BadgesShowcaseSectionProps {
   userId?: string;
+  userStats?: {
+    xp?: number;
+    examsTaken?: number;
+    streakCount?: number;
+  };
 }
 
-export default function BadgesShowcaseSection({ userId }: BadgesShowcaseSectionProps) {
+export default function BadgesShowcaseSection({ userId, userStats }: BadgesShowcaseSectionProps) {
   const [badges, setBadges] = useState<BadgeItem[]>(ALL_BADGES);
   const [selectedBadge, setSelectedBadge] = useState<BadgeItem | null>(null);
   const supabase = createClient();
@@ -141,24 +146,57 @@ export default function BadgesShowcaseSection({ userId }: BadgesShowcaseSectionP
           .select('badge_id, unlocked_at')
           .eq('user_id', userId);
 
-        if (data) {
-          const unlockedMap = new Map<string, string>();
+        const unlockedMap = new Map<string, string>();
+        if (data && data.length > 0) {
           data.forEach((r: any) => {
             unlockedMap.set(r.badge_id, r.unlocked_at);
           });
-
-          setBadges(
-            ALL_BADGES.map((b) => ({
-              ...b,
-              isUnlocked: unlockedMap.has(b.id),
-              unlockedAt: unlockedMap.get(b.id),
-            }))
-          );
         }
+
+        // If no explicit rows in user_badges, evaluate milestone badges from stats (matching Flutter GamificationService)
+        if (unlockedMap.size === 0) {
+          let xp = userStats?.xp ?? 0;
+          let exams = userStats?.examsTaken ?? 0;
+          let streak = userStats?.streakCount ?? 0;
+
+          if (!userStats) {
+            try {
+              const { data: prof } = await supabase
+                .from('public_profiles')
+                .select('xp, exams_taken, streak')
+                .eq('id', userId)
+                .maybeSingle();
+              if (prof) {
+                xp = prof.xp || 0;
+                exams = prof.exams_taken || 0;
+                streak = prof.streak || 0;
+              }
+            } catch (_) {}
+          }
+
+          const now = new Date().toISOString();
+          if (exams >= 1) unlockedMap.set('first_step', now);
+          if (streak >= 3) unlockedMap.set('streak_3', now);
+          if (streak >= 7) unlockedMap.set('streak_7', now);
+          if (exams >= 5) unlockedMap.set('precision_master', now);
+          if (exams >= 10 || xp >= 1000) unlockedMap.set('knowledge_sage', now);
+          if (exams >= 15) unlockedMap.set('speed_demon', now);
+          if (exams >= 20) unlockedMap.set('night_owl', now);
+          if (xp >= 5000) unlockedMap.set('apex_legend', now);
+          if (xp >= 10000) unlockedMap.set('live_champion', now);
+        }
+
+        setBadges(
+          ALL_BADGES.map((b) => ({
+            ...b,
+            isUnlocked: unlockedMap.has(b.id),
+            unlockedAt: unlockedMap.get(b.id),
+          }))
+        );
       } catch (_) {}
     }
     loadBadges();
-  }, [userId, supabase]);
+  }, [userId, userStats, supabase]);
 
   const unlockedCount = badges.filter((b) => b.isUnlocked).length;
 

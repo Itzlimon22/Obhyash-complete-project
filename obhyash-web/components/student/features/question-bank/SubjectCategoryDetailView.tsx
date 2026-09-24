@@ -27,14 +27,6 @@ const ALL_CATEGORIES: Record<string, CategoryItem> = {
     svgIcon: "/images/question-bank/svg/academic.svg",
     hasBadge: false,
   },
-  textbook: {
-    id: "textbook",
-    title: "মূলবই",
-    subtitle: "অনুশীলনী ও রেফারেন্স",
-    gradient: "from-[#10B981] via-[#059669] to-[#047857]",
-    svgIcon: "/images/question-bank/svg/textbook.svg",
-    hasBadge: false,
-  },
   engineering: {
     id: "engineering",
     title: "ইঞ্জিনিয়ারিং",
@@ -95,75 +87,64 @@ export function getCategoriesForSubject(subjectId: string, subjectName: string =
   const id = (subjectId || "").toLowerCase();
   const name = (subjectName || "").toLowerCase();
 
-  // 1. Math: Engineering YES, Varsity Ka YES, Medical NO
+  // 1. Math: Academic, Engineering, Varsity Ka
   if (id.includes("math") || name.includes("গণিত")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
       ALL_CATEGORIES.engineering,
       ALL_CATEGORIES.varsity_ka,
-      ALL_CATEGORIES.gst,
     ];
   }
 
-  // 2. Biology: Medical YES, Varsity Ka YES, Engineering NO
+  // 2. Biology: Academic, Medical, Varsity Ka
   if (id.includes("biology") || name.includes("জীব")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
       ALL_CATEGORIES.medical,
       ALL_CATEGORIES.varsity_ka,
-      ALL_CATEGORIES.gst,
     ];
   }
 
-  // 3. Bangla: Neither Medical nor Engineering
+  // 3. Bangla: Academic, Varsity Kha, Varsity Ka
   if (id.includes("bangla") || name.includes("বাংলা")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
       ALL_CATEGORIES.varsity_kha,
       ALL_CATEGORIES.varsity_ka,
-      ALL_CATEGORIES.gst,
     ];
   }
 
-  // 4. English: Medical YES, Engineering NO, IBA/BUP YES
+  // 4. English: Academic, Engineering, Medical, Varsity Ka, IBA/BUP
   if (id.includes("english") || name.includes("ইংরেজি")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
+      ALL_CATEGORIES.engineering,
       ALL_CATEGORIES.medical,
       ALL_CATEGORIES.varsity_ka,
       ALL_CATEGORIES.iba_bup,
     ];
   }
 
-  // 5. Statistics: Academic, Textbook, Varsity Ka, GST
+  // 5. Statistics: Academic, Varsity Ka
   if (id.includes("stat") || name.includes("পরিসংখ্যান")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
       ALL_CATEGORIES.varsity_ka,
-      ALL_CATEGORIES.gst,
     ];
   }
 
-  // 6. ICT: Engineering YES, Medical NO
+  // 6. ICT: Academic, Engineering, Varsity Ka
   if (id.includes("ict") || name.includes("তথ্য") || name.includes("আইসিটি")) {
     return [
       ALL_CATEGORIES.academic,
-      ALL_CATEGORIES.textbook,
       ALL_CATEGORIES.engineering,
       ALL_CATEGORIES.varsity_ka,
-      ALL_CATEGORIES.gst,
     ];
   }
 
-  // 7. Physics & Chemistry (Default Science): Academic, Textbook, Engineering, Medical, Varsity Ka
+  // 7. Physics & Chemistry (Default Science): Academic, Engineering, Medical, Varsity Ka
   return [
     ALL_CATEGORIES.academic,
-    ALL_CATEGORIES.textbook,
     ALL_CATEGORIES.engineering,
     ALL_CATEGORIES.medical,
     ALL_CATEGORIES.varsity_ka,
@@ -253,6 +234,15 @@ export default function SubjectCategoryDetailView({
   // Intelligently retrieve relevant categories for this specific subject
   const categories = getCategoriesForSubject(subject.id, subject.name);
 
+  const subjectId = (subject.id || "").toLowerCase();
+  const subjectName = (subject.name || "").toLowerCase();
+  const paper = (subject.paper || "").toLowerCase();
+  const isEnglishFirstPaper =
+    subjectId === "english_1" ||
+    subjectId === "hsc_english_1" ||
+    ((subjectId.includes("english") || subjectName.includes("ইংরেজি")) &&
+      (paper.includes("১ম") || paper.includes("1st") || subjectId.includes("1")));
+
   return (
     <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#FAF9F6] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-20">
       {/* ── Top Header ── */}
@@ -276,48 +266,62 @@ export default function SubjectCategoryDetailView({
       )}
 
       {/* ── 2 Per Row Category Cards Grid ── */}
-      <div className="px-3.5 sm:px-6 py-4 sm:py-6">
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              onClick={() => {
-                if (cat.id === "academic") {
-                  if (onSelectCategory) {
-                    onSelectCategory(cat);
-                  } else {
-                    setShowAcademicView(true);
+      <div className="px-3.5 sm:px-4 py-3 sm:py-4">
+        <div className="grid grid-cols-2 gap-3.5 sm:gap-4">
+          {categories.map((cat) => {
+            const isEnglishAcademic = cat.id === "academic" && isEnglishFirstPaper;
+
+            return (
+              <div
+                key={cat.id}
+                onClick={() => {
+                  if (isEnglishAcademic) {
+                    alert("ইংরেজি ১ম পত্রের কন্টেন্ট শীঘ্রই যুক্ত হচ্ছে।");
+                    return;
                   }
-                } else {
-                  handleOpenSection(cat);
-                }
-              }}
-              className={`group relative aspect-[1.25/1] rounded-[16px] sm:rounded-[24px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3 sm:p-4.5 flex flex-col justify-between`}
-            >
-              {/* Ambient Glow */}
-              <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
-              <div className="absolute -left-6 -top-6 w-20 h-20 rounded-full bg-black/10 blur-lg pointer-events-none" />
+                  if (cat.id === "academic") {
+                    if (onSelectCategory) {
+                      onSelectCategory(cat);
+                    } else {
+                      setShowAcademicView(true);
+                    }
+                  } else {
+                    handleOpenSection(cat);
+                  }
+                }}
+                className={`group relative aspect-[1.25/1] rounded-[26px] overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3 sm:p-4 flex flex-col justify-between`}
+              >
+                {/* Ambient Glow */}
+                <div className="absolute -right-5 -bottom-5 w-[100px] h-[100px] rounded-full bg-white/12 pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
-              {/* Top Left: Card Title */}
-              <div className="relative z-10 text-left pt-2 sm:pt-4 pl-0.5 sm:pl-1">
-                <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-lg sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
-                  {cat.title}
-                </h2>
-              </div>
+                {/* Coming Soon Badge for English 1st paper academic */}
+                {isEnglishAcademic && (
+                  <div className="absolute top-2.5 right-3 px-2 py-0.5 bg-white/22 rounded-xl border border-white/35 text-[10.5px] font-bold text-white shadow-xs z-10">
+                    শীঘ্রই আসছে
+                  </div>
+                )}
 
-              {/* Center / Bottom-Right: Rich Generated SVG Vector Art */}
-              <div className="absolute right-1 bottom-1 sm:right-2 sm:bottom-2 z-0 w-14 h-14 sm:w-20 sm:h-20 md:w-22 md:h-22 flex items-center justify-center pointer-events-none">
-                <div className="relative w-full h-full group-hover:scale-108 group-hover:-translate-y-1 transition-all duration-300">
-                  <Image
-                    src={cat.svgIcon}
-                    alt={cat.title}
-                    fill
-                    className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
-                  />
+                {/* Top Left: Card Title */}
+                <div className="relative z-10 text-left pt-2.5 sm:pt-3 pl-1 sm:pl-1.5">
+                  <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[19px] sm:text-[21px] text-white leading-tight tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
+                    {cat.title}
+                  </h2>
+                </div>
+
+                {/* Bottom-Right: SVG Vector Art */}
+                <div className="absolute right-[-4px] bottom-[-4px] z-0 w-24 h-24 flex items-center justify-center pointer-events-none">
+                  <div className="relative w-full h-full group-hover:scale-105 group-hover:-translate-y-0.5 transition-all duration-300">
+                    <Image
+                      src={cat.svgIcon}
+                      alt={cat.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

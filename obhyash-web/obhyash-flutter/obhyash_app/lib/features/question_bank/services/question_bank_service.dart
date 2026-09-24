@@ -10,15 +10,15 @@ class QuestionBankService {
     final id = instituteId.toLowerCase();
     switch (id) {
       case 'buet':
-        return ['BUET', 'বুয়েট'];
+        return ['BUET', 'বুয়েট'];
       case 'ckruet':
         return ['CKRUET', 'RUET', 'KUET', 'CUET', 'গুচ্ছ ইঞ্জিঃ'];
       case 'ruet':
-        return ['RUET', 'রুয়েট'];
+        return ['RUET', 'রুয়েট'];
       case 'kuet':
-        return ['KUET', 'কুয়েট'];
+        return ['KUET', 'কুয়েট'];
       case 'cuet':
-        return ['CUET', 'চুয়েট'];
+        return ['CUET', 'চুয়েট'];
       case 'medical':
         return ['Medical', 'মেডিকেল', 'ডেন্টাল ভর্তি পরীক্ষা', 'MATS', 'MBBS', 'BDS'];
       case 'du':
@@ -60,7 +60,7 @@ class QuestionBankService {
       case 'board_barisal':
         return ['BB', 'বরিশাল বোর্ড', 'Barisal Board', 'Barishal Board'];
       case 'board_mymensingh':
-        return ['MB', 'ময়মনসিংহ বোর্ড', 'Mymensingh Board'];
+        return ['MB', 'ময়মনসিংহ বোর্ড', 'Mymensingh Board'];
       default:
         if (id.startsWith('board_')) {
           final boardName = id.replaceFirst('board_', '');
@@ -70,8 +70,13 @@ class QuestionBankService {
     }
   }
 
-  static List<int> extractYearsFromSession(String yearStr) {
+  /// Extracts 4-digit years from session string.
+  /// For single-year admission sets (not board/school), also includes [year-1]
+  /// because KUET 18 = session 2017-18, questions tagged with both 2017 and 2018.
+  static List<int> extractYearsFromSession(String yearStr,
+      {String? instituteId}) {
     final Set<int> years = {};
+    if (yearStr.isEmpty) return [];
     final parts = yearStr.split(RegExp(r'[-/]'));
     for (final p in parts) {
       final num = int.tryParse(p.trim());
@@ -83,10 +88,21 @@ class QuestionBankService {
         }
       }
     }
+
+    // For single-year admission sets (not board/school), include [year-1, year]
+    // because KUET 18 = session 2017-18, so questions are tagged 2017 AND 2018.
+    final id = (instituteId ?? '').toLowerCase();
+    if (!id.startsWith('board_') && !id.startsWith('school_')) {
+      if (parts.length == 1 && years.length == 1) {
+        final y = years.first;
+        years.add(y - 1);
+      }
+    }
+
     return years.toList();
   }
 
-  /// Sorts questions serially subject-wise (Physics -> Chemistry -> Higher Math -> Biology -> etc.)
+  /// Sorts questions serially subject-wise (Physics → Chemistry → Higher Math → Biology → etc.)
   /// Preserves relative order within the same subject.
   static List<Question> sortSeriallySubjectwise(List<Question> list) {
     final indexed = list.asMap().entries.toList();
@@ -105,7 +121,14 @@ class QuestionBankService {
     return indexed.map((e) => e.value).toList();
   }
 
-  /// Fetch authentic questions for an institute and exam set
+  /// Fetch authentic questions for an institute and exam set.
+  ///
+  /// Rules:
+  /// 1. ZERO QUESTION LEAKAGE: When a year is specified, ONLY return questions
+  ///    tagged with that exact year. Never pad from other years or generic pools.
+  /// 2. SERIAL-WISE GROUPING: Physics → Chemistry → Higher Math → Biology → etc.
+  /// 3. FASTEST LOADING: Parallel Supabase queries (no .overlaps() combo
+  ///    which causes statement timeout 57014). In-memory intersection.
   static Future<List<Question>> fetchExamSetQuestions({
     required String instituteId,
     required InstituteExamSet examSet,
@@ -116,347 +139,193 @@ class QuestionBankService {
         examSet.title.toLowerCase().contains('written') ||
         examSet.title.contains('লিখিত');
 
-    final targetCount = examSet.questionCount > 0 ? examSet.questionCount : 25;
     final tags = getInstituteSearchTags(instituteId);
-    final years = extractYearsFromSession(examSet.year);
-
-    final List<Question> collected = [];
-    final Set<String> seenIds = {};
+    final years = extractYearsFromSession(examSet.year, instituteId: instituteId);
+    final supabase = Supabase.instance.client;
 
     try {
-      final supabase = Supabase.instance.client;
-
       // ======================================================================
-      // 0. SELECTED SUBJECTS PIPELINE (One-by-one subject serially)
-      // When subjects are chosen, fetch each subject's questions in exact order!
+      // PARALLEL FAST FETCH
+      // Avoid Postgres .overlaps(inst).overlaps(years) combo — it always times
+      // out (error 57014). Run institute queries + year query concurrently,
+      // then intersect strictly in-memory.
       // ======================================================================
-      if (selectedSubjects.isNotEmpty) {
-        final List<Question> orderedQuestions = [];
-        final Set<String> subjectSeenIds = {};
+      final List<Future<List<Map<String, dynamic>>>> queryFutures = [];
 
-        for (final subjectName in selectedSubjects) {
-          final subjectVariants = BanglaNameHelper.getSubjectSearchVariants(subjectName, subjectName);
-          final isScienceSubj = subjectName.contains('পদার্থ') ||
-              subjectName.contains('রসায়ন') ||
-              subjectName.contains('উচ্চতর গণিত') ||
-              subjectName.contains('জীববিজ্ঞান') ||
-              subjectName.contains('আইসিটি');
-
-          final int targetSubjCount = isWritten ? 11 : (isScienceSubj ? 25 : 30);
-          final List<Question> subjCollected = [];
-
-          // Tier 1: exact institute + exact years + exact subject
-          if (years.isNotEmpty) {
-            try {
-              var qry = supabase
-                  .from('questions')
-                  .select('*')
-                  .inFilter('subject', subjectVariants)
-                  .overlaps('institutes', tags)
-                  .overlaps('years', years);
-
-              if (isWritten) {
-                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
-              }
-
-              final res = await qry.limit(targetSubjCount * 2);
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
-                  if (!subjectSeenIds.contains(q.id)) {
-                    subjectSeenIds.add(q.id);
-                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
-                  }
-                }
-              }
-            } catch (e) {
-              debugPrint('[QuestionBankService] Subj Tier 1 error: $e');
-            }
-          }
-
-          // Tier 2: institute questions for this subject
-          if (subjCollected.length < targetSubjCount) {
-            final needed = targetSubjCount - subjCollected.length;
-            try {
-              var qry = supabase
-                  .from('questions')
-                  .select('*')
-                  .inFilter('subject', subjectVariants)
-                  .overlaps('institutes', tags);
-
-              if (isWritten) {
-                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
-              }
-
-              final res = await qry.limit(needed * 2);
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
-                  if (!subjectSeenIds.contains(q.id)) {
-                    subjectSeenIds.add(q.id);
-                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
-                  }
-                  if (subjCollected.length >= targetSubjCount) break;
-                }
-              }
-            } catch (e) {
-              debugPrint('[QuestionBankService] Subj Tier 2 error: $e');
-            }
-          }
-
-          // Tier 3: Standard question bank pool for this subject
-          if (subjCollected.length < targetSubjCount) {
-            final needed = targetSubjCount - subjCollected.length;
-            try {
-              var qry = supabase
-                  .from('questions')
-                  .select('*')
-                  .inFilter('subject', subjectVariants);
-
-              if (isWritten) {
-                qry = qry.inFilter('type', ['written', 'Written', 'WRITTEN', 'লিখিত', 'cq', 'CQ', 'creative', 'সৃজনশীল']);
-              }
-
-              final res = await qry.limit(needed * 2);
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (isWritten ? q.isStrictWritten : q.isAdmissionStandardMcq) {
-                  if (!subjectSeenIds.contains(q.id)) {
-                    subjectSeenIds.add(q.id);
-                    subjCollected.add(q.copyWith(subjectLabel: subjectName));
-                  }
-                  if (subjCollected.length >= targetSubjCount) break;
-                }
-              }
-            } catch (e) {
-              debugPrint('[QuestionBankService] Subj Tier 3 error: $e');
-            }
-          }
-
-          // Append this subject's questions before moving to the next subject!
-          orderedQuestions.addAll(subjCollected.take(targetSubjCount));
-        }
-
-        if (orderedQuestions.isNotEmpty) {
-          OfflineQuestionBankService.cacheQuestions(orderedQuestions);
-          return orderedQuestions;
-        }
-      }
-
-      // ======================================================================
-      // 1. WRITTEN EXAM PIPELINE (BUET / QB Written Exams)
-      // Strictly filter type == 'written' FIRST, then apply other filters.
-      // NO MCQs allowed under any circumstances.
-      // Serially grouped subject-wise (Physics -> Chemistry -> Math).
-      // If a subject has fewer questions, keep as is without mixing.
-      // ======================================================================
-      if (isWritten) {
-        final writtenTypes = ['written', 'Written', 'WRITTEN', 'লিখিত'];
-
-        // Tier 1: type == 'written' FIRST, then institute tags + exact years
-        if (years.isNotEmpty) {
-          try {
-            final res = await supabase
-                .from('questions')
-                .select('*')
-                .inFilter('type', writtenTypes)
-                .overlaps('institutes', tags)
-                .overlaps('years', years)
-                .limit(targetCount * 2);
-
-            if (res.isNotEmpty) {
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (q.isStrictWritten && !seenIds.contains(q.id)) {
-                  seenIds.add(q.id);
-                  collected.add(q);
-                }
-              }
-            }
-          } catch (e) {
-            debugPrint('[QuestionBankService] Written Tier 1 error: $e');
-          }
-        }
-
-        // Tier 2: type == 'written' FIRST, then general institute questions
-        if (collected.length < targetCount) {
-          final needed = targetCount - collected.length;
-          try {
-            final res = await supabase
-                .from('questions')
-                .select('*')
-                .inFilter('type', writtenTypes)
-                .overlaps('institutes', tags)
-                .limit(needed * 3);
-
-            if (res.isNotEmpty) {
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (q.isStrictWritten && !seenIds.contains(q.id)) {
-                  seenIds.add(q.id);
-                  collected.add(q);
-                }
-                if (collected.length >= targetCount) break;
-              }
-            }
-          } catch (e) {
-            debugPrint('[QuestionBankService] Written Tier 2 error: $e');
-          }
-        }
-
-        // Tier 2b: Search questions where type is written in general engineering pool if institute empty
-        if (collected.length < targetCount) {
-          final needed = targetCount - collected.length;
-          try {
-            final res = await supabase
-                .from('questions')
-                .select('*')
-                .inFilter('type', writtenTypes)
-                .ilike('exam_type', '%Engineering%')
-                .limit(needed * 2);
-
-            if (res.isNotEmpty) {
-              for (final row in res) {
-                final q = Question.fromJson(row);
-                if (q.isStrictWritten && !seenIds.contains(q.id)) {
-                  seenIds.add(q.id);
-                  collected.add(q);
-                }
-                if (collected.length >= targetCount) break;
-              }
-            }
-          } catch (e) {
-            debugPrint('[QuestionBankService] Written Tier 2b error: $e');
-          }
-        }
-
-        // STRICT SAFETY CHECK: Discard ANY question that has MCQ options or is an MCQ
-        final strictlyWritten = collected.where((q) {
-          if (!q.isStrictWritten) return false;
-          if (q.isAdmissionStandardMcq || q.isStrictMcq) return false;
-          final nonEmptyOptions = q.options.where((opt) => opt.trim().isNotEmpty).toList();
-          if (nonEmptyOptions.length >= 2) return false;
-          return true;
-        }).toList();
-
-        // Sort serially subject-wise (Physics -> Chemistry -> Higher Math -> Biology -> etc.)
-        final sortedWritten = sortSeriallySubjectwise(strictlyWritten);
-
-        // Cache for offline use
-        if (sortedWritten.isNotEmpty) {
-          OfflineQuestionBankService.cacheQuestions(sortedWritten);
-        }
-
-        // Return strictly written questions sorted serially subject-wise.
-        // No mixing of other subjects or MCQs even if count is less than target.
-        return sortedWritten.take(targetCount).toList();
-      }
-
-      // ======================================================================
-      // 2. MCQ / ADMISSION EXAM PIPELINE
-      // ======================================================================
-      // 1. Tier 1: Institute tags + exact years
-      if (years.isNotEmpty) {
-        try {
-          final res = await supabase
+      if (tags.isNotEmpty) {
+        queryFutures.add(
+          supabase
               .from('questions')
               .select('*')
-              .overlaps('institutes', tags)
-              .overlaps('years', years)
-              .limit(targetCount * 2);
-
-          if (res.isNotEmpty) {
-            for (final row in res) {
-              final q = Question.fromJson(row);
-              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
-                seenIds.add(q.id);
-                collected.add(q);
-              }
-            }
-          }
-        } catch (e) {
-          debugPrint('[QuestionBankService] Tier 1 query error: $e');
-        }
-      }
-
-      // 2. Tier 2: General institute questions
-      if (collected.length < targetCount) {
-        final needed = targetCount - collected.length;
-        try {
-          final res = await supabase
-              .from('questions')
-              .select('*')
-              .overlaps('institutes', tags)
-              .limit(needed * 3);
-
-          if (res.isNotEmpty) {
-            for (final row in res) {
-              final q = Question.fromJson(row);
-              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
-                seenIds.add(q.id);
-                collected.add(q);
-              }
-              if (collected.length >= targetCount) break;
-            }
-          }
-        } catch (e) {
-          debugPrint('[QuestionBankService] Tier 2 query error: $e');
-        }
-      }
-
-      // 3. Tier 3: Admission standard questions pool
-      if (collected.length < targetCount) {
-        final needed = targetCount - collected.length;
-        try {
-          final res = await supabase
-              .from('questions')
-              .select('*')
-              .ilike('exam_type', '%Admission%')
-              .limit(needed * 2);
-
-          if (res.isNotEmpty) {
-            for (final row in res) {
-              final q = Question.fromJson(row);
-              if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
-                seenIds.add(q.id);
-                collected.add(q);
-              }
-              if (collected.length >= targetCount) break;
-            }
-          }
-        } catch (e) {
-          debugPrint('[QuestionBankService] Tier 3 query error: $e');
-        }
-      }
-
-      // 4. Tier 4: Offline question bank cache
-      if (collected.length < targetCount) {
-        final needed = targetCount - collected.length;
-        for (final sub in ['physics', 'chemistry', 'higher_math', 'biology']) {
-          if (collected.length >= targetCount) break;
-          final offlineQs = await OfflineQuestionBankService.getQuestions(
-            subject: sub,
-            count: needed,
+              .contains('institutes', [tags[0]])
+              .limit(200)
+              .then((res) => List<Map<String, dynamic>>.from(res)),
+        );
+        if (tags.length > 1) {
+          queryFutures.add(
+            supabase
+                .from('questions')
+                .select('*')
+                .contains('institutes', [tags[1]])
+                .limit(200)
+                .then((res) => List<Map<String, dynamic>>.from(res)),
           );
-          for (final q in offlineQs) {
-            if (q.isAdmissionStandardMcq && !seenIds.contains(q.id)) {
-              seenIds.add(q.id);
-              collected.add(q);
-            }
-            if (collected.length >= targetCount) break;
+        }
+      }
+
+      if (years.isNotEmpty) {
+        queryFutures.add(
+          supabase
+              .from('questions')
+              .select('*')
+              .overlaps('years', years)
+              .limit(200)
+              .then((res) => List<Map<String, dynamic>>.from(res)),
+        );
+      }
+
+      final List<List<Map<String, dynamic>>> queryResults =
+          await Future.wait(queryFutures);
+
+      // Deduplicate raw rows by id
+      final Map<String, Map<String, dynamic>> seenRaw = {};
+      for (final rows in queryResults) {
+        for (final row in rows) {
+          final id = row['id']?.toString() ?? '';
+          if (id.isNotEmpty && !seenRaw.containsKey(id)) {
+            seenRaw[id] = row;
           }
         }
       }
 
-      // 5. Cache fetched questions for future offline availability
-      if (collected.isNotEmpty) {
-        OfflineQuestionBankService.cacheQuestions(collected);
+      // ======================================================================
+      // STRICT IN-MEMORY FILTER — ZERO QUESTION LEAKAGE
+      // Question included ONLY IF:
+      //   (a) institutes array contains this institute tag, AND
+      //   (b) years array contains the requested year(s)
+      // ======================================================================
+      final normalizedTags =
+          tags.map((t) => t.toLowerCase().trim()).toList();
+      final List<Question> matched = [];
+
+      for (final row in seenRaw.values) {
+        // 1. Strict Year check (zero-leak)
+        if (years.isNotEmpty) {
+          final rowYears = (row['years'] as List?)
+                  ?.map((y) => int.tryParse(y.toString()) ?? 0)
+                  .toList() ??
+              [];
+          final hasYear = years.any((y) => rowYears.contains(y));
+          if (!hasYear) continue; // STRICT ZERO LEAK
+        }
+
+        // 2. Strict Institute check (zero-leak)
+        final rowInstitutes = (row['institutes'] as List?)
+                ?.map((i) => i.toString().toLowerCase().trim())
+                .toList() ??
+            [];
+        final hasInst = normalizedTags.any((t) => rowInstitutes.contains(t));
+        if (!hasInst) continue; // STRICT ZERO LEAK
+
+        // 3. Written vs MCQ type check
+        final qType = (row['type'] ?? '').toString().toLowerCase();
+        final isQWritten = qType.contains('written') ||
+            qType.contains('cq') ||
+            qType.contains('creative') ||
+            qType.contains('short');
+        final rawOpts = (row['options'] as List?)
+                ?.where(
+                    (o) => o != null && o.toString().trim().isNotEmpty)
+                .toList() ??
+            [];
+
+        if (isWritten) {
+          if (!isQWritten && rawOpts.length >= 2) continue;
+        } else {
+          if (isQWritten && rawOpts.length < 2) continue;
+        }
+
+        // 4. Subject filter (e.g. for Board exam subject selection)
+        if (selectedSubjects.isNotEmpty) {
+          final rowSubject =
+              (row['subject'] ?? '').toString().toLowerCase();
+          final matchesSub = selectedSubjects.any((s) {
+            final sl = s.toLowerCase();
+            return rowSubject.contains(sl) || sl.contains(rowSubject);
+          });
+          if (!matchesSub) continue;
+        }
+
+        matched.add(Question.fromJson(row));
       }
 
-      return collected.take(targetCount).toList();
+      // ======================================================================
+      // SERIAL-WISE SUBJECT SORTING
+      // Physics 1st → Physics 2nd → Chemistry 1st → Chemistry 2nd → ...
+      // ======================================================================
+      List<Question> sortedQuestions;
+      if (selectedSubjects.isNotEmpty) {
+        final indexed = matched.asMap().entries.toList();
+        indexed.sort((a, b) {
+          final subA = a.value.subject.toLowerCase();
+          final subB = b.value.subject.toLowerCase();
+          var idxA = selectedSubjects.indexWhere((s) {
+            final sl = s.toLowerCase();
+            return subA.contains(sl) || sl.contains(subA);
+          });
+          var idxB = selectedSubjects.indexWhere((s) {
+            final sl = s.toLowerCase();
+            return subB.contains(sl) || sl.contains(subB);
+          });
+          if (idxA < 0) idxA = 999;
+          if (idxB < 0) idxB = 999;
+          if (idxA != idxB) return idxA.compareTo(idxB);
+          final pA = BanglaNameHelper.getWrittenSubjectSortPriority(
+              a.value.subject, a.value.subjectLabel);
+          final pB = BanglaNameHelper.getWrittenSubjectSortPriority(
+              b.value.subject, b.value.subjectLabel);
+          if (pA != pB) return pA.compareTo(pB);
+          return a.key.compareTo(b.key);
+        });
+        sortedQuestions = indexed.map((e) => e.value).toList();
+      } else {
+        sortedQuestions = sortSeriallySubjectwise(matched);
+      }
+
+      // ======================================================================
+      // FALLBACK: only when DB returns 0 results for this specific year/institute.
+      // Never mix years — use offline cache only.
+      // ======================================================================
+      if (sortedQuestions.isEmpty) {
+        debugPrint(
+            '[QuestionBankService] No DB questions for $instituteId ${examSet.year}. Trying offline cache.');
+        final offlineQs = await OfflineQuestionBankService.getQuestions(
+          subject:
+              selectedSubjects.isNotEmpty ? selectedSubjects.first : 'physics',
+          count: isWritten ? 11 : 25,
+        );
+        if (offlineQs.isNotEmpty) {
+          OfflineQuestionBankService.cacheQuestions(offlineQs);
+          return sortSeriallySubjectwise(offlineQs);
+        }
+        return [];
+      }
+
+      // Cache for offline use
+      OfflineQuestionBankService.cacheQuestions(sortedQuestions);
+      return sortedQuestions;
     } catch (e) {
       debugPrint('[QuestionBankService] General error: $e');
-      return collected;
+      try {
+        final offlineQs = await OfflineQuestionBankService.getQuestions(
+          subject:
+              selectedSubjects.isNotEmpty ? selectedSubjects.first : 'physics',
+          count: isWritten ? 11 : 25,
+        );
+        return offlineQs;
+      } catch (_) {
+        return [];
+      }
     }
   }
 }

@@ -264,8 +264,8 @@ export default function StudentRoot({
       // Strip leading slash
       const path = pathname.replace(/^\//, "");
 
-      // Deep paths: /leaderboard/user/[id] or /history/[examId]
-      if (path.startsWith("leaderboard/user/")) return "user_profile";
+      // Deep paths: /leaderboard/user/[id] or /leaderboard/user-profile/[id] or /history/[examId]
+      if (path.startsWith("leaderboard/user/") || path.startsWith("leaderboard/user-profile/")) return "user_profile";
       if (path.startsWith("history/") && path !== "history") return "history_result";
       if (path.startsWith("exam/")) return "exam";
 
@@ -279,7 +279,7 @@ export default function StudentRoot({
   // IDs parsed from the initial URL (for deep-link restoration)
   const [initialDeepUserId] = useState(() => {
     if (typeof window === "undefined") return null;
-    const m = window.location.pathname.match(/^\/leaderboard\/user\/(.+)$/);
+    const m = window.location.pathname.match(/^\/leaderboard\/(?:user|user-profile)\/(.+)$/);
     return m ? m[1] : null;
   });
   const [initialDeepExamId] = useState(() => {
