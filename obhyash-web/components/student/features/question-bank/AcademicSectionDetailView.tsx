@@ -228,20 +228,48 @@ export default function AcademicSectionDetailView({
           `hsc_${cleanId}`,
           `ssc_${cleanId}`,
         ];
+        const subjectVariants = BanglaNameHelper.getSubjectSearchVariants(rawSubjectId, displayTitle);
 
-        let query = supabase.from("questions").select("*");
+        const LEAN_QUESTION_FIELDS =
+          "id, question, options, correct_answer_indices, explanation, difficulty, subject, subject_id, chapter, chapter_id, topic, topic_id, type, exam_type, image_url, option_images, explanation_image_url, random_id, passage";
 
-        // Subject filter
-        query = query.in("subject_id", subjectIds);
+        let query = supabase.from("questions").select(LEAN_QUESTION_FIELDS);
 
-        // Chapter filter
+        // Subject filter (matches either subject_id or subject name variant)
+        const subConds = [
+          `subject_id.in.(${subjectIds.join(",")})`,
+          ...subjectVariants.map((s) => `subject.eq.${s}`),
+        ];
+        query = query.or(subConds.join(","));
+
+        // Chapter filter (dual ID and Name matching)
         if (selectedChapterId !== "all") {
-          query = query.eq("chapter_id", selectedChapterId);
+          const selectedCh = chapters.find((c) => c.id === selectedChapterId);
+          const chVars = selectedCh ? BanglaNameHelper.getChapterSearchVariants(selectedCh.name) : [];
+          const chConds = [`chapter_id.eq.${selectedChapterId}`];
+          for (const v of chVars) {
+            const sanitized = v.replace(/[,*]/g, "").trim();
+            if (sanitized.length >= 2) {
+              chConds.push(`chapter.ilike.%${sanitized}%`);
+            }
+          }
+          query = query.or(chConds.join(","));
         }
 
-        // Topic filter
+        // Topic filter (dual ID and Name matching)
         if (selectedTopicId !== "all") {
-          query = query.eq("topic_id", selectedTopicId);
+          const selectedTop = topics.find((t) => t.id === selectedTopicId);
+          const topConds = [`topic_id.eq.${selectedTopicId}`];
+          if (selectedTop?.name) {
+            const cleanTop = selectedTop.name
+              .replace(/^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*)/, "")
+              .replace(/\s*\([^)]*\)\s*/, "")
+              .trim();
+            if (cleanTop.length >= 2) {
+              topConds.push(`topic.ilike.%${cleanTop}%`);
+            }
+          }
+          query = query.or(topConds.join(","));
         }
 
         const { data } = await query.limit(50);

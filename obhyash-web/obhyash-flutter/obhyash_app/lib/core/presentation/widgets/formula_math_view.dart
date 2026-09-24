@@ -101,16 +101,79 @@ class FormulaMathView extends StatelessWidget {
     return result.isEmpty ? [raw] : result;
   }
 
+  static String _sanitizeLatex(String input) {
+    if (input.isEmpty) return input;
+    var s = input;
+
+    // 1. Fix nested dollars inside equations e.g. $f \propto \sqrt{$[\text{M}\text{L}]$}$
+    s = s.replaceAllMapped(
+      RegExp(r'(\$(?:[^\$\n]+))\$([^\$\n]+)\$((?:[^\$\n]+)\$)'),
+      (m) => '${m[1]}${m[2]}${m[3]}',
+    );
+
+    // 2. Fix over-escaped double backslashes
+    s = s.replaceAllMapped(
+      RegExp(r'\\\\(circ|Delta|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|Gamma|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|times|cdot|frac|sqrt|text|mathrm|pm|to|rightarrow|leftarrow|rightleftharpoons|approx|ne|leq|geq|infty|sum|int|partial|sim|propto|perp|parallel)\b'),
+      (m) => '\\${m[1]}',
+    );
+
+    // 3. Unpack Greek and math symbols incorrectly enclosed in \text{...}
+    s = s.replaceAllMapped(
+      RegExp(r'\\text\{\s*\\(Omega|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi)\s*\}'),
+      (m) => '\\${m[1]}',
+    );
+
+    // 4. Unpack math expressions inside \text{...} that contain \pi, \frac or math operators
+    s = s.replaceAllMapped(
+      RegExp(r'\\text\{\s*([^}]*\\(?:pi|frac|sqrt|times|cdot|pm)[^}]*)\}'),
+      (m) => '${m[1]}',
+    );
+
+    // 5. Fix units with exponents inside \text{...} e.g. \text{L^-1}, \text{s^-1}, \text{m s^-2}
+    s = s.replaceAllMapped(RegExp(r'\\text\{([A-Za-z]+)\^([-\d]+)\}'), (m) => '\\text{${m[1]}}^{${m[2]}}');
+    s = s.replaceAllMapped(RegExp(r'\\text\{([A-Za-z]+)\^-\}'), (m) => '\\text{${m[1]}}^{-}');
+    s = s.replaceAllMapped(RegExp(r'\\text\{([A-Za-z\s]+)\^([-\d]+)\}'), (m) => '\\text{${m[1]}}^{${m[2]}}');
+
+    // 6. Fix subscript inside \text{} e.g. \text{y_m} -> y_m, \text{N_A} -> N_A
+    s = s.replaceAllMapped(RegExp(r'\\text\{([A-Za-z]+)_([A-Za-z0-9]+)\}'), (m) => '${m[1]}_{${m[2]}}');
+
+    // 7. Fix \text{^\circ...} -> ^{\circ...}
+    s = s.replaceAllMapped(RegExp(r'\\text\{\s*\^\\circ\s*([A-Za-z]*)\s*\}'), (m) => '^{\\circ}\\text{${m[1]}}');
+    s = s.replaceAllMapped(RegExp(r'\\text\{\s*\^([^{}]+)\s*\}'), (m) => '^{${m[1]}}');
+    s = s.replaceAllMapped(RegExp(r'\\text\{\s*_([^{}]+)\s*\}'), (m) => '_{${m[1]}}');
+
+    // 8. Typo in physics questions e.g. \pier -> \pi r
+    s = s.replaceAll(RegExp(r'\\pier\b'), r'\pi r');
+
+    // 9. Stray carriage returns in chemical reactions
+    s = s.replaceAllMapped(RegExp(r'\\r\\(rightleftharpoons|rightarrow|leftarrow|leftrightharpoons)'), (m) => '\\${m[1]}');
+
+    // 10. Fix stray \&& -> \&\&
+    s = s.replaceAll(r'\&&', r'\&\&');
+
+    // 11. Fix \text{B^-}1 -> B^{-1}
+    s = s.replaceAllMapped(RegExp(r'\\text\{([A-Za-z]+)\^-\}([0-9]+)'), (m) => '${m[1]}^{-${m[2]}}');
+
+    // 12. Fix degree Celsius e.g. ^\circC -> ^\circ \text{C}
+    s = s.replaceAllMapped(RegExp(r'\^\\circ([A-Z])'), (m) => '^{\\circ}\\text{${m[1]}}');
+
+    // 13. Fix empty \text{}
+    s = s.replaceAll(RegExp(r'\\text\{\s*\}'), '');
+
+    return s;
+  }
+
   /// Renders a single clause — checks whether it requires Bengali-aware rendering or pure KaTeX
   Widget _renderSingleClause(String clause, Color textColor) {
-    final hasBengali = _bengaliRegex.hasMatch(clause);
+    final cleanClause = _sanitizeLatex(clause);
+    final hasBengali = _bengaliRegex.hasMatch(cleanClause);
 
     if (!hasBengali) {
       return FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.center,
         child: Math.tex(
-          clause,
+          cleanClause,
           mathStyle: MathStyle.display,
           textStyle: TextStyle(
             fontSize: fontSize,

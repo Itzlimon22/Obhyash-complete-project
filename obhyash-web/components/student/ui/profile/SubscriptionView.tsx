@@ -145,17 +145,34 @@ export const SubscriptionView: React.FC = () => {
     }
   }, []);
 
-  const handleApplyCoupon = (code: string): boolean => {
+  const handleApplyCoupon = async (code: string): Promise<boolean> => {
     const activePlan = plans[selectedPlanIndex] || plans[0];
     const refPrice = activePlan?.price || 149;
-    const result = calculateCouponDiscount(code, refPrice);
-    if (result.isValid && result.appliedCoupon) {
-      setAppliedCoupon(result.appliedCoupon);
-      toast.success(`🎉 '${result.appliedCoupon.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!`);
-      return true;
+
+    try {
+      const res = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, originalPrice: refPrice }),
+      });
+      const data = await res.json();
+      if (data.isValid && data.appliedCoupon) {
+        setAppliedCoupon(data.appliedCoupon);
+        toast.success(`🎉 '${data.appliedCoupon.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!`);
+        return true;
+      }
+      toast.error(data.errorMessage || 'অকার্যকর কুপন কোড!');
+      return false;
+    } catch {
+      const result = calculateCouponDiscount(code, refPrice);
+      if (result.isValid && result.appliedCoupon) {
+        setAppliedCoupon(result.appliedCoupon);
+        toast.success(`🎉 '${result.appliedCoupon.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!`);
+        return true;
+      }
+      toast.error(result.errorMessage || 'অকার্যকর কুপন কোড!');
+      return false;
     }
-    toast.error(result.errorMessage || 'অকার্যকর কুপন কোড!');
-    return false;
   };
 
   const handleRemoveCoupon = () => {

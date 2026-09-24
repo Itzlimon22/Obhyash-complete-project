@@ -188,6 +188,64 @@ const MAX_PREPROCESS_CACHE = 600;
  * - Automatically detects and wraps unwrapped formulas and chemical equations
  * - Ensures space boundaries around $ for remark-math
  */
+function sanitizeLatexTokens(s: string): string {
+  if (!s) return s;
+  let res = s;
+  // 1. Fix nested dollars inside equations e.g. $f \propto \sqrt{$[\text{M}\text{L}]$}$
+  res = res.replace(/(\$(?:[^\$\n]+))\$([^\$\n]+)\$((?:[^\$\n]+)\$)/g, "$1$2$3");
+
+  // 2. Fix over-escaped double backslashes in math commands e.g. ^\\circ -> ^\circ
+  res = res.replace(
+    /\\\\(circ|Delta|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|Gamma|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|times|cdot|frac|sqrt|text|mathrm|pm|to|rightarrow|leftarrow|rightleftharpoons|approx|ne|leq|geq|infty|sum|int|partial|sim|propto|perp|parallel)\b/g,
+    "\\$1"
+  );
+
+  // 3. Unpack Greek and math symbols incorrectly enclosed in \text{...}
+  res = res.replace(
+    /\\text\{\s*\\(Omega|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi)\s*\}/g,
+    "\\$1"
+  );
+
+  // 4. Unpack math expressions inside \text{...} that contain \pi, \frac or math operators
+  res = res.replace(/\\text\{\s*([^}]*\\(?:pi|frac|sqrt|times|cdot|pm)[^}]*)\}/g, "$1");
+
+  // 5. Fix units with exponents inside \text{...} e.g. \text{L^-1}, \text{s^-1}, \text{m s^-2}
+  res = res.replace(/\\text\{([A-Za-z]+)\^([-\d]+)\}/g, "\\text{$1}^{$2}");
+  res = res.replace(/\\text\{([A-Za-z]+)\^-\}/g, "\\text{$1}^{-}");
+  res = res.replace(/\\text\{([A-Za-z\s]+)\^([-\d]+)\}/g, "\\text{$1}^{$2}");
+
+  // 6. Fix subscript inside \text{} e.g. \text{y_m} -> y_m, \text{N_A} -> N_A
+  res = res.replace(/\\text\{([A-Za-z]+)_([A-Za-z0-9]+)\}/g, "$1_{$2}");
+
+  // 7. Fix \text{^\circ...} -> ^{\circ...}
+  res = res.replace(/\\text\{\s*\^\\circ\s*([A-Za-z]*)\s*\}/g, "^{\\circ}\\text{$1}");
+  res = res.replace(/\\text\{\s*\^([^{}]+)\s*\}/g, "^{$1}");
+  res = res.replace(/\\text\{\s*_([^{}]+)\s*\}/g, "_{$1}");
+
+  // 8. Typo in physics questions e.g. \pier -> \pi r
+  res = res.replace(/\\pier\b/g, "\\pi r");
+
+  // 9. Stray carriage returns in chemical reactions e.g. \r\rightleftharpoons or \r\rightarrow
+  res = res.replace(/\\r\\(rightleftharpoons|rightarrow|leftarrow|leftrightharpoons)/g, "\\$1");
+
+  // 10. Fix stray \&& -> \&\&
+  res = res.replace(/\\&&/g, "\\&\\&");
+
+  // 11. Fix \text{B^-}1 -> B^{-1}
+  res = res.replace(/\\text\{([A-Za-z]+)\^-\}([0-9]+)/g, "$1^{-$2}");
+
+  // 12. Fix $14 x $1.66 -> $14 \times 1.66
+  res = res.replace(/\$([0-9\.]+)\s*x\s*\$/gi, "$1 \\times ");
+
+  // 13. Fix degree Celsius e.g. ^\circC -> ^\circ \text{C}
+  res = res.replace(/\^\\circ([A-Z])/g, "^{\\circ}\\text{$1}");
+
+  // 14. Fix empty \text{}
+  res = res.replace(/\\text\{\s*\}/g, "");
+
+  return res;
+}
+
 function preprocess(text: string): string {
   if (!text) return "";
   if (preprocessCache.has(text)) {
@@ -196,6 +254,9 @@ function preprocess(text: string): string {
 
   // 1. Heal control characters and legacy bracket syntax
   let processedText = healControlCharacters(text);
+
+  // 1.1 Sanitize broken LaTeX tokens and corrupt constructs
+  processedText = sanitizeLatexTokens(processedText);
 
   // 2. Protect Markdown tables from line adjustments
   const { textWithoutTables, tables } = extractAndProtectTables(processedText);

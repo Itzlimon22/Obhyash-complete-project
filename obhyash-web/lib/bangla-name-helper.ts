@@ -920,6 +920,28 @@ export class BanglaNameHelper {
       set.add('বিস্তার ও সংরক্ষণ,জীবের পরিবেশ');
       set.add('জীবের পরিবেশ');
     }
+    if (raw.includes('grammar')) {
+      set.add('Grammar');
+      set.add('Grammar Part');
+    }
+    if (raw.includes('ব্যাকরণ')) {
+      set.add('ব্যাকরণ অংশ');
+      set.add('ব্যাকরণ অংশ ( এডমিশন )');
+      set.add('ব্যাকরণ অংশ (এডমিশন)');
+      set.add('বাংলা ব্যাকরণ');
+      set.add('ব্যাকরণ');
+    }
+    if (raw.includes('নির্মিতি')) {
+      set.add('নির্মিতি অংশ');
+      set.add('নির্মিতি অংশ ( এডমিশন )');
+      set.add('নির্মিতি অংশ (এডমিশন)');
+      set.add('নির্মিতি');
+    }
+    if (raw.includes('ডেটাবেস') || raw.includes('ডেটাবেজ') || raw.includes('ডাটাবেজ') || raw.includes('ডাটাবেস')) {
+      set.add('ডেটাবেস ম্যানেজমেন্ট সিস্টেম');
+      set.add('ডেটাবেজ ম্যানেজমেন্ট সিস্টেম');
+      set.add('ডেটাবেস ম্যাওেজমেন্ট সিস্টেম');
+    }
 
     // Unicode expansion for Bengali য় vs য+়, ২য় vs ২য়
     for (const c of Array.from(set)) {
@@ -963,6 +985,29 @@ export class BanglaNameHelper {
       set.add(t.replace(/২য়/g, '২য়'));
       set.add(t.replace(/২য়/g, '২য়'));
       set.add(t.replace(/১ম/g, '১ম'));
+      if (t.includes('-')) set.add(t.replace(/-/g, ' '));
+      if (t.includes(' ')) set.add(t.replace(/\s+/g, '-'));
+    }
+
+    // Common Bangla literature aliases
+    const litAliases: Record<string, string[]> = {
+      'মানব-কল্যাণ': ['মানব কল্যাণ', 'মানব-কল্যাণ'],
+      'মানব কল্যাণ': ['মানব-কল্যাণ', 'মানব কল্যাণ'],
+      'তাহারেই পড়ে মনে': ['তাহাই পড়ে মনে', 'তাহারেই পড়ে মনে', 'তাহারেই পেড়ে মনে'],
+      'তাহাই পড়ে মনে': ['তাহারেই পড়ে মনে', 'তাহাই পড়ে মনে'],
+      'নূরলদীনের কথা মনে পড়ে যায়': ['নুরলদীনের কথা মনে পড়ে যায়', 'নূরলদীনের কথা মনে পড়ে যায়'],
+      'নুরলদীনের কথা মনে পড়ে যায়': ['নূরলদীনের কথা মনে পড়ে যায়', 'নুরলদীনের কথা মনে পড়ে যায়'],
+      'বায়ান্নর দিনগুলো': ['বায়ান্নোর দিনগুলো', 'বায়ান্নর দিনগুলো', 'বায়ান্নর দিনগুলো'],
+      'বায়ান্নোর দিনগুলো': ['বায়ান্নর দিনগুলো', 'বায়ান্নর দিনগুলো'],
+      'রেইনকোট': ['রেনকোট', 'রেইনকোট'],
+      'রেনকোট': ['রেইনকোট', 'রেনকোট'],
+    };
+
+    const targetKey = strippedPrefix || trimmed;
+    if (litAliases[targetKey]) {
+      for (const alias of litAliases[targetKey]) {
+        set.add(alias);
+      }
     }
 
     // Match against known question topics if provided

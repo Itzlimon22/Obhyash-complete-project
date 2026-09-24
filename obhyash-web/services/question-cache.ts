@@ -17,16 +17,24 @@ interface CachedQuestionSet {
   timestamp: number;
   subject: string;
   chapters?: string[];
+  topics?: string[];
 }
 
 /**
- * Build a cache key from subject and optional chapters.
+ * Build a cache key from subject and optional chapters and topics.
  */
-function buildKey(subject: string, chapters?: string[] | null): string {
+function buildKey(
+  subject: string,
+  chapters?: string[] | null,
+  topics?: string[] | null,
+): string {
   const chapterPart = chapters?.length
-    ? '_' + chapters.sort().join('_').slice(0, 50) // cap key length
+    ? '_' + [...chapters].sort().join('_').slice(0, 40)
     : '_all';
-  return CACHE_PREFIX + subject.normalize('NFC') + chapterPart;
+  const topicPart = topics?.length
+    ? '_t_' + [...topics].sort().join('_').slice(0, 40)
+    : '';
+  return CACHE_PREFIX + subject.normalize('NFC') + chapterPart + topicPart;
 }
 
 /**
@@ -36,16 +44,18 @@ export function cacheQuestions(
   subject: string,
   questions: Question[],
   chapters?: string[] | null,
+  topics?: string[] | null,
 ): void {
   if (typeof window === 'undefined' || questions.length === 0) return;
 
   try {
-    const key = buildKey(subject, chapters);
+    const key = buildKey(subject, chapters, topics);
     const entry: CachedQuestionSet = {
       questions,
       timestamp: Date.now(),
       subject,
       chapters: chapters || undefined,
+      topics: topics || undefined,
     };
 
     localStorage.setItem(key, JSON.stringify(entry));
@@ -62,11 +72,12 @@ export function cacheQuestions(
 export function getCachedQuestions(
   subject: string,
   chapters?: string[] | null,
+  topics?: string[] | null,
 ): Question[] | null {
   if (typeof window === 'undefined') return null;
 
   try {
-    const key = buildKey(subject, chapters);
+    const key = buildKey(subject, chapters, topics);
     const raw = localStorage.getItem(key);
     if (!raw) return null;
 
@@ -85,13 +96,14 @@ export function getCachedQuestions(
 }
 
 /**
- * Check if we have a valid cache for the given subject/chapters.
+ * Check if we have a valid cache for the given subject/chapters/topics.
  */
 export function hasCachedQuestions(
   subject: string,
   chapters?: string[] | null,
+  topics?: string[] | null,
 ): boolean {
-  return getCachedQuestions(subject, chapters) !== null;
+  return getCachedQuestions(subject, chapters, topics) !== null;
 }
 
 /**

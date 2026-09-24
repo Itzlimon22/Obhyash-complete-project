@@ -1878,10 +1878,24 @@ class BanglaNameHelper {
       variants.addAll([
         'প্রোগ্রামিং ভাষা', 'প্রোগ্রামিং ল্যাঙ্গুয়েজ', 'সি প্রোগ্রামিং', 'C প্রোগ্রামিং', 'প্রোগ্রামিং',
       ]);
-    } else if (raw.contains('ডেটাবেজ') || raw.contains('ডাটাবেজ') || raw.contains('dbms')) {
+    } else if (raw.contains('ডেটাবেজ') || raw.contains('ডাটাবেজ') || raw.contains('ডেটাবেস') || raw.contains('ডাটাবেস') || raw.contains('dbms')) {
       variants.addAll([
         'ডেটাবেজ ম্যানেজমেন্ট সিস্টেম', 'ডাটাবেজ ম্যানেজমেন্ট সিস্টেম',
-        'ডেটাবেজ', 'ডাটাবেজ', 'DBMS',
+        'ডেটাবেস ম্যানেজমেন্ট সিস্টেম', 'ডাটাবেস ম্যানেজমেন্ট সিস্টেম',
+        'ডেটাবেস ম্যাওেজমেন্ট সিস্টেম',
+        'ডেটাবেজ', 'ডাটাবেজ', 'ডেটাবেস', 'DBMS',
+      ]);
+    } else if (raw.contains('grammar')) {
+      variants.addAll(['Grammar', 'Grammar Part']);
+    } else if (raw.contains('ব্যাকরণ')) {
+      variants.addAll([
+        'ব্যাকরণ অংশ', 'ব্যাকরণ অংশ ( এডমিশন )', 'ব্যাকরণ অংশ (এডমিশন)',
+        'বাংলা ব্যাকরণ', 'ব্যাকরণ',
+      ]);
+    } else if (raw.contains('নির্মিতি')) {
+      variants.addAll([
+        'নির্মিতি অংশ', 'নির্মিতি অংশ ( এডমিশন )', 'নির্মিতি অংশ (এডমিশন)',
+        'নির্মিতি',
       ]);
     }
 
@@ -1968,8 +1982,29 @@ class BanglaNameHelper {
       extra.add(t.replaceAll('১ম', '১ম'));
       extra.add(t.replaceAll('৩য়', '৩য়'));
       extra.add(t.replaceAll('৩য়', '৩য়'));
+      if (t.contains('-')) extra.add(t.replaceAll('-', ' '));
+      if (t.contains(' ')) extra.add(t.replaceAll(RegExp(r'\s+'), '-'));
     }
     set.addAll(extra);
+
+    // Common Bangla literature aliases
+    const litAliases = <String, List<String>>{
+      'মানব-কল্যাণ': ['মানব কল্যাণ', 'মানব-কল্যাণ'],
+      'মানব কল্যাণ': ['মানব-কল্যাণ', 'মানব কল্যাণ'],
+      'তাহারেই পড়ে মনে': ['তাহাই পড়ে মনে', 'তাহারেই পড়ে মনে'],
+      'তাহাই পড়ে মনে': ['তাহারেই পড়ে মনে', 'তাহাই পড়ে মনে'],
+      'নূরলদীনের কথা মনে পড়ে যায়': ['নুরলদীনের কথা মনে পড়ে যায়', 'নূরলদীনের কথা মনে পড়ে যায়'],
+      'নুরলদীনের কথা মনে পড়ে যায়': ['নূরলদীনের কথা মনে পড়ে যায়', 'নুরলদীনের কথা মনে পড়ে যায়'],
+      'বায়ান্নর দিনগুলো': ['বায়ান্নোর দিনগুলো', 'বায়ান্নর দিনগুলো', 'বায়ান্নর দিনগুলো'],
+      'বায়ান্নোর দিনগুলো': ['বায়ান্নর দিনগুলো', 'বায়ান্নর দিনগুলো'],
+      'রেইনকোট': ['রেনকোট', 'রেইনকোট'],
+      'রেনকোট': ['রেইনকোট', 'রেনকোট'],
+    };
+
+    final targetKey = strippedParen.isNotEmpty ? strippedParen : trimmed;
+    if (litAliases.containsKey(targetKey)) {
+      set.addAll(litAliases[targetKey]!);
+    }
 
     if (knownQuestionTopics != null && knownQuestionTopics.isNotEmpty) {
       final cleanNorm = normalizeBengali(strippedParen.isNotEmpty ? strippedParen : trimmed).toLowerCase();

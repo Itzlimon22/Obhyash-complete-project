@@ -100,10 +100,28 @@ class _PaymentViewState extends ConsumerState<PaymentView>
     _paymentMode = widget.flowType == PaymentFlowType.manual ? 1 : 0;
     _currentPlan = widget.plan;
     if (widget.appliedCouponCode != null && widget.appliedCouponCode!.isNotEmpty) {
-      final res = CouponService.validate(widget.appliedCouponCode!, widget.plan.price);
+      final res = CouponService.validateSync(widget.appliedCouponCode!, widget.plan.price);
       if (res.isValid && res.appliedCoupon != null) {
         _appliedCoupon = res.appliedCoupon;
       }
+      CouponService.validate(widget.appliedCouponCode!, widget.plan.price).then((remoteRes) {
+        if (mounted && remoteRes.isValid && remoteRes.appliedCoupon != null) {
+          setState(() {
+            _appliedCoupon = remoteRes.appliedCoupon;
+            _currentPlan = SubscriptionPlan(
+              id: widget.plan.id,
+              name: widget.plan.name,
+              price: remoteRes.appliedCoupon!.finalPrice,
+              billingCycle: widget.plan.billingCycle,
+              durationDays: widget.plan.durationDays,
+              currency: widget.plan.currency,
+              features: widget.plan.features,
+              colorTheme: widget.plan.colorTheme,
+              expiresAt: widget.plan.expiresAt,
+            );
+          });
+        }
+      });
     }
     _tabController = TabController(length: 3, vsync: this);
     _fetchSavedMethods();
@@ -115,15 +133,16 @@ class _PaymentViewState extends ConsumerState<PaymentView>
       context: context,
       appliedCoupon: _appliedCoupon,
       planPrice: widget.plan.price,
-      onApply: (code) {
-        final res = CouponService.validate(code, widget.plan.price);
-        if (res.isValid && res.appliedCoupon != null) {
+      onApply: (code, [coupon]) async {
+        final applied = coupon ?? (await CouponService.validate(code, widget.plan.price)).appliedCoupon;
+        if (!mounted) return;
+        if (applied != null) {
           setState(() {
-            _appliedCoupon = res.appliedCoupon;
+            _appliedCoupon = applied;
             _currentPlan = SubscriptionPlan(
               id: widget.plan.id,
               name: widget.plan.name,
-              price: res.appliedCoupon!.finalPrice,
+              price: applied.finalPrice,
               billingCycle: widget.plan.billingCycle,
               durationDays: widget.plan.durationDays,
               currency: widget.plan.currency,
@@ -134,12 +153,12 @@ class _PaymentViewState extends ConsumerState<PaymentView>
           });
           AppPopups.success(
             context,
-            message: "🎉 '${res.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
+            message: "🎉 '${applied.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
           );
         } else {
           AppPopups.warning(
             context,
-            message: res.errorMessage ?? 'অকার্যকর কুপন কোড!',
+            message: 'অকার্যকর কুপন কোড!',
           );
         }
       },

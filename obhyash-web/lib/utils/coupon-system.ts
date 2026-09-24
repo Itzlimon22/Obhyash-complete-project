@@ -23,12 +23,36 @@ export interface AppliedCoupon {
 
 // Built-in coupons list
 export const ACTIVE_COUPONS: Record<string, Coupon> = {
+  AHAMZA: {
+    code: 'AHAMZA',
+    name: 'আমির (HSC 27) অ্যাম্বাসেডর অফার',
+    discountPercentage: 33.56,
+    description: '১৪৯ টাকার প্ল্যানে ৫০ টাকা, ৩৪৯ টাকায় ১০০ টাকা ও ৫৯৯ টাকায় ২০০ টাকা ছাড়!',
+    isActive: true,
+    fixedPrices: {
+      149: 99,
+      349: 249,
+      599: 399,
+    },
+  },
+  AMIR33: {
+    code: 'AMIR33',
+    name: 'অ্যাম্বাসেডর অফার (AMIR33)',
+    discountPercentage: 33.56,
+    description: '১৪৯ টাকার প্ল্যানে ৫০ টাকা, ৩৪৯ টাকায় ১০০ টাকা ও ৫৯৯ টাকায় ২০০ টাকা ছাড়!',
+    isActive: false,
+    fixedPrices: {
+      149: 99,
+      349: 249,
+      599: 399,
+    },
+  },
   PIONEER: {
     code: 'PIONEER',
     name: 'পায়োনিয়ার অফার (Pioneer Discount)',
     discountPercentage: 33.56,
     description: '১৪৯ টাকার প্ল্যানে ৫০ টাকা, ৩৪৯ টাকায় ১০০ টাকা ও ৫৯৯ টাকায় ২০০ টাকা ছাড়!',
-    isActive: true,
+    isActive: false,
     fixedPrices: {
       149: 99,
       349: 249,

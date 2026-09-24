@@ -182,7 +182,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             'p_difficulties': difficultiesList,
             'p_exam_types': examTypesList,
           },
-        ).timeout(const Duration(milliseconds: 1200));
+        ).timeout(const Duration(milliseconds: 3500));
 
         final qList = (data as List<dynamic>?) ?? [];
         if (qList.isNotEmpty) {
@@ -218,6 +218,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               var topicQuery = supabase
                   .from('questions')
                   .select(kQuestionFields)
+                  .eq('status', 'Approved')
                   .inFilter('subject', subjectVariants)
                   .not('options', 'is', null);
 
@@ -245,27 +246,35 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               debugPrint('[ExamProvider] Topic Tier 1 query error: $e');
             }
 
-            // ── Tier 2: Substring / Keyword Search (Handles prefixed names like "টপিক ১ - ভেক্টর") ──
+            // ── Tier 2: Substring / Keyword Search for requested topics ──
             if (rawData.length < config.questionCount && topicsList != null && topicsList.isNotEmpty) {
               final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
-              for (final rawTopic in topicsList.take(4)) {
+              for (final rawTopic in topicsList) {
                 if (rawData.length >= config.questionCount * 2) break;
                 final clean = rawTopic
                     .replaceAll(RegExp(r'^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*)'), '')
                     .replaceAll(RegExp(r'\s*\([^)]*\)\s*'), '')
                     .trim();
-                if (clean.length < 3) continue;
+                if (clean.length < 2) continue;
 
                 try {
                   var kwQuery = supabase
                       .from('questions')
                       .select(kQuestionFields)
+                      .eq('status', 'Approved')
                       .inFilter('subject', subjectVariants)
                       .ilike('topic', '%$clean%')
                       .not('options', 'is', null);
 
                   if (expandedChapters != null && expandedChapters.isNotEmpty) {
                     kwQuery = kwQuery.inFilter('chapter', expandedChapters);
+                  }
+                  if (difficultiesList != null && difficultiesList.isNotEmpty) {
+                    kwQuery = kwQuery.inFilter('difficulty', difficultiesList);
+                  }
+                  if (examTypesList != null && examTypesList.isNotEmpty) {
+                    final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
+                    kwQuery = kwQuery.or(orConditions);
                   }
                   final kwRes = await kwQuery.limit(config.questionCount * 2);
                   for (final row in (kwRes as List)) {
@@ -278,42 +287,14 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
                 } catch (_) {}
               }
             }
-
-            // ── Tier 3: Seamless Chapter Top-Up (Guarantees full question quota instantly) ──
-            if (rawData.length < config.questionCount && expandedChapters != null && expandedChapters.isNotEmpty) {
-              debugPrint('[ExamProvider] Topics yielded ${rawData.length} of ${config.questionCount}, topping up from chapter...');
-              final seenIds = rawData.map((e) => e['id']?.toString()).whereType<String>().toSet();
-              try {
-                var topUpQuery = supabase
-                    .from('questions')
-                    .select(kQuestionFields)
-                    .inFilter('subject', subjectVariants)
-                    .inFilter('chapter', expandedChapters)
-                    .not('options', 'is', null);
-
-                if (difficultiesList != null && difficultiesList.isNotEmpty) {
-                  topUpQuery = topUpQuery.inFilter('difficulty', difficultiesList);
-                }
-                if (examTypesList != null && examTypesList.isNotEmpty) {
-                  final orConditions = examTypesList.map((t) => 'exam_type.ilike.%$t%').join(',');
-                  topUpQuery = topUpQuery.or(orConditions);
-                }
-
-                final topUpRes = await topUpQuery.limit(config.questionCount * 4);
-                for (final row in (topUpRes as List)) {
-                  final qId = row['id']?.toString();
-                  if (qId != null && !seenIds.contains(qId)) {
-                    seenIds.add(qId);
-                    rawData.add(row);
-                  }
-                }
-              } catch (_) {}
-            }
+            // NOTE: Never perform unconstrained chapter top-up when topics are specified!
+            // Topic exams MUST strictly contain questions matching the requested topic(s).
           } else {
             // General Chapter-level query (when no topic is specified - Mock Exams & Question Bank)
             var query = supabase
                 .from('questions')
                 .select(kQuestionFields)
+                .eq('status', 'Approved')
                 .inFilter('subject', subjectVariants)
                 .not('options', 'is', null);
 
@@ -403,6 +384,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         generatedQuestions = await OfflineQuestionBankService.getQuestions(
           subject: config.subject,
           chapters: chaptersList,
+          topics: topicsList,
           count: config.questionCount,
         );
       } else {

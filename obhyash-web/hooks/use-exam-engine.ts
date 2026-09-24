@@ -191,13 +191,18 @@ export const useExamEngine = () => {
     try {
       const generatedQuestions = await fetchQuestions(config);
 
+      const chaptersArr =
+        config.chapters && config.chapters !== 'All'
+          ? config.chapters.split(',').map((c) => c.trim())
+          : null;
+      const topicsArr =
+        config.topics && config.topics !== 'General' && config.topics !== 'All'
+          ? config.topics.split(',').map((t) => t.trim())
+          : null;
+
       if (!generatedQuestions || generatedQuestions.length === 0) {
         // Try offline cache as fallback
-        const chaptersArr =
-          config.chapters && config.chapters !== 'All'
-            ? config.chapters.split(',').map((c) => c.trim())
-            : null;
-        const cached = getCachedQuestions(config.subject, chaptersArr);
+        const cached = getCachedQuestions(config.subject, chaptersArr, topicsArr);
         if (cached && cached.length > 0) {
           console.log('📦 Using cached questions (offline fallback)');
           return setupExamFromQuestions(cached, config);
@@ -210,11 +215,7 @@ export const useExamEngine = () => {
       }
 
       // Cache for offline use
-      const chaptersArr =
-        config.chapters && config.chapters !== 'All'
-          ? config.chapters.split(',').map((c) => c.trim())
-          : null;
-      cacheQuestions(config.subject, generatedQuestions, chaptersArr);
+      cacheQuestions(config.subject, generatedQuestions, chaptersArr, topicsArr);
 
       return setupExamFromQuestions(generatedQuestions, config);
     } catch (e: unknown) {
@@ -236,7 +237,11 @@ export const useExamEngine = () => {
         config.chapters && config.chapters !== 'All'
           ? config.chapters.split(',').map((c) => c.trim())
           : null;
-      const cached = getCachedQuestions(config.subject, chaptersArr);
+      const topicsArr =
+        config.topics && config.topics !== 'General' && config.topics !== 'All'
+          ? config.topics.split(',').map((t) => t.trim())
+          : null;
+      const cached = getCachedQuestions(config.subject, chaptersArr, topicsArr);
       if (cached && cached.length > 0) {
         console.log('📦 Network error — using cached questions');
         return setupExamFromQuestions(cached, config);

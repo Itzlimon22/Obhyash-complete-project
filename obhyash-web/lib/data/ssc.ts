@@ -38,7 +38,6 @@ export const sscSubjects: Subject[] = [
           { id: 'ssc-bangla-1-ch1-t12', name: 'সাহিত্যের রূপ ও রীতি - হায়াৎ মামুদ', serial: 12 },
           { id: 'ssc-bangla-1-ch1-t13', name: 'নিয়তি - হুমায়ূন আহমেদ', serial: 13 },
           { id: 'ssc-bangla-1-ch1-t14', name: 'পয়লা বৈশাখ - কবীর চৌধুরী', serial: 14 },
-          { id: 'ssc-bangla-1-ch1-t15', name: 'আমার সন্তান - ভারতচন্দ্র রায়গুণাকর', serial: 15 },
         ],
       },
       {
@@ -60,6 +59,15 @@ export const sscSubjects: Subject[] = [
           { id: 'ssc-bangla-1-ch2-t13', name: 'স্বাধীনতা, এ শব্দটি কীভাবে আমাদের হলো - নির্মলেন্দু গুণ', serial: 13 },
           { id: 'ssc-bangla-1-ch2-t14', name: 'সাহসী জননী বাংলা - কামাল চৌধুরী', serial: 14 },
           { id: 'ssc-bangla-1-ch2-t15', name: 'মানুষ - কাজী নজরুল ইসলাম', serial: 15 },
+          { id: 'ssc-bangla-1-ch2-t16', name: 'আমার সন্তান - ভারতচন্দ্র রায়গুণাকর', serial: 16 },
+        ],
+      },
+      {
+        id: 'ssc-bangla-1-ch3',
+        name: 'উপন্যাস ও নাটক (সহপাঠ)',
+        topics: [
+          { id: 'ssc-bangla-1-ch3-t1', name: 'কাকতাড়ুয়া - সেলিনা হোসেন', serial: 1 },
+          { id: 'ssc-bangla-1-ch3-t2', name: 'বহিপীর - সৈয়দ ওয়ালীউল্লাহ্', serial: 2 },
         ],
       },
     ],
@@ -664,7 +672,7 @@ export const sscSubjects: Subject[] = [
       },
       {
         id: 'ssc-math-ch17',
-        name: 'পরিসংখ্যাও',
+        name: 'পরিসংখ্যান',
         topics: [
           { id: 'ssc-math-ch17-t1', name: 'অবিন্যস্ত ও বিন্যস্ত উপাত্ত, গণসংখ্যা নিবেশন সারণি তৈরি', serial: 1 },
           { id: 'ssc-math-ch17-t2', name: 'গড় (প্রত্যক্ষ ও সংক্ষিপ্ত পদ্ধতি)', serial: 2 },
@@ -1790,7 +1798,7 @@ export const sscSubjects: Subject[] = [
   },
   {
     id: 'ssc-finance-banking',
-    name: 'SSC ফিন্যাও্স ও ব্যাংকিং',
+    name: 'SSC ফিন্যান্স ও ব্যাংকিং',
     icon: Landmark,
     group: 'Business Studies',
     chapters: [

@@ -6,7 +6,7 @@ import '../../domain/coupon_service.dart';
 /// Reusable modal bottom sheet for entering and applying subscription coupon codes.
 class CouponBottomSheet extends StatefulWidget {
   final AppliedCoupon? appliedCoupon;
-  final void Function(String code) onApply;
+  final void Function(String code, [AppliedCoupon? coupon]) onApply;
   final VoidCallback onRemove;
   final int? planPrice;
 
@@ -22,7 +22,7 @@ class CouponBottomSheet extends StatefulWidget {
   static Future<void> show({
     required BuildContext context,
     required AppliedCoupon? appliedCoupon,
-    required void Function(String code) onApply,
+    required void Function(String code, [AppliedCoupon? coupon]) onApply,
     required VoidCallback onRemove,
     int? planPrice,
   }) {
@@ -48,6 +48,7 @@ class CouponBottomSheet extends StatefulWidget {
 class _CouponBottomSheetState extends State<CouponBottomSheet> {
   late final TextEditingController _controller;
   String _errorText = '';
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -61,22 +62,45 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
     super.dispose();
   }
 
-  void _tryApply(String code) {
+  Future<void> _tryApply(String code) async {
     final trimmed = code.trim().toUpperCase();
     if (trimmed.isEmpty) {
       setState(() => _errorText = 'কুপন কোড লিখুন');
       return;
     }
 
-    final res = CouponService.validate(trimmed, widget.planPrice ?? 149);
-    if (!res.isValid || res.appliedCoupon == null) {
-      setState(() => _errorText = res.errorMessage ?? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন কোড!');
-      return;
-    }
+    if (_isLoading) return;
 
-    setState(() => _errorText = '');
-    Navigator.of(context).pop();
-    widget.onApply(trimmed);
+    setState(() {
+      _isLoading = true;
+      _errorText = '';
+    });
+
+    try {
+      final res = await CouponService.validate(trimmed, widget.planPrice ?? 149);
+      if (!mounted) return;
+
+      if (!res.isValid || res.appliedCoupon == null) {
+        setState(() {
+          _isLoading = false;
+          _errorText = res.errorMessage ?? 'অকার্যকর বা মেয়াদোত্তীর্ণ কুপন কোড!';
+        });
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+        _errorText = '';
+      });
+      Navigator.of(context).pop();
+      widget.onApply(trimmed, res.appliedCoupon);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorText = 'কুপন যাচাই করতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করুন।';
+      });
+    }
   }
 
   @override
@@ -85,7 +109,6 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
     final bg = isDark ? const Color(0xFF000000) : Colors.white;
     final border = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
@@ -225,12 +248,12 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                 ),
               ),
             ] else ...[
-              // Text Box (pre-filled with PIONEER)
+              // Text Box for coupon input
               TextField(
                 controller: _controller,
                 textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
-                  hintText: 'যেমন: PIONEER',
+                  hintText: 'কুপন কোড লিখো',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.white30 : Colors.black26,
                   ),
@@ -277,72 +300,45 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
                 },
                 onSubmitted: _tryApply,
               ),
-              const SizedBox(height: 10),
-
-              // Current coupon name below text box
-              Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.tag, size: 14, color: Color(0xFFD97706)),
-                    const SizedBox(width: 6),
-                    Text(
-                      'চলতি অফার কুপন: ',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: subColor,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _controller.text = 'PIONEER';
-                          _errorText = '';
-                        });
-                      },
-                      child: Text(
-                        'PIONEER',
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1,
-                          color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF004633),
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 20),
 
               // The Apply Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => _tryApply(_controller.text),
+                  onPressed: _isLoading ? null : () => _tryApply(_controller.text),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF004633),
                     foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFF004633).withValues(alpha: 0.7),
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'কুপন যোগ করো',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          ),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(LucideIcons.arrowRight, size: 18),
-                    ],
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'কুপন যোগ করো',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(LucideIcons.arrowRight, size: 18),
+                          ],
+                        ),
                 ),
               ),
             ],

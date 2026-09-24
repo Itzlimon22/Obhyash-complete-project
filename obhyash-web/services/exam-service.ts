@@ -227,22 +227,28 @@ export const fetchQuestionsWithDiagnostics = async (
         `examTypes: ${examTypes?.join('+') ?? 'all'}`,
     );
 
-    // ── Primary: Adaptive Mock Exam RPC (75% New + 25% Spaced Repetition Weakness Mix) ──
-    for (const formName of subjectVariants) {
-      // 1. Try with specific topics if requested
-      const { data, error } = await supabase.rpc(
-        'get_adaptive_mock_exam_questions',
-        {
-          p_user_id: user?.id ?? null,
-          p_subject: formName,
-          p_subject_name: formName,
-          p_total: config.questionCount,
-          p_chapters: expandedChapters,
-          p_topics: expandedTopics,
-          p_difficulties: difficulties,
-          p_exam_types: examTypes,
-        },
+    const LEAN_QUESTION_FIELDS =
+      'id, question, options, correct_answer_indices, explanation, difficulty, subject, subject_id, chapter, chapter_id, topic, topic_id, type, exam_type, image_url, option_images, explanation_image_url, random_id';
+
+    // ── Primary: Fast Adaptive Mock Exam RPC (Single shot with canonical Bengali subject & 2.5s timeout) ──
+    const canonicalSubject = BanglaNameHelper.formatSubject(config.subject, config.subjectLabel);
+    try {
+      const rpcPromise = supabase.rpc('get_adaptive_mock_exam_questions', {
+        p_user_id: user?.id ?? null,
+        p_subject: canonicalSubject,
+        p_subject_name: config.subject,
+        p_total: config.questionCount,
+        p_chapters: expandedChapters,
+        p_topics: expandedTopics,
+        p_difficulties: difficulties,
+        p_exam_types: examTypes,
+      });
+
+      const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
+        setTimeout(() => reject(new Error('RPC_TIMEOUT')), 2500),
       );
+
+      const { data, error } = (await Promise.race([rpcPromise, timeoutPromise])) as any;
 
       if (!error && data && data.length > 0) {
         const questions = fisherYatesShuffle(
@@ -251,84 +257,20 @@ export const fetchQuestionsWithDiagnostics = async (
         debug.fetchMethod = 'ADAPTIVE_SMART_MOCK_RPC';
         debug.resultCount = questions.length;
         debug.diagnosis.push(
-          `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (form: "${formName}")`,
+          `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (canonical: "${canonicalSubject}")`,
         );
         return { questions, debug };
       }
-
-      // 2. If topics were selected but returned 0, try chapter level so user still gets questions
-      if (expandedTopics && expandedTopics.length > 0) {
-        const { data: chapOnlyData, error: chapOnlyError } = await supabase.rpc(
-          'get_adaptive_mock_exam_questions',
-          {
-            p_user_id: user?.id ?? null,
-            p_subject: formName,
-            p_subject_name: formName,
-            p_total: config.questionCount,
-            p_chapters: expandedChapters,
-            p_topics: null,
-            p_difficulties: difficulties,
-            p_exam_types: examTypes,
-          },
-        );
-
-        if (!chapOnlyError && chapOnlyData && chapOnlyData.length > 0) {
-          const questions = fisherYatesShuffle(
-            (chapOnlyData as unknown as QuestionDbRow[]).map(mapDbRow),
-          );
-          debug.fetchMethod = 'ADAPTIVE_SMART_MOCK_RPC_CHAPTER_FALLBACK';
-          debug.resultCount = questions.length;
-          debug.diagnosis.push(
-            `✅ Adaptive Smart Mock RPC returned ${questions.length}/${config.questionCount} (chapter fallback, form: "${formName}")`,
-          );
-          return { questions, debug };
-        }
-      }
-
-      // Secondary Distributed Fallback
-      const { data: distData, error: distError } = await supabase.rpc(
-        'get_distributed_exam_questions',
-        {
-          p_user_id: user?.id ?? null,
-          p_subject: formName,
-          p_subject_name: formName,
-          p_total: config.questionCount,
-          p_chapters: expandedChapters,
-          p_topics: expandedTopics,
-          p_difficulties: difficulties,
-          p_exam_types: examTypes,
-        },
-      );
-
-      if (distError) {
-        debug.rpcError = distError.message;
-        debug.diagnosis.push(
-          `⚠️ Distributed RPC error (form "${formName}"): ${distError.message}`,
-        );
-        continue;
-      }
-
-      if (distData && distData.length > 0) {
-        const questions = fisherYatesShuffle(
-          (distData as unknown as QuestionDbRow[]).map(mapDbRow),
-        );
-        debug.fetchMethod = 'DISTRIBUTED_RPC';
-        debug.resultCount = questions.length;
-        debug.diagnosis.push(
-          `✅ Distributed RPC returned ${questions.length}/${config.questionCount} (form: "${formName}")`,
-        );
-        return { questions, debug };
-      }
+    } catch (rpcErr: any) {
+      debug.diagnosis.push(`⚡ Adaptive Smart Mock RPC skipped/timed out: ${rpcErr?.message || rpcErr}`);
     }
 
-    // ── Fallback: direct query (RPC not yet deployed, or returned 0) ─────────
-    debug.diagnosis.push(
-      '⚠️ Distributed RPC returned 0 — falling back to direct query',
-    );
+    // ── Ultra-Fast Direct Query (Sub-second execution with Lean Fields) ─────────
+    debug.diagnosis.push('⚡ Executing fast direct query from questions table');
 
     let query = supabase
       .from('questions')
-      .select('*')
+      .select(LEAN_QUESTION_FIELDS)
       .in('subject', subjectVariants)
       .eq('status', 'Approved');
 
@@ -348,30 +290,43 @@ export const fetchQuestionsWithDiagnostics = async (
 
     let { data: fallbackData, error: fallbackError } = await query;
 
-    // If direct query with topics returned 0, retry without topic restriction to guarantee questions
+    // If direct in(topic) query returned 0, retry with substring/ilike matching STRICTLY bounded to the requested topics
     if ((!fallbackData || fallbackData.length === 0) && expandedTopics && expandedTopics.length > 0) {
-      debug.diagnosis.push('⚠️ Direct query with topics returned 0, retrying at chapter level');
-      let retryQuery = supabase
-        .from('questions')
-        .select('*')
-        .in('subject', subjectVariants)
-        .eq('status', 'Approved');
+      debug.diagnosis.push('🔍 Direct in(topic) returned 0, retrying with ilike substring topic matching');
+      const cleanTopics = (rawTopics || expandedTopics)
+        .map((t) =>
+          t
+            .replace(/^(?:টপিক\s*[০-৯0-9]+\s*[-–—:]\s*|[০-৯0-9]+(?:\.[০-৯0-9]+)*\s*[-–—:]*\s*)/, '')
+            .replace(/\s*\([^)]*\)\s*/, '')
+            .trim(),
+        )
+        .filter((t) => t.length >= 2);
 
-      if (expandedChapters && expandedChapters.length > 0) {
-        retryQuery = retryQuery.in('chapter', expandedChapters);
-      }
-      if (difficulties && difficulties.length > 0) {
-        retryQuery = retryQuery.in('difficulty', difficulties);
-      }
-      if (examTypes && examTypes.length > 0) {
-        retryQuery = retryQuery.in('exam_type', examTypes);
-      }
-      retryQuery = retryQuery.limit(config.questionCount * 3);
+      if (cleanTopics.length > 0) {
+        let kwQuery = supabase
+          .from('questions')
+          .select(LEAN_QUESTION_FIELDS)
+          .in('subject', subjectVariants)
+          .eq('status', 'Approved');
 
-      const retryRes = await retryQuery;
-      if (!retryRes.error && retryRes.data && retryRes.data.length > 0) {
-        fallbackData = retryRes.data;
-        fallbackError = null;
+        if (expandedChapters && expandedChapters.length > 0) {
+          kwQuery = kwQuery.in('chapter', expandedChapters);
+        }
+        if (difficulties && difficulties.length > 0) {
+          kwQuery = kwQuery.in('difficulty', difficulties);
+        }
+        if (examTypes && examTypes.length > 0) {
+          kwQuery = kwQuery.in('exam_type', examTypes);
+        }
+
+        const orFilter = cleanTopics.map((t) => `topic.ilike.%${t}%`).join(',');
+        kwQuery = kwQuery.or(orFilter).limit(config.questionCount * 3);
+
+        const retryRes = await kwQuery;
+        if (!retryRes.error && retryRes.data && retryRes.data.length > 0) {
+          fallbackData = retryRes.data;
+          fallbackError = null;
+        }
       }
     }
 
@@ -418,6 +373,7 @@ export const getAvailableQuestionCount = async (
   chapters?: string[] | null,
   difficulty?: string | null,
   examTypes?: string[] | null,
+  topics?: string[] | null,
 ): Promise<number> => {
   if (!isSupabaseConfigured() || !supabase) return 0;
 
@@ -425,6 +381,9 @@ export const getAvailableQuestionCount = async (
     const subjectVariants = BanglaNameHelper.getSubjectSearchVariants(subject, subjectLabel);
     const expandedChapters = chapters && chapters.length > 0
       ? Array.from(new Set(chapters.flatMap((c) => BanglaNameHelper.getChapterSearchVariants(c))))
+      : null;
+    const expandedTopics = topics && topics.length > 0
+      ? Array.from(new Set(topics.flatMap((t) => BanglaNameHelper.getTopicSearchVariants(t))))
       : null;
 
     let query = supabase
@@ -435,6 +394,9 @@ export const getAvailableQuestionCount = async (
 
     if (expandedChapters && expandedChapters.length > 0) {
       query = query.in('chapter', expandedChapters);
+    }
+    if (expandedTopics && expandedTopics.length > 0) {
+      query = query.in('topic', expandedTopics);
     }
     // Independent OR: any question matching ANY selected difficulty is included
     if (difficulty && difficulty !== 'Mixed' && difficulty !== 'All') {

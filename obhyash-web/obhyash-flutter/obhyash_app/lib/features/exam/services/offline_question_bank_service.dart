@@ -8,7 +8,8 @@ class OfflineQuestionBankService {
   static const String _kOfflineBankKey = 'obhyash_offline_question_bank_v2';
   static const int _kMaxQuestionsPerSubject = 200; // ~200 KB per subject
 
-  static String _normalizeKey(String s) {
+  static String _normalizeKey(String? s) {
+    if (s == null) return '';
     return s
         .toLowerCase()
         .replaceAll('\u09df', '\u09af\u09bc') // য় -> য + ়
@@ -69,6 +70,7 @@ class OfflineQuestionBankService {
   static Future<List<Question>> getQuestions({
     required String subject,
     List<String>? chapters,
+    List<String>? topics,
     int count = 25,
   }) async {
     try {
@@ -105,9 +107,9 @@ class OfflineQuestionBankService {
           .where((q) => q.isStrictMcq)
           .toList();
 
-      // Filter and balance by chapter if provided
+      // Filter by chapter if provided
       if (chapters != null && chapters.isNotEmpty) {
-        final chapterMatches = parsed.where((q) {
+        parsed = parsed.where((q) {
           final qCh = _normalizeKey(q.chapter);
           return chapters.any((c) {
             final targetCh = _normalizeKey(c);
@@ -117,9 +119,26 @@ class OfflineQuestionBankService {
           });
         }).toList();
 
-        if (chapterMatches.isNotEmpty) {
-          return balanceQuestionsByChapter(chapterMatches, count, chapters);
-        }
+        if (parsed.isEmpty) return [];
+      }
+
+      // Filter by topic if provided
+      if (topics != null && topics.isNotEmpty) {
+        parsed = parsed.where((q) {
+          final qTop = _normalizeKey(q.topic);
+          return topics.any((t) {
+            final targetTop = _normalizeKey(t);
+            return qTop == targetTop ||
+                qTop.contains(targetTop) ||
+                targetTop.contains(qTop);
+          });
+        }).toList();
+
+        if (parsed.isEmpty) return [];
+      }
+
+      if (chapters != null && chapters.isNotEmpty) {
+        return balanceQuestionsByChapter(parsed, count, chapters);
       }
 
       parsed.shuffle();

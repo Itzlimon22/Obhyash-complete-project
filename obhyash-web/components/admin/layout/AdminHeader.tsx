@@ -31,6 +31,7 @@ const ROUTE_TITLES: Record<string, string> = {
   '/admin/user-management': 'ইউজার ও রোল ম্যানেজমেন্ট',
   '/admin/subscriptions': 'সাবস্ক্রিপশন ও পেমেন্টস',
   '/admin/referrals': 'রেফারেল ও রিওয়ার্ড ম্যানেজমেন্ট',
+  '/admin/coupons': 'কুপন ও অ্যাম্বাসেডর কোড',
   '/admin/reports': 'প্রশ্ন এরর রিপোর্ট সমাধান',
   '/admin/complaints': 'অভিযোগ ও মতামত কেন্দ্র',
   '/admin/feature-requests': 'ফিচার প্রস্তাবনা ও রোডম্যাপ',

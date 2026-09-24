@@ -10,7 +10,7 @@ interface CouponModalProps {
   onClose: () => void;
   appliedCoupon: AppliedCoupon | null;
   samplePrice?: number;
-  onApplyCoupon: (couponCode: string) => boolean;
+  onApplyCoupon: (couponCode: string) => boolean | Promise<boolean>;
   onRemoveCoupon: () => void;
 }
 
@@ -24,10 +24,11 @@ export const CouponModal: React.FC<CouponModalProps> = ({
 }) => {
   const [inputCode, setInputCode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleApply = (codeToApply?: string) => {
+  const handleApply = async (codeToApply?: string) => {
     const code = (codeToApply || inputCode).trim().toUpperCase();
     if (!code) {
       setErrorMsg('কুপন কোড লিখুন');
@@ -35,13 +36,18 @@ export const CouponModal: React.FC<CouponModalProps> = ({
     }
 
     setErrorMsg('');
-    const success = onApplyCoupon(code);
-    if (success) {
-      toast.success(`🎉 '${code}' কুপন সফলভাবে প্রয়োগ করা হয়েছে!`);
-      onClose();
-    } else {
-      setErrorMsg('অকার্যকর কুপন কোড! অনুগ্রহ করে সঠিক কোড দিন।');
-      toast.error('ভুল কুপন কোড!');
+    setIsSubmitting(true);
+    try {
+      const success = await Promise.resolve(onApplyCoupon(code));
+      if (success) {
+        onClose();
+      } else {
+        setErrorMsg('অকার্যকর বা মেয়াদোত্তীর্ণ কুপন কোড!');
+      }
+    } catch {
+      setErrorMsg('কুপন যাচাইকরণে সমস্যা হয়েছে');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,7 +137,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({
                   </div>
                   <input
                     type="text"
-                    placeholder="যেমন: PIONEER"
+                    placeholder="কুপন কোড লিখো"
                     value={inputCode}
                     onChange={(e) => {
                       setInputCode(e.target.value.toUpperCase());
@@ -156,34 +162,6 @@ export const CouponModal: React.FC<CouponModalProps> = ({
                     <span>{errorMsg}</span>
                   </p>
                 )}
-              </div>
-
-              {/* Promo recommendation hint */}
-              <div className="flex items-center justify-between px-1 text-xs">
-                <div className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-['HindSiliguri',sans-serif]">
-                  <Tag size={13} className="text-amber-500 shrink-0" />
-                  <span>চলতি অফার কুপন: </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputCode('PIONEER');
-                      setErrorMsg('');
-                    }}
-                    className="font-mono text-xs font-bold text-[#12544F] dark:text-[#4ADE80] underline tracking-wider hover:opacity-80"
-                  >
-                    PIONEER
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setInputCode('PIONEER');
-                    handleApply('PIONEER');
-                  }}
-                  className="px-2.5 py-1 text-[11px] font-bold text-[#12544F] dark:text-[#2DD4BF] bg-[#12544F]/10 dark:bg-[#12544F]/20 hover:bg-[#12544F]/15 rounded-lg transition-colors font-['Anek_Bangla',sans-serif]"
-                >
-                  প্রয়োগ করো
-                </button>
               </div>
 
               <button

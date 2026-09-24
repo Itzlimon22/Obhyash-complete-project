@@ -27,6 +27,7 @@ import {
   Sun,
   Moon,
   SlidersHorizontal,
+  Tag,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -112,6 +113,12 @@ const ADMIN_NAVIGATION: NavSection[] = [
         label: 'রেফারেল ও রিওয়ার্ড',
         icon: Gift,
         href: '/admin/referrals',
+      },
+      {
+        id: 'coupons',
+        label: 'কুপন ও অ্যাম্বাসেডর',
+        icon: Tag,
+        href: '/admin/coupons',
       },
       {
         id: 'reports',

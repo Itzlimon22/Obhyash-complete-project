@@ -650,7 +650,9 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
       subjectIds.addAll(['hsc_statistics_$num', 'statistics_$num']);
     }
 
-    var query = supabase.from('questions').select('*');
+    const kLeanQuestionFields =
+        'id, question, options, correct_answer_indices, explanation, difficulty, subject, subject_id, chapter, chapter_id, topic, topic_id, type, section, exam_type, institutes, years, image_url, option_images, explanation_image_url, random_id, passage';
+    var query = supabase.from('questions').select(kLeanQuestionFields).eq('status', 'Approved');
 
     // 1. Filter by subject_id or subject name
     if (bySubjectName) {

@@ -326,14 +326,15 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
       context: context,
       appliedCoupon: _appliedCoupon,
       planPrice: refPrice,
-      onApply: (code) {
-        final result = CouponService.validate(code, refPrice);
-        if (result.isValid && result.appliedCoupon != null) {
-          setState(() => _appliedCoupon = result.appliedCoupon);
+      onApply: (code, [coupon]) async {
+        final applied = coupon ?? (await CouponService.validate(code, refPrice)).appliedCoupon;
+        if (!mounted) return;
+        if (applied != null) {
+          setState(() => _appliedCoupon = applied);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                "🎉 '${result.appliedCoupon!.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
+                "🎉 '${applied.code}' কুপন সফলভাবে প্রয়োগ হয়েছে!",
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               backgroundColor: const Color(0xFF004633),
@@ -344,9 +345,9 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                result.errorMessage ?? 'অকার্যকর কুপন কোড!',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+              content: const Text(
+                'অকার্যকর কুপন কোড!',
+                style: TextStyle(fontWeight: FontWeight.w700),
               ),
               backgroundColor: const Color(0xFF991B1B),
               behavior: SnackBarBehavior.floating,
