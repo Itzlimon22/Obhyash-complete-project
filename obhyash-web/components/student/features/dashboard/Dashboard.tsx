@@ -20,6 +20,7 @@ import SubjectStat from "./SubjectStat";
 
 interface DashboardProps {
   user: UserProfile;
+  initialSubjects?: any[];
   onMockExamClick: () => void;
   onHistoryClick: () => void;
   onSubjectClick: (subject: string) => void;
@@ -47,10 +48,6 @@ const fetchSubjectsOnly = async ([
   string | undefined,
   string | undefined,
 ]) => {
-  const { supabase } = await import("@/services/core");
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error("Auth session not ready for subjects");
-
   const { getSubjects } = await import("@/services/database");
   return await getSubjects(
     division || undefined,
@@ -61,6 +58,7 @@ const fetchSubjectsOnly = async ([
 
 export const Dashboard: React.FC<DashboardProps> = ({
   user,
+  initialSubjects = [],
   onMockExamClick,
   onHistoryClick,
   onSubjectClick,
@@ -76,8 +74,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const { loading: authLoading, user: authUser } = useAuth();
 
-  const isReady = !authLoading && !!(authUser?.id || user?.id);
-  const effectiveUserId = authUser?.id || user?.id;
+  const effectiveUserId = user?.id || authUser?.id;
 
   type DashboardSubject = {
     id: string;
@@ -89,6 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const [fallbackSubjects] = useState<DashboardSubject[]>(() => {
+    if (initialSubjects && initialSubjects.length > 0) return initialSubjects;
     if (typeof window === "undefined") return [];
     try {
       const cached = localStorage.getItem("obhyash_cached_subjects");
@@ -98,7 +96,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   });
 
   const { data: subjects = fallbackSubjects, isLoading: isLoadingStats } = useSWR(
-    isReady && effectiveUserId
+    effectiveUserId
       ? [
           "userSubjects",
           effectiveUserId,
@@ -110,16 +108,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
     fetchSubjectsOnly,
     {
       revalidateOnFocus: false,
-      revalidateIfStale: true,
-      dedupingInterval: 30_000,
+      revalidateIfStale: false,
+      dedupingInterval: 60_000,
+      fallbackData: initialSubjects.length > 0 ? initialSubjects : fallbackSubjects,
       onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
-        if (retryCount >= 3) return;
-        setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
+        if (retryCount >= 2) return;
+        setTimeout(() => revalidate({ retryCount }), 1500 * (retryCount + 1));
       },
-      fallbackData: fallbackSubjects,
       onSuccess: (data) => {
         if (data && data.length > 0) {
-          localStorage.setItem("obhyash_cached_subjects", JSON.stringify(data));
+          try {
+            localStorage.setItem("obhyash_cached_subjects", JSON.stringify(data));
+          } catch {}
         }
       },
     },
@@ -239,7 +239,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
   }, [filteredSubjects, history, isHsc]);
 
-  if (isLoadingStats && !subjectStats.length) {
+  if (isLoadingStats && !subjectStats.length && !initialSubjects?.length) {
     return <DashboardSkeleton />;
   }
 

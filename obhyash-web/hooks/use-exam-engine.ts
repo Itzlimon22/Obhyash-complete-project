@@ -52,7 +52,10 @@ function decryptAnswers(encrypted: string): Record<string | number, number> {
  *
  * @returns An object containing all exam state and control functions.
  */
-export const useExamEngine = () => {
+export const useExamEngine = (
+  userId?: string,
+  initialHistory: ExamResult[] = [],
+) => {
   // --- Core State Variables ---
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -78,23 +81,50 @@ export const useExamEngine = () => {
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   // --- History State (Local Sync) ---
-  const [examHistory, setExamHistory] = useState<ExamResult[]>([]);
+  const [examHistory, setExamHistory] = useState<ExamResult[]>(() => {
+    if (initialHistory && initialHistory.length > 0) {
+      return initialHistory;
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('obhyash_exam_history');
+        if (stored) return JSON.parse(stored);
+      } catch {}
+    }
+    return [];
+  });
 
-  // Load initial history
+  // Sync initialHistory if passed or changed
+  useEffect(() => {
+    if (initialHistory && initialHistory.length > 0) {
+      setExamHistory(initialHistory);
+      try {
+        localStorage.setItem(
+          'obhyash_exam_history',
+          JSON.stringify(initialHistory),
+        );
+      } catch {}
+    }
+  }, [initialHistory]);
+
+  // Load / update history from DB
   useEffect(() => {
     const loadHistory = async () => {
-      // 1. Try to load from Local Storage first (Instant)
-      const stored = localStorage.getItem('obhyash_exam_history');
-      if (stored) {
-        setExamHistory(JSON.parse(stored));
+      // 1. Try to load from Local Storage first if empty
+      if (examHistory.length === 0 && typeof window !== 'undefined') {
+        const stored = localStorage.getItem('obhyash_exam_history');
+        if (stored) {
+          try {
+            setExamHistory(JSON.parse(stored));
+          } catch {}
+        }
       }
 
       // 2. Fetch from Database (Source of Truth) and update
       try {
-        // Dynamic import to avoid circular dependency issues if any
         const { getExamHistory } = await import('@/services/database');
-        const dbHistory = await getExamHistory();
-        if (dbHistory) {
+        const dbHistory = await getExamHistory(userId);
+        if (dbHistory && dbHistory.length > 0) {
           setExamHistory(dbHistory);
           // Update local storage to match cloud
           localStorage.setItem(
@@ -108,7 +138,7 @@ export const useExamEngine = () => {
     };
 
     loadHistory();
-  }, []);
+  }, [userId]);
 
   const calculateExamStats = (
     currentQuestions: Question[],

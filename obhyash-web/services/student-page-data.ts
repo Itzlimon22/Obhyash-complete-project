@@ -1,10 +1,12 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { UserProfile } from '@/lib/types';
+import { UserProfile, ExamResult } from '@/lib/types';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 export async function getStudentPageData(): Promise<{
   userProfile: UserProfile;
   subjects: any[];
+  initialHistory: ExamResult[];
 }> {
   const supabase = await createClient();
 
@@ -16,11 +18,47 @@ export async function getStudentPageData(): Promise<{
     redirect('/login');
   }
 
-  const [{ data: dbProfile }, { data: subjectsData }] = await Promise.all([
+  const [{ data: dbProfile }, { data: subjectsData }, { data: examResultsData }] = await Promise.all([
     supabase.from('users').select('*').eq('id', user.id).single(),
-    supabase.from('subjects').select('*'),
+    supabase.from('subjects').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
+    supabase
+      .from('exam_results')
+      .select('*')
+      .eq('user_id', user.id)
+      .neq('submission_type', 'started')
+      .order('date', { ascending: false })
+      .limit(100),
   ]);
+
   const subjects = subjectsData || [];
+
+  const initialHistory: ExamResult[] = (examResultsData || []).map((data: any) => {
+    const rawLabel = data.subject_label || data.subject;
+    const resolvedLabel =
+      rawLabel === data.subject ? getSubjectDisplayName(data.subject) : rawLabel;
+
+    return {
+      id: data.id,
+      user_id: data.user_id,
+      subject: data.subject,
+      subjectLabel: resolvedLabel,
+      examType: data.exam_type,
+      date: data.date,
+      score: data.score,
+      totalMarks: data.total_marks,
+      totalQuestions: data.total_questions,
+      correctCount: data.correct_count,
+      wrongCount: data.wrong_count,
+      timeTaken: data.time_taken,
+      negativeMarking: data.negative_marking,
+      questions: data.questions,
+      userAnswers: data.user_answers,
+      flaggedQuestions: data.flagged_questions || [],
+      chapters: data.chapters || 'General',
+      submissionType: data.submission_type || 'digital',
+      scriptImageData: data.script_image_data,
+    };
+  });
 
   const userProfile: UserProfile = dbProfile
     ? {
@@ -41,7 +79,7 @@ export async function getStudentPageData(): Promise<{
           status: 'Active',
           expiry: '',
         },
-        recentExams: [],
+        recentExams: initialHistory.slice(0, 10),
       }
     : {
         id: user.id,
@@ -57,5 +95,6 @@ export async function getStudentPageData(): Promise<{
         recentExams: [],
       };
 
-  return { userProfile, subjects };
+  return { userProfile, subjects, initialHistory };
 }
+

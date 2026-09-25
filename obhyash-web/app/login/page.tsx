@@ -155,6 +155,9 @@ export default function LoginPage() {
             JSON.stringify({ userId: user.id, role, status })
           );
           document.cookie = `obhyash_role_cache=${roleCookieValue}; path=/; max-age=180; SameSite=Lax`;
+          localStorage.removeItem('obhyash_user_profile');
+          localStorage.removeItem('obhyash_cached_subjects');
+          localStorage.removeItem('obhyash_exam_history');
         } catch {
           // non-fatal
         }

@@ -3,18 +3,20 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import StudentRoot from '@/components/student/StudentRoot';
-import { UserProfile } from '@/lib/types';
+import { UserProfile, ExamResult } from '@/lib/types';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 interface DashboardClientProps {
   user: UserProfile;
   subjects?: any[];
+  initialHistory?: ExamResult[];
   initialTab?: string;
 }
 
 export default function DashboardClient({
   user,
   subjects = [],
+  initialHistory = [],
   initialTab = "dashboard",
 }: DashboardClientProps) {
   const { signOut } = useAuth();
@@ -43,6 +45,7 @@ export default function DashboardClient({
       toggleTheme={toggleTheme}
       onLogout={handleLogout}
       subjects={subjects}
+      initialHistory={initialHistory}
       initialTab={initialTab}
     />
   );

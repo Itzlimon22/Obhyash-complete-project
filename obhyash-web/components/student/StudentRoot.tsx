@@ -101,6 +101,7 @@ interface StudentRootProps {
   toggleTheme: () => void;
   onLogout: () => void;
   subjects?: { id: string; name: string; [key: string]: unknown }[];
+  initialHistory?: ExamResult[];
   initialTab?: string;
 }
 
@@ -114,12 +115,10 @@ export default function StudentRoot({
   toggleTheme,
   onLogout,
   subjects = [],
+  initialHistory = [],
   initialTab = "dashboard",
 }: StudentRootProps) {
   const router = useRouter();
-  const engine = useExamEngine();
-  // DO NOT call createClient() at component level — use AuthProvider's supabase context instead.
-  // Calling it here creates a new reference on every render and can cause stale session issues.
   const {
     user: authUser,
     profile: authProfile,
@@ -129,6 +128,7 @@ export default function StudentRoot({
 
   // Use authProfile if available, otherwise fall back to initialUser
   const effectiveUser = authProfile || initialUser;
+  const engine = useExamEngine(effectiveUser?.id, initialHistory);
 
   // Multi-device session monitor - keeps the Supabase Realtime connection warm
   useSessionMonitor({
@@ -480,22 +480,22 @@ export default function StudentRoot({
   // Streak System Check - Loads unified production streak info from DB
   useEffect(() => {
     let isMounted = true;
-
-    if (authLoading || !currentUser?.id) return;
+    const targetUserId = currentUser?.id || effectiveUser?.id;
+    if (!targetUserId) return;
 
     const handleStreakAndHistory = async () => {
       try {
-        const streakInfo = await fetchUserStreakInfo(currentUser.id);
+        const streakInfo = await fetchUserStreakInfo(targetUserId);
         
-        if (isMounted && streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
+        if (isMounted && streakInfo.currentStreak !== (currentUser?.streakCount || 0)) {
           setCurrentUser((prev) =>
             prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev,
           );
         }
 
         // Fetch History
-        const dbHistory = await getExamHistory(currentUser.id);
-        if (dbHistory && isMounted) {
+        const dbHistory = await getExamHistory(targetUserId);
+        if (dbHistory && dbHistory.length > 0 && isMounted) {
           setExamHistory(dbHistory);
         }
       } catch (err) {
@@ -508,7 +508,7 @@ export default function StudentRoot({
     return () => {
       isMounted = false;
     };
-  }, [currentUser?.id, authLoading]);
+  }, [currentUser?.id, effectiveUser?.id]);
 
   // Resume detection: check for unfinished exam on mount
   useEffect(() => {
@@ -1164,6 +1164,7 @@ export default function StudentRoot({
           <AppLayout activeTab={activeTab} {...commonLayoutProps}>
             <Dashboard
               user={currentUser!}
+              initialSubjects={subjects}
               onMockExamClick={() => handleTabChange("setup")}
               onHistoryClick={() => handleTabChange("history")}
               onSubjectClick={(subject) => {
