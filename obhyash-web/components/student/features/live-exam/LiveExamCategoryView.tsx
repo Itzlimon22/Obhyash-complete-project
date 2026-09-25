@@ -6,11 +6,7 @@ import {
   Clock,
   Zap,
   CheckCircle2,
-  ChevronRight,
-  Trophy,
-  ArrowRight,
   FileText,
-  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getPublishedLiveExams } from "@/services/live-exam-student-service";
@@ -92,6 +88,67 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     return true;
   });
 
+  const formatDurationBn = (minutes: number) => {
+    if (!minutes || minutes <= 0) return "২০ মিনিট";
+    return `${BanglaNameHelper.toBanglaNumeral(minutes)} মিনিট`;
+  };
+
+  const formatTimeRemaining = (exam: LiveExam) => {
+    const start = new Date(exam.start_time);
+    const end = new Date(exam.end_time);
+    const isOngoing = now >= start && now <= end;
+    const isPast = now > end;
+
+    if (isOngoing) {
+      const diffMs = end.getTime() - now.getTime();
+      if (diffMs <= 0) return "পরীক্ষা সম্পন্ন";
+
+      const totalSecs = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSecs / 86400);
+      const hours = Math.floor((totalSecs % 86400) / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+
+      if (days > 0) {
+        return hours > 0
+          ? `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(days)} দিন ${BanglaNameHelper.toBanglaNumeral(hours)} ঘণ্টা`
+          : `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(days)} দিন`;
+      } else if (hours > 0) {
+        if (hours < 3) {
+          return `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(hours)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(secs)} সে.`;
+        } else {
+          return `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(hours)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(mins)} মি.`;
+        }
+      } else {
+        return `সময় বাকি - ${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(secs)} সে.`;
+      }
+    } else if (isPast) {
+      return "পরীক্ষা সম্পন্ন";
+    } else {
+      const diffMs = start.getTime() - now.getTime();
+      if (diffMs <= 0) return "এখনই শুরু হচ্ছে";
+
+      const totalSecs = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSecs / 86400);
+      const hours = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+
+      if (hours < 24) {
+        if (hours > 0) {
+          return `${BanglaNameHelper.toBanglaNumeral(hours)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(secs)} সে.`;
+        } else {
+          return `${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(secs)} সে.`;
+        }
+      } else {
+        const remHours = hours % 24;
+        return remHours > 0
+          ? `${BanglaNameHelper.toBanglaNumeral(days)} দিন ${BanglaNameHelper.toBanglaNumeral(remHours)} ঘণ্টা বাকি`
+          : `${BanglaNameHelper.toBanglaNumeral(days)} দিন বাকি`;
+      }
+    }
+  };
+
   if (selectedExam) {
     return (
       <LiveExamDetailsView
@@ -114,250 +171,169 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       title={displayCategoryTitle}
       onBack={onBack}
     >
-      <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
-        {/* ── Top Header Bar ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-[#12544F] dark:bg-[#34D399]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#12544F] dark:text-[#34D399]">
-                ক্যাটাগরি
-              </span>
-            </div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-900 dark:text-white leading-tight">
-              {displayCategoryTitle} 🎯
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-              সকল লাইভ ও আসন্ন মডেল টেস্টের তালিকা
-            </p>
+      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+        {/* Filters & Routine Action Bar matching Flutter live_exam_category_view */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          {/* Filter Chips Capsule (All, Ongoing, Upcoming) */}
+          <div className="p-0.5 rounded-full bg-white dark:bg-[#181A24] border border-[#E2E8F0] dark:border-[#272A38] flex items-center shadow-2xs">
+            {(["All", "Ongoing", "Upcoming"] as const).map((f) => {
+              const isActive = activeFilter === f;
+              return (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setActiveFilter(f)}
+                  className={cn(
+                    "px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all cursor-pointer",
+                    isActive
+                      ? "bg-[#004633] text-white shadow-xs"
+                      : "text-[#64748B] dark:text-[#94A3B8] hover:text-[#0F172A] dark:hover:text-white"
+                  )}
+                >
+                  {f}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Routine Sheet Modal Button */}
+          {/* Routine Action Button */}
           <button
             type="button"
             onClick={() => setIsRoutineOpen(true)}
-            className="self-start sm:self-auto px-4 py-2.5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] hover:border-[#12544F] text-neutral-800 dark:text-neutral-200 hover:text-[#12544F] dark:hover:text-[#34D399] text-xs sm:text-sm font-bold shadow-2xs hover:shadow-sm transition-all flex items-center gap-2 cursor-pointer shrink-0"
+            className="px-3.5 py-1.5 rounded-full bg-[#EFF6FF] dark:bg-[#1E3A8A]/25 border border-[#BFDBFE] dark:border-[#1E3A8A]/50 text-[#2563EB] dark:text-[#60A5FA] text-[13px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs hover:opacity-90 active:scale-95"
           >
-            <CalendarDays size={16} className="text-[#12544F] dark:text-[#34D399]" />
-            <span>সম্পূর্ণ রুটিন দেখুন</span>
+            <Calendar size={13} />
+            <span>রুটিন</span>
           </button>
         </div>
 
-        {/* ── Filter Pills Bar (All, Ongoing, Upcoming) matching Flutter ── */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] w-fit mb-6 shadow-2xs">
-          {[
-            { id: "All", label: "সবগুলো" },
-            { id: "Ongoing", label: "⚡ চলমান" },
-            { id: "Upcoming", label: "🕒 আসন্ন" },
-          ].map((f) => {
-            const isActive = activeFilter === f.id;
-            return (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setActiveFilter(f.id as any)}
-                className={cn(
-                  "px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer",
-                  isActive
-                    ? "bg-[#12544F] text-white shadow-xs"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                )}
-              >
-                {f.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── Exams List: Responsive 2-Column Desktop Grid ── */}
+        {/* Exams List matching Flutter _LiveExamCard */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="space-y-3.5">
+            {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-44 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] animate-pulse"
+                className="h-32 rounded-2xl bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] animate-pulse"
               />
             ))}
           </div>
         ) : filteredExams.length === 0 ? (
-          <div className="py-16 text-center rounded-3xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] p-6 shadow-xs">
-            <div className="w-14 h-14 rounded-2xl bg-[#E6F0EC] dark:bg-[#12544F]/20 text-[#12544F] dark:text-[#34D399] mx-auto flex items-center justify-center mb-3">
-              <Calendar size={28} />
-            </div>
-            <h3 className="text-base sm:text-lg font-bold text-neutral-800 dark:text-neutral-200">
-              কোনো পরীক্ষা পাওয়া যায়নি
-            </h3>
-            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-              রুটিন দেখে পরবর্তী পরীক্ষার প্রস্তুতি নিন
-            </p>
+          <div className="py-16 text-center text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+            এই ক্যাটাগরিতে বর্তমানে কোনো লাইভ পরীক্ষা নেই।
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <div className="space-y-3.5">
             {filteredExams.map((exam) => {
-              const isTaken = exam.userAttemptStatus === "submitted";
               const start = new Date(exam.start_time);
               const end = new Date(exam.end_time);
-
               const isOngoing = now >= start && now <= end;
               const isPast = now > end;
+              const isTaken = exam.userAttemptStatus === "submitted";
 
               let statusText = "Upcoming";
               let StatusIcon = Clock;
-              let statusBadgeClass =
-                "bg-[#FEF2F2] dark:bg-[#740A03]/20 text-[#740A03] dark:text-[#F87171] border-[#740A03]/30";
+              let statusColorClass = "text-[#B91C1C] dark:text-[#F87171]";
+              let bottomStripBg = "bg-[#FEF2F2] dark:bg-[#260C0E]";
 
               if (isTaken) {
                 statusText = "অংশগ্রহণকৃত";
                 StatusIcon = CheckCircle2;
-                statusBadgeClass =
-                  "bg-[#EFF6FF] dark:bg-[#1E293B] text-[#2563EB] dark:text-[#60A5FA] border-[#2563EB]/30";
+                statusColorClass = "text-[#2563EB] dark:text-[#60A5FA]";
+                bottomStripBg = "bg-[#EFF6FF] dark:bg-[#0E1A2E]";
               } else if (isOngoing) {
-                statusText = "Ongoing Live";
+                statusText = "Ongoing";
                 StatusIcon = Zap;
-                statusBadgeClass =
-                  "bg-[#E6F0EC] dark:bg-[#12544F]/25 text-[#12544F] dark:text-[#34D399] border-[#12544F]/30";
+                statusColorClass = "text-[#15803D] dark:text-[#4ADE80]";
+                bottomStripBg = "bg-[#F0FDF4] dark:bg-[#0C2419]";
               } else if (isPast) {
                 statusText = "সমাপ্ত";
                 StatusIcon = CheckCircle2;
-                statusBadgeClass =
-                  "bg-neutral-100 dark:bg-[#27272A] text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700";
+                statusColorClass = "text-[#64748B] dark:text-[#94A3B8]";
+                bottomStripBg = "bg-[#F1F5F9] dark:bg-[#1E293B]/60";
               }
 
-              // Countdown text
-              let countdownText = "";
-              if (isOngoing) {
-                const diffSecs = Math.max(0, Math.floor((end.getTime() - now.getTime()) / 1000));
-                const mins = Math.floor(diffSecs / 60);
-                const secs = diffSecs % 60;
-                countdownText = `সময় বাকি: ${BanglaNameHelper.toBanglaNumeral(mins)} মি. ${BanglaNameHelper.toBanglaNumeral(secs)} সে.`;
-              } else if (!isPast) {
-                const diffMs = start.getTime() - now.getTime();
-                const totalSecs = Math.floor(diffMs / 1000);
-                const hours = Math.floor(totalSecs / 3600);
-                const mins = Math.floor((totalSecs % 3600) / 60);
-                const days = Math.floor(totalSecs / 86400);
-
-                if (hours < 24) {
-                  countdownText = `${BanglaNameHelper.toBanglaNumeral(hours)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(mins)} মি. বাকি`;
-                } else {
-                  countdownText = `${BanglaNameHelper.toBanglaNumeral(days)} দিন বাকি`;
-                }
-              }
+              const totalQ = exam.total_questions ?? 0;
+              const totalM = exam.total_marks ?? 0;
+              const count = totalQ > 0 ? totalQ : totalM > 0 ? Math.round(totalM) : 25;
+              const durationText = formatDurationBn(exam.duration_minutes);
+              const questionsText = `${BanglaNameHelper.toBanglaNumeral(count)} টি প্রশ্ন`;
+              const timeRemainingText = formatTimeRemaining(exam);
 
               return (
                 <div
                   key={exam.id}
-                  className="rounded-[22px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-4 sm:p-5 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4"
+                  onClick={() =>
+                    setSelectedExam({
+                      id: exam.id,
+                      title: exam.title,
+                      status: isTaken ? "taken" : "untaken",
+                    })
+                  }
+                  className="rounded-[16px] bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] p-4 cursor-pointer shadow-xs hover:shadow-md transition-all active:scale-[0.99] select-none"
                 >
-                  <div>
-                    {/* Top Row: Status Pill & Countdown */}
-                    <div className="flex items-center justify-between gap-2 mb-2.5">
-                      <span
-                        className={cn(
-                          "px-2.5 py-0.5 rounded-full border text-[11.5px] font-bold flex items-center gap-1",
-                          statusBadgeClass
-                        )}
-                      >
-                        <StatusIcon size={12} className={isOngoing ? "animate-pulse" : ""} />
-                        <span>{statusText}</span>
-                      </span>
+                  {/* Row 1: Exam Title */}
+                  <h3 className="text-[16px] font-bold text-[#0F172A] dark:text-white line-clamp-2 leading-snug">
+                    {exam.title}
+                  </h3>
 
-                      {countdownText && (
-                        <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                          {countdownText}
-                        </span>
-                      )}
+                  {/* Row 2: Metadata (Duration on left, Questions on right) */}
+                  <div className="mt-2.5 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-[13px] font-medium text-[#334155] dark:text-[#E2E8F0]">
+                      <Clock size={14} className="text-[#EF4444]" />
+                      <span>{durationText}</span>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white line-clamp-1 mb-2">
-                      {exam.title}
-                    </h3>
-
-                    {/* Meta Info Chips */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#222226] font-semibold">
-                        {BanglaNameHelper.toBanglaNumeral(exam.total_questions || 25)} টি প্রশ্ন
-                      </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#222226] font-semibold">
-                        {BanglaNameHelper.toBanglaNumeral(exam.duration_minutes || 25)} মিনিট
-                      </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-[#222226] font-semibold">
-                        পূর্ণমান: {BanglaNameHelper.toBanglaNumeral(exam.total_marks || 25)}
-                      </span>
+                    <div className="flex items-center gap-1.5 text-[13px] font-medium text-[#334155] dark:text-[#E2E8F0]">
+                      <FileText size={14} className="text-[#10B981]" />
+                      <span>{questionsText}</span>
                     </div>
                   </div>
 
-                  {/* Bottom Action Row */}
-                  <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setSelectedExam({
-                          id: exam.id,
-                          title: exam.title,
-                          status: isTaken ? "taken" : "untaken",
-                        })
-                      }
+                  {/* Row 3: Full Bottom Status Strip */}
+                  <div
+                    className={cn(
+                      "mt-3.5 px-3.5 py-2.5 rounded-[12px] flex items-center justify-between transition-colors",
+                      bottomStripBg
+                    )}
+                  >
+                    <div
                       className={cn(
-                        "w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 shadow-xs",
-                        isTaken
-                          ? "bg-[#601D49] hover:bg-[#4E173B] text-white"
-                          : isOngoing
-                          ? "bg-[#12544F] hover:bg-[#0D3E3A] text-white"
-                          : isPast
-                          ? "bg-neutral-800 hover:bg-neutral-900 text-white dark:bg-neutral-700 dark:hover:bg-neutral-600"
-                          : "bg-neutral-100 dark:bg-[#27272A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200"
+                        "flex items-center gap-1.5 text-[14px] font-semibold",
+                        statusColorClass
                       )}
                     >
-                      {isTaken ? (
-                        <>
-                          <Trophy size={14} />
-                          <span>মেধা তালিকা ও ফলাফল</span>
-                        </>
-                      ) : isOngoing ? (
-                        <>
-                          <Zap size={14} />
-                          <span>পরীক্ষায় অংশ নিন</span>
-                        </>
-                      ) : isPast ? (
-                        <>
-                          <FileText size={14} />
-                          <span>অনুশীলন ও সমাধান</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock size={14} />
-                          <span>পরীক্ষার বিস্তারিত</span>
-                        </>
-                      )}
-                      <ChevronRight size={14} />
-                    </button>
+                      <StatusIcon size={16} />
+                      <span>{statusText}</span>
+                    </div>
+
+                    <span className="text-[14px] font-semibold text-[#0F172A] dark:text-white">
+                      {timeRemainingText}
+                    </span>
                   </div>
                 </div>
               );
             })}
           </div>
         )}
-      </div>
 
-      {/* Routine Modal */}
-      <LiveExamRoutineModal
-        categoryTitle={displayCategoryTitle}
-        isOpen={isRoutineOpen}
-        onClose={() => setIsRoutineOpen(false)}
-        onSelectExam={(examTitle) => {
-          setIsRoutineOpen(false);
-          const found = exams.find((e) => e.title === examTitle);
-          if (found) {
-            setSelectedExam({
-              id: found.id,
-              title: found.title,
-              status: found.userAttemptStatus === "submitted" ? "taken" : "untaken",
-            });
-          }
-        }}
-      />
+        {/* Routine Modal */}
+        <LiveExamRoutineModal
+          categoryTitle={displayCategoryTitle}
+          isOpen={isRoutineOpen}
+          onClose={() => setIsRoutineOpen(false)}
+          onSelectExam={(examTitle) => {
+            setIsRoutineOpen(false);
+            const found = exams.find((e) => e.title === examTitle);
+            if (found) {
+              setSelectedExam({
+                id: found.id,
+                title: found.title,
+                status: found.userAttemptStatus === "submitted" ? "taken" : "untaken",
+              });
+            }
+          }}
+        />
+      </div>
     </AppLayout>
   );
 };

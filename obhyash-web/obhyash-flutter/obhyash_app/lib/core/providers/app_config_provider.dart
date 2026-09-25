@@ -129,7 +129,7 @@ final isPaymentGooglePlayEnabledProvider = Provider<bool>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   return configAsync.maybeWhen(
     data: (config) => config.paymentsEnabled && config.paymentGooglePlayEnabled,
-    orElse: () => true,
+    orElse: () => false,
   );
 });
 

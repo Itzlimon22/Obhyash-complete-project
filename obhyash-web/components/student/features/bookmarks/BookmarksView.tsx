@@ -8,9 +8,6 @@ import {
   X,
   AlertTriangle,
   RefreshCw,
-  Trash2,
-  HelpCircle,
-  CheckCircle2,
 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
@@ -18,10 +15,109 @@ import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { toast } from 'sonner';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 import ReportModal from '@/components/student/ui/common/ReportModal';
+import { cn } from '@/lib/utils';
+import { getBookmarkedQuestions } from '@/services/bookmark-service';
 
 interface BookmarkItem {
   question: Question;
   createdAt: Date;
+}
+
+// Ensure deterministic institute/board tag if absent, exactly matching Flutter _ensureQuestionHasInstitute
+function ensureQuestionHasInstitute(q: Question): Question {
+  const examHist = q.exam_history || (q as any).examHistory;
+  const insts = q.institutes || (q.institute ? [q.institute] : []);
+
+  if ((examHist && examHist.length > 0) || insts.length > 0) {
+    return q;
+  }
+
+  const examTypeLower = (q.examType || (q as any).exam_type || '').toLowerCase();
+  const isEngineering =
+    examTypeLower.includes('eng') || examTypeLower.includes('buet');
+  const isMedical =
+    examTypeLower.includes('med') || examTypeLower.includes('mat');
+  const isVarsity =
+    examTypeLower.includes('var') || examTypeLower.includes('admission');
+
+  // Simple string hash
+  let hash = 0;
+  const idStr = String(q.id || '');
+  for (let i = 0; i < idStr.length; i++) {
+    hash = (hash << 5) - hash + idStr.charCodeAt(i);
+    hash |= 0;
+  }
+  hash = Math.abs(hash);
+
+  let code: string;
+  let institute: string;
+  let year: number;
+
+  if (isEngineering) {
+    const engList = [
+      { code: 'BUET', institute: 'বুয়েট ভর্তি পরীক্ষা', years: [2023, 2022, 2021, 2020, 2019] },
+      { code: 'CKRUET', institute: 'চুয়েট-কুয়েট-রুয়েট সমন্বিত', years: [2023, 2022, 2021] },
+      { code: 'KUET', institute: 'কুয়েট ভর্তি পরীক্ষা', years: [2022, 2021, 2020, 2019] },
+      { code: 'RUET', institute: 'রুয়েট ভর্তি পরীক্ষা', years: [2022, 2021, 2020, 2018] },
+      { code: 'CUET', institute: 'চুয়েট ভর্তি পরীক্ষা', years: [2022, 2021, 2020, 2019] },
+      { code: 'BUTEX', institute: 'বুটেক্স ভর্তি পরীক্ষা', years: [2023, 2022, 2021, 2020] },
+      { code: 'MIST', institute: 'এমআইএসটি ভর্তি পরীক্ষা', years: [2023, 2022, 2021] },
+    ];
+    const entry = engList[hash % engList.length];
+    code = entry.code;
+    institute = entry.institute;
+    const qYears = q.years || (q.year ? [Number(q.year)] : []);
+    year = qYears.length > 0 ? Number(qYears[0]) : entry.years[hash % entry.years.length];
+  } else if (isMedical) {
+    const medList = [
+      { code: 'MAT', institute: 'মেডিকেল ভর্তি পরীক্ষা (MBBS)', years: [2023, 2022, 2021, 2020, 2019, 2018] },
+      { code: 'DAT', institute: 'ডেন্টাল ভর্তি পরীক্ষা (BDS)', years: [2023, 2022, 2021, 2020] },
+      { code: 'AFMC', institute: 'আর্মড ফোর্সেস মেডিকেল কলেজ', years: [2023, 2022, 2021] },
+    ];
+    const entry = medList[hash % medList.length];
+    code = entry.code;
+    institute = entry.institute;
+    const qYears = q.years || (q.year ? [Number(q.year)] : []);
+    year = qYears.length > 0 ? Number(qYears[0]) : entry.years[hash % entry.years.length];
+  } else if (isVarsity) {
+    const varList = [
+      { code: 'DU', institute: 'ঢাকা বিশ্ববিদ্যালয়', years: [2023, 2022, 2021, 2020, 2019] },
+      { code: 'JU', institute: 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয়', years: [2023, 2022, 2021, 2020] },
+      { code: 'RU', institute: 'রাজশাহী বিশ্ববিদ্যালয়', years: [2023, 2022, 2021, 2020] },
+      { code: 'CU', institute: 'চট্টগ্রাম বিশ্ববিদ্যালয়', years: [2023, 2022, 2021, 2019] },
+      { code: 'GST', institute: 'গুচ্ছ সমন্বিত বিশ্ববিদ্যালয়', years: [2023, 2022, 2021] },
+      { code: 'SUST', institute: 'শাহজালাল বিজ্ঞান ও প্রযুক্তি', years: [2022, 2021, 2020] },
+      { code: 'JnU', institute: 'জগন্নাথ বিশ্ববিদ্যালয়', years: [2022, 2021, 2019] },
+    ];
+    const entry = varList[hash % varList.length];
+    code = entry.code;
+    institute = entry.institute;
+    const qYears = q.years || (q.year ? [Number(q.year)] : []);
+    year = qYears.length > 0 ? Number(qYears[0]) : entry.years[hash % entry.years.length];
+  } else {
+    const boardList = [
+      { code: 'DB', institute: 'ঢাকা বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'CB', institute: 'কুমিল্লা বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'RB', institute: 'রাজশাহী বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'CtgB', institute: 'চট্টগ্রাম বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'JB', institute: 'যশোর বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'BB', institute: 'বরিশাল বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'SB', institute: 'সিলেট বোর্ড', years: [2023, 2022, 2021] },
+      { code: 'DinB', institute: 'দিনাজপুর বোর্ড', years: [2023, 2022, 2021] },
+    ];
+    const entry = boardList[hash % boardList.length];
+    code = entry.code;
+    institute = entry.institute;
+    const qYears = q.years || (q.year ? [Number(q.year)] : []);
+    year = qYears.length > 0 ? Number(qYears[0]) : entry.years[hash % entry.years.length];
+  }
+
+  return {
+    ...q,
+    exam_history: [{ code, institute, year }],
+    institutes: [institute],
+    years: [year],
+  };
 }
 
 export const BookmarksView: React.FC = () => {
@@ -53,97 +149,11 @@ export const BookmarksView: React.FC = () => {
         return;
       }
 
-      // 1. Fetch user bookmarks
-      const { data: bData, error: bErr } = await supabase
-        .from('bookmarks')
-        .select('question_id, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (bErr) throw bErr;
-
-      const rawList = bData || [];
-      if (rawList.length === 0) {
-        setBookmarks([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const qIds = rawList
-        .map((e: any) => e.question_id?.toString() || '')
-        .filter((id: string) => id.length > 0);
-
-      const dateMap = new Map<string, Date>();
-      rawList.forEach((e: any) => {
-        const qid = e.question_id?.toString() || '';
-        if (qid) {
-          dateMap.set(
-            qid,
-            e.created_at ? new Date(e.created_at) : new Date()
-          );
-        }
-      });
-
-      const questionMap = new Map<string, Question>();
-
-      // 2. Fetch from 'questions' table in chunks of 50
-      for (let i = 0; i < qIds.length; i += 50) {
-        const chunk = qIds.slice(i, i + 50);
-        try {
-          const { data: qData } = await supabase
-            .from('questions')
-            .select('*')
-            .in('id', chunk);
-
-          if (qData) {
-            qData.forEach((q: any) => {
-              if (q.id) questionMap.set(q.id, q as Question);
-            });
-          }
-        } catch (chunkErr) {
-          console.warn('[BookmarksView] chunk fetch error:', chunkErr);
-        }
-      }
-
-      // 3. Fallback: Search missing questions in exam_results
-      const missingIds = qIds.filter((id) => !questionMap.has(id));
-      if (missingIds.length > 0) {
-        try {
-          const { data: examRes } = await supabase
-            .from('exam_results')
-            .select('questions')
-            .eq('user_id', user.id)
-            .not('questions', 'is', null)
-            .order('created_at', { ascending: false })
-            .limit(50);
-
-          if (examRes) {
-            examRes.forEach((row: any) => {
-              const qList = row.questions;
-              if (Array.isArray(qList)) {
-                qList.forEach((item: any) => {
-                  if (item && item.id && missingIds.includes(item.id)) {
-                    questionMap.set(item.id, item as Question);
-                  }
-                });
-              }
-            });
-          }
-        } catch (fallbackErr) {
-          console.warn('[BookmarksView] fallback search error:', fallbackErr);
-        }
-      }
-
-      // 4. Build ordered list
-      const ordered: BookmarkItem[] = [];
-      qIds.forEach((id) => {
-        if (questionMap.has(id)) {
-          ordered.push({
-            question: questionMap.get(id)!,
-            createdAt: dateMap.get(id) || new Date(),
-          });
-        }
-      });
+      const fetchedQs = await getBookmarkedQuestions(user.id);
+      const ordered: BookmarkItem[] = fetchedQs.map((q) => ({
+        question: ensureQuestionHasInstitute(q),
+        createdAt: q.bookmarkedAt ? new Date(q.bookmarkedAt) : new Date(),
+      }));
 
       setBookmarks(ordered);
     } catch (err) {
@@ -159,7 +169,7 @@ export const BookmarksView: React.FC = () => {
   }, [fetchBookmarks]);
 
   // Remove single bookmark
-  const handleRemoveBookmark = async (questionId: string) => {
+  const handleRemoveBookmark = async (questionId: string | number) => {
     try {
       const supabase = createClient();
       const {
@@ -167,15 +177,15 @@ export const BookmarksView: React.FC = () => {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Optimistic update
-      setBookmarks((prev) => prev.filter((b) => b.question.id !== questionId));
+      const qIdStr = String(questionId);
+      setBookmarks((prev) => prev.filter((b) => String(b.question.id) !== qIdStr));
       toast.success('বুকমার্ক থেকে সরানো হয়েছে');
 
       await supabase
         .from('bookmarks')
         .delete()
         .eq('user_id', user.id)
-        .eq('question_id', questionId);
+        .eq('question_id', qIdStr);
     } catch (err) {
       console.error('[BookmarksView] remove error:', err);
       toast.error('বুকমার্ক সরাতে সমস্যা হয়েছে');
@@ -220,12 +230,24 @@ export const BookmarksView: React.FC = () => {
 
   const displayedList = filteredBookmarks.slice(0, displayCount);
 
+  // Formatted date for filter display (d/M)
+  const formattedFilterDateText = useMemo(() => {
+    if (!filterDate) return 'তারিখ';
+    const parts = filterDate.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[2], 10);
+      const month = parseInt(parts[1], 10);
+      return `${BanglaNameHelper.toBanglaNumeral(day)}/${BanglaNameHelper.toBanglaNumeral(month)}`;
+    }
+    return filterDate;
+  }, [filterDate]);
+
   return (
-    <div className="w-full flex flex-col space-y-4 font-sans pb-16">
-      {/* ── 1. Top Filters Bar (Matching Flutter BookmarksView) ── */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-        {/* Subject Filter */}
-        <div className="flex-1 min-w-[140px] relative">
+    <div className="w-full flex flex-col font-['HindSiliguri',sans-serif] pb-16">
+      {/* ── 1. Top Filters Bar (Matching Flutter BookmarksView horizontal: 10, vertical: 8) ── */}
+      <div className="px-2.5 sm:px-3 py-2 flex items-center gap-2">
+        {/* Subject Dropdown */}
+        <div className="flex-1 relative">
           <select
             value={filterSubject}
             onChange={(e) => {
@@ -233,31 +255,43 @@ export const BookmarksView: React.FC = () => {
               setFilterChapter('');
               setDisplayCount(15);
             }}
-            className="w-full h-11 px-3.5 pr-8 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-sm font-semibold text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none cursor-pointer"
+            className={cn(
+              "w-full h-[42px] px-3 pr-8 rounded-[12px] text-[13.5px] font-medium appearance-none cursor-pointer outline-none transition-colors",
+              "bg-white dark:bg-[#1C1C1C] border border-[#E5E5E5] dark:border-[#1C1C1E]",
+              filterSubject
+                ? "text-[#0F172A] dark:text-white font-semibold"
+                : "text-[#A3A3A3]"
+            )}
           >
             <option value="">সব বিষয়</option>
-            {subjects.map((s) => (
-              <option key={s} value={s}>
-                {BanglaNameHelper.getSubjectEmoji(
-                  s,
-                  BanglaNameHelper.formatSubject(s)
-                )}{' '}
-                {BanglaNameHelper.formatSubject(s)}
-              </option>
-            ))}
+            {subjects.map((s) => {
+              const name = BanglaNameHelper.formatSubject(s);
+              const emoji = BanglaNameHelper.getSubjectEmoji(s, name);
+              return (
+                <option key={s} value={s}>
+                  {emoji} {name}
+                </option>
+              );
+            })}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" />
         </div>
 
-        {/* Chapter Filter */}
-        <div className="flex-1 min-w-[140px] relative">
+        {/* Chapter Dropdown */}
+        <div className="flex-1 relative">
           <select
             value={filterChapter}
             onChange={(e) => {
               setFilterChapter(e.target.value);
               setDisplayCount(15);
             }}
-            className="w-full h-11 px-3.5 pr-8 rounded-xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] text-sm font-semibold text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none cursor-pointer"
+            className={cn(
+              "w-full h-[42px] px-3 pr-8 rounded-[12px] text-[13.5px] font-medium appearance-none cursor-pointer outline-none transition-colors",
+              "bg-white dark:bg-[#1C1C1C] border border-[#E5E5E5] dark:border-[#1C1C1E]",
+              filterChapter
+                ? "text-[#0F172A] dark:text-white font-semibold"
+                : "text-[#A3A3A3]"
+            )}
           >
             <option value="">সব অধ্যায়</option>
             {chapters.map((c) => (
@@ -266,115 +300,133 @@ export const BookmarksView: React.FC = () => {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" />
         </div>
 
-        {/* Date Filter */}
-        <div className="relative">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => {
-              setFilterDate(e.target.value);
-              setDisplayCount(15);
-            }}
-            className={`
-              h-11 px-3 rounded-xl border text-xs sm:text-sm font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20
-              ${
-                filterDate
-                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-white dark:bg-[#18181B] border-neutral-200 dark:border-[#27272A] text-neutral-700 dark:text-neutral-300'
-              }
-            `}
-          />
-          {filterDate && (
-            <button
-              onClick={() => {
-                setFilterDate('');
+        {/* Date Filter (Matching Flutter styling: 42px height, green when selected, d/M text, clear button) */}
+        <div className="relative shrink-0">
+          <div
+            className={cn(
+              "h-[42px] px-3 rounded-[12px] border text-[13.5px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer relative",
+              filterDate
+                ? "bg-[#ECFDF5] dark:bg-[#064E3B]/30 border-[#34D399] dark:border-[#059669] text-[#059669] dark:text-[#34D399]"
+                : "bg-white dark:bg-[#1C1C1C] border-[#E5E5E5] dark:border-[#1C1C1E] text-[#A3A3A3]"
+            )}
+          >
+            <Calendar
+              size={16}
+              className={filterDate ? "text-[#059669] dark:text-[#34D399]" : "text-[#A3A3A3]"}
+            />
+            <span className="select-none">{formattedFilterDateText}</span>
+
+            {/* Invisible Date Input Covering the Box for Native Picker */}
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => {
+                setFilterDate(e.target.value);
                 setDisplayCount(15);
               }}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 flex items-center justify-center shadow-xs text-xs hover:bg-neutral-300"
-              title="ফিল্টার ক্লিয়ার করো"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          )}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            />
+
+            {filterDate && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFilterDate('');
+                  setDisplayCount(15);
+                }}
+                className="z-10 ml-0.5 p-0.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-[#059669] dark:text-[#34D399]"
+                title="তারিখ মুছুন"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── 2. Content Body ── */}
+      {/* ── 2. Content Body (Matching Flutter BookmarksView _buildBody) ── */}
       {isLoading ? (
-        <div className="space-y-4 pt-2">
+        <div className="px-2.5 sm:px-3 py-4 space-y-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="p-5 rounded-2xl bg-white dark:bg-[#18181B] border border-neutral-200 dark:border-[#27272A] animate-pulse space-y-3"
+              className="p-5 rounded-[16px] bg-white dark:bg-[#13151F] border border-[#E2E8F0] dark:border-[#232738] animate-pulse space-y-3"
             >
               <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded w-1/3" />
               <div className="h-5 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4" />
               <div className="grid grid-cols-2 gap-2 pt-2">
-                <div className="h-10 bg-neutral-100 dark:bg-neutral-800 rounded-xl" />
-                <div className="h-10 bg-neutral-100 dark:bg-neutral-800 rounded-xl" />
+                <div className="h-10 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl" />
+                <div className="h-10 bg-neutral-100 dark:bg-neutral-800/60 rounded-xl" />
               </div>
             </div>
           ))}
         </div>
       ) : hasError ? (
-        <div className="p-12 text-center flex flex-col items-center justify-center bg-white dark:bg-[#18181B] rounded-3xl border border-neutral-200 dark:border-[#27272A]">
-          <div className="w-14 h-14 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3">
-            <AlertTriangle className="w-7 h-7" />
+        <div className="py-20 text-center flex flex-col items-center justify-center px-4">
+          <div className="w-14 h-14 rounded-full bg-[#EF4444]/10 text-[#EF4444] flex items-center justify-center mb-4">
+            <AlertTriangle size={36} />
           </div>
-          <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+          <h3 className="text-[15px] font-semibold text-[#1E293B] dark:text-white">
             ডাটা লোড করতে সমস্যা হয়েছে!
           </h3>
           <button
+            type="button"
             onClick={fetchBookmarks}
-            className="mt-4 px-5 py-2.5 rounded-xl bg-[#059669] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#047857] transition-all cursor-pointer"
+            className="mt-4 px-5 py-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-semibold text-[13.5px] transition-all cursor-pointer shadow-xs active:scale-95"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>আবার চেষ্টা করো</span>
+            আবার চেষ্টা করো
           </button>
         </div>
       ) : filteredBookmarks.length === 0 ? (
-        <div className="p-14 text-center flex flex-col items-center justify-center bg-white dark:bg-[#18181B] rounded-3xl border border-neutral-200 dark:border-[#27272A]">
-          <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-[#27272A] flex items-center justify-center text-neutral-400 mb-4">
-            <Bookmark className="w-8 h-8" />
-          </div>
-          <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
+        <div className="py-24 text-center flex flex-col items-center justify-center px-4">
+          <Bookmark
+            size={54}
+            className="text-neutral-300 dark:text-neutral-800 mb-3.5"
+          />
+          <h3 className="text-[15.5px] font-semibold text-neutral-600 dark:text-neutral-400">
             কোনো বুকমার্ক করা প্রশ্ন নেই!
           </h3>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 max-w-sm">
-            পরীক্ষা বা অনুশীলনের সময় গুরুত্বপূর্ণ প্রশ্নগুলো বুকমার্ক করে রাখলে
-            এখানে দেখতে পাবে।
+          <p className="text-[12.5px] text-neutral-500 dark:text-neutral-500 mt-1 max-w-sm leading-relaxed">
+            এক্সাম দেওয়ার সময় গুরুত্বপূর্ণ প্রশ্নগুলো বুকমার্ক করে রাখো।
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="px-2.5 sm:px-3 py-4 space-y-4">
           {displayedList.map((item, idx) => (
-            <div key={item.question.id || idx} className="relative group">
+            <div key={item.question.id || idx} className="relative">
               <QuestionCard
                 question={item.question}
                 serialNumber={idx + 1}
-                isBookmarked={true}
+                isFlagged={false}
                 readOnly={true}
                 showAnswer={true}
                 showFeedback={true}
                 initiallyExpanded={false}
+                isBookmarked={true}
+                alwaysShowSourceTag={true}
+                showReport={true}
+                onSelectOption={() => {}}
+                onToggleFlag={() => {}}
                 onToggleBookmark={() => handleRemoveBookmark(item.question.id)}
-                onReport={() => setReportQuestionId(item.question.id)}
+                onReport={() => setReportQuestionId(String(item.question.id))}
               />
             </div>
           ))}
 
-          {/* Load More Button */}
+          {/* Load More Button matching Flutter ElevatedButton.icon */}
           {filteredBookmarks.length > displayCount && (
             <div className="py-4 text-center">
               <button
+                type="button"
                 onClick={() => setDisplayCount((prev) => prev + 15)}
-                className="px-6 py-3 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272A] dark:hover:bg-[#3F3F46] text-neutral-800 dark:text-white font-bold text-sm flex items-center gap-2 mx-auto transition-all cursor-pointer shadow-xs"
+                className="px-6 py-3 rounded-xl bg-[#F5F5F5] hover:bg-neutral-200 dark:bg-[#1C1C1E] dark:hover:bg-[#27272A] text-neutral-800 dark:text-white font-semibold text-sm inline-flex items-center gap-2 transition-all cursor-pointer shadow-2xs active:scale-95"
               >
-                <ChevronDown className="w-4 h-4" />
-                <span>আরও লোড করুন ({filteredBookmarks.length - displayCount}টি বাকি)</span>
+                <ChevronDown size={16} />
+                <span>আরও লোড করুন</span>
               </button>
             </div>
           )}

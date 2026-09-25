@@ -105,7 +105,7 @@ class AppConfigModel {
       paymentGooglePlayEnabled:
           json['payment_google_play_enabled'] as bool? ??
           json['google_play_enabled'] as bool? ??
-          true,
+          false,
       manualPaymentMerchantNumber:
           json['manual_payment_merchant_number'] as String? ?? '01749591456',
       leaderboardEnabled: json['leaderboard_enabled'] as bool? ?? true,

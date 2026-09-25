@@ -115,7 +115,10 @@ class InAppPurchaseService {
       }
 
       final purchaseParam = PurchaseParam(productDetails: product);
-      return await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+      return await _iap.buyConsumable(
+        purchaseParam: purchaseParam,
+        autoConsume: true,
+      );
     } catch (e) {
       debugPrint('[InAppPurchaseService] Error initiating purchase: $e');
       _purchaseStatusController.add(PurchaseResult.error(e.toString()));
@@ -179,6 +182,9 @@ class InAppPurchaseService {
     }
   }
 
+  /// Global callback invoked immediately when a subscription is verified & synced
+  static VoidCallback? onSubscriptionActivated;
+
   /// Sync the successful purchase with Supabase user profile & subscription history
   Future<bool> _verifyAndSyncPurchase(PurchaseDetails purchase) async {
     try {
@@ -202,10 +208,41 @@ class InAppPurchaseService {
       }
 
       final now = DateTime.now();
-      final expiresAt = now.add(Duration(days: durationDays));
 
-      // 1. Insert into subscription_history
+      // Check existing subscription to support stacking if already active
+      DateTime baseTime = now;
       try {
+        final existingUser = await supabase
+            .from('users')
+            .select('subscription, subscription_expires_at')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (existingUser != null) {
+          final subJson = existingUser['subscription'] as Map<String, dynamic>?;
+          final expStr = existingUser['subscription_expires_at'] ??
+              subJson?['expiry'] ??
+              subJson?['expires_at'];
+          if (expStr != null) {
+            final parsedExp = DateTime.tryParse(expStr.toString());
+            if (parsedExp != null && parsedExp.isAfter(now)) {
+              baseTime = parsedExp;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[InAppPurchaseService] Existing expiry check error: $e');
+      }
+
+      final expiresAt = baseTime.add(Duration(days: durationDays));
+
+      // 1. Deactivate old records and insert new active record into subscription_history
+      try {
+        await supabase
+            .from('subscription_history')
+            .update({'is_active': false})
+            .eq('user_id', user.id);
+
         await supabase.from('subscription_history').insert({
           'user_id': user.id,
           'plan_name': planName,
@@ -218,19 +255,35 @@ class InAppPurchaseService {
           'transaction_id': purchase.purchaseID ?? 'GP-${now.millisecondsSinceEpoch}',
         });
       } catch (histErr) {
-        debugPrint('[InAppPurchaseService] Error inserting subscription_history: $histErr');
+        debugPrint('[InAppPurchaseService] Error updating subscription_history: $histErr');
       }
 
-      // 2. Update users table subscription status
+      // 2. Update users table with BOTH jsonb subscription map and scalar columns for 100% compatibility
       try {
         await supabase.from('users').update({
           'is_subscribed': true,
           'subscription_status': 'active',
           'subscription_expires_at': expiresAt.toIso8601String(),
-          'plan': planName,
+          'level': 'Pro',
+          'plan': 'Pro',
+          'subscription': {
+            'plan': planName,
+            'status': 'Active',
+            'expiry': expiresAt.toIso8601String(),
+            'expires_at': expiresAt.toIso8601String(),
+          },
+          'updated_at': now.toIso8601String(),
         }).eq('id', user.id);
       } catch (userErr) {
         debugPrint('[InAppPurchaseService] Error updating users subscription: $userErr');
+        return false;
+      }
+
+      // 3. Trigger in-memory UI refresh callback immediately
+      try {
+        onSubscriptionActivated?.call();
+      } catch (cbErr) {
+        debugPrint('[InAppPurchaseService] onSubscriptionActivated callback error: $cbErr');
       }
 
       return true;

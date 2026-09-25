@@ -33,6 +33,7 @@ import '../../features/notifications/services/notification_permission_manager.da
 import '../../features/history/presentation/exam_history_view.dart';
 import '../../features/exam/providers/exam_provider.dart';
 import '../../features/question_bank/presentation/question_bank_tab_provider.dart';
+import '../../features/subscription/services/in_app_purchase_service.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -50,6 +51,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
   @override
   void initState() {
     super.initState();
+    InAppPurchaseService.onSubscriptionActivated = () {
+      if (mounted) {
+        ref.invalidate(userProfileProvider);
+      }
+    };
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = ref.read(authProvider);
       if (user != null) {

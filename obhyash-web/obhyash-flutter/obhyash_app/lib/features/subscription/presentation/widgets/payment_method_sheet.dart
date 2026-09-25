@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:obhyash_app/features/subscription/presentation/payment_view.dart';
 import '../../../../core/providers/app_config_provider.dart';
+import '../../../dashboard/providers/dashboard_providers.dart';
 import '../../domain/models.dart';
 import '../../services/in_app_purchase_service.dart';
 
@@ -178,16 +178,19 @@ class PaymentMethodSheet extends ConsumerWidget {
                 badge: _buildGooglePlayBadge(),
                 onTap: () async {
                   Navigator.pop(context);
+                  InAppPurchaseService.onSubscriptionActivated = () {
+                    ref.invalidate(userProfileProvider);
+                  };
                   final iapService = InAppPurchaseService();
                   final launched = await iapService.purchasePlan(plan);
                   if (!launched && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          'Google Play Billing প্রক্রিয়া চালু হচ্ছে (${iapService.getSkuForPlan(plan)})...',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        content: const Text(
+                          'পেমেন্ট প্রক্রিয়া শুরু করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        backgroundColor: const Color(0xFF0F172A),
+                        backgroundColor: const Color(0xFFEF4444),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         duration: const Duration(seconds: 3),
@@ -288,15 +291,6 @@ class PaymentMethodSheet extends ConsumerWidget {
       child: Center(
         child: _GooglePlayLogo(size: 22),
       ),
-    );
-  }
-
-  void _showGooglePlayPurchaseSheet(BuildContext context, SubscriptionPlan plan) {
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => _GooglePlayPurchaseModal(plan: plan),
     );
   }
 }
@@ -442,210 +436,4 @@ class _GooglePlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// Official Google Play purchase confirmation sheet
-class _GooglePlayPurchaseModal extends StatefulWidget {
-  final SubscriptionPlan plan;
-
-  const _GooglePlayPurchaseModal({required this.plan});
-
-  @override
-  State<_GooglePlayPurchaseModal> createState() => _GooglePlayPurchaseModalState();
-}
-
-class _GooglePlayPurchaseModalState extends State<_GooglePlayPurchaseModal> {
-  bool _isProcessing = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final userEmail = Supabase.instance.client.auth.currentUser?.email ?? 'student@obhyash.com';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E24) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.all(22),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Google Play header
-            Row(
-              children: [
-                const _GooglePlayLogo(size: 24),
-                const SizedBox(width: 10),
-                Text(
-                  'Google Play',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 20),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-
-            // Plan details
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.plan.name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Obhyash - অভ্যাস এডুকেশন',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  '৳${widget.plan.price}.00',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Google Account info
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.account_circle_outlined,
-                    size: 18,
-                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      userEmail,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF334155),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    'Google Play Balance',
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF059669),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Buy button
-            ElevatedButton(
-              onPressed: _isProcessing
-                  ? null
-                  : () async {
-                      final nav = Navigator.of(context);
-                      final messenger = ScaffoldMessenger.of(context);
-                      setState(() => _isProcessing = true);
-
-                      final iapService = InAppPurchaseService();
-                      final launched = await iapService.purchasePlan(widget.plan);
-
-                      if (mounted) {
-                        setState(() => _isProcessing = false);
-                        nav.pop();
-
-                        if (launched) {
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                'Google Play পেমেন্ট প্রক্রিয়া চালু হয়েছে...',
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              backgroundColor: const Color(0xFF0086F8),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          );
-                        } else {
-                          // Product awaiting sync in Play Console or sandbox fallback
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Google Play Billing কনফিগার সম্পন্ন (${iapService.getSkuForPlan(widget.plan)})। প্লে কনসোলে রিলিজের পর গুগল সরাসরি চার্জ করবে।',
-                                style: const TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                              backgroundColor: const Color(0xFF0F172A),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                        }
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0086F8),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 0,
-              ),
-              child: _isProcessing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      '1-ট্যাপে কিনুন (1-Tap Buy)',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

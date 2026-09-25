@@ -524,20 +524,20 @@ export default function ControlPanelPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <Smartphone size={16} className={config.payment_google_play_enabled ?? true ? 'text-blue-600' : 'text-slate-400'} />
+                  <Smartphone size={16} className={config.payment_google_play_enabled ?? false ? 'text-blue-600' : 'text-slate-400'} />
                   গুগল ইন-অ্যাপ পারচেজ
                 </span>
                 <input
                   type="checkbox"
-                  checked={config.payment_google_play_enabled ?? true}
+                  checked={config.payment_google_play_enabled ?? false}
                   onChange={(e) => handleToggle('payment_google_play_enabled', e.target.checked)}
                   className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
                 />
               </div>
               <p className="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
-                {config.payment_google_play_enabled ?? true
+                {config.payment_google_play_enabled ?? false
                   ? 'গুগল প্লে স্টোর অফিসিয়াল ডিজিটাল বিলিং চালু'
-                  : 'প্লে কনসোল রিভিউ চলাকালে বা অন্য সময়ে গুগল বিলিং বন্ধ'}
+                  : 'প্লে কনসোল রিভিউ চলাকালে বা কনসোল সেটআপ না হওয়া পর্যন্ত গুগল বিলিং বন্ধ'}
               </p>
             </div>
           </div>

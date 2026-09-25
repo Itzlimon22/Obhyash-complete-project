@@ -81,6 +81,171 @@ export const getUserBookmarks = async (
 };
 
 /**
+ * Comprehensive question normalization supporting both web and Flutter schema variants.
+ */
+export function normalizeQuestion(d: any, bookmarkedAt?: Date): Question {
+  if (!d) {
+    return {
+      id: '',
+      question: '',
+      options: [],
+      correctAnswer: '',
+      correctAnswerIndex: 0,
+      correctAnswerIndices: [0],
+      subject: 'general',
+      chapter: '',
+      status: 'Approved',
+      author: 'system',
+      createdAt: new Date().toISOString(),
+      version: 1,
+      tags: [],
+      type: 'MCQ',
+      difficulty: 'Medium',
+    };
+  }
+
+  // 1. Parse options
+  let opts: string[] = [];
+  if (Array.isArray(d.options)) {
+    opts = d.options.map((e: any) => {
+      if (typeof e === 'object' && e !== null) {
+        return e.text || e.option || '';
+      }
+      return String(e ?? '');
+    });
+  }
+
+  // 2. Parse exam_history
+  let validExamHistory: any[] = [];
+  const rawHistory = d.exam_history || d.examHistory;
+  if (Array.isArray(rawHistory)) {
+    validExamHistory = rawHistory.map((item: any) => ({
+      institute: item?.institute || '',
+      code: item?.code || '',
+      year: Number(item?.year) || 0,
+    }));
+  }
+
+  // 3. Parse institutes
+  let insts: string[] = [];
+  if (Array.isArray(d.institutes)) {
+    insts = d.institutes.map((e: any) => String(e).trim()).filter(Boolean);
+  } else {
+    const raw = d.institute ?? d.institution ?? d.board;
+    if (raw) {
+      insts = String(raw)
+        .split(',')
+        .map((e) => e.trim())
+        .filter(Boolean);
+    }
+  }
+
+  // 4. Parse years
+  let yrs: number[] = [];
+  if (Array.isArray(d.years)) {
+    for (const y of d.years) {
+      if (typeof y === 'number') yrs.push(y);
+      else if (y) {
+        const parsed = parseInt(String(y).replace(/[^0-9]/g, ''), 10);
+        if (!isNaN(parsed) && parsed > 0) yrs.push(parsed);
+      }
+    }
+  } else if (d.year) {
+    const parts = String(d.year).split(',');
+    for (const p of parts) {
+      const parsed = parseInt(p.replace(/[^0-9]/g, ''), 10);
+      if (!isNaN(parsed) && parsed > 0) yrs.push(parsed);
+    }
+  }
+
+  // Synchronize history & legacy fields
+  if (validExamHistory.length > 0) {
+    if (insts.length === 0) {
+      insts = validExamHistory
+        .map((h) => h.institute || h.code)
+        .filter(Boolean);
+    }
+    if (yrs.length === 0) {
+      yrs = validExamHistory.map((h) => h.year).filter((y) => y > 0);
+    }
+  }
+
+  // 5. Correct answer resolution
+  let correctIdx = 0;
+  let correctIndices: number[] = [];
+
+  const rawIndices = d.correct_answer_indices || d.correctAnswerIndices;
+  if (Array.isArray(rawIndices) && rawIndices.length > 0) {
+    for (const item of rawIndices) {
+      const p = typeof item === 'number' ? item : parseInt(String(item), 10);
+      if (!isNaN(p)) correctIndices.push(p);
+    }
+    if (correctIndices.length > 0) correctIdx = correctIndices[0];
+  } else if (
+    typeof d.correct_answer_index === 'number' ||
+    typeof d.correctAnswerIndex === 'number'
+  ) {
+    correctIdx = d.correct_answer_index ?? d.correctAnswerIndex;
+    correctIndices = [correctIdx];
+  } else if (d.correct_answer !== undefined || d.correctAnswer !== undefined) {
+    const raw = String(d.correct_answer ?? d.correctAnswer).trim();
+    const asInt = parseInt(raw, 10);
+    if (!isNaN(asInt) && asInt >= 0 && asInt < (opts.length || 4)) {
+      correctIdx = asInt;
+    } else if (raw.length === 1) {
+      const upper = raw.toUpperCase();
+      if (upper === 'A') correctIdx = 0;
+      else if (upper === 'B') correctIdx = 1;
+      else if (upper === 'C') correctIdx = 2;
+      else if (upper === 'D') correctIdx = 3;
+    } else {
+      const idx = opts.indexOf(raw);
+      if (idx !== -1) correctIdx = idx;
+    }
+    correctIndices = [correctIdx];
+  }
+
+  if (correctIndices.length === 0) {
+    correctIndices = [correctIdx];
+  }
+
+  const resolvedQuestionText = d.question || d.question_text || '';
+  const resolvedExplanation =
+    d.explanation || d.explanation_text || d.solution || '';
+
+  return {
+    ...d,
+    id: String(d.id ?? ''),
+    question: resolvedQuestionText,
+    options: opts,
+    correctAnswer: (d.correct_answer ||
+      d.correctAnswer ||
+      opts[correctIdx] ||
+      'A') as string,
+    correctAnswerIndex: correctIdx,
+    correctAnswerIndices: correctIndices,
+    subject: d.subject || d.subject_id || 'general',
+    subjectId: d.subject_id || d.subject || '',
+    subjectLabel: d.subject_label || d.subjectLabel || d.subject || 'General',
+    chapter: d.chapter || d.chapter_id || '',
+    chapterId: d.chapter_id || d.chapter || '',
+    topic: d.topic || d.topic_id || '',
+    topicId: d.topic_id || d.topic || '',
+    explanation: resolvedExplanation,
+    imageUrl: d.image_url || d.imageUrl,
+    optionImages: d.option_images || d.optionImages || [],
+    explanationImageUrl: d.explanation_image_url || d.explanationImageUrl,
+    exam_history: validExamHistory,
+    examHistory: validExamHistory,
+    institutes: insts,
+    years: yrs,
+    passage: d.passage || null,
+    points: typeof d.points === 'number' ? d.points : 1,
+    bookmarkedAt: bookmarkedAt ? bookmarkedAt.toISOString() : d.bookmarkedAt,
+  };
+}
+
+/**
  * Fetch full question data for all bookmarked questions of a user.
  * Fetches from bookmarks, then queries questions table and falls back to exam_results.
  */
@@ -126,34 +291,9 @@ export const getBookmarkedQuestions = async (
 
         if (qData) {
           qData.forEach((d: any) => {
-            if (d && d.id) {
-              const qObj: Question = {
-                ...d,
-                id: String(d.id),
-                question: d.question || d.question_text || '',
-                options: d.options || [],
-                correctAnswer: (d.correct_answer || d.correctAnswer || 'A') as string,
-                correctAnswerIndex:
-                  typeof d.correct_answer_index === 'number'
-                    ? d.correct_answer_index
-                    : typeof d.correctAnswerIndex === 'number'
-                    ? d.correctAnswerIndex
-                    : 0,
-                correctAnswerIndices:
-                  d.correct_answer_indices || d.correctAnswerIndices || [],
-                subject: d.subject || d.subject_id || '',
-                subjectId: d.subject_id || d.subject || '',
-                chapter: d.chapter || d.chapter_id || '',
-                chapterId: d.chapter_id || d.chapter || '',
-                topicId: d.topic_id || d.topic || '',
-                explanation: d.explanation || '',
-                imageUrl: d.image_url || d.imageUrl,
-                optionImages: d.option_images || d.optionImages || [],
-                explanationImageUrl:
-                  d.explanation_image_url || d.explanationImageUrl,
-                bookmarkedAt: dateMap.get(String(d.id)),
-              };
-              questionMap.set(String(d.id), qObj);
+            if (d && d.id !== undefined && d.id !== null) {
+              const qid = String(d.id);
+              questionMap.set(qid, normalizeQuestion(d, dateMap.get(qid)));
             }
           });
         }
@@ -179,14 +319,13 @@ export const getBookmarkedQuestions = async (
             const qList = row.questions;
             if (Array.isArray(qList)) {
               qList.forEach((item: any) => {
-                if (item && item.id && missingIds.includes(String(item.id))) {
+                if (item && item.id !== undefined && item.id !== null) {
                   const sId = String(item.id);
-                  if (!questionMap.has(sId)) {
-                    questionMap.set(sId, {
-                      ...item,
-                      id: sId,
-                      bookmarkedAt: dateMap.get(sId),
-                    } as Question);
+                  if (missingIds.includes(sId) && !questionMap.has(sId)) {
+                    questionMap.set(
+                      sId,
+                      normalizeQuestion(item, dateMap.get(sId)),
+                    );
                   }
                 }
               });
@@ -194,7 +333,10 @@ export const getBookmarkedQuestions = async (
           });
         }
       } catch (fallbackErr) {
-        console.warn('[getBookmarkedQuestions] fallback search error:', fallbackErr);
+        console.warn(
+          '[getBookmarkedQuestions] fallback search error:',
+          fallbackErr,
+        );
       }
     }
 

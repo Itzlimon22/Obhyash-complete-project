@@ -183,7 +183,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col select-none max-w-full overflow-x-hidden">
       {/* ── 1. Top Sticky Exam Header (Matching Flutter 1:1) ── */}
       <header className="sticky top-0 z-40 bg-white dark:bg-[#000000] border-b border-[#E2E8F0] dark:border-[#27272A] shadow-xs select-none">
         <div className="max-w-3xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
@@ -260,7 +260,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
       </header>
 
       {/* ── 2. Main Question Flow Feed ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] min-w-0 max-w-full overflow-x-hidden">
         <div className="flex flex-col gap-3.5 sm:gap-4">
           {questions.map((question, idx) => {
             const isAnswered = userAnswers[question.id] !== undefined;

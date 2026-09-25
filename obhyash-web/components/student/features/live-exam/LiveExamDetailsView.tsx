@@ -1,13 +1,31 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getStudentLiveExamDetails, getPublicLeaderboard, getStudentLiveExamPracticeHistory } from "@/services/live-exam-student-service";
+import {
+  getStudentLiveExamDetails,
+  getPublicLeaderboard,
+  getStudentLiveExamPracticeHistory,
+} from "@/services/live-exam-student-service";
 import { LiveExam, LiveExamAttempt } from "@/lib/types";
 import { toast } from "sonner";
-import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight, History, Award, EyeOff } from "lucide-react";
+import {
+  Trophy,
+  Calendar,
+  Clock,
+  BookOpen,
+  AlertCircle,
+  RotateCcw,
+  ArrowRight,
+  History,
+  EyeOff,
+} from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
 import LiveExamSolutionView from "./LiveExamSolutionView";
 import LiveExamLeaderboardView from "./LiveExamLeaderboardView";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
+import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import { cn } from "@/lib/utils";
 
 export interface LiveExamDetailsViewProps {
   examId: string;
@@ -17,7 +35,7 @@ export interface LiveExamDetailsViewProps {
   onBack: () => void;
 }
 
-const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
+export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   examId,
   examTitle,
   status,
@@ -55,20 +73,26 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
       const end = new Date(detailsData.exam.end_time);
       const isPast = now > end;
 
-      // Only show public leaderboard if exam has ended or publish_result_instantly is true
-      if (detailsData.attempt?.status === "submitted" && (isPast || detailsData.exam.id.startsWith("mock-"))) {
+      if (
+        detailsData.attempt?.status === "submitted" &&
+        (isPast || detailsData.exam.id.startsWith("mock-"))
+      ) {
         const lb = await getPublicLeaderboard(examId, 5);
         setLeaderboard(lb);
       }
     } catch (error) {
-      toast.error("Failed to load exam details");
+      toast.error("পরীক্ষার বিবরণ লোড করতে সমস্যা হয়েছে");
     } finally {
       setIsLoading(false);
     }
   };
 
   if (isLoading) {
-    return <div className="w-full flex justify-center py-20 text-neutral-500 font-medium animate-pulse">পরীক্ষার বিবরণ লোড হচ্ছে...</div>;
+    return (
+      <div className="w-full flex justify-center py-20 text-neutral-500 font-medium animate-pulse">
+        পরীক্ষার বিবরণ লোড হচ্ছে...
+      </div>
+    );
   }
 
   if (!exam) return null;
@@ -83,15 +107,33 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const isTaken = attempt?.status === "submitted";
 
   let statusBadgeText = "Upcoming";
-  let statusBadgeColor = "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400";
+  let statusBadgeColor = "#3B82F6";
+  let statusBadgeBg = "bg-[#3B82F6]/10 dark:bg-[#3B82F6]/15 border-[#3B82F6]/25 dark:border-[#3B82F6]/30 text-[#3B82F6]";
 
-  if (isOngoing) {
+  if (isTaken) {
+    statusBadgeText = "অংশগ্রহণ সম্পন্ন";
+    statusBadgeColor = "#0B6B42";
+    statusBadgeBg = "bg-[#0B6B42]/10 dark:bg-[#0B6B42]/15 border-[#0B6B42]/25 dark:border-[#0B6B42]/30 text-[#0B6B42] dark:text-[#34D399]";
+  } else if (isOngoing) {
     statusBadgeText = "Ongoing Live";
-    statusBadgeColor = "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400";
+    statusBadgeColor = "#0B6B42";
+    statusBadgeBg = "bg-[#0B6B42]/10 dark:bg-[#0B6B42]/15 border-[#0B6B42]/25 dark:border-[#0B6B42]/30 text-[#0B6B42] dark:text-[#34D399]";
   } else if (isPast) {
-    statusBadgeText = "Archive / Past";
-    statusBadgeColor = "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400";
+    statusBadgeText = "পরীক্ষা শেষ";
+    statusBadgeColor = "#6B7280";
+    statusBadgeBg = "bg-[#6B7280]/10 dark:bg-[#6B7280]/15 border-[#6B7280]/25 dark:border-[#6B7280]/30 text-[#6B7280] dark:text-[#9CA3AF]";
+  } else {
+    statusBadgeText = "আসন্ন পরীক্ষা";
+    statusBadgeColor = "#3B82F6";
+    statusBadgeBg = "bg-[#3B82F6]/10 dark:bg-[#3B82F6]/15 border-[#3B82F6]/25 dark:border-[#3B82F6]/30 text-[#3B82F6]";
   }
+
+  const syllabusList = exam.description?.trim()
+    ? exam.description
+        .split(/[\n\r,;•|]+/)
+        .map((s: string) => s.trim())
+        .filter(Boolean)
+    : [];
 
   // Leaderboard View Screen
   if (isViewingLeaderboard) {
@@ -135,7 +177,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         exam={exam}
         onExit={() => {
           setIsTakingExam(false);
-          fetchDetails(); // refresh attempt status
+          fetchDetails();
         }}
         onViewLeaderboard={() => {
           setIsTakingExam(false);
@@ -154,395 +196,445 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
     );
   }
 
+  const padZero = (n: number) => String(n).padStart(2, "0");
+
   return (
     <AppLayout
       activeTab="live_exam"
       {...commonLayoutProps}
-      title={exam.title || "লাইভ পরীক্ষা"}
+      title="পরীক্ষার বিবরণ"
       onBack={onBack}
     >
-    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-2 md:pt-4 animate-in fade-in zoom-in-95 duration-300 pb-24">
-      
-      {/* Header Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-            {exam.category}
-          </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-900 dark:text-white mt-1.5">
+      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+        {/* Unified Big Exam Information Card matching Flutter live_exam_details_view */}
+        <div className="rounded-[22px] bg-white dark:bg-[#141417] border border-[#E2E8F0] dark:border-[#27272A] p-5 sm:p-6 shadow-xs">
+          {/* 1. Category Tag & Status Badge */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="px-2.5 py-1 rounded-[8px] bg-[#F1F5F9] dark:bg-[#27272A] border border-[#E2E8F0] dark:border-[#3F3F46] text-[#475569] dark:text-[#CBD5E1] text-[11px] font-bold tracking-wider uppercase">
+              {exam.category}
+            </span>
+
+            <span
+              className={cn(
+                "px-2.5 py-1 rounded-[10px] border text-[12px] font-bold",
+                statusBadgeBg
+              )}
+            >
+              {statusBadgeText}
+            </span>
+          </div>
+
+          {/* Exam Title */}
+          <h1 className="mt-4 text-[20px] sm:text-[22px] font-black text-[#0F172A] dark:text-[#F8FAFC] tracking-[-0.3px] leading-tight">
             {exam.title}
-          </h2>
-        </div>
+          </h1>
 
-        {isTaken && attempt && (
-          <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-3.5 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm self-start sm:self-auto shadow-xs">
-            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>প্রাপ্ত নম্বর: {attempt.score}</span>
+          <div className="my-4 h-px bg-[#F1F5F9] dark:bg-[#27272A]" />
+
+          {/* 2. Schedule Section */}
+          <div className="flex items-center gap-2 text-[14.5px] font-bold text-[#334155] dark:text-[#E2E8F0]">
+            <Calendar size={16} className="text-[#64748B] dark:text-[#94A3B8]" />
+            <span>পরীক্ষার সময়সূচী</span>
           </div>
-        )}
-      </div>
 
-      <div className={`grid gap-6 lg:gap-8 ${(isTaken && isPast) ? "lg:grid-cols-[1.1fr_0.9fr]" : "w-full max-w-4xl mx-auto"}`}>
-        
-        {/* Left Column: Details & Actions */}
-        <div className="space-y-6">
-          
-          {/* Unified Big Exam Information Card */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-6">
-            
-            {/* Header / Schedule Header */}
-            <div className="flex items-center justify-between font-extrabold text-lg text-neutral-900 dark:text-white">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <span>পরীক্ষার সময়সূচী</span>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusBadgeColor}`}>
-                {statusBadgeText}
+          <div className="mt-3.5 flex items-center justify-between">
+            {/* Start info */}
+            <div>
+              <span className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA]">
+                শুরু
               </span>
-            </div>
-            
-            {/* Schedule Range */}
-            <div className="flex justify-between items-center bg-neutral-50 dark:bg-neutral-800/40 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
-              <div>
-                <span className="text-xs text-neutral-500 font-semibold">শুরু</span>
-                <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
-                  {start.toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
-                </div>
-                <div className="text-xs text-neutral-500 font-medium">
-                  {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-              <div className="text-neutral-300 dark:text-neutral-700 font-black text-xl">→</div>
-              <div className="text-right">
-                <span className="text-xs text-neutral-500 font-semibold">সমাপ্তি</span>
-                <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
-                  {end.toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
-                </div>
-                <div className="text-xs text-neutral-500 font-medium">
-                  {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
+              <p className="text-[14px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
+                {BanglaNameHelper.toBanglaNumeral(start.getDate())}/
+                {BanglaNameHelper.toBanglaNumeral(start.getMonth() + 1)}/
+                {BanglaNameHelper.toBanglaNumeral(start.getFullYear())}
+              </p>
+              <p className="text-[12.5px] font-semibold text-[#475569] dark:text-[#CBD5E1]">
+                {BanglaNameHelper.toBanglaNumeral(padZero(start.getHours()))}:
+                {BanglaNameHelper.toBanglaNumeral(padZero(start.getMinutes()))}
+              </p>
             </div>
 
-            {/* Meta Information Stats */}
-            <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-100 dark:border-neutral-800 grid grid-cols-3 divide-x divide-neutral-200 dark:divide-neutral-700 text-center">
-              <div>
-                <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">সময়</p>
-                <p className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white">{exam.duration_minutes} মিনিট</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">মোট প্রশ্ন</p>
-                <p className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white">{exam.total_questions} টি</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">নেগেটিভ মার্ক</p>
-                <p className="text-base sm:text-lg font-extrabold text-red-600 dark:text-red-400">-{exam.negative_marking || 0.25}</p>
-              </div>
-            </div>
+            <ArrowRight size={18} className="text-[#CBD5E1] dark:text-[#52525B]" />
 
-            {/* Syllabus & Chapter Breakdown */}
-            <div className="space-y-3 pt-1">
-              <div className="flex items-center gap-2 text-sm font-extrabold text-neutral-900 dark:text-white">
-                <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>সিলেবাস ও অধ্যায়সমূহ</span>
-              </div>
-              <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-100 dark:border-neutral-800">
-                {(() => {
-                  const syllabusList = exam.description?.trim()
-                    ? exam.description.split(/[\n\r,;•|]+/).map((s: string) => s.trim()).filter(Boolean)
-                    : [];
-
-                  if (syllabusList.length === 0) {
-                    return (
-                      <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-medium">
-                        এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।
-                      </p>
-                    );
-                  }
-
-                  return (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-neutral-800 dark:text-neutral-200">
-                      {syllabusList.map((item: string, idx: number) => (
-                        <div key={idx} className="flex items-start gap-2 min-w-0">
-                          <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono text-xs mt-0.5">
-                            {String(idx + 1).padStart(2, '0')}.
-                          </span>
-                          <span className="leading-relaxed font-medium truncate">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
+            {/* End info */}
+            <div className="text-right">
+              <span className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA]">
+                সমাপ্তি
+              </span>
+              <p className="text-[14px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
+                {BanglaNameHelper.toBanglaNumeral(end.getDate())}/
+                {BanglaNameHelper.toBanglaNumeral(end.getMonth() + 1)}/
+                {BanglaNameHelper.toBanglaNumeral(end.getFullYear())}
+              </p>
+              <p className="text-[12.5px] font-semibold text-[#EF4444]">
+                {BanglaNameHelper.toBanglaNumeral(padZero(end.getHours()))}:
+                {BanglaNameHelper.toBanglaNumeral(padZero(end.getMinutes()))}
+              </p>
             </div>
           </div>
 
-          {/* Action Buttons based on lifecycle */}
-          <div className="flex flex-col gap-3 pt-2">
-            {!isTaken ? (
-              // Untaken
-              isOngoing ? (
-                <button 
-                  className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-[#12544F]/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                  onClick={() => setIsTakingExam(true)}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                  পরীক্ষা শুরু করুন
-                </button>
-              ) : isUpcoming ? (
-                <button 
-                  disabled
-                  className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-4 rounded-2xl font-bold text-base cursor-not-allowed"
-                >
-                  পরীক্ষা এখনো শুরু হয়নি
-                </button>
-              ) : (
-                // Past & Untaken -> Practice mode
-                <button 
-                  className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-[#12544F]/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                  onClick={() => setIsTakingExam(true)}
-                >
-                  <RotateCcw className="w-5 h-5" />
-                  অনুশীলন পরীক্ষা শুরু করুন
-                </button>
-              )
-            ) : (
-              // Taken
-              isPast || exam.id.startsWith("mock-") ? (
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => setIsViewingLeaderboard(true)}
-                    className="w-full bg-[#601D49] hover:bg-[#4D173B] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Trophy className="w-5 h-5" />
-                    মেধা তালিকা দেখুন
-                  </button>
-                  <button 
-                    onClick={() => setIsViewingSolutions(true)}
-                    className="w-full bg-[#12544F] hover:bg-[#0D3E3A] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <BookOpen className="w-5 h-5" />
-                    সমাধান ও ব্যাখ্যা দেখুন
-                  </button>
-                  <button 
-                    onClick={() => setIsTakingExam(true)}
-                    className="w-full bg-transparent border-2 border-[#12544F] text-[#12544F] dark:border-[#34D399] dark:text-[#34D399] py-3 rounded-2xl font-bold text-sm hover:bg-[#E6F0EC] dark:hover:bg-[#12544F]/20 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    পুনরায় অনুশীলন করুন
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => setIsViewingLeaderboard(true)}
-                    className="w-full bg-[#601D49] hover:bg-[#4D173B] text-white py-3.5 rounded-2xl font-bold text-base transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Trophy className="w-5 h-5" />
-                    চলমান মেধা তালিকা দেখুন
-                  </button>
-                  <button 
-                    disabled
-                    className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-3 rounded-2xl font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <Clock className="w-4 h-4" />
-                    ফলাফল ও সমাধান প্রকাশের অপেক্ষায়...
-                  </button>
-                </div>
-              )
-            )}
+          {/* 3. Meta 3-Column Stats */}
+          <div className="mt-5 rounded-[16px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] py-3.5 px-3 flex items-center justify-around text-center">
+            <div>
+              <p className="text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                {BanglaNameHelper.toBanglaNumeral(exam.duration_minutes || 25)} মি.
+              </p>
+              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                সময়
+              </p>
+            </div>
+
+            <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+
+            <div>
+              <p className="text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                {BanglaNameHelper.toBanglaNumeral(exam.total_questions || 25)} টি
+              </p>
+              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                মোট প্রশ্ন
+              </p>
+            </div>
+
+            <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+
+            <div>
+              <p className="text-[17px] font-black text-[#EF4444]">
+                -{BanglaNameHelper.toBanglaNumeral(exam.negative_marking || 0.25)}
+              </p>
+              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                নেগেটিভ মার্ক
+              </p>
+            </div>
           </div>
 
-          {/* User's Result summary if completed and ended */}
-          {isTaken && (isPast || exam.id.startsWith("mock-")) && attempt && (
-            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
-                    অফিসিয়াল লাইভ পরীক্ষার ফলাফল
-                  </h3>
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                  মেধা তালিকায় অন্তর্ভুক্ত
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                  <span className="text-xs text-neutral-500 font-medium">সঠিক</span>
-                  <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{attempt.correct_count || 0}</p>
-                </div>
-                <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
-                  <span className="text-xs text-neutral-500 font-medium">ভুল</span>
-                  <p className="text-lg font-black text-red-600 dark:text-red-400">{attempt.wrong_count || 0}</p>
-                </div>
-                <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700">
-                  <span className="text-xs text-neutral-500 font-medium">মোট স্কোর</span>
-                  <p className="text-lg font-black text-neutral-900 dark:text-white">{attempt.score}</p>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="my-4 h-px bg-[#F1F5F9] dark:bg-[#27272A]" />
 
-          {/* Practice Attempts History Section */}
-          {practiceHistory.length > 0 && (
-            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
-                    অনুশীলন পরীক্ষার ইতিহাস ({practiceHistory.length})
-                  </h3>
-                </div>
-                <span className="text-xs text-neutral-500 font-medium">
-                  শুধুমাত্র অনুশীলনের রেকর্ড
-                </span>
-              </div>
+          {/* 4. Syllabus Section */}
+          <div className="flex items-center gap-2 text-[14.5px] font-bold text-[#334155] dark:text-[#E2E8F0]">
+            <BookOpen size={16} className="text-[#64748B] dark:text-[#94A3B8]" />
+            <span>সিলেবাস ও অধ্যায়সমূহ</span>
+          </div>
 
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-neutral-100 dark:divide-zinc-800">
-                {practiceHistory.map((ph, idx) => (
-                  <div key={ph.id || idx} className="pt-2.5 first:pt-0 flex items-center justify-between text-xs">
-                    <div>
-                      <div className="font-bold text-neutral-800 dark:text-zinc-200 flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 font-mono text-[10px]">
-                          অনুশীলন #{practiceHistory.length - idx}
-                        </span>
-                        <span>{new Date(ph.submit_time).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                      <div className="text-[11px] text-neutral-500 mt-0.5">
-                        সঠিক: <span className="text-emerald-600 font-bold">{ph.correct_count}</span> • ভুল: <span className="text-rose-600 font-bold">{ph.wrong_count}</span>
-                        {ph.time_taken_seconds > 0 && ` • সময়: ${Math.floor(ph.time_taken_seconds / 60)} মি.`}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-black text-sm text-neutral-900 dark:text-white">
-                        {ph.score}
-                      </span>
-                      <span className="text-[10px] text-neutral-400 block font-semibold">নম্বর</span>
-                    </div>
+          <div className="mt-3 rounded-[14px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-3.5">
+            {syllabusList.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                {syllabusList.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-1.5 min-w-0">
+                    <span className="text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8] shrink-0">
+                      {BanglaNameHelper.toBanglaNumeral(padZero(idx + 1))}.
+                    </span>
+                    <span className="text-[13px] font-medium text-[#1E293B] dark:text-[#E2E8F0] line-clamp-2 leading-[1.35]">
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-[13.5px] leading-relaxed text-[#475569] dark:text-[#CBD5E1]">
+                {exam.description?.trim() ||
+                  "এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।"}
+              </p>
+            )}
+          </div>
+        </div>
 
-          {/* Anti-Leakage / Pending Results Banner (Placed Below Practice History) */}
-          {isTaken && isOngoing && !exam.id.startsWith("mock-") && (
-            <div className="mt-6 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-2xl p-5 text-amber-900 dark:text-amber-200 flex items-start gap-3.5">
-              <AlertCircle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+        {/* Main Action Buttons */}
+        <div className="mt-5 space-y-3">
+          {!isTaken ? (
+            isOngoing ? (
+              <button
+                type="button"
+                onClick={() => setIsTakingExam(true)}
+                className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+              >
+                <span>পরীক্ষা শুরু করুন</span>
+              </button>
+            ) : isUpcoming ? (
+              <button
+                type="button"
+                disabled
+                className="w-full h-[52px] rounded-2xl bg-[#E2E8F0] dark:bg-[#27272A] text-[#94A3B8] dark:text-[#71717A] font-bold text-[16px] cursor-not-allowed flex items-center justify-center"
+              >
+                <span>পরীক্ষা এখনও শুরু হয়নি</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsTakingExam(true)}
+                className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+              >
+                <RotateCcw size={18} />
+                <span>অনুশীলন পরীক্ষা শুরু করুন</span>
+              </button>
+            )
+          ) : (
+            isPast || exam.id.startsWith("mock-") ? (
+              <div className="space-y-3">
+                {/* Solutions Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsViewingSolutions(true)}
+                  className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[15.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+                >
+                  <BookOpen size={18} />
+                  <span>সমাধান ও ব্যাখ্যা দেখুন</span>
+                </button>
+
+                {/* Retake as Practice Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsTakingExam(true)}
+                  className="w-full h-[50px] rounded-2xl bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[15px] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-99"
+                >
+                  <RotateCcw size={18} />
+                  <span>অনুশীলন পরীক্ষা দিন (Practice)</span>
+                </button>
+              </div>
+            ) : null
+          )}
+        </div>
+
+        {/* Score Overview Card (When taken) */}
+        {isTaken && attempt && (
+          <div className="mt-5 rounded-[22px] bg-white dark:bg-[#141417] border border-[#E2E8F0] dark:border-[#27272A] p-5 shadow-xs">
+            <h3 className="text-[15.5px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">
+              আপনার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)
+            </h3>
+
+            <div className="mt-4 flex items-center justify-around text-center">
               <div>
-                <h4 className="font-bold text-base mb-1">উত্তরপত্র সফলভাবে জমা নেওয়া হয়েছে!</h4>
-                <p className="text-sm text-amber-800/90 dark:text-amber-300 leading-relaxed">
-                  পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষার সময়সীমা ({end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}) শেষ হওয়ার পর সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
+                <p className="text-[19px] font-black text-[#10B981]">
+                  {BanglaNameHelper.toBanglaNumeral(attempt.correct_count || 0)}
+                </p>
+                <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                  সঠিক
+                </p>
+              </div>
+
+              <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+
+              <div>
+                <p className="text-[19px] font-black text-[#EF4444]">
+                  {BanglaNameHelper.toBanglaNumeral(attempt.wrong_count || 0)}
+                </p>
+                <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                  ভুল
+                </p>
+              </div>
+
+              <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+
+              <div>
+                <p className="text-[19px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                  {BanglaNameHelper.toBanglaNumeral(attempt.score ?? 0)}
+                </p>
+                <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
+                  মোট স্কোর
                 </p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
-
-        {/* Right Column: Leaderboard (Published / Ended) */}
-        {isTaken && (isPast || exam.id.startsWith("mock-")) && (
-          exam.is_leaderboard_published !== false ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white">
-                    শীর্ষ মেধা তালিকা (Top Rankers)
-                  </h3>
-                </div>
-                <span className="text-xs font-bold text-neutral-500">
-                  শীর্ষ ৫ জন
-                </span>
+        {/* Practice Attempts History Section */}
+        {practiceHistory.length > 0 && (
+          <div className="mt-5 rounded-[20px] bg-white dark:bg-[#1C1C1E] border border-[#F4F4F5] dark:border-[#27272A] p-4 sm:p-5 shadow-xs">
+            <div className="flex items-center justify-between gap-2 mb-3.5">
+              <div className="flex items-center gap-2">
+                <History size={18} className="text-[#3B82F6]" />
+                <h3 className="text-[15px] font-bold text-[#0F172A] dark:text-white">
+                  অনুশীলন পরীক্ষার ইতিহাস
+                </h3>
               </div>
+              <span className="text-[12px] text-neutral-500 dark:text-neutral-400 font-medium">
+                {BanglaNameHelper.toBanglaNumeral(practiceHistory.length)} বার সম্পন্ন
+              </span>
+            </div>
 
-              <div className="space-y-2.5">
-                {leaderboard.length === 0 ? (
-                  <div className="p-8 text-center text-neutral-500 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
-                    লিডারবোর্ড তথ্য এখনও উপলব্ধ নয়।
-                  </div>
-                ) : (
-                  leaderboard.slice(0, 5).map((lbEntry, index) => (
-                    <div 
-                      key={lbEntry.id || index} 
-                      className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow-sm border transition-all flex items-center justify-between ${
-                        index === 0 
-                          ? "border-amber-300 dark:border-amber-700 bg-amber-50/20 dark:bg-amber-950/10" 
-                          : "border-neutral-200 dark:border-neutral-800"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        {/* Rank number badge */}
-                        <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
-                          index === 0 ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" :
-                          index === 1 ? "bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-white" :
-                          index === 2 ? "bg-amber-700 text-white" :
-                          "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
-                        }`}>
-                          #{index + 1}
-                        </span>
+            <div className="space-y-2">
+              {practiceHistory.map((ph, idx) => {
+                const attemptNum = practiceHistory.length - idx;
+                const d = new Date(ph.submit_time || ph.created_at);
+                const mins = Math.floor((ph.time_taken_seconds || 0) / 60);
 
-                        {/* User Avatar */}
-                        <div 
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
-                          style={{ backgroundColor: lbEntry.users?.avatarColor || '#10b981' }}
-                        >
-                          {lbEntry.users?.name?.charAt(0)?.toUpperCase() || 'U'}
-                        </div>
-                        
-                        {/* Name & Institute */}
-                        <div className="min-w-0">
-                          <div className="font-extrabold text-neutral-900 dark:text-white text-sm sm:text-base truncate">
-                            {lbEntry.users?.name || "নাম অপ্রকাশিত"}
-                          </div>
-                          <div className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
-                            {lbEntry.users?.institute || "প্রতিষ্ঠান নেই"}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Score */}
-                      <div className="text-right shrink-0 pl-3">
-                        <span className="font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
-                          {lbEntry.score}
-                        </span>
-                        <p className="text-[10px] text-neutral-400 font-semibold">নম্বর</p>
+                return (
+                  <div
+                    key={ph.id || idx}
+                    className="p-3 rounded-[14px] bg-[#F9FAFB] dark:bg-[#141416] border border-[#E5E7EB] dark:border-[#27272A] flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="px-2 py-1 rounded-[8px] bg-[#3B82F6]/12 text-[#3B82F6] text-[11px] font-bold shrink-0">
+                        অনুশীলন #{BanglaNameHelper.toBanglaNumeral(attemptNum)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-semibold text-[#1E293B] dark:text-white/70">
+                          {BanglaNameHelper.toBanglaNumeral(d.getDate())}/
+                          {BanglaNameHelper.toBanglaNumeral(d.getMonth() + 1)}/
+                          {BanglaNameHelper.toBanglaNumeral(d.getFullYear())}{" "}
+                          {BanglaNameHelper.toBanglaNumeral(padZero(d.getHours()))}:
+                          {BanglaNameHelper.toBanglaNumeral(padZero(d.getMinutes()))}
+                        </p>
+                        <p className="text-[11px] text-[#64748B] dark:text-white/40 mt-0.5">
+                          সঠিক: {BanglaNameHelper.toBanglaNumeral(ph.correct_count || 0)} • ভুল:{" "}
+                          {BanglaNameHelper.toBanglaNumeral(ph.wrong_count || 0)}
+                          {mins > 0 &&
+                            ` • সময়: ${BanglaNameHelper.toBanglaNumeral(mins)} মি.`}
+                        </p>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
 
-              {leaderboard.length > 0 && (
-                <button
-                  onClick={() => setIsViewingLeaderboard(true)}
-                  className="w-full mt-4 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-neutral-800 dark:text-neutral-200 hover:text-emerald-700 dark:hover:text-emerald-300 font-extrabold text-sm rounded-xl transition-all flex items-center justify-center gap-2 border border-neutral-200 dark:border-neutral-700"
-                >
-                  <Trophy className="w-4 h-4 text-emerald-600" />
-                  <span>সম্পূর্ণ মেধা তালিকা দেখুন</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
+                    <span className="text-[16px] font-bold text-[#0B6B42] dark:text-[#34D399] shrink-0">
+                      {BanglaNameHelper.toBanglaNumeral(ph.score ?? 0)}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          ) : (
-            <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-neutral-200/60 dark:bg-neutral-800 flex items-center justify-center mx-auto text-neutral-500">
-                <EyeOff className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-base text-neutral-900 dark:text-white">মেধা তালিকা প্রকাশ স্থগিত</h4>
-              <p className="text-sm text-neutral-500 leading-relaxed max-w-sm mx-auto">
+          </div>
+        )}
+
+        {/* Anti-Leakage / Pending Results Banner (When ongoing) */}
+        {isTaken && isOngoing && !exam.id.startsWith("mock-") && (
+          <div className="mt-5 rounded-[20px] bg-[#F59E0B]/12 border border-[#F59E0B]/30 p-4 flex items-start gap-3">
+            <AlertCircle size={20} className="text-[#D97706] shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-[14px] font-bold text-[#D97706]">
+                উত্তরপত্র সফলভাবে জমা নেওয়া হয়েছে!
+              </h4>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-[#78350F] dark:text-white/70">
+                পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষার সময়সীমা (
+                {BanglaNameHelper.toBanglaNumeral(padZero(end.getHours()))}:
+                {BanglaNameHelper.toBanglaNumeral(padZero(end.getMinutes()))}
+                ) শেষ হওয়ার পর সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Admin Hidden Leaderboard Banner */}
+        {isTaken && (isPast || exam.id.startsWith("mock-")) && !exam.is_leaderboard_published && (
+          <div className="mt-5 rounded-[20px] bg-[#F4F4F5] dark:bg-[#27272A] border border-[#E5E7EB] dark:border-[#3F3F46] p-4 flex items-start gap-3">
+            <EyeOff size={20} className="text-[#4B5563] dark:text-white/70 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-[14px] font-bold text-[#1F2937] dark:text-white">
+                মেধা তালিকা প্রকাশ স্থগিত
+              </h4>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-[#4B5563] dark:text-white/70">
                 কর্তৃপক্ষ কর্তৃক এই পরীক্ষার মেধা তালিকা সাময়িকভাবে অপ্রকাশিত রাখা হয়েছে।
               </p>
             </div>
-          )
+          </div>
         )}
 
+        {/* Leaderboard Section (Top 5 Rankers) */}
+        {isTaken && (isPast || exam.id.startsWith("mock-")) && exam.is_leaderboard_published && (
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-[#F59E0B]" />
+                <h3 className="text-[16px] font-bold text-[#0F172A] dark:text-white">
+                  শীর্ষ মেধা তালিকা (Top Rankers)
+                </h3>
+              </div>
+              <span className="text-[12px] text-neutral-500 dark:text-white/50 font-medium">
+                শীর্ষ ৫ জন
+              </span>
+            </div>
+
+            {leaderboard.length === 0 ? (
+              <div className="p-5 rounded-[20px] bg-white dark:bg-[#1C1C1E] border border-[#E2E8F0] dark:border-[#27272A] text-center text-sm text-neutral-500">
+                মেধা তালিকার তথ্য এখনও নেই
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {leaderboard.slice(0, 5).map((lb, idx) => {
+                  const totalAttempted = (lb.correct_count || 0) + (lb.wrong_count || 0);
+                  const accuracy =
+                    totalAttempted > 0
+                      ? Math.round(((lb.correct_count || 0) / totalAttempted) * 100)
+                      : lb.score > 0
+                      ? 100
+                      : 0;
+
+                  return (
+                    <div
+                      key={lb.id || idx}
+                      className={cn(
+                        "p-3 sm:px-3.5 sm:py-3 rounded-[18px] bg-white dark:bg-[#141417] border flex items-center justify-between gap-3 shadow-2xs",
+                        idx === 0
+                          ? "border-[#F59E0B]/50"
+                          : "border-[#E2E8F0] dark:border-[#27272A]"
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Rank Badge */}
+                        <div
+                          className={cn(
+                            "w-[30px] h-[30px] rounded-[9px] flex items-center justify-center font-extrabold text-[12px] shrink-0",
+                            idx === 0
+                              ? "bg-[#F59E0B] text-white"
+                              : idx === 1
+                              ? "bg-[#94A3B8] text-white"
+                              : idx === 2
+                              ? "bg-[#B45309] text-white"
+                              : "bg-[#F1F5F9] dark:bg-[#27272A] text-[#475569] dark:text-[#CBD5E1]"
+                          )}
+                        >
+                          #{BanglaNameHelper.toBanglaNumeral(idx + 1)}
+                        </div>
+
+                        {/* Name & Institute */}
+                        <div className="min-w-0">
+                          <p className="text-[14px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                            {lb.users?.name || "পরীক্ষার্থী"}
+                          </p>
+                          <p className="text-[11.5px] text-[#64748B] dark:text-[#A1A1AA] truncate mt-0.5">
+                            {lb.users?.institute || "প্রতিষ্ঠান নেই"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Accuracy & Score */}
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span
+                          className={cn(
+                            "text-[11px] font-bold hidden sm:inline-block",
+                            accuracy >= 80
+                              ? "text-[#10B981]"
+                              : accuracy >= 50
+                              ? "text-[#F59E0B]"
+                              : "text-[#EF4444]"
+                          )}
+                        >
+                          {BanglaNameHelper.toBanglaNumeral(accuracy)}% নির্ভুলতা
+                        </span>
+
+                        <div className="px-2.5 py-1 rounded-[8px] bg-[#F1F5F9] dark:bg-[#1F2937] border border-[#E2E8F0] dark:border-[#374151]">
+                          <span className="text-[12px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
+                            {BanglaNameHelper.toBanglaNumeral(lb.score)} মার্কস
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* View Full Leaderboard Outlined Button */}
+            <button
+              type="button"
+              onClick={() => setIsViewingLeaderboard(true)}
+              className="w-full mt-3 h-[48px] rounded-[14px] bg-white dark:bg-[#141417] border border-[#CBD5E1] dark:border-[#27272A] text-[#0F172A] dark:text-[#E2E8F0] hover:bg-[#F8FAFC] dark:hover:bg-[#1C1C20] font-bold text-[14px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-99"
+            >
+              <Trophy size={18} />
+              <span>সম্পূর্ণ মেধা তালিকা দেখুন</span>
+            </button>
+          </div>
+        )}
       </div>
-    </div>
     </AppLayout>
   );
 };
 
 export default LiveExamDetailsView;
-

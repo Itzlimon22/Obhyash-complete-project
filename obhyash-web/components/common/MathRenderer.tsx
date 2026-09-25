@@ -376,8 +376,8 @@ function BaseMathRenderer({ text, block = false, className = "" }: MathRendererP
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none dark:prose-invert font-sans",
-        block ? "block my-1.5" : "inline",
+        "prose prose-sm max-w-none dark:prose-invert font-sans min-w-0 max-w-full break-words [overflow-wrap:anywhere] [word-break:break-word]",
+        block ? "block my-1.5" : "inline-block max-w-full align-middle",
         !block && "prose-p:inline prose-p:my-0 prose-p:leading-normal",
         className
       )}
@@ -393,11 +393,12 @@ function BaseMathRenderer({ text, block = false, className = "" }: MathRendererP
           p: ({ node, ...props }) => (
             <p
               {...props}
-              className={
+              className={cn(
+                "break-words [overflow-wrap:anywhere] [word-break:break-word] max-w-full",
                 block
                   ? "block mb-2 leading-relaxed text-[#2E2621] dark:text-[#F4F4F5]"
                   : "inline leading-normal"
-              }
+              )}
             />
           ),
           table: ({ node, ...props }) => (
@@ -427,17 +428,31 @@ function BaseMathRenderer({ text, block = false, className = "" }: MathRendererP
             />
           ),
           ul: ({ node, ...props }) => (
-            <ul {...props} className="list-disc list-inside space-y-1.5 my-2 text-[#2E2621] dark:text-[#F4F4F5]" />
+            <ul {...props} className="list-disc list-inside space-y-1.5 my-2 text-[#2E2621] dark:text-[#F4F4F5] max-w-full break-words [overflow-wrap:anywhere]" />
           ),
           ol: ({ node, ...props }) => (
-            <ol {...props} className="list-decimal list-inside space-y-1.5 my-2 text-[#2E2621] dark:text-[#F4F4F5]" />
+            <ol {...props} className="list-decimal list-inside space-y-1.5 my-2 text-[#2E2621] dark:text-[#F4F4F5] max-w-full break-words [overflow-wrap:anywhere]" />
           ),
-          li: ({ node, ...props }) => <li {...props} className="leading-relaxed my-0.5" />,
+          li: ({ node, ...props }) => <li {...props} className="leading-relaxed my-0.5 max-w-full break-words [overflow-wrap:anywhere]" />,
           blockquote: ({ node, ...props }) => (
             <blockquote
               {...props}
-              className="border-l-4 border-[#D97706] pl-3 py-1.5 my-2 italic bg-[#FEF3C7]/20 dark:bg-[#78350F]/20 rounded-r-lg text-[#2E2621] dark:text-[#F4F4F5]"
+              className="border-l-4 border-[#D97706] pl-3 py-1.5 my-2 italic bg-[#FEF3C7]/20 dark:bg-[#78350F]/20 rounded-r-lg text-[#2E2621] dark:text-[#F4F4F5] max-w-full break-words [overflow-wrap:anywhere]"
             />
+          ),
+          code: ({ node, inline, ...props }: any) => (
+            <code
+              {...props}
+              className={cn(
+                "font-mono text-[13px] px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-[#1E1E22] text-[#B45309] dark:text-[#FCD34D] break-all max-w-full inline-block",
+                props.className
+              )}
+            />
+          ),
+          pre: ({ node, ...props }) => (
+            <div className="overflow-x-auto my-2 p-3 rounded-xl bg-neutral-100 dark:bg-[#1E1E22] max-w-full">
+              <pre {...props} className="text-xs font-mono max-w-full" />
+            </div>
           ),
         }}
       >

@@ -21,6 +21,7 @@ import UserAvatar from '../common/UserAvatar';
 import { supabase } from '@/services/database';
 import { toast } from 'sonner';
 import { PARENT_ROUTE_MAP } from '@/lib/routes';
+import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -41,6 +42,11 @@ interface AppLayoutProps {
   hideTitle?: boolean;
   hideBottomNav?: boolean;
   headerTabs?: {
+    tabs: { id: string; label: string }[];
+    activeTabId: string;
+    onTabSelect: (id: string) => void;
+  };
+  headerSegment?: {
     tabs: { id: string; label: string }[];
     activeTabId: string;
     onTabSelect: (id: string) => void;
@@ -102,6 +108,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   hideTitle = false,
   hideBottomNav = false,
   headerTabs,
+  headerSegment,
   headerRight,
   onRefresh,
 }) => {
@@ -279,7 +286,28 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   </button>
                 )}
 
-                {headerTabs ? (
+                {headerSegment ? (
+                  <div className="h-9 p-[3px] rounded-xl bg-[#F3F4F6] dark:bg-[#1E1E1E] border border-[#E5E7EB] dark:border-[#2E2E2E] flex items-center select-none shrink-0">
+                    {headerSegment.tabs.map((tab) => {
+                      const isActive = headerSegment.activeTabId === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => headerSegment.onTabSelect(tab.id)}
+                          className={cn(
+                            "h-[30px] px-3 sm:px-4 rounded-[9px] text-[13px] font-['Anek_Bangla',sans-serif] transition-all flex items-center justify-center cursor-pointer",
+                            isActive
+                              ? "bg-[#12544F] text-white font-semibold shadow-xs"
+                              : "text-[#71717A] dark:text-[#A1A1AA] hover:text-[#0F172A] dark:hover:text-white font-normal"
+                          )}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : headerTabs ? (
                   <div className="flex items-center justify-center gap-6 min-w-0 overflow-x-auto no-scrollbar py-0.5">
                     {headerTabs.tabs.map((tab) => {
                       const isActive = headerTabs.activeTabId === tab.id;

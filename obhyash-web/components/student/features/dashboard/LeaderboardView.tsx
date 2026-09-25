@@ -27,6 +27,7 @@ import { UserProfile } from "@/lib/types";
 import { isUserPro } from "@/lib/subscription-utils";
 import UserAvatar from "../../ui/common/UserAvatar";
 import { LeaderboardSkeleton } from "../../ui/common/Skeletons";
+import { getCanonicalCollegeName } from "@/lib/college-mapping";
 
 // ─── Level Definitions matching Flutter ──────────────────────────────────────
 export interface LevelInfo {
@@ -190,7 +191,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const [viewMode, setViewMode] = useState<"level" | "college" | "rankings">("level");
   const [selectedLevel, setSelectedLevel] = useState<string>("Explorer");
   const [timeframe, setTimeframe] = useState<"monthly" | "all_time">("monthly");
-  const [batchFilter, setBatchFilter] = useState<"all" | "my_batch">("all");
+  const [batchFilter, setBatchFilter] = useState<"all" | "my_batch">("my_batch");
 
   const [levelCounts, setLevelCounts] = useState<Record<string, number>>({});
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
@@ -243,12 +244,18 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       await Promise.all(
         LEADERBOARD_LEVELS.map(async (lvl) => {
           try {
-            let query = supabase.from("users").select("id", { count: "exact", head: true });
+            let query = supabase
+              .from("users")
+              .select("id", { count: "exact", head: true })
+              .or("role.ilike.student,role.is.null");
             if (lvl.minXP > 0) {
               query = query.gte(sortColumn, lvl.minXP);
             }
             if (lvl.maxXP < 999999999) {
               query = query.lte(sortColumn, lvl.maxXP);
+            }
+            if (batchFilter === "my_batch" && currentUser?.batch) {
+              query = query.ilike("batch", `%${currentUser.batch.trim()}%`);
             }
             const { count } = await query;
             counts[lvl.id] = count || 0;
@@ -262,7 +269,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     } catch (err) {
       console.error("Error fetching level counts:", err);
     }
-  }, [supabase, timeframe]);
+  }, [supabase, timeframe, batchFilter, currentUser]);
 
   useEffect(() => {
     fetchCounts();
@@ -289,7 +296,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         try {
           let query = supabase
             .from("users")
-            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender");
+            .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
+            .or("role.ilike.student,role.is.null");
 
           if (currentLevelInfo.minXP > 0) {
             query = query.gte(sortColumn, currentLevelInfo.minXP);
@@ -336,6 +344,33 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 is_pro: isPro,
               };
             });
+          }
+
+          // Compute accurate current user rank in their tier if initial fetch
+          if (currentUser && !isLoadMore) {
+            try {
+              const myEffXp = timeframe === "monthly" ? currentUser.monthly_xp || 0 : currentUser.xp || 0;
+              const userCalculatedLevel = calculateLevelFromXp(myEffXp);
+              const myLvlInfo = getLevelById(userCalculatedLevel);
+              let countQuery = supabase
+                .from("users")
+                .select("id", { count: "exact", head: true })
+                .or("role.ilike.student,role.is.null")
+                .gte(sortColumn, myLvlInfo.minXP);
+              if (myLvlInfo.maxXP < 999999999) {
+                countQuery = countQuery.lte(sortColumn, myLvlInfo.maxXP);
+              }
+              if (batchFilter === "my_batch" && currentUser.batch) {
+                countQuery = countQuery.ilike("batch", `%${currentUser.batch.trim()}%`);
+              }
+              countQuery = countQuery.gt(sortColumn, myEffXp);
+              const { count: rankCount } = await countQuery;
+              if (typeof rankCount === "number") {
+                setMyExactRank(rankCount + 1);
+              }
+            } catch (rankErr) {
+              console.warn("[LeaderboardView] Rank count error:", rankErr);
+            }
           }
         } catch (dbErr) {
           console.warn("[LeaderboardView] Direct Supabase query failed, falling back to API:", dbErr);
@@ -403,7 +438,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           .from("users")
           .select("id, name, institute, xp, monthly_xp, level, exams_taken, avatar_url, batch, is_subscribed, subscription_status, subscription_expires_at, subscription, role, gender")
           .or("role.ilike.student,role.is.null")
-          .eq("institute", currentUser.institute)
+          .ilike("institute", currentUser.institute.trim())
           .order("monthly_xp", { ascending: false, nullsFirst: false })
           .order("xp", { ascending: false, nullsFirst: false })
           .limit(100);
@@ -498,8 +533,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         const bestRankMap: Record<string, number> = {};
 
         (data || []).forEach((row: any, i: number) => {
-          const inst = (row.institute || "").trim();
-          if (!inst) return;
+          const rawInst = (row.institute || "").trim();
+          if (!rawInst) return;
+          const inst = getCanonicalCollegeName(rawInst);
           const rank = i + 1;
           const pts = calculateRankPoints(rank);
 
@@ -510,14 +546,15 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           }
         });
 
-        const myInst = (currentUser?.institute || "").trim().toLowerCase();
+        const myRawInst = (currentUser?.institute || "").trim();
+        const myInst = myRawInst ? getCanonicalCollegeName(myRawInst) : "";
 
         rankings = Object.keys(pointsMap).map((inst) => ({
           institute: inst,
           points: pointsMap[inst],
           studentCount: countsMap[inst],
           bestRank: bestRankMap[inst],
-          isMyCollege: myInst.length > 0 && inst.toLowerCase() === myInst,
+          isMyCollege: Boolean(myInst && inst.toLowerCase() === myInst.toLowerCase()),
         }));
 
         rankings.sort((a, b) => {
@@ -529,13 +566,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         const res = await fetch(`/api/leaderboard/rankings?timeframe=monthly`);
         if (res.ok) {
           const json = await res.json();
-          const myInst = (currentUser?.institute || "").trim().toLowerCase();
+          const myRawInst = (currentUser?.institute || "").trim();
+          const myInst = myRawInst ? getCanonicalCollegeName(myRawInst) : "";
           rankings = (json || []).map((r: any) => ({
             institute: r.institute,
             points: r.points || 0,
             studentCount: r.studentCount || 0,
             bestRank: r.bestRank || 9999,
-            isMyCollege: myInst.length > 0 && (r.institute || "").toLowerCase() === myInst,
+            isMyCollege: Boolean(myInst && (r.institute || "").toLowerCase() === myInst.toLowerCase()),
           }));
         }
       }

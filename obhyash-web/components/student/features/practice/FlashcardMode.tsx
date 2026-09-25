@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Question } from '@/lib/types';
-import LatexText from '@/components/student/ui/common/LatexText';
-import { toBengaliNumeral } from '@/lib/utils';
+import { QuestionCard } from '@/components/student/ui/exam/QuestionCard';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
+import { cn } from '@/lib/utils';
 
 export type FlashcardGrade = 'got_it' | 'struggling';
 
@@ -21,13 +22,12 @@ interface FlashcardModeProps {
   onExit: () => void;
 }
 
-const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
-
-// Tiny Web Audio API beep — no external file needed
+// Tiny Web Audio API synthesizers — matches Flutter audio/correct.wav & audio/wrong.wav
 function playCorrectSound() {
   try {
     const ctx = new (
-      window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     )();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
@@ -40,9 +40,27 @@ function playCorrectSound() {
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
     o.start(ctx.currentTime);
     o.stop(ctx.currentTime + 0.35);
-  } catch (_) {
-    // silently fail if audio not available
-  }
+  } catch (_) {}
+}
+
+function playWrongSound() {
+  try {
+    const ctx = new (
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    )();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(220, ctx.currentTime);
+    o.frequency.setValueAtTime(160, ctx.currentTime + 0.1);
+    g.gain.setValueAtTime(0.2, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime + 0.35);
+  } catch (_) {}
 }
 
 type CardPhase = 'selecting' | 'revealed';
@@ -57,17 +75,16 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [results, setResults] = useState<FlashcardResult[]>([]);
   const [direction, setDirection] = useState(1);
-  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
 
   const current = questions[currentIndex];
   const total = questions.length;
-  const isCorrect = selectedIdx !== null && (
-    selectedIdx === current.correctAnswerIndex ||
-    (current.correctAnswerIndices != null &&
-      current.correctAnswerIndices.includes(selectedIdx))
-  );
+  const isCorrect =
+    selectedIdx !== null &&
+    (selectedIdx === current.correctAnswerIndex ||
+      (current.correctAnswerIndices != null &&
+        current.correctAnswerIndices.includes(selectedIdx)));
 
-  // Count correct so far for progress bar colour
+  // Count correct so far
   const correctSoFar = results.filter((r) => r.grade === 'got_it').length;
 
   const handleSelect = useCallback(
@@ -81,18 +98,19 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
           current.correctAnswerIndices.includes(idx));
       if (isCorrectNow) {
         playCorrectSound();
+      } else {
+        playWrongSound();
       }
     },
-    [phase, current],
+    [phase, current]
   );
 
   const handleNext = useCallback(() => {
-    // If skipping (selectedIdx is null), we treat it as struggling or just move on
-    const isCorrectLoc = selectedIdx !== null && (
-      selectedIdx === current.correctAnswerIndex ||
-      (current.correctAnswerIndices != null &&
-        current.correctAnswerIndices.includes(selectedIdx))
-    );
+    const isCorrectLoc =
+      selectedIdx !== null &&
+      (selectedIdx === current.correctAnswerIndex ||
+        (current.correctAnswerIndices != null &&
+          current.correctAnswerIndices.includes(selectedIdx)));
     const grade: FlashcardGrade = isCorrectLoc ? 'got_it' : 'struggling';
     const newResults = [
       ...results,
@@ -109,18 +127,10 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     setCurrentIndex((i) => i + 1);
     setPhase('selecting');
     setSelectedIdx(null);
-    setIsExplanationOpen(false);
-  }, [
-    selectedIdx,
-    results,
-    current,
-    currentIndex,
-    total,
-    onComplete,
-  ]);
+  }, [selectedIdx, results, current, currentIndex, total, onComplete]);
 
   const handlePrevious = useCallback(() => {
-    if (currentIndex === 0) return;
+    if (currentIndex === 0 || results.length === 0) return;
 
     const prevResult = results[results.length - 1];
     if (!prevResult) return;
@@ -129,407 +139,156 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     setResults(results.slice(0, -1));
     setCurrentIndex((i) => i - 1);
     setSelectedIdx(prevResult.selectedIndex);
-    setPhase('revealed');
-    setIsExplanationOpen(false);
+    setPhase(prevResult.selectedIndex !== null ? 'revealed' : 'selecting');
   }, [currentIndex, results]);
 
-  // Option styling mirrored from QuestionCard
-  const getOptionClasses = (idx: number) => {
-    let bgClass =
-      'bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800';
-    let borderClass = 'border-transparent';
-    let iconBorder = 'border-neutral-300 dark:border-neutral-600';
-    let iconText = BANGLA_INDICES[idx] ?? (idx + 1).toString();
-
-    if (phase === 'revealed') {
-      const isActuallyCorrect =
-        idx === current.correctAnswerIndex ||
-        (current.correctAnswerIndices != null &&
-          current.correctAnswerIndices.includes(idx));
-
-      if (isActuallyCorrect) {
-        bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
-        borderClass = 'border-emerald-500 dark:border-emerald-500';
-        iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
-        iconText = '✓';
-      } else if (idx === selectedIdx) {
-        bgClass = 'bg-red-50 dark:bg-red-900/20';
-        borderClass = 'border-red-500 dark:border-red-500';
-        iconBorder = 'border-red-600 bg-red-600 text-white';
-        iconText = '✕';
-      } else {
-        bgClass = 'bg-neutral-50 dark:bg-neutral-800/40 opacity-95';
-      }
-    } else if (selectedIdx === idx) {
-      bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
-      borderClass = 'border-emerald-500 shadow-sm';
-      iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
-      iconText = '✓';
-    }
-
-    return { bgClass, borderClass, iconBorder, iconText };
-  };
-
-  // Left border of card
-  const cardBorderLeft =
-    phase === 'revealed'
-      ? isCorrect
-        ? 'border-l-emerald-500'
-        : 'border-l-red-500'
-      : 'border-l-neutral-200 dark:border-l-neutral-700';
+  const isLast = currentIndex + 1 >= total;
+  const nextLabel = isLast
+    ? 'ফলাফল দেখো'
+    : phase === 'revealed'
+    ? 'পরবর্তী প্রশ্ন'
+    : 'পরবর্তী (স্কিপ)';
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-950 flex flex-col">
-      {/* ── Top bar ── */}
-      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
-        <div className="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black flex flex-col font-sans">
+      {/* ── Top Status Bar (Matching Flutter 1:1) ── */}
+      <div className="bg-white dark:bg-black border-b border-[#E5E5E5] dark:border-[#1C1C1E] sticky top-0 z-40">
+        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          {/* Back / Cancel button */}
           <button
+            type="button"
             onClick={onExit}
-            className="flex items-center gap-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            className="flex items-center gap-1.5 text-base font-bold text-[#525252] dark:text-[#A3A3A3] hover:text-black dark:hover:text-white transition-colors cursor-pointer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-              />
-            </svg>
-            বাতিল
+            <ArrowLeft size={18} />
+            <span>বাতিল</span>
           </button>
 
-          {/* Centre: step dots */}
-          <div className="flex items-center gap-1.5">
-            {questions.map((_, i) => {
-              const done = i < currentIndex;
-              const active = i === currentIndex;
-              const correct = done && results[i]?.grade === 'got_it';
-              const wrong = done && results[i]?.grade === 'struggling';
+          {/* Progress dots (if <= 12 questions) */}
+          {total <= 12 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+              {questions.map((_, i) => {
+                const done = i < currentIndex;
+                const active = i === currentIndex;
+                const wasCorrect = done && results[i]?.grade === 'got_it';
+                const wasWrong = done && results[i]?.grade === 'struggling';
 
-              return (
-                <div
-                  key={i}
-                  className={`rounded-full transition-all duration-300 ${
-                    active
-                      ? 'w-5 h-2.5 bg-emerald-600'
-                      : done
-                        ? correct
-                          ? 'w-2.5 h-2.5 bg-emerald-500'
-                          : wrong
-                            ? 'w-2.5 h-2.5 bg-red-500'
-                            : 'w-2.5 h-2.5 bg-neutral-300'
-                        : 'w-2.5 h-2.5 bg-neutral-200 dark:bg-neutral-700'
-                  }`}
-                />
-              );
-            })}
-          </div>
+                let dotColor = 'bg-[#E5E5E5] dark:bg-[#27272A]';
+                if (active) dotColor = 'bg-[#059669]';
+                else if (wasCorrect) dotColor = 'bg-[#059669]';
+                else if (wasWrong) dotColor = 'bg-[#B91C1C]';
 
-          {/* Score counter */}
-          <div className="text-sm font-bold tabular-nums text-neutral-500 dark:text-neutral-400">
-            {toBengaliNumeral(correctSoFar)}/{toBengaliNumeral(total)} সঠিক
+                return (
+                  <div
+                    key={i}
+                    className={cn(
+                      'h-1.5 rounded-full transition-all duration-200',
+                      active ? 'w-4' : 'w-1.5',
+                      dotColor
+                    )}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Counter */}
+          <div className="text-base font-bold tabular-nums text-[#737373]">
+            {BanglaNameHelper.toBanglaNumeral(correctSoFar)}/
+            {BanglaNameHelper.toBanglaNumeral(total)} সঠিক
           </div>
         </div>
 
-        {/* Thin animated progress bar */}
-        <div className="h-0.5 bg-neutral-100 dark:bg-neutral-800">
-          <motion.div
-            className="h-full bg-emerald-600"
-            animate={{ width: `${(currentIndex / total) * 100}%` }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+        {/* Linear progress bar */}
+        <div className="w-full h-[2px] bg-[#E5E5E5] dark:bg-[#1C1C1E]">
+          <div
+            className="h-full bg-[#059669] transition-all duration-300 ease-out"
+            style={{ width: `${(currentIndex / total) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* ── Card ── */}
+      {/* ── Scrollable Card Area ── */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-2 md:px-4 pt-4 pb-40">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 pt-4 pb-36">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
-              key={currentIndex}
+              key={`${current.id}_${currentIndex}`}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 40 }}
+              initial={{ opacity: 0, x: direction * 24 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -direction * 40 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              exit={{ opacity: 0, x: -direction * 24 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              {/* Card — same structure as QuestionCard */}
-              <div
-                className={`
-                  bg-white dark:bg-neutral-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-300
-                  border-l-4 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800
-                  ${cardBorderLeft}
-                `}
-              >
-                {/* Header */}
-                <div className="flex items-center justify-between px-2 pt-2 pb-1.5 md:px-5 md:pt-4 md:pb-2">
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                    <span className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                      প্রশ্ন {toBengaliNumeral(currentIndex + 1)}
-                    </span>
-                    {phase === 'revealed' && (
-                      <span
-                        className={`px-1.5 py-0.5 md:px-2 rounded text-[9px] md:text-[10px] font-bold ${
-                          isCorrect
-                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                        }`}
-                      >
-                        {isCorrect ? 'সঠিক' : 'ভুল'}
-                      </span>
-                    )}
-                    {(current.subjectLabel || current.subject) && (
-                      <span className="px-1.5 py-0.5 md:px-2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[9px] md:text-[10px] font-bold">
-                        {BanglaNameHelper.formatSubject(current.subject, current.subjectLabel)}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[11px] md:text-xs font-bold text-neutral-400 dark:text-neutral-500">
-                    {current.points} Marks
-                  </span>
-                </div>
-
-                <div className="px-2 pb-2 md:px-5 md:pb-6">
-                  {/* Question text */}
-                  <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-base md:text-xl leading-relaxed mb-3 md:mb-6 px-1.5 md:px-0">
-                    <LatexText text={current.question} />
-                  </h3>
-
-                  {/* 2-column options grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-3">
-                    {current.options.map((option, idx) => {
-                      const { bgClass, borderClass, iconBorder, iconText } =
-                        getOptionClasses(idx);
-                      return (
-                        <motion.label
-                          key={idx}
-                          whileTap={
-                            phase === 'selecting' ? { scale: 0.98 } : {}
-                          }
-                          onClick={() => handleSelect(idx)}
-                          className={`
-                            relative flex items-center gap-2 md:items-start md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl transition-all duration-200 border h-full
-                            ${phase === 'selecting' ? 'cursor-pointer' : 'cursor-default'}
-                            ${bgClass} ${borderClass}
-                          `}
-                        >
-                          <input
-                            type="radio"
-                            name={`flashcard-${currentIndex}`}
-                            checked={selectedIdx === idx}
-                            onChange={() => handleSelect(idx)}
-                            disabled={phase === 'revealed'}
-                            className="sr-only"
-                          />
-                          {/* Custom radio circle */}
-                          <div
-                            className={`w-5 h-5 md:mt-0.5 md:w-6 md:h-6 rounded-full flex items-center justify-center border-2 transition-all shrink-0 ${iconBorder}`}
-                          >
-                            <span className="text-xs font-bold">
-                              {iconText}
-                            </span>
-                          </div>
-                          {/* Option text */}
-                          <div
-                            className={`text-[13px] md:text-base font-medium leading-[1.35] md:leading-relaxed select-none font-serif-exam ${
-                              selectedIdx === idx ||
-                              (phase === 'revealed' && (
-                                idx === current.correctAnswerIndex ||
-                                (current.correctAnswerIndices != null &&
-                                  current.correctAnswerIndices.includes(idx))
-                              ))
-                                ? 'text-neutral-900 dark:text-neutral-100'
-                                : 'text-neutral-700 dark:text-neutral-300'
-                            }`}
-                          >
-                            <LatexText text={option} />
-                          </div>
-                        </motion.label>
-                      );
-                    })}
-                  </div>
-
-                  {/* Explanation — unified collapsible design */}
-                  <AnimatePresence initial={false}>
-                    {phase === 'revealed' && current.explanation && (
-                      <div className="mt-4 md:mt-6 border-t border-neutral-100 dark:border-neutral-800 pt-4">
-                        <div
-                          className={`
-                            rounded-xl overflow-hidden transition-all duration-300
-                            ${isExplanationOpen ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/60' : 'bg-neutral-50/80 dark:bg-[#1c1c1c] border-neutral-200/80 dark:border-[#333]'}
-                            border
-                          `}
-                        >
-                          {/* Header / Toggle Row */}
-                          <button
-                            onClick={() =>
-                              setIsExplanationOpen(!isExplanationOpen)
-                            }
-                            className="w-full flex items-center justify-between p-3 md:px-4 md:py-3.5 transition-colors hover:bg-emerald-100/20 dark:hover:bg-emerald-900/20"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              <span className="text-[14px] md:text-[15px] font-extrabold text-emerald-700 dark:text-emerald-400">
-                                সঠিক উত্তর :{' '}
-                                {current.correctAnswerIndices && current.correctAnswerIndices.length > 0
-                                  ? current.correctAnswerIndices.map(i => BANGLA_INDICES[i]).join(', ')
-                                  : (BANGLA_INDICES[current.correctAnswerIndex ?? 0] || '')}
-                              </span>
-                            </div>
-                            <div
-                              className="text-emerald-600 dark:text-emerald-400 p-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white dark:bg-neutral-800 transition-transform duration-300"
-                              style={{
-                                transform: isExplanationOpen
-                                  ? 'rotate(180deg)'
-                                  : 'rotate(0deg)',
-                              }}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="m6 9 6 6 6-6" />
-                              </svg>
-                            </div>
-                          </button>
-
-                          {/* Collapsible Content */}
-                          <AnimatePresence initial={false}>
-                            {isExplanationOpen && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{
-                                  type: 'spring',
-                                  stiffness: 300,
-                                  damping: 30,
-                                }}
-                              >
-                                <div className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-emerald-200/50 dark:border-emerald-800/30">
-                                  <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam mt-3">
-                                    <LatexText
-                                      text={current.explanation || ''}
-                                      className="text-[14px] md:text-[15px]"
-                                    />
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
+              <QuestionCard
+                question={current}
+                serialNumber={currentIndex + 1}
+                selectedOptionIndex={selectedIdx !== null ? selectedIdx : undefined}
+                onSelectOption={(idx) => {
+                  if (phase !== 'revealed') {
+                    handleSelect(idx);
+                  }
+                }}
+                showFeedback={phase === 'revealed'}
+                readOnly={phase === 'revealed'}
+                showAnswer={phase === 'revealed'}
+                initiallyExpanded={true}
+              />
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
-      {/* ── Fixed bottom navigation bar ── */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom)+0.5rem)] bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-[60] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
+      {/* ── Fixed Bottom Navigation (Matching Flutter 1:1) ── */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom)+0.5rem)] bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-[#E5E5E5] dark:border-[#1C1C1E] z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
           {/* Previous Button */}
           <button
+            type="button"
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className={`
-              flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all
-              ${
-                currentIndex === 0
-                  ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
-                  : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 active:scale-95'
-              }
-            `}
+            className={cn(
+              'w-12 h-12 rounded-xl flex items-center justify-center border transition-all cursor-pointer',
+              currentIndex === 0
+                ? 'bg-[#F5F5F5] dark:bg-[#1C1C1C] text-[#A3A3A3] border-[#E5E5E5] dark:border-[#27272A] cursor-not-allowed opacity-60'
+                : 'bg-white dark:bg-[#1C1C1E] text-black dark:text-white border-[#E5E5E5] dark:border-[#27272A] active:scale-95'
+            )}
+            title="পূর্ববর্তী প্রশ্ন"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-            <span className="hidden sm:inline">পেছনে</span>
+            <ChevronLeft size={18} />
           </button>
 
-          {/* Result Chip (Only in revealed phase) */}
-          <AnimatePresence>
-            {phase === 'revealed' && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className={`
-                  flex items-center gap-1.5 px-3 py-2 rounded-lg font-bold text-[12px] md:text-sm shrink-0
-                  ${
-                    isCorrect
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                  }
-                `}
-              >
-                {isCorrect ? '✓ সঠিক' : '✗ ভুল'}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Result Chip */}
+          {phase === 'revealed' && (
+            <div
+              className={cn(
+                'px-3 py-2 rounded-[10px] text-base font-bold animate-in fade-in zoom-in-95 duration-200',
+                isCorrect
+                  ? 'bg-[#059669]/12 text-[#059669]'
+                  : 'bg-[#B91C1C]/12 text-[#B91C1C]'
+              )}
+            >
+              {isCorrect ? '✓ সঠিক' : '✗ ভুল'}
+            </div>
+          )}
+
+          <div className="flex-1" />
 
           {/* Next / Skip Button */}
           <button
+            type="button"
             onClick={handleNext}
-            className={`
-              flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] shadow-md
-              ${
-                phase === 'revealed'
-                  ? isCorrect
-                    ? 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20'
-                    : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
-                  : 'bg-neutral-800 dark:bg-neutral-200 dark:text-neutral-900 hover:bg-neutral-900 dark:hover:bg-white shadow-neutral-800/20'
-              }
-            `}
+            className={cn(
+              'px-6 py-3 rounded-xl text-base font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95',
+              phase === 'revealed'
+                ? isCorrect
+                  ? 'bg-[#059669] hover:bg-[#047857]'
+                  : 'bg-[#B91C1C] hover:bg-[#991B1B]'
+                : 'bg-black dark:bg-[#1C1C1E] hover:bg-neutral-800'
+            )}
           >
-            <span>
-              {currentIndex + 1 >= total
-                ? 'ফলাফল দেখো'
-                : phase === 'selecting'
-                  ? 'পরবর্তী (স্কিপ)'
-                  : 'পরবর্তী প্রশ্ন'}
-            </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
+            <span>{nextLabel}</span>
+            <ChevronRight size={15} />
           </button>
         </div>
       </div>

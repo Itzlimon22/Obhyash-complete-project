@@ -280,7 +280,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
   return (
     <div
       className={cn(
-        "w-full text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col",
+        "w-full max-w-full overflow-x-hidden text-neutral-900 dark:text-neutral-100 font-['HindSiliguri',sans-serif] flex flex-col",
         showHeader ? "min-h-screen bg-[#FAF9F6] dark:bg-[#000000]" : "py-1 sm:py-2"
       )}
     >

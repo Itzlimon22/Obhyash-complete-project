@@ -22,7 +22,7 @@ export async function GET() {
       data: {
         payment_auto_enabled: true,
         payment_manual_enabled: true,
-        payment_google_play_enabled: true,
+        payment_google_play_enabled: false,
         manual_payment_merchant_number: '01749591456',
         reviewer_emails:
           'tester@obhyash.com,review@obhyash.com,reviewer@obhyash.com,google@obhyash.com',

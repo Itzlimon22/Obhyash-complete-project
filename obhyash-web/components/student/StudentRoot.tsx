@@ -309,6 +309,7 @@ export default function StudentRoot({
   } | null>(null);
   const [selectedQuestionBankInstitute, setSelectedQuestionBankInstitute] = useState<InstituteCardItem | null>(null);
   const [historyTab, setHistoryTab] = useState<"exams" | "questions">("exams");
+  const [practiceTab, setPracticeTab] = useState<"mistakes" | "bookmarks">("mistakes");
 
   const activeUserId = authProfile?.id || currentUser?.id || initialUser?.id;
   const isPro = isUserPro(currentUser || effectiveUser);
@@ -1536,8 +1537,16 @@ export default function StudentRoot({
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title="অনুশীলন ও প্র্যাকটিস"
+            title="অনুশীলন"
             onBack={() => smartBack("dashboard")}
+            headerSegment={{
+              tabs: [
+                { id: "mistakes", label: "ভুলসমূহ" },
+                { id: "bookmarks", label: "বুকমার্ক" },
+              ],
+              activeTabId: practiceTab,
+              onTabSelect: (id) => setPracticeTab(id as "mistakes" | "bookmarks"),
+            }}
           >
             <PracticeDashboard
               history={examHistory}
@@ -1545,7 +1554,8 @@ export default function StudentRoot({
               onNavigateToMock={() => handleTabChange("setup")}
               subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
-              initialTab="mistakes"
+              activeTab={practiceTab}
+              onTabChange={setPracticeTab}
             />
           </AppLayout>
         );

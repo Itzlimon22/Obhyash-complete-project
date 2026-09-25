@@ -104,17 +104,17 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       id={`question-${question.id}`}
       className={cn(
-        "relative mb-5 sm:mb-6 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-['HindSiliguri',sans-serif]",
+        "relative mb-5 sm:mb-6 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-['HindSiliguri',sans-serif] w-full max-w-full overflow-hidden min-w-0 box-border",
         isFlagged
           ? 'border-[#FB923C] border-2 ring-2 ring-[#FB923C]/20 shadow-md'
           : 'border-[#E5E7EB] dark:border-[#333333] border shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none',
       )}
     >
       {/* ── Top Question Section (Flutter: EdgeInsets.fromLTRB(14, 14, 14, 10)) ── */}
-      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-4 sm:pb-3">
+      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-4 sm:pb-3 w-full max-w-full min-w-0 overflow-hidden box-border">
         {/* Stimulus / Passage (উদ্দীপক) if present */}
         {question.passage && (
-          <div className="mb-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
+          <div className="mb-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word]">
             <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block mb-1 uppercase tracking-wider">
               উদ্দীপক
             </span>
@@ -123,7 +123,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         )}
 
         {/* Serial number + Question text INLINE (Flutter: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}') */}
-        <div className="text-[16.5px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5]">
+        <div className="text-[16.5px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5] w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
           <MathRenderer
             text={
               serialNumber !== undefined
@@ -135,11 +135,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
         {/* Question Image (if any) */}
         {question.imageUrl && (
-          <div className="my-2.5 max-w-md mx-auto rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#262626] bg-neutral-50 dark:bg-[#111] p-1.5">
+          <div className="my-2.5 max-w-full mx-auto rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#262626] bg-neutral-50 dark:bg-[#111] p-1.5 flex justify-center">
             <img
               src={question.imageUrl}
               alt="Question diagram"
-              className="max-h-60 mx-auto object-contain rounded-lg"
+              className="max-h-60 max-w-full h-auto object-contain rounded-lg"
             />
           </div>
         )}
@@ -241,7 +241,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       {/* ── Options List (Flutter: EdgeInsets.fromLTRB(10, 0, 10, 14) with 8px bottom spacing) ── */}
-      <div className="px-2.5 pb-3.5 sm:px-3.5 sm:pb-4 flex flex-col gap-2">
+      <div className="px-2.5 pb-3.5 sm:px-3.5 sm:pb-4 flex flex-col gap-2 w-full max-w-full min-w-0 overflow-hidden box-border">
         {question.options.map((option, idx) => {
           const banglaIndex = BANGLA_INDICES[idx] || `${idx + 1}`;
           const isSelected = isUserSelected(idx);
@@ -310,14 +310,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               disabled={readOnly || showFeedback || isLocked}
               onClick={() => onSelectOption && onSelectOption(idx)}
               className={cn(
-                'w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group touch-manipulation',
+                'w-full max-w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group touch-manipulation min-w-0 overflow-hidden box-border',
                 boxBg,
                 boxBorder,
                 !readOnly && !showFeedback && !isLocked && 'cursor-pointer active:scale-[0.99]',
                 isLocked && !showFeedback && !showAnswer && isSelected && 'cursor-default',
               )}
             >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex items-center gap-3 min-w-0 flex-1 max-w-full overflow-hidden">
                 {/* Circular Badge Indicator (Flutter: 26x26, 13.0px, w600) */}
                 <div
                   className={cn(
@@ -334,7 +334,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 {/* Option Text (Flutter: 16.0px, w500 / w700, line-height 1.45) */}
                 <div
                   className={cn(
-                    'flex-1 min-w-0 text-[16px] leading-[1.45]',
+                    'flex-1 min-w-0 max-w-full text-[16px] leading-[1.45] break-words [overflow-wrap:anywhere] [word-break:break-word] overflow-hidden',
                     optionTextColor,
                     isBold ? 'font-bold' : 'font-medium',
                   )}
@@ -344,7 +344,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     <img
                       src={optionImageUrl}
                       alt={`Option ${banglaIndex}`}
-                      className="max-h-28 object-contain rounded-lg border border-[#E5E7EB] dark:border-[#333333] mt-1.5 bg-white p-1"
+                      className="max-h-28 max-w-full h-auto object-contain rounded-lg border border-[#E5E7EB] dark:border-[#333333] mt-1.5 bg-white p-1"
                     />
                   )}
                 </div>
@@ -364,7 +364,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       {/* ── Explanation Panel (Flutter Warm Book Page Theme) ── */}
       {showFeedback &&
         (question.explanation || question.explanationImageUrl) && (
-          <div className="mx-2.5 mb-3 sm:mx-3.5 sm:mb-3.5 rounded-[10px] border border-[#E2D7C9] dark:border-[#27272A] overflow-hidden transition-all duration-200">
+          <div className="mx-2.5 mb-3 sm:mx-3.5 sm:mb-3.5 rounded-[10px] border border-[#E2D7C9] dark:border-[#27272A] overflow-hidden transition-all duration-200 max-w-full box-border">
             {/* Toggle Header */}
             <div
               onClick={() => setIsExplanationOpen(!isExplanationOpen)}
@@ -387,7 +387,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
             {/* Explanation Content */}
             {isExplanationOpen && (
-              <div className="p-3.5 sm:p-4 bg-[#FAF7F2] dark:bg-[#09090B] border-t border-[#E8DFD3] dark:border-[#27272A] text-[#2E2621] dark:text-[#F4F4F5] text-[14.5px] leading-[1.6] animate-in fade-in duration-200">
+              <div className="p-3.5 sm:p-4 bg-[#FAF7F2] dark:bg-[#09090B] border-t border-[#E8DFD3] dark:border-[#27272A] text-[#2E2621] dark:text-[#F4F4F5] text-[14.5px] leading-[1.6] animate-in fade-in duration-200 w-full max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word] box-border">
                 {question.explanation && (
                   <MathRenderer text={question.explanation} block={true} />
                 )}
@@ -395,7 +395,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   <img
                     src={question.explanationImageUrl}
                     alt="Explanation diagram"
-                    className="max-h-56 object-contain rounded-lg border border-[#E8DFD3] dark:border-[#27272A] mt-2.5 bg-white p-1"
+                    className="max-h-56 max-w-full h-auto object-contain rounded-lg border border-[#E8DFD3] dark:border-[#27272A] mt-2.5 bg-white p-1 mx-auto"
                   />
                 )}
               </div>
