@@ -44,50 +44,59 @@ export const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps })
   const [isRoutineOpen, setIsRoutineOpen] = useState<boolean>(false);
 
   // Fetch ongoing live exams to flag active categories with "LIVE NOW"
-  useEffect(() => {
-    const fetchLiveStatus = async () => {
-      try {
-        const currentTime = new Date().toISOString();
-        const { data, error } = await supabase
-          .from("live_exams")
-          .select("id, title, category, start_time, end_time")
-          .lte("start_time", currentTime)
-          .gte("end_time", currentTime);
+  const fetchLiveStatus = React.useCallback(async () => {
+    try {
+      const currentTime = new Date().toISOString();
+      const { data, error } = await supabase
+        .from("live_exams")
+        .select("id, title, category, start_time, end_time")
+        .lte("start_time", currentTime)
+        .gte("end_time", currentTime);
 
-        if (error) {
-          console.warn("[LiveExamView] Error fetching live status:", error);
-          return;
-        }
-
-        const map: Record<string, boolean> = {};
-
-        if (data && data.length > 0) {
-          data.forEach((e: any) => {
-            const cat = (e.category || "").toLowerCase();
-            map[cat] = true;
-            if (cat === "varsity_a" || cat === "all") map.varsity = true;
-            if (cat === "all") {
-              map.engineering = true;
-              map.medical = true;
-              map.hsc = true;
-              map.ssc_board = true;
-              map.ssc_school = true;
-              map.ssc_science = true;
-              map.ssc_business = true;
-              map.ssc_humanities = true;
-              map.ssc_compulsory = true;
-            }
-          });
-        }
-
-        setLiveExamsMap(map);
-      } catch (err) {
-        console.warn("[LiveExamView] Error:", err);
+      if (error) {
+        console.warn("[LiveExamView] Error fetching live status:", error);
+        return;
       }
-    };
 
-    fetchLiveStatus();
+      const map: Record<string, boolean> = {};
+
+      if (data && data.length > 0) {
+        data.forEach((e: any) => {
+          const cat = (e.category || "").toLowerCase();
+          map[cat] = true;
+          if (cat === "varsity_a" || cat === "all") map.varsity = true;
+          if (cat === "all") {
+            map.engineering = true;
+            map.medical = true;
+            map.hsc = true;
+            map.ssc_board = true;
+            map.ssc_school = true;
+            map.ssc_science = true;
+            map.ssc_business = true;
+            map.ssc_humanities = true;
+            map.ssc_compulsory = true;
+          }
+        });
+      }
+
+      setLiveExamsMap(map);
+    } catch (err) {
+      console.warn("[LiveExamView] Error:", err);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchLiveStatus();
+  }, [fetchLiveStatus]);
+
+  // Global Pull-to-Refresh listener
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchLiveStatus();
+    };
+    window.addEventListener("app:refresh", handleRefresh);
+    return () => window.removeEventListener("app:refresh", handleRefresh);
+  }, [fetchLiveStatus]);
 
   // Stream & Level detection matching Flutter LiveExamMainView
   const isSSC =

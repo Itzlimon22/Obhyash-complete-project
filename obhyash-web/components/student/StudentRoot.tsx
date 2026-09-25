@@ -21,6 +21,12 @@ import {
 import { updateUserProfile } from "@/services/database";
 import { calculateLevel, cn } from "@/lib/utils";
 
+import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+import { fetchUserStreakInfo } from "@/services/streak-service";
+import { getExamHistory } from "@/services/exam-service";
+import { getUserProfile } from "@/services/user-service";
+
 // Hooks
 import { useExamEngine } from "@/hooks/use-exam-engine";
 import { useBookmarks } from "@/hooks/use-bookmarks";
@@ -110,7 +116,7 @@ export default function StudentRoot({
   subjects = [],
   initialTab = "dashboard",
 }: StudentRootProps) {
-  // ... (keeping existing hooks and state)
+  const router = useRouter();
   const engine = useExamEngine();
   // DO NOT call createClient() at component level — use AuthProvider's supabase context instead.
   // Calling it here creates a new reference on every render and can cause stale session issues.
@@ -332,6 +338,7 @@ export default function StudentRoot({
     isBookmarked,
     toggle: toggleBookmark,
     isLoading: isBookmarksLoading,
+    refetch: refetchBookmarkIds,
   } = useBookmarks(
     activeUserId,
     authLoading,
@@ -478,7 +485,6 @@ export default function StudentRoot({
 
     const handleStreakAndHistory = async () => {
       try {
-        const { fetchUserStreakInfo } = await import("@/services/streak-service");
         const streakInfo = await fetchUserStreakInfo(currentUser.id);
         
         if (isMounted && streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
@@ -488,7 +494,6 @@ export default function StudentRoot({
         }
 
         // Fetch History
-        const { getExamHistory } = await import("@/services/database");
         const dbHistory = await getExamHistory(currentUser.id);
         if (dbHistory && isMounted) {
           setExamHistory(dbHistory);
@@ -1061,38 +1066,73 @@ export default function StudentRoot({
   };
 
   const handleGlobalRefresh = async () => {
-    try {
-      if (!currentUser?.id) return;
-      const { fetchUserStreakInfo } = await import("@/services/streak-service");
-      const streakInfo = await fetchUserStreakInfo(currentUser.id);
-      if (streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
-        setCurrentUser((prev) =>
-          prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev
-        );
-      }
+    if (!currentUser?.id) return;
+    const userId = currentUser.id;
 
-      const { getExamHistory, getUserProfile } = await import("@/services/database");
-      const [dbHistory, dbUser] = await Promise.all([
-        getExamHistory(currentUser.id),
-        getUserProfile(currentUser.id),
+    // Helper for per-query safety timeout (max 2200ms)
+    const withTimeout = <T,>(p: Promise<T>, ms = 2200, fallback: T): Promise<T> =>
+      Promise.race([
+        p,
+        new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
       ]);
 
-      if (dbHistory) {
-        setExamHistory(dbHistory);
-      }
-      if (dbUser) {
-        setCurrentUser(dbUser);
+    try {
+      // 1. Revalidate all active SWR queries in parallel (Dashboard stats, subjects, etc.)
+      try {
+        mutate(() => true);
+      } catch (e) {
+        console.warn("[StudentRoot] SWR mutate error:", e);
       }
 
-      if (currentUser?.id) {
-        const { getBookmarkedQuestions } = await import("@/services/bookmark-service");
-        const fetchedQs = await getBookmarkedQuestions(currentUser.id);
-        if (fetchedQs) {
-          setBookmarkedQuestions(fetchedQs.filter((q) => bookmarkedIds.has(String(q.id))));
+      // 2. Dispatch broadcast event so active views (Bookmarks, Leaderboard, Live Exam) refresh their data
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("app:refresh"));
+      }
+
+      // 3. Trigger server components revalidation
+      try {
+        router.refresh();
+      } catch {}
+
+      // 4. Fetch Core User Data in PARALLEL with strict timeouts
+      const [streakRes, historyRes, profileRes, bookmarksRes] = await Promise.allSettled([
+        withTimeout(fetchUserStreakInfo(userId), 2000, null),
+        withTimeout(getExamHistory(userId), 2200, null),
+        withTimeout(getUserProfile(userId), 2000, null),
+        withTimeout(getBookmarkedQuestions(userId), 2200, null),
+      ]);
+
+      // Apply streak update
+      if (streakRes.status === "fulfilled" && streakRes.value) {
+        const streakInfo = streakRes.value;
+        if (streakInfo.currentStreak !== (currentUser.streakCount || 0)) {
+          setCurrentUser((prev) =>
+            prev ? { ...prev, streakCount: streakInfo.currentStreak, streak: streakInfo.currentStreak } : prev
+          );
         }
       }
 
-      toast.success("ডাটা রিফ্রেশ সম্পন্ন হয়েছে", { id: "pull-to-refresh-toast", duration: 1500 });
+      // Apply exam history update
+      if (historyRes.status === "fulfilled" && historyRes.value) {
+        setExamHistory(historyRes.value);
+      }
+
+      // Apply user profile update
+      if (profileRes.status === "fulfilled" && profileRes.value) {
+        setCurrentUser(profileRes.value);
+      }
+
+      // Apply bookmarks questions update
+      if (bookmarksRes.status === "fulfilled" && bookmarksRes.value) {
+        setBookmarkedQuestions(bookmarksRes.value.filter((q) => bookmarkedIds.has(String(q.id))));
+      }
+
+      // Refresh bookmark IDs in hook
+      if (refetchBookmarkIds) {
+        refetchBookmarkIds().catch(() => {});
+      }
+
+      toast.success("ডাটা রিফ্রেশ সম্পন্ন হয়েছে", { id: "pull-to-refresh-toast", duration: 1200 });
     } catch (err) {
       console.error("[StudentRoot] Global refresh error:", err);
     }

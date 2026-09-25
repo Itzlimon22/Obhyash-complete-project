@@ -23,36 +23,30 @@ export function useBookmarks(
   const [isLoading, setIsLoading] = useState(false);
 
   // ── Initial fetch ───────────────────────────────────────────────────────────
-  useEffect(() => {
+  const fetchBookmarks = useCallback(async () => {
     if (!userId || loading) {
       return;
     }
 
-    let cancelled = false;
+    setIsLoading(true);
+    try {
+      const ids = await getUserBookmarks(userId);
+      // Normalise every ID to string so Set.has() always works regardless
+      // of whether a question ID was stored as a number or string.
+      const normalised = new Set<string>([...ids].map((id) => String(id)));
+      setBookmarkedIds(normalised);
+      return normalised;
+    } catch (err) {
+      console.error('[useBookmarks] fetch error', err);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, loading]);
 
-    const fetchBookmarks = async () => {
-      setIsLoading(true);
-      try {
-        const ids = await getUserBookmarks(userId);
-        if (!cancelled) {
-          // Normalise every ID to string so Set.has() always works regardless
-          // of whether a question ID was stored as a number or string.
-          const normalised = new Set<string>([...ids].map((id) => String(id)));
-          setBookmarkedIds(normalised);
-        }
-      } catch (err) {
-        console.error('[useBookmarks] fetch error', err);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchBookmarks();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
+  }, [fetchBookmarks]);
 
   // ── Toggle (optimistic with limit enforcement) ──────────────────────────────
   const toggle = useCallback(
@@ -119,5 +113,5 @@ export function useBookmarks(
     [bookmarkedIds],
   );
 
-  return { bookmarkedIds, isBookmarked, toggle, isLoading };
+  return { bookmarkedIds, isBookmarked, toggle, isLoading, refetch: fetchBookmarks };
 }

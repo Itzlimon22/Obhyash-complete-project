@@ -45,9 +45,25 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
   const isPullingRef = useRef<boolean>(false);
   const isAtTopRef = useRef<boolean>(false);
   const isRefreshingRef = useRef<boolean>(false);
+  const pullDistanceRef = useRef<number>(0);
 
   // Keep ref in sync
   isRefreshingRef.current = isRefreshing;
+
+  // Watchdog: If for any reason isRefreshing is stuck for more than 4 seconds, force reset
+  useEffect(() => {
+    if (!isRefreshing) return;
+    const watchdog = setTimeout(() => {
+      if (isRefreshingRef.current) {
+        console.warn('[AppRefreshIndicator] Watchdog timeout reached, force resetting refresh state');
+        setPullDistance(0);
+        pullDistanceRef.current = 0;
+        setIsRefreshing(false);
+        isRefreshingRef.current = false;
+      }
+    }, 4000);
+    return () => clearTimeout(watchdog);
+  }, [isRefreshing]);
 
   // Resolve target scroll element
   const getScrollElement = useCallback((): HTMLElement | Window => {
@@ -71,13 +87,13 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
     return window;
   }, [scrollContainerRef]);
 
-  // Check if target is at scrollTop <= 0
+  // Check if target is at scrollTop <= 1 (tolerance for fractional pixel scaling)
   const checkIsAtTop = useCallback((): boolean => {
     const el = getScrollElement();
     if (el === window) {
-      return window.scrollY <= 0;
+      return window.scrollY <= 1;
     }
-    return (el as HTMLElement).scrollTop <= 0;
+    return (el as HTMLElement).scrollTop <= 1;
   }, [getScrollElement]);
 
   useEffect(() => {
@@ -108,6 +124,7 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
       // Re-verify we are still at top
       if (!checkIsAtTop()) {
         isAtTopRef.current = false;
+        pullDistanceRef.current = 0;
         setPullDistance(0);
         return;
       }
@@ -134,8 +151,10 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
 
         // Apply Flutter-like resistance damping curve
         const dampened = Math.min(85, Math.pow(deltaY, 0.82) * 1.6);
+        pullDistanceRef.current = dampened;
         setPullDistance(dampened);
       } else {
+        pullDistanceRef.current = 0;
         setPullDistance(0);
       }
     };
@@ -143,9 +162,12 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
     const handleTouchEnd = async () => {
       if (isRefreshingRef.current) return;
 
-      if (isPullingRef.current && pullDistance >= threshold) {
+      const currentPull = pullDistanceRef.current;
+      if (isPullingRef.current && currentPull >= threshold) {
         // Trigger Refresh!
+        isRefreshingRef.current = true;
         setIsRefreshing(true);
+        pullDistanceRef.current = displacement;
         setPullDistance(displacement);
 
         // Haptic feedback matching Flutter HapticFeedback.lightImpact()
@@ -158,18 +180,24 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
         }
 
         try {
-          await onRefresh();
+          // Hard cap on refresh execution (3000ms max) to ensure spinner NEVER hangs
+          const refreshPromise = Promise.resolve(onRefresh());
+          const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 3000));
+          await Promise.race([refreshPromise, timeoutPromise]);
         } catch (err) {
           console.error('[AppRefreshIndicator] onRefresh error:', err);
         } finally {
           // Smooth glide back
+          pullDistanceRef.current = 0;
           setPullDistance(0);
           setTimeout(() => {
             setIsRefreshing(false);
+            isRefreshingRef.current = false;
           }, 260);
         }
       } else {
         // Did not reach threshold: snap back smoothly
+        pullDistanceRef.current = 0;
         setPullDistance(0);
       }
 
@@ -188,7 +216,7 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
       target.removeEventListener('touchend', handleTouchEnd);
       target.removeEventListener('touchcancel', handleTouchEnd);
     };
-  }, [disabled, onRefresh, displacement, threshold, checkIsAtTop, pullDistance, scrollContainerRef]);
+  }, [disabled, onRefresh, displacement, threshold, checkIsAtTop, scrollContainerRef]);
 
   const progress = Math.min(1, pullDistance / threshold);
   const isVisible = pullDistance > 4 || isRefreshing;

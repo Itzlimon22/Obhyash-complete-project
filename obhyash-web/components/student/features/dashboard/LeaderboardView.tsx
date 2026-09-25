@@ -592,6 +592,21 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     }
   }, [viewMode, fetchInstituteRankings]);
 
+  // ── Global Pull-to-Refresh Listener ──
+  useEffect(() => {
+    const handleGlobalRefreshEvent = () => {
+      if (viewMode === "level") {
+        fetchLevelUsers(false);
+      } else if (viewMode === "college") {
+        fetchCollegeLeaderboard();
+      } else if (viewMode === "rankings") {
+        fetchInstituteRankings();
+      }
+    };
+    window.addEventListener("app:refresh", handleGlobalRefreshEvent);
+    return () => window.removeEventListener("app:refresh", handleGlobalRefreshEvent);
+  }, [viewMode, fetchLevelUsers, fetchCollegeLeaderboard, fetchInstituteRankings]);
+
   // ── Derived Data ───────────────────────────────────────────────────────────
   const myEffectiveXp = timeframe === "monthly" ? currentUser?.monthly_xp || 0 : currentUser?.xp || 0;
   const myCalculatedLevel = calculateLevelFromXp(myEffectiveXp);

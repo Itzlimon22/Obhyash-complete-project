@@ -193,6 +193,15 @@ export const BookmarksView: React.FC<BookmarksViewProps> = ({
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  // Listen to global pull-to-refresh event
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchBookmarks();
+    };
+    window.addEventListener('app:refresh', handleRefresh);
+    return () => window.removeEventListener('app:refresh', handleRefresh);
+  }, [fetchBookmarks]);
+
   // Remove single bookmark
   const handleRemoveBookmark = async (questionId: string | number) => {
     try {
