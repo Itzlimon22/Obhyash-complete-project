@@ -1514,7 +1514,7 @@ export default function StudentRoot({
             onBack={() => smartBack("practice")}
             hideBottomNav={true}
           >
-            <BookmarksView />
+            <BookmarksView userId={activeUserId || currentUser?.id} />
           </AppLayout>
         );
       }

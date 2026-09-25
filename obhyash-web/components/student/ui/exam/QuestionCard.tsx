@@ -127,8 +127,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <MathRenderer
             text={
               serialNumber !== undefined
-                ? `**${BanglaNameHelper.toBanglaNumeral(serialNumber)}.** ${question.question}`
-                : question.question
+                ? `**${BanglaNameHelper.toBanglaNumeral(serialNumber)}.** ${question.question || ''}`
+                : (question.question || '')
             }
           />
         </div>
@@ -242,10 +242,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* ── Options List (Flutter: EdgeInsets.fromLTRB(10, 0, 10, 14) with 8px bottom spacing) ── */}
       <div className="px-2.5 pb-3.5 sm:px-3.5 sm:pb-4 flex flex-col gap-2 w-full max-w-full min-w-0 overflow-hidden box-border">
-        {question.options.map((option, idx) => {
+        {(question.options || []).map((option, idx) => {
           const banglaIndex = BANGLA_INDICES[idx] || `${idx + 1}`;
           const isSelected = isUserSelected(idx);
           const isCorrect = isCorrectAnswer(idx);
+          const optionText = typeof option === 'object' && option !== null ? ((option as any).text || '') : String(option ?? '');
 
           // ── Flutter-Matching Exact State Colors ──
           let boxBg = 'bg-[#F8F9FA] dark:bg-[#1F1F1F]';
@@ -339,7 +340,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     isBold ? 'font-bold' : 'font-medium',
                   )}
                 >
-                  <MathRenderer text={option} />
+                  <MathRenderer text={optionText} />
                   {optionImageUrl && (
                     <img
                       src={optionImageUrl}

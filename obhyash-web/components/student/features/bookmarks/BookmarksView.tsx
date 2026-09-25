@@ -120,7 +120,13 @@ function ensureQuestionHasInstitute(q: Question): Question {
   };
 }
 
-export const BookmarksView: React.FC = () => {
+interface BookmarksViewProps {
+  userId?: string;
+}
+
+export const BookmarksView: React.FC<BookmarksViewProps> = ({
+  userId: propUserId,
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
@@ -140,16 +146,35 @@ export const BookmarksView: React.FC = () => {
 
     try {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      let targetUserId = propUserId;
 
-      if (!user) {
+      if (!targetUserId) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        targetUserId = sessionData?.session?.user?.id;
+      }
+
+      if (!targetUserId) {
+        const { data: userData } = await supabase.auth.getUser();
+        targetUserId = userData?.user?.id;
+      }
+
+      if (!targetUserId && typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem('obhyash_user_profile');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            targetUserId = parsed?.id;
+          }
+        } catch (_) {}
+      }
+
+      if (!targetUserId) {
+        console.warn('[BookmarksView] No user session found');
         setIsLoading(false);
         return;
       }
 
-      const fetchedQs = await getBookmarkedQuestions(user.id);
+      const fetchedQs = await getBookmarkedQuestions(targetUserId, supabase);
       const ordered: BookmarkItem[] = fetchedQs.map((q) => ({
         question: ensureQuestionHasInstitute(q),
         createdAt: q.bookmarkedAt ? new Date(q.bookmarkedAt) : new Date(),
@@ -162,7 +187,7 @@ export const BookmarksView: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [propUserId]);
 
   useEffect(() => {
     fetchBookmarks();
@@ -172,10 +197,16 @@ export const BookmarksView: React.FC = () => {
   const handleRemoveBookmark = async (questionId: string | number) => {
     try {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+      let targetUserId = propUserId;
+      if (!targetUserId) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        targetUserId = sessionData?.session?.user?.id;
+      }
+      if (!targetUserId) {
+        const { data: userData } = await supabase.auth.getUser();
+        targetUserId = userData?.user?.id;
+      }
+      if (!targetUserId) return;
 
       const qIdStr = String(questionId);
       setBookmarks((prev) => prev.filter((b) => String(b.question.id) !== qIdStr));
@@ -184,7 +215,7 @@ export const BookmarksView: React.FC = () => {
       await supabase
         .from('bookmarks')
         .delete()
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .eq('question_id', qIdStr);
     } catch (err) {
       console.error('[BookmarksView] remove error:', err);

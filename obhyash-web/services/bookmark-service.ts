@@ -251,12 +251,14 @@ export function normalizeQuestion(d: any, bookmarkedAt?: Date): Question {
  */
 export const getBookmarkedQuestions = async (
   userId: string,
+  customClient?: any,
 ): Promise<Question[]> => {
-  if (!isSupabaseConfigured() || !supabase) return [];
+  const sb = customClient || supabase;
+  if (!isSupabaseConfigured() || !sb) return [];
 
   try {
     // 1. Fetch user bookmarks
-    const { data: bData, error: bErr } = await supabase
+    const { data: bData, error: bErr } = await sb
       .from('bookmarks')
       .select('question_id, created_at')
       .eq('user_id', userId)
@@ -264,7 +266,7 @@ export const getBookmarkedQuestions = async (
 
     if (bErr || !bData || bData.length === 0) return [];
 
-    const qIds = bData
+    const qIds: string[] = (bData || [])
       .map((e: any) => e.question_id?.toString() || '')
       .filter((id: string) => id.length > 0);
 
@@ -278,16 +280,24 @@ export const getBookmarkedQuestions = async (
       }
     });
 
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidIds = qIds.filter((id: string) => uuidRegex.test(id));
+
     const questionMap = new Map<string, Question>();
 
-    // 2. Fetch from 'questions' table in chunks of 50
-    for (let i = 0; i < qIds.length; i += 50) {
-      const chunk = qIds.slice(i, i + 50);
+    // 2. Fetch from 'questions' table in chunks of 50 (only valid UUIDs to avoid 22P02 error)
+    for (let i = 0; i < uuidIds.length; i += 50) {
+      const chunk = uuidIds.slice(i, i + 50);
       try {
-        const { data: qData } = await supabase
+        const { data: qData, error: qErr } = await sb
           .from('questions')
           .select('*')
           .in('id', chunk);
+
+        if (qErr) {
+          console.warn('[getBookmarkedQuestions] chunk query error:', qErr);
+        }
 
         if (qData) {
           qData.forEach((d: any) => {
@@ -303,10 +313,10 @@ export const getBookmarkedQuestions = async (
     }
 
     // 3. Fallback: Search missing questions in exam_results
-    const missingIds = qIds.filter((id) => !questionMap.has(id));
+    const missingIds = qIds.filter((id: string) => !questionMap.has(id));
     if (missingIds.length > 0) {
       try {
-        const { data: examRes } = await supabase
+        const { data: examRes } = await sb
           .from('exam_results')
           .select('questions')
           .eq('user_id', userId)
@@ -340,9 +350,37 @@ export const getBookmarkedQuestions = async (
       }
     }
 
-    // 4. Return questions in original bookmark order
+    // 4. LocalStorage Fallback for any client-side cached questions
+    if (typeof window !== 'undefined') {
+      const stillMissing = qIds.filter((id: string) => !questionMap.has(id));
+      if (stillMissing.length > 0) {
+        try {
+          const cachedJson =
+            localStorage.getItem('obhyash_cached_questions') ||
+            localStorage.getItem('obhyash_all_questions');
+          if (cachedJson) {
+            const cachedList = JSON.parse(cachedJson);
+            if (Array.isArray(cachedList)) {
+              cachedList.forEach((item: any) => {
+                if (item && item.id !== undefined && item.id !== null) {
+                  const sId = String(item.id);
+                  if (stillMissing.includes(sId) && !questionMap.has(sId)) {
+                    questionMap.set(
+                      sId,
+                      normalizeQuestion(item, dateMap.get(sId)),
+                    );
+                  }
+                }
+              });
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
+    // 5. Return questions in original bookmark order
     const ordered: Question[] = [];
-    qIds.forEach((id) => {
+    qIds.forEach((id: string) => {
       if (questionMap.has(id)) {
         ordered.push(questionMap.get(id)!);
       }
