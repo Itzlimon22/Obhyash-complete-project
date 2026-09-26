@@ -106,21 +106,36 @@ export default async function BlogPostPage({
   // JSON-LD Article schema
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
+    '@id': `https://obhyash.com/blog/${post.slug}`,
     headline: post.title,
     description: post.excerpt,
+    image: post.coverImage
+      ? [post.coverImage]
+      : ['https://obhyash.com/og-image.png'],
     author: {
       '@type': 'Organization',
       name: post.author.name,
+      url: 'https://obhyash.com',
     },
     publisher: {
       '@type': 'Organization',
       name: 'Obhyash',
       url: 'https://obhyash.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://obhyash.com/icon-512.png',
+      },
     },
     datePublished: post.publishedAt,
+    dateModified: post.publishedAt,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://obhyash.com/blog/${post.slug}`,
+    },
     keywords: post.tags.join(', '),
     url: `https://obhyash.com/blog/${post.slug}`,
+    inLanguage: 'bn-BD',
   };
 
   // Custom Markdown Callout components

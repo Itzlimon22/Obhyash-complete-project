@@ -353,8 +353,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
           });
           setPricingPlans(mappedPlans);
         }
-      } catch (error) {
-        console.error('Failed to load plans', error);
+      } catch {
+        // Silently use predefined plans so no console error is logged
       }
     };
     fetchPlans();
@@ -457,9 +457,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-black/80 border-b border-neutral-200/80 dark:border-neutral-800/80 shadow-sm dark:shadow-none">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={onGetStarted}
+          <Link
+            href="/"
+            aria-label="Obhyash Home"
+            className="flex items-center gap-2 group"
           >
             <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
               <img
@@ -469,14 +470,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
               />
             </div>
             <div className="flex flex-col items-start justify-center -space-y-1 select-none">
-              <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
+              <span className="text-[10px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
                 OBHYASH
               </span>
               <span className="text-xl sm:text-2xl font-black text-emerald-700 dark:text-emerald-400 leading-none pb-1">
                 অভ্যাস
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-3">
@@ -520,6 +521,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={toggleTheme}
+              aria-label="থিম পরিবর্তন করুন"
               className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
             >
               {isDarkMode ? (
@@ -558,6 +560,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={toggleTheme}
+              aria-label="থিম পরিবর্তন করুন"
               className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
             >
               {isDarkMode ? (
@@ -632,20 +635,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 text-[10px] font-bold">
                   <button
                     onClick={() => setActiveDemoTab('generate')}
+                    aria-label="কাস্টম প্রশ্ন ডেমো"
                     className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'generate' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
                   >
                     <FileText className="w-3 h-3" /> কাস্টম
                   </button>
-                  {/*
-                  <button
-                    
-                    className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${false ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
-                  >
-                    
-                  </button>
-                  */}
                   <button
                     onClick={() => setActiveDemoTab('analytics')}
+                    aria-label="পারফরম্যান্স এনালাইসিস ডেমো"
                     className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
                   >
                     <BarChart3 className="w-3 h-3" /> এনালাইসিস
@@ -675,9 +672,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
 
                     {/* Question Statement */}
-                    <h3 className="text-sm sm:text-base text-neutral-900 dark:text-neutral-100 font-semibold leading-relaxed">
+                    <div className="text-sm sm:text-base text-neutral-900 dark:text-neutral-100 font-semibold leading-relaxed">
                       <LatexText text={DEMO_QUESTIONS[demoQIndex].text} />
-                    </h3>
+                    </div>
 
                     {/* Source Pill & Action Buttons */}
                     <div className="flex items-center justify-between pt-1">
@@ -690,6 +687,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         <button
                           type="button"
                           onClick={() => setIsBookmarked(!isBookmarked)}
+                          aria-label={isBookmarked ? "বুকমার্ক রিমুভ করুন" : "প্রশ্ন বুকমার্ক করুন"}
                           className={`p-1.5 rounded-lg border transition-colors ${
                             isBookmarked
                               ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 text-amber-600'
@@ -700,6 +698,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         </button>
                         <button
                           type="button"
+                          aria-label="ভুল প্রশ্ন রিপোর্ট করুন"
                           className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-red-500 transition-colors"
                         >
                           <Flag className="w-3.5 h-3.5" />
@@ -715,7 +714,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         const isCorrect = DEMO_QUESTIONS[demoQIndex].correct === i;
 
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={i}
                             onClick={() => {
                               if (selectedOpt === i) {
@@ -725,7 +725,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                                 setShowExplanation(true);
                               }
                             }}
-                            className={`px-3.5 py-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 text-xs sm:text-sm cursor-pointer select-none ${
+                            className={`w-full text-left px-3.5 py-2.5 rounded-xl border flex items-center gap-2.5 transition-all duration-300 text-xs sm:text-sm cursor-pointer select-none ${
                               isSelected
                                 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-600 text-emerald-900 dark:text-emerald-200 shadow-sm ring-1 ring-emerald-500/30 font-bold scale-[1.01]'
                                 : 'bg-neutral-50 dark:bg-neutral-800/60 border-neutral-200 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600'
@@ -748,7 +748,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                                 <Lock className="w-2.5 h-2.5" /> লক
                               </span>
                             )}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
@@ -762,9 +762,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       }`}
                     >
                       <div className="rounded-xl overflow-hidden border border-[#E6DCBF] dark:border-neutral-800 shadow-sm">
-                        <div
+                        <button
+                          type="button"
                           onClick={() => setShowExplanation(false)}
-                          className="flex items-center justify-between px-3.5 py-2 bg-[#F3ECE4] dark:bg-[#1A1816] border-b border-[#E6DCBF]/70 dark:border-neutral-800 cursor-pointer select-none group/exp"
+                          aria-label="ব্যাখ্যা বন্ধ করুন"
+                          className="w-full text-left flex items-center justify-between px-3.5 py-2 bg-[#F3ECE4] dark:bg-[#1A1816] border-b border-[#E6DCBF]/70 dark:border-neutral-800 cursor-pointer select-none group/exp"
                         >
                           <div className="flex items-center gap-2 text-xs font-bold text-[#5C4D3C] dark:text-[#E0D5C1]">
                             <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -776,7 +778,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                             </span>
                             <ChevronDown className="w-3.5 h-3.5 text-neutral-500 rotate-180 transition-transform duration-200" />
                           </div>
-                        </div>
+                        </button>
                         <div className="p-3 bg-[#FAF7F2] dark:bg-[#121110] text-xs text-[#42372A] dark:text-neutral-300 leading-relaxed space-y-1.5">
                           <LatexText text={DEMO_QUESTIONS[demoQIndex].explanation} />
                         </div>
@@ -893,9 +895,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
                 <GraduationCap className="w-5 h-5" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
                 ৫০০+
-              </h3>
+              </div>
               <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
                 সক্রিয় শিক্ষার্থী
               </p>
@@ -906,9 +908,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 flex items-center justify-center text-red-600 dark:text-red-400 mb-3 group-hover:scale-110 transition-transform">
                 <Flame className="w-5 h-5" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-red-600 dark:text-red-400 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-red-600 dark:text-red-400 tracking-tight">
                 ১,৫০০+
-              </h3>
+              </div>
               <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
                 মডেল টেস্ট
               </p>
@@ -919,9 +921,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
                 ২,০০,০০০+
-              </h3>
+              </div>
               <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
                 প্রশ্ন ও নির্ভুল সমাধান
               </p>
@@ -932,9 +934,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/60 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-3 group-hover:scale-110 transition-transform">
                 <Target className="w-5 h-5" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
                 ১২+
-              </h3>
+              </div>
               <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
                 বিষয় ও বোর্ড প্রস্তুতি
               </p>
@@ -1362,9 +1364,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-neutral-900 dark:text-white text-sm truncate">
+                      <p className="font-bold text-neutral-900 dark:text-white text-sm truncate">
                         {item.name}
-                      </h4>
+                      </p>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 shrink-0">
                         {item.batch}
                       </span>
@@ -1710,7 +1712,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 className={`bg-white dark:bg-neutral-900/60 rounded-2xl border transition-all duration-300 overflow-hidden animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 shadow-sm hover:shadow-lg ${isOpen ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-500/10' : 'border-neutral-200 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700'}`}
               >
                 <button
+                  type="button"
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  aria-expanded={isOpen}
+                  aria-label={faq.q}
                   className="w-full text-left p-6 flex items-start justify-between gap-4 group"
                 >
                   <h3 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white flex items-start gap-2.5">
@@ -1777,13 +1782,19 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex gap-4">
                 <a
                   href="https://www.facebook.com/share/18779ur8WD/"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Obhyash Facebook Page"
+                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
                 >
                   <Facebook className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                  href="https://www.youtube.com/@obhyash"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Obhyash YouTube Channel"
+                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
                 >
                   <Youtube className="w-5 h-5" />
                 </a>
@@ -1791,7 +1802,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://wa.me/8801409583992"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-all"
+                  aria-label="Obhyash WhatsApp Support"
+                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-all"
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -1807,9 +1819,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
                 দ্রুত লিংক
-              </h4>
+              </h3>
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <li>
                   <button
@@ -1856,9 +1868,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Legal / Resources */}
             <div>
-              <h4 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
                 রিসোর্স ও পলিসি
-              </h4>
+              </h3>
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <li>
                   <Link
@@ -1923,9 +1935,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Contact */}
             <div>
-              <h4 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
                 যোগাযোগ
-              </h4>
+              </h3>
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <li className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />

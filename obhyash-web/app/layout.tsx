@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Inter, Hind_Siliguri, Anek_Bangla } from "next/font/google";
 import "./globals.css";
-import "katex/dist/katex.min.css";
 import { Toaster } from "sonner";
 import AuthProvider from "@/components/auth/AuthProvider";
 import SWRProvider from "@/components/providers/SWRProvider";
@@ -11,28 +10,29 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-// ✅ Configure Inter (English, numbers, units, badges, UI elements)
+// ✅ Configure Inter (Variable font - single request)
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
+  preload: true,
 });
 
-// ✅ Configure Hind Siliguri (Bengali Unicode body text)
+// ✅ Configure Hind Siliguri (Optimized to essential weights only)
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind",
   subsets: ["bengali"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
   display: "swap",
+  preload: true,
 });
 
-// ✅ Configure Anek Bangla (1:1 with Flutter App Typography for titles, cards, badges & numerals)
+// ✅ Configure Anek Bangla (Variable font - single request)
 const anekBangla = Anek_Bangla({
   variable: "--font-anek",
   subsets: ["bengali"],
-  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -50,13 +50,19 @@ export const metadata: Metadata = {
     "অভ্যাস অ্যাপ",
     "obhyash web",
     "hsc exam preparation",
-    "admission test",
+    "hsc preparation bangladesh",
+    "admission test bangladesh",
     "question bank",
     "প্রশ্ন ব্যাংক",
     "মডেল টেস্ট",
+    "এইচএসসি প্রস্তুতি",
+    "ভর্তি পরীক্ষা প্রস্তুতি",
     "smart exam platform",
     "medical admission preparation",
     "buet admission test",
+    "online mcq practice bangladesh",
+    "bsc admission",
+    "university admission bangladesh",
   ],
   authors: [{ name: "Obhyash Team" }],
   creator: "Obhyash",
@@ -74,6 +80,14 @@ export const metadata: Metadata = {
     siteName: "Obhyash | অভ্যাস",
     locale: "bn_BD",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Obhyash (অভ্যাস) - Smart Exam Platform for Bangladesh Students",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -81,6 +95,7 @@ export const metadata: Metadata = {
     description:
       "হাজারো বোর্ড ও ভর্তি পরীক্ষার প্রশ্ন প্র্যাকটিস, স্মার্ট অ্যানালাইসিস এবং লাইভ লিডারবোর্ড।",
     creator: "@obhyash",
+    images: ["/og-image.png"],
   },
   manifest: "/manifest.json",
   appleWebApp: {
@@ -109,7 +124,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="bn"
       className={`${inter.variable} ${hindSiliguri.variable} ${anekBangla.variable}`}
       suppressHydrationWarning
     >

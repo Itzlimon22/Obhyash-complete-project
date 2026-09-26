@@ -16,21 +16,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/login`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/signup`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/blog`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/demo`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
@@ -40,28 +34,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/referral-program`,
+      url: `${baseUrl}/login`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/signup`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/referral-program`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
       url: `${baseUrl}/privacy-policy`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'yearly',
-      priority: 0.4,
+      priority: 0.3,
     },
     {
       url: `${baseUrl}/terms-and-conditions`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'yearly',
-      priority: 0.4,
+      priority: 0.3,
     },
     {
       url: `${baseUrl}/refund-policy`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'yearly',
-      priority: 0.4,
+      priority: 0.3,
     },
   ];
 
