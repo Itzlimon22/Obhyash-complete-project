@@ -1076,7 +1076,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     কুইজ ব্যাটল (Battle)
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
                   বন্ধুদের সাথে রিয়েল-টাইমে ১v১ লাইভ কুইজ যুদ্ধে অংশ নিয়ে নিজের মেধার পরীক্ষা নাও।
                 </p>
               </div>
@@ -1091,7 +1091,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     ডাউট সলভ
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
                   এক্সপার্ট মেন্টরদের কাছ থেকে কঠিন প্রশ্নের সমাধান।
                 </p>
               </div>
@@ -1106,7 +1106,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     ভার্সিটি প্রেডিক্টর
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
                   তোমার স্কোর অনুযায়ী চান্স পাওয়ার সম্ভাবনা যাচাই।
                 </p>
               </div>
@@ -1122,7 +1122,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
               শুরু করা খুবই সহজ
             </h2>
-            <p className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400 font-medium">
+            <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 font-medium">
               মাত্র ৩ ধাপে প্র্যাকটিস শুরু।
             </p>
           </div>
@@ -1185,7 +1185,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
                       2
                     </span>
-                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                    <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
                       ধাপ 2
                     </span>
                   </div>
@@ -1245,7 +1245,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
                       3
                     </span>
-                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                    <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
                       ধাপ 3
                     </span>
                   </div>
@@ -1593,7 +1593,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       দৈনিক প্র্যাকটিস ও এক্সাম
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-500">২টি / দিন</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">২টি / দিন</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       সীমাহীন আনলিমিটেড
                     </td>
@@ -1603,7 +1603,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-400">❌ সীমিত</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ সীমিত</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ
                     </td>
@@ -1613,7 +1613,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       ২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-400">❌ নেই</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ নেই</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট
                     </td>
@@ -1623,7 +1623,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       ৩-মেট্রিক অ্যানালাইসিস ও নেগেটিভ হিসাব
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-500">বেসিক স্কোর</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">বেসিক স্কোর</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ সঠিকতা %, ব্যয়িত সময় ও নেগেটিভ টেবিল
                     </td>
@@ -1633,7 +1633,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       বুকমার্ক ও ভুল প্রশ্নের রিভিশন শিট
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-500">সর্বোচ্চ ২৫টি</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">সর্বোচ্চ ২৫টি</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ সীমাহীন সেভ ও রিভিশন
                     </td>

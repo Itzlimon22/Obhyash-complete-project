@@ -90,11 +90,11 @@ const nextConfig: NextConfig = {
     // Strict CSP — no unsafe-eval — applied to all routes except blog post pages
     const strictCsp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.dicebear.com https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.dicebear.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://cloudflareinsights.com https://*.cloudflareinsights.com",
       "media-src 'self' https:",
       "frame-src 'self'",
       "frame-ancestors 'self'",
@@ -105,11 +105,11 @@ const nextConfig: NextConfig = {
     // Relaxed CSP for blog post pages — Mermaid requires unsafe-eval for diagram parsing
     const blogCsp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.dicebear.com https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.dicebear.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://cloudflareinsights.com https://*.cloudflareinsights.com",
       "media-src 'self' https:",
       "frame-src 'self'",
       "frame-ancestors 'self'",
