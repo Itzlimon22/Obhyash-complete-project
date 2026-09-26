@@ -294,7 +294,12 @@ export const getAllPosts = unstable_cache(
 
 export async function getBlogPost(slug: string): Promise<BlogPost | undefined> {
   const posts = await getAllPosts();
-  return posts.find((post: BlogPost) => post.slug === slug);
+  const cached = posts.find((post: BlogPost) => post.slug === slug);
+  if (cached) return cached;
+
+  // Fallback: direct read from local markdown files in case ISR cache is updating
+  const localPosts = await getLocalPosts();
+  return localPosts.find((post: BlogPost) => post.slug === slug);
 }
 
 export async function getBlogPostsByCategory(
