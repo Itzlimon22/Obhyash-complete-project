@@ -21,24 +21,8 @@ export async function GET() {
 
     if (subError) throw subError;
 
-    // 2. Fetch Comments Count
-    const { count: commentsCount, error: commentsError } = await supabaseAdmin
-      .from('blog_comments')
-      .select('*', { count: 'exact', head: true });
-
-    if (commentsError) throw commentsError;
-
-    // 3. Fetch Likes Count
-    const { count: likesCount, error: likesError } = await supabaseAdmin
-      .from('blog_likes')
-      .select('*', { count: 'exact', head: true });
-
-    if (likesError) throw likesError;
-
     return NextResponse.json({
       subscribers: subscriberCount || 0,
-      comments: commentsCount || 0,
-      likes: likesCount || 0,
     });
   } catch (error: any) {
     console.error('Error fetching blog metrics:', error);

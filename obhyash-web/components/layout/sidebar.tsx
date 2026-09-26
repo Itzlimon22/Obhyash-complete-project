@@ -20,7 +20,7 @@ import {
   BookOpen,
   Bell,
   AlertTriangle,
-  MessageSquare,
+  Mail,
   Radio,
   HeartPulse,
 } from 'lucide-react';
@@ -121,8 +121,8 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
       },
       {
         id: 'blog-management',
-        label: 'ব্লগ ম্যাওেজমেন্ট',
-        icon: MessageSquare,
+        label: 'নিউজলেটার সাবস্ক্রাইবার',
+        icon: Mail,
         href: '/admin/blog-management',
       },
     ],

@@ -5,9 +5,9 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'Blog Management | Obhyash Admin',
+  title: 'Blog Subscribers | Obhyash Admin',
   description:
-    'Manage blog comments, subscribers, and view interaction metrics.',
+    'Manage blog newsletter subscribers and export subscriber lists.',
 };
 
 export default async function BlogManagementPage() {
@@ -31,10 +31,10 @@ export default async function BlogManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              ব্লগ ম্যানেজমেন্ট
+              ব্লগ ও নিউজলেটার সাবস্ক্রাইবার
             </h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              ব্লগের সমস্ত কমেন্ট মডারেট করুন এবং নিউজলেটার সাবস্ক্রাইবারদের পরিচালনা করুন।
+              ব্লগের সমস্ত নিউজলেটার সাবস্ক্রাইবারদের তালিকা পরিচালনা ও CSV এক্সপোর্ট করুন।
             </p>
           </div>
         </div>

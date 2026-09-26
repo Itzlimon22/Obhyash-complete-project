@@ -40,11 +40,9 @@ import 'katex/dist/katex.min.css';
 import ProgressBar from '@/components/blog/ProgressBar';
 import MermaidRenderer from '@/components/blog/MermaidRenderer';
 import SocialShare from '@/components/blog/SocialShare';
-import CommentSection from '@/components/blog/CommentSection';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
-import EmojiReactions from '@/components/blog/EmojiReactions';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -651,11 +649,8 @@ export default async function BlogPostPage({
             </div>
             {/* end max-w readable */}
 
-            {/* Emoji Reactions */}
-            <EmojiReactions slug={post.slug} />
-
             {/* Share + Save Bar */}
-            <div className="flex flex-wrap items-center gap-2.5 mt-6 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
+            <div className="flex flex-wrap items-center gap-2.5 mt-8 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
               <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-anek">
                 শেয়ার ও সেভ
               </span>
@@ -691,13 +686,31 @@ export default async function BlogPostPage({
               </div>
             </div>
 
+            {/* Obhyash Smart Practice CTA Card */}
+            <div className="mt-8 mb-6 p-6 sm:p-8 rounded-3xl bg-linear-to-br from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/20 dark:border-rose-500/30">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 font-anek">
+                    🚀 লাইভ প্র্যাকটিস
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white font-anek">
+                    পড়াশোনাকে অভ্যাসে পরিণত করো এখনই!
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 font-anek max-w-xl">
+                    বোর্ড প্রশ্ন, শর্টকাট টেস্ট এবং লাইভ লিডারবোর্ডে হাজারো শিক্ষার্থীর সাথে নিজের প্রস্তুতি যাচাই করতে যুক্ত হও অভ্যাসে।
+                  </p>
+                </div>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm font-anek shadow-lg shadow-rose-600/20 transition-all hover:scale-[1.02] shrink-0"
+                >
+                  বিনামূল্যে শুরু করো →
+                </Link>
+              </div>
+            </div>
+
             {/* Newsletter Subscription */}
             <NewsletterSubscribe />
-
-            {/* Comments Section */}
-            <div className="mt-10">
-              <CommentSection postSlug={post.slug} />
-            </div>
           </article>
         </div>
       </div>
