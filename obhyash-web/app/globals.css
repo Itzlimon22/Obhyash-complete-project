@@ -94,8 +94,7 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     overscroll-behavior-x: none;
-    overflow-x: clip;
-    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   body {
@@ -103,15 +102,12 @@
     position: relative;
     min-height: 100vh;
     min-height: 100dvh;
-    max-width: 100vw;
-    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-family: var(--font-inter), var(--font-hind), var(--font-anek), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 0.9375rem; /* 15px crisp modern app baseline */
     line-height: 1.5;
-    overscroll-behavior-y: none;
     -webkit-overflow-scrolling: touch;
   }
 }
@@ -317,11 +313,12 @@ body::after {
 
 /* Ensure inline math does not burst parent container horizontally */
 span.katex {
-  max-width: 100%;
+  max-width: 100% !important;
   overflow-x: auto;
   overflow-y: hidden;
   vertical-align: middle;
   scrollbar-width: none;
+  display: inline-block;
 }
 span.katex::-webkit-scrollbar {
   display: none;

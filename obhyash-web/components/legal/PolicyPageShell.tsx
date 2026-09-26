@@ -18,7 +18,7 @@ export default function PolicyPageShell({
     activeSlug === 'privacy' || activeSlug === 'terms' || activeSlug === 'refund';
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0B0C0E] text-slate-900 dark:text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-700 dark:selection:text-emerald-300 transition-colors">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white dark:bg-[#0B0C0E] text-slate-900 dark:text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-700 dark:selection:text-emerald-300 transition-colors">
       {/* ── Top Header with Official Logo (Hidden on Frameless Pages: Privacy, Terms, Refund) ── */}
       {!isFrameless && (
         <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/90 dark:bg-[#0B0C0E]/90 border-b border-slate-200/80 dark:border-zinc-800/80">

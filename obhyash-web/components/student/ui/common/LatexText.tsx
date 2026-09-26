@@ -12,7 +12,11 @@ interface LatexTextProps {
  * Uses the unified MathRenderer engine to ensure 100% visual consistency.
  */
 const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
-  return <MathRenderer text={text} className={className} block />;
+  return (
+    <div className="w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
+      <MathRenderer text={text} className={className} block />
+    </div>
+  );
 };
 
 export default React.memo(LatexText);

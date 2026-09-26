@@ -372,7 +372,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     currentList.length > 0 && currentList.every((q) => selectedIds.has(String(q.id)));
 
   return (
-    <div className="w-full flex flex-col font-sans pb-16">
+    <div className="w-full max-w-full min-w-0 flex flex-col font-sans pb-16 overflow-x-hidden">
       {/* ── 1. Top Stat Row (Matching Flutter _StatBox 1:1) ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
         {/* Box 1: মোট ভুল */}
@@ -550,7 +550,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 w-full max-w-full min-w-0">
           {currentList.map((q, index) => {
             const isSel = selectedIds.has(String(q.id));
             const freq = mistakeFrequency.get(String(q.id));
@@ -561,7 +561,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 key={q.id}
                 onClick={() => toggleSelection(String(q.id))}
                 className={cn(
-                  "px-3.5 py-2.5 rounded-[14px] bg-white dark:bg-[#18181B] transition-all cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.04)] select-none",
+                  "w-full max-w-full min-w-0 px-3.5 py-2.5 rounded-[14px] bg-white dark:bg-[#18181B] transition-all cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.04)] select-none overflow-hidden break-words [overflow-wrap:anywhere]",
                   isSel
                     ? "border-[1.5px] border-[#EF4444]"
                     : "border border-[#E2E8F0] dark:border-[#27272A]"
@@ -615,7 +615,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 </div>
 
                 {/* Question Text with Numbering */}
-                <div className="text-base font-normal text-[#0F172A] dark:text-[#F4F4F5] leading-[1.45]">
+                <div className="text-base font-normal text-[#0F172A] dark:text-[#F4F4F5] leading-[1.45] w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word] overflow-x-auto">
                   <LatexText
                     text={`**${BanglaNameHelper.toBanglaNumeral(index + 1)}.** ${q.question}`}
                   />

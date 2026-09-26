@@ -246,6 +246,58 @@ function sanitizeLatexTokens(s: string): string {
   return res;
 }
 
+/**
+ * Heals corrupt math spans where authors forgot closing/opening $ delimiters
+ * causing KaTeX to swallow multiple Bengali words and strip spaces.
+ */
+function healCorruptMathSpans(s: string): string {
+  if (!s) return "";
+  let text = s;
+
+  // 1. Fix mismatched parentheses math tokens: e.g. ($\lambda_{\max}) -> ($\lambda_{\max}$)
+  text = text.replace(/\(\$([^\)\n]+)\)/g, (match, inner) => {
+    if (!inner.endsWith("$")) {
+      return `($${inner}$)`;
+    }
+    return match;
+  });
+
+  // 2. Fix unmatched open paren dollar: e.g. ($v) ... (\omega$) -> ($v$) ... ($\omega$)
+  text = text.replace(/\(([a-zA-Z0-9\\]+)\$\)/g, "($$$1$$)");
+
+  // 3. Fix unclosed variable followed by space and Bengali word: e.g. $h উচ্চতা -> $h$ উচ্চতা
+  text = text.replace(/\$([a-zA-Z0-9_]+)\s+([\u0980-\u09FF])/g, "$$$1$$ $2");
+
+  // 4. Fix unclosed math command before closing $: e.g. \lambda_{\max}$ preceded by space and Bengali word
+  text = text.replace(/([\u0980-\u09FF])\s+(\\[a-zA-Z]+(?:(?:_|\^)(?:\{[^{}]*\}|[a-zA-Z0-9]+))*(?:\{[^{}]*\})*)\$/g, "$1 $$$2$$");
+
+  // 5. Fix single unclosed variable before closing $: e.g. h_2$ preceded by space and Bengali word
+  text = text.replace(/([\u0980-\u09FF])\s+([a-zA-Z0-9_\^\{\}]+)\$/g, "$1 $$$2$$");
+
+  // 6. Broad scan: if a $...$ span contains 2 or more space-separated Bengali words,
+  // it is ALWAYS an accidental multiline/sentence span.
+  text = text.replace(/\$([^\$\n]+)\$/g, (match: string, inner: string) => {
+    const bengaliWords = inner.match(/[\u0980-\u09FF]+/g);
+    if (bengaliWords && bengaliWords.length >= 2) {
+      let unnested = inner;
+      unnested = unnested.replace(/(\\[a-zA-Z]+(?:(?:_|\^)(?:\{[^{}]*\}|[a-zA-Z0-9]+))*(?:\{[^{}]*\})*)\s*\)/g, " $$$1$$ )");
+
+      const mathTokenRegex = /(\\[a-zA-Z]+(?:(?:_|\^)(?:\{[^{}]*\}|[a-zA-Z0-9]+))*(?:\{[^{}]*\})*|[a-zA-Z0-9]+(?:(?:_|\^)(?:\{[^{}]*\}|[a-zA-Z0-9]+))+|[a-zA-Z]\s*=\s*[^,\u0980-\u09FF।]+|[0-9]+(?:\.[0-9]+)?\s*(?:[a-zA-Z]+(?:\^\{?[-\d]+\}?)?)+)/g;
+
+      unnested = unnested.replace(mathTokenRegex, (token: string) => {
+        const trimmed = token.trim();
+        if (/^[\u0980-\u09FF]/.test(trimmed)) return token;
+        return `$$${trimmed}$$`;
+      });
+      unnested = unnested.replace(/\${2,}/g, "$$");
+      return unnested;
+    }
+    return match;
+  });
+
+  return text;
+}
+
 function preprocess(text: string): string {
   if (!text) return "";
   if (preprocessCache.has(text)) {
@@ -257,6 +309,9 @@ function preprocess(text: string): string {
 
   // 1.1 Sanitize broken LaTeX tokens and corrupt constructs
   processedText = sanitizeLatexTokens(processedText);
+
+  // 1.2 Heal broken math spans spanning across sentences
+  processedText = healCorruptMathSpans(processedText);
 
   // 2. Protect Markdown tables from line adjustments
   const { textWithoutTables, tables } = extractAndProtectTables(processedText);
@@ -314,10 +369,14 @@ function preprocess(text: string): string {
   // 11. Wrap naked Bengali words inside $...$ in \text{...} so KaTeX renders without errors
   processedText = processedText.replace(/\$([^\$\n]+)\$/g, (match, inner) => {
     if (/[\u0980-\u09FF]/.test(inner)) {
+      const bengaliWords = inner.match(/[\u0980-\u09FF]+/g) || [];
+      // Do not wrap spans that contain multiple Bengali words
+      if (bengaliWords.length >= 2) return match;
+
       const safe = inner
-        .replace(/([^\\]|^)(\b[\u0980-\u09FF\s]+)/g, (m: string, prefix: string, bengali: string) => {
+        .replace(/([^\\]|^)(\b[\u0980-\u09FF]+)/g, (m: string, prefix: string, bengali: string) => {
           if (prefix.includes("\\text")) return m;
-          return `${prefix}\\text{${bengali.trim()}}`;
+          return `${prefix}\\text{${bengali}}`;
         })
         .replace(/\\text\{\\text\{([^}]+)\}\}/g, "\\text{$1}");
       return `$${safe}$`;

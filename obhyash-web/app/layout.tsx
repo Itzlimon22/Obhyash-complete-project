@@ -132,7 +132,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
+      <body className="antialiased selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
         <Suspense fallback={null}>
           <ThemeProvider>
             <AuthProvider>
