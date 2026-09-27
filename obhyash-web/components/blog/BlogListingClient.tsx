@@ -17,8 +17,11 @@ import {
   Star,
   Award,
   GraduationCap,
+  Sparkles,
+  Lightbulb,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import BlogSearchModal from '@/components/blog/BlogSearchModal';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -53,6 +56,21 @@ const CATEGORY_TRANSLATIONS: Record<string, string> = {
   Motivation: 'অনুপ্রেরণা',
 };
 
+export type AudienceSegment =
+  | 'all'
+  | 'admission-2026'
+  | 'test-paper'
+  | 'study-hacks'
+  | 'saved';
+
+export const AUDIENCE_SEGMENTS = [
+  { id: 'all' as const, label: 'সকল পোস্ট', icon: Sparkles },
+  { id: 'admission-2026' as const, label: 'বিশ্ববিদ্যালয় ভর্তি ২০২৬', icon: GraduationCap },
+  { id: 'test-paper' as const, label: 'এইচএসসি টেস্ট পেপার', icon: BookOpen },
+  { id: 'study-hacks' as const, label: 'পড়ার স্মার্ট কৌশল', icon: Lightbulb },
+  { id: 'saved' as const, label: 'সংরক্ষিত', icon: Bookmark },
+] as const;
+
 interface BlogListingClientProps {
   posts: BlogPost[];
   featuredPost?: BlogPost;
@@ -74,6 +92,8 @@ export default function BlogListingClient({
   const router = useRouter();
   const activeTag = searchParams.get('tag') ?? '';
 
+  const [activeSegment, setActiveSegment] = useState<AudienceSegment>('all');
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeSubCategory, setActiveSubCategory] = useState('সব');
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,6 +109,33 @@ export default function BlogListingClient({
     () => new Set(bookmarkData?.slugs ?? []),
     [bookmarkData],
   );
+
+  const segmentCounts = useMemo(() => {
+    return {
+      all: posts.length,
+      'admission-2026': posts.filter(
+        (p) =>
+          p.tags.some((t) =>
+            /ভর্তি|Admission|বুয়েট|মেডিকেল|গুচ্ছ|CKRUET|DU|MIST|BUP/i.test(t),
+          ) || /ভর্তি|admission|circular|সার্কুলার/i.test(p.title),
+      ).length,
+      'test-paper': posts.filter(
+        (p) =>
+          p.tags.some((t) => /টেস্ট পেপার|Test Paper/i.test(t)) ||
+          /টেস্ট পেপার|test paper/i.test(p.title),
+      ).length,
+      'study-hacks': posts.filter(
+        (p) =>
+          p.category === 'পড়ার কৌশল' ||
+          p.category === 'স্টাডি টিপস' ||
+          p.category === 'Study Tips' ||
+          p.tags.some((t) =>
+            /কৌশল|হ্যাকস|রুটিন|পমোডোরো|Routine|Tips|Memory|Stress/i.test(t),
+          ),
+      ).length,
+      saved: bookmarkedSlugs.size,
+    };
+  }, [posts, bookmarkedSlugs]);
 
   const toggleBookmark = async (slug: string) => {
     if (!bookmarkData) {
@@ -116,8 +163,33 @@ export default function BlogListingClient({
   const filteredPosts = useMemo(() => {
     let result = posts;
 
-    if (showSaved) {
+    if (activeSegment === 'saved' || showSaved) {
       return result.filter((p) => bookmarkedSlugs.has(p.slug));
+    }
+
+    if (activeSegment === 'admission-2026') {
+      result = result.filter(
+        (p) =>
+          p.tags.some((t) =>
+            /ভর্তি|Admission|বুয়েট|মেডিকেল|গুচ্ছ|CKRUET|DU|MIST|BUP/i.test(t),
+          ) || /ভর্তি|admission|circular|সার্কুলার/i.test(p.title),
+      );
+    } else if (activeSegment === 'test-paper') {
+      result = result.filter(
+        (p) =>
+          p.tags.some((t) => /টেস্ট পেপার|Test Paper/i.test(t)) ||
+          /টেস্ট পেপার|test paper/i.test(p.title),
+      );
+    } else if (activeSegment === 'study-hacks') {
+      result = result.filter(
+        (p) =>
+          p.category === 'পড়ার কৌশল' ||
+          p.category === 'স্টাডি টিপস' ||
+          p.category === 'Study Tips' ||
+          p.tags.some((t) =>
+            /কৌশল|হ্যাকস|রুটিন|পমোডোরো|Routine|Tips|Memory|Stress/i.test(t),
+          ),
+      );
     }
 
     if (activeCategory !== 'All') {
@@ -150,6 +222,7 @@ export default function BlogListingClient({
     return result;
   }, [
     posts,
+    activeSegment,
     activeCategory,
     activeSubCategory,
     searchQuery,
@@ -208,111 +281,137 @@ export default function BlogListingClient({
             ))}
           </div>
 
-          {/* Search bar — navigates to /blog/search on Enter */}
-          <div className="relative max-w-lg mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 pointer-events-none" />
+          {/* Search bar — opens live search modal on click or Enter */}
+          <div
+            onClick={() => setIsSearchModalOpen(true)}
+            className="relative max-w-lg mx-auto cursor-pointer group"
+          >
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 group-hover:text-rose-500 transition-colors pointer-events-none" />
             <input
               type="text"
-              placeholder="আর্টিকেল খুঁজুন…"
+              readOnly
+              placeholder="আর্টিকেল বা বিষয় সার্চ করুন..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && searchQuery.trim()) {
-                  router.push(
-                    `/blog/search?q=${encodeURIComponent(searchQuery.trim())}`,
-                  );
-                }
-              }}
-              className="w-full pl-11 pr-28 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-all text-[15px] font-anek"
+              className="w-full pl-11 pr-28 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none cursor-pointer transition-all text-[15px] font-anek"
             />
-            <button
-              onClick={() =>
-                router.push(
-                  searchQuery.trim()
-                    ? `/blog/search?q=${encodeURIComponent(searchQuery.trim())}`
-                    : '/blog/search',
-                )
-              }
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold rounded-xl hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors font-anek whitespace-nowrap"
-            >
-              সার্চ করো
-            </button>
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 text-[11px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                ⌘K
+              </kbd>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsSearchModalOpen(true);
+                }}
+                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition-colors font-anek whitespace-nowrap shadow-sm shadow-rose-600/20"
+              >
+                সার্চ
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── Category Filter ─── */}
-      <div id="blog-category-sticky-bar" className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-2 pb-3">
-        <div className="max-w-7xl mx-auto py-1.5">
-          <div className="relative">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-            <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
-              <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
-                {/* Saved tab */}
+      {/* ─── Segmented Filter & Category Filter ─── */}
+      <div id="blog-category-sticky-bar" className="sticky top-16 z-40 bg-[#FAF6F3]/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-3 pb-3 space-y-2">
+        {/* Segmented Audience Tabs */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 justify-start sm:justify-center">
+            {AUDIENCE_SEGMENTS.map((seg) => {
+              const Icon = seg.icon;
+              const isActive = activeSegment === seg.id;
+              const count = segmentCounts[seg.id as keyof typeof segmentCounts];
+              return (
                 <button
+                  key={seg.id}
                   onClick={() => {
-                    setShowSaved((v) => !v);
+                    setActiveSegment(seg.id);
+                    if (seg.id === 'saved') {
+                      setShowSaved(true);
+                    } else {
+                      setShowSaved(false);
+                    }
                     setActiveCategory('All');
                     setActiveSubCategory('সব');
                   }}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                    showSaved
-                      ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
-                      : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[13px] font-bold whitespace-nowrap transition-all font-anek shrink-0 ${
+                    isActive
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
+                      : 'bg-white/80 dark:bg-[#141414] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
                   }`}
                 >
-                  <Bookmark
-                    className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`}
-                  />
-                  সংরক্ষিত
-                </button>
-
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => {
-                      setShowSaved(false);
-                      setActiveCategory(cat);
-                      setActiveSubCategory('সব');
-                    }}
-                    className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                      !showSaved && activeCategory === cat
-                        ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
-                        : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-rose-500'}`} />
+                  <span>{seg.label}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[11px] font-mono ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                     }`}
                   >
-                    {cat === 'All' ? 'সব' : cat}
-                  </button>
-                ))}
-              </div>
-            </div>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          {activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' && (
-            <div className="relative mt-2 pt-2 border-t border-slate-100 dark:border-[#2b2b2b]">
+        {/* Sub-category pills for All / Subject study */}
+        {activeSegment === 'all' && (
+          <div className="max-w-7xl mx-auto pt-1">
+            <div className="relative">
               <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
               <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
               <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
-                <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
-                  {SUB_CATEGORIES.map((subcat) => (
+                <div className="flex items-center gap-1.5 min-w-max mx-auto justify-start sm:justify-center">
+                  {categories.map((cat) => (
                     <button
-                      key={subcat}
-                      onClick={() => setActiveSubCategory(subcat)}
-                      className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
-                        activeSubCategory === subcat
-                          ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
-                          : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
+                      key={cat}
+                      onClick={() => {
+                        setShowSaved(false);
+                        setActiveCategory(cat);
+                        setActiveSubCategory('সব');
+                      }}
+                      className={`px-3 py-1 rounded-lg text-[12.5px] font-medium whitespace-nowrap transition-colors border font-anek ${
+                        !showSaved && activeCategory === cat
+                          ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
+                          : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
                       }`}
                     >
-                      {subcat}
+                      {cat === 'All' ? 'সব বিষয়' : cat}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' && (
+              <div className="relative mt-2 pt-2 border-t border-slate-100 dark:border-[#2b2b2b]">
+                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+                <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+                <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
+                  <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
+                    {SUB_CATEGORIES.map((subcat) => (
+                      <button
+                        key={subcat}
+                        onClick={() => setActiveSubCategory(subcat)}
+                        className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
+                          activeSubCategory === subcat
+                            ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
+                            : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
+                        }`}
+                      >
+                        {subcat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ─── Main Content ─── */}
@@ -489,6 +588,14 @@ export default function BlogListingClient({
           </div>
         </div>
       </section>
+
+      {/* Live Search Modal */}
+      <BlogSearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        posts={posts}
+        initialQuery={searchQuery}
+      />
     </>
   );
 }

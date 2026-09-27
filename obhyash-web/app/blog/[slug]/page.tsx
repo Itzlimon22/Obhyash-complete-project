@@ -43,6 +43,7 @@ import SocialShare from '@/components/blog/SocialShare';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
+import NextPostFloater from '@/components/blog/NextPostFloater';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -97,6 +98,15 @@ export default async function BlogPostPage({
   const { slug } = await params;
   const post = await getBlogPost(slug);
   if (!post) notFound();
+
+  const allPosts = await getAllPosts();
+  const otherPosts = allPosts.filter((p) => p.slug !== post.slug);
+  // Pick matching category or shared tags first, else chronological next
+  const nextPost =
+    otherPosts.find((p) => p.category === post.category && p.slug !== post.slug) ||
+    otherPosts.find((p) => p.tags.some((t) => post.tags.includes(t))) ||
+    otherPosts[0] ||
+    null;
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -714,6 +724,7 @@ export default async function BlogPostPage({
           </article>
         </div>
       </div>
+      <NextPostFloater currentSlug={post.slug} nextPost={nextPost} />
       <BackToTop />
     </>
   );
