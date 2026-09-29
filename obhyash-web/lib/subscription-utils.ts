@@ -18,67 +18,112 @@ export function isUserPro(
 ): boolean {
   if (!user) return false;
 
-  // 1. Role-based Admin bypass
-  const role = (user.role || '').toString().toLowerCase().trim();
+  const uAny = user as any;
+  const meta = (uAny.user_metadata || {}) as Record<string, any>;
+
+  // 1. Role-based bypass for Admins, Moderators, Teachers
+  const role = (user.role || meta.role || '').toString().toLowerCase().trim();
   if (
     role === 'admin' ||
     role === 'super admin' ||
     role === 'superadmin' ||
-    role === 'moderator'
+    role === 'moderator' ||
+    role === 'teacher'
   ) {
     return true;
   }
 
-  // 2. Extract expiration timestamp
-  const uAny = user as any;
-  const rawSub = (user.subscription && typeof user.subscription === 'object'
-    ? user.subscription
-    : {}) as Record<string, any>;
-
-  const rawExp =
-    uAny.subscription_expires_at ||
-    rawSub.expiry ||
-    rawSub.expires_at ||
-    uAny.subscription_end_date;
-
-  if (!rawExp) {
-    return false;
+  // 2. Safely parse subscription object if it is a JSON string or object
+  let rawSub: Record<string, any> = {};
+  if (user.subscription && typeof user.subscription === 'object') {
+    rawSub = user.subscription;
+  } else if (typeof user.subscription === 'string' && user.subscription.trim().startsWith('{')) {
+    try {
+      rawSub = JSON.parse(user.subscription);
+    } catch (_) {}
+  } else if (meta.subscription && typeof meta.subscription === 'object') {
+    rawSub = meta.subscription;
   }
 
-  const expDate = new Date(rawExp);
-  if (isNaN(expDate.getTime())) {
-    return false;
-  }
-
-  const now = new Date();
-  // If expired in the past, they are NOT Pro
-  if (expDate <= now) {
-    return false;
-  }
-
-  // 3. Check status
-  const rawStatus = (rawSub.status || user.subscription_status || '')
+  // 3. Status check: explicit cancellation / expired status overrides Pro
+  const rawStatus = (rawSub.status || user.subscription_status || meta.subscription_status || '')
     .toString()
     .toLowerCase()
     .trim();
 
-  const isSubscribed = Boolean(
+  if (rawStatus === 'expired' || rawStatus === 'cancelled' || rawStatus === 'canceled') {
+    return false;
+  }
+
+  // 4. Extract expiration timestamp
+  const rawExp =
+    uAny.subscription_expires_at ||
+    rawSub.expiry ||
+    rawSub.expires_at ||
+    uAny.expires_at ||
+    uAny.subscription_end_date ||
+    meta.subscription_expires_at ||
+    meta.expires_at;
+
+  const expDate = rawExp ? new Date(rawExp) : null;
+  const isExpValid = expDate !== null && !isNaN(expDate.getTime());
+  const now = new Date();
+
+  // If an expiration date is set and has passed, user is strictly NOT Pro
+  if (isExpValid && expDate <= now) {
+    return false;
+  }
+
+  // 5. Plan check
+  const rawPlan = (
+    rawSub.plan ||
+    rawSub.plan_name ||
+    user.plan ||
+    uAny.subscription_tier ||
+    meta.plan ||
+    ''
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  const isExplicitlyFree =
+    rawPlan === 'free' ||
+    rawPlan === 'inactive' ||
+    rawPlan === 'rookie' ||
+    rawPlan === 'basic' ||
+    rawPlan === 'explorer';
+
+  const isPlanPro =
+    rawPlan.includes('pro') ||
+    rawPlan.includes('premium') ||
+    rawPlan.includes('ranker') ||
+    rawPlan.includes('booster') ||
+    rawPlan.includes('master') ||
+    String(uAny.level || '').toLowerCase().trim() === 'pro';
+
+  const hasSubFlag = Boolean(
     user.is_subscribed === true ||
-    (user as any).is_pro === true ||
-    rawStatus === 'active',
+    uAny.is_pro === true ||
+    meta.is_pro === true ||
+    rawStatus === 'active'
   );
 
-  if (!isSubscribed) {
-    return false;
+  // If user has active subscription flag or a recognized Pro plan
+  if (hasSubFlag || isPlanPro) {
+    // If explicitly marked free without valid future expiry and not explicitly is_subscribed
+    if (isExplicitlyFree && (!isExpValid || expDate <= now) && user.is_subscribed !== true && uAny.is_pro !== true) {
+      return false;
+    }
+    return true;
   }
 
-  // 4. Check plan
-  const rawPlan = (rawSub.plan || user.plan || '').toString().toLowerCase().trim();
-  if (rawPlan === 'free' || rawPlan === 'inactive') {
-    return false;
+  // If user has a valid future expiration date and plan is not explicitly free
+  if (isExpValid && expDate > now && !isExplicitlyFree) {
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export interface UserSubscriptionDetails {
@@ -107,15 +152,27 @@ export function getUserSubscriptionDetails(
 
   const isPro = isUserPro(user);
   const uAny = user as any;
-  const rawSub = (user.subscription && typeof user.subscription === 'object'
-    ? user.subscription
-    : {}) as Record<string, any>;
+  const meta = (uAny.user_metadata || {}) as Record<string, any>;
+
+  let rawSub: Record<string, any> = {};
+  if (user.subscription && typeof user.subscription === 'object') {
+    rawSub = user.subscription;
+  } else if (typeof user.subscription === 'string' && user.subscription.trim().startsWith('{')) {
+    try {
+      rawSub = JSON.parse(user.subscription);
+    } catch (_) {}
+  } else if (meta.subscription && typeof meta.subscription === 'object') {
+    rawSub = meta.subscription;
+  }
 
   const rawExp =
     uAny.subscription_expires_at ||
     rawSub.expiry ||
     rawSub.expires_at ||
-    uAny.subscription_end_date;
+    uAny.expires_at ||
+    uAny.subscription_end_date ||
+    meta.subscription_expires_at ||
+    meta.expires_at;
 
   let expiresAt: string | null = null;
   let daysLeft = 0;
@@ -129,7 +186,7 @@ export function getUserSubscriptionDetails(
     }
   }
 
-  const rawPlan = (rawSub.plan || user.plan || '').toString().trim();
+  const rawPlan = (rawSub.plan || rawSub.plan_name || user.plan || uAny.subscription_tier || meta.plan || '').toString().trim();
   const planName = isPro
     ? rawPlan && rawPlan.toLowerCase() !== 'free'
       ? rawPlan

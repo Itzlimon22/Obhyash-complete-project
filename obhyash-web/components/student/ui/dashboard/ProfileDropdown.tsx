@@ -89,7 +89,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             </div>
             <div className="overflow-hidden">
               <h4 className="font-bold text-neutral-900 dark:text-white text-base truncate">
-                {user?.name || 'আপনি (You)'}
+                {user?.name || 'তুমি (You)'}
               </h4>
               <p className="text-xs text-neutral-500 truncate">
                 {user?.institute || 'Student'}

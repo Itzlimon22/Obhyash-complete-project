@@ -72,15 +72,18 @@ const TRUST_BADGES = [
 ];
 
 const COMPARISON_FEATURES = [
-  { label: 'দৈনিক পরীক্ষা কোটা', free: '২টি / দিন', pro: 'সীমাহীন' },
-  { label: 'দৈনিক প্র্যাকটিস সেশন', free: '১টি / দিন', pro: 'সীমাহীন' },
-  { label: 'প্রতি পরীক্ষায় প্রশ্ন সংখ্যা', free: 'সর্বোচ্চ ৫০', pro: '১০০+ পূর্ণাঙ্গ' },
+  { label: 'দৈনিক মক পরীক্ষা কোটা', free: '২টি / দিন', pro: 'সীমাহীন' },
+  { label: 'দৈনিক প্রশ্ন ব্যাংক টেস্ট', free: '১টি / দিন', pro: 'সীমাহীন' },
+  { label: 'প্রতি পরীক্ষায় প্রশ্ন সংখ্যা', free: 'সর্বোচ্চ ৫০', pro: 'সীমাহীন' },
   { label: 'বুকমার্ক প্রশ্ন সংরক্ষণ', free: 'সর্বোচ্চ ২৫টি', pro: 'সীমাহীন' },
-  { label: 'প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান', free: false, pro: true },
-  { label: 'পারফরম্যান্স ও ফলাফল অ্যানালিটিক্স', free: false, pro: true },
-  { label: 'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড', free: false, pro: true },
-  { label: 'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক', free: false, pro: true },
-  { label: 'ডেইলি স্ট্রিক ও মিশন রিওয়ার্ড', free: false, pro: true },
+  { label: 'প্রশ্নপত্র PDF ডাউনলোড', free: '৩টি / সপ্তাহ', pro: 'সীমাহীন' },
+  { label: 'ব্যাখ্যাসহ উত্তরপত্র PDF', free: false, pro: true },
+  { label: 'প্রশ্ন ব্যাংকে বিস্তারিত ব্যাখ্যা', free: false, pro: true },
+  { label: 'প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান', free: true, pro: true },
+  { label: 'পারফরম্যান্স ও ফলাফল অ্যানালিটিক্স', free: true, pro: true },
+  { label: 'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড', free: true, pro: true },
+  { label: 'অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক', free: true, pro: true },
+  { label: 'ডেইলি স্ট্রিক ও মিশন রিওয়ার্ড', free: true, pro: true },
   { label: '১০০% বিজ্ঞাপনমুক্ত পরিবেশ', free: false, pro: true },
 ];
 
@@ -133,7 +136,7 @@ export const SubscriptionView: React.FC = () => {
       const params = new URLSearchParams(window.location.search);
       const status = params.get('status');
       if (status === 'success') {
-        toast.success('🎉 অভিনন্দন! আপনার পেমেন্ট সফল হয়েছে এবং প্রো সাবস্ক্রিপশন সক্রিয় হয়েছে।');
+        toast.success('🎉 অভিনন্দন! তোমার পেমেন্ট সফল হয়েছে এবং প্রো সাবস্ক্রিপশন সক্রিয় হয়েছে।');
         // Clean URL parameters without reloading
         const newUrl = window.location.pathname;
         window.history.replaceState({}, '', newUrl);

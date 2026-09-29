@@ -37,7 +37,7 @@ export const POST = async (req: Request) => {
 
   if (profile?.subscription?.is_referral_blocked) {
     return NextResponse.json(
-      { error: 'আপনার অ্যাকাউন্টে রেফারেল কোড তৈরি বা শেয়ার করার সুবিধা সাময়িকভাবে স্থগিত রয়েছে।' },
+      { error: 'তোমার অ্যাকাউন্টে রেফারেল কোড তৈরি বা শেয়ার করার সুবিধা সাময়িকভাবে স্থগিত রয়েছে।' },
       { status: 403 },
     );
   }
@@ -77,7 +77,7 @@ export const POST = async (req: Request) => {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'রেফারেল কোড আপডেট!',
-        message: `আপনার রেফারেল কোড পরিবর্তন করা হয়েছে। তোমার নতুন কোড: ${customCode}`,
+        message: `তোমার রেফারেল কোড পরিবর্তন করা হয়েছে। তোমার নতুন কোড: ${customCode}`,
         type: 'system',
         is_read: false,
       });
@@ -149,7 +149,7 @@ export const POST = async (req: Request) => {
   await supabase.from('notifications').insert({
     user_id: user.id,
     title: 'রেফারেল কোড তৈরি!',
-    message: `আপনার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
+    message: `তোমার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
     type: 'system',
     is_read: false,
   });

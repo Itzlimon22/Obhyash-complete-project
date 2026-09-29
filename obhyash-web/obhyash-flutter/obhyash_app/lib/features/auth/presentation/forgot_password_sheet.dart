@@ -62,6 +62,9 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
           surface: Color(0xFF000000),
           primary: Color(0xFF059669),
         ),
+        textTheme: AppTheme.darkTheme.textTheme.apply(
+          fontFamily: 'HindSiliguri',
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.only(

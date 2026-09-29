@@ -137,6 +137,7 @@ class OfficialReceiptService {
           bytes: pdfBytes,
           rawFileName: 'obhyash_receipt_$shortId',
           notificationTitle: 'অফিসিয়াল পেমেন্ট রিসিট (#$shortId)',
+          subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে রিসিট দেখুন',
           context: context,
         );
       }
@@ -580,7 +581,7 @@ class OfficialReceiptCard extends StatelessWidget {
           const SizedBox(height: 16),
           const Center(
             child: Text(
-              'অভ্যাস (Obhyash) প্ল্যাটফর্ম ব্যবহার করার জন্য আপনাকে ধন্যবাদ!',
+              'অভ্যাস (Obhyash) প্ল্যাটফর্ম ব্যবহার করার জন্য তোমাকে ধন্যবাদ!',
               style: TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,

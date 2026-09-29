@@ -217,6 +217,8 @@ class SubjectReportView extends ConsumerStatefulWidget {
 }
 
 class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
+  static final Map<String, _SRStats> _statsMemoryCache = {};
+
   String _filter = 'all';
   _SRStats? _stats;
   bool _isLoading = true;
@@ -224,6 +226,11 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
   @override
   void initState() {
     super.initState();
+    final cacheKey = '${widget.subject}_$_filter';
+    if (_statsMemoryCache.containsKey(cacheKey)) {
+      _stats = _statsMemoryCache[cacheKey];
+      _isLoading = false;
+    }
     _fetch();
   }
 
@@ -231,12 +238,196 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
   void didUpdateWidget(covariant SubjectReportView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.subject != widget.subject) {
+      final cacheKey = '${widget.subject}_$_filter';
+      if (_statsMemoryCache.containsKey(cacheKey)) {
+        setState(() {
+          _stats = _statsMemoryCache[cacheKey];
+          _isLoading = false;
+        });
+      }
       _fetch();
     }
   }
 
+  _SRStats _computeStatsFromCombined(List<Map<String, dynamic>> combined) {
+    final now = DateTime.now();
+    final weekAgo = now.subtract(const Duration(days: 7));
+    final monthAgo = now.subtract(const Duration(days: 30));
+
+    int totalQ = 0, correct = 0, wrong = 0, totalTime = 0;
+    final Map<String, ({int total, int correct})> chapMap = {};
+
+    for (final row in combined) {
+      // Date filter
+      final dateStr = (row['date'] ?? row['created_at'])?.toString();
+      if (dateStr != null) {
+        final examDate = DateTime.tryParse(dateStr);
+        if (examDate != null) {
+          if (_filter == 'week' && examDate.isBefore(weekAgo)) continue;
+          if (_filter == 'month' && examDate.isBefore(monthAgo)) continue;
+        }
+      }
+
+      final examSub = (row['subject'] as String?) ?? '';
+      final examSubLabel = (row['subject_label'] as String?) ?? '';
+      final isDedicatedExam = _matchesSubject(
+        candidateSub: examSub,
+        candidateSubLabel: examSubLabel,
+        target: widget.subject,
+      );
+
+      final questions = row['questions'];
+      final userAnswers = row['user_answers'];
+      final answersMap = userAnswers is Map
+          ? Map<String, dynamic>.from(userAnswers)
+          : <String, dynamic>{};
+
+      if (questions is List && questions.isNotEmpty) {
+        int matchedQInExam = 0;
+        int examCorrectInSubject = 0;
+        int examWrongInSubject = 0;
+
+        for (final q in questions) {
+          if (q is! Map) continue;
+          final qSub = (q['subject'] ?? '').toString();
+          final qSubLabel = (q['subject_label'] ?? '').toString();
+
+          final bool qMatches = isDedicatedExam ||
+              _matchesSubject(
+                candidateSub: qSub,
+                candidateSubLabel: qSubLabel,
+                target: widget.subject,
+              );
+
+          if (!qMatches) continue;
+
+          matchedQInExam++;
+          final qId = q['id']?.toString() ?? '';
+          final userAns = answersMap[qId];
+          final correctAns =
+              (q['correct_answer_index'] ?? q['correctAnswerIndex'])
+                  ?.toString();
+          final correctIndices =
+              (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
+
+          final isAnswered =
+              userAns != null && userAns.toString().trim().isNotEmpty;
+          bool isCorrect = false;
+
+          if (isAnswered) {
+            if (correctIndices is List && correctIndices.isNotEmpty) {
+              isCorrect = correctIndices
+                  .map((e) => e.toString())
+                  .contains(userAns.toString());
+            } else if (correctAns != null) {
+              isCorrect = userAns.toString() == correctAns.toString();
+            }
+          }
+          final isWrong = isAnswered && !isCorrect;
+
+          if (isCorrect) {
+            examCorrectInSubject++;
+          } else if (isWrong) {
+            examWrongInSubject++;
+          }
+
+          // Chapter aggregation
+          final rawChap = q['chapter'] ?? q['topic'];
+          final cName =
+              (rawChap != null && rawChap.toString().trim().isNotEmpty)
+                  ? rawChap.toString().trim()
+                  : 'General';
+          final prev = chapMap[cName];
+          chapMap[cName] = (
+            total: (prev?.total ?? 0) + 1,
+            correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
+          );
+        }
+
+        if (matchedQInExam > 0) {
+          totalQ += matchedQInExam;
+          correct += examCorrectInSubject;
+          wrong += examWrongInSubject;
+
+          final examTime = (row['time_taken'] as num?)?.toInt() ?? 0;
+          final examTotalQ =
+              (row['total_questions'] as num?)?.toInt() ?? questions.length;
+          if (examTotalQ > 0) {
+            totalTime += (examTime * (matchedQInExam / examTotalQ)).round();
+          } else {
+            totalTime += examTime;
+          }
+        }
+      } else if (isDedicatedExam) {
+        // Fallback when question details are not preserved
+        final total = (row['total_questions'] as num?)?.toInt() ?? 0;
+        final c = (row['correct_count'] as num?)?.toInt() ?? 0;
+        final w = (row['wrong_count'] as num?)?.toInt() ?? 0;
+        final time = (row['time_taken'] as num?)?.toInt() ?? 0;
+        totalQ += total;
+        correct += c;
+        wrong += w;
+        totalTime += time;
+
+        final chapText = (row['chapters'] as String?) ?? 'General';
+        for (final ch in chapText
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)) {
+          final prev = chapMap[ch];
+          chapMap[ch] = (
+            total: (prev?.total ?? 0) + (total > 0 ? 1 : 0),
+            correct: (prev?.correct ?? 0) + (c > 0 ? 1 : 0),
+          );
+        }
+      }
+    }
+
+    final skipped = (totalQ - correct - wrong).clamp(0, totalQ);
+    final accuracy = totalQ > 0 ? (correct / totalQ * 100).round() : 0;
+    final avgTime = totalQ > 0 ? (totalTime / totalQ).round() : 0;
+
+    final chapters =
+        chapMap.entries
+            .where((e) {
+              final k = e.key.trim().toLowerCase();
+              return k.isNotEmpty &&
+                  k != 'general' &&
+                  k != 'সাধারণ' &&
+                  k != 'সাধারণ প্রশ্ন' &&
+                  k != 'null';
+            })
+            .map(
+              (e) => _Chapter(
+                name: e.key,
+                total: e.value.total,
+                correct: e.value.correct,
+                accuracy: e.value.total > 0
+                    ? (e.value.correct / e.value.total * 100).round()
+                    : 0,
+              ),
+            )
+            .toList()
+          ..sort((a, b) => b.total.compareTo(a.total));
+
+    return _SRStats(
+      totalQuestions: totalQ,
+      correct: correct,
+      wrong: wrong,
+      skipped: skipped,
+      accuracy: accuracy,
+      averageTime: avgTime,
+      chapters: chapters,
+    );
+  }
+
   Future<void> _fetch() async {
-    setState(() => _isLoading = true);
+    final cacheKey = '${widget.subject}_$_filter';
+
+    if (_stats == null && !_statsMemoryCache.containsKey(cacheKey)) {
+      setState(() => _isLoading = true);
+    }
+
     try {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
@@ -283,7 +474,19 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
         });
       }
 
-      // 2. Fetch from Supabase (if online & authenticated)
+      // If local cache has data and UI is not showing stats yet, render immediately!
+      if (combined.isNotEmpty && _stats == null) {
+        final initialStats = _computeStatsFromCombined(combined);
+        _statsMemoryCache[cacheKey] = initialStats;
+        if (mounted) {
+          setState(() {
+            _stats = initialStats;
+            _isLoading = false;
+          });
+        }
+      }
+
+      // 2. Fetch from Supabase (if online & authenticated) in background
       if (userId != null) {
         try {
           final query = supabase
@@ -323,183 +526,18 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
         return;
       }
 
-      final now = DateTime.now();
-      final weekAgo = now.subtract(const Duration(days: 7));
-      final monthAgo = now.subtract(const Duration(days: 30));
-
-      int totalQ = 0, correct = 0, wrong = 0, totalTime = 0;
-      final Map<String, ({int total, int correct})> chapMap = {};
-
-      for (final row in combined) {
-        // Date filter
-        final dateStr = (row['date'] ?? row['created_at'])?.toString();
-        if (dateStr != null) {
-          final examDate = DateTime.tryParse(dateStr);
-          if (examDate != null) {
-            if (_filter == 'week' && examDate.isBefore(weekAgo)) continue;
-            if (_filter == 'month' && examDate.isBefore(monthAgo)) continue;
-          }
-        }
-
-        final examSub = (row['subject'] as String?) ?? '';
-        final examSubLabel = (row['subject_label'] as String?) ?? '';
-        final isDedicatedExam = _matchesSubject(
-          candidateSub: examSub,
-          candidateSubLabel: examSubLabel,
-          target: widget.subject,
-        );
-
-        final questions = row['questions'];
-        final userAnswers = row['user_answers'];
-        final answersMap = userAnswers is Map
-            ? Map<String, dynamic>.from(userAnswers)
-            : <String, dynamic>{};
-
-        if (questions is List && questions.isNotEmpty) {
-          int matchedQInExam = 0;
-          int examCorrectInSubject = 0;
-          int examWrongInSubject = 0;
-
-          for (final q in questions) {
-            if (q is! Map) continue;
-            final qSub = (q['subject'] ?? '').toString();
-            final qSubLabel = (q['subject_label'] ?? '').toString();
-
-            final bool qMatches = isDedicatedExam ||
-                _matchesSubject(
-                  candidateSub: qSub,
-                  candidateSubLabel: qSubLabel,
-                  target: widget.subject,
-                );
-
-            if (!qMatches) continue;
-
-            matchedQInExam++;
-            final qId = q['id']?.toString() ?? '';
-            final userAns = answersMap[qId];
-            final correctAns =
-                (q['correct_answer_index'] ?? q['correctAnswerIndex'])
-                    ?.toString();
-            final correctIndices =
-                (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
-
-            final isAnswered =
-                userAns != null && userAns.toString().trim().isNotEmpty;
-            bool isCorrect = false;
-
-            if (isAnswered) {
-              if (correctIndices is List && correctIndices.isNotEmpty) {
-                isCorrect = correctIndices
-                    .map((e) => e.toString())
-                    .contains(userAns.toString());
-              } else if (correctAns != null) {
-                isCorrect = userAns.toString() == correctAns.toString();
-              }
-            }
-            final isWrong = isAnswered && !isCorrect;
-
-            if (isCorrect) {
-              examCorrectInSubject++;
-            } else if (isWrong) {
-              examWrongInSubject++;
-            }
-
-            // Chapter aggregation
-            final rawChap = q['chapter'] ?? q['topic'];
-            final cName =
-                (rawChap != null && rawChap.toString().trim().isNotEmpty)
-                    ? rawChap.toString().trim()
-                    : 'General';
-            final prev = chapMap[cName];
-            chapMap[cName] = (
-              total: (prev?.total ?? 0) + 1,
-              correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
-            );
-          }
-
-          if (matchedQInExam > 0) {
-            totalQ += matchedQInExam;
-            correct += examCorrectInSubject;
-            wrong += examWrongInSubject;
-
-            final examTime = (row['time_taken'] as num?)?.toInt() ?? 0;
-            final examTotalQ =
-                (row['total_questions'] as num?)?.toInt() ?? questions.length;
-            if (examTotalQ > 0) {
-              totalTime += (examTime * (matchedQInExam / examTotalQ)).round();
-            } else {
-              totalTime += examTime;
-            }
-          }
-        } else if (isDedicatedExam) {
-          // Fallback when question details are not preserved
-          final total = (row['total_questions'] as num?)?.toInt() ?? 0;
-          final c = (row['correct_count'] as num?)?.toInt() ?? 0;
-          final w = (row['wrong_count'] as num?)?.toInt() ?? 0;
-          final time = (row['time_taken'] as num?)?.toInt() ?? 0;
-          totalQ += total;
-          correct += c;
-          wrong += w;
-          totalTime += time;
-
-          final chapText = (row['chapters'] as String?) ?? 'General';
-          for (final ch in chapText
-              .split(',')
-              .map((s) => s.trim())
-              .where((s) => s.isNotEmpty)) {
-            final prev = chapMap[ch];
-            chapMap[ch] = (
-              total: (prev?.total ?? 0) + (total > 0 ? 1 : 0),
-              correct: (prev?.correct ?? 0) + (c > 0 ? 1 : 0),
-            );
-          }
-        }
-      }
-
-      final skipped = (totalQ - correct - wrong).clamp(0, totalQ);
-      final accuracy = totalQ > 0 ? (correct / totalQ * 100).round() : 0;
-      final avgTime = totalQ > 0 ? (totalTime / totalQ).round() : 0;
-
-      final chapters =
-          chapMap.entries
-              .where((e) {
-                final k = e.key.trim().toLowerCase();
-                return k.isNotEmpty &&
-                    k != 'general' &&
-                    k != 'সাধারণ' &&
-                    k != 'সাধারণ প্রশ্ন' &&
-                    k != 'null';
-              })
-              .map(
-                (e) => _Chapter(
-                  name: e.key,
-                  total: e.value.total,
-                  correct: e.value.correct,
-                  accuracy: e.value.total > 0
-                      ? (e.value.correct / e.value.total * 100).round()
-                      : 0,
-                ),
-              )
-              .toList()
-            ..sort((a, b) => b.total.compareTo(a.total));
+      final freshStats = _computeStatsFromCombined(combined);
+      _statsMemoryCache[cacheKey] = freshStats;
 
       if (mounted) {
         setState(() {
-          _stats = _SRStats(
-            totalQuestions: totalQ,
-            correct: correct,
-            wrong: wrong,
-            skipped: skipped,
-            accuracy: accuracy,
-            averageTime: avgTime,
-            chapters: chapters,
-          );
+          _stats = freshStats;
           _isLoading = false;
         });
       }
     } catch (e) {
       debugPrint('[SubjectReportView] _fetch error: $e');
-      if (mounted) {
+      if (mounted && _stats == null) {
         setState(() {
           _stats = _SRStats.empty;
           _isLoading = false;

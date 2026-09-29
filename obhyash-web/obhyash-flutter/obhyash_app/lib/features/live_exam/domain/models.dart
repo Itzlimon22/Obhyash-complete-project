@@ -190,16 +190,15 @@ class LiveExamLeaderboardEntry {
 
   factory LiveExamLeaderboardEntry.fromJson(Map<String, dynamic> json) {
     final userData = json['users'] as Map<String, dynamic>?;
-    final start = json['start_time'] != null ? DateTime.tryParse(json['start_time'].toString()) : null;
+    final startRaw = json['start_time'] ?? json['created_at'];
+    final start = startRaw != null ? DateTime.tryParse(startRaw.toString()) : null;
     final submit = json['submit_time'] != null ? DateTime.tryParse(json['submit_time'].toString()) : null;
     int? timeTaken;
     if (json['time_taken_seconds'] != null) {
       timeTaken = (json['time_taken_seconds'] as num?)?.toInt();
     } else if (start != null && submit != null) {
       final diff = submit.difference(start).inSeconds;
-      if (diff >= 0 && diff <= 86400) {
-        timeTaken = diff;
-      }
+      timeTaken = diff < 0 ? 0 : (diff > 86400 ? 86400 : diff);
     }
 
     return LiveExamLeaderboardEntry(

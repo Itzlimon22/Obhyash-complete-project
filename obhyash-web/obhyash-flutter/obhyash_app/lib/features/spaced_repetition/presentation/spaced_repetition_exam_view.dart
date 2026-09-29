@@ -437,7 +437,7 @@ class _SpacedRepetitionExamViewState extends State<SpacedRepetitionExamView> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'আপনার ফলাফল মেমোরি বক্সে প্রসেস করা হয়েছে।',
+            'তোমার ফলাফল মেমোরি বক্সে প্রসেস করা হয়েছে।',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white54, fontSize: 12.5, ),
           ),

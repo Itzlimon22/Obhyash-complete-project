@@ -321,6 +321,27 @@ export default function StudentRoot({
   const isPro = isUserPro(currentUser || effectiveUser);
 
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
+  const [showProPdfModal, setShowProPdfModal] = useState(false);
+
+  // PDF weekly download quota helpers (free users: max 3 per week)
+  const FREE_WEEKLY_PDF_LIMIT = 3;
+  const getPdfWeeklyCount = (): { count: number; weekKey: string } => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const weekNum = Math.ceil(
+      ((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7
+    );
+    const weekKey = `${now.getFullYear()}-W${weekNum}`;
+    const stored =
+      typeof window !== "undefined"
+        ? localStorage.getItem(`obhyash_pdf_dl_${weekKey}`)
+        : null;
+    return { count: stored ? parseInt(stored, 10) : 0, weekKey };
+  };
+  const incrementPdfWeeklyCount = () => {
+    const { count, weekKey } = getPdfWeeklyCount();
+    localStorage.setItem(`obhyash_pdf_dl_${weekKey}`, String(count + 1));
+  };
 
   const handleBookmarkLimitReached = useCallback(() => {
     if (appState === AppState.ACTIVE) {
@@ -2054,12 +2075,25 @@ export default function StudentRoot({
                 ? "script"
                 : "digital"
             }
-            onDownloadQuestionPaper={() =>
-              examDetails && downloadQuestionPaper(examDetails, questions)
-            }
-            onDownloadResultWithExplanations={() =>
-              examDetails && downloadResultWithExplanations(examDetails, questions, userAnswers)
-            }
+            onDownloadQuestionPaper={() => {
+                if (!isPro) {
+                  const { count } = getPdfWeeklyCount();
+                  if (count >= FREE_WEEKLY_PDF_LIMIT) {
+                    setShowProPdfModal(true);
+                    return;
+                  }
+                  incrementPdfWeeklyCount();
+                }
+                examDetails && downloadQuestionPaper(examDetails, questions);
+              }}
+            onDownloadResultWithExplanations={() => {
+                // Solution PDF is Pro-only
+                if (!isPro) {
+                  setShowProPdfModal(true);
+                  return;
+                }
+                examDetails && downloadResultWithExplanations(examDetails, questions, userAnswers);
+              }}
             currentUser={currentUser}
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
@@ -2132,6 +2166,20 @@ export default function StudentRoot({
         featurePill="বুকমার্ক লিমিট: ২৫/২৫"
         onUpgradeClick={() => {
           setShowProBookmarkModal(false);
+          setActiveTab("subscription");
+          if (typeof window !== "undefined") {
+            window.history.pushState({ tab: "subscription" }, "", "/subscription");
+          }
+        }}
+      />
+      <ProUpgradeModal
+        isOpen={showProPdfModal}
+        onClose={() => setShowProPdfModal(false)}
+        title="PDF ডাউনলোড সীমিত"
+        message="ফ্রি অ্যাকাউন্টে সপ্তাহে মাত্র ৩টি প্রশ্নপত্র PDF ডাউনলোড করা যাবে। ব্যাখ্যাসহ উত্তরপত্র PDF শুধুমাত্র প্রো সদস্যদের জন্য। আনলিমিটেড ডাউনলোডের জন্য প্রো সাবস্ক্রিপশন নাও।"
+        featurePill="সাপ্তাহিক লিমিট: ৩টি PDF"
+        onUpgradeClick={() => {
+          setShowProPdfModal(false);
           setActiveTab("subscription");
           if (typeof window !== "undefined") {
             window.history.pushState({ tab: "subscription" }, "", "/subscription");

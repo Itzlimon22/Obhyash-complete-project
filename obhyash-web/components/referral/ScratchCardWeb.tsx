@@ -34,7 +34,7 @@ export const ScratchCardWeb: React.FC<ScratchCardWebProps> = ({ card, onRevealed
 
       setLocalReward(data as string);
       setIsScratched(true);
-      toast.success('অভিনন্দন! আপনি একটি নতুন পুরস্কার পেয়েছেন!');
+      toast.success('অভিনন্দন! তুমি একটি নতুন পুরস্কার পেয়েছ!');
       onRevealed();
     } catch (err: any) {
       console.error(err);

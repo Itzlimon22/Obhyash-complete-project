@@ -55,6 +55,7 @@ class MainActivity : FlutterActivity() {
                     val bytes = call.argument<ByteArray>("bytes")
                     val fileName = call.argument<String>("fileName") ?: "document.pdf"
                     val title = call.argument<String>("title") ?: "Download Complete"
+                    val subtitle = call.argument<String>("subtitle") ?: "ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন"
 
                     if (bytes == null) {
                         result.error("INVALID_ARGS", "Bytes cannot be null", null)
@@ -64,7 +65,7 @@ class MainActivity : FlutterActivity() {
                     try {
                         val fileUri = saveFileToPublicDownloads(bytes, fileName)
                         if (fileUri != null) {
-                            showDownloadNotification(fileName, title, fileUri)
+                            showDownloadNotification(fileName, title, fileUri, subtitle)
                             result.success(fileUri.toString())
                         } else {
                             result.error("SAVE_FAILED", "Failed to save file to downloads", null)
@@ -110,7 +111,7 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun showDownloadNotification(fileName: String, title: String, uri: Uri) {
+    private fun showDownloadNotification(fileName: String, title: String, uri: Uri, subtitle: String? = null) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -144,11 +145,13 @@ class MainActivity : FlutterActivity() {
             null
         }
 
+        val bodyText = if (!subtitle.isNullOrBlank()) subtitle else "ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন"
+
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setColor(0xFF059669.toInt())
             .setContentTitle(title)
-            .setContentText("$fileName ডাউনলোড সম্পন্ন হয়েছে। দেখতে ট্যাপ করুন।")
+            .setContentText(bodyText)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

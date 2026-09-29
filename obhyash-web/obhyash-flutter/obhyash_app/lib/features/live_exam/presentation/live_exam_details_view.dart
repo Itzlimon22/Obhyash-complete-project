@@ -564,7 +564,7 @@ class _LiveExamDetailsViewState extends ConsumerState<LiveExamDetailsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "আপনার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)",
+                          "তোমার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)",
                           style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,

@@ -104,7 +104,7 @@ export default function LeitnerMemoryBoxCard({ userId }: LeitnerMemoryBoxCardPro
               </span>
             </h3>
             <p className="text-xs text-slate-400">
-              স্মৃতিবিজ্ঞান অনুযায়ী আপনার পড়া প্রশ্নগুলোর স্থায়ী রূপান্তরের স্তর
+              স্মৃতিবিজ্ঞান অনুযায়ী তোমার পড়া প্রশ্নগুলোর স্থায়ী রূপান্তরের স্তর
             </p>
           </div>
         </div>

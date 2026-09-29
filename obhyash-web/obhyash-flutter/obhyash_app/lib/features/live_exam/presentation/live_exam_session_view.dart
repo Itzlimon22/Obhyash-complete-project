@@ -322,7 +322,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             ],
           ),
           content: const Text(
-            'আপনি অনুমোদিত সীমার চেয়ে বেশিবার অ্যাপ মিনিমাইজ করেছেন। পরীক্ষার সততা রক্ষার্থে আপনার উত্তরপত্র স্বয়ংক্রিয়ভাবে জমা করা হচ্ছে।',
+            'তুমি অনুমোদিত সীমার চেয়ে বেশিবার অ্যাপ মিনিমাইজ করেছ। পরীক্ষার সততা রক্ষার্থে তোমার উত্তরপত্র স্বয়ংক্রিয়ভাবে জমা করা হচ্ছে।',
             style: TextStyle(fontSize: 13, height: 1.4),
           ),
           actions: [
@@ -864,7 +864,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontWeight: FontWeight.w600)),
         content: const Text(

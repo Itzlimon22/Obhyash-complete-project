@@ -139,41 +139,44 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
               (subJson?['status']?.toString().toLowerCase() == 'active');
 
           final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? '').toString().toLowerCase().trim();
-          final bool isNotFree = rawPlan.isNotEmpty && rawPlan != 'free' && rawPlan != 'inactive';
+          final bool isExplicitlyFree = rawPlan == 'free' || rawPlan == 'inactive';
 
           final bool isValidActive = isStatusActive &&
-              isNotFree &&
+              !isExplicitlyFree &&
               parsedExp != null &&
               parsedExp.isAfter(DateTime.now());
 
-          if (isValidActive && activePlan == null) {
-            expiresAt = parsedExp;
-            final days = (parsedExp.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 999);
-            final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
-            final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
-            final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
-                ? 'Yearly Plan'
-                : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
-                    ? 'Quarterly Plan'
-                    : 'Monthly Plan';
+          if (isValidActive) {
+            // If activePlan is null OR user table has a later (extended) expiration date than past invoice:
+            if (activePlan == null || (expiresAt != null && parsedExp.isAfter(expiresAt))) {
+              expiresAt = parsedExp;
+              final days = (parsedExp.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 9999);
+              final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? activePlan?.name ?? 'প্রো সাবস্ক্রিপশন').toString();
+              final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
+              final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                  ? 'Yearly Plan'
+                  : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                      ? 'Quarterly Plan'
+                      : 'Monthly Plan';
 
-            activePlan = SubscriptionPlan(
-              id: 'user_active_plan',
-              name: planTitle,
-              price: 0,
-              billingCycle: cycle,
-              durationDays: days,
-              currency: '৳',
-              features: const [
-                'সকল প্রিমিয়াম ফিচার আনলকড',
-                'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
-                'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
-              ],
-              colorTheme: 'emerald',
-              expiresAt: parsedExp.toIso8601String().length >= 10
-                  ? parsedExp.toIso8601String().substring(0, 10)
-                  : null,
-            );
+              activePlan = SubscriptionPlan(
+                id: activePlan?.id ?? 'user_active_plan',
+                name: planTitle,
+                price: activePlan?.price ?? 0,
+                billingCycle: cycle,
+                durationDays: days,
+                currency: '৳',
+                features: const [
+                  'সকল প্রিমিয়াম ফিচার আনলকড',
+                  'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                  'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+                ],
+                colorTheme: 'emerald',
+                expiresAt: parsedExp.toIso8601String().length >= 10
+                    ? parsedExp.toIso8601String().substring(0, 10)
+                    : null,
+              );
+            }
           }
         }
       } catch (e) {

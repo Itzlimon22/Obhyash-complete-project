@@ -1032,7 +1032,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -1153,7 +1153,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -2526,7 +2526,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF141417) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border.all(
           color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),

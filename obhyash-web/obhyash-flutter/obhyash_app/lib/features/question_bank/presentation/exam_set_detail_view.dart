@@ -8,8 +8,9 @@ import '../../exam/providers/exam_provider.dart';
 import '../services/question_bank_service.dart';
 import 'institute_question_bank_detail_view.dart';
 import '../../../core/utils/bangla_name_helper.dart';
-
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../exam/presentation/mock_exam_limit_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SubjectDistribution {
   final String subject;
@@ -841,6 +842,37 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     required int calculatedMarks,
   }) async {
     HapticFeedback.mediumImpact();
+    var profile = ref.read(userProfileProvider).value;
+    if (profile == null) {
+      try {
+        profile = await ref.read(userProfileProvider.future);
+      } catch (_) {}
+    }
+    final isPro = profile?.isPro ?? false;
+    if (!isPro) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        final now = DateTime.now().toUtc();
+        final startOfDay = DateTime.utc(now.year, now.month, now.day).toIso8601String();
+        try {
+          final List res = await Supabase.instance.client
+              .from('exam_results')
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('chapters', 'সকল অধ্যায়')
+              .gte('created_at', startOfDay);
+
+          if (res.length >= 1) {
+            if (!mounted) return;
+            MockExamLimitScreen.show(context);
+            return;
+          }
+        } catch (e) {
+          debugPrint('[ExamSetDetailView] QB Quota check error: $e');
+        }
+      }
+    }
+
     final qs = await _getQuestions();
     if (!mounted || qs.isEmpty) return;
 
@@ -896,7 +928,8 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
     final instName = (widget.institute['name'] ?? 'ইনস্টিটিউট').toString();
     final instLogo = (widget.institute['logo'] ?? '').toString();
 
-    final userDivision = ref.watch(userProfileProvider).value?.division ?? '';
+    final userProfile = ref.watch(userProfileProvider).value;
+    final userDivision = userProfile?.division ?? '';
     final distributions = getMarkDistribution(instId, widget.examSet, userDivision);
     final isWritten = widget.examSet.type == 'written' ||
         widget.examSet.id.toLowerCase().contains('written') ||
@@ -1253,10 +1286,61 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                             }).toList(),
                           )
                         else
-                          Column(
-                            children: distributions
-                                .map((dist) => _buildStaticSubjectRow(dist: dist, isDark: isDark))
-                                .toList(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF18181B) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                for (int i = 0; i < distributions.length; i += 2) ...[
+                                  if (i > 0)
+                                    Divider(
+                                      height: 20,
+                                      thickness: 1,
+                                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                                    ),
+                                  IntrinsicHeight(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: _buildStaticSubjectItem(
+                                            dist: distributions[i],
+                                            isDark: isDark,
+                                          ),
+                                        ),
+                                        if (i + 1 < distributions.length) ...[
+                                          VerticalDivider(
+                                            width: 20,
+                                            thickness: 1,
+                                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
+                                          ),
+                                          Expanded(
+                                            child: _buildStaticSubjectItem(
+                                              dist: distributions[i + 1],
+                                              isDark: isDark,
+                                            ),
+                                          ),
+                                        ] else
+                                          const Spacer(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                       ],
                     ),
@@ -1283,7 +1367,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                   ),
                   child: Row(
                     children: [
-                      // Button 1: প্রশ্ন দেখো (View Questions)
+                      // Button 1: প্রশ্ন দেখো (View Questions) - Works for all users
                       Expanded(
                         child: SizedBox(
                           height: 48,
@@ -1310,7 +1394,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                       ),
                       const SizedBox(width: 12),
 
-                      // Button 2: পরীক্ষা দাও (Take Exam)
+                      // Button 2: পরীক্ষা দাও (Take Exam) - Only for premium members
                       Expanded(
                         child: SizedBox(
                           height: 48,
@@ -1323,14 +1407,24 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                                     ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF004633),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                            child: const Text(
-                              'পরীক্ষা দাও',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text(
+                                  'পরীক্ষা দাও',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -1426,62 +1520,55 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
   }
 
 
-  Widget _buildStaticSubjectRow({
+  Widget _buildStaticSubjectItem({
     required SubjectDistribution dist,
     required bool isDark,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF18181B) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: dist.color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(dist.icon, size: 17, color: dist.color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                dist.subject,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  height: 1.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${dist.questions} • ${dist.marks}',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  height: 1.2,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
-        child: Row(
-          children: [
-            // Subject Icon
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: dist.color.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(dist.icon, size: 18, color: dist.color),
-            ),
-            const SizedBox(width: 12),
-            // Name & details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dist.subject,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${dist.questions} • ${dist.marks}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
   Widget _buildInteractiveSubjectCard({

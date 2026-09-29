@@ -168,7 +168,7 @@ class NotificationRouter {
         return Container(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : Colors.white,
+            color: isDark ? const Color(0xFF141417) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
               color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),

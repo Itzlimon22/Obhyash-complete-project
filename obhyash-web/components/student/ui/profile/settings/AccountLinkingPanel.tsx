@@ -138,7 +138,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
 
   const handleChangeGoogle = async () => {
     if (!googleIdentity) return;
-    if (!confirm('আপনি কি বর্তমান গুগল অ্যাকাউন্ট পরিবর্তন করে নতুন একটি গুগল অ্যাকাউন্ট সংযুক্ত করতে চান?')) {
+    if (!confirm('তুমি কি বর্তমান গুগল অ্যাকাউন্ট পরিবর্তন করে নতুন একটি গুগল অ্যাকাউন্ট সংযুক্ত করতে চাও?')) {
       return;
     }
     setIsLinking(true);
@@ -160,7 +160,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
 
   const handleUnlinkGoogle = async () => {
     if (!googleIdentity) return;
-    if (!confirm('আপনি কি নিশ্চিত যে গুগল অ্যাকাউন্টটি এই আইডি থেকে আনলিঙ্ক করতে চান?')) {
+    if (!confirm('তুমি কি নিশ্চিত যে গুগল অ্যাকাউন্টটি এই আইডি থেকে আনলিঙ্ক করতে চাও?')) {
       return;
     }
     setIsLinking(true);
@@ -299,7 +299,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'ওটিপি পাঠাতে ব্যর্থ হয়েছে');
 
-      toast.success(data.message || 'আপনার ইমেইলে ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে!');
+      toast.success(data.message || 'তোমার ইমেইলে ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে!');
       setEmailOtpCooldown(data.cooldown_seconds || 60);
       setIsEmailOtpModalOpen(true);
     } catch (error: any) {
@@ -613,7 +613,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
                   ইমেইল অ্যাড্রেস পরিবর্তন
                 </h3>
                 <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['HindSiliguri',sans-serif]">
-                  ভেরিফাই করার পূর্বে আপনার আসল ইমেইল লিখুন
+                  ভেরিফাই করার পূর্বে তোমার আসল ইমেইল লেখো
                 </p>
               </div>
             </div>
@@ -752,7 +752,7 @@ export default function AccountLinkingPanel({ user }: AccountLinkingPanelProps) 
                   {displayPhone ? 'মোবাইল নম্বর পরিবর্তন' : 'মোবাইল নম্বর যুক্ত করুন'}
                 </h3>
                 <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['HindSiliguri',sans-serif]">
-                  আপনার সক্রিয় ১১ ডিজিটের নম্বর লিখুন
+                  তোমার সক্রিয় ১১ ডিজিটের নম্বর লেখো
                 </p>
               </div>
             </div>

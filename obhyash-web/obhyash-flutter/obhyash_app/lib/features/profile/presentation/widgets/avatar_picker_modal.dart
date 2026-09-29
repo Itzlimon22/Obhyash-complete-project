@@ -332,7 +332,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
         maxHeight: screenHeight * 0.88,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF141417) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
@@ -376,7 +376,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'অবতার ও প্রোফাইল ছবি',
+                        'Avatar ও প্রোফাইল ছবি',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -480,7 +480,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'শিক্ষার্থী অবতার কালেকশন:',
+                          'শিক্ষার্থী Avatar কালেকশন:',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           ),
                         ),
                         Text(
-                          '${filtered.length} টি অবতার',
+                          '${filtered.length} টি Avatar',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -681,7 +681,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                                 Icon(LucideIcons.checkCircle2, size: 18, color: Colors.white),
                                 SizedBox(width: 8),
                                 Text(
-                                  'অবতার সেভ করো',
+                                  'Avatar সেভ করো',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,

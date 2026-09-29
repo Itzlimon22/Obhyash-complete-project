@@ -6,13 +6,24 @@ import '../../exam/services/offline_question_bank_service.dart';
 import '../presentation/institute_question_bank_detail_view.dart';
 
 class QuestionBankService {
+  static const String _leanQuestionFields =
+      'id, question, options, correct_answer_indices, explanation, type, difficulty, subject, chapter, topic, image_url, option_images, explanation_image_url, status, institutes, years, tags, exam_type, passage, section';
+
+  static final Map<String, List<Question>> _examSetCache = {};
+
+  static void clearCache() {
+    _examSetCache.clear();
+  }
+
   static List<String> getInstituteSearchTags(String instituteId) {
     final id = instituteId.toLowerCase();
     switch (id) {
       case 'buet':
         return ['BUET', 'বুয়েট'];
       case 'ckruet':
-        return ['CKRUET', 'RUET', 'KUET', 'CUET', 'গুচ্ছ ইঞ্জিঃ'];
+        // STRICT: Only CKRUET combined cluster tags. Never include RUET, KUET, CUET
+        // to prevent individual university questions from leaking into CKRUET exam sets.
+        return ['CKRUET', 'গুচ্ছ ইঞ্জিঃ', 'গুচ্ছ ইঞ্জিনিয়ারিং', 'চুয়েট-কুয়েট-রুয়েট'];
       case 'ruet':
         return ['RUET', 'রুয়েট'];
       case 'kuet':
@@ -41,8 +52,9 @@ class QuestionBankService {
       case 'bup':
         return ['BUP'];
       case 'gst':
+        return ['GST', 'গুচ্ছ'];
       case 'agri':
-        return ['GST', 'গুচ্ছ', 'কৃষি গুচ্ছ', 'Agri'];
+        return ['Agri', 'কৃষি গুচ্ছ'];
       case 'board_dhaka':
         return ['DB', 'ঢাকা বোর্ড', 'Dhaka Board', 'Dhaka'];
       case 'board_rajshahi':
@@ -71,35 +83,37 @@ class QuestionBankService {
   }
 
   /// Extracts 4-digit years from session string.
-  /// For single-year admission sets (not board/school), also includes [year-1]
-  /// because KUET 18 = session 2017-18, questions tagged with both 2017 and 2018.
+  /// In Bangladeshi admission & academic systems:
+  /// A session like '2022-23', '22-23', or '2022-2023' (consecutive years Y and Y+1)
+  /// is stored in the question bank under its start year Y (e.g. 2022 for session 2022-23).
+  /// Returning both Y and Y+1 causes question leakage between consecutive sessions (e.g. 22-23 and 23-24).
   static List<int> extractYearsFromSession(String yearStr,
       {String? instituteId}) {
-    final Set<int> years = {};
     if (yearStr.isEmpty) return [];
-    final parts = yearStr.split(RegExp(r'[-/]'));
+    final parts = yearStr
+        .split(RegExp(r'[-/]'))
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+    final List<int> nums = [];
     for (final p in parts) {
-      final num = int.tryParse(p.trim());
+      final num = int.tryParse(p);
       if (num != null) {
         if (num < 100) {
-          years.add(num > 50 ? 1900 + num : 2000 + num);
+          nums.add(num > 50 ? 1900 + num : 2000 + num);
         } else {
-          years.add(num);
+          nums.add(num);
         }
       }
     }
 
-    // For single-year admission sets (not board/school), include [year-1, year]
-    // because KUET 18 = session 2017-18, so questions are tagged 2017 AND 2018.
-    final id = (instituteId ?? '').toLowerCase();
-    if (!id.startsWith('board_') && !id.startsWith('school_')) {
-      if (parts.length == 1 && years.length == 1) {
-        final y = years.first;
-        years.add(y - 1);
-      }
+    // For consecutive year sessions Y and Y+1 (e.g. 2022-23 -> 2022, 2023),
+    // the canonical question bank database session year is the start year Y.
+    if (nums.length == 2 && nums[1] == nums[0] + 1) {
+      return [nums[0]];
     }
 
-    return years.toList();
+    return nums;
   }
 
   /// Sorts questions serially subject-wise (Physics → Chemistry → Higher Math → Biology → etc.)
@@ -125,15 +139,20 @@ class QuestionBankService {
   ///
   /// Rules:
   /// 1. ZERO QUESTION LEAKAGE: When a year is specified, ONLY return questions
-  ///    tagged with that exact year. Never pad from other years or generic pools.
-  /// 2. SERIAL-WISE GROUPING: Physics → Chemistry → Higher Math → Biology → etc.
-  /// 3. FASTEST LOADING: Parallel Supabase queries (no .overlaps() combo
-  ///    which causes statement timeout 57014). In-memory intersection.
+  ///    tagged with that exact session year. Never combine subsequent or prior sessions.
+  /// 2. ZERO INSTITUTE LEAKAGE: Institute tags are strictly isolated. CKRUET never pulls RUET/KUET/CUET.
+  /// 3. FASTEST LOADING: Targeted lean column queries on institute tags only; instant memory caching.
   static Future<List<Question>> fetchExamSetQuestions({
     required String instituteId,
     required InstituteExamSet examSet,
     List<String> selectedSubjects = const [],
   }) async {
+    final cacheKey = '$instituteId:${examSet.id}:${selectedSubjects.join(",")}';
+    if (_examSetCache.containsKey(cacheKey) && _examSetCache[cacheKey]!.isNotEmpty) {
+      debugPrint('[QuestionBankService] Serving from memory cache for $cacheKey (${_examSetCache[cacheKey]!.length} questions)');
+      return _examSetCache[cacheKey]!;
+    }
+
     final isWritten = examSet.type == 'written' ||
         examSet.id.toLowerCase().contains('written') ||
         examSet.title.toLowerCase().contains('written') ||
@@ -145,10 +164,9 @@ class QuestionBankService {
 
     try {
       // ======================================================================
-      // PARALLEL FAST FETCH
-      // Avoid Postgres .overlaps(inst).overlaps(years) combo — it always times
-      // out (error 57014). Run institute queries + year query concurrently,
-      // then intersect strictly in-memory.
+      // TARGETED FAST LEAN FETCH
+      // Only query by specific institute tag(s). Never run unconstrained
+      // overlaps('years') across 76k rows, which causes 57014 timeouts and leaks.
       // ======================================================================
       final List<Future<List<Map<String, dynamic>>>> queryFutures = [];
 
@@ -156,32 +174,19 @@ class QuestionBankService {
         queryFutures.add(
           supabase
               .from('questions')
-              .select('*')
+              .select(_leanQuestionFields)
               .contains('institutes', [tags[0]])
-              .limit(200)
               .then((res) => List<Map<String, dynamic>>.from(res)),
         );
         if (tags.length > 1) {
           queryFutures.add(
             supabase
                 .from('questions')
-                .select('*')
+                .select(_leanQuestionFields)
                 .contains('institutes', [tags[1]])
-                .limit(200)
                 .then((res) => List<Map<String, dynamic>>.from(res)),
           );
         }
-      }
-
-      if (years.isNotEmpty) {
-        queryFutures.add(
-          supabase
-              .from('questions')
-              .select('*')
-              .overlaps('years', years)
-              .limit(200)
-              .then((res) => List<Map<String, dynamic>>.from(res)),
-        );
       }
 
       final List<List<Map<String, dynamic>>> queryResults =
@@ -199,10 +204,10 @@ class QuestionBankService {
       }
 
       // ======================================================================
-      // STRICT IN-MEMORY FILTER — ZERO QUESTION LEAKAGE
+      // STRICT IN-MEMORY FILTER — ZERO QUESTION & INSTITUTE LEAKAGE
       // Question included ONLY IF:
       //   (a) institutes array contains this institute tag, AND
-      //   (b) years array contains the requested year(s)
+      //   (b) years array contains the requested session year(s)
       // ======================================================================
       final normalizedTags =
           tags.map((t) => t.toLowerCase().trim()).toList();
@@ -216,7 +221,7 @@ class QuestionBankService {
                   .toList() ??
               [];
           final hasYear = years.any((y) => rowYears.contains(y));
-          if (!hasYear) continue; // STRICT ZERO LEAK
+          if (!hasYear) continue; // STRICT ZERO LEAK: Must contain requested session year
         }
 
         // 2. Strict Institute check (zero-leak)
@@ -225,7 +230,7 @@ class QuestionBankService {
                 .toList() ??
             [];
         final hasInst = normalizedTags.any((t) => rowInstitutes.contains(t));
-        if (!hasInst) continue; // STRICT ZERO LEAK
+        if (!hasInst) continue; // STRICT ZERO LEAK: Must belong to this institute
 
         // 3. Written vs MCQ type check
         final qType = (row['type'] ?? '').toString().toLowerCase();
@@ -305,12 +310,16 @@ class QuestionBankService {
           count: isWritten ? 11 : 25,
         );
         if (offlineQs.isNotEmpty) {
-          OfflineQuestionBankService.cacheQuestions(offlineQs);
-          return sortSeriallySubjectwise(offlineQs);
+          final sortedOffline = sortSeriallySubjectwise(offlineQs);
+          _examSetCache[cacheKey] = sortedOffline;
+          OfflineQuestionBankService.cacheQuestions(sortedOffline);
+          return sortedOffline;
         }
         return [];
       }
 
+      // Store in memory cache for instant future loads
+      _examSetCache[cacheKey] = sortedQuestions;
       // Cache for offline use
       OfflineQuestionBankService.cacheQuestions(sortedQuestions);
       return sortedQuestions;
@@ -329,3 +338,4 @@ class QuestionBankService {
     }
   }
 }
+

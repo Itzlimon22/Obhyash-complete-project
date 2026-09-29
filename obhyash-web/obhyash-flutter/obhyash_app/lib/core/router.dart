@@ -12,6 +12,8 @@ import '../features/auth/presentation/splash_view.dart';
 
 import '../features/auth/presentation/signup_view.dart';
 import '../features/auth/presentation/welcome_view.dart';
+import '../features/auth/presentation/complete_profile_view.dart';
+import '../features/auth/presentation/login_support_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
 import '../features/profile/presentation/profile_stats_page.dart';
 import '../features/subscription/presentation/subscription_view.dart';
@@ -38,6 +40,7 @@ import '../features/live_exam/presentation/live_exam_details_view.dart';
 import '../features/live_exam/presentation/live_exam_session_view.dart';
 import '../features/live_exam/presentation/live_exam_solution_view.dart';
 import '../features/live_exam/presentation/live_exam_leaderboard_view.dart';
+import '../features/live_exam/presentation/live_exam_history_page.dart';
 import '../features/live_exam/domain/models.dart';
 import '../features/profile/presentation/bookmarks_view.dart';
 import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
@@ -124,6 +127,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == '/welcome';
       final isUpdatingPassword = state.matchedLocation == '/update-password';
 
+      final isCompleteProfile = state.matchedLocation == '/complete-profile';
+      final isSupport = state.matchedLocation == '/login-support';
+
+      if (isSupport) {
+        return null;
+      }
+      if (isAuth && isCompleteProfile) {
+        return null;
+      }
       if (!isAuth && !isLoggingIn && !isUpdatingPassword) {
         return '/welcome';
       }
@@ -133,6 +145,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/login-support',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const LoginSupportView(), state),
+      ),
+      GoRoute(
+        path: '/complete-profile',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const CompleteProfileView(), state),
+      ),
       GoRoute(
         path: '/splash',
         parentNavigatorKey: rootNavigatorKey,
@@ -319,6 +343,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             state,
           );
         },
+      ),
+      GoRoute(
+        path: '/live_exam_history',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const LiveExamHistoryPage(), state),
       ),
       GoRoute(
         path: '/exam-setup',

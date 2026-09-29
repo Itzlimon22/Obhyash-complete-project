@@ -527,9 +527,15 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final isMarked = _bookmarkedIds.contains(qid);
 
     if (!isMarked) {
-      final profile = ref.read(userProfileProvider).value;
+      var profile = ref.read(userProfileProvider).value;
+      if (profile == null) {
+        try {
+          profile = await ref.read(userProfileProvider.future);
+        } catch (_) {}
+      }
       final isPro = profile?.isPro ?? false;
       if (!isPro && _totalBookmarks >= 25) {
+        if (!mounted) return;
         ProUpgradeModal.show(
           context,
           title: 'বুকমার্ক লিমিট শেষ 📌',
@@ -622,7 +628,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (_shuffle) qs = (qs..shuffle());
 
     // Daily 1 practice session quota for free users
-    final profile = ref.read(userProfileProvider).value;
+    var profile = ref.read(userProfileProvider).value;
+    if (profile == null) {
+      try {
+        profile = await ref.read(userProfileProvider.future);
+      } catch (_) {}
+    }
     final isPro = profile?.isPro ?? false;
 
     if (!isPro) {

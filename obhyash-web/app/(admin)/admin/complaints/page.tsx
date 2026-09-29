@@ -19,14 +19,17 @@ import {
   AlertCircle,
   Download,
   ExternalLink,
+  Headphones,
 } from 'lucide-react';
 import { ComplaintResolutionModal } from '@/components/admin/complaints/complaint-resolution-modal';
+import { LoginSupportTicketsView } from '@/components/admin/complaints/login-support-tickets-view';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import { exportToCSV } from '@/lib/utils/export-csv';
 
 export default function AdminComplaintsPage() {
+  const [activeTab, setActiveTab] = useState<'complaints' | 'support'>('complaints');
   const [complaints, setComplaints] = useState<AppComplaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -150,54 +153,102 @@ export default function AdminComplaintsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-0.5">
             <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
-              <AlertTriangle className="text-red-600" size={24} />
-              Complaints
+              {activeTab === 'complaints' ? (
+                <>
+                  <AlertTriangle className="text-red-600" size={24} />
+                  Complaints & Feedback
+                </>
+              ) : (
+                <>
+                  <Headphones className="text-emerald-600" size={24} />
+                  Login & Registration Support
+                </>
+              )}
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
-              Manage technical issues and feedback from students
+              {activeTab === 'complaints'
+                ? 'Manage technical issues and feedback from registered students'
+                : 'Direct support requests from students facing login, OTP or registration issues'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <div className="flex items-center gap-2.5 mr-1">
-              <div className="px-3 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800 rounded-xl flex items-center gap-2">
-                <div className="p-1 px-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg">
-                  <AlertCircle size={12} />
-                </div>
-                <div>
-                  <p className="text-[8px] text-red-600/70 font-black uppercase tracking-tight">
-                    Pending ({serverStats.pending})
-                  </p>
-                  <p className="text-sm font-black text-red-600 dark:text-red-400 leading-none">
-                    Total: {serverStats.total}
-                  </p>
+          {activeTab === 'complaints' && (
+            <div className="flex items-center gap-2 self-end md:self-auto">
+              <div className="flex items-center gap-2.5 mr-1">
+                <div className="px-3 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800 rounded-xl flex items-center gap-2">
+                  <div className="p-1 px-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg">
+                    <AlertCircle size={12} />
+                  </div>
+                  <div>
+                    <p className="text-[8px] text-red-600/70 font-black uppercase tracking-tight">
+                      Pending ({serverStats.pending})
+                    </p>
+                    <p className="text-sm font-black text-red-600 dark:text-red-400 leading-none">
+                      Total: {serverStats.total}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              onClick={exportCSV}
-              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 text-xs font-bold"
-              title="Export CSV"
-            >
-              <Download size={16} />
-              <span className="hidden sm:inline">Export</span>
-            </button>
-            <button
-              onClick={() => fetchComplaints(true)}
-              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-              title="Refresh"
-            >
-              <RefreshCw
-                size={18}
-                className={`text-neutral-500 ${isLoading ? 'animate-spin' : ''}`}
-              />
-            </button>
-          </div>
+              <button
+                onClick={exportCSV}
+                className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 text-xs font-bold"
+                title="Export CSV"
+              >
+                <Download size={16} />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+              <button
+                onClick={() => fetchComplaints(true)}
+                className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                title="Refresh"
+              >
+                <RefreshCw
+                  size={18}
+                  className={`text-neutral-500 ${isLoading ? 'animate-spin' : ''}`}
+                />
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 p-1.5 rounded-2xl w-fit border border-neutral-200 dark:border-neutral-800">
+          <button
+            onClick={() => setActiveTab('complaints')}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'complaints'
+                ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400'
+            }`}
+          >
+            <AlertTriangle size={15} className="text-red-500" />
+            <span>অ্যাপ অভিযোগ ({serverStats.total})</span>
+            {serverStats.pending > 0 && (
+              <span className="px-1.5 py-0.2 bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 text-[10px] font-extrabold rounded-full">
+                {serverStats.pending}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('support')}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'support'
+                ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400'
+            }`}
+          >
+            <Headphones size={15} className="text-emerald-500" />
+            <span>লগইন সাপোর্ট টিকিট</span>
+          </button>
+        </div>
+
+        {activeTab === 'support' ? (
+          <LoginSupportTicketsView />
+        ) : (
+          <>
+            {/* Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative col-span-1 md:col-span-2">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
@@ -461,6 +512,8 @@ export default function AdminComplaintsPage() {
               </div>
             </div>
           </div>
+        )}
+        </>
         )}
 
         {/* Modal */}

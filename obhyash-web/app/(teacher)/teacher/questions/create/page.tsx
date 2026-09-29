@@ -367,7 +367,7 @@ export default function TeacherCreateQuestionPage() {
             <RichTextEditor
               value={formData.question}
               onChange={(val) => handleChange('question', val)}
-              placeholder="আপনার প্রশ্নটি এখানে লেখো (supports LaTeX and formatting)..."
+              placeholder="তোমার প্রশ্নটি এখানে লেখো (supports LaTeX and formatting)..."
             />
           </div>
 

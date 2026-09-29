@@ -178,41 +178,43 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 (subJson?['status']?.toString().toLowerCase() == 'active');
 
             final rawPlan = (subJson?['plan'] ?? userRes['plan'] ?? '').toString().toLowerCase().trim();
-            final bool isNotFree = rawPlan.isNotEmpty && rawPlan != 'free' && rawPlan != 'inactive';
+            final bool isExplicitlyFree = rawPlan == 'free' || rawPlan == 'inactive';
 
             final bool isValidActive = isStatusActive &&
-                isNotFree &&
+                !isExplicitlyFree &&
                 parsedExp != null &&
                 parsedExp.isAfter(DateTime.now());
 
-            if (isValidActive && activeSub == null) {
-              expiresAt = parsedExp;
-              final days = (parsedExp.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 999);
-              final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? 'প্রো সাবস্ক্রিপশন').toString();
-              final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
-              final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
-                  ? 'Yearly'
-                  : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
-                      ? 'Quarterly'
-                      : 'Monthly';
+            if (isValidActive) {
+              if (activeSub == null || (expiresAt != null && parsedExp.isAfter(expiresAt))) {
+                expiresAt = parsedExp;
+                final days = (parsedExp.difference(DateTime.now()).inSeconds / (24 * 3600)).ceil().clamp(1, 9999);
+                final rawPlanName = (subJson?['plan'] ?? userRes['plan'] ?? activeSub?.name ?? 'প্রো সাবস্ক্রিপশন').toString();
+                final planTitle = rawPlanName.toLowerCase() == 'pro' ? 'প্রো সাবস্ক্রিপশন' : rawPlanName;
+                final cycle = planTitle.toLowerCase().contains('year') || planTitle.toLowerCase().contains('বছর')
+                    ? 'Yearly'
+                    : planTitle.toLowerCase().contains('quarter') || planTitle.toLowerCase().contains('ত্রৈমাসিক')
+                        ? 'Quarterly'
+                        : 'Monthly';
 
-              activeSub = SubscriptionPlan(
-                id: 'user_active_plan',
-                name: planTitle,
-                price: 0,
-                billingCycle: cycle,
-                durationDays: days,
-                currency: '৳',
-                features: const [
-                  'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-                  'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-                  'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
-                ],
-                colorTheme: 'emerald',
-                expiresAt: parsedExp.toIso8601String().length >= 10
-                    ? parsedExp.toIso8601String().substring(0, 10)
-                    : null,
-              );
+                activeSub = SubscriptionPlan(
+                  id: activeSub?.id ?? 'user_active_plan',
+                  name: planTitle,
+                  price: activeSub?.price ?? 0,
+                  billingCycle: cycle,
+                  durationDays: days,
+                  currency: '৳',
+                  features: const [
+                    'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                    'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                    'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+                  ],
+                  colorTheme: 'emerald',
+                  expiresAt: parsedExp.toIso8601String().length >= 10
+                      ? parsedExp.toIso8601String().substring(0, 10)
+                      : null,
+                );
+              }
             }
           }
         } catch (userSubErr) {
@@ -803,11 +805,14 @@ class _ComparisonTable extends StatelessWidget {
   const _ComparisonTable({required this.isDark});
 
   static const _features = [
-    ('দৈনিক পরীক্ষা কোটা', '২টি / দিন', 'সীমাহীন', false),
-    ('দৈনিক প্র্যাকটিস সেশন', '১টি / দিন', 'সীমাহীন', false),
-    ('প্রতি পরীক্ষায় প্রশ্ন সংখ্যা', 'সর্বোচ্চ ৫০', '১০০+ পূর্ণাঙ্গ', false),
+    ('দৈনিক মক পরীক্ষা কোটা', '২টি / দিন', 'সীমাহীন', false),
+    ('দৈনিক প্রশ্ন ব্যাংক টেস্ট', '১টি / দিন', 'সীমাহীন', false),
+    ('প্রতি পরীক্ষায় প্রশ্ন সংখ্যা', 'সর্বোচ্চ ৫০', 'সীমাহীন', false),
     ('বুকমার্ক প্রশ্ন সংরক্ষণ', 'সর্বোচ্চ ২৫টি', 'সীমাহীন', false),
-    ('প্রশ্নের বিস্তারিত ব্যাখ্যা ও ট্রিকস', null, null, true),
+    ('প্রশ্নপত্র PDF ডাউনলোড', '৩টি / সপ্তাহ', 'সীমাহীন', false),
+    ('ব্যাখ্যাসহ উত্তরপত্র PDF', null, null, false),
+    ('প্রশ্ন ব্যাংকে বিস্তারিত ব্যাখ্যা', null, null, false),
+    ('প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান', null, null, true),
     ('পারফরম্যান্স ও ফলাফল অ্যানালিটিক্স', null, null, true),
     ('জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড', null, null, true),
     ('অধ্যায়ভিত্তিক ফর্মুলা ব্যাংক', null, null, true),

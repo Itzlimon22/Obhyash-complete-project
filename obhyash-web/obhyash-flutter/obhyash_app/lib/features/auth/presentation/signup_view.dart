@@ -11,7 +11,6 @@ import 'widgets/otp_verification_dialog.dart';
 
 import '../providers/auth_controller.dart';
 import '../../../core/data/college_list.dart';
-import '../../../core/theme/app_theme.dart';
 
 class SignupView extends ConsumerStatefulWidget {
   const SignupView({super.key});
@@ -24,6 +23,29 @@ class _SignupViewState extends ConsumerState<SignupView>
     with SingleTickerProviderStateMixin {
   int _step = 1;
   bool _success = false;
+
+  static const _googleSvgString = '''
+<svg viewBox="0 0 24 24" width="20" height="20">
+  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+  <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+</svg>
+''';
+
+  void _handleGoogleLogin() async {
+    HapticFeedback.lightImpact();
+    await ref.read(authControllerProvider.notifier).loginWithGoogle();
+    if (!mounted) return;
+    final authState = ref.read(authControllerProvider);
+    if (authState.hasError) {
+      AppPopups.show(
+        context,
+        message: authState.error.toString(),
+        isError: true,
+      );
+    }
+  }
 
   // Form Fields
   final _nameController = TextEditingController();
@@ -255,191 +277,254 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   @override
   Widget build(BuildContext context) {
-    const isDark = true;
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = authState.isLoading;
-
-    const bgColor = Color(0xFF000000); // OLED Pure Black
-    const textColor = Colors.white;
-
-    if (_success) {
-      return _buildSuccessScreen(isDark, textColor, bgColor);
-    }
-
     return Theme(
-      data: AppTheme.darkTheme.copyWith(
-        scaffoldBackgroundColor: bgColor,
-        colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF141417),
-          primary: Color(0xFF064E3B),
+      data: ThemeData.light().copyWith(
+        textTheme: ThemeData.light().textTheme.apply(
+          fontFamily: 'HindSiliguri',
         ),
       ),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: bgColor,
-        ),
-        child: Scaffold(
-          backgroundColor: bgColor,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-              child: AnimatedBuilder(
-                animation: _animController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Opacity(opacity: _fadeAnimation.value, child: child),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Brand Logo
-                    Center(
-                      child: SvgPicture.asset(
-                        'assets/images/obhyash_full_logo_dark.svg',
-                        height: 32,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
+      child: Builder(
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final authState = ref.watch(authControllerProvider);
+          final isLoading = authState.isLoading;
 
-                    // Header
-                    const Text(
-                      'রেজিস্ট্রেশন',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFA1A1AA),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+    final bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
+    final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
+    final dividerColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    const primaryGreen = Color(0xFF006A4E);
 
-                    _buildProgressBar(isDark),
-                    const SizedBox(height: 20),
+    if (_success) {
+      return _buildSuccessScreen(isDark, textPrimary, bgColor);
+    }
 
-                    // Render Step Content
-                    _step == 1
-                        ? _buildStep1(isDark)
-                        : _step == 2
-                        ? _buildStep2(isDark)
-                        : _buildStep3(isDark),
-
-                    const SizedBox(height: 20),
-
-                    // Action Buttons
-                    Row(
-                      children: [
-                        if (_step > 1) ...[
-                          InkWell(
-                            onTap: _handleBack,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF141417),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFF27272A)),
-                              ),
-                              child: const Icon(
-                                LucideIcons.chevronLeft,
-                                size: 20,
-                                color: Color(0xFFA1A1AA),
-                              ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: bgColor,
+      ),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: AnimatedBuilder(
+                      animation: _animController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _scaleAnimation.value,
+                          child: Opacity(opacity: _fadeAnimation.value, child: child),
+                        );
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Brand Logo (Transparent BG, Black Text)
+                          Center(
+                            child: Image.asset(
+                              'assets/images/obhyash_full_logo.png',
+                              height: 38,
+                              fit: BoxFit.contain,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                        ],
+                          const SizedBox(height: 18),
 
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: (isLoading || _isSendingOtp)
-                                ? null
-                                : (_step == 3 ? _handleSignup : _handleNext),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF064E3B),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 13),
+                      // Header Title (Matching screenshot bold style)
+                      Text(
+                        'লগইন/রেজিস্টার',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.4,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildProgressBar(isDark),
+                      const SizedBox(height: 24),
+
+                      // Render Step Content
+                      _step == 1
+                          ? _buildStep1(isDark)
+                          : _step == 2
+                          ? _buildStep2(isDark)
+                          : _buildStep3(isDark),
+
+                      const SizedBox(height: 24),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          if (_step > 1) ...[
+                            InkWell(
+                              onTap: _handleBack,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF141417) : const Color(0xFFF4F4F5),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                                  ),
+                                ),
+                                child: Icon(
+                                  LucideIcons.chevronLeft,
+                                  size: 20,
+                                  color: textPrimary,
+                                ),
                               ),
-                            child: (isLoading || _isSendingOtp)
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : _step == 3
-                                ? const Text(
-                                    'অ্যাকাউন্ট তৈরি করো',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  )
-                                : const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'পরবর্তী ধাপ',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      SizedBox(width: 6),
-                                      Icon(
-                                        LucideIcons.chevronRight,
-                                        size: 18,
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: (isLoading || _isSendingOtp)
+                                  ? null
+                                  : (_step == 3 ? _handleSignup : _handleNext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryGreen,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: (isLoading || _isSendingOtp)
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.2,
                                         color: Colors.white,
                                       ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'আগেই অ্যাকাউন্ট আছে? ',
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.normal,
-                            color: Color(0xFFA1A1AA),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.push('/login'),
-                          child: const Text(
-                            'লগইন করো',
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.normal,
-                              color: Color(0xFF34D399),
+                                    )
+                                  : _step == 3
+                                  ? const Text(
+                                      'অ্যাকাউন্ট তৈরি করো',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    )
+                                  : const Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'পরবর্তী ধাপ',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                        SizedBox(width: 6),
+                                        Icon(
+                                          LucideIcons.chevronRight,
+                                          size: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ),
+                        ],
+                      ),
+
+                      if (_step == 1) ...[
+                        const SizedBox(height: 28),
+                        Row(
+                          children: [
+                            Expanded(child: Divider(color: dividerColor, thickness: 1)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                              child: Text(
+                                'Login / Registration with',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: textMuted,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: dividerColor, thickness: 1)),
+                          ],
                         ),
+                        const SizedBox(height: 20),
+                        _buildGoogleButton(isDark, textPrimary, dividerColor),
                       ],
-                    ),
-                  ],
+
+                      const SizedBox(height: 28),
+
+                      // Existing Account Login Prompt
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'আগেই অ্যাকাউন্ট আছে? ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textMuted,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              context.push('/login');
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                              child: Text(
+                                'লগইন করো',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryGreen,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          // Top Right Support Button pinned directly to the top right corner
+          Positioned(
+            top: 6,
+            right: 20,
+            child: _buildSupportButton(context, isDark),
+          ),
+        ],
       ),
-    );
+    ),
+  ),
+);
+},
+),
+);
 }
 
   Widget _buildProgressBar(bool isDark) {
+    const primaryGreen = Color(0xFF006A4E);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,15 +548,15 @@ class _SignupViewState extends ConsumerState<SignupView>
                   height: 32,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? const Color(0xFF064E3B)
+                        ? primaryGreen
                         : (isDark
-                            ? const Color(0xFF1C1C1E)
-                            : const Color(0xFFF5F5F5)),
+                            ? const Color(0xFF141417)
+                            : const Color(0xFFF4F4F5)),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isActive
-                          ? const Color(0xFF065F46)
-                          : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                          ? primaryGreen
+                          : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
                       width: 1,
                     ),
                   ),
@@ -480,23 +565,23 @@ class _SignupViewState extends ConsumerState<SignupView>
                       s.toString(),
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                         color: isActive
                             ? Colors.white
-                            : (isDark ? Colors.white54 : Colors.black54),
+                            : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
                   stepName,
                   style: TextStyle(
                     fontSize: 11.5,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                     color: isActive
-                        ? (isDark ? Colors.white : Colors.black87)
-                        : (isDark ? Colors.white54 : Colors.black54),
+                        ? (isDark ? Colors.white : const Color(0xFF18181B))
+                        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
                   ),
                 ),
               ],
@@ -511,10 +596,10 @@ class _SignupViewState extends ConsumerState<SignupView>
                   margin: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                     color: isLineActive
-                        ? const Color(0xFF064E3B)
+                        ? primaryGreen
                         : (isDark
-                            ? const Color(0xFF1C1C1E)
-                            : const Color(0xFFF5F5F5)),
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE4E4E7)),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -526,12 +611,13 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   Widget _buildLabel(String text, bool isDark, {String? tooltip}) {
+    final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
     final labelText = Text(
       text,
       style: TextStyle(
-        fontSize: 13.5,
-        fontWeight: FontWeight.normal,
-        color: isDark ? Colors.white70 : Colors.black87,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: textMuted,
       ),
     );
 
@@ -560,7 +646,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   child: Icon(
                     LucideIcons.info,
                     size: 15,
-                    color: isDark ? Colors.white54 : Colors.black45,
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
                   ),
                 ),
               ],
@@ -836,7 +922,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         const SizedBox(height: 12),
 
         _buildLabel('লিঙ্গ (Gender)', isDark),
-        const SizedBox(height: 5),
+        const SizedBox(height: 7),
         Row(
           children: ['Male', 'Female'].map((g) {
             final isSelected = _gender == g;
@@ -845,31 +931,32 @@ class _SignupViewState extends ConsumerState<SignupView>
                 padding: EdgeInsets.only(right: g == 'Male' ? 10 : 0),
                 child: InkWell(
                   onTap: () => setState(() => _gender = g),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF064E3B).withValues(alpha: 0.2)
+                          ? const Color(0xFF006A4E).withValues(alpha: 0.15)
                           : (isDark
                                 ? const Color(0xFF141417)
-                                : const Color(0xFFF5F5F5)),
+                                : const Color(0xFFFFFFFF)),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF065F46)
-                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                            ? const Color(0xFF006A4E)
+                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
+                        width: isSelected ? 1.5 : 1,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       g == 'Male' ? 'পুরুষ' : 'মহিলা',
                       style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                         color: isSelected
-                            ? const Color(0xFF34D399)
-                            : (isDark ? Colors.white70 : Colors.black87),
+                            ? (isDark ? const Color(0xFF34D399) : const Color(0xFF006A4E))
+                            : (isDark ? Colors.white70 : const Color(0xFF18181B)),
                       ),
                     ),
                   ),
@@ -905,23 +992,24 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   Widget _examTargetOption(String id, String emoji, String label, bool isDark) {
     final isSelected = _examTarget == id;
+    const primaryGreen = Color(0xFF006A4E);
     return GestureDetector(
       onTap: () => setState(() => _examTarget = isSelected ? '' : id),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF064E3B).withValues(alpha: 0.2)
-              : (isDark ? const Color(0xFF141417) : const Color(0xFFF5F5F5)),
-          borderRadius: BorderRadius.circular(12),
+              ? primaryGreen.withValues(alpha: 0.15)
+              : (isDark ? const Color(0xFF141417) : const Color(0xFFFFFFFF)),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF065F46)
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                ? primaryGreen
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
             width: isSelected ? 1.5 : 1,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -937,10 +1025,10 @@ class _SignupViewState extends ConsumerState<SignupView>
                 maxLines: 1,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   color: isSelected
-                      ? const Color(0xFF34D399)
-                      : (isDark ? Colors.white70 : Colors.black87),
+                      ? (isDark ? const Color(0xFF34D399) : primaryGreen)
+                      : (isDark ? Colors.white70 : const Color(0xFF18181B)),
                 ),
               ),
             ),
@@ -1003,8 +1091,8 @@ class _SignupViewState extends ConsumerState<SignupView>
     return AppDropdown<String>(
       value: value,
       icon: icon,
-      borderRadius: 12,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       options: customOptions ?? options.map((opt) => AppDropdownOption(value: opt, label: opt)).toList(),
       onChanged: onChanged,
     );
@@ -1021,58 +1109,58 @@ class _SignupViewState extends ConsumerState<SignupView>
     TextInputType keyboardType = TextInputType.text,
     String? tooltip,
   }) {
-    final bgColor = isDark ? const Color(0xFF141417) : const Color(0xFFF5F5F5);
+    final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
+    final fieldBg = isDark ? const Color(0xFF141417) : const Color(0xFFFFFFFF);
+    final fieldBorder = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
+    const primaryGreen = Color(0xFF006A4E);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty) ...[
           _buildLabel(label, isDark, tooltip: tooltip),
-          const SizedBox(height: 5),
+          const SizedBox(height: 7),
         ],
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-            color: isDark ? Colors.white : Colors.black,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              fontSize: 13.5,
+              fontSize: 14.5,
               fontWeight: FontWeight.normal,
-              color: isDark ? Colors.white38 : Colors.black38,
+              color: textMuted.withValues(alpha: 0.7),
             ),
             prefixIcon: Icon(
               icon,
               size: 18,
-              color: isDark ? Colors.white54 : Colors.black54,
+              color: textMuted,
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: bgColor,
-            isDense: true,
+            fillColor: fieldBg,
             contentPadding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 14,
+              vertical: 15,
+              horizontal: 16,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-              ),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: fieldBorder),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-              ),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: fieldBorder),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF065F46), width: 1.5),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+              borderSide: BorderSide(color: primaryGreen, width: 1.5),
             ),
           ),
         ),
@@ -1081,6 +1169,7 @@ class _SignupViewState extends ConsumerState<SignupView>
   }
 
   Widget _buildSuccessScreen(bool isDark, Color textColor, Color bgColor) {
+    const primaryGreen = Color(0xFF006A4E);
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
@@ -1094,7 +1183,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   width: 76,
                   height: 76,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF064E3B).withValues(alpha: 0.2),
+                    color: primaryGreen.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
@@ -1110,7 +1199,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   'রেজিস্ট্রেশন সফল!',
                   style: TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                     color: textColor,
                   ),
                 ),
@@ -1121,7 +1210,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.normal,
-                    color: isDark ? Colors.white70 : Colors.black54,
+                    color: isDark ? Colors.white70 : const Color(0xFF4B5563),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -1130,16 +1219,19 @@ class _SignupViewState extends ConsumerState<SignupView>
                   child: ElevatedButton(
                     onPressed: () => context.go('/'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF064E3B),
+                      backgroundColor: primaryGreen,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
+                    ),
                     child: const Text(
-                      'ড্যাশবোর্ডে যান',
+                      'ড্যাশবোর্ডে যাও',
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.normal,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
@@ -1147,6 +1239,59 @@ class _SignupViewState extends ConsumerState<SignupView>
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGoogleButton(bool isDark, Color textPrimary, Color dividerColor) {
+    return OutlinedButton(
+      onPressed: _handleGoogleLogin,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
+        elevation: 0,
+        side: BorderSide(color: dividerColor),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.string(
+            _googleSvgString,
+            width: 20,
+            height: 20,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'Google',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSupportButton(BuildContext context, bool isDark) {
+    final textMuted = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        context.push('/login-support');
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        'সাপোর্ট লাগবে?',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: textMuted,
         ),
       ),
     );

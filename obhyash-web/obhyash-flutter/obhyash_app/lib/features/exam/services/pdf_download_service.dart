@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:bangla_pdf/bangla_pdf.dart' as bn;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
@@ -11,9 +14,55 @@ import '../../../core/utils/question_formatter.dart';
 import '../domain/exam_models.dart';
 
 class PdfDownloadService {
+  /// Weekly download limit for question papers for free users
+  static const int maxFreeWeeklyDownloads = 3;
+
+  /// Helper to get weekly key format: weekly_pdf_q_YYYY_WW_userId
+  static String _getWeeklyKey() {
+    final now = DateTime.now().toUtc();
+    final user = Supabase.instance.client.auth.currentUser;
+    final userId = user?.id ?? 'guest';
+    final firstDayOfYear = DateTime.utc(now.year, 1, 1);
+    final weekNumber = ((now.difference(firstDayOfYear).inDays) / 7).floor();
+    return 'weekly_pdf_q_${now.year}_${weekNumber}_$userId';
+  }
+
+  /// Get how many question papers the user downloaded this week
+  static Future<int> getWeeklyDownloadCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_getWeeklyKey()) ?? 0;
+  }
+
+  /// Increment weekly download count
+  static Future<void> incrementWeeklyDownloadCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _getWeeklyKey();
+    final current = prefs.getInt(key) ?? 0;
+    await prefs.setInt(key, current + 1);
+  }
+
   /// Unified body font size for Question Stems and Answer Options.
   /// Ensures perfectly equal, harmonious, and readable typography across all generated PDFs.
   static const double _fontSizeBody = 8.2;
+
+  /// Pre-configures BanglaPdf with HindSiliguri if available in assets to guarantee
+  /// native rendering of math symbols (√, ≤, ≥, ≠, ∞, ∫, ∑, °, ², ³, ¹, ±, π, •).
+  static Future<void> _configureBanglaPdf() async {
+    try {
+      final fontData = await rootBundle.load('assets/fonts/HindSiliguri-Regular.ttf');
+      final customFont = bn.BanglaPdf.loadFont(fontData);
+      if (customFont != null) {
+        bn.BanglaPdf.configure(
+          shapingMode: bn.BanglaShapingMode.auto,
+          defaultFont: customFont,
+        );
+        return;
+      }
+    } catch (e) {
+      debugPrint('[PdfDownloadService] Font loading fallback: $e');
+    }
+    bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
+  }
 
   static String _toBanglaDigits(dynamic number) {
     return BanglaNameHelper.toBanglaNumeral(number);
@@ -36,20 +85,6 @@ class PdfDownloadService {
     return res;
   }
 
-  static String _toSubscript(String s) {
-    const safeNormal = '0123456789+-=()aehijklmnoprstuvx';
-    const safeSub = '₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ';
-    var res = '';
-    for (int i = 0; i < s.length; i++) {
-      final idx = safeNormal.indexOf(s[i]);
-      if (idx != -1) {
-        res += safeSub[idx];
-      } else {
-        res += s[i];
-      }
-    }
-    return res;
-  }
 
   /// Strips institute and exam citations (e.g. [MGCC 2024, BUET 2012], [BUET 24], [বুয়েট ২২-২৩])
   /// to keep question papers clean, authoritative, and uncluttered.
@@ -86,15 +121,16 @@ class PdfDownloadService {
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n');
 
-    // 0.1 Clean KaTeX chemistry wrappers \ce{...}, \pu{...} early with auto-subscripts
+    // 0.1 Clean KaTeX chemistry wrappers \ce{...}, \pu{...} early
     t = t.replaceAllMapped(
       RegExp(r'\\(?:ce|pu)\{([^{}]*)\}'),
       (m) {
         var inner = m.group(1)!;
         inner = inner.replaceAllMapped(
-          RegExp(r'([A-Za-z\)])(\d+)'),
-          (cm) => '${cm.group(1)}${_toSubscript(cm.group(2)!)}',
+          RegExp(r'([A-Za-z\)])_?(\d+)'),
+          (cm) => '${cm.group(1)}${cm.group(2)}',
         );
+        inner = inner.replaceAll(r'^+', '+').replaceAll(r'^-', '-');
         return inner;
       },
     );
@@ -109,19 +145,29 @@ class PdfDownloadService {
         if (above != null && above.isNotEmpty) labelParts.add(_formatMathForPdf(above));
         if (below != null && below.isNotEmpty) labelParts.add(_formatMathForPdf(below));
         if (labelParts.isNotEmpty) {
-          return ' ──(${labelParts.join(', ')})──> ';
+          return ' -> (${labelParts.join(', ')}) -> ';
         }
-        return ' ──> ';
+        return ' -> ';
       },
     );
 
-    // 0.3 Degrees Celsius & temperatures
+    // 0.3 Degrees Celsius & temperatures & angles
     t = t
-        .replaceAll(RegExp(r'\^\{?\\circ\}?\\s*(?:\\text\{C\}|C)'), '°C')
-        .replaceAll(RegExp(r'\^\{?\\circ\}?\\s*(?:\\text\{F\}|F)'), '°F')
-        .replaceAll(RegExp(r'\^\{?\\circ\}?\\s*(?:\\text\{K\}|K)'), ' K')
+        .replaceAll(RegExp(r'\^\{?\\circ\}?\s*(?:\\text\{C\}|C)'), '°C')
+        .replaceAll(RegExp(r'\^\{?\\circ\}?\s*(?:\\text\{F\}|F)'), '°F')
+        .replaceAll(RegExp(r'\^\{?\\circ\}?\s*(?:\\text\{K\}|K)'), ' K')
         .replaceAll(RegExp(r'\^\{?\\circ\}?'), '°')
         .replaceAll(r'\degree', '°');
+    // Ensure "২৭ C" or "১০ C" or "৪ C" followed by তাপমাত্রা becomes "২৭°C", "১০°C", "৪°C"
+    t = t.replaceAllMapped(
+      RegExp(r'([০-৯0-9]+)\s*°?\s*C\s+(?=তাপমাত্রা)'),
+      (m) => '${m.group(1)}°C ',
+    );
+    // Ensure degree in bond angles like "বন্ধন কোণ ১৮০" -> "বন্ধন কোণ ১৮০°"
+    t = t.replaceAllMapped(
+      RegExp(r'(কোণ\s+[০-৯0-9]+)\s*(?=[,\)\s]|\$)'),
+      (m) => '${m.group(1)}°',
+    );
 
     // 1. Matrices: \begin{matrix} a & b \\ c & d \end{matrix} -> [ a  b ; c  d ]
     t = t.replaceAllMapped(
@@ -160,110 +206,110 @@ class PdfDownloadService {
         .replaceAll(r'\min', 'min');
 
     // 3. Greek letters & mathematical constants
+    // Note: Bengali fonts (Kalpurush & HindSiliguri) lack Greek block glyphs (U+0370-U+03FF) except π.
+    // We map Greek characters to clear, universal phonetic notation so questions NEVER render blank gaps.
     final greekMap = {
-      r'\alpha': 'α',
-      r'\beta': 'β',
-      r'\gamma': 'γ',
-      r'\Gamma': 'Γ',
-      r'\delta': 'δ',
-      r'\Delta': 'Δ',
-      r'\epsilon': 'ε',
-      r'\varepsilon': 'ε',
-      r'\zeta': 'ζ',
-      r'\eta': 'η',
-      r'\theta': 'θ',
-      r'\Theta': 'Θ',
-      r'\iota': 'ι',
-      r'\kappa': 'κ',
-      r'\lambda': 'λ',
-      r'\Lambda': 'Λ',
-      r'\mu': 'µ',
-      r'\nu': 'ν',
-      r'\xi': 'ξ',
-      r'\pi': 'π',
-      r'\Pi': 'Π',
-      r'\rho': 'ρ',
-      r'\sigma': 'σ',
-      r'\Sigma': 'Σ',
-      r'\tau': 'τ',
-      r'\upsilon': 'υ',
-      r'\phi': 'φ',
-      r'\Phi': 'Φ',
-      r'\varphi': 'φ',
-      r'\chi': 'χ',
-      r'\psi': 'ψ',
-      r'\Psi': 'Ψ',
-      r'\omega': 'ω',
-      r'\Omega': 'Ω',
+      r'\theta': 'theta',
+      r'\Theta': 'Theta',
+      r'\lambda': 'lambda',
+      r'\Lambda': 'Lambda',
+      r'\alpha': 'alpha',
+      r'\beta': 'beta',
+      r'\gamma': 'gamma',
+      r'\Gamma': 'Gamma',
+      r'\delta': 'delta',
+      r'\Delta': 'Delta',
+      r'\omega': 'omega',
+      r'\Omega': 'Omega',
+      r'\sigma': 'sigma',
+      r'\Sigma': 'Sigma',
+      r'\phi': 'phi',
+      r'\Phi': 'Phi',
+      r'\varphi': 'phi',
+      r'\mu': 'mu',
+      r'\nu': 'nu',
+      r'\tau': 'tau',
+      r'\rho': 'rho',
+      r'\eta': 'eta',
+      r'\zeta': 'zeta',
+      r'\epsilon': 'epsilon',
+      r'\varepsilon': 'epsilon',
+      r'\iota': 'iota',
+      r'\kappa': 'kappa',
+      r'\xi': 'xi',
+      r'\psi': 'psi',
+      r'\Psi': 'Psi',
+      r'\upsilon': 'upsilon',
+      r'\chi': 'chi',
+      r'\pi': 'π', // HindSiliguri has native π (U+03C0)
+      r'\Pi': 'Pi',
     };
 
     greekMap.forEach((k, v) {
-      t = t.replaceAll(k, v);
+      t = t.replaceAll(RegExp(RegExp.escape(k) + r'(?![a-zA-Z])'), v);
       final bare = k.replaceFirst(r'\', '');
       t = t.replaceAll(RegExp('\\b$bare\\b'), v);
     });
 
-    // 4. Mathematical operators & relations
-    final opMap = {
-      r'\times': '×',
-      r'\div': '÷',
-      r'\pm': '±',
-      r'\mp': '∓',
-      r'\cdot': '·',
-      r'\bullet': '•',
-      r'\circ': '°',
-      r'\degree': '°',
-      r'\infty': '∞',
-      r'\approx': '≈',
-      r'\ne': '≠',
-      r'\neq': '≠',
-      r'\equiv': '≡',
-      r'\le': '≤',
-      r'\leq': '≤',
-      r'\ge': '≥',
-      r'\geq': '≥',
-      r'\ll': '≪',
-      r'\gg': '≫',
-      r'\propto': '∝',
-      r'\subset': '⊂',
-      r'\supset': '⊃',
-      r'\subseteq': '⊆',
-      r'\supseteq': '⊇',
-      r'\in': '∈',
-      r'\notin': '∉',
-      r'\cup': '∪',
-      r'\cap': '∩',
-      r'\emptyset': '∅',
-      r'\forall': '∀',
-      r'\exists': '∃',
-      r'\nabla': '∇',
-      r'\partial': '∂',
-      r'\int': '∫',
-      r'\sum': '∑',
-      r'\prod': '∏',
-      r'\angle': '∠',
-      r'\triangle': '△',
-      r'\perp': '⊥',
-      r'\parallel': '∥',
-      r'\rightarrow': '→',
-      r'\to': '→',
-      r'\longrightarrow': '→',
-      r'\leftarrow': '←',
-      r'\longleftarrow': '←',
-      r'\leftrightarrow': '↔',
-      r'\Rightarrow': '⇒',
-      r'\implies': '⇒',
-      r'\Leftarrow': '⇐',
-      r'\Leftrightarrow': '⇔',
-      r'\iff': '⇔',
-      r'\rightleftharpoons': '⇌',
-      r'\leftrightharpoons': '⇌',
-      '@@CHEM_ARROW': '→',
-    };
+    // 4. Mathematical operators & relations (Sorted longest-first to prevent prefix collisions like \in vs \int)
+    final opList = [
+      (r'\longrightarrow', '->'),
+      (r'\longleftarrow', '<-'),
+      (r'\rightleftharpoons', '<=>'),
+      (r'\leftrightharpoons', '<=>'),
+      (r'\leftrightarrow', '<->'),
+      (r'\Leftrightarrow', '<=>'),
+      (r'\Rightarrow', '=>'),
+      (r'\Leftarrow', '<='),
+      (r'\rightarrow', '->'),
+      (r'\leftarrow', '<-'),
+      (r'\implies', '=>'),
+      (r'\iff', '<=>'),
+      (r'\to', '->'),
+      (r'\subseteq', '⊆'),
+      (r'\supseteq', '⊇'),
+      (r'\subset', '⊂'),
+      (r'\supset', '⊃'),
+      (r'\notin', '∉'),
+      (r'\int', '∫'),
+      (r'\infty', '∞'),
+      (r'\in', '∈'),
+      (r'\approx', '≈'),
+      (r'\equiv', '≡'),
+      (r'\neq', '≠'),
+      (r'\ne', '≠'),
+      (r'\leq', '≤'),
+      (r'\le', '≤'),
+      (r'\geq', '≥'),
+      (r'\ge', '≥'),
+      (r'\ll', '≪'),
+      (r'\gg', '≫'),
+      (r'\propto', '∝'),
+      (r'\times', '×'),
+      (r'\div', '÷'),
+      (r'\pm', '±'),
+      (r'\mp', '∓'),
+      (r'\cdot', '·'),
+      (r'\bullet', '•'),
+      (r'\circ', '°'),
+      (r'\degree', '°'),
+      (r'\sum', '∑'),
+      (r'\prod', '∏'),
+      (r'\nabla', '∇'),
+      (r'\partial', '∂'),
+      (r'\forall', '∀'),
+      (r'\exists', '∃'),
+      (r'\emptyset', '∅'),
+      (r'\angle', '∠'),
+      (r'\triangle', '△'),
+      (r'\perp', '⊥'),
+      (r'\parallel', '∥'),
+      ('@@CHEM_ARROW', '->'),
+    ];
 
-    opMap.forEach((k, v) {
-      t = t.replaceAll(k, v);
-    });
+    for (final pair in opList) {
+      t = t.replaceAll(RegExp(RegExp.escape(pair.$1) + r'(?![a-zA-Z])'), pair.$2);
+    }
 
     // 4.1 Clean text wrappers \text{...}, \mathrm{...} before parsing fractions
     int textPasses = 0;
@@ -318,22 +364,23 @@ class PdfDownloadService {
       (m) => '(${m.group(1)} / ${m.group(2)})',
     );
 
-    // 7. Unit vectors & vector arrows: \hat{i} -> î, \vec{A} -> A⃗, \vec{AB} -> AB⃗
+    // 7. Unit vectors & vector arrows: \hat{i} -> i, \hat{j} -> j, \hat{k} -> k, \vec{A} -> A
+    // (Bengali fonts cannot render combining diacritics î/ĵ/k̂/⃗, resulting in blank gaps)
     t = t
-        .replaceAll(r'\hat{i}', 'î')
-        .replaceAll(r'\hat{j}', 'ĵ')
-        .replaceAll(r'\hat{k}', 'k̂')
-        .replaceAll(r'\hat i', 'î')
-        .replaceAll(r'\hat j', 'ĵ')
-        .replaceAll(r'\hat k', 'k̂');
+        .replaceAll(r'\hat{i}', 'i')
+        .replaceAll(r'\hat{j}', 'j')
+        .replaceAll(r'\hat{k}', 'k')
+        .replaceAll(r'\hat i', 'i')
+        .replaceAll(r'\hat j', 'j')
+        .replaceAll(r'\hat k', 'k');
 
     t = t.replaceAllMapped(
       RegExp(r'\\(?:vec|overrightarrow)\{?([a-zA-Z0-9]+)\}?'),
-      (m) => '${m.group(1)}⃗',
+      (m) => m.group(1)!,
     );
     t = t.replaceAllMapped(
       RegExp(r'\\(?:bar|overline)\{?([a-zA-Z0-9]+)\}?'),
-      (m) => '${m.group(1)}̄',
+      (m) => m.group(1)!,
     );
 
     // 8. Clean \text{...}, \mathrm{...}, \mathbf{...} before exponents so units like \text{ms}^{-1} become ms⁻¹
@@ -342,16 +389,40 @@ class PdfDownloadService {
       (m) => m.group(1)!,
     );
 
-    // 9. Superscripts & powers: x^{2} -> x², 10^{-5} -> 10⁻⁵, ms^-1 -> ms⁻¹
+    // 9. Superscripts & powers:
+    // 9a. Standard single powers: x^2 -> x², x^3 -> x³, x^1 -> x¹ (Latin-1 chars natively supported)
     t = t.replaceAllMapped(
-      RegExp(r'\^\{?([0-9\+\-nNxXtyTabcdegijklmoprstuvwzABDEGHIJKLMNOPRTUVW]+)\}?'),
-      (m) => _toSuperscript(m.group(1)!),
+      RegExp(r'\^\{?([123])\}?'),
+      (m) {
+        final d = m.group(1)!;
+        if (d == '2') return '²';
+        if (d == '3') return '³';
+        if (d == '1') return '¹';
+        return '^$d';
+      },
     );
 
-    // 10. Subscripts: z_{1} -> z₁, H_2O -> H₂O, CuSO_4 -> CuSO₄
+    // 9b. Multi-digit exponents, negative powers, scientific powers of 10:
+    // 10^{-14} -> 10^-14, 10^{23} -> 10^23, ms^{-1} -> ms^-1, H^+ -> H+, OH^- -> OH-
     t = t.replaceAllMapped(
-      RegExp(r'\_\{?([0-9\+\-a-zA-Z]+)\}?'),
-      (m) => _toSubscript(m.group(1)!),
+      RegExp(r'\^\{?([\+\-]?[0-9a-zA-Z\+\-]+)\}?'),
+      (m) {
+        final exp = m.group(1)!;
+        if (exp == '+' || exp == '-') return exp;
+        return '^$exp';
+      },
+    );
+
+    // 10. Subscripts:
+    // In chemistry and physics formulas, keep digits and indices clean, standard and visible:
+    // H_2O -> H2O, CuSO_4 -> CuSO4, [H_2O] -> [H2O], C_2H_2 -> C2H2, 2pz_z -> 2pz
+    t = t.replaceAllMapped(
+      RegExp(r'([A-Za-z\)])\_\{?([0-9]+)\}?'),
+      (m) => '${m.group(1)}${m.group(2)}',
+    );
+    t = t.replaceAllMapped(
+      RegExp(r'\_\{?([0-9a-zA-Z]+)\}?'),
+      (m) => '${m.group(1)}',
     );
 
     // 11. Clean \left, \right delimiters
@@ -383,7 +454,7 @@ class PdfDownloadService {
         .replaceAll(RegExp(r'\\'), '');
 
     // Prevent orphan punctuation by removing spaces before punctuation
-    t = t.replaceAll(RegExp(r'\s+([?!।,;:])'), r'$1');
+    t = t.replaceAllMapped(RegExp(r'\s+([?!।,;:])'), (m) => m.group(1)!);
 
     // Prevent split units like "5 ms ⁻¹" -> "5 ms⁻¹"
     t = t.replaceAll(RegExp(r'([A-Za-z0-9])\s+([⁻¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁰]+)'), r'$1$2');
@@ -417,11 +488,12 @@ class PdfDownloadService {
 
     final maxLen = formattedOptions.fold<int>(0, (max, o) => o.length > max ? o.length : max);
 
-    // 1. Very short options (<= 12 chars each): 4 in one row
-    if (formattedOptions.length == 4 && maxLen <= 12) {
+    // 1. Very short options (<= 14 chars each): 4 in one row
+    if (formattedOptions.length == 4 && maxLen <= 14) {
       return pw.Padding(
-        padding: const pw.EdgeInsets.only(left: 10),
+        padding: const pw.EdgeInsets.only(left: 6),
         child: pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: List.generate(4, (i) {
             return pw.Expanded(
               child: bn.AutoText(
@@ -435,76 +507,76 @@ class PdfDownloadService {
       );
     }
 
-    // 2. Long options (> 26 chars): Stacked vertically (1 per line)
-    if (maxLen > 26) {
+    // 2. Standard medium options (<= 42 chars): 2x2 Grid
+    if (maxLen <= 42) {
       return pw.Padding(
-        padding: const pw.EdgeInsets.only(left: 10),
+        padding: const pw.EdgeInsets.only(left: 6),
         child: pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: List.generate(formattedOptions.length, (i) {
-            return pw.Padding(
-              padding: const pw.EdgeInsets.only(bottom: 1.5),
-              child: bn.AutoText(
-                '${optionLetters[i]} ${formattedOptions[i]}',
-                fontSize: _fontSizeBody,
-                color: PdfColor.fromHex('1E293B'),
-              ),
-            );
-          }),
-        ),
-      );
-    }
-
-    // 3. Standard medium options: 2x2 Grid
-    return pw.Padding(
-      padding: const pw.EdgeInsets.only(left: 10),
-      child: pw.Column(
-        children: [
-          pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              if (formattedOptions.isNotEmpty)
-                pw.Expanded(
-                  child: bn.AutoText(
-                    '${optionLetters[0]} ${formattedOptions[0]}',
-                    fontSize: _fontSizeBody,
-                    color: PdfColor.fromHex('1E293B'),
-                  ),
-                ),
-              if (formattedOptions.length > 1)
-                pw.Expanded(
-                  child: bn.AutoText(
-                    '${optionLetters[1]} ${formattedOptions[1]}',
-                    fontSize: _fontSizeBody,
-                    color: PdfColor.fromHex('1E293B'),
-                  ),
-                ),
-            ],
-          ),
-          if (formattedOptions.length > 2) ...[
-            pw.SizedBox(height: 1.5),
+          children: [
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Expanded(
-                  child: bn.AutoText(
-                    '${optionLetters[2]} ${formattedOptions[2]}',
-                    fontSize: _fontSizeBody,
-                    color: PdfColor.fromHex('1E293B'),
-                  ),
-                ),
-                if (formattedOptions.length > 3)
+                if (formattedOptions.isNotEmpty)
                   pw.Expanded(
                     child: bn.AutoText(
-                      '${optionLetters[3]} ${formattedOptions[3]}',
+                      '${optionLetters[0]} ${formattedOptions[0]}',
+                      fontSize: _fontSizeBody,
+                      color: PdfColor.fromHex('1E293B'),
+                    ),
+                  ),
+                if (formattedOptions.length > 1)
+                  pw.Expanded(
+                    child: bn.AutoText(
+                      '${optionLetters[1]} ${formattedOptions[1]}',
                       fontSize: _fontSizeBody,
                       color: PdfColor.fromHex('1E293B'),
                     ),
                   ),
               ],
             ),
+            if (formattedOptions.length > 2) ...[
+              pw.SizedBox(height: 1.5),
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Expanded(
+                    child: bn.AutoText(
+                      '${optionLetters[2]} ${formattedOptions[2]}',
+                      fontSize: _fontSizeBody,
+                      color: PdfColor.fromHex('1E293B'),
+                    ),
+                  ),
+                  if (formattedOptions.length > 3)
+                    pw.Expanded(
+                      child: bn.AutoText(
+                        '${optionLetters[3]} ${formattedOptions[3]}',
+                        fontSize: _fontSizeBody,
+                        color: PdfColor.fromHex('1E293B'),
+                      ),
+                    ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
+      );
+    }
+
+    // 3. Long options (> 42 chars): Stacked vertically (1 per line)
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(left: 6),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: List.generate(formattedOptions.length, (i) {
+          return pw.Padding(
+            padding: const pw.EdgeInsets.only(bottom: 1.5),
+            child: bn.AutoText(
+              '${optionLetters[i]} ${formattedOptions[i]}',
+              fontSize: _fontSizeBody,
+              color: PdfColor.fromHex('1E293B'),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -524,9 +596,9 @@ class PdfDownloadService {
     final formattedOpts = q.options.map((o) => _formatMathForPdf(o)).toList();
     final maxLen = formattedOpts.fold<int>(0, (max, o) => o.length > max ? o.length : max);
     double optHeight = 22.0;
-    if (formattedOpts.length == 4 && maxLen <= 12) {
+    if (formattedOpts.length == 4 && maxLen <= 14) {
       optHeight = 11.0;
-    } else if (maxLen > 26) {
+    } else if (maxLen > 42) {
       optHeight = formattedOpts.length * 11.5;
     }
 
@@ -548,9 +620,9 @@ class PdfDownloadService {
     final formattedOpts = q.options.map((o) => _formatMathForPdf(o)).toList();
     final maxLen = formattedOpts.fold<int>(0, (max, o) => o.length > max ? o.length : max);
     double optHeight = 22.0;
-    if (formattedOpts.length == 4 && maxLen <= 12) {
+    if (formattedOpts.length == 4 && maxLen <= 14) {
       optHeight = 11.0;
-    } else if (maxLen > 26) {
+    } else if (maxLen > 42) {
       optHeight = formattedOpts.length * 11.5;
     }
 
@@ -586,20 +658,20 @@ class PdfDownloadService {
                 pw.Text(
                   'OBHYASH',
                   style: pw.TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: pw.FontWeight.bold,
-                    color: const PdfColor(0.88, 0.91, 0.95, 0.12),
-                    letterSpacing: 5,
+                    color: const PdfColor(0.80, 0.85, 0.90, 0.035),
+                    letterSpacing: 4,
                   ),
                 ),
                 pw.SizedBox(width: 50),
                 pw.Text(
                   'OBHYASH',
                   style: pw.TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: pw.FontWeight.bold,
-                    color: const PdfColor(0.88, 0.91, 0.95, 0.12),
-                    letterSpacing: 5,
+                    color: const PdfColor(0.80, 0.85, 0.90, 0.035),
+                    letterSpacing: 4,
                   ),
                 ),
                 if (!isEven) pw.SizedBox(width: 40),
@@ -616,16 +688,18 @@ class PdfDownloadService {
     ExamResult result,
     BuildContext context,
   ) async {
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(
-      result.subjectLabel?.isNotEmpty == true
-          ? result.subjectLabel!
-          : BanglaNameHelper.formatSubject(result.subject),
+    final formattedSubject = BanglaNameHelper.formatSubject(
+      result.subject,
+      result.subjectLabel,
     );
+    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
     final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-    final filename = '${cleanTitle}_Question';
+    final filename = '${cleanTitle}_প্রশ্নপত্র';
+
+    final subjectCode = BanglaNameHelper.getSubjectCode(result.subject, result.subjectLabel);
 
     try {
-      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
+      await _configureBanglaPdf();
 
       pw.Font? roboto;
       pw.Font? robotoBold;
@@ -841,27 +915,56 @@ class PdfDownloadService {
                 crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                 children: [
                   if (isFirstPage) ...[
-                    // Clean Official Masthead
+                    // Clean Official Masthead matching authentic Board Question Papers
                     pw.Container(
                       alignment: pw.Alignment.center,
                       child: pw.Column(
                         children: [
-                          bn.AutoText(
-                            'অভ্যাস — $examTitle',
-                            fontSize: 14.5,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColor.fromHex('0F172A'),
+                          pw.Row(
+                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: pw.CrossAxisAlignment.end,
+                            children: [
+                              pw.Container(
+                                width: 90,
+                                child: bn.AutoText(
+                                  subjectCode != null ? 'বিষয় কোড: $subjectCode' : 'মডেল টেস্ট',
+                                  fontSize: 8,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColor.fromHex('334155'),
+                                ),
+                              ),
+                              pw.Column(
+                                children: [
+                                  bn.AutoText(
+                                    '$examTitle (বহুনির্বাচনি অভীক্ষা)',
+                                    fontSize: 13,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColor.fromHex('0F172A'),
+                                  ),
+                                  pw.SizedBox(height: 1.5),
+                                  bn.AutoText(
+                                    'উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com',
+                                    fontSize: 7.2,
+                                    color: PdfColor.fromHex('475569'),
+                                  ),
+                                ],
+                              ),
+                              pw.Container(
+                                width: 90,
+                                alignment: pw.Alignment.centerRight,
+                                child: bn.AutoText(
+                                  'সেট কোড: ক',
+                                  fontSize: 8,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColor.fromHex('334155'),
+                                ),
+                              ),
+                            ],
                           ),
-                          pw.SizedBox(height: 2),
-                          bn.AutoText(
-                            'উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com',
-                            fontSize: 7.5,
-                            color: PdfColor.fromHex('475569'),
-                          ),
-                          pw.SizedBox(height: 5),
+                          pw.SizedBox(height: 4.5),
                           // Metadata Bar (Clean, rounded container)
                           pw.Container(
-                            padding: const pw.EdgeInsets.symmetric(horizontal: 14, vertical: 4.5),
+                            padding: const pw.EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                             decoration: pw.BoxDecoration(
                               color: PdfColor.fromHex('F8FAFC'),
                               border: pw.Border.all(color: PdfColor.fromHex('CBD5E1'), width: 0.7),
@@ -889,7 +992,9 @@ class PdfDownloadService {
                                   color: PdfColor.fromHex('1E293B'),
                                 ),
                                 bn.AutoText(
-                                  'নেগেটিভ মার্ক: ${_toBanglaDigits(result.negativeMarking)}x',
+                                  result.negativeMarking > 0
+                                      ? 'নেগেটিভ মার্ক: -${_toBanglaDigits(result.negativeMarking)}'
+                                      : 'নেগেটিভ মার্ক: নেই',
                                   fontSize: 8,
                                   fontWeight: pw.FontWeight.bold,
                                   color: PdfColor.fromHex('1E293B'),
@@ -897,15 +1002,18 @@ class PdfDownloadService {
                               ],
                             ),
                           ),
-                          pw.SizedBox(height: 4),
+                          pw.SizedBox(height: 3.5),
                           bn.AutoText(
-                            '[ বিশেষ নির্দেশাবলী: প্রতিটি প্রশ্নের সঠিক উত্তরের জন্য ১ নম্বর বরাদ্দ এবং ভুল উত্তরের জন্য ০.২৫ নম্বর কাটা যাবে। ]',
-                            fontSize: 6.8,
-                            color: PdfColor.fromHex('64748B'),
+                            result.negativeMarking > 0
+                                ? '[ বিশেষ দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা ভরাট করো। সকল প্রশ্নের মান সমান। প্রতিটি সঠিক উত্তরের জন্য ১ নম্বর বরাদ্দ এবং ভুল উত্তরের জন্য -${_toBanglaDigits(result.negativeMarking)} নম্বর কাটা যাবে। ]'
+                                : '[ বিশেষ দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা ভরাট করো। সকল প্রশ্নের মান সমান (প্রতিটি ১ নম্বর)। ]',
+                            fontSize: 6.4,
+                            color: PdfColor.fromHex('475569'),
+                            textAlign: pw.TextAlign.center,
                           ),
-                          pw.SizedBox(height: 4),
+                          pw.SizedBox(height: 3.5),
                           pw.Divider(color: PdfColor.fromHex('94A3B8'), thickness: 0.7),
-                          pw.SizedBox(height: 4),
+                          pw.SizedBox(height: 3),
                         ],
                       ),
                     ),
@@ -917,7 +1025,7 @@ class PdfDownloadService {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           bn.AutoText(
-                            '$examTitle — প্রশ্নপত্র',
+                            '$examTitle — বহুনির্বাচনি অভীক্ষা (সেট: ক)',
                             fontSize: 7.8,
                             color: PdfColor.fromHex('64748B'),
                           ),
@@ -966,14 +1074,24 @@ class PdfDownloadService {
                     padding: const pw.EdgeInsets.only(top: 4),
                     child: pw.Column(
                       children: [
-                        if (pageIdx == pages.length - 1) ...[
+                        if (pageIdx < pages.length - 1) ...[
                           pw.Padding(
-                            padding: const pw.EdgeInsets.only(bottom: 3),
+                            padding: const pw.EdgeInsets.only(bottom: 2),
                             child: bn.AutoText(
-                              '— পরীক্ষা সমাপ্ত (End of Question Paper) —',
+                              '[ অপর পৃষ্ঠায় দ্রষ্টব্য / চলমান পাতা - ${_toBanglaDigits(pageIdx + 2)} ]',
+                              fontSize: 7,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('475569'),
+                            ),
+                          ),
+                        ] else ...[
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.only(bottom: 2),
+                            child: bn.AutoText(
+                              '— প্রশ্নপত্র সমাপ্ত (End of Question Paper) —',
                               fontSize: 7.5,
                               fontWeight: pw.FontWeight.bold,
-                              color: PdfColor.fromHex('64748B'),
+                              color: PdfColor.fromHex('475569'),
                             ),
                           ),
                         ],
@@ -1007,7 +1125,8 @@ class PdfDownloadService {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$cleanTitle প্রশ্নপত্র',
+        notificationTitle: '$cleanTitle — প্রশ্নপত্র',
+        subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন',
         context: context.mounted ? context : null,
       );
 
@@ -1030,16 +1149,17 @@ class PdfDownloadService {
     ExamResult result,
     BuildContext context,
   ) async {
-    final examTitle = BanglaNameHelper.deduplicateExamTitle(
-      result.subjectLabel?.isNotEmpty == true
-          ? result.subjectLabel!
-          : BanglaNameHelper.formatSubject(result.subject),
+    final formattedSubject = BanglaNameHelper.formatSubject(
+      result.subject,
+      result.subjectLabel,
     );
+    final examTitle = BanglaNameHelper.deduplicateExamTitle(formattedSubject);
     final cleanTitle = examTitle.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
-    final filename = '${cleanTitle}_Solution';
+    final filename = '${cleanTitle}_সমাধান';
+    final subjectCode = BanglaNameHelper.getSubjectCode(result.subject, result.subjectLabel);
 
     try {
-      bn.BanglaPdf.configure(shapingMode: bn.BanglaShapingMode.auto);
+      await _configureBanglaPdf();
 
       pw.Font? roboto;
       pw.Font? robotoBold;
@@ -1329,17 +1449,46 @@ class PdfDownloadService {
                       alignment: pw.Alignment.center,
                       child: pw.Column(
                         children: [
-                          bn.AutoText(
-                            '$examTitle — সমাধান ও ব্যাখ্যা',
-                            fontSize: 14.5,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColor.fromHex('0F172A'),
-                          ),
-                          pw.SizedBox(height: 2),
-                          bn.AutoText(
-                            'উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com',
-                            fontSize: 7.5,
-                            color: PdfColor.fromHex('475569'),
+                          pw.Row(
+                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: pw.CrossAxisAlignment.end,
+                            children: [
+                              pw.Container(
+                                width: 85,
+                                child: bn.AutoText(
+                                  subjectCode != null ? 'বিষয় কোড: $subjectCode' : 'মডেল টেস্ট',
+                                  fontSize: 8,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColor.fromHex('334155'),
+                                ),
+                              ),
+                              pw.Column(
+                                children: [
+                                  bn.AutoText(
+                                    '$examTitle — সমাধান ও ব্যাখ্যা',
+                                    fontSize: 13.5,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColor.fromHex('0F172A'),
+                                  ),
+                                  pw.SizedBox(height: 1.5),
+                                  bn.AutoText(
+                                    'উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com',
+                                    fontSize: 7.2,
+                                    color: PdfColor.fromHex('475569'),
+                                  ),
+                                ],
+                              ),
+                              pw.Container(
+                                width: 85,
+                                alignment: pw.Alignment.centerRight,
+                                child: bn.AutoText(
+                                  'সেট কোড: ক',
+                                  fontSize: 8,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColor.fromHex('334155'),
+                                ),
+                              ),
+                            ],
                           ),
                           pw.SizedBox(height: 5),
                           // Results Summary Bar
@@ -1443,14 +1592,24 @@ class PdfDownloadService {
                     padding: const pw.EdgeInsets.only(top: 4),
                     child: pw.Column(
                       children: [
-                        if (pageIdx == pages.length - 1) ...[
+                        if (pageIdx < pages.length - 1) ...[
                           pw.Padding(
-                            padding: const pw.EdgeInsets.only(bottom: 3),
+                            padding: const pw.EdgeInsets.only(bottom: 2),
+                            child: bn.AutoText(
+                              '[ অপর পৃষ্ঠায় দ্রষ্টব্য / চলমান পাতা - ${_toBanglaDigits(pageIdx + 2)} ]',
+                              fontSize: 7,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColor.fromHex('475569'),
+                            ),
+                          ),
+                        ] else ...[
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.only(bottom: 2),
                             child: bn.AutoText(
                               '— উত্তর ও ব্যাখ্যা সমাপ্ত (End of Solutions) —',
                               fontSize: 7.5,
                               fontWeight: pw.FontWeight.bold,
-                              color: PdfColor.fromHex('64748B'),
+                              color: PdfColor.fromHex('475569'),
                             ),
                           ),
                         ],
@@ -1484,7 +1643,8 @@ class PdfDownloadService {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: filename,
-        notificationTitle: '$cleanTitle সমাধান',
+        notificationTitle: '$cleanTitle — সমাধান ও ব্যাখ্যা',
+        subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন',
         context: context.mounted ? context : null,
       );
 

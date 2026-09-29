@@ -110,7 +110,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </h3>
               <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
                 {isWarning
-                  ? `আপনি এখনো ${unansweredCount}টি প্রশ্নের উত্তর দেননি। তুমি কি নিশ্চিত যে পরীক্ষা জমা দিতে চাও?`
+                  ? `তুমি এখনো ${unansweredCount}টি প্রশ্নের উত্তর দাওনি। তুমি কি নিশ্চিত যে পরীক্ষা জমা দিতে চাও?`
                   : "তুমি সব প্রশ্নের উত্তর দিয়েছো। তুমি কি উত্তরপত্র জমা দিতে প্রস্তুত?"}
               </p>
             </div>

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/presentation/widgets/app_icon.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../../../core/services/haptics_service.dart';
 import '../../../../core/utils/bangla_name_helper.dart';
 import '../../domain/exam_models.dart';
@@ -24,6 +26,7 @@ class QuestionCard extends StatefulWidget {
   final bool hideSourceTag;
   final bool alwaysShowSourceTag;
   final bool showReport;
+  final bool hideExplanation;
   final VoidCallback? onToggleBookmark;
   final VoidCallback? onDelete;
 
@@ -44,6 +47,7 @@ class QuestionCard extends StatefulWidget {
     this.hideSourceTag = false,
     this.alwaysShowSourceTag = false,
     this.showReport = false,
+    this.hideExplanation = false,
     this.onToggleBookmark,
     this.onDelete,
   });
@@ -592,6 +596,7 @@ class _QuestionCardState extends State<QuestionCard>
               arrowTurns: _arrowTurns,
               onToggle: _toggleExplanation,
               banglaIndices: _banglaIndices,
+              hideExplanation: widget.hideExplanation,
             ),
         ],
       ),
@@ -608,6 +613,7 @@ class _ExplanationPanel extends StatelessWidget {
   final Animation<double> arrowTurns;
   final VoidCallback onToggle;
   final List<String> banglaIndices;
+  final bool hideExplanation;
 
   const _ExplanationPanel({
     required this.question,
@@ -616,6 +622,7 @@ class _ExplanationPanel extends StatelessWidget {
     required this.arrowTurns,
     required this.onToggle,
     required this.banglaIndices,
+    this.hideExplanation = false,
   });
 
   @override
@@ -729,14 +736,75 @@ class _ExplanationPanel extends StatelessWidget {
                 children: [
                   Divider(height: 1, thickness: 1, color: dividerColor),
                   const SizedBox(height: 8),
-                  LatexText(
-                    text: question.explanation!,
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      height: 1.6,
-                      color: bodyTextColor,
+                  if (hideExplanation) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(LucideIcons.lock, size: 15, color: Color(0xFFE11D48)),
+                              SizedBox(width: 6),
+                              Text(
+                                'ব্যাখ্যা দেখতে প্রো সাবস্ক্রিপশন প্রয়োজন',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFE11D48),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () => ProUpgradeModal.show(
+                              context,
+                              title: 'ব্যাখ্যা আনলক করো 👑',
+                              message:
+                                  'বিগত বছরের সকল প্রশ্নের বিস্তারিত ও নির্ভুল ব্যাখ্যা দেখতে অভ্যাস প্রো-তে আপগ্রেড করো।',
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF004633), Color(0xFF065F46)],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF004633).withValues(alpha: 0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                'প্রো আনলক করো 👑',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    LatexText(
+                      text: question.explanation!,
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        height: 1.6,
+                        color: bodyTextColor,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

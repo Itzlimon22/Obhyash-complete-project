@@ -264,7 +264,7 @@ export default function SpacedRepetitionModal({
                 {sessionResult.is_perfect_score ? '🌟 পারফেক্ট মেমোরি স্কোর!' : '🎉 আজকের রিভিশন সম্পন্ন!'}
               </h2>
               <p className="text-xs md:text-sm text-slate-400">
-                আপনার উত্তরগুলো মেমোরি বক্সে প্রসেস করা হয়েছে।
+                তোমার উত্তরগুলো মেমোরি বক্সে প্রসেস করা হয়েছে।
               </p>
             </div>
 

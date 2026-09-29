@@ -444,6 +444,7 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
       wrong_count,
       start_time,
       submit_time,
+      created_at,
       users (
         name,
         avatarUrl:avatar_url,

@@ -94,7 +94,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'আপনার উপহার!',
+                  'তোমার উপহার!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

@@ -17,6 +17,7 @@ import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../gamification/services/gamification_service.dart';
 import '../../notifications/services/notification_manager.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 class ResultView extends ConsumerStatefulWidget {
   final ExamResult result;
@@ -270,84 +271,149 @@ class _ResultViewState extends ConsumerState<ResultView> {
 
 
                   // Top Action buttons (PDF)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ObhyashTooltip(
-                          message: 'শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো',
-                          preferredPosition: TooltipPosition.top,
-                          child: OutlinedButton.icon(
-                            onPressed: () async {
-                              AppPopups.info(
-                                context,
-                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
-                              );
-                              await PdfDownloadService.downloadQuestionPaper(
-                                  widget.result, context);
-                            },
-                            icon: const Icon(Icons.download_rounded, size: 15),
-                            label: const Text(
-                              'প্রশ্নপত্র',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
+                  Builder(
+                    builder: (context) {
+                      final isPro = ref.watch(userProfileProvider).value?.isPro ?? false;
+
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: ObhyashTooltip(
+                              message: isPro
+                                  ? 'প্রশ্নপত্রের PDF ডাউনলোড করো (আনলিমিটেড)'
+                                  : 'প্রশ্নপত্রের PDF ডাউনলোড করো (সাপ্তাহিক কোটা ৩টি)',
+                              preferredPosition: TooltipPosition.top,
+                              child: OutlinedButton.icon(
+                                onPressed: () async {
+                                  final profile = ref.read(userProfileProvider).value;
+                                  final isUserPro = profile?.isPro ?? false;
+
+                                  if (!isUserPro) {
+                                    final weeklyCount =
+                                        await PdfDownloadService.getWeeklyDownloadCount();
+                                    if (weeklyCount >=
+                                        PdfDownloadService.maxFreeWeeklyDownloads) {
+                                      if (!context.mounted) return;
+                                      ProUpgradeModal.show(
+                                        context,
+                                        title: 'সাপ্তাহিক PDF কোটা শেষ 🎯',
+                                        message:
+                                            'ফ্রি অ্যাকাউন্টে সপ্তাহে সর্বোচ্চ ৩টি প্রশ্নপত্র PDF ডাউনলোড করা যায়। আনলিমিটেড প্রশ্নপত্র ও উত্তরপত্র ডাউনলোড করতে প্রো সাবস্ক্রিপশন নাও।',
+                                        featurePill: 'সাপ্তাহিক কোটা: ৩/৩',
+                                        icon: LucideIcons.download,
+                                      );
+                                      return;
+                                    }
+                                    await PdfDownloadService.incrementWeeklyDownloadCount();
+                                  }
+
+                                  if (!context.mounted) return;
+                                  AppPopups.info(
+                                    context,
+                                    message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
+                                  );
+                                  await PdfDownloadService.downloadQuestionPaper(
+                                      widget.result, context);
+                                },
+                                icon: const Icon(Icons.download_rounded, size: 15),
+                                label: const Text(
+                                  'প্রশ্নপত্র',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-                              foregroundColor: isDark ? Colors.white : const Color(0xFF12544F),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              side: BorderSide(
-                                color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFF12544F),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+                                  foregroundColor: isDark ? Colors.white : const Color(0xFF12544F),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  side: BorderSide(
+                                    color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFF12544F),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ObhyashTooltip(
-                          message: 'প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো',
-                          preferredPosition: TooltipPosition.top,
-                          child: OutlinedButton.icon(
-                            onPressed: () async {
-                              AppPopups.info(
-                                context,
-                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
-                              );
-                              await PdfDownloadService.downloadResultWithExplanations(
-                                  widget.result, context);
-                            },
-                            icon: const Icon(Icons.download_done_rounded, size: 15),
-                            label: const Text(
-                              'ফলাফল ও ব্যাখ্যা',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ObhyashTooltip(
+                              message: isPro
+                                  ? 'প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো'
+                                  : 'ব্যাখ্যাসহ উত্তরপত্র PDF ডাউনলোড (প্রো এক্সক্লুসিভ)',
+                              preferredPosition: TooltipPosition.top,
+                              child: OutlinedButton.icon(
+                                onPressed: () async {
+                                  final profile = ref.read(userProfileProvider).value;
+                                  final isUserPro = profile?.isPro ?? false;
+
+                                  // ── Strictly Pro Only Gatekeeper ──
+                                  if (!isUserPro) {
+                                    if (!context.mounted) return;
+                                    ProUpgradeModal.show(
+                                      context,
+                                      title: 'ব্যাখ্যাসহ উত্তরপত্র PDF আনলক করো 👑',
+                                      message:
+                                          'প্রতিটি প্রশ্নের সঠিক উত্তর ও পূর্ণাঙ্গ ব্যাখ্যা সহ অফলাইন PDF ডাউনলোড শুধুমাত্র প্রো মেম্বারদের জন্য এক্সক্লুসিভ। এখনই অভ্যাস প্রো-তে আপগ্রেড করো!',
+                                      featurePill: 'প্রো ফিচার',
+                                      icon: LucideIcons.crown,
+                                    );
+                                    return;
+                                  }
+
+                                  if (!context.mounted) return;
+                                  AppPopups.info(
+                                    context,
+                                    message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
+                                  );
+                                  await PdfDownloadService.downloadResultWithExplanations(
+                                      widget.result, context);
+                                },
+                                icon: const Icon(Icons.download_done_rounded, size: 15),
+                                label: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'ফলাফল ও ব্যাখ্যা',
+                                      style: TextStyle(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    if (!isPro) ...[
+                                      const SizedBox(width: 5),
+                                      const Icon(
+                                        LucideIcons.crown,
+                                        size: 14,
+                                        color: Color(0xFFFBBF24),
+                                      ),
+                                    ],
+                                  ],
                                 ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: isDark
-                                  ? const Color(0xFF12544F).withValues(alpha: 0.22)
-                                  : const Color(0xFF12544F).withValues(alpha: 0.1),
-                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF12544F),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              side: BorderSide(
-                                color: isDark
-                                    ? const Color(0xFF12544F).withValues(alpha: 0.4)
-                                    : const Color(0xFF12544F),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: isDark
+                                      ? const Color(0xFF12544F).withValues(alpha: 0.22)
+                                      : const Color(0xFF12544F).withValues(alpha: 0.1),
+                                  foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF12544F),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? const Color(0xFF12544F).withValues(alpha: 0.4)
+                                        : const Color(0xFF12544F),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
                   ),
 
                   // Exam Details Scope Header / 2-Column Preset Info Card

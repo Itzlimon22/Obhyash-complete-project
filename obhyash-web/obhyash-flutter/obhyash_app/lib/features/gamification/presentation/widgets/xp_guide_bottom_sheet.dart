@@ -19,7 +19,7 @@ class XpGuideBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF141417) : Colors.white;
     final cardBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC);
     final borderColor = isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0);
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);

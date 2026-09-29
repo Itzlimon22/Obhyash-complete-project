@@ -96,8 +96,8 @@ const config = {
       },
       fontFamily: {
         sans: [
-          'var(--font-inter)',
           'var(--font-hind)',
+          'var(--font-inter)',
           'var(--font-anek)',
           'system-ui',
           '-apple-system',

@@ -357,7 +357,7 @@ final liveExamLeaderboardProvider = FutureProvider.autoDispose
   final supabase = Supabase.instance.client;
   final data = await supabase
       .from('live_exam_attempts')
-      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, users(id, name, institute, avatar_color, avatar_url, role)')
+      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, created_at, users(id, name, institute, avatar_color, avatar_url, role)')
       .eq('live_exam_id', examId)
       .eq('status', 'submitted')
       .order('score', ascending: false)

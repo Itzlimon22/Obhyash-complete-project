@@ -7,7 +7,7 @@ import '../../services/secure_storage_service.dart';
 import '../../services/session_monitor_service.dart';
 import '../../features/notifications/providers/notification_providers.dart';
 import '../router.dart';
-import '../utils/app_popups.dart';
+import 'package:go_router/go_router.dart';
 
 // Equivalent to `useAuth` in React.
 // Holds the current Supabase user and listens to auth state changes.
@@ -105,20 +105,15 @@ class AuthNotifier extends Notifier<User?> {
         (user.identities?.any((i) => i.provider == 'google') ?? false);
 
     if (isGoogleUser && !isRegistered) {
-      debugPrint('[AuthNotifier] ❌ Unregistered Google account ($email). Rejecting login and signing out.');
-      state = null;
-      try {
-        await supabase.auth.signOut(scope: SignOutScope.local);
-      } catch (_) {}
-
-      // Display proper error toast to user on Login Screen
+      debugPrint('[AuthNotifier] ℹ️ New Google account ($email). Navigating to /complete-profile.');
       final ctx = rootNavigatorKey.currentContext;
       if (ctx != null && ctx.mounted) {
-        AppPopups.error(
-          ctx,
-          message: 'এই গুগল ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে আগে নতুন অ্যাকাউন্ট খুলুন।',
-          duration: const Duration(seconds: 4),
-        );
+        // Small delay to ensure router is ready
+        Future.microtask(() {
+          if (ctx.mounted) {
+            GoRouter.of(ctx).go('/complete-profile');
+          }
+        });
       }
       return;
     }
@@ -164,6 +159,10 @@ class AuthNotifier extends Notifier<User?> {
         },
       ),
     );
+  }
+
+  void refreshUser() {
+    state = Supabase.instance.client.auth.currentUser;
   }
 
   /// Convenience sign-out that cleans up and delegates to Supabase.

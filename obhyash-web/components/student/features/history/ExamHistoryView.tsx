@@ -1049,7 +1049,7 @@ export const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               </h3>
             </div>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 leading-relaxed font-['HindSiliguri',sans-serif]">
-              এই পরীক্ষার সমস্ত রেকর্ড এবং ফলাফল স্থায়ীভাবে মুছে যাবে। আপনি কি নিশ্চিত?
+              এই পরীক্ষার সমস্ত রেকর্ড এবং ফলাফল স্থায়ীভাবে মুছে যাবে। তুমি কি নিশ্চিত?
             </p>
             <div className="flex items-center justify-end gap-2.5">
               <button

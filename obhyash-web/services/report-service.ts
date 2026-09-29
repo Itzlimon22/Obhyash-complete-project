@@ -46,7 +46,7 @@ export const submitReport = async (data: SubmitReportData) => {
       if (existingReport) {
         return {
           success: false,
-          error: 'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
+          error: 'এই প্রশ্নটিতে তোমার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
         };
       }
     }

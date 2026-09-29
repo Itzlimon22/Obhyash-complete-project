@@ -11,6 +11,7 @@ import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 
 class ExamRunnerView extends ConsumerStatefulWidget {
@@ -80,7 +81,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -188,7 +189,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -234,7 +235,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি জমা দিন। আপনি কি পরীক্ষা জমা দিয়ে বের হতে চান?',
+                  'পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি জমা দাও। তুমি কি পরীক্ষা জমা দিয়ে বের হতে চাও?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -323,7 +324,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Dialog(
-          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
@@ -690,6 +691,29 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                                 userAnswers: {},
                               );
                               
+                              final profile = ref.read(userProfileProvider).value;
+                              final isUserPro = profile?.isPro ?? false;
+
+                              if (!isUserPro) {
+                                final weeklyCount =
+                                    await PdfDownloadService.getWeeklyDownloadCount();
+                                if (weeklyCount >=
+                                    PdfDownloadService.maxFreeWeeklyDownloads) {
+                                  if (!context.mounted) return;
+                                  ProUpgradeModal.show(
+                                    context,
+                                    title: 'সাপ্তাহিক PDF কোটা শেষ 🎯',
+                                    message:
+                                        'ফ্রি অ্যাকাউন্টে সপ্তাহে সর্বোচ্চ ৩টি প্রশ্নপত্র PDF ডাউনলোড করা যায়। আনলিমিটেড প্রশ্নপত্র ও উত্তরপত্র ডাউনলোড করতে প্রো সাবস্ক্রিপশন নাও।',
+                                    featurePill: 'সাপ্তাহিক কোটা: ৩/৩',
+                                    icon: LucideIcons.download,
+                                  );
+                                  return;
+                                }
+                                await PdfDownloadService.incrementWeeklyDownloadCount();
+                              }
+
+                              if (!context.mounted) return;
                               await PdfDownloadService.downloadQuestionPaper(dummyResult, context);
                             },
                             borderRadius: BorderRadius.circular(6),

@@ -579,7 +579,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
             maxHeight: MediaQuery.of(ctx).size.height * 0.52,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
+            color: isDark ? const Color(0xFF141417) : const Color(0xFFF8FAFC),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(

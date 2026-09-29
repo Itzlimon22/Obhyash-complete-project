@@ -5,6 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { Question } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import { QuestionCard } from "@/components/student/ui/exam/QuestionCard";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { isUserPro } from "@/lib/subscription-utils";
 import {
   InstituteCardItem,
   InstituteExamSet,
@@ -26,6 +28,9 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
   onBack,
   showHeader = true,
 }) => {
+  const { profile } = useAuth();
+  const isPro = isUserPro(profile);
+
   // Map of questionId -> selectedOptionIndex
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set());
@@ -113,6 +118,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
                   selectedOptionIndex={selectedAnswers[q.id]}
                   isFlagged={flaggedQuestions.has(q.id)}
                   showFeedback={selectedAnswers[q.id] !== undefined || !q.options || q.options.length === 0}
+                  hideExplanation={!isPro}
                   initiallyExpanded={true}
                   onSelectOption={(optIndex) => {
                     setSelectedAnswers((prev) => ({

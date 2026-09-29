@@ -113,33 +113,27 @@ export async function GET(request: Request) {
           isRegistered = !!directProfile;
         }
 
-        // Deny Google login if user has no profile (not registered)
+        // If user is not yet registered in public.users, guide them to complete onboarding profile
         if (!isRegistered) {
-          await supabase.auth.signOut();
-
-          // If request was initiated from Flutter mobile app, redirect back to mobile app
+          // If request was initiated from Flutter mobile app, redirect back to mobile app with onboarding flag
           if (isMobileApp) {
             return NextResponse.redirect(
               getMobileRedirectUrl({
-                error: 'unregistered_google',
-                error_description: 'এই গুগল ইমেইল দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে আগে নতুন অ্যাকাউন্ট খুলুন।',
+                code: code || '',
+                onboarding: 'true',
               }),
             );
           }
 
-          const redirectUrl = new URL('/login', origin);
-          redirectUrl.searchParams.set('error', 'unregistered_google');
-          const res = NextResponse.redirect(redirectUrl);
+          const forwardedHost = request.headers.get('x-forwarded-host');
+          const isLocalEnv = process.env.NODE_ENV === 'development';
+          const targetOrigin = isLocalEnv
+            ? origin
+            : forwardedHost
+            ? `https://${forwardedHost}`
+            : origin;
 
-          // Clear auth cookies on redirect response
-          cookieStore.getAll().forEach((c) => {
-            if (c.name.startsWith('sb-') || c.name.startsWith('sb:') || c.name.startsWith('obhyash_')) {
-              res.cookies.delete(c.name);
-            }
-          });
-          res.cookies.delete('obhyash_role_cache');
-          res.cookies.delete('obhyash_user_profile');
-          return res;
+          return NextResponse.redirect(`${targetOrigin}/onboarding`);
         }
 
         // If registered from mobile app, redirect back to app

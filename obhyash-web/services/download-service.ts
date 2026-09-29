@@ -7,28 +7,109 @@ const toBengaliNumber = (num: number | string): string => {
   return String(num).replace(/\d/g, (d) => bnDigits[parseInt(d, 10)]);
 };
 
+// --- Academic Subject Formatting & Board Subject Code Helpers ---
+const formatSubjectTitle = (subject?: string, subjectLabel?: string): string => {
+  if (subjectLabel && /[\u0980-\u09FF]/.test(subjectLabel)) {
+    return subjectLabel.trim();
+  }
+  const s = (subject || '').toLowerCase().replace(/-/g, '_').trim();
+  if (s.includes('physics')) {
+    if (s.includes('1')) return 'পদার্থবিজ্ঞান ১ম পত্র';
+    if (s.includes('2')) return 'পদার্থবিজ্ঞান ২য় পত্র';
+    return 'পদার্থবিজ্ঞান';
+  }
+  if (s.includes('chemistry') || s.includes('chem')) {
+    if (s.includes('1')) return 'রসায়ন ১ম পত্র';
+    if (s.includes('2')) return 'রসায়ন ২য় পত্র';
+    return 'রসায়ন';
+  }
+  if (s.includes('higher_math') || s.includes('math')) {
+    if (s.includes('1')) return 'উচ্চতর গণিত ১ম পত্র';
+    if (s.includes('2')) return 'উচ্চতর গণিত ২য় পত্র';
+    return 'উচ্চতর গণিত';
+  }
+  if (s.includes('biology') || s.includes('bio')) {
+    if (s.includes('1') || s.includes('botany')) return 'জীববিজ্ঞান ১ম পত্র (উদ্ভিদবিজ্ঞান)';
+    if (s.includes('2') || s.includes('zoology')) return 'জীববিজ্ঞান ২য় পত্র (প্রাণিবিজ্ঞান)';
+    return 'জীববিজ্ঞান';
+  }
+  if (s.includes('ict')) return 'তথ্য ও যোগাযোগ প্রযুক্তি';
+  if (s.includes('bangla')) {
+    if (s.includes('1')) return 'বাংলা ১ম পত্র';
+    if (s.includes('2')) return 'বাংলা ২য় পত্র';
+    return 'বাংলা';
+  }
+  if (s.includes('english')) {
+    if (s.includes('1')) return 'ইংরেজি ১ম পত্র';
+    if (s.includes('2')) return 'ইংরেজি ২য় পত্র';
+    return 'ইংরেজি';
+  }
+  return subjectLabel || subject || 'মডেল টেস্ট';
+};
+
+const getSubjectCode = (subject?: string, subjectLabel?: string): string | null => {
+  const title = formatSubjectTitle(subject, subjectLabel);
+  if (title.includes('বাংলা ১ম')) return '১০১';
+  if (title.includes('বাংলা ২')) return '১০২';
+  if (title.includes('ইংরেজি ১ম')) return '১০৭';
+  if (title.includes('ইংরেজি ২')) return '১০৮';
+  if (title.includes('তথ্য ও যোগাযোগ') || title.includes('আইসিটি')) return '২৭৫';
+  if (title.includes('পদার্থবিজ্ঞান ১ম')) return '১৭৪';
+  if (title.includes('পদার্থবিজ্ঞান ২')) return '১৭৫';
+  if (title.includes('রসায়ন ১ম')) return '১৭৬';
+  if (title.includes('রসায়ন ২')) return '১৭৭';
+  if (title.includes('জীববিজ্ঞান ১ম')) return '১৭৮';
+  if (title.includes('জীববিজ্ঞান ২')) return '১৭৯';
+  if (title.includes('উচ্চতর গণিত ১ম')) return '২৬৫';
+  if (title.includes('উচ্চতর গণিত ২')) return '২৬৬';
+  return null;
+};
+
+// --- LaTeX Preprocessor (Chemistry, temperatures, and arrows) ---
+const preprocessMath = (math: string): string => {
+  let m = math.trim();
+  // Chemistry \ce{...}, \pu{...} cleanup for KaTeX
+  m = m.replace(/\\(?:ce|pu)\{([^{}]*)\}/g, (_, inner) => {
+    return inner.replace(/([A-Za-z\)])_?(\d+)/g, '$1_{$2}');
+  });
+  // Temperatures and degrees
+  m = m.replace(/\^\{?\\circ\}?\s*(?:\\text\{C\}|C)/g, '^{\\circ}\\text{C}');
+  m = m.replace(/\^\{?\\circ\}?\s*(?:\\text\{F\}|F)/g, '^{\\circ}\\text{F}');
+  m = m.replace(/\^\{?\\circ\}?/g, '^{\\circ}');
+  m = m.replace(/\\degree/g, '^{\\circ}');
+  // Arrows
+  m = m.replace(/\\xrightarrow(?:\[([^\]]*)\])?\{([^}]*)\}/g, (_, below, above) => {
+    if (above && below) return `\\xrightarrow[${below}]{${above}}`;
+    if (above) return `\\xrightarrow{${above}}`;
+    return '\\rightarrow';
+  });
+  return m;
+};
+
 // --- LaTeX & Markdown Renderer ---
 const renderLatex = (text: string): string => {
   if (!text) return '';
 
   // 1. Display LaTeX: $$...$$
   let result = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+    const clean = preprocessMath(math);
     try {
-      return `<div style="overflow-x:auto;margin:3px 0;text-align:left;">${katex.renderToString(math.trim(), { throwOnError: false, displayMode: true })}</div>`;
+      return `<div style="overflow-x:auto;margin:3px 0;text-align:left;">${katex.renderToString(clean, { throwOnError: false, displayMode: true })}</div>`;
     } catch {
-      return `<span style="font-family:serif;font-style:italic;">$$${math}$$</span>`;
+      return `<span style="font-family:serif;font-style:italic;">$$${clean}$$</span>`;
     }
   });
 
   // 2. Inline LaTeX: $...$
   result = result.replace(/\$([^$\n]+?)\$/g, (_, math) => {
+    const clean = preprocessMath(math);
     try {
-      return katex.renderToString(math.trim(), {
+      return katex.renderToString(clean, {
         throwOnError: false,
         displayMode: false,
       });
     } catch {
-      return `<span style="font-family:serif;font-style:italic;">$${math}$</span>`;
+      return `<span style="font-family:serif;font-style:italic;">$${clean}$</span>`;
     }
   });
 
@@ -328,7 +409,8 @@ export const downloadQuestionPaper = (
   const w = window.open('', '_blank');
   if (!w) return;
 
-  const subjectTitle = details.subjectLabel || details.subject;
+  const subjectTitle = formatSubjectTitle(details.subject, details.subjectLabel);
+  const subjectCode = getSubjectCode(details.subject, details.subjectLabel);
   const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
 
   const html = `
@@ -346,16 +428,30 @@ export const downloadQuestionPaper = (
         ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
         
         <div class="header-container">
-          <div class="header-top">অভ্যাস (Obhyash)</div>
-          <div class="header-sub">EXAM PLATFORM · obhyash.com</div>
-          <div class="exam-title-badge">${subjectTitle} — ${details.examType}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;">
+            <div style="width:110px;text-align:left;font-size:8.5pt;font-weight:700;color:#334155;">
+              ${subjectCode ? `বিষয় কোড: ${subjectCode}` : 'মডেল টেস্ট'}
+            </div>
+            <div style="text-align:center;">
+              <div class="header-top">অভ্যাস — বিশেষ মডেল টেস্ট</div>
+              <div class="header-sub">উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com</div>
+              <div class="exam-title-badge">${subjectTitle} (বহুনির্বাচনি অভীক্ষা)</div>
+            </div>
+            <div style="width:110px;text-align:right;font-size:8.5pt;font-weight:700;color:#334155;">
+              সেট কোড: ক
+            </div>
+          </div>
           <table class="meta-table">
             <tr>
-              <td width="33%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
-              <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
-              <td width="33%" align="right">&#9998; পূর্ণমান: ${toBengaliNumber(details.totalMarks)} (${toBengaliNumber(questions.length)}টি প্রশ্ন)</td>
+              <td width="25%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="25%" align="center">&#10067; মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি</td>
+              <td width="25%" align="center">&#9998; পূর্ণমান: ${toBengaliNumber(details.totalMarks)}</td>
+              <td width="25%" align="right">&#9888; নেগেটিভ মার্ক: ${details.negativeMarking ? `-${toBengaliNumber(details.negativeMarking)}` : 'নেই'}</td>
             </tr>
           </table>
+          <div style="margin-top:4px;font-size:6.8pt;color:#475569;text-align:center;line-height:1.3;">
+            [ বিশেষ দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা ভরাট করো। সকল প্রশ্নের মান সমান (প্রতিটি ১ নম্বর)।${details.negativeMarking ? ` প্রতিটি ভুল উত্তরের জন্য -${toBengaliNumber(details.negativeMarking)} নম্বর কাটা যাবে।` : ''} ]
+          </div>
         </div>
 
         <div class="content-wrapper">
@@ -386,6 +482,10 @@ export const downloadQuestionPaper = (
             )
             .join('')}
         </div>
+
+        <div style="text-align:center;margin:18px 0 10px 0;font-size:8.5pt;font-weight:700;color:#64748b;letter-spacing:0.5px;">
+          — প্রশ্নপত্র সমাপ্ত (End of Question Paper) —
+        </div>
       </body>
     </html>
   `;
@@ -404,7 +504,8 @@ export const downloadResult = (
   const w = window.open('', '_blank');
   if (!w) return;
 
-  const subjectTitle = details.subjectLabel || details.subject;
+  const subjectTitle = formatSubjectTitle(details.subject, details.subjectLabel);
+  const subjectCode = getSubjectCode(details.subject, details.subjectLabel);
   const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
 
   const score = questions.reduce((acc, q) => {
@@ -428,14 +529,25 @@ export const downloadResult = (
         ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
         
         <div class="header-container">
-          <div class="header-top">অভ্যাস (Obhyash)</div>
-          <div class="header-sub">EXAM PLATFORM · SOLUTION & EXPLANATION</div>
-          <div class="exam-title-badge">${subjectTitle} — ${details.examType} (সমাধান পত্র)</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;">
+            <div style="width:110px;text-align:left;font-size:8.5pt;font-weight:700;color:#334155;">
+              ${subjectCode ? `বিষয় কোড: ${subjectCode}` : 'মডেল টেস্ট'}
+            </div>
+            <div style="text-align:center;">
+              <div class="header-top">অভ্যাস — সমাধান ও ব্যাখ্যা</div>
+              <div class="header-sub">উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com</div>
+              <div class="exam-title-badge">${subjectTitle} — সমাধান পত্র (সেট: ক)</div>
+            </div>
+            <div style="width:110px;text-align:right;font-size:8.5pt;font-weight:700;color:#334155;">
+              সেট কোড: ক
+            </div>
+          </div>
           <table class="meta-table">
             <tr>
-              <td width="30%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
-              <td width="40%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
-              <td width="30%" align="right">&#127942; প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)}</td>
+              <td width="25%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
+              <td width="25%" align="center">&#10067; মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি</td>
+              <td width="25%" align="center">&#127942; প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)}</td>
+              <td width="25%" align="right">&#9888; নেগেটিভ মার্ক: ${details.negativeMarking ? `-${toBengaliNumber(details.negativeMarking)}` : 'নেই'}</td>
             </tr>
           </table>
         </div>

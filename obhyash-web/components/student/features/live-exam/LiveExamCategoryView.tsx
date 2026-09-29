@@ -13,7 +13,7 @@ import { getPublishedLiveExams } from "@/services/live-exam-student-service";
 import { LiveExam } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
 import LiveExamDetailsView from "./LiveExamDetailsView";
-import LiveExamRoutineModal from "./LiveExamRoutineModal";
+import LiveExamRoutinePageView from "./LiveExamRoutinePageView";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import { cn } from "@/lib/utils";
 
@@ -164,6 +164,24 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     );
   }
 
+  if (isRoutineOpen) {
+    return (
+      <AppLayout
+        activeTab="live_exam"
+        {...commonLayoutProps}
+        title="পরীক্ষার রুটিন ও পূর্ণাঙ্গ সিলেবাস"
+        onBack={() => setIsRoutineOpen(false)}
+      >
+        <div className="w-full max-w-5xl mx-auto px-3 sm:px-6 pt-5 sm:pt-7 pb-24 font-['HindSiliguri']">
+          <LiveExamRoutinePageView
+            categoryTitle={displayCategoryTitle}
+            onBack={() => setIsRoutineOpen(false)}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout
       activeTab="live_exam"
@@ -171,7 +189,7 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       title={displayCategoryTitle}
       onBack={onBack}
     >
-      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
+      <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 pt-7 sm:pt-9 pb-28 font-['HindSiliguri']">
         {/* Filters & Routine Action Bar matching Flutter live_exam_category_view */}
         <div className="flex items-center justify-between gap-3 mb-4">
           {/* Filter Chips Capsule (All, Ongoing, Upcoming) */}
@@ -315,24 +333,6 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
             })}
           </div>
         )}
-
-        {/* Routine Modal */}
-        <LiveExamRoutineModal
-          categoryTitle={displayCategoryTitle}
-          isOpen={isRoutineOpen}
-          onClose={() => setIsRoutineOpen(false)}
-          onSelectExam={(examTitle) => {
-            setIsRoutineOpen(false);
-            const found = exams.find((e) => e.title === examTitle);
-            if (found) {
-              setSelectedExam({
-                id: found.id,
-                title: found.title,
-                status: found.userAttemptStatus === "submitted" ? "taken" : "untaken",
-              });
-            }
-          }}
-        />
       </div>
     </AppLayout>
   );

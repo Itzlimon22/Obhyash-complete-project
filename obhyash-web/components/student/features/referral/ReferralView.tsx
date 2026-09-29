@@ -333,6 +333,48 @@ export const ReferralView: React.FC = () => {
         </h2>
       </div>
 
+      {/* ── 2. How It Works (২য় কার্ড) (1:1 with Flutter 3 Steps) ── */}
+      <div className={cardContainerClass}>
+        <h3 className="text-sm font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
+          কীভাবে শুরু করবে?
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Step 1 */}
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
+            <div className="text-2xl mb-1.5">🔗</div>
+            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
+              কোড কপি করো
+            </h4>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+              তোমার কোডটি কপি করো।
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
+            <div className="text-2xl mb-1.5">📤</div>
+            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
+              শেয়ার করো
+            </h4>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+              বন্ধুদের পাঠাও।
+            </p>
+          </div>
+
+          {/* Step 3 */}
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
+            <div className="text-2xl mb-1.5">🎉</div>
+            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
+              পুরস্কার পাও
+            </h4>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+              বন্ধু পাবে প্রিমিয়াম, তুমি পাবে কার্ড।
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* ── 2. Claim Friend's Referral Code Card (If not used yet) ── */}
       {!hasUsedReferral && (
         <div className="bg-white dark:bg-[#18181B] rounded-[20px] p-5 sm:p-6 border border-[#A7F3D0] dark:border-[#059669]/30 shadow-2xs mb-5">
@@ -455,7 +497,7 @@ export const ReferralView: React.FC = () => {
 
         <p className="text-xs text-neutral-600 dark:text-neutral-400">
           {needed === 3 && totalReferrals > 0
-            ? '🎉 অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
+            ? '🎉 অভিনন্দন! তুমি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছ!'
             : `আর মাত্র ${needed} টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!`}
         </p>
       </div>
@@ -464,7 +506,7 @@ export const ReferralView: React.FC = () => {
       {scratchCards.length > 0 && (
         <div className="mb-5">
           <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-3">
-            আপনার স্ক্র্যাচ কার্ডসমূহ
+            তোমার স্ক্র্যাচ কার্ডসমূহ
           </h3>
 
           <div className="grid grid-cols-2 gap-3">
@@ -557,48 +599,6 @@ export const ReferralView: React.FC = () => {
               );
             })
           )}
-        </div>
-      </div>
-
-      {/* ── 7. How It Works (1:1 with Flutter 3 Steps) ── */}
-      <div className={cardContainerClass}>
-        <h3 className="text-sm font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
-          কীভাবে শুরু করবে?
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Step 1 */}
-          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
-            <div className="text-2xl mb-1.5">🔗</div>
-            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
-              কোড কপি করো
-            </h4>
-            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-              ওপরের কোডটি কপি করো।
-            </p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
-            <div className="text-2xl mb-1.5">📤</div>
-            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
-              শেয়ার করো
-            </h4>
-            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-              বন্ধুদের পাঠাও।
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#1C1C1E] border border-neutral-200 dark:border-[#27272A] text-center">
-            <div className="text-2xl mb-1.5">🎉</div>
-            <h4 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white">
-              পুরস্কার পাও
-            </h4>
-            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-              বন্ধু পাবে প্রিমিয়াম, তুমি পাবে কার্ড।
-            </p>
-          </div>
         </div>
       </div>
 

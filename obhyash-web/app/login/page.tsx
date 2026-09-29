@@ -4,7 +4,7 @@ import { useState, Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Mail, Lock, LogIn, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, Lock, LogIn, Loader2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 
 const AUTH_TIMEOUT_MS = 30000;
@@ -30,6 +30,7 @@ async function withTimeout<T>(
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -191,40 +192,42 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
-      {/* Top Header / Branding */}
-      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
-            অ
-          </div>
-          <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
-            OBHYASH
-          </span>
-        </Link>
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+      {/* Top Header / Language Switcher & Back Link */}
+      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
         <Link
           href="/"
           className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
         >
-          <span>হোমপেজে ফিরে যাও</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>← হোম</span>
+        </Link>
+
+        {/* Support Link - Plain text, no box, no background */}
+        <Link
+          href="/support"
+          className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+        >
+          সাপোর্ট লাগবে?
         </Link>
       </header>
 
       {/* Center Auth Form */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-md bg-white dark:bg-neutral-900/80 rounded-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-xl shadow-neutral-200/40 dark:shadow-none p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-1.5">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-              তোমার অ্যাকাউন্টে লগইন করো
+      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
+        <div className="w-full max-w-sm sm:max-w-md bg-white sm:border sm:border-neutral-200/90 sm:rounded-3xl sm:p-8 sm:shadow-lg space-y-6">
+          {/* Centered Brand Logo & Title */}
+          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+            <img
+              src="/obhyash_full_logo.png"
+              alt="Obhyash Logo"
+              className="h-10 w-auto object-contain"
+            />
+            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+              লগইন/রেজিস্টার
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm">
-              প্রস্তুতি শুরু করতে তোমার তথ্য দিয়ে প্রবেশ করো
-            </p>
           </div>
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 text-xs sm:text-sm font-medium flex items-center gap-2 animate-in slide-in-from-top-2">
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs sm:text-sm font-medium flex items-center gap-2 animate-in slide-in-from-top-2">
               <span className="text-base">⚠️</span>
               <span>{error}</span>
             </div>
@@ -232,98 +235,123 @@ export default function LoginPage() {
 
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 ml-1">
-                মোবাইল নম্বর অথবা ইমেইল
+              <label className="text-xs sm:text-sm font-semibold text-neutral-600 block">
+                মোবাইল নম্বর
               </label>
-              <div className="relative group">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 group-focus-within:text-emerald-600 transition-colors" />
-                <input
-                  id="identifier"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium text-neutral-800 dark:text-neutral-200"
-                  placeholder="017XXXXXXXX অথবা example@mail.com"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                />
-              </div>
+              <input
+                id="identifier"
+                type="text"
+                required
+                className="w-full px-4 py-3 sm:py-3.5 bg-white border border-neutral-300 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                placeholder="01XXXXXXXX"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 ml-1">
+              <label className="text-xs sm:text-sm font-semibold text-neutral-600 block">
                 পাসওয়ার্ড
               </label>
-              <div className="relative group">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 group-focus-within:text-emerald-600 transition-colors" />
+              <div className="relative">
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-medium text-neutral-800 dark:text-neutral-200"
+                  className="w-full pl-4 pr-11 py-3 sm:py-3.5 bg-white border border-neutral-300 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors p-1 cursor-pointer"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
+                </button>
+              </div>
+              {/* Forgot password link */}
+              <div className="flex justify-end pt-1">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs sm:text-sm font-semibold text-red-500 hover:text-red-600 transition-colors"
+                >
+                  পাসওয়ার্ড ভুলে গেছেন?
+                </Link>
               </div>
             </div>
 
+            {/* Primary Action Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
+              className="w-full mt-2 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   <span>প্রবেশ করা হচ্ছে...</span>
                 </>
               ) : (
-                <>
-                  <LogIn className="w-4 h-4" />
-                  <span>লগইন</span>
-                </>
+                <span>এগিয়ে যাও</span>
               )}
             </button>
           </form>
 
+          {/* Divider matching screenshot */}
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
+              <div className="w-full border-t border-neutral-200"></div>
             </div>
-            <div className="relative flex justify-center text-[11px] uppercase">
-              <span className="bg-white dark:bg-neutral-900 px-3 text-neutral-500 dark:text-neutral-400 font-bold">
-                অথবা
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-3 text-neutral-500 font-medium">
+                Login / Registration with
               </span>
             </div>
           </div>
 
+          {/* Social Google Login Card */}
           <Suspense
             fallback={
-              <div className="h-11 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
+              <div className="h-12 w-full bg-neutral-100 rounded-xl sm:rounded-2xl animate-pulse" />
             }
           >
-            <SocialLoginButton mode="signin" />
+            <SocialLoginButton
+              mode="signin"
+              label="Google"
+              className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white !border !border-neutral-300 !text-neutral-800 !shadow-2xs hover:!bg-neutral-50 transition-all font-semibold"
+            />
           </Suspense>
 
-          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-            অ্যাকাউন্ট নেই?{' '}
-            <Link
-              href="/signup"
-              className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
-            >
-              নতুন অ্যাকাউন্ট খোলো
-            </Link>
+          {/* Registration Prompt */}
+          <div className="pt-2 text-center">
+            <div className="text-xs sm:text-sm text-neutral-500">
+              অ্যাকাউন্ট নেই?{' '}
+              <Link
+                href="/signup"
+                className="text-[#006A4E] hover:underline font-bold transition-all ml-1"
+              >
+                নতুন অ্যাকাউন্ট খুলুন
+              </Link>
+            </div>
           </div>
         </div>
       </main>
 
+
       {/* Bottom Footer */}
       <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
-        <Link href="/privacy" className="hover:underline">
+        <Link href="/privacy-policy" className="hover:underline">
           গোপনীয়তা নীতি
         </Link>
         <span>•</span>
-        <Link href="/terms" className="hover:underline">
+        <Link href="/terms-and-conditions" className="hover:underline">
           শর্তাবলী
         </Link>
         <span>•</span>

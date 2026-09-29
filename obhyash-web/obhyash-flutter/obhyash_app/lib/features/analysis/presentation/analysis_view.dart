@@ -10,6 +10,7 @@ import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 
 // ─── Domain Models ──────────────────────────────────────────────────────────────
 
@@ -164,6 +165,8 @@ class AnalysisView extends ConsumerStatefulWidget {
 }
 
 class _AnalysisViewState extends ConsumerState<AnalysisView> {
+  static final Map<String, OverallAnalytics> _analyticsMemoryCache = {};
+
   String _timeFilter = 'all'; // 'week', 'month', 'all'
   OverallAnalytics? _analytics;
   bool _isLoading = true;
@@ -171,6 +174,10 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
   @override
   void initState() {
     super.initState();
+    if (_analyticsMemoryCache.containsKey(_timeFilter)) {
+      _analytics = _analyticsMemoryCache[_timeFilter];
+      _isLoading = false;
+    }
     _fetchAnalytics();
   }
 
@@ -403,16 +410,437 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
     return null;
   }
 
-  Future<void> _fetchAnalytics() async {
-    setState(() => _isLoading = true);
+  OverallAnalytics _computeAnalyticsFromRows(List rows) {
+    if (rows.isEmpty) {
+      return const OverallAnalytics(
+        totalExams: 0,
+        avgScore: 0,
+        avgAccuracy: 0,
+        totalTime: 0,
+        totalQuestions: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        totalSkipped: 0,
+        avgTimePerQuestion: 0,
+        highestScore: 0,
+        lowestScore: 0,
+        totalNegativeDeduction: 0,
+        masteryIndex: 0,
+        masteryTier: 'নতুন অভিযাত্রী',
+        masterySubtitle: 'পরীক্ষা দিয়ে তোমার পারফরম্যান্স ট্র্যাক করো',
+        subjectData: [],
+        timelineData: [],
+        guidelines: [],
+        achievements: [],
+      );
+    }
+
+    int totalExams = rows.length;
+    int totalTime = 0;
+    double scoreSum = 0;
+    int totalQuestions = 0;
+    int totalCorrect = 0;
+    int totalWrong = 0;
+    double highestScore = 0;
+    double lowestScore = 100;
+    double totalNegativeDeduction = 0;
+
+    final Map<String, ({int total, int correct, int wrong})> subjectMap = {};
+    final List<TimelinePoint> timeline = [];
+
+    for (final row in rows) {
+      final total = (row['total_questions'] as num?)?.toInt() ?? 0;
+      final correct = (row['correct_count'] as num?)?.toInt() ?? 0;
+      final wrong = (row['wrong_count'] as num?)?.toInt() ?? 0;
+      final time = (row['time_taken'] as num?)?.toInt() ?? 0;
+      final totalMarks = (row['total_marks'] as num?)?.toDouble() ??
+          (total > 0 ? total.toDouble() : 1.0);
+      final rawDbScore = (row['score'] as num?)?.toDouble();
+      final negRate = (row['negative_marking'] as num?)?.toDouble() ?? 0.25;
+
+      // Exact net score with negative marking deduction
+      final netScore = rawDbScore ??
+          (correct - (wrong * negRate)).clamp(0.0, totalMarks);
+      final score = totalMarks > 0
+          ? ((netScore / totalMarks) * 100.0).clamp(0.0, 100.0)
+          : 0.0;
+
+      final createdAt =
+          DateTime.tryParse(row['created_at'] ?? row['date'] ?? '') ??
+              DateTime.now();
+      final examSub = (row['subject'] as String?) ?? '';
+      final examSubLabel = row['subject_label'] as String?;
+
+      totalTime += time;
+      scoreSum += score;
+      totalQuestions += total;
+      totalCorrect += correct;
+      totalWrong += wrong;
+      totalNegativeDeduction += (wrong * negRate);
+
+      if (score > highestScore) highestScore = score;
+      if (score < lowestScore) lowestScore = score;
+
+      // Populate Subject Breakdown: ONLY genuine academic subjects!
+      final questions = row['questions'];
+      final userAnswers = row['user_answers'];
+      final answersMap = userAnswers is Map
+          ? Map<String, dynamic>.from(userAnswers)
+          : <String, dynamic>{};
+
+      if (questions is List && questions.isNotEmpty) {
+        // Question-level subject distribution
+        for (final q in questions) {
+          if (q is! Map) continue;
+          final qSub = (q['subject'] ?? '').toString();
+          final qSubLabel = (q['subject_label'] ?? '').toString();
+
+          final academicSub = _resolveAcademicSubject(qSub, qSubLabel) ??
+              _resolveAcademicSubject(examSub, examSubLabel);
+
+          if (academicSub == null) continue; // Skip non-academic entries
+
+          final qId = q['id']?.toString() ?? '';
+          final userAns = answersMap[qId];
+          final correctAns =
+              (q['correct_answer_index'] ?? q['correctAnswerIndex'])?.toString();
+          final correctIndices =
+              (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
+
+          final isAnswered =
+              userAns != null && userAns.toString().trim().isNotEmpty;
+          bool isCorrect = false;
+
+          if (isAnswered) {
+            if (correctIndices is List && correctIndices.isNotEmpty) {
+              isCorrect = correctIndices
+                  .map((e) => e.toString())
+                  .contains(userAns.toString());
+            } else if (correctAns != null) {
+              isCorrect = userAns.toString() == correctAns.toString();
+            }
+          }
+          final isWrong = isAnswered && !isCorrect;
+
+          final prev = subjectMap[academicSub];
+          subjectMap[academicSub] = (
+            total: (prev?.total ?? 0) + 1,
+            correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
+            wrong: (prev?.wrong ?? 0) + (isWrong ? 1 : 0),
+          );
+        }
+      } else {
+        // Fallback when question details are not preserved
+        final academicSub = _resolveAcademicSubject(examSub, examSubLabel);
+        if (academicSub != null) {
+          final prev = subjectMap[academicSub];
+          subjectMap[academicSub] = (
+            total: (prev?.total ?? 0) + total,
+            correct: (prev?.correct ?? 0) + correct,
+            wrong: (prev?.wrong ?? 0) + wrong,
+          );
+        }
+      }
+
+      timeline.add(
+        TimelinePoint(
+          label: DateFormat('d/M').format(createdAt),
+          score: score,
+          date: createdAt,
+        ),
+      );
+    }
+
+    final avgScore = totalExams > 0 ? (scoreSum / totalExams) : 0.0;
+    final avgAccuracy =
+        totalQuestions > 0 ? (totalCorrect / totalQuestions * 100.0) : 0.0;
+    final avgTimePerQ =
+        totalQuestions > 0 ? (totalTime / totalQuestions.toDouble()) : 0.0;
+
+    final subjectData = subjectMap.entries.map((e) {
+      final t = e.value.total;
+      final c = e.value.correct;
+      final w = e.value.wrong;
+      final skipped = (t - c - w).clamp(0, t);
+      final acc = t > 0 ? (c / t * 100.0) : 0.0;
+
+      return SubjectAnalytics(
+        rawName: e.key,
+        displayName: e.key,
+        total: t,
+        correct: c,
+        wrong: w,
+        skipped: skipped,
+        accuracy: acc,
+      );
+    }).toList()
+      ..sort((a, b) => b.accuracy.compareTo(a.accuracy));
+
+    // Mastery Score Algorithm
+    final volumeBonus = (totalQuestions / 200.0).clamp(0.0, 1.0) * 10.0;
+    final examBonus = (totalExams / 15.0).clamp(0.0, 1.0) * 10.0;
+    final masteryIndex =
+        ((avgScore * 0.45) + (avgAccuracy * 0.35) + volumeBonus + examBonus)
+            .clamp(0.0, 100.0);
+
+    String masteryTier;
+    String masterySubtitle;
+    if (masteryIndex >= 85) {
+      masteryTier = 'বিজয় অভিযাত্রী (Elite)';
+      masterySubtitle = 'অসাধারণ ধারাবাহিকতা! তুমি শীর্ষ প্রস্তুতিতে রয়েছো।';
+    } else if (masteryIndex >= 70) {
+      masteryTier = 'দ্রুত অগ্রগামী (Advanced)';
+      masterySubtitle = 'ধারাবাহিক গতি! ভুলগুলো নিয়মিত সংশোধন করলে কাঙ্ক্ষিত ফলাফল নিশ্চিত।';
+    } else if (masteryIndex >= 50) {
+      masteryTier = 'উন্নতির পথে (Growing)';
+      masterySubtitle = 'প্রস্তুতি সন্তোষজনক। দুর্বল অধ্যায়গুলোতে একটু বাড়তি সময় দাও।';
+    } else {
+      masteryTier = 'নতুন শুরু (Kickstart)';
+      masterySubtitle = 'নিয়মিত টেস্ট দিয়ে নিজের বেসিক ও নির্ভুলতা বাড়াও।';
+    }
+
+    // Smart Study Guidelines
+    final List<StudyGuideline> guidelines = [];
+
+    if (subjectData.isNotEmpty) {
+      final best = subjectData.first;
+      guidelines.add(
+        StudyGuideline(
+          color: const Color(0xFF059669),
+          icon: LucideIcons.trophy,
+          tag: 'সর্বোচ্চ শক্তি',
+          title: best.displayName,
+          metric: '${BanglaNameHelper.toBanglaNumeral(best.accuracy.round())}% নির্ভুলতা',
+          description:
+              'এই বিষয়ে তোমার নির্ভুলতা সবচেয়ে বেশি! নিয়মিত রিভিশন বজায় রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।',
+        ),
+      );
+
+      if (subjectData.length > 1) {
+        final worst = subjectData.last;
+        if (worst.accuracy < 75) {
+          guidelines.add(
+            StudyGuideline(
+              color: const Color(0xFFF59E0B),
+              icon: LucideIcons.alertTriangle,
+              tag: 'অগ্রাধিকার রিভিশন',
+              title: worst.displayName,
+              metric: '${BanglaNameHelper.toBanglaNumeral(worst.accuracy.round())}% নির্ভুলতা',
+              description:
+                  'অধ্যায়ের মূল সূত্র ও গুরুত্বপূর্ণ কনসেপ্টগুলো প্রতিদিন অন্তত ১০ মিনিট অনুশীলন করে দুর্বলতা কাটিয়ে ওঠো।',
+            ),
+          );
+        }
+      }
+    }
+
+    // Speed guideline
+    if (avgTimePerQ > 0) {
+      if (avgTimePerQ < 25) {
+        guidelines.add(
+          StudyGuideline(
+            color: const Color(0xFF0284C7),
+            icon: LucideIcons.zap,
+            tag: 'টাইমিং বিশ্লেষণ',
+            title: 'উচ্চ সমাধান গতি',
+            metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
+            description:
+                'প্রশ্নের উত্তর করার গতি চমৎকার। তবে তাড়াহুড়ো এড়িয়ে প্রতিটি প্রশ্নের অপশন মনোযোগ দিয়ে পড়ার অভ্যাস করো।',
+          ),
+        );
+      } else if (avgTimePerQ <= 50) {
+        guidelines.add(
+          StudyGuideline(
+            color: const Color(0xFF059669),
+            icon: LucideIcons.timer,
+            tag: 'টাইমিং বিশ্লেষণ',
+            title: 'আদর্শ গতি ও ব্যালান্স',
+            metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
+            description:
+                'প্রতি প্রশ্নে গড় সময় পরীক্ষার জন্য নিখুঁত ও আদর্শ। এই ইতিবাচক রিদম ধরে রাখো।',
+          ),
+        );
+      } else {
+        guidelines.add(
+          StudyGuideline(
+            color: const Color(0xFF8B5CF6),
+            icon: LucideIcons.hourglass,
+            tag: 'টাইমিং পরামর্শ',
+            title: 'গতি বৃদ্ধির সুযোগ',
+            metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
+            description:
+                'নিয়মিত প্র্যাকটিস ও শর্টকাট টেকনিক কাজে লাগিয়ে প্রশ্ন সমাধানের সময় আরও কিছুটা কমিয়ে আনো।',
+          ),
+        );
+      }
+    }
+
+    // Negative Marking Guideline
+    if (totalWrong > 0) {
+      guidelines.add(
+        StudyGuideline(
+          color: const Color(0xFFE11D48),
+          icon: LucideIcons.target,
+          tag: 'স্কোর রিকভারি',
+          title: 'নেগেটিভ মার্কিং পুনরুদ্ধার',
+          metric: '+${BanglaNameHelper.toBanglaNumeral(totalNegativeDeduction.toStringAsFixed(1))} নম্বর সুযোগ',
+          description:
+              'ভুল উত্তরের কারণে মোট ${BanglaNameHelper.toBanglaNumeral(totalWrong)}টি প্রশ্নে নম্বর কেটেছে। নিশ্চিত না হয়ে আন্দাজে দাগানো কমালেই স্কোর অনেক বাড়বে।',
+        ),
+      );
+    }
+
+    // Achievements
+    final achievements = [
+      AchievementBadge(
+        id: 'first',
+        label: 'প্রথম সূচনা',
+        description: 'প্রথম পরীক্ষা সম্পন্ন',
+        unlocked: totalExams >= 1,
+        accentColor: AppColors.deepGreen,
+      ),
+      AchievementBadge(
+        id: 'ten',
+        label: '১০ পরীক্ষা ক্লাব',
+        description: '১০টি পরীক্ষায় অংশগ্রহণ',
+        unlocked: totalExams >= 10,
+        accentColor: AppColors.deepBlue,
+      ),
+      AchievementBadge(
+        id: 'fifty',
+        label: '৫০ পরীক্ষা লিজেন্ড',
+        description: '৫০টি পরীক্ষা সফল সম্পন্ন',
+        unlocked: totalExams >= 50,
+        accentColor: AppColors.deepestBlue,
+      ),
+      AchievementBadge(
+        id: 'score80',
+        label: '৮০%+ স্কোর',
+        description: 'গড়ে ৮০%+ স্কোর অর্জন',
+        unlocked: avgScore >= 80,
+        accentColor: AppColors.emerald,
+      ),
+      AchievementBadge(
+        id: 'score90',
+        label: '৯০%+ জিনিয়াস',
+        description: 'গড়ে ৯০%+ উচ্চমান স্কোর',
+        unlocked: avgScore >= 90,
+        accentColor: AppColors.vibrantBlue,
+      ),
+      AchievementBadge(
+        id: 'perfect',
+        label: 'পারফেক্ট ১০০',
+        description: '১০০% নির্ভুল স্কোর',
+        unlocked: highestScore >= 100,
+        accentColor: AppColors.crimson,
+      ),
+    ];
+
+    return OverallAnalytics(
+      totalExams: totalExams,
+      avgScore: avgScore,
+      avgAccuracy: avgAccuracy,
+      totalTime: totalTime,
+      totalQuestions: totalQuestions,
+      totalCorrect: totalCorrect,
+      totalWrong: totalWrong,
+      totalSkipped: (totalQuestions - totalCorrect - totalWrong)
+          .clamp(0, totalQuestions),
+      avgTimePerQuestion: avgTimePerQ,
+      highestScore: highestScore,
+      lowestScore: lowestScore < 100 ? lowestScore : highestScore,
+      totalNegativeDeduction: totalNegativeDeduction,
+      masteryIndex: masteryIndex,
+      masteryTier: masteryTier,
+      masterySubtitle: masterySubtitle,
+      subjectData: subjectData,
+      timelineData: timeline,
+      guidelines: guidelines,
+      achievements: achievements,
+    );
+  }
+
+  Future<void> _fetchAnalytics({bool isBackgroundRefresh = false}) async {
+    final cacheKey = _timeFilter;
+
+    // 1. Instant load from memory cache
+    if (_analyticsMemoryCache.containsKey(cacheKey)) {
+      _analytics = _analyticsMemoryCache[cacheKey];
+      _isLoading = false;
+      if (mounted) setState(() {});
+    } else if (!isBackgroundRefresh && _analytics == null) {
+      setState(() => _isLoading = true);
+    }
+
     try {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
+
+      // 2. Instant seed from local storage if memory cache was empty
+      if (_analytics == null) {
+        final localResults =
+            await LocalExamCacheService.getAllCachedExamResults();
+        if (localResults.isNotEmpty) {
+          final now = DateTime.now();
+          final weekAgo = now.subtract(const Duration(days: 7));
+          final monthAgo = now.subtract(const Duration(days: 30));
+
+          final localRows = localResults
+              .where((res) {
+                if (_timeFilter == 'all') return true;
+                final d = DateTime.tryParse(res.date);
+                if (d == null) return true;
+                if (_timeFilter == 'week') return !d.isBefore(weekAgo);
+                if (_timeFilter == 'month') return !d.isBefore(monthAgo);
+                return true;
+              })
+              .map((res) => {
+                    'total_questions': res.totalQuestions,
+                    'correct_count': res.correctCount,
+                    'wrong_count': res.wrongCount,
+                    'time_taken': res.timeTaken,
+                    'score': res.score,
+                    'total_marks': res.totalMarks,
+                    'negative_marking': res.negativeMarking,
+                    'subject': res.subject,
+                    'subject_label': res.subjectLabel,
+                    'date': res.date,
+                    'created_at': res.date,
+                    'questions': res.questions
+                        .map((q) => {
+                              'id': q.id,
+                              'subject': q.subject,
+                              'subject_label': q.subjectLabel,
+                              'chapter': q.chapter,
+                              'correct_answer_index': q.correctAnswerIndex,
+                              'correct_answer_indices': q.correctAnswerIndices,
+                            })
+                        .toList(),
+                    'user_answers': res.userAnswers,
+                  })
+              .toList();
+
+          if (localRows.isNotEmpty && _analytics == null) {
+            final initialAnalytics = _computeAnalyticsFromRows(localRows);
+            _analyticsMemoryCache[cacheKey] = initialAnalytics;
+            if (mounted) {
+              setState(() {
+                _analytics = initialAnalytics;
+                _isLoading = false;
+              });
+            }
+          }
+        }
+      }
+
       if (userId == null) {
-        setState(() => _isLoading = false);
+        if (mounted && _analytics == null) {
+          setState(() => _isLoading = false);
+        }
         return;
       }
 
+      // 3. Supabase remote fetch in background (optimized with limit)
       var query = supabase
           .from('exam_results')
           .select(
@@ -427,369 +855,23 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
         query = query.gte('date', monthAgo.toIso8601String());
       }
 
-      final data = await query.order('created_at', ascending: true);
+      final data = await query.order('created_at', ascending: true).limit(150);
       final rows = data as List;
 
-      if (rows.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _analytics = const OverallAnalytics(
-              totalExams: 0,
-              avgScore: 0,
-              avgAccuracy: 0,
-              totalTime: 0,
-              totalQuestions: 0,
-              totalCorrect: 0,
-              totalWrong: 0,
-              totalSkipped: 0,
-              avgTimePerQuestion: 0,
-              highestScore: 0,
-              lowestScore: 0,
-              totalNegativeDeduction: 0,
-              masteryIndex: 0,
-              masteryTier: 'নতুন অভিযাত্রী',
-              masterySubtitle: 'পরীক্ষা দিয়ে তোমার পারফরম্যান্স ট্র্যাক করো',
-              subjectData: [],
-              timelineData: [],
-              guidelines: [],
-              achievements: [],
-            );
-            _isLoading = false;
-          });
-        }
-        return;
-      }
-
-      int totalExams = rows.length;
-      int totalTime = 0;
-      double scoreSum = 0;
-      int totalQuestions = 0;
-      int totalCorrect = 0;
-      int totalWrong = 0;
-      double highestScore = 0;
-      double lowestScore = 100;
-      double totalNegativeDeduction = 0;
-
-      final Map<String, ({int total, int correct, int wrong})> subjectMap = {};
-      final List<TimelinePoint> timeline = [];
-
-      for (final row in rows) {
-        final total = (row['total_questions'] as num?)?.toInt() ?? 0;
-        final correct = (row['correct_count'] as num?)?.toInt() ?? 0;
-        final wrong = (row['wrong_count'] as num?)?.toInt() ?? 0;
-        final time = (row['time_taken'] as num?)?.toInt() ?? 0;
-        final totalMarks = (row['total_marks'] as num?)?.toDouble() ??
-            (total > 0 ? total.toDouble() : 1.0);
-        final rawDbScore = (row['score'] as num?)?.toDouble();
-        final negRate = (row['negative_marking'] as num?)?.toDouble() ?? 0.25;
-
-        // Exact net score with negative marking deduction
-        final netScore = rawDbScore ??
-            (correct - (wrong * negRate)).clamp(0.0, totalMarks);
-        final score = totalMarks > 0
-            ? ((netScore / totalMarks) * 100.0).clamp(0.0, 100.0)
-            : 0.0;
-
-        final createdAt =
-            DateTime.tryParse(row['created_at'] ?? row['date'] ?? '') ??
-                DateTime.now();
-        final examSub = (row['subject'] as String?) ?? '';
-        final examSubLabel = row['subject_label'] as String?;
-
-        totalTime += time;
-        scoreSum += score;
-        totalQuestions += total;
-        totalCorrect += correct;
-        totalWrong += wrong;
-        totalNegativeDeduction += (wrong * negRate);
-
-        if (score > highestScore) highestScore = score;
-        if (score < lowestScore) lowestScore = score;
-
-        // Populate Subject Breakdown: ONLY genuine academic subjects!
-        final questions = row['questions'];
-        final userAnswers = row['user_answers'];
-        final answersMap = userAnswers is Map
-            ? Map<String, dynamic>.from(userAnswers)
-            : <String, dynamic>{};
-
-        if (questions is List && questions.isNotEmpty) {
-          // Question-level subject distribution
-          for (final q in questions) {
-            if (q is! Map) continue;
-            final qSub = (q['subject'] ?? '').toString();
-            final qSubLabel = (q['subject_label'] ?? '').toString();
-
-            final academicSub = _resolveAcademicSubject(qSub, qSubLabel) ??
-                _resolveAcademicSubject(examSub, examSubLabel);
-
-            if (academicSub == null) continue; // Skip non-academic entries
-
-            final qId = q['id']?.toString() ?? '';
-            final userAns = answersMap[qId];
-            final correctAns =
-                (q['correct_answer_index'] ?? q['correctAnswerIndex'])?.toString();
-            final correctIndices =
-                (q['correct_answer_indices'] ?? q['correctAnswerIndices']);
-
-            final isAnswered =
-                userAns != null && userAns.toString().trim().isNotEmpty;
-            bool isCorrect = false;
-
-            if (isAnswered) {
-              if (correctIndices is List && correctIndices.isNotEmpty) {
-                isCorrect = correctIndices
-                    .map((e) => e.toString())
-                    .contains(userAns.toString());
-              } else if (correctAns != null) {
-                isCorrect = userAns.toString() == correctAns.toString();
-              }
-            }
-            final isWrong = isAnswered && !isCorrect;
-
-            final prev = subjectMap[academicSub];
-            subjectMap[academicSub] = (
-              total: (prev?.total ?? 0) + 1,
-              correct: (prev?.correct ?? 0) + (isCorrect ? 1 : 0),
-              wrong: (prev?.wrong ?? 0) + (isWrong ? 1 : 0),
-            );
-          }
-        } else {
-          // Fallback when question details are not preserved
-          final academicSub = _resolveAcademicSubject(examSub, examSubLabel);
-          if (academicSub != null) {
-            final prev = subjectMap[academicSub];
-            subjectMap[academicSub] = (
-              total: (prev?.total ?? 0) + total,
-              correct: (prev?.correct ?? 0) + correct,
-              wrong: (prev?.wrong ?? 0) + wrong,
-            );
-          }
-        }
-
-        timeline.add(
-          TimelinePoint(
-            label: DateFormat('d/M').format(createdAt),
-            score: score,
-            date: createdAt,
-          ),
-        );
-      }
-
-      final avgScore = totalExams > 0 ? (scoreSum / totalExams) : 0.0;
-      final avgAccuracy =
-          totalQuestions > 0 ? (totalCorrect / totalQuestions * 100.0) : 0.0;
-      final avgTimePerQ =
-          totalQuestions > 0 ? (totalTime / totalQuestions.toDouble()) : 0.0;
-
-      final subjectData = subjectMap.entries.map((e) {
-        final t = e.value.total;
-        final c = e.value.correct;
-        final w = e.value.wrong;
-        final skipped = (t - c - w).clamp(0, t);
-        final acc = t > 0 ? (c / t * 100.0) : 0.0;
-
-        return SubjectAnalytics(
-          rawName: e.key,
-          displayName: e.key,
-          total: t,
-          correct: c,
-          wrong: w,
-          skipped: skipped,
-          accuracy: acc,
-        );
-      }).toList()
-        ..sort((a, b) => b.accuracy.compareTo(a.accuracy));
-
-      // Mastery Score Algorithm
-      final volumeBonus = (totalQuestions / 200.0).clamp(0.0, 1.0) * 10.0;
-      final examBonus = (totalExams / 15.0).clamp(0.0, 1.0) * 10.0;
-      final masteryIndex =
-          ((avgScore * 0.45) + (avgAccuracy * 0.35) + volumeBonus + examBonus)
-              .clamp(0.0, 100.0);
-
-      String masteryTier;
-      String masterySubtitle;
-      if (masteryIndex >= 85) {
-        masteryTier = 'বিজয় অভিযাত্রী (Elite)';
-        masterySubtitle = 'অসাধারণ ধারাবাহিকতা! তুমি শীর্ষ প্রস্তুতিতে রয়েছো।';
-      } else if (masteryIndex >= 70) {
-        masteryTier = 'দ্রুত অগ্রগামী (Advanced)';
-        masterySubtitle = 'ধারাবাহিক গতি! ভুলগুলো নিয়মিত সংশোধন করলে কাঙ্ক্ষিত ফলাফল নিশ্চিত।';
-      } else if (masteryIndex >= 50) {
-        masteryTier = 'উন্নতির পথে (Growing)';
-        masterySubtitle = 'প্রস্তুতি সন্তোষজনক। দুর্বল অধ্যায়গুলোতে একটু বাড়তি সময় দাও।';
-      } else {
-        masteryTier = 'নতুন শুরু (Kickstart)';
-        masterySubtitle = 'নিয়মিত টেস্ট দিয়ে নিজের বেসিক ও নির্ভুলতা বাড়াও।';
-      }
-
-      // Smart Study Guidelines
-      final List<StudyGuideline> guidelines = [];
-
-      if (subjectData.isNotEmpty) {
-        final best = subjectData.first;
-        guidelines.add(
-          StudyGuideline(
-            color: const Color(0xFF059669),
-            icon: LucideIcons.trophy,
-            tag: 'সর্বোচ্চ শক্তি',
-            title: best.displayName,
-            metric: '${BanglaNameHelper.toBanglaNumeral(best.accuracy.round())}% নির্ভুলতা',
-            description:
-                'এই বিষয়ে তোমার নির্ভুলতা সবচেয়ে বেশি! নিয়মিত রিভিশন বজায় রেখে এই শক্তিকে ১০০% মার্কসে রূপান্তর করো।',
-          ),
-        );
-
-        if (subjectData.length > 1) {
-          final worst = subjectData.last;
-          if (worst.accuracy < 75) {
-            guidelines.add(
-              StudyGuideline(
-                color: const Color(0xFFF59E0B),
-                icon: LucideIcons.alertTriangle,
-                tag: 'অগ্রাধিকার রিভিশন',
-                title: worst.displayName,
-                metric: '${BanglaNameHelper.toBanglaNumeral(worst.accuracy.round())}% নির্ভুলতা',
-                description:
-                    'অধ্যায়ের মূল সূত্র ও গুরুত্বপূর্ণ কনসেপ্টগুলো প্রতিদিন অন্তত ১০ মিনিট অনুশীলন করে দুর্বলতা কাটিয়ে ওঠো।',
-              ),
-            );
-          }
-        }
-      }
-
-      // Speed guideline
-      if (avgTimePerQ > 0) {
-        if (avgTimePerQ < 25) {
-          guidelines.add(
-            StudyGuideline(
-              color: const Color(0xFF0284C7),
-              icon: LucideIcons.zap,
-              tag: 'টাইমিং বিশ্লেষণ',
-              title: 'উচ্চ সমাধান গতি',
-              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
-              description:
-                  'প্রশ্নের উত্তর করার গতি চমৎকার। তবে তাড়াহুড়ো এড়িয়ে প্রতিটি প্রশ্নের অপশন মনোযোগ দিয়ে পড়ার অভ্যাস করো।',
-            ),
-          );
-        } else if (avgTimePerQ <= 50) {
-          guidelines.add(
-            StudyGuideline(
-              color: const Color(0xFF059669),
-              icon: LucideIcons.timer,
-              tag: 'টাইমিং বিশ্লেষণ',
-              title: 'আদর্শ গতি ও ব্যালান্স',
-              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
-              description:
-                  'প্রতি প্রশ্নে গড় সময় পরীক্ষার জন্য নিখুঁত ও আদর্শ। এই ইতিবাচক রিদম ধরে রাখো।',
-            ),
-          );
-        } else {
-          guidelines.add(
-            StudyGuideline(
-              color: const Color(0xFF8B5CF6),
-              icon: LucideIcons.hourglass,
-              tag: 'টাইমিং পরামর্শ',
-              title: 'গতি বৃদ্ধির সুযোগ',
-              metric: '${BanglaNameHelper.toBanglaNumeral(avgTimePerQ.round())} সে./প্রশ্ন',
-              description:
-                  'নিয়মিত প্র্যাকটিস ও শর্টকাট টেকনিক কাজে লাগিয়ে প্রশ্ন সমাধানের সময় আরও কিছুটা কমিয়ে আনো।',
-            ),
-          );
-        }
-      }
-
-      // Negative Marking Guideline
-      if (totalWrong > 0) {
-        guidelines.add(
-          StudyGuideline(
-            color: const Color(0xFFE11D48),
-            icon: LucideIcons.target,
-            tag: 'স্কোর রিকভারি',
-            title: 'নেগেটিভ মার্কিং পুনরুদ্ধার',
-            metric: '+${BanglaNameHelper.toBanglaNumeral(totalNegativeDeduction.toStringAsFixed(1))} নম্বর সুযোগ',
-            description:
-                'ভুল উত্তরের কারণে মোট ${BanglaNameHelper.toBanglaNumeral(totalWrong)}টি প্রশ্নে নম্বর কেটেছে। নিশ্চিত না হয়ে আন্দাজে দাগানো কমালেই স্কোর অনেক বাড়বে।',
-          ),
-        );
-      }
-
-      // Achievements
-      final achievements = [
-        AchievementBadge(
-          id: 'first',
-          label: 'প্রথম সূচনা',
-          description: 'প্রথম পরীক্ষা সম্পন্ন',
-          unlocked: totalExams >= 1,
-          accentColor: AppColors.deepGreen,
-        ),
-        AchievementBadge(
-          id: 'ten',
-          label: '১০ পরীক্ষা ক্লাব',
-          description: '১০টি পরীক্ষায় অংশগ্রহণ',
-          unlocked: totalExams >= 10,
-          accentColor: AppColors.deepBlue,
-        ),
-        AchievementBadge(
-          id: 'fifty',
-          label: '৫০ পরীক্ষা লিজেন্ড',
-          description: '৫০টি পরীক্ষা সফল সম্পন্ন',
-          unlocked: totalExams >= 50,
-          accentColor: AppColors.deepestBlue,
-        ),
-        AchievementBadge(
-          id: 'score80',
-          label: '৮০%+ স্কোর',
-          description: 'গড়ে ৮০%+ স্কোর অর্জন',
-          unlocked: avgScore >= 80,
-          accentColor: AppColors.emerald,
-        ),
-        AchievementBadge(
-          id: 'score90',
-          label: '৯০%+ জিনিয়াস',
-          description: 'গড়ে ৯০%+ উচ্চমান স্কোর',
-          unlocked: avgScore >= 90,
-          accentColor: AppColors.vibrantBlue,
-        ),
-        AchievementBadge(
-          id: 'perfect',
-          label: 'পারফেক্ট ১০০',
-          description: '১০০% নির্ভুল স্কোর',
-          unlocked: highestScore >= 100,
-          accentColor: AppColors.crimson,
-        ),
-      ];
+      final freshAnalytics = _computeAnalyticsFromRows(rows);
+      _analyticsMemoryCache[cacheKey] = freshAnalytics;
 
       if (mounted) {
         setState(() {
-          _analytics = OverallAnalytics(
-            totalExams: totalExams,
-            avgScore: avgScore,
-            avgAccuracy: avgAccuracy,
-            totalTime: totalTime,
-            totalQuestions: totalQuestions,
-            totalCorrect: totalCorrect,
-            totalWrong: totalWrong,
-            totalSkipped: (totalQuestions - totalCorrect - totalWrong)
-                .clamp(0, totalQuestions),
-            avgTimePerQuestion: avgTimePerQ,
-            highestScore: highestScore,
-            lowestScore: lowestScore < 100 ? lowestScore : highestScore,
-            totalNegativeDeduction: totalNegativeDeduction,
-            masteryIndex: masteryIndex,
-            masteryTier: masteryTier,
-            masterySubtitle: masterySubtitle,
-            subjectData: subjectData,
-            timelineData: timeline,
-            guidelines: guidelines,
-            achievements: achievements,
-          );
+          _analytics = freshAnalytics;
           _isLoading = false;
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint('[AnalysisView] _fetchAnalytics error: $e');
+      if (mounted && _analytics == null) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

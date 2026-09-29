@@ -14,6 +14,7 @@ import {
   XCircle,
   BookOpen,
   Trash2,
+  Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,7 @@ export interface QuestionCardProps {
   alwaysShowSourceTag?: boolean;
   showReport?: boolean;
   initiallyExpanded?: boolean;
+  hideExplanation?: boolean;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -57,6 +59,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   alwaysShowSourceTag = false,
   showReport = false,
   initiallyExpanded = false,
+  hideExplanation = false,
 }) => {
   const [isExplanationOpen, setIsExplanationOpen] = useState(
     showFeedback && initiallyExpanded,
@@ -389,15 +392,32 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {/* Explanation Content */}
             {isExplanationOpen && (
               <div className="p-3.5 sm:p-4 bg-[#FAF7F2] dark:bg-[#09090B] border-t border-[#E8DFD3] dark:border-[#27272A] text-[#2E2621] dark:text-[#F4F4F5] text-[14.5px] leading-[1.6] animate-in fade-in duration-200 w-full max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word] box-border">
-                {question.explanation && (
-                  <MathRenderer text={question.explanation} block={true} />
-                )}
-                {question.explanationImageUrl && (
-                  <img
-                    src={question.explanationImageUrl}
-                    alt="Explanation diagram"
-                    className="max-h-56 max-w-full h-auto object-contain rounded-lg border border-[#E8DFD3] dark:border-[#27272A] mt-2.5 bg-white p-1 mx-auto"
-                  />
+                {hideExplanation ? (
+                  <div className="py-3 px-2 flex flex-col items-center justify-center text-center gap-2.5">
+                    <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold text-sm">
+                      <Lock size={15} />
+                      <span>ব্যাখ্যা দেখতে প্রো সাবস্ক্রিপশন প্রয়োজন</span>
+                    </div>
+                    <a
+                      href="/subscription"
+                      className="px-4 py-1.5 bg-gradient-to-r from-emerald-800 to-emerald-700 hover:from-emerald-700 hover:to-emerald-600 text-white rounded-full text-xs font-bold shadow-md hover:scale-105 transition-all inline-block"
+                    >
+                      প্রো আনলক করো 👑
+                    </a>
+                  </div>
+                ) : (
+                  <>
+                    {question.explanation && (
+                      <MathRenderer text={question.explanation} block={true} />
+                    )}
+                    {question.explanationImageUrl && (
+                      <img
+                        src={question.explanationImageUrl}
+                        alt="Explanation diagram"
+                        className="max-h-56 max-w-full h-auto object-contain rounded-lg border border-[#E8DFD3] dark:border-[#27272A] mt-2.5 bg-white p-1 mx-auto"
+                      />
+                    )}
+                  </>
                 )}
               </div>
             )}

@@ -51,8 +51,8 @@ class AppConfigModel {
     this.examAntiCheatEnabled = true,
     this.maxTabSwitchesAllowed = 2,
     this.paymentsEnabled = true,
-    this.paymentAutoEnabled = true,
-    this.paymentManualEnabled = true,
+    this.paymentAutoEnabled = false,
+    this.paymentManualEnabled = false,
     this.paymentGooglePlayEnabled = true,
     this.manualPaymentMerchantNumber = '01749591456',
     this.leaderboardEnabled = true,
@@ -97,15 +97,15 @@ class AppConfigModel {
       paymentAutoEnabled:
           json['payment_auto_enabled'] as bool? ??
           json['auto_payment_enabled'] as bool? ??
-          true,
+          false,
       paymentManualEnabled:
           json['payment_manual_enabled'] as bool? ??
           json['manual_payment_enabled'] as bool? ??
-          true,
+          false,
       paymentGooglePlayEnabled:
           json['payment_google_play_enabled'] as bool? ??
           json['google_play_enabled'] as bool? ??
-          false,
+          true,
       manualPaymentMerchantNumber:
           json['manual_payment_merchant_number'] as String? ?? '01749591456',
       leaderboardEnabled: json['leaderboard_enabled'] as bool? ?? true,

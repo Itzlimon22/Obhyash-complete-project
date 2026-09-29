@@ -12,6 +12,7 @@ import {
   X,
   Flag,
   HelpCircle,
+  BookOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -142,6 +143,26 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   const isTimerCritical = timeLeft <= 60;
   const isTimerWarning = timeLeft <= 300 && !isTimerCritical;
 
+  // Distinct subjects and counts for subject-wise headers (matching Flutter)
+  const distinctSubjects = React.useMemo(() => {
+    return Array.from(
+      new Set(
+        questions
+          .map((q) => (q.subject || (q as any).subjectLabel || '').trim())
+          .filter(Boolean)
+      )
+    );
+  }, [questions]);
+
+  const subjectQuestionCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    questions.forEach((q) => {
+      const key = (q.subject || (q as any).subjectLabel || '').trim();
+      if (key) counts[key] = (counts[key] || 0) + 1;
+    });
+    return counts;
+  }, [questions]);
+
   const handleOptionSelect = (qId: string | number, optionIndex: number) => {
     if (userAnswers[qId] !== undefined) return; // Locked after one selected
     setUserAnswers((prev) => ({
@@ -267,25 +288,53 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
             const isFlagged = flaggedQuestions.has(question.id);
             const isBookmarked = bookmarkedIds.has(question.id.toString());
 
+            const currentSub = (question.subject || (question as any).subjectLabel || '').trim();
+            const prevSub =
+              idx > 0
+                ? (questions[idx - 1].subject || (questions[idx - 1] as any).subjectLabel || '').trim()
+                : null;
+            const isFirstInSubject =
+              idx === 0 || (prevSub && prevSub.toLowerCase() !== currentSub.toLowerCase());
+            const showSubjectHeader =
+              distinctSubjects.length > 1 && isFirstInSubject && currentSub;
+
             return (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                serialNumber={idx + 1}
-                selectedOptionIndex={userAnswers[question.id]}
-                isFlagged={isFlagged}
-                isBookmarked={isBookmarked}
-                onSelectOption={(optIdx) =>
-                  handleOptionSelect(question.id, optIdx)
-                }
-                onToggleFlag={() => handleToggleFlag(question.id)}
-                onToggleBookmark={
-                  onToggleBookmark
-                    ? () => onToggleBookmark(question.id)
-                    : undefined
-                }
-                onReport={() => setReportingQuestionId(question.id)}
-              />
+              <React.Fragment key={question.id}>
+                {showSubjectHeader && (
+                  <div className="flex items-center gap-3 my-2 sm:my-3">
+                    <div className="flex-1 h-px bg-[#E2E8F0] dark:bg-[#27272A]" />
+                    <div className="px-3.5 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#18181B] border border-[#CBD5E1] dark:border-[#27272A] flex items-center gap-2 shadow-2xs font-['HindSiliguri']">
+                      <BookOpen size={14} className="text-[#004633] dark:text-[#10B981]" />
+                      <span className="text-[13px] font-bold text-[#0F172A] dark:text-white">
+                        {BanglaNameHelper.formatSubject(currentSub)}
+                      </span>
+                      {subjectQuestionCounts[currentSub] && (
+                        <span className="text-[11px] text-[#64748B] dark:text-white/50 font-medium">
+                          ({BanglaNameHelper.toBanglaNumeral(subjectQuestionCounts[currentSub])}টি প্রশ্ন)
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1 h-px bg-[#E2E8F0] dark:bg-[#27272A]" />
+                  </div>
+                )}
+                <QuestionCard
+                  question={question}
+                  serialNumber={idx + 1}
+                  selectedOptionIndex={userAnswers[question.id]}
+                  isFlagged={isFlagged}
+                  isBookmarked={isBookmarked}
+                  onSelectOption={(optIdx) =>
+                    handleOptionSelect(question.id, optIdx)
+                  }
+                  onToggleFlag={() => handleToggleFlag(question.id)}
+                  onToggleBookmark={
+                    onToggleBookmark
+                      ? () => onToggleBookmark(question.id)
+                      : undefined
+                  }
+                  onReport={() => setReportingQuestionId(question.id)}
+                />
+              </React.Fragment>
             );
           })}
         </div>
@@ -401,7 +450,7 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
 
             <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
               পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি
-              জমা দিন। আপনি কি পরীক্ষা জমা দিয়ে বের হতে চান?
+              জমা দাও। তুমি কি পরীক্ষা জমা দিয়ে বের হতে চাও?
             </p>
 
             <div className="grid grid-cols-2 gap-3">

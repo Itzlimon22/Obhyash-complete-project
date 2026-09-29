@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_button_3d.dart';
 import '../../../core/utils/bangla_name_helper.dart';
@@ -39,14 +38,16 @@ class _WelcomeViewState extends State<WelcomeView> {
   int _currentPage = 0;
   Timer? _autoPlayTimer;
 
-  // Luxury Premium Palette (Titanium Slate & Matte Dark)
-  static const Color bgDark = Color(0xFF000000); // Pure Zinc 950
-  static const Color surfaceCard = Color(0xFF141417); // Elevated Matte Grey
-  static const Color surfaceBorder = Color(0xFF27272A); // Zinc 800
-  static const Color textMuted = Color(0xFFA1A1AA); // Zinc 400
-  static const Color brandGreen = Color(0xFF004633); // Brand Pine Green
-  static const Color accentGreen = Color(0xFF10B981); // Refined Emerald
-  static const Color accentRed = Color(0xFFEF4444); // Refined Crimson
+  // Fixed Luxury Light Mode Palette
+  static const Color bgLight = Color(0xFFFFFFFF);
+  static const Color surfaceCard = Color(0xFFFFFFFF);
+  static const Color surfaceMuted = Color(0xFFF4F4F5);
+  static const Color surfaceBorder = Color(0xFFE4E4E7);
+  static const Color textPrimary = Color(0xFF18181B);
+  static const Color textMuted = Color(0xFF71717A);
+  static const Color brandGreen = Color(0xFF006A4E);
+  static const Color accentGreen = Color(0xFF006A4E);
+  static const Color accentRed = Color(0xFFEF4444);
 
   @override
   void initState() {
@@ -99,7 +100,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         title: 'লাইভ কাউন্টডাউন ও টাইমড পরীক্ষা',
         icon: LucideIcons.timer,
         imageAssetPath: 'assets/images/onboarding/exam.png',
-        accentColor: const Color(0xFF10B981),
+        accentColor: const Color(0xFF059669),
         fallbackWidget: _buildMinimalExamCard(),
       ),
 
@@ -109,7 +110,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         title: 'হাজারো অধ্যায়ভিত্তিক প্রশ্ন ও নির্ভুল ব্যাখ্যা',
         icon: LucideIcons.bookOpen,
         imageAssetPath: 'assets/images/onboarding/practice.png',
-        accentColor: accentGreen,
+        accentColor: const Color(0xFF0D9488),
         fallbackWidget: _buildMinimalExamCard(),
       ),
 
@@ -119,7 +120,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         title: 'সকল বিষয়ের প্রয়োজনীয় সূত্র ও শর্টকাট',
         icon: LucideIcons.binary,
         imageAssetPath: 'assets/images/onboarding/formulas.png',
-        accentColor: const Color(0xFF3B82F6),
+        accentColor: const Color(0xFF2563EB),
         fallbackWidget: _buildMinimalAnalysisCard(),
       ),
 
@@ -129,210 +130,197 @@ class _WelcomeViewState extends State<WelcomeView> {
         title: 'ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি প্রস্তুতি',
         icon: LucideIcons.trophy,
         imageAssetPath: 'assets/images/onboarding/live_exam.png',
-        accentColor: const Color(0xFFF59E0B),
+        accentColor: const Color(0xFFD97706),
         fallbackWidget: _buildMinimalLeaderboardCard(),
       ),
     ];
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: bgDark,
+    return Theme(
+      data: ThemeData.light().copyWith(
+        textTheme: ThemeData.light().textTheme.apply(
+          fontFamily: 'HindSiliguri',
+        ),
       ),
-      child: Scaffold(
-        backgroundColor: bgDark,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Top Brand Logo
-              Padding(
-                padding: const EdgeInsets.only(top: 14, bottom: 4),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/images/obhyash_full_logo_dark.svg',
-                    height: 28,
-                    fit: BoxFit.contain,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark.copyWith(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
+          backgroundColor: bgLight,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Top Brand Logo (Transparent BG, Black Text)
+                Padding(
+                  padding: const EdgeInsets.only(top: 14, bottom: 4),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/obhyash_full_logo.png',
+                      height: 32,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-              ),
 
-              // PageView Carousel (Fills upper screen naturally without empty top void)
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() => _currentPage = index);
-                    _onUserSwiped();
-                  },
-                  itemCount: slides.length,
-                  itemBuilder: (context, index) {
-                    final slide = slides[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 10),
+                // PageView Carousel
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() => _currentPage = index);
+                      _onUserSwiped();
+                    },
+                    itemCount: slides.length,
+                    itemBuilder: (context, index) {
+                      final slide = slides[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 10),
 
-                          // Showcase Image — perfectly centered in viewport
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxHeight: MediaQuery.of(context).size.height * 0.47,
+                            // Showcase Image
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: MediaQuery.of(context).size.height * 0.47,
+                                  ),
+                                  child: _buildShowcaseCard(slide),
                                 ),
-                                child: _buildShowcaseCard(slide),
                               ),
                             ),
-                          ),
 
-                          const SizedBox(height: 14),
+                            const SizedBox(height: 14),
 
-                          // Minimal Tag Pill
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: surfaceCard,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: surfaceBorder),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  slide.icon,
-                                  size: 13,
-                                  color: slide.accentColor,
+                            // Slide Tag Pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: slide.accentColor.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: slide.accentColor.withValues(alpha: 0.20),
                                 ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  slide.tag,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    slide.icon,
+                                    size: 13,
                                     color: slide.accentColor,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Slide Title
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: Text(
-                              slide.title,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 18.5,
-                                fontWeight: FontWeight.w800,
-                                height: 1.3,
-                                color: Colors.white,
-                                letterSpacing: -0.2,
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    slide.tag,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: slide.accentColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+
+                            // Slide Title
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Text(
+                                slide.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 18.5,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.3,
+                                  color: textPrimary,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Indicator Dots
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(slides.length, (index) {
+                    final isSelected = _currentPage == index;
+
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      width: isSelected ? 22 : 6,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: isSelected ? brandGreen : surfaceBorder,
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     );
-                  },
+                  }),
                 ),
-              ),
 
-              const SizedBox(height: 12),
+                const SizedBox(height: 18),
 
-              // Minimal Grey Indicator Dots
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(slides.length, (index) {
-                  final isSelected = _currentPage == index;
-
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: isSelected ? 20 : 6,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.white : const Color(0xFF3F3F46),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-              ),
-
-              // Breathing space between indicator & buttons
-              const SizedBox(height: 18),
-
-              // Bottom CTA Buttons in a single Row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        // Secondary Button: Titanium Slate 3D Login
-                        Expanded(
-                          flex: 4,
-                          child: AppButton3D(
-                            text: 'লগইন',
-                            onPressed: () => context.push('/login'),
-                            baseColor: surfaceCard,
-                            shadowColor: const Color(0xFF09090B),
-                            textColor: Colors.white,
-                            height: 48,
-                            borderRadius: 14,
-                            depth: 4,
-                            fontSize: 15.5,
-                            border: Border.all(color: surfaceBorder, width: 1.0),
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        // Primary 3D Button: Pine Green with Deepest Green 3D Base
-                        Expanded(
-                          flex: 6,
-                          child: AppButton3D(
-                            text: 'শুরু করুন',
-                            suffixIcon: const Icon(LucideIcons.arrowRight, size: 16, color: Colors.white),
-                            onPressed: () => context.push('/signup'),
-                            baseColor: brandGreen, // Preserved exact current green
-                            shadowColor: const Color(0xFF002219), // Deepest green 3D base
-                            textColor: Colors.white,
-                            height: 48,
-                            borderRadius: 14,
-                            depth: 5,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // Brand Slogan Footer Line (Clean Minimal Text)
-                    const Center(
-                      child: Text(
-                        'অভ্যাসে শুরু, সাফল্যে শেষ',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF71717A),
-                          letterSpacing: 0.3,
+                // Bottom CTA Button & Slogan
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: AppButton3D(
+                          text: 'শুরু করুন',
+                          suffixIcon: const Icon(LucideIcons.arrowRight, size: 18, color: Colors.white),
+                          onPressed: () => context.push('/login'),
+                          baseColor: brandGreen,
+                          shadowColor: const Color(0xFF003828),
+                          textColor: Colors.white,
+                          height: 50,
+                          borderRadius: 14,
+                          depth: 4,
+                          fontSize: 16,
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 10),
-                  ],
+                      const SizedBox(height: 14),
+
+                      // Brand Slogan Footer Line
+                      const Center(
+                        child: Text(
+                          'অভ্যাসে শুরু, সাফল্যে শেষ',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: textMuted,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -349,12 +337,12 @@ class _WelcomeViewState extends State<WelcomeView> {
           aspectRatio: 9 / 19.5,
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF000000),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFF27272A), width: 1.2),
+              border: Border.all(color: surfaceBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 20,
                   spreadRadius: 0,
                   offset: const Offset(0, 8),
@@ -395,7 +383,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF27272A),
+                  color: surfaceMuted,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
@@ -413,7 +401,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: textMuted,
-                  ),
+                ),
               ),
             ],
           ),
@@ -424,7 +412,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               fontSize: 12,
               fontWeight: FontWeight.w700,
               height: 1.35,
-              color: Colors.white,
+              color: textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -456,9 +444,9 @@ class _WelcomeViewState extends State<WelcomeView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: const Color(0xFFF0FDF4),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF334155)),
+              border: Border.all(color: const Color(0xFFBBF7D0)),
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -468,7 +456,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Color(0xFF166534),
                   ),
                 ),
                 Text(
@@ -476,7 +464,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF38BDF8),
+                    color: Color(0xFF15803D),
                   ),
                 ),
               ],
@@ -503,8 +491,8 @@ class _WelcomeViewState extends State<WelcomeView> {
                 height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF27272A),
-                  border: Border.all(color: accentGreen, width: 2),
+                  color: const Color(0xFFECFDF5),
+                  border: Border.all(color: brandGreen, width: 2),
                 ),
                 child: const Center(
                   child: Text(
@@ -512,7 +500,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: brandGreen,
                     ),
                   ),
                 ),
@@ -526,7 +514,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: textPrimary,
                     ),
                   ),
                   Text(
@@ -563,8 +551,9 @@ class _WelcomeViewState extends State<WelcomeView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF27272A),
+              color: const Color(0xFFFEF2F2),
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFFECACA)),
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -578,7 +567,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: Color(0xFF991B1B),
                       ),
                     ),
                   ],
@@ -588,7 +577,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFFBBF24),
+                    color: Color(0xFFD97706),
                   ),
                 ),
               ],
@@ -604,7 +593,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                           width: 22,
                           height: 22,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF27272A),
+                            color: const Color(0xFFFEF2F2),
                             shape: BoxShape.circle,
                             border: Border.all(color: accentRed, width: 1),
                           ),
@@ -630,7 +619,7 @@ class _WelcomeViewState extends State<WelcomeView> {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // REUSABLE TITANIUM DEVICE WRAPPER
+  // REUSABLE DEVICE WRAPPER
   // ─────────────────────────────────────────────────────────────
   Widget _buildDeviceWrapper({
     required String headerTitle,
@@ -645,9 +634,9 @@ class _WelcomeViewState extends State<WelcomeView> {
         border: Border.all(color: surfaceBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -656,7 +645,7 @@ class _WelcomeViewState extends State<WelcomeView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: const BoxDecoration(
-              color: Color(0xFF1A1A1E),
+              color: surfaceMuted,
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               border: Border(bottom: BorderSide(color: surfaceBorder, width: 0.8)),
             ),
@@ -668,7 +657,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white70,
+                    color: textPrimary,
                   ),
                 ),
                 Text(
@@ -695,10 +684,10 @@ class _WelcomeViewState extends State<WelcomeView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF1E293B) : const Color(0xFF1A1A1E),
+        color: isSelected ? const Color(0xFFECFDF5) : surfaceMuted,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isSelected ? const Color(0xFF38BDF8) : surfaceBorder,
+          color: isSelected ? const Color(0xFF10B981) : surfaceBorder,
           width: 1,
         ),
       ),
@@ -706,7 +695,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         children: [
           Icon(
             isSelected ? LucideIcons.checkCircle2 : LucideIcons.circle,
-            color: isSelected ? const Color(0xFF38BDF8) : textMuted,
+            color: isSelected ? const Color(0xFF059669) : textMuted,
             size: 13,
           ),
           const SizedBox(width: 8),
@@ -715,7 +704,7 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? Colors.white : textMuted,
+              color: isSelected ? const Color(0xFF065F46) : textPrimary,
             ),
           ),
         ],
@@ -727,9 +716,9 @@ class _WelcomeViewState extends State<WelcomeView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isFirst ? const Color(0xFF1E293B) : const Color(0xFF1A1A1E),
+        color: isFirst ? const Color(0xFFFEF3C7) : surfaceMuted,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: isFirst ? const Color(0xFF334155) : surfaceBorder),
+        border: Border.all(color: isFirst ? const Color(0xFFFDE68A) : surfaceBorder),
       ),
       child: Row(
         children: [
@@ -738,7 +727,7 @@ class _WelcomeViewState extends State<WelcomeView> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              color: isFirst ? const Color(0xFFFBBF24) : textMuted,
+              color: isFirst ? const Color(0xFFD97706) : textMuted,
             ),
           ),
           const SizedBox(width: 8),
@@ -748,7 +737,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: textPrimary,
               ),
             ),
           ),
@@ -777,7 +766,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                color: textMuted,
+                color: textPrimary,
               ),
             ),
             Text(
@@ -785,7 +774,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               style: const TextStyle(
                 fontSize: 8,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: brandGreen,
               ),
             ),
           ],
@@ -795,8 +784,8 @@ class _WelcomeViewState extends State<WelcomeView> {
           borderRadius: BorderRadius.circular(2),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: const Color(0xFF27272A),
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF52525B)),
+            backgroundColor: surfaceBorder,
+            valueColor: const AlwaysStoppedAnimation<Color>(brandGreen),
             minHeight: 3,
           ),
         ),

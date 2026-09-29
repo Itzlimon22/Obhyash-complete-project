@@ -100,27 +100,17 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
       });
 
   const formatTime = (seconds?: number, startTime?: string, submitTime?: string) => {
-    if (seconds && seconds > 0) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${BanglaNameHelper.toBanglaNumeral(String(mins).padStart(2, "0"))}:${BanglaNameHelper.toBanglaNumeral(String(secs).padStart(2, "0"))} মি.`;
-    }
-    if (startTime && submitTime) {
-      const diff = Math.floor(
+    let totalSecs = seconds;
+    if (totalSecs === undefined && startTime && submitTime) {
+      totalSecs = Math.floor(
         (new Date(submitTime).getTime() - new Date(startTime).getTime()) / 1000
       );
-      if (diff > 0 && diff <= 86400) {
-        const mins = Math.floor(diff / 60);
-        const secs = diff % 60;
-        return `${BanglaNameHelper.toBanglaNumeral(String(mins).padStart(2, "0"))}:${BanglaNameHelper.toBanglaNumeral(String(secs).padStart(2, "0"))} মি.`;
-      }
     }
-    if (submitTime) {
-      const d = new Date(submitTime);
-      let hours = d.getHours();
-      const period = hours >= 12 ? "PM" : "AM";
-      hours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
-      return `${BanglaNameHelper.toBanglaNumeral(String(hours).padStart(2, "0"))}:${BanglaNameHelper.toBanglaNumeral(String(d.getMinutes()).padStart(2, "0"))} ${period}`;
+    if (totalSecs !== undefined) {
+      const clamped = Math.max(0, Math.min(86400, totalSecs));
+      const mins = Math.floor(clamped / 60);
+      const secs = clamped % 60;
+      return `${BanglaNameHelper.toBanglaNumeral(String(mins).padStart(2, "0"))}:${BanglaNameHelper.toBanglaNumeral(String(secs).padStart(2, "0"))} মি.`;
     }
     return "--";
   };
@@ -201,10 +191,10 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
             {/* Info */}
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-[#64748B] dark:text-[#A1A1AA] uppercase">
-                আপনার অবস্থান
+                তোমার অবস্থান
               </span>
               <h3 className="text-[15.5px] font-black text-[#0F172A] dark:text-[#F8FAFC] truncate">
-                {myEntry.users?.name || "আপনি"}
+                {myEntry.users?.name || "তুমি"}
               </h3>
               <p className="text-[11px] text-[#94A3B8] dark:text-[#71717A] truncate">
                 মোট {BanglaNameHelper.toBanglaNumeral(leaderboard.length)} জনের মধ্যে{" "}
@@ -282,7 +272,7 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
 
               const timeText = formatTime(
                 candidate.time_taken_seconds,
-                candidate.start_time,
+                candidate.start_time || (candidate as any).created_at,
                 candidate.submit_time
               );
 
@@ -331,7 +321,7 @@ export const LiveExamLeaderboardView: React.FC<LiveExamLeaderboardViewProps> = (
                       </span>
                       {isMe && (
                         <span className="px-1.5 py-0.5 rounded-[4px] bg-[#059669]/20 text-[#059669] dark:text-[#34D399] text-[9.5px] font-bold">
-                          আপনি
+                          তুমি
                         </span>
                       )}
                     </div>

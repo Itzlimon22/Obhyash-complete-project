@@ -198,7 +198,7 @@ function PaymentSuccessContent() {
               পেমেন্ট যাচাই করা হচ্ছে...
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
-              অনুগ্রহ করে অপেক্ষা করুন, UddoktaPay থেকে আপনার লেনদেন স্বয়ংক্রিয়ভাবে নিশ্চিত করা হচ্ছে।
+              অনুগ্রহ করে অপেক্ষা করো, UddoktaPay থেকে তোমার লেনদেন স্বয়ংক্রিয়ভাবে নিশ্চিত করা হচ্ছে।
             </p>
             {invoiceId && (
               <p className="text-xs font-mono bg-neutral-100 dark:bg-neutral-800 py-1.5 px-3 rounded-lg inline-block text-neutral-600 dark:text-neutral-300">
@@ -226,10 +226,10 @@ function PaymentSuccessContent() {
               পেমেন্ট সফল ও সক্রিয় হয়েছে
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight mb-2">
-              অভিনন্দন! আপনি এখন প্রো সদস্য 🎉
+              অভিনন্দন! তুমি এখন প্রো সদস্য 🎉
             </h1>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6 leading-relaxed">
-              আপনার পেমেন্ট সফলভাবে যাচাই করা হয়েছে। সকল প্রিমিয়াম ফিচার, আনলিমিটেড পরীক্ষা ও বিশ্লেষণ তাৎক্ষণিক চালু করা হয়েছে।
+              তোমার পেমেন্ট সফলভাবে যাচাই করা হয়েছে। সকল প্রিমিয়াম ফিচার, আনলিমিটেড পরীক্ষা ও বিশ্লেষণ তাৎক্ষণিক চালু করা হয়েছে।
             </p>
 
             {/* Details Card */}
@@ -312,7 +312,7 @@ function PaymentSuccessContent() {
             </h2>
             <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto leading-relaxed">
               {errorMessage ||
-                'পেমেন্টটি এখনো গেটওয়েতে প্রক্রিয়াধীন থাকতে পারে। যদি আপনার অ্যাকাউন্ট থেকে টাকা কেটে গিয়ে থাকে, তবে সাধারণত কয়েক মিনিটের মধ্যেই তা স্বয়ংক্রিয়ভাবে সক্রিয় হয়ে যাবে।'}
+                'পেমেন্টটি এখনো গেটওয়েতে প্রক্রিয়াধীন থাকতে পারে। যদি তোমার অ্যাকাউন্ট থেকে টাকা কেটে গিয়ে থাকে, তবে সাধারণত কয়েক মিনিটের মধ্যেই তা স্বয়ংক্রিয়ভাবে সক্রিয় হয়ে যাবে।'}
             </p>
 
             {invoiceId && (

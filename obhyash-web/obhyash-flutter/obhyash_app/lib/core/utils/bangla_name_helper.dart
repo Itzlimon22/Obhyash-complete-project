@@ -367,8 +367,28 @@ class BanglaNameHelper {
     if (formatted.contains('বাংলা')) return 'বাংলা';
     if (formatted.contains('ইংরেজি') || formatted.contains('English')) return 'ইংরেজি';
     if (formatted.contains('আইসিটি') || formatted.contains('তথ্য ও যোগাযোগ') || formatted.contains('ict')) return 'তথ্য ও যোগাযোগ প্রযুক্তি';
-    if (formatted.contains('সাধারণ জ্ঞান') || formatted.contains('GK')) return 'সাধারণ জ্ঞান';
     return formatted.replaceAll(RegExp(r'\s*(?:১ম|২য়|১ম পত্র|২য় পত্র|১ম খণ্ড|২য় খণ্ড)\b'), '').trim();
+  }
+
+  /// Returns authentic board exam subject code for academic subjects
+  /// e.g. "রসায়ন ২য় পত্র" -> "১৭৭", "physics_1st" -> "১৭৪"
+  static String? getSubjectCode(String? subject, [String? subjectLabel]) {
+    final s = formatSubject(subject, subjectLabel);
+    if (s.contains('বাংলা ১ম')) return '১০১';
+    if (s.contains('বাংলা ২')) return '১০২';
+    if (s.contains('ইংরেজি ১ম') || s.contains('English 1')) return '১০৭';
+    if (s.contains('ইংরেজি ২') || s.contains('English 2')) return '১০৮';
+    if (s.contains('তথ্য ও যোগাযোগ') || s.contains('আইসিটি')) return '২৭৫';
+    if (s.contains('পদার্থবিজ্ঞান ১ম')) return '১৭৪';
+    if (s.contains('পদার্থবিজ্ঞান ২')) return '১৭৫';
+    if (s.contains('রসায়ন ১ম')) return '১৭৬';
+    if (s.contains('রসায়ন ২')) return '১৭৭';
+    if (s.contains('জীববিজ্ঞান ১ম') || s.contains('উদ্ভিদ')) return '১৭৮';
+    if (s.contains('জীববিজ্ঞান ২') || s.contains('প্রাণি')) return '১৭৯';
+    if (s.contains('উচ্চতর গণিত ১ম')) return '২৬৫';
+    if (s.contains('উচ্চতর গণিত ২')) return '২৬৬';
+    if (s.contains('সাধারণ গণিত')) return '১০৯';
+    return null;
   }
 
   /// Converts chapter strings into clean Bengali text.

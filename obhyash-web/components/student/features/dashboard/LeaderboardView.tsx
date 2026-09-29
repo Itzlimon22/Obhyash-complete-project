@@ -724,7 +724,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   >
                     {isUserLevel && (
                       <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-600 border border-white dark:border-black shadow-xs whitespace-nowrap">
-                        আপনার স্তর
+                        তোমার স্তর
                       </div>
                     )}
 

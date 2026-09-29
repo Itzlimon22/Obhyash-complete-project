@@ -106,7 +106,7 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF000000) : Colors.white;
+    final bg = isDark ? const Color(0xFF141417) : Colors.white;
     final border = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 

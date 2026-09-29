@@ -74,7 +74,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
     if (_alreadyReported) {
       AppPopups.warning(
         context,
-        message: 'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
+        message: 'এই প্রশ্নটিতে তোমার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
       );
       return;
     }
@@ -140,7 +140,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF141417) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
@@ -214,7 +214,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পর্যালোচনায় আছে।',
+                          'এই প্রশ্নটিতে তোমার রিপোর্ট ইতিমধ্যে পর্যালোচনায় আছে।',
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,

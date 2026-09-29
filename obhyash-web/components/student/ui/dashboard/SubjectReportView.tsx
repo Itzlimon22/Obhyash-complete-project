@@ -495,7 +495,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                       পরামর্শ (Recommendation)
                     </h4>
                     <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                      আপনার{' '}
+                      তোমার{' '}
                       <span className="font-bold text-emerald-600 dark:text-emerald-400">
                         {weakChapters[0]?.name}
                       </span>{' '}

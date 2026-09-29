@@ -10,7 +10,7 @@ const SubjectRadar: React.FC<SubjectRadarProps> = ({ data }) => {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">বিষয়ভিত্তিক দক্ষতা</h3>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">আপনার বিভিন্ন বিষয়ের দক্ষতার তুলনামূলক চিত্র</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">তোমার বিভিন্ন বিষয়ের দক্ষতার তুলনামূলক চিত্র</p>
       
       <div className="flex-1 min-h-[250px]">
         {/* SUPABASE: Data fed here should come from aggregation of 'exam_results' by subject */}

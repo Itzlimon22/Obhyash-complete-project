@@ -332,9 +332,43 @@ export async function PATCH(request: NextRequest) {
         is_subscribed: isSubActive,
         subscription_status: isSubActive ? 'active' : (isFree ? 'inactive' : subStatus.toLowerCase()),
         subscription_expires_at: expiryIso,
+        level: isSubActive ? 'Pro' : 'Free',
+        plan: isSubActive ? 'Pro' : 'Free',
       }).eq('id', userId);
 
       if (error) throw error;
+
+      // Sync with subscription_history so invoices and validity records match
+      try {
+        if (isSubActive && expiryIso) {
+          // Deactivate any previous active records
+          await supabaseAdmin
+            .from('subscription_history')
+            .update({ is_active: false })
+            .eq('user_id', userId);
+
+          // Insert new official record for admin grant / extension
+          await supabaseAdmin
+            .from('subscription_history')
+            .insert({
+              user_id: userId,
+              plan_name: plan === 'Free' ? 'প্রো সাবস্ক্রিপশন' : plan,
+              amount: 0,
+              started_at: new Date().toISOString(),
+              expires_at: expiryIso,
+              is_active: true,
+              status: 'completed',
+              created_at: new Date().toISOString(),
+            });
+        } else if (isFree) {
+          await supabaseAdmin
+            .from('subscription_history')
+            .update({ is_active: false })
+            .eq('user_id', userId);
+        }
+      } catch (subHistErr) {
+        console.warn('Could not sync subscription_history for admin update:', subHistErr);
+      }
 
       // Log activity
       try {

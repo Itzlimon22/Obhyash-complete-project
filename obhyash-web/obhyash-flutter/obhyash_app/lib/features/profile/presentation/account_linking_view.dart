@@ -53,7 +53,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'গুগল অ্যাকাউন্ট পরিবর্তন',
@@ -63,7 +63,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
             ),
           ),
           content: Text(
-            'আপনি কি বর্তমান গুগল অ্যাকাউন্ট পরিবর্তন করে অন্য একটি গুগল অ্যাকাউন্ট যুক্ত করতে চান?',
+            'তুমি কি বর্তমান গুগল অ্যাকাউন্ট পরিবর্তন করে অন্য একটি গুগল অ্যাকাউন্ট যুক্ত করতে চাও?',
             style: TextStyle(
               fontSize: 14,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
@@ -119,7 +119,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF141417) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
             'গুগল অ্যাকাউন্ট আনলিঙ্ক',
@@ -129,7 +129,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
             ),
           ),
           content: Text(
-            'আপনি কি নিশ্চিত যে গুগল অ্যাকাউন্টটি এই আইডি থেকে বিচ্ছিন্ন (আনলিঙ্ক) করতে চান?',
+            'তুমি কি নিশ্চিত যে গুগল অ্যাকাউন্টটি এই আইডি থেকে বিচ্ছিন্ন (আনলিঙ্ক) করতে চাও?',
             style: TextStyle(
               fontSize: 14,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
@@ -195,7 +195,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             final isDark = Theme.of(ctx).brightness == Brightness.dark;
-            final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
+            final sheetBg = isDark ? const Color(0xFF141417) : Colors.white;
             final textPrimary = isDark ? Colors.white : const Color(0xFF111827);
             final textSecondary = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280);
             final inputBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6);
@@ -438,7 +438,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
+        final sheetBg = isDark ? const Color(0xFF141417) : Colors.white;
 
         return StatefulBuilder(
           builder: (sheetContext, setModalState) {
@@ -507,7 +507,7 @@ class _AccountLinkingViewState extends ConsumerState<AccountLinkingView> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'আপনার সক্রিয় ইমেইল অ্যাড্রেস লিখুন',
+                                  'তোমার সক্রিয় ইমেইল অ্যাড্রেস লেখো',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),

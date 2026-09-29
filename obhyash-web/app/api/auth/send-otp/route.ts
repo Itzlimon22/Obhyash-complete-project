@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     // Send SMS via Greenweb BD if token is configured
     if (smsToken && otpCode) {
       try {
-        const smsMessage = `আপনার অভ্যাস (Obhyash) ভেরিফিকেশন ওটিপি কোড: ${otpCode}। এটি কাউকে শেয়ার করবেন না। মেয়াদ ৫ মিনিট।`;
+        const smsMessage = `তোমার অভ্যাস (Obhyash) ভেরিফিকেশন ওটিপি কোড: ${otpCode}। এটি কাউকে শেয়ার করবেন না। মেয়াদ ৫ মিনিট।`;
         const params = new URLSearchParams({
           token: smsToken,
           to: cleanPhone,

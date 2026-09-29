@@ -258,7 +258,7 @@ export default function OfficialReceiptModal({
             </div>
 
             <p className="text-center text-[11px] text-slate-400 pt-1 font-['HindSiliguri',sans-serif]">
-              অভ্যাস (Obhyash) প্ল্যাটফর্ম ব্যবহার করার জন্য আপনাকে ধন্যবাদ!
+              অভ্যাস (Obhyash) প্ল্যাটফর্ম ব্যবহার করার জন্য তোমাকে ধন্যবাদ!
             </p>
           </div>
         </div>

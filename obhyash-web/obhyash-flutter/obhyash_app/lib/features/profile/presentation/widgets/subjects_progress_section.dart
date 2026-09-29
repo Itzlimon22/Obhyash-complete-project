@@ -20,55 +20,8 @@ class SubjectsProgressSection extends StatelessWidget {
   });
 
   String _formatSubjectName(String name) {
-    if (name.isEmpty) return name;
-    final l = name.toLowerCase();
-
-    String subjectPart = name;
-    if (l.contains('physics')) {
-      subjectPart = 'পদার্থবিজ্ঞান';
-    } else if (l.contains('chemistry')) {
-      subjectPart = 'রসায়ন';
-    } else if (l.contains('biology') || l.contains('botany') || l.contains('zoology')) {
-      subjectPart = 'জীববিজ্ঞান';
-    } else if (l.contains('math') || l.contains('higher_math')) {
-      subjectPart = 'উচ্চতর গণিত';
-    } else if (l.contains('bangla')) {
-      subjectPart = 'বাংলা';
-    } else if (l.contains('english')) {
-      subjectPart = 'ইংরেজি';
-    } else if (l.contains('ict')) {
-      subjectPart = 'আইসিটি';
-    } else if (l.contains('accounting')) {
-      subjectPart = 'হিসাববিজ্ঞান';
-    } else if (l.contains('finance')) {
-      subjectPart = 'ফাইনান্স';
-    } else if (l.contains('management')) {
-      subjectPart = 'ব্যবসায় সংগঠন';
-    } else if (l.contains('general_science')) {
-      subjectPart = 'সাধারণ বিজ্ঞান';
-    } else if (l.contains('bgs') || l.contains('bangladesh_and_global_studies')) {
-      subjectPart = 'বাংলাদেশ ও বিশ্বপরিচয়';
-    } else if (l.contains('general_knowledge') || l.contains('gk')) {
-      subjectPart = 'সাধারণ জ্ঞান';
-    } else if (l.contains('general')) {
-      subjectPart = 'সাধারণ';
-    } else {
-      if (!name.contains('_')) return name;
-      return name.split('_').map((word) {
-        if (word.isEmpty) return word;
-        if (word.toLowerCase() == 'hsc' || word.toLowerCase() == 'ssc') return word.toUpperCase();
-        return word[0].toUpperCase() + word.substring(1).toLowerCase();
-      }).join(' ');
-    }
-
-    String suffix = '';
-    if (l.endsWith('_1')) {
-      suffix = ' ১ম পত্র';
-    } else if (l.endsWith('_2')) {
-      suffix = ' ২য় পত্র';
-    }
-
-    return '$subjectPart$suffix';
+    // Return only the base Bengali subject name — no paper suffixes, no institute tags
+    return BanglaNameHelper.getMainSubjectName(name);
   }
 
   int _calculateAccuracy(SubjectStats stat) {
@@ -163,7 +116,7 @@ class SubjectsProgressSection extends StatelessWidget {
             maxHeight: MediaQuery.of(context).size.height * 0.50,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : Colors.white,
+            color: isDark ? const Color(0xFF141417) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
               color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
@@ -451,9 +404,39 @@ class SubjectsProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final validStats = subjectStats
+    // Filter to academic subjects only, then merge duplicates by base subject name
+    final rawStats = subjectStats
         .where((s) => BanglaNameHelper.isAcademicSubject(s.id) || BanglaNameHelper.isAcademicSubject(s.name))
         .toList();
+
+    // Group by canonical base name so e.g. "physics_1" and "physics_2" merge into one
+    final Map<String, SubjectStats> merged = {};
+    for (final stat in rawStats) {
+      final baseName = BanglaNameHelper.getMainSubjectName(stat.name);
+      if (merged.containsKey(baseName)) {
+        final prev = merged[baseName]!;
+        merged[baseName] = SubjectStats(
+          id: prev.id,
+          name: baseName,
+          correct: prev.correct + stat.correct,
+          wrong: prev.wrong + stat.wrong,
+          skipped: prev.skipped + stat.skipped,
+          total: prev.total + stat.total,
+          examsCount: prev.examsCount + stat.examsCount,
+        );
+      } else {
+        merged[baseName] = SubjectStats(
+          id: stat.id,
+          name: baseName,
+          correct: stat.correct,
+          wrong: stat.wrong,
+          skipped: stat.skipped,
+          total: stat.total,
+          examsCount: stat.examsCount,
+        );
+      }
+    }
+    final validStats = merged.values.toList();
 
     if (validStats.isEmpty) {
       return Container(

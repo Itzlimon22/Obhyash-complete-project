@@ -76,7 +76,7 @@ export const ReferralDashboard: React.FC = () => {
 
   return (
     <section className={styles.dashboard}>
-      <h1 className={styles.title}>আপনার রেফারেল ড্যাশবোর্ড</h1>
+      <h1 className={styles.title}>তোমার রেফারেল ড্যাশবোর্ড</h1>
       {data?.is_enabled === false && (
         <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-sm font-medium font-anek">
           ⚠️ <strong>নোটিশ:</strong> বর্তমানে রেফারেল প্রোগ্রাম সাময়িকভাবে স্থগিত আছে। শীঘ্রই পুনরায় চালু করা হবে।
@@ -84,7 +84,7 @@ export const ReferralDashboard: React.FC = () => {
       )}
       {data?.referral ? (
         <div className={styles.codeBox}>
-          <p className={styles.label}>আপনার কোড</p>
+          <p className={styles.label}>তোমার কোড</p>
           <div className={styles.codeContainer}>
             <span className={styles.code}>{data.referral.code}</span>
             <button className={styles.copyBtn} onClick={copyCode}>
@@ -96,7 +96,7 @@ export const ReferralDashboard: React.FC = () => {
           </div>
         </div>
       ) : (
-        <p className={styles.noCode}>আপনি এখনও কোনো রেফারেল কোড তৈরি করেননি।</p>
+        <p className={styles.noCode}>তুমি এখনও কোনো রেফারেল কোড তৈরি করোনি।</p>
       )}
 
       {data?.referral && (
@@ -120,7 +120,7 @@ export const ReferralDashboard: React.FC = () => {
             </div>
             <p className="mt-3 text-sm text-slate-500 font-anek">
               {3 - ((data.totalApproved || 0) % 3) === 3 && (data.totalApproved || 0) > 0
-                ? 'অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
+                ? 'অভিনন্দন! তুমি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছ!'
                 : `আর মাত্র ${3 - ((data.totalApproved || 0) % 3)} টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!`}
             </p>
           </div>
@@ -129,7 +129,7 @@ export const ReferralDashboard: React.FC = () => {
           {data.scratchCards?.length > 0 && (
             <div className="mt-8">
               <h2 className="text-xl font-bold font-anek text-slate-900 dark:text-slate-100 mb-4">
-                আপনার স্ক্র্যাচ কার্ডসমূহ
+                তোমার স্ক্র্যাচ কার্ডসমূহ
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {data.scratchCards.map((card) => (

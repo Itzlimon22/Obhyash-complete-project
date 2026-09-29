@@ -35,8 +35,8 @@ class DownloadNotificationService {
 
     if (name.startsWith('_')) name = name.substring(1);
     if (name.endsWith('_')) name = name.substring(0, name.length - 1);
-    if (name.length > 35) {
-      name = name.substring(0, 35);
+    if (name.length > 50) {
+      name = name.substring(0, 50);
     }
     return '$name.pdf';
   }
@@ -48,8 +48,8 @@ class DownloadNotificationService {
         .replaceAll(RegExp(r'_\d{10,}'), '')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
-    if (title.length > 40) {
-      title = title.substring(0, 40);
+    if (title.length > 50) {
+      title = title.substring(0, 50);
     }
     return title;
   }
@@ -59,10 +59,14 @@ class DownloadNotificationService {
     required List<int> bytes,
     required String rawFileName,
     required String notificationTitle,
+    String? subtitle,
     BuildContext? context,
   }) async {
     final finalFileName = compactFileName(rawFileName);
     final finalTitle = cleanTitle(notificationTitle);
+    final finalSubtitle = (subtitle != null && subtitle.trim().isNotEmpty)
+        ? subtitle.trim()
+        : 'ডাউনলোড সফল হয়েছে • ট্যাপ করে পিডিএফ দেখুন';
     final byteData = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
 
     if (Platform.isAndroid) {
@@ -82,6 +86,7 @@ class DownloadNotificationService {
             'bytes': byteData,
             'fileName': finalFileName,
             'title': finalTitle,
+            'subtitle': finalSubtitle,
           },
         );
         debugPrint('[DownloadNotificationService] Successfully saved to public Downloads: $uriResult');
@@ -101,7 +106,7 @@ class DownloadNotificationService {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'ডাউনলোড সম্পন্ন: $finalFileName',
+                      '$finalTitle • $finalSubtitle',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.white, fontSize: 13),

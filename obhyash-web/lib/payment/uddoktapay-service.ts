@@ -331,8 +331,8 @@ export async function activateSubscriptionFromUddoktaPay(params: {
     await supabaseAdmin.from('notifications').insert({
       user_id: userId,
       title: '🎉 অভিনন্দন! তোমার প্রো সাবস্ক্রিপশন সক্রিয় হয়েছে',
-      message: `আপনার ${planDisplayName} সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${formattedExpiry} পর্যন্ত।`,
-      body: `আপনার ${planDisplayName} সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${formattedExpiry} পর্যন্ত।`,
+      message: `তোমার ${planDisplayName} সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${formattedExpiry} পর্যন্ত।`,
+      body: `তোমার ${planDisplayName} সফলভাবে সক্রিয় করা হয়েছে। মেয়াদ: ${formattedExpiry} পর্যন্ত।`,
       link: '/profile/my-subscription',
       data: { route: '/profile/my-subscription' },
       type: 'system',

@@ -69,7 +69,9 @@ class AppTheme {
 
   static TextTheme _applyDualFontStack(TextTheme theme) {
     final interFont = GoogleFonts.inter().fontFamily;
-    TextStyle apply(TextStyle? style) {
+
+    // Inter primary for structural/UI text (headings, titles, labels)
+    TextStyle applyInter(TextStyle? style) {
       final s = style ?? const TextStyle();
       return s.copyWith(
         fontFamily: interFont,
@@ -77,22 +79,32 @@ class AppTheme {
       );
     }
 
+    // HindSiliguri primary for body/paragraph text at normal weight
+    TextStyle applyHind(TextStyle? style) {
+      final s = style ?? const TextStyle();
+      return s.copyWith(
+        fontFamily: 'HindSiliguri',
+        fontFamilyFallback: [interFont ?? 'Inter', 'sans-serif'],
+        fontWeight: FontWeight.w400,
+      );
+    }
+
     return theme.copyWith(
-      displayLarge: apply(theme.displayLarge),
-      displayMedium: apply(theme.displayMedium),
-      displaySmall: apply(theme.displaySmall),
-      headlineLarge: apply(theme.headlineLarge),
-      headlineMedium: apply(theme.headlineMedium),
-      headlineSmall: apply(theme.headlineSmall),
-      titleLarge: apply(theme.titleLarge),
-      titleMedium: apply(theme.titleMedium),
-      titleSmall: apply(theme.titleSmall),
-      bodyLarge: apply(theme.bodyLarge),
-      bodyMedium: apply(theme.bodyMedium),
-      bodySmall: apply(theme.bodySmall),
-      labelLarge: apply(theme.labelLarge),
-      labelMedium: apply(theme.labelMedium),
-      labelSmall: apply(theme.labelSmall),
+      displayLarge: applyInter(theme.displayLarge),
+      displayMedium: applyInter(theme.displayMedium),
+      displaySmall: applyInter(theme.displaySmall),
+      headlineLarge: applyInter(theme.headlineLarge),
+      headlineMedium: applyInter(theme.headlineMedium),
+      headlineSmall: applyInter(theme.headlineSmall),
+      titleLarge: applyInter(theme.titleLarge),
+      titleMedium: applyInter(theme.titleMedium),
+      titleSmall: applyInter(theme.titleSmall),
+      bodyLarge: applyHind(theme.bodyLarge),
+      bodyMedium: applyHind(theme.bodyMedium),
+      bodySmall: applyHind(theme.bodySmall),
+      labelLarge: applyInter(theme.labelLarge),
+      labelMedium: applyInter(theme.labelMedium),
+      labelSmall: applyInter(theme.labelSmall),
     );
   }
 
@@ -428,8 +440,9 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: const Color(0xFF000000), // OLED Pure Black
-        elevation: 0,
+        backgroundColor: const Color(0xFF141417), // Elevated Dark Grey
+        elevation: 8,
+        shadowColor: Colors.black.withValues(alpha: 0.5),
         titleTextStyle: const TextStyle(
           fontFamily: 'HindSiliguri',
           fontSize: 18,
@@ -443,19 +456,19 @@ class AppTheme {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: Color.fromARGB(255, 18, 18, 20), width: 1),
+          side: const BorderSide(color: Color(0xFF27272A), width: 1),
         ),
       ),
       datePickerTheme: const DatePickerThemeData(
-        backgroundColor: Color(0xFF171717),
+        backgroundColor: Color(0xFF141417),
         headerBackgroundColor: Color(0xFF064E3B),
         headerForegroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         dividerColor: Color(0xFF27272A),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Color(0xFF000000), // OLED Pure Black
-        elevation: 0,
+        backgroundColor: Color(0xFF141417), // Elevated Dark Grey
+        elevation: 10,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),

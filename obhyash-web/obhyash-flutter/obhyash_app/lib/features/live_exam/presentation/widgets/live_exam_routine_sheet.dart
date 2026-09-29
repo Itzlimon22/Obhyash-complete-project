@@ -5,34 +5,9 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../../../../core/services/download_notification_service.dart';
-import '../../providers/live_exam_providers.dart';
-import '../../domain/models.dart';
+import '../../services/live_exam_routine_service.dart';
 
-class RoutineItemModel {
-  final String id;
-  final String date;
-  final String dayName;
-  final String time;
-  final String subject;
-  final String paper;
-  final List<String> chapters;
-  final int totalMarks;
-  final int durationMinutes;
-
-  const RoutineItemModel({
-    required this.id,
-    required this.date,
-    required this.dayName,
-    required this.time,
-    required this.subject,
-    required this.paper,
-    required this.chapters,
-    required this.totalMarks,
-    required this.durationMinutes,
-  });
-}
-
-class LiveExamRoutineSheet extends ConsumerWidget {
+class LiveExamRoutineSheet extends ConsumerStatefulWidget {
   final String categoryTitle;
 
   const LiveExamRoutineSheet({
@@ -50,7 +25,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     );
   }
 
-  static String _toBanglaDigits(dynamic number) {
+  static String toBanglaDigits(dynamic number) {
     const en = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
     String s = number.toString();
@@ -62,6 +37,13 @@ class LiveExamRoutineSheet extends ConsumerWidget {
 
   static String formatCategoryTitle(String cat) {
     switch (cat.toLowerCase().trim()) {
+      case 'medical':
+        return 'মেডিকেল ভর্তি';
+      case 'engineering':
+        return 'ইঞ্জিনিয়ারিং ভর্তি';
+      case 'varsity':
+      case 'varsity_a':
+        return 'ঢাবি ক-ইউনিট ভর্তি';
       case 'ssc_board':
         return 'এসএসসি বোর্ড মডেল';
       case 'ssc_school':
@@ -74,328 +56,86 @@ class LiveExamRoutineSheet extends ConsumerWidget {
         return 'এসএসসি মানবিক বিভাগ';
       case 'ssc_compulsory':
         return 'এসএসসি আবশ্যিক বিষয়';
-      case 'engineering':
-        return 'ইঞ্জিনিয়ারিং ভর্তি';
-      case 'medical':
-        return 'মেডিকেল ভর্তি';
-      case 'varsity':
-      case 'varsity_a':
-        return 'ভার্সিটি ক-ইউনিট';
-      case 'hsc':
-        return 'এইচএসসি স্পেশাল';
-      case 'all':
-        return 'সকল লাইভ পরীক্ষা';
       default:
-        if (cat.toLowerCase().startsWith('ssc_')) {
-          return 'এসএসসি ${cat.substring(4).toUpperCase()}';
-        }
-        return cat;
+        return cat.isNotEmpty ? cat : 'ভর্তি পরীক্ষা';
     }
   }
 
-  static List<RoutineItemModel> _convertLiveExamsToRoutine(
-      List<LiveExam> exams, String category) {
-    if (exams.isEmpty) return [];
+  @override
+  ConsumerState<LiveExamRoutineSheet> createState() => _LiveExamRoutineSheetState();
+}
 
-    const bnMonths = [
-      '',
-      'জানুয়ারি',
-      'ফেব্রুয়ারি',
-      'মার্চ',
-      'এপ্রিল',
-      'মে',
-      'জুন',
-      'জুলাই',
-      'আগস্ট',
-      'সেপ্টেম্বর',
-      'অক্টোবর',
-      'নভেম্বর',
-      'ডিসেম্বর'
-    ];
-    const bnDays = [
-      '',
-      'সোমবার',
-      'মঙ্গলবার',
-      'বুধবার',
-      'বৃহস্পতিবার',
-      'শুক্রবার',
-      'শনিবার',
-      'রবিবার'
-    ];
+class _LiveExamRoutineSheetState extends ConsumerState<LiveExamRoutineSheet> {
+  late String _activeTrack;
+  List<GoogleSheetRoutineItem> _items = [];
+  bool _isLoading = true;
+  String _searchQuery = '';
 
-    // Sort upcoming exams chronologically
-    final sortedExams = List<LiveExam>.from(exams)
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+  static const List<Map<String, String>> _tracks = [
+    {'key': 'Medical', 'label': 'মেডিকেল', 'badge': 'MBBS ২০২৬-২৭'},
+    {'key': 'Engineering', 'label': 'ইঞ্জিনিয়ারিং', 'badge': 'BUET/CKRUET'},
+    {'key': 'Varsity_A', 'label': 'ঢাবি \'ক\' ইউনিট', 'badge': 'DU Science'},
+  ];
 
-    return sortedExams.map((exam) {
-      final d = exam.startTime;
-      final dateStr =
-          '${_toBanglaDigits(d.day)} ${bnMonths[d.month]} ${_toBanglaDigits(d.year)}';
-      final dayStr = bnDays[d.weekday];
+  @override
+  void initState() {
+    super.initState();
+    _activeTrack = LiveExamGoogleSheetService.getSheetName(widget.categoryTitle);
+    _loadRoutineData();
+  }
 
-      final hour = d.hour;
-      final minute = d.minute.toString().padLeft(2, '0');
-      final period = hour >= 18
-          ? 'রাত'
-          : (hour >= 12
-              ? 'দুপুর'
-              : (hour >= 6
-                  ? 'সকাল'
-                  : 'রাত'));
-      final h12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-      final timeStr = '$period ${_toBanglaDigits(h12)}:${_toBanglaDigits(minute)}';
+  Future<void> _loadRoutineData() async {
+    setState(() => _isLoading = true);
+    final data = await LiveExamGoogleSheetService.fetchRoutine(_activeTrack);
+    if (mounted) {
+      setState(() {
+        _items = data;
+        _isLoading = false;
+      });
+    }
+  }
 
-      // Parse chapters from description
-      List<String> chapters = [];
-      if (exam.description.trim().isNotEmpty) {
-        chapters = exam.description
-            .split(RegExp(r'[,;\n]'))
-            .map((c) => c.trim())
-            .where((c) => c.isNotEmpty)
-            .toList();
-      }
-      if (chapters.isEmpty) {
-        chapters = ['সম্পূর্ণ সিলেবাস'];
-      }
+  void _switchTrack(String trackKey) {
+    if (_activeTrack == trackKey) return;
+    setState(() {
+      _activeTrack = trackKey;
+    });
+    _loadRoutineData();
+  }
 
-      return RoutineItemModel(
-        id: exam.id,
-        date: dateStr,
-        dayName: dayStr,
-        time: timeStr,
-        subject: exam.title,
-        paper: exam.category.toUpperCase(),
-        chapters: chapters,
-        totalMarks: exam.totalMarks.toInt() > 0
-            ? exam.totalMarks.toInt()
-            : (exam.totalQuestions > 0 ? exam.totalQuestions : 25),
-        durationMinutes: exam.durationMinutes > 0 ? exam.durationMinutes : 30,
-      );
+  List<GoogleSheetRoutineItem> get _filteredItems {
+    if (_searchQuery.trim().isEmpty) return _items;
+    final q = _searchQuery.toLowerCase().trim();
+    return _items.where((item) {
+      return item.examName.toLowerCase().contains(q) ||
+          item.subject.toLowerCase().contains(q) ||
+          item.syllabus.toLowerCase().contains(q) ||
+          item.date.toLowerCase().contains(q) ||
+          item.dayName.toLowerCase().contains(q);
     }).toList();
   }
 
-  static const List<RoutineItemModel> _defaultHscRoutineList = [
-    RoutineItemModel(
-      id: 'hsc-1',
-      date: '১৮ আগস্ট ২০২৬',
-      dayName: 'মঙ্গলবার',
-      time: 'রাত ৮:০০ - ৯:০০',
-      subject: 'পদার্থবিজ্ঞান ১ম পত্র',
-      paper: '১ম পত্র',
-      chapters: ['অধ্যায় ২: ভেক্টর', 'অধ্যায় ৩: গতিবিদ্যা'],
-      totalMarks: 50,
-      durationMinutes: 45,
-    ),
-    RoutineItemModel(
-      id: 'hsc-2',
-      date: '২০ আগস্ট ২০২৬',
-      dayName: 'বৃহস্পতিবার',
-      time: 'রাত ৮:০০ - ৯:০০',
-      subject: 'রসায়ন ১ম পত্র',
-      paper: '১ম পত্র',
-      chapters: ['অধ্যায় ২: গুণগত রসায়ন', 'অধ্যায় ৩: পর্যায়বৃত্ত ধর্ম'],
-      totalMarks: 50,
-      durationMinutes: 45,
-    ),
-    RoutineItemModel(
-      id: 'hsc-3',
-      date: '২২ আগস্ট ২০২৬',
-      dayName: 'শনিবার',
-      time: 'রাত ৮:০০ - ৯:০০',
-      subject: 'উচ্চতর গণিত ১ম পত্র',
-      paper: '১ম পত্র',
-      chapters: ['অধ্যায় ১: ম্যাট্রিক্স ও নির্ণায়ক', 'অধ্যায় ৯: অন্তরীকরণ'],
-      totalMarks: 50,
-      durationMinutes: 45,
-    ),
-  ];
+  Future<void> _downloadPdf(BuildContext context) async {
+    if (_items.isEmpty) return;
 
-  static const List<RoutineItemModel> _defaultSscScienceRoutineList = [
-    RoutineItemModel(
-      id: 'ssc-sci-1',
-      date: '১৮ আগস্ট ২০২৬',
-      dayName: 'মঙ্গলবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'পদার্থবিজ্ঞান',
-      paper: 'বিজ্ঞান',
-      chapters: ['অধ্যায় ২: গতি', 'অধ্যায় ৩: বল'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-sci-2',
-      date: '২০ আগস্ট ২০২৬',
-      dayName: 'বৃহস্পতিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'রসায়ন',
-      paper: 'বিজ্ঞান',
-      chapters: ['অধ্যায় ৩: পদার্থের গঠন', 'অধ্যায় ৪: পর্যায় সারণি'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-sci-3',
-      date: '২২ আগস্ট ২০২৬',
-      dayName: 'শনিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'জীববিজ্ঞান',
-      paper: 'বিজ্ঞান',
-      chapters: ['অধ্যায় ২: জীবকোষ ও টিস্যু', 'অধ্যায় ৪: জীবনীশক্তি'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-sci-4',
-      date: '২৪ আগস্ট ২০২৬',
-      dayName: 'সোমবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'উচ্চতর গণিত',
-      paper: 'বিজ্ঞান',
-      chapters: ['অধ্যায় ২: বীজগাণিতিক রাশি', 'অধ্যায় ৭: অসীম ধারা'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-  ];
-
-  static const List<RoutineItemModel> _defaultSscBusinessRoutineList = [
-    RoutineItemModel(
-      id: 'ssc-biz-1',
-      date: '১৮ আগস্ট ২০২৬',
-      dayName: 'মঙ্গলবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'হিসাববিজ্ঞান',
-      paper: 'বাণিজ্য',
-      chapters: ['অধ্যায় ২: লেনদেন', 'অধ্যায় ৩: দুতরফা দাখিলা পদ্ধতি'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-biz-2',
-      date: '২০ আগস্ট ২০২৬',
-      dayName: 'বৃহস্পতিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'ব্যবসায় উদ্যোগ',
-      paper: 'বাণিজ্য',
-      chapters: ['অধ্যায় ১: ব্যবসায় পরিচিতি', 'অধ্যায় ৩: আত্মকর্মসংস্থান'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-biz-3',
-      date: '২২ আগস্ট ২০২৬',
-      dayName: 'শনিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'ফিন্যান্স ও ব্যাংকিং',
-      paper: 'বাণিজ্য',
-      chapters: ['অধ্যায় ৩: অর্থের সময়মূল্য', 'অধ্যায় ৪: ঝুঁকি ও অনিশ্চয়তা'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-  ];
-
-  static const List<RoutineItemModel> _defaultSscHumanitiesRoutineList = [
-    RoutineItemModel(
-      id: 'ssc-hum-1',
-      date: '১৮ আগস্ট ২০২৬',
-      dayName: 'মঙ্গলবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'বাংলাদেশের ইতিহাস ও বিশ্বসভ্যতা',
-      paper: 'মানবিক',
-      chapters: ['অধ্যায় ১: ইতিহাস পরিচিতি', 'অধ্যায় ২: বিশ্বসভ্যতা'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-hum-2',
-      date: '২০ আগস্ট ২০২৬',
-      dayName: 'বৃহস্পতিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'ভূগোল ও পরিবেশ',
-      paper: 'মানবিক',
-      chapters: ['অধ্যায় ১: ভূগোল ও পরিবেশ', 'অধ্যায় ২: মহাবিশ্ব ও আমাদের পৃথিবী'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-hum-3',
-      date: '২২ আগস্ট ২০২৬',
-      dayName: 'শনিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'পৌরনীতি ও নাগরিকতা',
-      paper: 'মানবিক',
-      chapters: ['অধ্যায় ১: পৌরনীতি ও নাগরিকতা', 'অধ্যায় ৪: রাষ্ট্র ও সরকার ব্যবস্থা'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-  ];
-
-  static const List<RoutineItemModel> _defaultSscCompulsoryRoutineList = [
-    RoutineItemModel(
-      id: 'ssc-comp-1',
-      date: '১৮ আগস্ট ২০২৬',
-      dayName: 'মঙ্গলবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'বাংলা ১ম পত্র',
-      paper: 'আবশ্যিক',
-      chapters: ['গদ্য: শুভা, বই পড়া', 'পদ্য: বঙ্গবাণী, কপোতাক্ষ নদ'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-comp-2',
-      date: '২০ আগস্ট ২০২৬',
-      dayName: 'বৃহস্পতিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'সাধারণ গণিত',
-      paper: 'আবশ্যিক',
-      chapters: ['অধ্যায় ২: সেট ও ফাংশন', 'অধ্যায় ৩: বীজগাণিতিক রাশি'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-comp-3',
-      date: '২২ আগস্ট ২০২৬',
-      dayName: 'শনিবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'ইংরেজি ১ম পত্র',
-      paper: 'আবশ্যিক',
-      chapters: ['Unit 1: Good Citizens', 'Unit 3: Events and Festivals'],
-      totalMarks: 40,
-      durationMinutes: 40,
-    ),
-    RoutineItemModel(
-      id: 'ssc-comp-4',
-      date: '২৪ আগস্ট ২০২৬',
-      dayName: 'সোমবার',
-      time: 'সন্ধ্যা ৭:৩০ - ৮:৩০',
-      subject: 'তথ্য ও যোগাযোগ প্রযুক্তি',
-      paper: 'আবশ্যিক',
-      chapters: ['অধ্যায় ১: তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', 'অধ্যায় ২: কম্পিউটার নিরাপত্তা'],
-      totalMarks: 25,
-      durationMinutes: 25,
-    ),
-  ];
-
-  Future<void> _downloadPdf(
-      BuildContext context, List<RoutineItemModel> routineList, bool isHSC,
-      {String categoryTitle = ''}) async {
-    final banglaRegular = await PdfGoogleFonts.notoSerifBengaliRegular();
-    final banglaBold = await PdfGoogleFonts.notoSerifBengaliBold();
-    final timesRegular = await PdfGoogleFonts.tinosRegular();
-    final timesBold = await PdfGoogleFonts.tinosBold();
+    final fontRegular = await PdfGoogleFonts.hindSiliguriRegular();
+    final fontBold = await PdfGoogleFonts.hindSiliguriBold();
 
     final theme = pw.ThemeData.withFont(
-      base: banglaRegular,
-      bold: banglaBold,
-      fontFallback: [banglaRegular, banglaBold, timesRegular, timesBold],
+      base: fontRegular,
+      bold: fontBold,
     );
 
     final pdf = pw.Document(theme: theme);
+    final trackName = _tracks.firstWhere(
+      (t) => t['key'] == _activeTrack,
+      orElse: () => {'label': 'ভর্তি পরীক্ষা'},
+    )['label']!;
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        margin: const pw.EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         theme: theme,
         build: (pw.Context ctx) {
           return [
@@ -415,7 +155,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                       ),
                       alignment: pw.Alignment.center,
                       child: pw.Text(
-                        'O',
+                        'অ',
                         style: pw.TextStyle(
                           color: PdfColors.white,
                           fontSize: 20,
@@ -428,35 +168,32 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Text(
-                          'Obhyash (অভ্যাস)',
+                          'অভ্যাস (Obhyash)',
                           style: pw.TextStyle(
-                            fontSize: 17,
+                            fontSize: 18,
                             fontWeight: pw.FontWeight.bold,
                             color: PdfColor.fromHex('004633'),
                           ),
                         ),
                         pw.Text(
-                          'স্মার্ট অনলাইন পরীক্ষা ও প্রস্তুতি প্ল্যাটফর্ম',
-                          style: const pw.TextStyle(
-                            fontSize: 9,
-                            color: PdfColors.grey700,
-                          ),
+                          'স্মার্ট লাইভ পরীক্ষা প্রস্তুতি প্ল্যাটফর্ম • obhyash.com',
+                          style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
                         ),
                       ],
                     ),
                   ],
                 ),
                 pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: pw.BoxDecoration(
                     color: PdfColor.fromHex('E8F5E9'),
-                    borderRadius: pw.BorderRadius.circular(20),
+                    borderRadius: pw.BorderRadius.circular(16),
                     border: pw.Border.all(color: PdfColor.fromHex('A5D6A7')),
                   ),
                   child: pw.Text(
                     'অফিশিয়াল লাইভ রুটিন',
                     style: pw.TextStyle(
-                      fontSize: 10,
+                      fontSize: 9.5,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColor.fromHex('004633'),
                     ),
@@ -464,104 +201,101 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                 ),
               ],
             ),
-            pw.SizedBox(height: 14),
-            pw.Divider(color: PdfColor.fromHex('004633'), thickness: 1.2),
             pw.SizedBox(height: 10),
+            pw.Divider(color: PdfColor.fromHex('004633'), thickness: 1.2),
+            pw.SizedBox(height: 8),
 
-            // Category & Routine Info Banner
+            // Title Banner
             pw.Container(
               width: double.infinity,
-              padding: const pw.EdgeInsets.all(12),
+              padding: const pw.EdgeInsets.all(10),
               decoration: pw.BoxDecoration(
                 color: PdfColor.fromHex('F8FAF9'),
-                borderRadius: pw.BorderRadius.circular(8),
+                borderRadius: pw.BorderRadius.circular(6),
                 border: pw.Border.all(color: PdfColor.fromHex('E0E7E3')),
               ),
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
-                    categoryTitle.isNotEmpty
-                        ? '${formatCategoryTitle(categoryTitle)} লাইভ পরীক্ষা ও সিলেবাস রুটিন'
-                        : (isHSC
-                            ? 'এইচএসসি (HSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন'
-                            : 'এসএসসি (SSC) লাইভ পরীক্ষা ও সিলেবাস রুটিন'),
+                    '$trackName - সাপ্তাহিক লাইভ পরীক্ষা ও পূর্ণাঙ্গ সিলেবাস ২০২৬-২৭',
                     style: pw.TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColor.fromHex('004633'),
                     ),
                   ),
-                  pw.SizedBox(height: 3),
+                  pw.SizedBox(height: 2),
                   pw.Text(
-                    'পরীক্ষার নির্ধারিত সময়ে অ্যাপে প্রবেশ করে লাইভ পরীক্ষায় অংশ নিন। নিচে প্রতিটি পরীক্ষার তারিখ, সময় ও বিস্তারিত সিলেবাস দেওয়া হলো।',
-                    style: const pw.TextStyle(fontSize: 9.5, color: PdfColors.grey800),
+                    'সাপ্তাহিক লাইভ পরীক্ষা প্রতি রবিবার, মঙ্গলবার, বৃহস্পতিবার এবং শুক্রবার রাত ৮:০০ টা থেকে রাত ১১:০০ টা পর্যন্ত লাইভ থাকবে।',
+                    style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey800),
                   ),
                 ],
               ),
             ),
-            pw.SizedBox(height: 14),
+            pw.SizedBox(height: 10),
 
-            // Organized Table of Routine & Syllabus
+            // Table
             pw.TableHelper.fromTextArray(
               headers: [
                 'ক্রম',
-                'পরীক্ষার নাম ও বিষয়',
                 'তারিখ ও বার',
-                'সময় ও নম্বর',
-                'সিলেবাস ও অধ্যায়সমূহ',
+                'পরীক্ষার নাম ও বিষয়',
+                'সিলেবাস (অধ্যায়সমূহ)',
+                'নম্বর ও সময়',
               ],
               columnWidths: {
-                0: const pw.FixedColumnWidth(26),
-                1: const pw.FlexColumnWidth(2.0),
+                0: const pw.FixedColumnWidth(24),
+                1: const pw.FlexColumnWidth(1.6),
                 2: const pw.FlexColumnWidth(2.0),
-                3: const pw.FlexColumnWidth(1.6),
-                4: const pw.FlexColumnWidth(3.0),
+                3: const pw.FlexColumnWidth(3.8),
+                4: const pw.FlexColumnWidth(1.6),
               },
               headerStyle: pw.TextStyle(
-                fontSize: 9.5,
+                fontSize: 9,
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.white,
               ),
               headerDecoration: pw.BoxDecoration(
                 color: PdfColor.fromHex('004633'),
-                borderRadius: const pw.BorderRadius.vertical(top: pw.Radius.circular(6)),
               ),
-              cellStyle: const pw.TextStyle(fontSize: 9),
-              cellAlignment: pw.Alignment.centerLeft,
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 7),
-              data: routineList.asMap().entries.map((entry) {
+              cellStyle: const pw.TextStyle(fontSize: 8.5),
+              cellAlignment: pw.Alignment.topLeft,
+              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              data: _items.asMap().entries.map((entry) {
                 final idx = entry.key + 1;
                 final item = entry.value;
                 return [
-                  _toBanglaDigits(idx),
-                  item.subject,
+                  LiveExamRoutineSheet.toBanglaDigits(idx),
                   '${item.date}\n(${item.dayName})',
-                  '${item.time}\n${_toBanglaDigits(item.durationMinutes)} মি. | ${_toBanglaDigits(item.totalMarks)} নম্বর',
-                  item.chapters.join(', '),
+                  '${item.examName}\n(${item.subject})',
+                  item.chapters.join('; '),
+                  '${LiveExamRoutineSheet.toBanglaDigits(item.totalMarks)} নম্বর\n${LiveExamRoutineSheet.toBanglaDigits(item.durationMinutes)} মিনিট',
                 ];
               }).toList(),
             ),
 
-            pw.SizedBox(height: 20),
+            pw.SizedBox(height: 12),
 
             // Notice Box
             pw.Container(
-              padding: const pw.EdgeInsets.all(10),
+              padding: const pw.EdgeInsets.all(8),
               decoration: pw.BoxDecoration(
                 color: PdfColor.fromHex('F3F4F6'),
                 borderRadius: pw.BorderRadius.circular(6),
                 border: pw.Border.all(color: PdfColor.fromHex('E5E7EB')),
               ),
-              child: pw.Row(
+              child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text('📌 ', style: const pw.TextStyle(fontSize: 10)),
-                  pw.Expanded(
-                    child: pw.Text(
-                      'পরীক্ষা সমাপ্ত হওয়ার পর স্বয়ংক্রিয়ভাবে বিস্তারিত সমাধান, সঠিক উত্তর ও মেধা তালিকা (Leaderboard) প্রকাশিত হবে। যেকোনো প্রয়োজনে আমাদের সাপোর্ট টিমের সাথে যোগাযোগ করুন।',
-                      style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey800),
-                    ),
+                  pw.Text(
+                    '📌 নির্দেশাবলী:',
+                    style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('004633')),
+                  ),
+                  pw.SizedBox(height: 2),
+                  pw.Text(
+                    '১. প্রতিটি ভুল উত্তরের জন্য ০.২৫ নম্বর কর্তন করা হবে।\n২. পরীক্ষা সমাপ্তির পর স্বয়ংক্রিয়ভাবে বিস্তারিত সমাধান ও মেধা তালিকা (Leaderboard) প্রকাশিত হবে।',
+                    style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey800),
                   ),
                 ],
               ),
@@ -572,15 +306,14 @@ class LiveExamRoutineSheet extends ConsumerWidget {
     );
 
     final bytes = await pdf.save();
-    final fileName = 'Obhyash_Routine';
+    final fileName = 'Obhyash_${_activeTrack}_Routine';
 
     try {
       final file = await DownloadNotificationService().savePdfAndNotify(
         bytes: bytes,
         rawFileName: fileName,
-        notificationTitle: categoryTitle.isNotEmpty
-            ? '${formatCategoryTitle(categoryTitle)} রুটিন'
-            : 'পরীক্ষার রুটিন',
+        notificationTitle: '$trackName রুটিন',
+        subtitle: 'ডাউনলোড সফল হয়েছে • ট্যাপ করে রুটিন দেখুন',
         context: context.mounted ? context : null,
       );
 
@@ -593,42 +326,16 @@ class LiveExamRoutineSheet extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final formattedTitle = formatCategoryTitle(categoryTitle);
-    final catLower = categoryTitle.toLowerCase().trim();
-    final isHSC = catLower.contains('hsc') || categoryTitle.contains('এইচএসসি');
-
-    final liveExamsAsync = ref.watch(liveExamsCategoryProvider(categoryTitle));
-    final dynamicRoutine = liveExamsAsync.maybeWhen(
-      data: (exams) => _convertLiveExamsToRoutine(
-        exams,
-        categoryTitle,
-      ),
-      orElse: () => <RoutineItemModel>[],
-    );
-
-    final List<RoutineItemModel> routineList;
-    if (dynamicRoutine.isNotEmpty) {
-      routineList = dynamicRoutine;
-    } else if (catLower.contains('business') || catLower.contains('বাণিজ্য')) {
-      routineList = _defaultSscBusinessRoutineList;
-    } else if (catLower.contains('humanities') || catLower.contains('মানবিক')) {
-      routineList = _defaultSscHumanitiesRoutineList;
-    } else if (catLower.contains('compulsory') || catLower.contains('আবশ্যিক')) {
-      routineList = _defaultSscCompulsoryRoutineList;
-    } else if (isHSC) {
-      routineList = _defaultHscRoutineList;
-    } else {
-      routineList = _defaultSscScienceRoutineList;
-    }
+    final filtered = _filteredItems;
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.65,
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF141417) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -637,7 +344,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
           // Drag Handle
           const SizedBox(height: 10),
           Container(
-            width: 36,
+            width: 38,
             height: 4,
             decoration: BoxDecoration(
               color: Colors.grey.withValues(alpha: 0.3),
@@ -646,7 +353,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
 
-          // Header
+          // Header Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -674,9 +381,9 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                               color: const Color(0xFF004633).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(
-                              formattedTitle,
-                              style: const TextStyle(
+                            child: const Text(
+                              'অফিশিয়াল লাইভ রুটিন',
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF004633),
@@ -685,7 +392,7 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'একাডেমিক রুটিন',
+                            '২০২৬-২৭ সেশন',
                             style: TextStyle(
                               fontSize: 11,
                               color: isDark ? Colors.white54 : Colors.black54,
@@ -695,9 +402,9 @@ class LiveExamRoutineSheet extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$formattedTitle রুটিন',
+                        'ভর্তি পরীক্ষা রুটিন ও পূর্ণাঙ্গ সিলেবাস',
                         style: TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
@@ -714,134 +421,307 @@ class LiveExamRoutineSheet extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
-          const Divider(height: 1),
+          const SizedBox(height: 12),
 
-          // Routine Items List (Clean, No bulky syllabus box)
-          Expanded(
+          // Track Switcher Buttons
+          SizedBox(
+            height: 38,
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              itemCount: routineList.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final item = routineList[index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFFAFAFA),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              scrollDirection: Axis.horizontal,
+              itemCount: _tracks.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              itemBuilder: (context, idx) {
+                final track = _tracks[idx];
+                final isSelected = _activeTrack == track['key'];
+
+                return GestureDetector(
+                  onTap: () => _switchTrack(track['key']!),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF004633)
+                          : (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF004633)
+                            : (isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7)),
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      // Serial Badge
-                      Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF004633),
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _toBanglaDigits(index + 1),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          track['label']!,
+                          style: TextStyle(
                             fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Title & Date/Time
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.subject,
-                              style: const TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.bold,
-                                ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.2)
+                                : (isDark ? const Color(0xFF18181B) : Colors.white),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            track['badge']!,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? Colors.white : (isDark ? Colors.white54 : Colors.black54),
                             ),
-                            const SizedBox(height: 3),
-                            Text(
-                              '${item.date} (${item.dayName}) • ${item.time}',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Duration & Marks Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF18181B) : Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
                           ),
                         ),
-                        child: Text(
-                          '${_toBanglaDigits(item.durationMinutes)} মি. | ${_toBanglaDigits(item.totalMarks)} নম্বর',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
             ),
+          ),
+          const SizedBox(height: 10),
+
+          // Search Field
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Container(
+              height: 38,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1F2026) : const Color(0xFFF4F4F5),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF2E303B) : const Color(0xFFE4E4E7),
+                ),
+              ),
+              child: TextField(
+                onChanged: (val) => setState(() => _searchQuery = val),
+                style: const TextStyle(fontSize: 12.5),
+                decoration: InputDecoration(
+                  hintText: 'অধ্যায় বা বিষয় খুঁজুন (উদা: ভেক্টর, সমাণুতা)...',
+                  hintStyle: TextStyle(
+                    fontSize: 11.5,
+                    color: isDark ? Colors.white38 : Colors.black38,
+                  ),
+                  prefixIcon: const Icon(LucideIcons.search, size: 15, color: Colors.grey),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1),
+
+          // Items List
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF004633)),
+                  )
+                : filtered.isEmpty
+                    ? Center(
+                        child: Text(
+                          'কোনো পরীক্ষা পাওয়া যায়নি',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        itemCount: filtered.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final item = filtered[index];
+                          final isMega = item.examName.toLowerCase().contains('mega') ||
+                              item.examName.toLowerCase().contains('mock');
+
+                          return Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isMega
+                                  ? (isDark
+                                      ? const Color(0xFF004633).withValues(alpha: 0.15)
+                                      : const Color(0xFFF0FDF4))
+                                  : (isDark ? const Color(0xFF1C1D24) : Colors.white),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isMega
+                                    ? const Color(0xFF004633).withValues(alpha: 0.4)
+                                    : (isDark ? const Color(0xFF2E303B) : const Color(0xFFE4E4E7)),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: isMega
+                                            ? const Color(0xFF004633)
+                                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5)),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        LiveExamRoutineSheet.toBanglaDigits(index + 1),
+                                        style: TextStyle(
+                                          color: isMega ? Colors.white : const Color(0xFF004633),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.examName,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 1),
+                                          Text(
+                                            '${item.date} (${item.dayName}) • ${item.subject}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0xFF141417) : const Color(0xFFF4F4F5),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: isDark ? const Color(0xFF2E303B) : const Color(0xFFE4E4E7),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '${LiveExamRoutineSheet.toBanglaDigits(item.durationMinutes)} মি. | ${LiveExamRoutineSheet.toBanglaDigits(item.totalMarks)} নম্বর',
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF004633),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Syllabus Box
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF14151B) : const Color(0xFFF9FAFB),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(LucideIcons.bookOpen, size: 12, color: Color(0xFF004633)),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            'সিলেবাস:',
+                                            style: TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? Colors.white70 : const Color(0xFF004633),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Wrap(
+                                        spacing: 4,
+                                        runSpacing: 4,
+                                        children: item.chapters.map((ch) {
+                                          return Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: isDark ? const Color(0xFF27272A) : Colors.white,
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(
+                                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              ch,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: isDark ? Colors.white70 : Colors.black87,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
           ),
 
           // Footer Action Buttons
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 14),
               child: Row(
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 46,
+                      height: 44,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF004633),
                           side: const BorderSide(color: Color(0xFF004633), width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        onPressed: () => _downloadPdf(context, routineList, isHSC, categoryTitle: categoryTitle),
-                        icon: const Icon(LucideIcons.download, size: 17),
-                        label: const Text('রুটিন PDF', style: TextStyle(fontWeight: FontWeight.bold)),
+                        onPressed: () => _downloadPdf(context),
+                        icon: const Icon(LucideIcons.download, size: 16),
+                        label: const Text('রুটিন PDF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: SizedBox(
-                      height: 46,
+                      height: 44,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF004633),
                           foregroundColor: Colors.white,
-                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('ঠিক আছে', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text('ঠিক আছে', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                       ),
                     ),
                   ),

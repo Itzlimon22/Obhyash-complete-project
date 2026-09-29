@@ -454,6 +454,8 @@ export const getUserActiveSubscription =
         .limit(1)
         .maybeSingle();
 
+      let activeSubResult: SubscriptionPlan | null = null;
+
       if (hist) {
         let plan = hist.subscription_plans as any;
         const expiry = hist.expires_at;
@@ -484,7 +486,7 @@ export const getUserActiveSubscription =
                 ? 'Monthly Plan'
                 : `${durationDays} Days Plan`;
 
-        return {
+        activeSubResult = {
           id: plan?.id || hist.id || 'history_active_sub',
           name: displayName,
           price: plan?.price || hist.amount || 0,
@@ -501,7 +503,7 @@ export const getUserActiveSubscription =
         };
       }
 
-      // 2. Check 'users' table fallback
+      // 2. Check 'users' table fallback & extension verification
       const { data: userProfile } = await supabase
         .from('users')
         .select(
@@ -543,28 +545,33 @@ export const getUserActiveSubscription =
                 ? 'Quarterly Plan'
                 : 'Monthly Plan';
 
-          return {
-            id: 'user_active_plan',
-            name: planName,
-            price: 0,
-            currency: '৳',
-            billingCycle: cycle,
-            features: [
-              'সকল প্রিমিয়াম প্রশ্নের সমাধান',
-              'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
-              'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
-            ],
-            colorTheme: 'emerald',
-            isPopular: true,
-            expiresAt: expDate.toISOString(),
-          };
+          // If activeSubResult is null OR users table has a later (extended) expiration date
+          const currentExp = activeSubResult?.expiresAt ? new Date(activeSubResult.expiresAt) : null;
+          if (!activeSubResult || (currentExp && expDate > currentExp)) {
+            activeSubResult = {
+              id: activeSubResult?.id || 'user_active_plan',
+              name: planName,
+              price: activeSubResult?.price || 0,
+              currency: '৳',
+              billingCycle: cycle,
+              features: activeSubResult?.features || [
+                'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+              ],
+              colorTheme: 'emerald',
+              isPopular: true,
+              expiresAt: expDate.toISOString(),
+            };
+          }
         }
       }
+
+      return activeSubResult;
     } catch (e) {
       console.warn('Subscription check failed:', e);
+      return null;
     }
-
-    return null;
   };
 
 export const submitManualPayment = async (
@@ -603,7 +610,7 @@ export const submitManualPayment = async (
 
   if (pendingReq) {
     throw new Error(
-      'আপনার একটি পেমেন্ট রিকোয়েস্ট ইতিমধ্যে প্রক্রিয়াধীন আছে। সেটি যাচাই সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন।',
+      'তোমার একটি পেমেন্ট রিকোয়েস্ট ইতিমধ্যে প্রক্রিয়াধীন আছে। সেটি যাচাই সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন।',
     );
   }
 

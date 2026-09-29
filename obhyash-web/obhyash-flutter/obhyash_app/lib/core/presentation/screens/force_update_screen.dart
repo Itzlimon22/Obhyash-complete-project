@@ -13,9 +13,18 @@ class ForceUpdateScreen extends StatelessWidget {
   });
 
   Future<void> _launchUpdateUrl() async {
-    final uri = Uri.parse(updateUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      final uri = Uri.parse(updateUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+      final marketUri = Uri.parse('market://details?id=com.obhyash.app');
+      if (await canLaunchUrl(marketUri)) {
+        await launchUrl(marketUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('[ForceUpdateScreen] Launch failed: $e');
     }
   }
 

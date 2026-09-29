@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'core/services/download_notification_service.dart';
+import 'core/services/in_app_update_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'core/providers/shared_prefs_provider.dart';
@@ -19,7 +21,6 @@ import 'features/notifications/services/notification_service.dart';
 import 'core/providers/auth_provider.dart';
 import 'services/session_monitor_service.dart';
 import 'services/anti_piracy_service.dart';
-import 'core/services/shake_feedback_service.dart';
 import 'core/services/device_security_service.dart';
 import 'core/presentation/screens/device_blocked_screen.dart';
 import 'features/subscription/services/in_app_purchase_service.dart';
@@ -86,9 +87,21 @@ void main() async {
   // Initialize Google Play In-App Purchase
   unawaited(InAppPurchaseService().initialize());
 
+  // Retrieve current app version details dynamically (with safe fallback)
+  PackageInfo? packageInfo;
+  try {
+    packageInfo = await PackageInfo.fromPlatform();
+  } catch (e) {
+    debugPrint('[Main] packageInfo init skipped: $e');
+  }
+
   runApp(
     ProviderScope(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        if (packageInfo != null)
+          packageInfoProvider.overrideWithValue(packageInfo),
+      ],
       child: const ObhyashApp(),
     ),
   );
@@ -106,8 +119,10 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ShakeFeedbackService().initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 1. Google Play Immediate / In-App Update Check
+      InAppUpdateService.checkForImmediateUpdate();
+
       final isEnabled = ref.read(isScreenshotProtectionEnabledProvider);
       AntiPiracyService.setProtection(isEnabled);
 
@@ -130,7 +145,6 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
 
   @override
   void dispose() {
-    ShakeFeedbackService().stop();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -138,7 +152,9 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ShakeFeedbackService().initialize();
+      // Re-check or resume in-app update if user switched apps
+      InAppUpdateService.checkForImmediateUpdate();
+
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
         SessionMonitorService.checkSessionSync(
@@ -148,8 +164,6 @@ class _ObhyashAppState extends ConsumerState<ObhyashApp> with WidgetsBindingObse
       }
       final isSecureEnabled = ref.read(isScreenshotProtectionEnabledProvider);
       AntiPiracyService.setProtection(isSecureEnabled);
-    } else if (state == AppLifecycleState.paused) {
-      ShakeFeedbackService().stop();
     }
   }
 

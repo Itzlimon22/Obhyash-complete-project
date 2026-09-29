@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/main_sidebar.dart';
@@ -448,7 +449,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               if (mounted) {
                 AppPopups.show(
                   context,
-                  message: 'আপনার অ্যাকাউন্টটি সাময়িকভাবে স্থগিত (Suspended) করা হয়েছে। সহায়তার জন্য সাপোর্টে যোগাযোগ করুন।',
+                  message: 'তোমার অ্যাকাউন্টটি সাময়িকভাবে স্থগিত (Suspended) করা হয়েছে। সহায়তার জন্য সাপোর্টে যোগাযোগ করো।',
                   isError: true,
                 );
                 context.go('/login');
@@ -1108,6 +1109,52 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       ),
                                     ],
                                   ),
+                                ),
+                              ),
+                            )
+                          else if (activeTab == 'live_exam')
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                context.push('/live_exam_history');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1E2230)
+                                      : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(9),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFF33374A)
+                                        : const Color(0xFFCBD5E1),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.award,
+                                      size: 15,
+                                      color: isDark ? Colors.white : Colors.black,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      'আমার ফলাফল',
+                                      style: TextStyle(
+                                        fontFamily: 'HindSiliguri',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: isDark ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

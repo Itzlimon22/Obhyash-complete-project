@@ -12,6 +12,7 @@ import 'package:obhyash_app/core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
+import 'mock_exam_limit_screen.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/providers/app_config_provider.dart';
 
@@ -461,11 +462,17 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       return;
     }
 
-    final profile = ref.read(userProfileProvider).value;
+    var profile = ref.read(userProfileProvider).value;
+    if (profile == null) {
+      try {
+        profile = await ref.read(userProfileProvider.future);
+      } catch (_) {}
+    }
     final isPro = profile?.isPro ?? false;
 
     // Gatekeeper 1: 50+ Questions limit for free users
     if (_questionCount > 50 && !isPro) {
+      if (!mounted) return;
       ProUpgradeModal.show(
         context,
         title: '৫০+ প্রশ্ন আনলক করো ⚡',
@@ -490,13 +497,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               .gte('created_at', startOfDay);
           if (res.length >= maxFreeExams) {
             if (mounted) {
-              ProUpgradeModal.show(
-                context,
-                title: 'আজকের ফ্রি কোটা শেষ 🎯',
-                message: 'তুমি আজকের $maxFreeExams টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
-                featurePill: 'দৈনিক ফ্রি কোটা: ${res.length}/$maxFreeExams',
-                icon: LucideIcons.calendarCheck,
-              );
+              MockExamLimitScreen.show(context);
             }
             return;
           }
@@ -1686,12 +1687,18 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     _PresetExamBadge badge,
     List<PresetSubjectDistribution> activeDistribution,
   ) async {
-    final profile = ref.read(userProfileProvider).value;
+    var profile = ref.read(userProfileProvider).value;
+    if (profile == null) {
+      try {
+        profile = await ref.read(userProfileProvider.future);
+      } catch (_) {}
+    }
     final isPro = profile?.isPro ?? false;
     final totalQuestions =
         activeDistribution.fold(0, (sum, item) => sum + item.count);
 
     if (totalQuestions > 50 && !isPro) {
+      if (!mounted) return;
       ProUpgradeModal.show(
         context,
         title: '৫০+ প্রশ্ন আনলক করো ⚡',
@@ -1717,14 +1724,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               .gte('created_at', startOfDay);
           if (res.length >= maxFreeExams) {
             if (mounted) {
-              ProUpgradeModal.show(
-                context,
-                title: 'আজকের ফ্রি কোটা শেষ 🎯',
-                message:
-                    'তুমি আজকের $maxFreeExams টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
-                featurePill: 'দৈনিক ফ্রি কোটা: ${res.length}/$maxFreeExams',
-                icon: LucideIcons.calendarCheck,
-              );
+              MockExamLimitScreen.show(context);
             }
             return;
           }
@@ -2759,7 +2759,7 @@ class _SubjectDropdownModal extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
+          color: isDark ? const Color(0xFF141417) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SafeArea(
@@ -3091,7 +3091,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
+          color: isDark ? const Color(0xFF141417) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -3475,7 +3475,7 @@ class _TopicCollapsibleSelectionModalState
       child: Container(
         constraints: BoxConstraints(maxHeight: maxHeight),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF000000) : Colors.white,
+          color: isDark ? const Color(0xFF141417) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -4147,7 +4147,7 @@ class _PresetExamSelectionModalState extends State<_PresetExamSelectionModal> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
+        color: isDark ? const Color(0xFF141417) : const Color(0xFFF8FAFC),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(

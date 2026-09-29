@@ -105,7 +105,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'me',
-    name: 'আপনি (You)',
+    name: 'তুমি (You)',
     institute: 'Rajuk Uttara Model College',
     xp: 2850,
     level: 'Warrior',

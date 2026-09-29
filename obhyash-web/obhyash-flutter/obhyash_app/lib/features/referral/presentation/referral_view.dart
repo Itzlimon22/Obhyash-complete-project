@@ -544,6 +544,64 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
 
                   const SizedBox(height: 16),
 
+                  // ── How It Works ─────────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: card,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'কীভাবে শুরু করবে?',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                            color: textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _StepBubble(
+                              icon: '🔗',
+                              title: 'কোড কপি করো',
+                              desc: 'তোমার কোডটি কপি করো।',
+                              isDark: isDark,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                            ),
+                            _Arrow(isDark: isDark),
+                            _StepBubble(
+                              icon: '📤',
+                              title: 'শেয়ার করো',
+                              desc: 'বন্ধুদের পাঠাও।',
+                              isDark: isDark,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                            ),
+                            _Arrow(isDark: isDark),
+                            _StepBubble(
+                              icon: '🎉',
+                              title: 'পুরস্কার পাও',
+                              desc: 'বন্ধু পাবে প্রিমিয়াম, তুমি পাবে কার্ড।',
+                              isDark: isDark,
+                              textPrimary: textPrimary,
+                              textSecondary: textSecondary,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // ── Claim Friend's Referral Code Card (If not used yet) ──
                   if (!_hasUsedReferral) ...[
                     Container(
@@ -883,62 +941,6 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                   const SizedBox(height: 16),
 
 
-
-                  // ── How It Works ─────────────────────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: card,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'কীভাবে শুরু করবে?',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                            color: textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _StepBubble(
-                              icon: '🔗',
-                              title: 'কোড কপি করো',
-                              desc: 'ওপরের কোডটি কপি করো।',
-                              isDark: isDark,
-                              textPrimary: textPrimary,
-                              textSecondary: textSecondary,
-                            ),
-                            _Arrow(isDark: isDark),
-                            _StepBubble(
-                              icon: '📤',
-                              title: 'শেয়ার করো',
-                              desc: 'বন্ধুদের পাঠাও।',
-                              isDark: isDark,
-                              textPrimary: textPrimary,
-                              textSecondary: textSecondary,
-                            ),
-                            _Arrow(isDark: isDark),
-                            _StepBubble(
-                              icon: '🎉',
-                              title: 'পুরস্কার পাও',
-                              desc: 'বন্ধু পাবে প্রিমিয়াম, তুমি পাবে কার্ড।',
-                              isDark: isDark,
-                              textPrimary: textPrimary,
-                              textSecondary: textSecondary,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
 
                   // ── Referral History ─────────────────────────────────────
                   if (_history.isNotEmpty) ...[
@@ -1282,7 +1284,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           const SizedBox(height: 12),
           Text(
             needed == 3 && _totalReferrals > 0
-                ? 'অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
+                ? 'অভিনন্দন! তুমি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছ!'
                 : 'আর মাত্র $needed টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!',
             style: TextStyle(
               fontSize: 14,
@@ -1299,7 +1301,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'আপনার স্ক্র্যাচ কার্ডসমূহ',
+          'তোমার স্ক্র্যাচ কার্ডসমূহ',
           style: TextStyle(
             fontSize: 15.5,
             fontWeight: FontWeight.w600,

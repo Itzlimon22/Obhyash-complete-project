@@ -1,9 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/app_config_model.dart';
 import 'shared_prefs_provider.dart';
 
-// Current App Version (can be bumped on releases)
+/// Overridden in main.dart with actual platform package info
+final packageInfoProvider = Provider<PackageInfo?>((ref) => null);
+
+/// Fallback or real app version
+final currentAppVersionProvider = Provider<String>((ref) {
+  final info = ref.watch(packageInfoProvider);
+  if (info != null) {
+    return '${info.version}+${info.buildNumber}';
+  }
+  return '1.0.0+5';
+});
+
+// Backward-compatible constant fallback
 const String kCurrentAppVersion = '1.0.0';
 
 /// Realtime Stream Provider for Master App Configuration
@@ -26,11 +39,12 @@ final appConfigStreamProvider = StreamProvider<AppConfigModel>((ref) {
 final isForceUpdateRequiredProvider = Provider<bool>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   final prefs = ref.watch(sharedPreferencesProvider);
+  final currentVersion = ref.watch(currentAppVersionProvider);
 
   return configAsync.maybeWhen(
     data: (config) {
       final isRequired = config.forceUpdate &&
-          _isVersionOlder(kCurrentAppVersion, config.minAppVersion);
+          _isVersionOlder(currentVersion, config.minAppVersion);
       // Persist state locally so airplane mode or disconnecting data cannot bypass
       prefs.setBool('cached_force_update_required', isRequired);
       if (isRequired) {
@@ -44,7 +58,7 @@ final isForceUpdateRequiredProvider = Provider<bool>((ref) {
       final cachedRequired =
           prefs.getBool('cached_force_update_required') ?? false;
       final cachedMin = prefs.getString('cached_min_app_version') ?? '1.0.0';
-      if (cachedRequired && _isVersionOlder(kCurrentAppVersion, cachedMin)) {
+      if (cachedRequired && _isVersionOlder(currentVersion, cachedMin)) {
         return true;
       }
       return false;
@@ -129,7 +143,7 @@ final isPaymentGooglePlayEnabledProvider = Provider<bool>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   return configAsync.maybeWhen(
     data: (config) => config.paymentsEnabled && config.paymentGooglePlayEnabled,
-    orElse: () => false,
+    orElse: () => true,
   );
 });
 
@@ -156,15 +170,18 @@ final maxFreeExamsPerDayProvider = Provider<int>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   return configAsync.maybeWhen(
     data: (config) => config.maxFreeExamsPerDay,
-    orElse: () => 5,
+    orElse: () => 2,
   );
 });
 
-/// Compares semver version strings: returns true if current < min
+/// Compares semver version strings and build numbers: returns true if current < min
 bool _isVersionOlder(String current, String min) {
   try {
-    final currentParts = current.split('.').map(int.parse).toList();
-    final minParts = min.split('.').map(int.parse).toList();
+    final currentClean = current.split('+').first.trim();
+    final minClean = min.split('+').first.trim();
+
+    final currentParts = currentClean.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final minParts = minClean.split('.').map((e) => int.tryParse(e) ?? 0).toList();
 
     for (int i = 0; i < 3; i++) {
       final curr = i < currentParts.length ? currentParts[i] : 0;
@@ -172,6 +189,14 @@ bool _isVersionOlder(String current, String min) {
       if (curr < m) return true;
       if (curr > m) return false;
     }
+
+    // If major.minor.patch are identical, compare build number if available
+    if (current.contains('+') && min.contains('+')) {
+      final currBuild = int.tryParse(current.split('+').last.trim()) ?? 0;
+      final minBuild = int.tryParse(min.split('+').last.trim()) ?? 0;
+      if (currBuild < minBuild) return true;
+    }
+
     return false;
   } catch (_) {
     return false;

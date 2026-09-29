@@ -418,6 +418,7 @@ class _BookFormulaCard extends StatelessWidget {
                   formula: formula,
                   chapterName: chapterName,
                   serialNumber: serialNumber,
+                  paletteIndex: index,
                 ),
               ),
             );

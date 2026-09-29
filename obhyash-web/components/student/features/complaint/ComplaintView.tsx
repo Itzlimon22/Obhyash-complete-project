@@ -209,14 +209,14 @@ export const ComplaintView: React.FC = () => {
 
     if (isPendingLimitReached) {
       toast.warning(
-        'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।'
+        'তোমার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করো।'
       );
       return;
     }
 
     if (isDailyLimitReached) {
       toast.warning(
-        'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।'
+        'আজকের জন্য তোমার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করো।'
       );
       return;
     }
@@ -255,7 +255,7 @@ export const ComplaintView: React.FC = () => {
     );
     if (isDuplicate) {
       toast.warning(
-        'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।'
+        'তুমি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছ! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।'
       );
       return;
     }
@@ -385,14 +385,14 @@ export const ComplaintView: React.FC = () => {
             <div className="p-3.5 rounded-[12px] bg-[#FFFBEB] dark:bg-[#451A03]/40 border border-[#FDE68A] dark:border-[#D97706]/40 flex items-center gap-2.5">
               <AlertTriangle className="w-4.5 h-4.5 text-[#D97706] shrink-0" />
               <p className="text-xs font-semibold text-[#92400E] dark:text-[#FDE68A] leading-snug">
-                আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।
+                তোমার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করো।
               </p>
             </div>
           ) : isDailyLimitReached ? (
             <div className="p-3.5 rounded-[12px] bg-[#FFFBEB] dark:bg-[#451A03]/40 border border-[#FDE68A] dark:border-[#D97706]/40 flex items-center gap-2.5">
               <ShieldAlert className="w-4.5 h-4.5 text-[#D97706] shrink-0" />
               <p className="text-xs font-semibold text-[#92400E] dark:text-[#FDE68A] leading-snug">
-                আজকের জন্য আপনার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।
+                আজকের জন্য তোমার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করো।
               </p>
             </div>
           ) : cooldownSeconds > 0 ? (

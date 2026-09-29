@@ -30,37 +30,7 @@ UserProfile _profileFromJson(Map<String, dynamic> json) {
   final profile = UserProfile.fromJson(json);
   final resolved = _resolveAvatarUrl(profile.avatarUrl);
   if (resolved == profile.avatarUrl) return profile;
-  // Return a copy with the resolved URL
-  return UserProfile(
-    id: profile.id,
-    name: profile.name,
-    email: profile.email,
-    xp: profile.xp,
-    level: profile.level,
-    division: profile.division,
-    stream: profile.stream,
-    optionalSubject: profile.optionalSubject,
-    institute: profile.institute,
-    streakCount: profile.streakCount,
-    phone: profile.phone,
-    dob: profile.dob,
-    gender: profile.gender,
-    address: profile.address,
-    batch: profile.batch,
-    target: profile.target,
-    sscRoll: profile.sscRoll,
-    sscReg: profile.sscReg,
-    sscBoard: profile.sscBoard,
-    sscYear: profile.sscYear,
-    avatarUrl: resolved,
-    examTarget: profile.examTarget,
-    dailyExamsGoal: profile.dailyExamsGoal,
-    admissionTrackInterest: profile.admissionTrackInterest,
-    lastStreakDate: profile.lastStreakDate,
-    isSubscribed: profile.isSubscribed,
-    subscriptionStatus: profile.subscriptionStatus,
-    subscriptionExpiresAt: profile.subscriptionExpiresAt,
-  );
+  return profile.copyWith(avatarUrl: resolved);
 }
 
 // Riverpod Provider for the Supabase Client

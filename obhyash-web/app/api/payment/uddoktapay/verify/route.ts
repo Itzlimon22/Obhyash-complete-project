@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       planName: activation.planName,
       expiresAt: activation.expiresAt,
       invoiceId: activation.invoiceId,
-      message: 'অভিনন্দন! আপনার সাবস্ক্রিপশন সফলভাবে সক্রিয় করা হয়েছে।',
+      message: 'অভিনন্দন! তোমার সাবস্ক্রিপশন সফলভাবে সক্রিয় করা হয়েছে।',
     });
   } catch (error: any) {
     console.error('[UddoktaPay Verify API] Error:', error);

@@ -398,7 +398,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         {isTaken && attempt && (
           <div className="mt-5 rounded-[22px] bg-white dark:bg-[#141417] border border-[#E2E8F0] dark:border-[#27272A] p-5 shadow-xs">
             <h3 className="text-[15.5px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC]">
-              আপনার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)
+              তোমার ফলাফলের সারসংক্ষেপ (অফিসিয়াল)
             </h3>
 
             <div className="mt-4 flex items-center justify-around text-center">

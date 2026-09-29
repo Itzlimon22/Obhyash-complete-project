@@ -7,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/app_popups.dart';
 import '../providers/auth_controller.dart';
 import 'forgot_password_sheet.dart';
-import '../../../core/theme/app_theme.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -94,307 +93,326 @@ class _LoginViewState extends ConsumerState<LoginView>
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = authState.isLoading;
-
-    const bgColor = Color(0xFF000000); // OLED Pure Black
-
     return Theme(
-      data: AppTheme.darkTheme.copyWith(
-        scaffoldBackgroundColor: bgColor,
-        colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF141417),
-          primary: Color(0xFF004633),
+      data: ThemeData.light().copyWith(
+        textTheme: ThemeData.light().textTheme.apply(
+          fontFamily: 'HindSiliguri',
         ),
       ),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: bgColor,
-        ),
-        child: Scaffold(
-          backgroundColor: bgColor,
-          body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22.0,
-                  vertical: 24.0,
-                ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: AnimatedBuilder(
-                    animation: _animController,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _scaleAnimation.value,
-                        child: Opacity(
-                          opacity: _fadeAnimation.value,
-                          child: child,
+      child: Builder(
+        builder: (context) {
+          final authState = ref.watch(authControllerProvider);
+          final isLoading = authState.isLoading;
+
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+          final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
+          final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
+          final dividerColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+          const primaryGreen = Color(0xFF006A4E);
+
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+                .copyWith(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: bgColor,
+            ),
+            child: Scaffold(
+              backgroundColor: bgColor,
+              body: SafeArea(
+                child: Stack(
+                  children: [
+                    Center(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: 16.0,
                         ),
-                      );
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Top Brand Icon Badge
-                        Center(
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 4),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          child: AnimatedBuilder(
+                            animation: _animController,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: _scaleAnimation.value,
+                                child: Opacity(
+                                  opacity: _fadeAnimation.value,
+                                  child: child,
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
-                              child: Image.asset(
-                                'assets/images/app_logo.png',
-                                width: 68,
-                                height: 68,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Center(
-                          child: SvgPicture.asset(
-                            'assets/images/obhyash_full_logo_dark.svg',
-                            height: 32,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Header Title
-                        const Text(
-                          'তোমার অ্যাকাউন্টে লগইন করো',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFA1A1AA),
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-
-                        // Form Field 1: Email / Phone
-                        _buildInputField(
-                          label: 'মোবাইল নম্বর অথবা ইমেইল',
-                          icon: LucideIcons.user,
-                          controller: _emailController,
-                          hint: '017XXXXXXXX অথবা example@gmail.com',
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Form Field 2: Password with Show/Hide Toggle
-                        _buildInputField(
-                          label: 'পাসওয়ার্ড',
-                          icon: LucideIcons.lock,
-                          controller: _passwordController,
-                          hint: '••••••••',
-                          obscureText: _obscurePassword,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? LucideIcons.eyeOff
-                                  : LucideIcons.eye,
-                              size: 18,
-                              color: const Color(0xFFA1A1AA),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
+                              );
                             },
-                          ),
-                        ),
-
-                        // Forgot password link
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  useRootNavigator: true,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) =>
-                                      const ForgotPasswordSheet(),
-                                );
-                              },
-                              behavior: HitTestBehavior.opaque,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 2,
-                                ),
-                                child: Text(
-                                  'পাসওয়ার্ড ভুলে গেছেন?',
-                                  style: TextStyle(
-                                    fontSize: 13.5,
-                                    color: Color(0xFFF87171),
-                                    fontWeight: FontWeight.w700,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Brand Logo (Transparent BG, Black Text)
+                                Center(
+                                  child: Image.asset(
+                                    'assets/images/obhyash_full_logo.png',
+                                    height: 38,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
+                      const SizedBox(height: 20),
+
+                      // Header Title (Clean, bold like screenshot)
+                      Text(
+                        'লগইন/রেজিস্টার',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.4,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Form Field 1: Phone / Email
+                      _buildInputField(
+                        label: 'মোবাইল নম্বর',
+                        controller: _emailController,
+                        hint: '01XXXXXXXX',
+                        keyboardType: TextInputType.text,
+                        isDark: isDark,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Form Field 2: Password with Show/Hide Toggle
+                      _buildInputField(
+                        label: 'পাসওয়ার্ড',
+                        controller: _passwordController,
+                        hint: '••••••••',
+                        obscureText: _obscurePassword,
+                        isDark: isDark,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? LucideIcons.eyeOff
+                                : LucideIcons.eye,
+                            size: 18,
+                            color: textMuted,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                      ),
+
+                      // Forgot password link
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                useRootNavigator: true,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) =>
+                                    const ForgotPasswordSheet(),
+                              );
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 2,
                               ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 22),
-
-                        // Primary Login Button (Deep Green)
-                        ElevatedButton(
-                          onPressed: isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF004633),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'লগইন করো',
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Divider "অথবা"
-                        const Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Color(0xFF27272A),
-                                thickness: 1,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 14),
                               child: Text(
-                                'অথবা',
+                                'পাসওয়ার্ড ভুলে গেছেন?',
                                 style: TextStyle(
-                                  color: Color(0xFF71717A),
                                   fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFEF4444),
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Divider(
-                                color: Color(0xFF27272A),
-                                thickness: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Google Login Button with Crisp Vector G Logo
-                        OutlinedButton(
-                          onPressed: isLoading ? null : _handleGoogleLogin,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(
-                              color: Color(0xFF27272A),
-                              width: 1,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            backgroundColor: const Color(0xFF141417),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.string(
-                                _googleSvgString,
-                                width: 19,
-                                height: 19,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Google দিয়ে লগইন করো',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Primary Action Button: "এগিয়ে যাও" (Forest Green like screenshot)
+                      ElevatedButton(
+                        onPressed: isLoading ? null : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryGreen,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
                                   color: Colors.white,
                                 ),
+                              )
+                            : const Text(
+                                'এগিয়ে যাও',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.2,
+                                ),
                               ),
-                            ],
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // Divider with "Login / Registration with"
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: dividerColor,
+                              thickness: 1,
+                            ),
                           ),
-                        ),
-
-                        const SizedBox(height: 28),
-
-                        // Footer
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'অ্যাকাউন্ট নেই? ',
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'Login / Registration with',
                               style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xFFA1A1AA),
+                                color: textMuted,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                context.push('/signup');
-                              },
-                              behavior: HitTestBehavior.opaque,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 2,
-                                ),
-                                child: Text(
-                                  'নতুন অ্যাকাউন্ট খুলুন',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF10B981),
-                                  ),
-                                ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: dividerColor,
+                              thickness: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Google Social Login Card (Clean rounded card like screenshot)
+                      OutlinedButton(
+                        onPressed: isLoading ? null : _handleGoogleLogin,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(
+                            color: dividerColor,
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          backgroundColor: isDark
+                              ? const Color(0xFF141417)
+                              : Colors.white,
+                          elevation: 0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.string(
+                              _googleSvgString,
+                              width: 20,
+                              height: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Google',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: textPrimary,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      // New Registration Prompt
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'অ্যাকাউন্ট নেই? ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textMuted,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              context.push('/signup');
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 2,
+                              ),
+                              child: Text(
+                                'নতুন অ্যাকাউন্ট খুলুন',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryGreen,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
+                  ),
               ),
             ),
           ),
+          // Top Right Support Button pinned directly to the top right corner
+          Positioned(
+            top: 6,
+            right: 20,
+            child: _buildSupportButton(context, isDark),
+          ),
+        ],
+      ),
+    ),
+  ),
+);
+},
+),
+);
+}
+
+  Widget _buildSupportButton(BuildContext context, bool isDark) {
+    final textMuted = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        context.push('/login-support');
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        'সাপোর্ট লাগবে?',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: textMuted,
         ),
       ),
     );
@@ -402,23 +420,28 @@ class _LoginViewState extends ConsumerState<LoginView>
 
   Widget _buildInputField({
     required String label,
-    required IconData icon,
     required TextEditingController controller,
     required String hint,
+    required bool isDark,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
   }) {
-    const bgColor = Color(0xFF141417);
+    final textMuted = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
+    final fieldBg = isDark ? const Color(0xFF141417) : const Color(0xFFFFFFFF);
+    final fieldBorder = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF18181B);
+    const primaryGreen = Color(0xFF006A4E);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14.5,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFA1A1AA),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: textMuted,
           ),
         ),
         const SizedBox(height: 7),
@@ -426,40 +449,35 @@ class _LoginViewState extends ConsumerState<LoginView>
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(
-              color: Color(0xFF71717A),
+            hintStyle: TextStyle(
+              color: textMuted.withValues(alpha: 0.7),
               fontSize: 14.5,
-            ),
-            prefixIcon: Icon(
-              icon,
-              size: 20,
-              color: const Color(0xFFA1A1AA),
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: bgColor,
+            fillColor: fieldBg,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 15,
               horizontal: 16,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF27272A)),
+              borderSide: BorderSide(color: fieldBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF27272A)),
+              borderSide: BorderSide(color: fieldBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF10B981), width: 1.5),
+              borderSide: const BorderSide(color: primaryGreen, width: 1.5),
             ),
           ),
         ),

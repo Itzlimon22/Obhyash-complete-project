@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class LeaderboardUser {
   final String id;
   final String name;
@@ -246,33 +248,63 @@ class UserProfile {
   }
 
   bool get isPro {
-    // 1. Role-based bypass for Admins and Moderators
+    // 1. Role-based bypass for Admins, Moderators, Teachers
     final r = (role ?? '').toString().toLowerCase().trim();
     if (r == 'admin' ||
         r == 'super admin' ||
         r == 'superadmin' ||
-        r == 'moderator') {
+        r == 'moderator' ||
+        r == 'teacher') {
       return true;
     }
 
-    // 2. Strict plan check: Free or Inactive is strictly NOT Pro
+    // 2. Cancellation / explicit expired status check
+    final s = (subscriptionStatus ?? '').toString().toLowerCase().trim();
+    if (s == 'expired' || s == 'cancelled' || s == 'canceled') {
+      return false;
+    }
+
+    // 3. Expiration date check: if provided, must not be expired
+    DateTime? expDate;
+    if (subscriptionExpiresAt != null && subscriptionExpiresAt!.trim().isNotEmpty) {
+      expDate = DateTime.tryParse(subscriptionExpiresAt!.trim());
+    }
+    final now = DateTime.now();
+    if (expDate != null && expDate.isBefore(now)) {
+      return false;
+    }
+
+    // 4. Plan check: Explicitly free or inactive plans are not pro
     final p = (plan ?? '').toString().toLowerCase().trim();
-    if (p.isEmpty || p == 'free' || p == 'inactive') {
-      return false;
+    final bool isExplicitlyFree = p == 'free' ||
+        p == 'inactive' ||
+        p == 'rookie' ||
+        p == 'basic' ||
+        p == 'explorer';
+
+    final bool isPlanPro = p.contains('pro') ||
+        p.contains('premium') ||
+        p.contains('ranker') ||
+        p.contains('booster') ||
+        p.contains('master') ||
+        (level ?? '').toString().toLowerCase().trim() == 'pro';
+
+    final bool hasActiveSubscription = isSubscribed == true || s == 'active';
+
+    // If marked subscribed or has active status or pro plan
+    if (hasActiveSubscription || isPlanPro) {
+      if (isExplicitlyFree && (expDate == null || expDate.isBefore(now)) && isSubscribed != true) {
+        return false;
+      }
+      return true;
     }
 
-    // 3. Expiration check: Must not be null or in the past
-    if (subscriptionExpiresAt == null || subscriptionExpiresAt!.isEmpty) {
-      return false;
-    }
-    final exp = DateTime.tryParse(subscriptionExpiresAt!);
-    if (exp == null || exp.isBefore(DateTime.now())) {
-      return false;
+    // If valid future expiration date and not explicitly free
+    if (expDate != null && expDate.isAfter(now) && !isExplicitlyFree) {
+      return true;
     }
 
-    // 4. Status check: Must be active
-    final s = subscriptionStatus?.toString().toLowerCase().trim();
-    return isSubscribed == true || s == 'active';
+    return false;
   }
 
   String get displayStudentId {
@@ -314,6 +346,9 @@ class UserProfile {
     int? dailyExamsGoal,
     bool? admissionTrackInterest,
     String? lastStreakDate,
+    bool? requiresPhoneVerification,
+    bool? isEmailVerified,
+    bool? requiresEmailVerification,
     bool? isSubscribed,
     String? subscriptionStatus,
     String? subscriptionExpiresAt,
@@ -350,6 +385,9 @@ class UserProfile {
       dailyExamsGoal: dailyExamsGoal ?? this.dailyExamsGoal,
       admissionTrackInterest: admissionTrackInterest ?? this.admissionTrackInterest,
       lastStreakDate: lastStreakDate ?? this.lastStreakDate,
+      requiresPhoneVerification: requiresPhoneVerification ?? this.requiresPhoneVerification,
+      isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      requiresEmailVerification: requiresEmailVerification ?? this.requiresEmailVerification,
       isSubscribed: isSubscribed ?? this.isSubscribed,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
@@ -360,30 +398,51 @@ class UserProfile {
   }
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
-    final subJson = json['subscription'] as Map<String, dynamic>?;
-    final rawStatus = (subJson?['status'] ?? json['subscription_status'])?.toString().toLowerCase().trim();
-    final rawExp = subJson?['expiry'] as String? ??
-        subJson?['expires_at'] as String? ??
-        json['subscription_expires_at'] as String?;
-    final expDate = rawExp != null ? DateTime.tryParse(rawExp) : null;
+    Map<String, dynamic>? subJson;
+    if (json['subscription'] is Map<String, dynamic>) {
+      subJson = json['subscription'] as Map<String, dynamic>;
+    } else if (json['subscription'] is Map) {
+      subJson = Map<String, dynamic>.from(json['subscription'] as Map);
+    } else if (json['subscription'] is String && (json['subscription'] as String).trim().startsWith('{')) {
+      try {
+        final decoded = jsonDecode(json['subscription'] as String);
+        if (decoded is Map) {
+          subJson = Map<String, dynamic>.from(decoded);
+        }
+      } catch (_) {}
+    }
+
+    final rawStatus = (subJson?['status'] ?? json['subscription_status'])?.toString().trim();
+    final rawExp = subJson?['expiry']?.toString() ??
+        subJson?['expires_at']?.toString() ??
+        json['subscription_expires_at']?.toString() ??
+        json['expires_at']?.toString() ??
+        json['subscription_end_date']?.toString();
+    final expDate = rawExp != null && rawExp.trim().isNotEmpty ? DateTime.tryParse(rawExp.trim()) : null;
     final bool isExpired = expDate != null && expDate.isBefore(DateTime.now());
 
-    final rawPlan = (subJson?['plan'] ?? json['plan'] ?? '').toString().trim();
-    final rawPlanLower = rawPlan.toLowerCase();
-    final bool isNotFree = rawPlanLower.isNotEmpty && rawPlanLower != 'free' && rawPlanLower != 'inactive';
+    final rawPlan = (subJson?['plan'] ??
+        subJson?['plan_name'] ??
+        json['plan'] ??
+        json['subscription_tier'] ??
+        '')
+        .toString()
+        .trim();
 
     final roleStr = (json['role'] ?? '').toString().toLowerCase().trim();
     final bool isAdmin = roleStr == 'admin' ||
         roleStr == 'super admin' ||
         roleStr == 'superadmin' ||
-        roleStr == 'moderator';
+        roleStr == 'moderator' ||
+        roleStr == 'teacher';
 
-    final bool isSub = isAdmin ||
-        (!isExpired &&
-            expDate != null &&
-            expDate.isAfter(DateTime.now()) &&
-            isNotFree &&
-            (json['is_subscribed'] == true || rawStatus == 'active'));
+    final bool isProFlag = json['is_pro'] == true ||
+        (subJson?['is_pro'] == true) ||
+        json['is_subscribed'] == true ||
+        rawStatus?.toLowerCase() == 'active' ||
+        (rawPlan.toLowerCase().contains('pro') && (expDate == null || expDate.isAfter(DateTime.now())));
+
+    final bool isSub = isAdmin || (isProFlag && !isExpired);
 
     return UserProfile(
       id: json['id'] as String,
@@ -424,9 +483,9 @@ class UserProfile {
       isEmailVerified: json['is_email_verified'] == true,
       requiresEmailVerification: json['requires_email_verification'] == true,
       isSubscribed: isSub,
-      subscriptionStatus: subJson?['status'] as String? ?? json['subscription_status'] as String?,
+      subscriptionStatus: rawStatus,
       subscriptionExpiresAt: rawExp,
-      plan: rawPlan,
+      plan: rawPlan.isNotEmpty ? rawPlan : (isSub ? 'Pro' : 'Free'),
       role: json['role'] as String?,
       status: json['status'] as String? ?? 'Active',
     );

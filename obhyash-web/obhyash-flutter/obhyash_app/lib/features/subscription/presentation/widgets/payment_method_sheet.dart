@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:obhyash_app/features/subscription/presentation/payment_view.dart';
 import '../../../../core/providers/app_config_provider.dart';
-import '../../../dashboard/providers/dashboard_providers.dart';
 import '../../domain/models.dart';
-import '../../services/in_app_purchase_service.dart';
+import '../google_play_purchase_view.dart';
 
 /// Chorcha-style bottom sheet modal for choosing a payment method.
 class PaymentMethodSheet extends ConsumerWidget {
@@ -176,27 +175,16 @@ class PaymentMethodSheet extends ConsumerWidget {
                 title: 'In App Purchase',
                 subtitle: 'Google Play Store Billing',
                 badge: _buildGooglePlayBadge(),
-                onTap: () async {
+                onTap: () {
+                  final nav = Navigator.of(context, rootNavigator: true);
                   Navigator.pop(context);
-                  InAppPurchaseService.onSubscriptionActivated = () {
-                    ref.invalidate(userProfileProvider);
-                  };
-                  final iapService = InAppPurchaseService();
-                  final launched = await iapService.purchasePlan(plan);
-                  if (!launched && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                          'পেমেন্ট প্রক্রিয়া শুরু করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        backgroundColor: const Color(0xFFEF4444),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        duration: const Duration(seconds: 3),
+                  nav.push(
+                    MaterialPageRoute(
+                      builder: (_) => GooglePlayPurchaseView(
+                        initialPlan: plan,
                       ),
-                    );
-                  }
+                    ),
+                  );
                 },
               ),
             ],

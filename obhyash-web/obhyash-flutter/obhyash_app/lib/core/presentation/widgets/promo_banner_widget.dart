@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/app_config_provider.dart';
 import '../../../features/dashboard/providers/dashboard_providers.dart';
@@ -196,7 +197,61 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
             ? config.promoBannerTarget.trim()
             : (isSub ? '/profile/subscription' : '/profile/referral'));
 
-    final countdownString = '${_toBengaliNumerals(_daysLeft)} দিন';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Theme adaptive colors
+    final List<Color> bgGradient = isDark
+        ? (isSub
+            ? const [Color(0xFF16151B), Color(0xFF100F14)]
+            : const [Color(0xFF0F1A17), Color(0xFF0A1210)])
+        : (isSub
+            ? const [Color(0xFFFFFDF5), Color(0xFFFEF9EE)]
+            : const [Color(0xFFF4FDF9), Color(0xFFEDFBF5)]);
+
+    final Color borderColor = isDark
+        ? (isSub
+            ? const Color(0xFFF59E0B).withValues(alpha: 0.32)
+            : const Color(0xFF10B981).withValues(alpha: 0.32))
+        : (isSub
+            ? const Color(0xFFF59E0B).withValues(alpha: 0.28)
+            : const Color(0xFF10B981).withValues(alpha: 0.28));
+
+    final Color titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final Color subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    final Color iconBg = isDark
+        ? (isSub
+            ? const Color(0xFFF59E0B).withValues(alpha: 0.16)
+            : const Color(0xFF10B981).withValues(alpha: 0.16))
+        : (isSub
+            ? const Color(0xFFFEF3C7)
+            : const Color(0xFFD1FAE5));
+
+    final Color iconBorder = isDark
+        ? (isSub
+            ? const Color(0xFFF59E0B).withValues(alpha: 0.35)
+            : const Color(0xFF10B981).withValues(alpha: 0.35))
+        : (isSub
+            ? const Color(0xFFF59E0B).withValues(alpha: 0.45)
+            : const Color(0xFF10B981).withValues(alpha: 0.45));
+
+    final Color iconColor = isDark
+        ? (isSub ? const Color(0xFFFBBF24) : const Color(0xFF34D399))
+        : (isSub ? const Color(0xFFD97706) : const Color(0xFF059669));
+
+    final Color actionBtnBg = isDark
+        ? (isSub ? const Color(0xFFF59E0B) : const Color(0xFF10B981))
+        : (isSub ? const Color(0xFF0F172A) : const Color(0xFF065F46));
+
+    final Color actionBtnTextColor = isDark
+        ? const Color(0xFF0F172A)
+        : Colors.white;
+
+    final Color dismissBg = isDark
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.black.withValues(alpha: 0.06);
+
+    final Color dismissIconColor = isDark ? Colors.white70 : const Color(0xFF64748B);
 
     return SizeTransition(
       sizeFactor: Tween<double>(begin: 1.0, end: 0.0).animate(_collapseAnimation),
@@ -206,35 +261,24 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            // Luxury dark gradient matching Obhyash Midnight Teal design language
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: isSub
-                  ? const [
-                      Color(0xFF141F23), // Deep Obsidian Teal
-                      Color(0xFF0A1518),
-                      Color(0xFF101C20),
-                    ]
-                  : const [
-                      Color(0xFF0F2623), // Emerald Tinted Dark
-                      Color(0xFF081917),
-                      Color(0xFF0C1F1D),
-                    ],
+              colors: bgGradient,
             ),
             border: Border(
               top: BorderSide(
-                color: isSub
-                    ? const Color(0xFFF59E0B).withValues(alpha: 0.6) // Warm Amber top rim
-                    : const Color(0xFF10B981).withValues(alpha: 0.6), // Emerald top rim
-                width: 1.2,
+                color: borderColor,
+                width: 1.1,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 10,
-                offset: const Offset(0, -3),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.35)
+                    : const Color(0xFFF59E0B).withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
               ),
             ],
           ),
@@ -252,43 +296,20 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                     padding: const EdgeInsets.fromLTRB(14, 10, 36, 10),
                     child: Row(
                       children: [
-                        // Left: Glowing Replica Icon Badge
+                        // Left: Elegant Pro Crown or Gift Badge
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: 42,
+                          height: 42,
                           decoration: BoxDecoration(
+                            color: iconBg,
                             shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: isSub
-                                  ? const [
-                                      Color(0xFFEF4444), // Crimson to Red (Alarm/Offer clock style)
-                                      Color(0xFFDC2626),
-                                    ]
-                                  : const [
-                                      Color(0xFF10B981), // Emerald to Teal
-                                      Color(0xFF059669),
-                                    ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (isSub
-                                        ? const Color(0xFFEF4444)
-                                        : const Color(0xFF10B981))
-                                    .withValues(alpha: 0.4),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            border: Border.all(color: iconBorder, width: 1.1),
                           ),
                           child: Center(
                             child: Icon(
-                              isSub
-                                  ? Icons.alarm_rounded
-                                  : Icons.card_giftcard_rounded,
-                              color: Colors.white,
-                              size: 24,
+                              isSub ? LucideIcons.crown : LucideIcons.gift,
+                              color: iconColor,
+                              size: 20,
                             ),
                           ),
                         ),
@@ -304,10 +325,10 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                                 displayTitle,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'HindSiliguri',
-                                  color: Colors.white,
-                                  fontSize: 14.5,
+                                  color: titleColor,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.2,
                                 ),
@@ -319,8 +340,8 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontFamily: 'HindSiliguri',
-                                  color: Colors.white.withValues(alpha: 0.85),
-                                  fontSize: 12.0,
+                                  color: subtitleColor,
+                                  fontSize: 11.5,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -328,53 +349,86 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                           ),
                         ),
 
-                        // Right: Countdown Pill Replica
+                        // Right: Clean, native badge + button
                         const SizedBox(width: 8),
                         Column(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              'বাকি মাত্র',
-                              style: TextStyle(
-                                fontFamily: 'HindSiliguri',
-                                color: Colors.white.withValues(alpha: 0.85),
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFF9800), // Vibrant Orange
-                                    Color(0xFFF57C00),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                            if (isSub) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                                      : const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
+                                        : const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                                    width: 0.7,
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(20),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.zap,
+                                      size: 10,
+                                      color: isDark
+                                          ? const Color(0xFFFBBF24)
+                                          : const Color(0xFFD97706),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      'বাকি ${_toBengaliNumerals(_daysLeft)} দিন',
+                                      style: TextStyle(
+                                        fontFamily: 'HindSiliguri',
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? const Color(0xFFFBBF24)
+                                            : const Color(0xFFD97706),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: actionBtnBg,
+                                borderRadius: BorderRadius.circular(14),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF9800).withValues(alpha: 0.4),
-                                    blurRadius: 8,
+                                    color: actionBtnBg.withValues(alpha: isDark ? 0.30 : 0.15),
+                                    blurRadius: 5,
                                     offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
-                              child: Text(
-                                countdownString,
-                                style: const TextStyle(
-                                  fontFamily: 'HindSiliguri',
-                                  color: Colors.white,
-                                  fontSize: 13.0,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    isSub ? 'প্রো দেখুন' : 'রেফার',
+                                    style: TextStyle(
+                                      fontFamily: 'HindSiliguri',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: actionBtnTextColor,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Icon(
+                                    LucideIcons.arrowRight,
+                                    size: 11,
+                                    color: actionBtnTextColor,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -387,22 +441,22 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
 
               // Top-Right: Translucent Circular Dismiss Button
               Positioned(
-                top: 6,
+                top: 7,
                 right: 8,
                 child: GestureDetector(
                   onTap: _isClosing ? null : _handleDismiss,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    width: 24,
-                    height: 24,
+                    width: 22,
+                    height: 22,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
+                      color: dismissBg,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.close_rounded,
-                      size: 14,
-                      color: Colors.white,
+                      size: 13,
+                      color: dismissIconColor,
                     ),
                   ),
                 ),
@@ -414,3 +468,4 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
     );
   }
 }
+

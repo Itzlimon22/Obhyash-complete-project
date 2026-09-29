@@ -241,7 +241,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                 value={formData.name}
                 onChange={handleChange}
                 className={inputClass}
-                placeholder="আপনার পূর্ণ নাম লেখো"
+                placeholder="তোমার পূর্ণ নাম লেখো"
               />
             </div>
 
@@ -321,7 +321,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
               onChange={handleChange}
               rows={4}
               className={inputClass}
-              placeholder="আপনার সম্পর্কে কিছু লেখো..."
+              placeholder="তোমার সম্পর্কে কিছু লেখো..."
             />
           </div>
         </div>
@@ -341,7 +341,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
               value={formData.institute}
               onChange={handleChange}
               className={inputClass}
-              placeholder="আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো..."
+              placeholder="তোমার শিক্ষা প্রতিষ্ঠানের নাম লেখো..."
             />
           </div>
         </div>

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/live_exam_providers.dart';
 import '../../../core/presentation/widgets/app_refresh_indicator.dart';
-
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../domain/models.dart';
 
@@ -51,15 +51,13 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
         _ObhyashCategoryData(
           key: 'ssc_board',
           tag: 'বোর্ড স্পেশাল',
-          title: 'বোর্ড মডেল লাইভ টেস্ট',
+          title: 'বোর্ড মডেল টেস্ট',
           subtitle: 'এসএসসি পূর্ণাঙ্গ মডেল',
-          description: 'সকল শিক্ষা বোর্ডের স্ট্যান্ডার্ড প্যাটার্নে মেগা লাইভ পরীক্ষা',
-          icon: Icons.assignment_turned_in_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF064E3B), const Color(0xFF022C22), const Color(0xFF011812)]
-              : [const Color(0xFF059669), const Color(0xFF047857), const Color(0xFF065F46)],
-          accentColor: const Color(0xFF34D399),
-          shadowColor: const Color(0xFF059669),
+          description: 'সকল শিক্ষা বোর্ডের স্ট্যান্ডার্ড মেগা লাইভ টেস্ট',
+          svgAsset: 'assets/dashboard-icons/exam_pencil.svg',
+          fallbackIcon: Icons.assignment_turned_in_rounded,
+          solidColor: const Color(0xFF1D4ED8), // Deep Blue
+          accentColor: const Color(0xFFDBEAFE),
           hasLive: _hasLive(exams, 'ssc_board'),
         ),
         _ObhyashCategoryData(
@@ -67,13 +65,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           tag: 'শীর্ষ স্কুল',
           title: 'শীর্ষ স্কুল ও ক্যাডেট',
           subtitle: 'টেস্ট পরীক্ষা স্পেশাল',
-          description: 'আইডিয়াল • ভিকারুননিসা • রাজউক • ক্যাডেট টেস্ট পরীক্ষা',
-          icon: Icons.school_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF1E3A8A), const Color(0xFF172554), const Color(0xFF0F172A)]
-              : [const Color(0xFF2563EB), const Color(0xFF1D4ED8), const Color(0xFF1E40AF)],
-          accentColor: const Color(0xFF60A5FA),
-          shadowColor: const Color(0xFF2563EB),
+          description: 'আইডিয়াল • ভিকারুননিসা • রাজউক • ক্যাডেট টেস্ট',
+          svgAsset: 'assets/images/subjects/varsity_ka.svg',
+          fallbackIcon: Icons.school_rounded,
+          solidColor: const Color(0xFF0F766E), // Deep Teal
+          accentColor: const Color(0xFFCCFBF1),
           hasLive: _hasLive(exams, 'ssc_school'),
         ),
         if (isBiz)
@@ -81,14 +77,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             key: 'ssc_business',
             tag: 'ব্যবসায় শিক্ষা',
             title: 'বাণিজ্য লাইভ টেস্ট',
-            subtitle: 'হিসাববিজ্ঞান • উদ্যোগ • ফিন্যান্স',
-            description: 'ব্যবসায় শিক্ষা বিভাগের শিক্ষার্থীদের স্পেশাল লাইভ পরীক্ষা',
-            icon: Icons.account_balance_wallet_rounded,
-            gradientColors: isDark
-                ? [const Color(0xFF78350F), const Color(0xFF451A03), const Color(0xFF290F02)]
-                : [const Color(0xFFD97706), const Color(0xFFB45309), const Color(0xFF92400E)],
-            accentColor: const Color(0xFFFBBF24),
-            shadowColor: const Color(0xFFD97706),
+            subtitle: 'হিসাববিজ্ঞান • ফিন্যান্স',
+            description: 'ব্যবসায় শিক্ষা বিভাগের মেগা লাইভ পরীক্ষা',
+            svgAsset: 'assets/dashboard-icons/account_card.svg',
+            fallbackIcon: Icons.account_balance_wallet_rounded,
+            solidColor: const Color(0xFFC2410C), // Deep Amber Orange
+            accentColor: const Color(0xFFFFEDD5),
             hasLive: _hasLive(exams, 'ssc_business'),
           )
         else if (isHum)
@@ -96,14 +90,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             key: 'ssc_humanities',
             tag: 'মানবিক বিভাগ',
             title: 'মানবিক লাইভ টেস্ট',
-            subtitle: 'ইতিহাস • ভূগোল • পৌরনীতি • অর্থনীতি',
-            description: 'মানবিক বিভাগের শিক্ষার্থীদের স্পেশাল লাইভ পরীক্ষা',
-            icon: Icons.history_edu_rounded,
-            gradientColors: isDark
-                ? [const Color(0xFF581C87), const Color(0xFF3B0764), const Color(0xFF240342)]
-                : [const Color(0xFF7C3AED), const Color(0xFF6D28D9), const Color(0xFF5B21B6)],
-            accentColor: const Color(0xFFA78BFA),
-            shadowColor: const Color(0xFF7C3AED),
+            subtitle: 'ইতিহাস • ভূগোল • পৌরনীতি',
+            description: 'মানবিক বিভাগের স্পেশাল লাইভ পরীক্ষা',
+            svgAsset: 'assets/images/subjects/textbook.svg',
+            fallbackIcon: Icons.history_edu_rounded,
+            solidColor: const Color(0xFF701A75), // Deep Plum
+            accentColor: const Color(0xFFFCE7F3),
             hasLive: _hasLive(exams, 'ssc_humanities'),
           )
         else if (isSci)
@@ -112,13 +104,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             tag: 'বিজ্ঞান বিভাগ',
             title: 'বিজ্ঞান লাইভ টেস্ট',
             subtitle: 'পদার্থ • রসায়ন • গণিত • জীব',
-            description: 'বিজ্ঞান বিভাগের শিক্ষার্থীদের স্পেশাল লাইভ পরীক্ষা',
-            icon: Icons.science_rounded,
-            gradientColors: isDark
-                ? [const Color(0xFF0E7490), const Color(0xFF155E75), const Color(0xFF083344)]
-                : [const Color(0xFF0891B2), const Color(0xFF0E7490), const Color(0xFF155E75)],
-            accentColor: const Color(0xFF22D3EE),
-            shadowColor: const Color(0xFF0891B2),
+            description: 'বিজ্ঞান বিভাগের শিক্ষার্থীদের অধ্যায়ভিত্তিক পরীক্ষা',
+            svgAsset: 'assets/images/subjects/engineering.svg',
+            fallbackIcon: Icons.science_rounded,
+            solidColor: const Color(0xFF047857), // Deep Green
+            accentColor: const Color(0xFFD1FAE5),
             hasLive: _hasLive(exams, 'ssc_science'),
           )
         else ...[
@@ -127,13 +117,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             tag: 'বিজ্ঞান বিভাগ',
             title: 'বিজ্ঞান লাইভ টেস্ট',
             subtitle: 'পদার্থ • রসায়ন • গণিত • জীব',
-            description: 'বিজ্ঞান বিভাগের শিক্ষার্থীদের স্পেশাল লাইভ পরীক্ষা',
-            icon: Icons.science_rounded,
-            gradientColors: isDark
-                ? [const Color(0xFF0E7490), const Color(0xFF155E75), const Color(0xFF083344)]
-                : [const Color(0xFF0891B2), const Color(0xFF0E7490), const Color(0xFF155E75)],
-            accentColor: const Color(0xFF22D3EE),
-            shadowColor: const Color(0xFF0891B2),
+            description: 'বিজ্ঞান বিভাগের শিক্ষার্থীদের অধ্যায়ভিত্তিক পরীক্ষা',
+            svgAsset: 'assets/images/subjects/engineering.svg',
+            fallbackIcon: Icons.science_rounded,
+            solidColor: const Color(0xFF047857), // Deep Green
+            accentColor: const Color(0xFFD1FAE5),
             hasLive: _hasLive(exams, 'ssc_science'),
           ),
           _ObhyashCategoryData(
@@ -141,13 +129,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             tag: 'বাণিজ্য ও মানবিক',
             title: 'বাণিজ্য ও মানবিক লাইভ',
             subtitle: 'হিসাববিজ্ঞান • ইতিহাস • পৌরনীতি',
-            description: 'ব্যবসায় শিক্ষা ও মানবিক বিভাগের স্পেশাল লাইভ পরীক্ষা',
-            icon: Icons.auto_stories_rounded,
-            gradientColors: isDark
-                ? [const Color(0xFF78350F), const Color(0xFF451A03), const Color(0xFF290F02)]
-                : [const Color(0xFFD97706), const Color(0xFFB45309), const Color(0xFF92400E)],
-            accentColor: const Color(0xFFFBBF24),
-            shadowColor: const Color(0xFFD97706),
+            description: 'ব্যবসায় শিক্ষা ও মানবিক বিভাগের লাইভ পরীক্ষা',
+            svgAsset: 'assets/images/subjects/textbook.svg',
+            fallbackIcon: Icons.auto_stories_rounded,
+            solidColor: const Color(0xFFC2410C), // Deep Amber Orange
+            accentColor: const Color(0xFFFFEDD5),
             hasLive: _hasLive(exams, 'ssc_business') || _hasLive(exams, 'ssc_humanities'),
           ),
         ],
@@ -156,13 +142,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           tag: 'আবশ্যিক বিষয়',
           title: 'আবশ্যিক লাইভ টেস্ট',
           subtitle: 'বাংলা • ইংরেজি • গণিত • আইসিটি',
-          description: 'সকল বিভাগের শিক্ষার্থীদের জন্য আবশ্যকীয় বিষয়ের মেগা টেস্ট',
-          icon: Icons.menu_book_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF881337), const Color(0xFF4C0519), const Color(0xFF2E020D)]
-              : [const Color(0xFFE11D48), const Color(0xFFBE123C), const Color(0xFF9F1239)],
-          accentColor: const Color(0xFFFB7185),
-          shadowColor: const Color(0xFFE11D48),
+          description: 'সকল বিভাগের শিক্ষার্থীদের জন্য আবশ্যকীয় মেগা টেস্ট',
+          svgAsset: 'assets/images/subjects/academic.svg',
+          fallbackIcon: Icons.menu_book_rounded,
+          solidColor: const Color(0xFF991B1B), // Deep Red
+          accentColor: const Color(0xFFFEE2E2),
           hasLive: _hasLive(exams, 'ssc_compulsory'),
         ),
       ];
@@ -174,12 +158,10 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           title: 'ইঞ্জিনিয়ারিং',
           subtitle: 'মডেল টেস্ট',
           description: 'বুয়েট • কুয়েট • রুয়েট • চুয়েট • আইইউটি',
-          icon: Icons.architecture_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF1E3A8A), const Color(0xFF172554), const Color(0xFF0F172A)]
-              : [const Color(0xFF2563EB), const Color(0xFF1D4ED8), const Color(0xFF1E40AF)],
-          accentColor: const Color(0xFF60A5FA),
-          shadowColor: const Color(0xFF2563EB),
+          svgAsset: 'assets/images/subjects/engineering.svg',
+          fallbackIcon: Icons.architecture_rounded,
+          solidColor: const Color(0xFF0E7490), // Deep Cyan (cyan-700)
+          accentColor: const Color(0xFFCFFAFE),
           hasLive: _hasLive(exams, 'engineering'),
         ),
         _ObhyashCategoryData(
@@ -187,13 +169,11 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           tag: 'মেডিকেল',
           title: 'মেডিকেল',
           subtitle: 'মডেল টেস্ট',
-          description: 'মেডিকেল ও ডেন্টাল সরকারি ভর্তি পরীক্ষা',
-          icon: Icons.medical_services_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF881337), const Color(0xFF4C0519), const Color(0xFF2E020D)]
-              : [const Color(0xFFE11D48), const Color(0xFFBE123C), const Color(0xFF9F1239)],
-          accentColor: const Color(0xFFFB7185),
-          shadowColor: const Color(0xFFE11D48),
+          description: 'মেডিকেল ও ডেন্টাল সরকারি ভর্তি প্রস্তুতি',
+          svgAsset: 'assets/images/subjects/medical.svg',
+          fallbackIcon: Icons.medical_services_rounded,
+          solidColor: const Color(0xFFBE123C), // Deep Red (rose-700)
+          accentColor: const Color(0xFFFFE4E6),
           hasLive: _hasLive(exams, 'medical'),
         ),
         _ObhyashCategoryData(
@@ -201,34 +181,32 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
           tag: 'ভার্সিটি',
           title: 'ভার্সিটি ক-ইউনিট',
           subtitle: 'মডেল টেস্ট',
-          description: 'ঢাকা বিশ্ববিদ্যালয় • সমন্বিত গুচ্ছ • জাহাঙ্গীরনগর',
-          icon: Icons.school_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF581C87), const Color(0xFF3B0764), const Color(0xFF240342)]
-              : [const Color(0xFF7C3AED), const Color(0xFF6D28D9), const Color(0xFF5B21B6)],
-          accentColor: const Color(0xFFA78BFA),
-          shadowColor: const Color(0xFF7C3AED),
+          description: 'ঢাকা বিশ্ববিদ্যালয় • জিএসটি গুচ্ছ • জাবি',
+          svgAsset: 'assets/images/subjects/varsity_ka.svg',
+          fallbackIcon: Icons.school_rounded,
+          solidColor: const Color(0xFF6D28D9), // Deep Purple (purple-700)
+          accentColor: const Color(0xFFEDE9FE),
           hasLive: _hasLive(exams, 'varsity'),
         ),
         _ObhyashCategoryData(
           key: 'hsc',
           tag: 'এইচএসসি',
           title: 'এইচএসসি স্পেশাল',
-          subtitle: 'অধ্যায়ভিত্তিক পরীক্ষা',
+          subtitle: 'অধ্যায়ভিত্তিক টেস্ট',
           description: 'বিজ্ঞান বিভাগ বোর্ড প্রশ্ন ও পূর্ণাঙ্গ প্রস্তুতি',
-          icon: Icons.menu_book_rounded,
-          gradientColors: isDark
-              ? [const Color(0xFF064E3B), const Color(0xFF022C22), const Color(0xFF011812)]
-              : [const Color(0xFF059669), const Color(0xFF047857), const Color(0xFF065F46)],
-          accentColor: const Color(0xFF34D399),
-          shadowColor: const Color(0xFF059669),
+          svgAsset: 'assets/images/subjects/academic.svg',
+          fallbackIcon: Icons.menu_book_rounded,
+          solidColor: const Color(0xFF047857), // Deep Green (emerald-700)
+          accentColor: const Color(0xFFD1FAE5),
           hasLive: _hasLive(exams, 'hsc'),
         ),
       ];
     }
 
+    final hasAnyLive = categories.any((c) => c.hasLive);
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       body: AppRefreshIndicator(
         onRefresh: () async {
           ref.invalidate(liveExamsProvider);
@@ -236,16 +214,80 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             await ref.read(liveExamsProvider.future);
           } catch (_) {}
         },
-        child: ListView.separated(
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-          itemCount: categories.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 14),
-          itemBuilder: (context, index) {
-            return _buildPremiumSingleCard(context, isDark, categories[index]);
-          },
+          slivers: [
+            // Generous breathing room below the header
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 24),
+            ),
+
+            // Live Status Indicator (Shown only when any live exam is actively running)
+            if (hasAnyLive)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _PulsingDot(),
+                            SizedBox(width: 4),
+                            Text(
+                              'লাইভ চলছে',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFEF4444),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // 2-Column Grid of Premium Category Cards
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 32),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.85,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final cat = categories[index];
+                    return _PremiumGridCard(
+                      cat: cat,
+                      isDark: isDark,
+                      onTap: () {
+                        context.push('/live_exam/${cat.key}');
+                      },
+                    );
+                  },
+                  childCount: categories.length,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -262,57 +304,96 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
       return match && e.isOngoing == true;
     });
   }
+}
 
-  Widget _buildPremiumSingleCard(
-    BuildContext context,
-    bool isDark,
-    _ObhyashCategoryData cat,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          context.push('/live_exam/${cat.key}');
-        },
-        borderRadius: BorderRadius.circular(24),
-        splashColor: Colors.white.withValues(alpha: 0.15),
-        highlightColor: Colors.white.withValues(alpha: 0.08),
+class _PremiumGridCard extends StatefulWidget {
+  final _ObhyashCategoryData cat;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _PremiumGridCard({
+    required this.cat,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  State<_PremiumGridCard> createState() => _PremiumGridCardState();
+}
+
+class _PremiumGridCardState extends State<_PremiumGridCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pressController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pressController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.965).animate(
+      CurvedAnimation(parent: _pressController, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pressController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cat = widget.cat;
+    final isDark = widget.isDark;
+
+    return GestureDetector(
+      onTapDown: (_) => _pressController.forward(),
+      onTapUp: (_) {
+        _pressController.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _pressController.reverse(),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) =>
+            Transform.scale(scale: _scaleAnimation.value, child: child),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: cat.gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(24),
+            color: cat.solidColor,
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withValues(alpha: isDark ? 0.14 : 0.28),
-              width: 1.2,
+              color: cat.hasLive
+                  ? const Color(0xFFFF4D4D)
+                  : Colors.white.withValues(alpha: 0.18),
+              width: cat.hasLive ? 1.8 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: cat.shadowColor.withValues(alpha: isDark ? 0.35 : 0.22),
-                blurRadius: 18,
-                spreadRadius: -2,
-                offset: const Offset(0, 8),
+                color: cat.solidColor.withValues(alpha: isDark ? 0.40 : 0.30),
+                blurRadius: cat.hasLive ? 16 : 10,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
             children: [
-              // Ambient Decorative Light Sphere (Top-Right)
+              // Top-Right Ambient Glow for subtle depth
               Positioned(
-                right: -25,
-                top: -25,
+                right: -20,
+                top: -20,
                 child: Container(
-                  width: 130,
-                  height: 130,
+                  width: 90,
+                  height: 90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        Colors.white.withValues(alpha: isDark ? 0.15 : 0.22),
+                        Colors.white.withValues(alpha: 0.12),
                         Colors.white.withValues(alpha: 0.0),
                       ],
                     ),
@@ -320,164 +401,139 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
                 ),
               ),
 
-              // Main Card Content
+              // Main Card Body
               Padding(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(13),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Top Header Row: Icon Emblem + Tag + Live Badge
+                    // Top Row: Custom SVG Emblem + Tag / Live Badge
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Glass Icon Emblem
+                        // Custom Icon Container
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: 42,
+                          height: 42,
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(13),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                              width: 1,
+                              color: Colors.white.withValues(alpha: 0.28),
+                              width: 1.0,
                             ),
                           ),
-                          child: Icon(
-                            cat.icon,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Tag Pill
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Text(
-                            cat.tag,
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
+                          padding: const EdgeInsets.all(8),
+                          child: SvgPicture.asset(
+                            cat.svgAsset,
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (_) => Icon(
+                              cat.fallbackIcon,
                               color: Colors.white,
-                              ),
+                              size: 22,
+                            ),
                           ),
                         ),
 
-                        const Spacer(),
-
-                        // Live Status Badge
+                        // Status Badge
                         if (cat.hasLive)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.25),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 7,
-                                  height: 7,
-                                  decoration: BoxDecoration(
-                                    color: cat.gradientColors.first,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  "LIVE NOW",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: cat.gradientColors.first,
-                                    letterSpacing: 0.6,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                          const _LivePulseBadge()
                         else
-                          const SizedBox.shrink(),
-
-                        const SizedBox(width: 8),
-
-                        // Sleek Chevron Arrow Indicator
-                        Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 0.8,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.20),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.32),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Text(
+                              cat.tag,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                        ),
                       ],
                     ),
 
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
 
-                    // Title and Subtitle Row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          cat.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "• ${cat.subtitle}",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white.withValues(alpha: 0.85),
-                            ),
-                        ),
-                      ],
+                    // Title
+                    Text(
+                      cat.title,
+                      style: const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    // Subtitle
+                    Text(
+                      cat.subtitle,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withValues(alpha: 0.90),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
 
                     const SizedBox(height: 4),
 
-                    // Target Institutions / Details
-                    Text(
-                      cat.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        height: 1.35,
-                        color: Colors.white.withValues(alpha: 0.78),
+                    // Description (Expanded absorbs remaining height cleanly)
+                    Expanded(
+                      child: Text(
+                        cat.description,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          height: 1.3,
+                          color: Colors.white.withValues(alpha: 0.82),
                         ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+
+                    // Bottom Action Row
+                    Row(
+                      children: [
+                        Text(
+                          cat.hasLive ? 'পরীক্ষায় যাও' : 'পরীক্ষা শুরু',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.22),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -490,16 +546,152 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
   }
 }
 
+class _LivePulseBadge extends StatefulWidget {
+  const _LivePulseBadge();
+
+  @override
+  State<_LivePulseBadge> createState() => _LivePulseBadgeState();
+}
+
+class _LivePulseBadgeState extends State<_LivePulseBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.45, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEF4444).withValues(alpha: 0.12 + (_animation.value * 0.08)),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFEF4444).withValues(alpha: 0.4 + (_animation.value * 0.4)),
+              width: 0.9,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFEF4444).withValues(alpha: _animation.value),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Text(
+                'LIVE',
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                  color: Color(0xFFEF4444),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot();
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: const Color(0xFFEF4444),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFEF4444).withValues(alpha: _animation.value),
+                blurRadius: 4,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ObhyashCategoryData {
   final String key;
   final String tag;
   final String title;
   final String subtitle;
   final String description;
-  final IconData icon;
-  final List<Color> gradientColors;
+  final String svgAsset;
+  final IconData fallbackIcon;
+  final Color solidColor;
   final Color accentColor;
-  final Color shadowColor;
   final bool hasLive;
 
   const _ObhyashCategoryData({
@@ -508,10 +700,10 @@ class _ObhyashCategoryData {
     required this.title,
     required this.subtitle,
     required this.description,
-    required this.icon,
-    required this.gradientColors,
+    required this.svgAsset,
+    required this.fallbackIcon,
+    required this.solidColor,
     required this.accentColor,
-    required this.shadowColor,
     required this.hasLive,
   });
 }

@@ -24,6 +24,7 @@ import {
   AlertCircle,
   Info,
   ArrowRight,
+  HelpCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -31,6 +32,7 @@ import { getDeviceFingerprint } from '@/lib/device-fingerprint';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
 import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
+import SocialLoginButton from '@/components/auth/SocialLoginButton';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -126,7 +128,7 @@ function SignupForm() {
     if (currentStep === 1) {
       // Personal
       if (!formData.name.trim()) {
-        return 'আপনার নাম উল্লেখ করা আবশ্যক';
+        return 'তোমার নাম উল্লেখ করা আবশ্যক';
       }
       if (!formData.phone.trim()) {
         return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
@@ -138,7 +140,7 @@ function SignupForm() {
     if (currentStep === 2) {
       // Academic
       if (!formData.institute) {
-        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
+        return 'তোমার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
       }
       if (!formData.batch) {
         return 'ব্যাচ সিলেক্ট করা আবশ্যক';
@@ -433,36 +435,38 @@ function SignupForm() {
   );
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
-      {/* Top Header / Branding */}
-      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
-            অ
-          </div>
-          <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
-            OBHYASH
-          </span>
-        </Link>
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white text-neutral-900 font-sans selection:bg-[#006A4E]/20">
+      {/* Top Header / Language Switcher & Back Link */}
+      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
         <Link
           href="/"
-          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 transition-colors flex items-center gap-1.5"
         >
-          <span>হোমপেজে ফিরে যাও</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>← হোম</span>
+        </Link>
+
+        {/* Support Link - Plain text, no box, no background */}
+        <Link
+          href="/support"
+          className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+        >
+          সাপোর্ট লাগবে?
         </Link>
       </header>
 
       {/* Center Form Container */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-lg bg-white dark:bg-neutral-900/80 rounded-2xl border border-neutral-200/90 dark:border-neutral-800 shadow-xl shadow-neutral-200/40 dark:shadow-none p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-              নতুন অ্যাকাউন্ট খোলো
+      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
+        <div className="w-full max-w-sm sm:max-w-md bg-white sm:border sm:border-neutral-200/90 sm:rounded-3xl sm:p-8 sm:shadow-lg space-y-6">
+          {/* Centered Brand Logo & Title */}
+          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+            <img
+              src="/obhyash_full_logo.png"
+              alt="Obhyash Logo"
+              className="h-10 w-auto object-contain"
+            />
+            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+              নতুন অ্যাকাউন্ট তৈরি করো
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm">
-              মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন
-            </p>
           </div>
 
           {renderProgress()}
@@ -793,7 +797,7 @@ function SignupForm() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="w-14 items-center justify-center flex rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  className="w-14 items-center justify-center flex rounded-xl sm:rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#14151a] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -803,23 +807,51 @@ function SignupForm() {
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
                 disabled={loading || isSendingOtp}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:py-3.5"
+                className="flex-1 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading || isSendingOtp ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {isSendingOtp ? 'ওটিপি পাঠানো হচ্ছে...' : 'অপেক্ষা করো...'}
+                    <span>{isSendingOtp ? 'ওটিপি পাঠানো হচ্ছে...' : 'অপেক্ষা করো...'}</span>
                   </>
                 ) : step === 3 ? (
                   'অ্যাকাউন্ট তৈরি করো'
                 ) : (
                   <>
-                    পরবর্তী ধাপ <ChevronRight className="w-5 h-5" />
+                    এগিয়ে যাও <ChevronRight className="w-5 h-5" />
                   </>
                 )}
               </button>
             </div>
           </div>
+
+          {/* Divider & Google Social Login (Step 1 only) */}
+          {step === 1 && (
+            <>
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white dark:bg-black sm:dark:bg-[#0d0e12] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
+                    Login / Registration with
+                  </span>
+                </div>
+              </div>
+
+              <Suspense
+                fallback={
+                  <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl sm:rounded-2xl animate-pulse" />
+                }
+              >
+                <SocialLoginButton
+                  mode="signup"
+                  label="Google"
+                  className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white dark:!bg-[#14151a] !border !border-neutral-300 dark:!border-neutral-800 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
+                />
+              </Suspense>
+            </>
+          )}
 
           {/* OTP VERIFICATION MODAL */}
           {isOtpModalOpen && (
@@ -884,7 +916,7 @@ function SignupForm() {
                   type="button"
                   onClick={verifyOtpRequest}
                   disabled={isVerifyingOtp || otpCode.length !== 6}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#006A4E] hover:bg-[#00573e] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isVerifyingOtp ? (
                     <>
@@ -917,25 +949,30 @@ function SignupForm() {
             </div>
           )}
 
-          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-            আগেই অ্যাকাউন্ট আছে?{' '}
-            <Link
-              href="/login"
-              className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
-            >
-              লগইন করো
-            </Link>
+          {/* Login Prompt */}
+          <div className="pt-2 text-center">
+
+            <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+              আগেই অ্যাকাউন্ট আছে?{' '}
+              <Link
+                href="/login"
+                className="text-[#006A4E] dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
+              >
+                লগইন করো
+              </Link>
+            </div>
           </div>
         </div>
       </main>
 
+
       {/* Bottom Footer */}
       <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
-        <Link href="/privacy" className="hover:underline">
+        <Link href="/privacy-policy" className="hover:underline">
           গোপনীয়তা নীতি
         </Link>
         <span>•</span>
-        <Link href="/terms" className="hover:underline">
+        <Link href="/terms-and-conditions" className="hover:underline">
           শর্তাবলী
         </Link>
         <span>•</span>

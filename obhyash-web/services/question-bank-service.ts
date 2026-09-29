@@ -11,7 +11,9 @@ export function getInstituteSearchTags(instituteId: string): string[] {
     case "buet":
       return ["BUET", "বুয়েট"];
     case "ckruet":
-      return ["CKRUET", "RUET", "KUET", "CUET", "গুচ্ছ ইঞ্জিঃ"];
+      // STRICT: Only CKRUET combined cluster tags. Never include RUET, KUET, CUET
+      // to prevent individual university questions from leaking into CKRUET exam sets.
+      return ["CKRUET", "গুচ্ছ ইঞ্জিঃ", "গুচ্ছ ইঞ্জিনিয়ারিং", "চুয়েট-কুয়েট-রুয়েট"];
     case "ruet":
       return ["RUET", "রুয়েট"];
     case "kuet":
@@ -40,8 +42,9 @@ export function getInstituteSearchTags(instituteId: string): string[] {
     case "bup":
       return ["BUP"];
     case "gst":
+      return ["GST", "গুচ্ছ"];
     case "agri":
-      return ["GST", "গুচ্ছ", "কৃষি গুচ্ছ", "Agri"];
+      return ["Agri", "কৃষি গুচ্ছ"];
     case "board_dhaka":
       return ["DB", "ঢাকা বোর্ড", "Dhaka Board", "Dhaka"];
     case "board_rajshahi":
@@ -83,31 +86,29 @@ export function getInstituteSearchTags(instituteId: string): string[] {
  * Extracts 4-digit years from session string (e.g. "24-25" -> [2024, 2025], "2023-24" -> [2023, 2024])
  */
 export function extractYearsFromSession(yearStr: string, instituteId?: string): number[] {
-  const years = new Set<number>();
   if (!yearStr) return [];
-  const parts = yearStr.split(/[-/]/);
+  const parts = yearStr.split(/[-/]/).map((p) => p.trim()).filter(Boolean);
+  const nums: number[] = [];
   for (const p of parts) {
-    const num = parseInt(p.trim(), 10);
+    const num = parseInt(p, 10);
     if (!isNaN(num)) {
       if (num < 100) {
-        years.add(num > 50 ? 1900 + num : 2000 + num);
+        nums.push(num > 50 ? 1900 + num : 2000 + num);
       } else {
-        years.add(num);
+        nums.push(num);
       }
     }
   }
 
-  // In Bangladeshi admission tests (KUET, BUET, DU, etc.), a single year like "18" or "2018"
-  // often refers to the academic session 2017-18 (questions tagged 2017 & 2018).
-  // For non-board/school admission sets with single year specified, include both [year-1, year].
-  if (instituteId && !instituteId.startsWith("board_") && !instituteId.startsWith("school_")) {
-    if (parts.length === 1 && years.size === 1) {
-      const y = Array.from(years)[0];
-      years.add(y - 1);
-    }
+  // In Bangladeshi admission & academic systems:
+  // A session like '2022-23', '22-23', or '2022-2023' (consecutive years Y and Y+1)
+  // is stored in the database under its start year Y (e.g. 2022 for session 2022-23).
+  // Returning both Y and Y+1 causes question leakage between consecutive sessions (e.g. 22-23 and 23-24).
+  if (nums.length === 2 && nums[1] === nums[0] + 1) {
+    return [nums[0]];
   }
 
-  return Array.from(years);
+  return nums;
 }
 
 /**
@@ -338,19 +339,32 @@ export function getSubjectSearchVariants(subjectName: string): string[] {
   return Array.from(variants);
 }
 
+const examSetCache = new Map<string, Question[]>();
+const LEAN_QUESTION_FIELDS =
+  "id, question, options, correct_answer_indices, explanation, type, difficulty, subject, chapter, topic, image_url, option_images, explanation_image_url, status, institutes, years, tags, exam_type, passage, section";
+
+export function clearExamSetCache(): void {
+  examSetCache.clear();
+}
+
 /**
  * Fetches authentic questions for a given institute and exam set.
  * Rules:
- * 1. ZERO QUESTION LEAKAGE: When a specific year is requested, ONLY fetch that year's questions.
- *    Never pad with questions from other years or generic pools.
- * 2. SERIAL-WISE GROUPING: Group and sort questions serial-wise by subject.
- * 3. FASTEST LOADING: Avoid Postgres multi-array timeout; run parallel queries and filter in-memory.
+ * 1. ZERO QUESTION LEAKAGE: When a specific year is requested, ONLY fetch that session year's questions.
+ *    Never combine adjacent or prior sessions.
+ * 2. ZERO INSTITUTE LEAKAGE: Strictly isolate institute tags (CKRUET never pulls RUET/KUET/CUET).
+ * 3. FASTEST LOADING: Targeted lean column queries on institute tags only; instant memory caching.
  */
 export async function fetchInstituteExamSetQuestions(
   instituteId: string,
   examSet: InstituteExamSet,
   selectedSubjects?: string[]
 ): Promise<Question[]> {
+  const cacheKey = `${instituteId}:${examSet.id}:${(selectedSubjects || []).join(",")}`;
+  if (examSetCache.has(cacheKey) && examSetCache.get(cacheKey)!.length > 0) {
+    return examSetCache.get(cacheKey)!;
+  }
+
   const isWritten =
     examSet.type === "written" ||
     examSet.id.toLowerCase().includes("written") ||
@@ -361,34 +375,23 @@ export async function fetchInstituteExamSetQuestions(
   const years = extractYearsFromSession(examSet.year, instituteId);
 
   try {
-    // ── Parallel Fast Fetch ──
+    // ── Targeted Fast Lean Fetch ──
     const queries = [];
     if (tags.length > 0) {
       queries.push(
         supabase
           .from("questions")
-          .select("*")
+          .select(LEAN_QUESTION_FIELDS)
           .contains("institutes", [tags[0]])
-          .limit(200)
       );
       if (tags.length > 1) {
         queries.push(
           supabase
             .from("questions")
-            .select("*")
+            .select(LEAN_QUESTION_FIELDS)
             .contains("institutes", [tags[1]])
-            .limit(200)
         );
       }
-    }
-    if (years.length > 0) {
-      queries.push(
-        supabase
-          .from("questions")
-          .select("*")
-          .overlaps("years", years)
-          .limit(200)
-      );
     }
 
     const results = await Promise.all(queries);
@@ -506,6 +509,10 @@ export async function fetchInstituteExamSetQuestions(
       matchedQuestions,
       selectedSubjects
     );
+
+    if (sortedQuestions.length > 0) {
+      examSetCache.set(cacheKey, sortedQuestions);
+    }
 
     return sortedQuestions;
   } catch (error) {

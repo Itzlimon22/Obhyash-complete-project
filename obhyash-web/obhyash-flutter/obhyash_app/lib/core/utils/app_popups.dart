@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,57 +11,64 @@ class AppPopups {
   static void show(
     BuildContext context, {
     required String message,
+    String? title,
     bool isError = false,
     Duration duration = const Duration(seconds: 3),
   }) {
     showTyped(
       context,
       message: message,
+      title: title,
       type: isError ? PopupType.error : PopupType.success,
       duration: duration,
     );
   }
 
-  /// Success message (Emerald badge & glow)
+  /// Success message (Green pastel glow & outline check badge)
   static void success(
     BuildContext context, {
     required String message,
+    String? title,
     Duration duration = const Duration(seconds: 3),
   }) {
-    showTyped(context, message: message, type: PopupType.success, duration: duration);
+    showTyped(context, message: message, title: title, type: PopupType.success, duration: duration);
   }
 
-  /// Error message (Rose/Crimson badge & glow) with intelligent backend error translation
+  /// Error message (Rose pastel glow & outline error badge) with intelligent backend error translation
   static void error(
     BuildContext context, {
     required String message,
+    String? title,
     Duration duration = const Duration(seconds: 4),
   }) {
-    showTyped(context, message: message, type: PopupType.error, duration: duration);
+    showTyped(context, message: message, title: title, type: PopupType.error, duration: duration);
   }
 
-  /// Warning / Alert message (Amber badge & glow)
+  /// Warning / Alert message (Amber pastel glow & outline warning badge)
   static void warning(
     BuildContext context, {
     required String message,
+    String? title,
     Duration duration = const Duration(seconds: 3),
   }) {
-    showTyped(context, message: message, type: PopupType.warning, duration: duration);
+    showTyped(context, message: message, title: title, type: PopupType.warning, duration: duration);
   }
 
-  /// Information message (Sky blue badge & glow)
+  /// Information message (Sky blue pastel glow & outline info badge)
   static void info(
     BuildContext context, {
     required String message,
+    String? title,
     Duration duration = const Duration(seconds: 3),
   }) {
-    showTyped(context, message: message, type: PopupType.info, duration: duration);
+    showTyped(context, message: message, title: title, type: PopupType.info, duration: duration);
   }
 
   /// Internal typed popup launcher
   static void showTyped(
     BuildContext context, {
     required String message,
+    String? title,
     required PopupType type,
     Duration duration = const Duration(seconds: 3),
   }) {
@@ -72,6 +77,9 @@ class AppPopups {
     final overlayState =
         Overlay.maybeOf(context, rootOverlay: true) ?? Overlay.maybeOf(context);
     if (overlayState == null) return;
+
+    // Detect app theme brightness from caller context
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Haptic feedback according to type
     if (type == PopupType.error) {
@@ -111,8 +119,10 @@ class AppPopups {
       builder: (context) {
         return _TopAnimatedPopup(
           message: cleanMessage,
+          title: title,
           type: type,
           duration: duration,
+          isDark: isDark,
           onDismiss: safeRemove,
         );
       },
@@ -185,14 +195,18 @@ class AppPopups {
 
 class _TopAnimatedPopup extends StatefulWidget {
   final String message;
+  final String? title;
   final PopupType type;
   final Duration duration;
+  final bool? isDark;
   final VoidCallback onDismiss;
 
   const _TopAnimatedPopup({
     required this.message,
+    this.title,
     required this.type,
     required this.duration,
+    this.isDark,
     required this.onDismiss,
   });
 
@@ -201,12 +215,12 @@ class _TopAnimatedPopup extends StatefulWidget {
 }
 
 class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
+  late AnimationController _progressController;
   late Animation<Offset> _offsetAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  Timer? _timer;
   bool _isDismissed = false;
 
   @override
@@ -214,8 +228,13 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 380),
+      duration: const Duration(milliseconds: 360),
       reverseDuration: const Duration(milliseconds: 220),
+    );
+
+    _progressController = AnimationController(
+      vsync: this,
+      duration: widget.duration,
     );
 
     _offsetAnimation = Tween<Offset>(
@@ -247,22 +266,26 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     );
 
     _controller.forward();
+    _progressController.reverse(from: 1.0);
 
-    // Auto dismiss after specified duration
-    _timer = Timer(widget.duration, _dismissWithAnimation);
+    _progressController.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        _dismissWithAnimation();
+      }
+    });
   }
 
   void _safeDismissImmediately() {
     if (_isDismissed) return;
     _isDismissed = true;
-    _timer?.cancel();
+    _progressController.stop();
     widget.onDismiss();
   }
 
   void _dismissWithAnimation() {
     if (_isDismissed) return;
     _isDismissed = true;
-    _timer?.cancel();
+    _progressController.stop();
 
     if (mounted) {
       _controller.reverse().then((_) {
@@ -277,7 +300,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _progressController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -285,31 +308,146 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final isDark = widget.isDark ?? (Theme.of(context).brightness == Brightness.dark);
 
     final Color accentColor;
+    final Color gradientStart;
+    final Color gradientMid;
+    final Color gradientEnd;
+    final Color cardBackground;
+    final Color cardBorder;
+    final Color badgeBackground;
+    final Color badgeBorder;
+    final Color titleColor;
+    final Color messageColor;
+    final Color closeIconColor;
+    final List<BoxShadow> cardShadows;
     final IconData iconData;
+    final String defaultTitle;
 
-    switch (widget.type) {
-      case PopupType.success:
-        accentColor = const Color(0xFF10B981); // Emerald Green
-        iconData = Icons.check_rounded;
-        break;
-      case PopupType.error:
-        accentColor = const Color(0xFFF43F5E); // Rose Crimson
-        iconData = Icons.priority_high_rounded;
-        break;
-      case PopupType.warning:
-        accentColor = const Color(0xFFF59E0B); // Amber
-        iconData = Icons.warning_amber_rounded;
-        break;
-      case PopupType.info:
-        accentColor = const Color(0xFF38BDF8); // Sky Blue
-        iconData = Icons.info_outline_rounded;
-        break;
+    if (isDark) {
+      // --- DARK THEME TOAST ---
+      cardBackground = const Color(0xFF111827); // Solid deep slate surface
+      cardBorder = const Color(0xFF1F2937);
+      badgeBackground = const Color(0xFF1F2937);
+      titleColor = const Color(0xFFF8FAFC);
+      messageColor = const Color(0xFF94A3B8);
+      closeIconColor = const Color(0xFF94A3B8);
+      gradientEnd = const Color(0xFF111827);
+
+      switch (widget.type) {
+        case PopupType.info:
+          accentColor = const Color(0xFF38BDF8); // Vibrant Sky 400
+          gradientStart = const Color(0xFF0C2A44); // Deep Sky Midnight
+          gradientMid = const Color(0xFF101E30);
+          badgeBorder = const Color(0xFF0284C7).withValues(alpha: 0.4);
+          iconData = Icons.info_outline_rounded;
+          defaultTitle = 'Information';
+          break;
+        case PopupType.success:
+          accentColor = const Color(0xFF34D399); // Vibrant Emerald 400
+          gradientStart = const Color(0xFF063321); // Deep Mint Midnight
+          gradientMid = const Color(0xFF0B241A);
+          badgeBorder = const Color(0xFF059669).withValues(alpha: 0.4);
+          iconData = Icons.check_circle_outline_rounded;
+          defaultTitle = 'Success';
+          break;
+        case PopupType.warning:
+          accentColor = const Color(0xFFFBBF24); // Vibrant Amber 400
+          gradientStart = const Color(0xFF382306); // Deep Amber Midnight
+          gradientMid = const Color(0xFF241909);
+          badgeBorder = const Color(0xFFD97706).withValues(alpha: 0.4);
+          iconData = Icons.warning_amber_rounded;
+          defaultTitle = 'Warning';
+          break;
+        case PopupType.error:
+          accentColor = const Color(0xFFFB7185); // Vibrant Rose 400
+          gradientStart = const Color(0xFF3B101A); // Deep Rose Midnight
+          gradientMid = const Color(0xFF280F16);
+          badgeBorder = const Color(0xFFE11D48).withValues(alpha: 0.4);
+          iconData = Icons.error_outline_rounded;
+          defaultTitle = 'Error';
+          break;
+      }
+
+      cardShadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.60),
+          blurRadius: 32,
+          spreadRadius: 0,
+          offset: const Offset(0, 12),
+        ),
+        BoxShadow(
+          color: accentColor.withValues(alpha: 0.14),
+          blurRadius: 18,
+          spreadRadius: -2,
+          offset: const Offset(0, 4),
+        ),
+      ];
+    } else {
+      // --- LIGHT THEME TOAST (Reference Design) ---
+      cardBackground = Colors.white;
+      cardBorder = const Color(0xFFE2E8F0);
+      badgeBackground = Colors.white;
+      badgeBorder = const Color(0xFFE2E8F0);
+      titleColor = const Color(0xFF0F172A);
+      messageColor = const Color(0xFF64748B);
+      closeIconColor = const Color(0xFF94A3B8);
+      gradientEnd = Colors.white;
+
+      switch (widget.type) {
+        case PopupType.info:
+          accentColor = const Color(0xFF0284C7); // Sky 600
+          gradientStart = const Color(0xFFE0F2FE); // 100% solid light sky
+          gradientMid = const Color(0xFFF0F9FF);   // 100% solid pale sky
+          iconData = Icons.info_outline_rounded;
+          defaultTitle = 'Information';
+          break;
+        case PopupType.success:
+          accentColor = const Color(0xFF16A34A); // Green 600
+          gradientStart = const Color(0xFFDCFCE7); // 100% solid light mint
+          gradientMid = const Color(0xFFF0FDF4);   // 100% solid pale mint
+          iconData = Icons.check_circle_outline_rounded;
+          defaultTitle = 'Success';
+          break;
+        case PopupType.warning:
+          accentColor = const Color(0xFFD97706); // Amber 600
+          gradientStart = const Color(0xFFFEF3C7); // 100% solid light amber
+          gradientMid = const Color(0xFFFFFBEB);   // 100% solid pale amber
+          iconData = Icons.warning_amber_rounded;
+          defaultTitle = 'Warning';
+          break;
+        case PopupType.error:
+          accentColor = const Color(0xFFE11D48); // Rose 600
+          gradientStart = const Color(0xFFFFE4E6); // 100% solid light rose
+          gradientMid = const Color(0xFFFFF1F2);   // 100% solid pale rose
+          iconData = Icons.error_outline_rounded;
+          defaultTitle = 'Error';
+          break;
+      }
+
+      cardShadows = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.14),
+          blurRadius: 28,
+          spreadRadius: 0,
+          offset: const Offset(0, 10),
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.05),
+          blurRadius: 10,
+          spreadRadius: 0,
+          offset: const Offset(0, 2),
+        ),
+      ];
     }
 
+    final resolvedTitle = (widget.title != null && widget.title!.trim().isNotEmpty)
+        ? widget.title!
+        : defaultTitle;
+
     return Positioned(
-      top: topPadding + 10,
+      top: math.max(topPadding, 16) + 12,
       left: 16,
       right: 16,
       child: Align(
@@ -341,88 +479,121 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
                           ),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xF2121318), // Deep Obsidian Glass
-                          borderRadius: BorderRadius.circular(28),
+                          color: cardBackground,
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: accentColor.withValues(alpha: 0.38),
-                            width: 1.2,
+                            color: cardBorder,
+                            width: 1.0,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: accentColor.withValues(alpha: 0.22),
-                              blurRadius: 20,
-                              spreadRadius: -2,
-                              offset: const Offset(0, 6),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.55),
-                              blurRadius: 28,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
+                          boxShadow: cardShadows,
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(28),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Circular Glowing Status Icon Badge
-                                  Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: accentColor.withValues(alpha: 0.16),
-                                      border: Border.all(
-                                        color: accentColor.withValues(alpha: 0.42),
-                                        width: 1,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  gradientStart,
+                                  gradientMid,
+                                  gradientEnd,
+                                  gradientEnd,
+                                ],
+                                stops: const [0.0, 0.28, 0.58, 1.0],
+                              ),
+                            ),
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(14, 13, 38, 13),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      // Squircle Outline Icon Badge
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: badgeBackground,
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: badgeBorder,
+                                            width: 1.0,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: isDark ? 0.25 : 0.04,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            iconData,
+                                            color: accentColor,
+                                            size: 21,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        iconData,
-                                        color: accentColor,
-                                        size: 17,
+                                      const SizedBox(width: 14),
+                                      // Title & Message Content
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              resolvedTitle,
+                                              style: TextStyle(
+                                                fontFamily: 'HindSiliguri',
+                                                color: titleColor,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: -0.2,
+                                                height: 1.2,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              widget.message,
+                                              style: TextStyle(
+                                                fontFamily: 'HindSiliguri',
+                                                color: messageColor,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                height: 1.35,
+                                              ),
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 10),
-                                  // Clean Message Text
-                                  Flexible(
-                                    child: Text(
-                                      widget.message,
-                                      style: const TextStyle(
-                                        color: Color(0xFFF8FAFC),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.32,
-                                        letterSpacing: 0.1,
-                                      ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  // Subtle Dismiss Close Button
-                                  GestureDetector(
+                                ),
+                                // Minimalist Slate Close Icon
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
                                     onTap: _dismissWithAnimation,
                                     behavior: HitTestBehavior.opaque,
                                     child: Padding(
                                       padding: const EdgeInsets.all(4),
                                       child: Icon(
                                         Icons.close_rounded,
-                                        color: Colors.white.withValues(alpha: 0.42),
-                                        size: 16,
+                                        color: closeIconColor,
+                                        size: 18,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

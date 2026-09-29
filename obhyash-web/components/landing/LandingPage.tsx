@@ -65,8 +65,8 @@ const LatexText = dynamic(
 interface LandingPageProps {
   onGetStarted: () => void;
   onLogin: () => void;
-  isDarkMode: boolean;
-  toggleTheme: () => void;
+  isDarkMode?: boolean;
+  toggleTheme?: () => void;
 }
 
 interface PricingPlan {
@@ -453,30 +453,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white dark:bg-black text-neutral-900 dark:text-neutral-100 transition-colors font-sans selection:bg-red-500/20">
+    <div className="dark min-h-screen w-full min-w-0 overflow-x-hidden bg-black text-neutral-100 font-sans selection:bg-red-500/20">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-black/80 border-b border-neutral-200/80 dark:border-neutral-800/80 shadow-sm dark:shadow-none">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-black/80 border-b border-neutral-800/80 shadow-none">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link
             href="/"
             aria-label="Obhyash Home"
-            className="flex items-center gap-2 group"
+            className="flex items-center group"
           >
-            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
-              <img
-                src="/obhyash_logo.svg"
-                alt="Obhyash Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col items-start justify-center -space-y-1 select-none">
-              <span className="text-[10px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
-                OBHYASH
-              </span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-700 dark:text-emerald-400 leading-none pb-1">
-                অভ্যাস
-              </span>
-            </div>
+            <img
+              src="/obhyash_full_logo_dark.svg"
+              alt="অভ্যাস"
+              className="h-8 sm:h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -487,7 +477,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   .getElementById('features')
                   ?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
             >
               ফিচার
             </button>
@@ -497,113 +487,54 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   .getElementById('pricing')
                   ?.scrollIntoView({ behavior: 'smooth' })
               }
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
             >
               প্রাইসিং
             </button>
             <Link
               href="/blog"
-              className="px-3 py-2 text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-400"
             >
               ব্লগ
             </Link>
 
-            {/* Demo Exam Link in Desktop Header */}
-            <Link
-              href="/demo"
-              className="px-3.5 py-1.5 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white font-bold text-sm flex items-center gap-1.5 shadow-[0_3px_0_#94A3B8] dark:shadow-[0_3px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[2px] transition-all cursor-pointer select-none"
-            >
-              <Flame className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-300" />
-              <span>ডেমো পরীক্ষা</span>
-            </Link>
-
-            <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-700 mx-1"></div>
-
-            <button
-              onClick={toggleTheme}
-              aria-label="থিম পরিবর্তন করুন"
-              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
-            >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-
-            {/* 2. Added Login Button */}
             <button
               onClick={onLogin}
-              className="px-4 py-2 text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-sm transition-all shadow-md shadow-emerald-500/20"
             >
-              লগইন
-            </button>
-
-            {/* 3. Updated Register/Get Started Button */}
-            <button
-              onClick={onGetStarted}
-              className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
-            >
-              শুরু করো
+              লগইন / রেজিস্ট্রেশন
             </button>
           </div>
 
-          {/* Mobile Navigation - Direct Buttons */}
-          <div className="md:hidden flex items-center gap-2">
-            <Link
-              href="/demo"
-              className="px-2.5 py-1 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white font-bold text-[11px] flex items-center gap-1 shadow-[0_2.5px_0_#94A3B8] dark:shadow-[0_2.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[1.5px] transition-all cursor-pointer select-none"
-            >
-              <Flame className="w-3 h-3 text-neutral-600 dark:text-neutral-300" />
-              <span>ডেমো</span>
-            </Link>
-
+          {/* Mobile Navigation - Single Login/Register Button */}
+          <div className="md:hidden flex items-center">
             <button
-              onClick={toggleTheme}
-              aria-label="থিম পরিবর্তন করুন"
-              className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
+              onClick={onLogin}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs transition-all shadow-sm shadow-emerald-500/20"
             >
-              {isDarkMode ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
+              লগইন / রেজিস্ট্রেশন
             </button>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={onLogin}
-                className="text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                লগইন
-              </button>
-              <button
-                onClick={onGetStarted}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-[11px] transition-all shadow-md shadow-emerald-500/20"
-              >
-                রেজিস্ট্রেশন
-              </button>
-            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-20 lg:pt-24 z-10">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row lg:items-start items-center gap-12 lg:gap-16">
+      <section className="relative pt-6 pb-12 sm:pt-12 sm:pb-16 lg:pt-20 lg:pb-24 z-10">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row lg:items-start items-center gap-8 sm:gap-12 lg:gap-16">
           {/* Left Content */}
-          <div className="lg:w-1/2 text-center lg:text-left space-y-8 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 dark:text-white leading-tight">
+          <div className="lg:w-1/2 text-center lg:text-left space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in-up">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
               ভুল থেকেই শুরু হোক <br />
-              <span className="text-red-600 dark:text-red-500">
+              <span className="text-red-500">
                 নিখুঁত প্রস্তুতি
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm md:text-base text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
               ২,০০,০০০+ অধ্যায়ভিত্তিক ও বিগত বছরের প্রশ্নব্যাংক, রিয়েল টাইমার এক্সাম, একবার ক্লিকেই অপশন লকিং, মূল পাঠ্যবইয়ের প্রমাণসহ নিখুঁত সমাধান এবং অফলাইন PDF ডাউনলোড—সবকিছু এক প্ল্যাটফর্মে।
             </p>
 
-            <div className="flex flex-row gap-2.5 sm:gap-3 justify-center lg:justify-start pt-2">
+            <div className="flex flex-row gap-2.5 sm:gap-3 justify-center lg:justify-start pt-1 sm:pt-2">
               <button
                 onClick={onGetStarted}
                 className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer"
@@ -614,9 +545,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
               <Link
                 href="/demo"
-                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#E2E8F0] hover:bg-[#CBD5E1] dark:bg-[#262626] dark:hover:bg-[#323232] border border-neutral-300 dark:border-white/[0.12] text-neutral-900 dark:text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#94A3B8] dark:shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#94A3B8] dark:active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer select-none"
+                className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 bg-[#262626] hover:bg-[#323232] border border-white/[0.12] text-white rounded-[14px] font-bold text-xs sm:text-base shadow-[0_4.5px_0_#141414] active:shadow-[0_1px_0_#141414] active:translate-y-[3.5px] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap cursor-pointer select-none"
               >
-                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-600 dark:text-neutral-300" />
+                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-300" />
                 <span>ডেমো পরীক্ষা দাও</span>
               </Link>
             </div>
@@ -624,26 +555,26 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Interactive Demo */}
           <div className="lg:w-1/2 w-full perspective-1000 lg:min-h-[580px]">
-            <div className="w-full relative bg-white dark:bg-[#0c0c0e] rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl shadow-neutral-300/40 dark:shadow-black/70 overflow-hidden transform rotate-y-2 hover:rotate-y-0 transition-all duration-300">
+            <div className="w-full relative bg-[#0c0c0e] rounded-2xl border border-neutral-800 shadow-2xl shadow-black/70 overflow-hidden transform rotate-y-2 hover:rotate-y-0 transition-all duration-300">
               {/* Fake Browser Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/80">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+              <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5 sm:py-3 border-b border-neutral-800 bg-neutral-900/80">
+                <div className="flex gap-1.5 sm:gap-2">
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400"></div>
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400"></div>
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400"></div>
                 </div>
-                <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 text-[10px] font-bold">
+                <div className="flex bg-neutral-800 rounded-lg p-1 text-[10px] font-bold">
                   <button
                     onClick={() => setActiveDemoTab('generate')}
                     aria-label="কাস্টম প্রশ্ন ডেমো"
-                    className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'generate' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
+                    className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded transition-all ${activeDemoTab === 'generate' ? 'bg-neutral-700 shadow text-emerald-400' : 'text-neutral-400'}`}
                   >
                     <FileText className="w-3 h-3" /> কাস্টম
                   </button>
                   <button
                     onClick={() => setActiveDemoTab('analytics')}
                     aria-label="পারফরম্যান্স এনালাইসিস ডেমো"
-                    className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
+                    className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded transition-all ${activeDemoTab === 'analytics' ? 'bg-neutral-700 shadow text-emerald-400' : 'text-neutral-400'}`}
                   >
                     <BarChart3 className="w-3 h-3" /> এনালাইসিস
                   </button>
@@ -651,7 +582,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Demo Content Area */}
-              <div className="p-6 min-h-[380px] flex flex-col relative">
+              <div className="p-3.5 sm:p-5 md:p-6 min-h-[340px] sm:min-h-[380px] flex flex-col relative">
                 {/* 1. Generate Question Demo (Realistic QuestionCard with Lock & Explanation) */}
                 {activeDemoTab === 'generate' && (
                   <div className="animate-in fade-in zoom-in duration-300 space-y-4">
@@ -887,57 +818,57 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
 
       {/* 2. Stats Banner */}
-      <section className="py-10 bg-neutral-50/50 dark:bg-black">
+      <section className="py-6 sm:py-10 bg-black">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
             {/* 1. Active Students */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0c0c0e] border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-neutral-700 transition-all duration-300 flex flex-col items-center text-center group">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
-                <GraduationCap className="w-5 h-5" />
+            <div className="p-3.5 sm:p-5 md:p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800/90 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all duration-300 flex flex-col items-center text-center group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-950/50 border border-emerald-800/60 flex items-center justify-center text-emerald-400 mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400 tracking-tight">
                 ৫০০+
               </div>
-              <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-[11px] sm:text-xs md:text-sm font-bold text-neutral-400 mt-1">
                 সক্রিয় শিক্ষার্থী
               </p>
             </div>
 
             {/* 2. Model Tests */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0c0c0e] border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-md hover:border-red-500/40 dark:hover:border-neutral-700 transition-all duration-300 flex flex-col items-center text-center group">
-              <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 flex items-center justify-center text-red-600 dark:text-red-400 mb-3 group-hover:scale-110 transition-transform">
-                <Flame className="w-5 h-5" />
+            <div className="p-3.5 sm:p-5 md:p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800/90 shadow-sm hover:shadow-md hover:border-red-500/40 transition-all duration-300 flex flex-col items-center text-center group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-950/50 border border-red-800/60 flex items-center justify-center text-red-400 mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
+                <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-red-600 dark:text-red-400 tracking-tight">
+              <div className="text-xl sm:text-2xl md:text-3xl font-black text-red-400 tracking-tight">
                 ১,৫০০+
               </div>
-              <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-[11px] sm:text-xs md:text-sm font-bold text-neutral-400 mt-1">
                 মডেল টেস্ট
               </p>
             </div>
 
             {/* 3. Questions & Solutions */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0c0c0e] border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-neutral-700 transition-all duration-300 flex flex-col items-center text-center group">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 group-hover:scale-110 transition-transform">
-                <CheckCircle2 className="w-5 h-5" />
+            <div className="p-3.5 sm:p-5 md:p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800/90 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all duration-300 flex flex-col items-center text-center group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-950/50 border border-emerald-800/60 flex items-center justify-center text-emerald-400 mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+              <div className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-400 tracking-tight">
                 ২,০০,০০০+
               </div>
-              <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-[11px] sm:text-xs md:text-sm font-bold text-neutral-400 mt-1">
                 প্রশ্ন ও নির্ভুল সমাধান
               </p>
             </div>
 
             {/* 4. Subject & Board Prep */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0c0c0e] border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-md hover:border-teal-500/40 dark:hover:border-neutral-700 transition-all duration-300 flex flex-col items-center text-center group">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/60 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-3 group-hover:scale-110 transition-transform">
-                <Target className="w-5 h-5" />
+            <div className="p-3.5 sm:p-5 md:p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800/90 shadow-sm hover:shadow-md hover:border-teal-500/40 transition-all duration-300 flex flex-col items-center text-center group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-950/50 border border-teal-800/60 flex items-center justify-center text-teal-400 mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
+              <div className="text-xl sm:text-2xl md:text-3xl font-black text-teal-400 tracking-tight">
                 ১২+
               </div>
-              <p className="text-xs sm:text-sm font-bold text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-[11px] sm:text-xs md:text-sm font-bold text-neutral-400 mt-1">
                 বিষয় ও বোর্ড প্রস্তুতি
               </p>
             </div>
@@ -948,17 +879,17 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* 3. Feature Grid - Why Obhyash? */}
       <section
         id="features"
-        className="py-24 bg-neutral-50/50 dark:bg-black max-w-full px-0"
+        className="py-10 sm:py-16 md:py-24 bg-black max-w-full px-0"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-0">
-          <div className="mb-16 text-center">
-            <span className="text-red-600 dark:text-red-400 font-bold tracking-wider uppercase text-sm">
+          <div className="mb-6 sm:mb-10 md:mb-16 text-center">
+            <span className="text-red-400 font-bold tracking-wider uppercase text-xs sm:text-sm">
               কেন আমরা সেরা?
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white mt-1.5">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white mt-1">
               তোমার প্রস্তুতিকে দাও <br className="hidden md:block" />
               <span className="relative whitespace-nowrap">
-                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500 dark:from-red-400 dark:to-red-500">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-500">
                   নতুন মাত্রা
                 </span>
               </span>
@@ -972,85 +903,85 @@ const LandingPage: React.FC<LandingPageProps> = ({
               ডানে স্ক্রল করো <ArrowRight className="w-3 h-3 ml-1" />
             </div>
 
-            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
               {/* 1. Real Exam & Option Locking */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
-                  <Zap className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
+                  <Zap className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
                   রিয়েল এক্সাম ও অপশন লকিং
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   পরীক্ষার হলের মতোই একবার অপশন দাগালে লক হয়ে যাবে। সাথে থাকছে ০ মিলিসেকেন্ডে তাৎক্ষণিক খাতা জমা ও ফলাফল।
                 </p>
               </div>
 
               {/* 2. Textbook Solutions & References */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <BookOpen className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
+                  <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
                   প্রমাণসহ বিস্তারিত সমাধান
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   প্রতিটি প্রশ্নের সাথে মূল পাঠ্যবই ও সম্মানিত লেখকদের রেফারেন্স সহ পুঙ্খানুপুঙ্খ ব্যাখ্যা ও সঠিক সূত্র।
                 </p>
               </div>
 
               {/* 3. Question Paper & Result PDF Downloads */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
-                  <FileText className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
+                  <FileText className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
                   অফলাইন PDF ডাউনলোড
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   অনুশীলনের পর এক ক্লিকেই সম্পূর্ণ ২-কলাম প্রশ্নপত্র এবং ব্যাখ্যা সহ উত্তরপত্র PDF প্রিন্ট বা ডাউনলোড করো।
                 </p>
               </div>
 
               {/* 4. Live Model Test */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <Video className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
+                  <Video className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2 flex items-center gap-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2 flex items-center gap-2">
                   <span>লাইভ মডেল টেস্ট</span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 text-[10px] font-extrabold uppercase">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 text-red-400 text-[10px] font-extrabold uppercase">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
                     Live
                   </span>
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   একই সময়ে সারা দেশের হাজারো শিক্ষার্থীর সাথে রিয়েল-টাইম লাইভ পরীক্ষায় অংশ নিয়ে যাচাই করো জাতীয় মেধাতালিকায় তোমার অবস্থান।
                 </p>
               </div>
 
               {/* 5. Daily Streak & Leaderboard */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-100 dark:ring-emerald-900/30">
-                  <Flame className="w-8 h-8 md:w-7 md:h-7 text-red-500" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-emerald-900/30">
+                  <Flame className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
                   ডেইলি স্ট্রাইক ও লিডারবোর্ড
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   পড়াশোনার ধারাবাহিকতা বজায় রাখতে ফ্লেম স্ট্রিক এবং কলেজ ও জাতীয় লিডারবোর্ডে বন্ধুদের সাথে প্রতিযোগিতা।
                 </p>
               </div>
 
               {/* 6. Spaced Repetition Revision */}
-              <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
-                <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
-                  <RotateCcw className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+              <div className="min-w-[80vw] sm:min-w-[60vw] md:min-w-0 snap-center group p-4 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] bg-neutral-900/70 border border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-red-900/20 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-900/30">
+                  <RotateCcw className="w-6 h-6 md:w-7 md:h-7 text-red-500" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2">
                   ভুল প্রশ্নের স্মার্ট রিভিশন
                 </h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                   পরীক্ষায় যেসব প্রশ্ন ভুল হয়, সেগুলোকে চিহ্নিত করে বারবার অনুশীলনের মাধ্যমে দুর্বলতা চিরতরে দূর করো।
                 </p>
               </div>
@@ -1058,55 +989,55 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Future Features (Coming Soon) */}
-          <div className="mt-16">
-            <div className="text-center mb-10">
-              <span className="inline-block px-4 py-1.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-bold border border-red-200 dark:border-red-800 animate-pulse">
+          <div className="mt-10 sm:mt-16">
+            <div className="text-center mb-6 sm:mb-10">
+              <span className="inline-block px-3.5 py-1.5 rounded-full bg-red-900/30 text-red-400 text-xs sm:text-sm font-bold border border-red-800 animate-pulse">
                 🚀 আসছে শীঘ্রই (Coming Soon)
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-90">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-6 opacity-90">
               {/* Quiz Battle (Battle) */}
-              <div className="relative p-6 rounded-2xl bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900/60 dark:to-neutral-800/30 border border-dashed border-neutral-300 dark:border-neutral-700/70 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-xl text-red-600">
-                    <Swords className="w-6 h-6" />
+              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
+                  <div className="p-2.5 sm:p-3 bg-red-900/20 rounded-xl text-red-500">
+                    <Swords className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <h3 className="font-bold text-neutral-900 dark:text-white">
+                  <h3 className="font-bold text-sm sm:text-base text-white">
                     কুইজ ব্যাটল (Battle)
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                <p className="text-xs sm:text-sm text-neutral-300">
                   বন্ধুদের সাথে রিয়েল-টাইমে ১v১ লাইভ কুইজ যুদ্ধে অংশ নিয়ে নিজের মেধার পরীক্ষা নাও।
                 </p>
               </div>
 
               {/* Doubt Solve */}
-              <div className="relative p-6 rounded-2xl bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900/60 dark:to-neutral-800/30 border border-dashed border-neutral-300 dark:border-neutral-700/70 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl text-emerald-600">
-                    <HelpCircle className="w-6 h-6" />
+              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
+                  <div className="p-2.5 sm:p-3 bg-emerald-900/20 rounded-xl text-emerald-400">
+                    <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <h3 className="font-bold text-neutral-900 dark:text-white">
+                  <h3 className="font-bold text-sm sm:text-base text-white">
                     ডাউট সলভ
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                <p className="text-xs sm:text-sm text-neutral-300">
                   এক্সপার্ট মেন্টরদের কাছ থেকে কঠিন প্রশ্নের সমাধান।
                 </p>
               </div>
 
               {/* Varsity Predictor */}
-              <div className="relative p-6 rounded-2xl bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900/60 dark:to-neutral-800/30 border border-dashed border-neutral-300 dark:border-neutral-700/70 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl text-emerald-600">
-                    <GraduationCap className="w-6 h-6" />
+              <div className="relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-neutral-900/60 to-neutral-800/30 border border-dashed border-neutral-700/70 hover:border-neutral-600 transition-colors">
+                <div className="flex items-center gap-3 sm:gap-4 mb-2.5 sm:mb-4">
+                  <div className="p-2.5 sm:p-3 bg-emerald-900/20 rounded-xl text-emerald-400">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <h3 className="font-bold text-neutral-900 dark:text-white">
+                  <h3 className="font-bold text-sm sm:text-base text-white">
                     ভার্সিটি প্রেডিক্টর
                   </h3>
                 </div>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                <p className="text-xs sm:text-sm text-neutral-300">
                   তোমার স্কোর অনুযায়ী চান্স পাওয়ার সম্ভাবনা যাচাই।
                 </p>
               </div>
@@ -1116,34 +1047,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 4. How It Works - Workflow */}
-      <section className="py-24 bg-white dark:bg-black relative overflow-hidden">
+      <section className="py-10 sm:py-16 md:py-24 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
-          <div className="text-center mb-12 sm:mb-16 space-y-3">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16 space-y-2 sm:space-y-3">
+            <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
               শুরু করা খুবই সহজ
             </h2>
-            <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 font-medium">
+            <p className="text-xs sm:text-base text-neutral-400 font-medium">
               মাত্র ৩ ধাপে প্র্যাকটিস শুরু।
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-neutral-100/40 dark:bg-[#121316] p-4 sm:p-6 lg:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
+          <div className="rounded-2xl sm:rounded-3xl border border-neutral-800 bg-[#0d0e12] p-3 sm:p-6 lg:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-5 lg:gap-6">
               {/* Card 1: ফ্রি অ্যাকাউন্ট খুলুন */}
-              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
                       1
                     </span>
-                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                    <span className="text-[11px] sm:text-xs font-semibold text-neutral-500">
                       ধাপ 1
                     </span>
                   </div>
 
-                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
                     {/* SVG Illustration 1: Laptop with User Avatar & Password dots */}
-                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
                       {/* Screen Bezel */}
                       <rect x="28" y="24" width="104" height="62" rx="8" stroke="#1E293B" strokeWidth="4" fill="#F8FAFC" />
                       
@@ -1169,30 +1100,30 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-0.5 sm:mb-1">
                     ফ্রি অ্যাকাউন্ট খুলুন
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                  <p className="text-xs sm:text-sm text-neutral-400">
                     Google দিয়ে এক ক্লিকে শুরু।
                   </p>
                 </div>
               </div>
 
               {/* Card 2: বিষয় বেছে নিন */}
-              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
                       2
                     </span>
-                    <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+                    <span className="text-[11px] sm:text-xs font-bold text-neutral-400">
                       ধাপ 2
                     </span>
                   </div>
 
-                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
                     {/* SVG Illustration 2: 3 Subject Cards with Pointing Hand */}
-                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
                       {/* Left Green Card */}
                       <g transform="translate(26, 26)">
                         <rect width="28" height="40" rx="5" fill="#10B981" stroke="#1E293B" strokeWidth="3.5" />
@@ -1229,30 +1160,30 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-0.5 sm:mb-1">
                     বিষয় বেছে নিন
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                  <p className="text-xs sm:text-sm text-neutral-400">
                     সিলেবাস অনুযায়ী সাবজেক্ট সিলেক্ট।
                   </p>
                 </div>
               </div>
 
               {/* Card 3: প্র্যাকটিস শুরু করুন */}
-              <div className="bg-white dark:bg-[#1c1d22] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+              <div className="bg-[#18191f] border border-neutral-800/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between hover:border-neutral-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="w-6 h-6 rounded-full bg-neutral-900 dark:bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-neutral-800 text-white font-bold text-xs flex items-center justify-center">
                       3
                     </span>
-                    <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
+                    <span className="text-[11px] sm:text-xs font-bold text-neutral-400">
                       ধাপ 3
                     </span>
                   </div>
 
-                  <div className="w-full h-44 sm:h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-4 mb-5 border border-neutral-100">
+                  <div className="w-full h-36 sm:h-44 md:h-48 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden shadow-inner p-3 sm:p-4 mb-3.5 sm:mb-5 border border-neutral-100">
                     {/* SVG Illustration 3: Test with clicking cursor & sparks */}
-                    <svg viewBox="0 0 160 120" className="w-36 h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 160 120" className="w-32 h-24 sm:w-36 sm:h-28 overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
                       {/* Laptop Screen Bezel */}
                       <rect x="28" y="24" width="104" height="62" rx="8" stroke="#1E293B" strokeWidth="4" fill="#F8FAFC" />
                       
@@ -1295,10 +1226,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mb-1">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-0.5 sm:mb-1">
                     প্র্যাকটিস শুরু করুন
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                  <p className="text-xs sm:text-sm text-neutral-400">
                     প্রশ্ন সলভ করে সাথে সাথে ফিডব্যাক।
                   </p>
                 </div>
@@ -1309,10 +1240,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 bg-white dark:bg-black">
+      <section className="py-10 sm:py-16 md:py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-16 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16 space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-2xs">
               <div className="flex items-center gap-0.5 text-amber-500">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -1322,61 +1253,61 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="opacity-40">•</span>
               <span>৫০০+ শিক্ষার্থীর আস্থা</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white">
               শিক্ষার্থীদের সাফল্যের অভিজ্ঞতা
             </h2>
           </div>
 
-          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-none snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-none snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="w-[85vw] max-w-[340px] md:w-auto md:max-w-none snap-center shrink-0 md:shrink bg-white dark:bg-[#0c0c0e] p-6 sm:p-7 rounded-2xl border border-neutral-200/90 dark:border-neutral-800/90 shadow-sm hover:shadow-xl hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
+                className="w-[82vw] max-w-[320px] md:w-auto md:max-w-none snap-center shrink-0 md:shrink bg-[#111216] p-4 sm:p-6 md:p-7 rounded-xl sm:rounded-2xl border border-neutral-800 shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   {/* Top Bar: Stars + Verified Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
+                  <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
                     <div className="flex items-center gap-1">
                       {[...Array(item.rating)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
                       ))}
                     </div>
                     {item.verified && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-800/60">
+                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         <span>ভেরিফাইড শিক্ষার্থী</span>
                       </span>
                     )}
                   </div>
 
                   {/* Student Review Quote */}
-                  <p className="text-neutral-700 dark:text-neutral-300 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                  <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 font-normal">
                     &ldquo;{item.text}&rdquo;
                   </p>
                 </div>
 
                 {/* Author Info */}
-                <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800/70 flex items-center gap-3">
+                <div className="pt-3 sm:pt-4 border-t border-neutral-800/70 flex items-center gap-2.5 sm:gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${item.avatarBg} flex items-center justify-center font-bold text-white text-sm shadow-xs shrink-0`}
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${item.avatarBg} flex items-center justify-center font-bold text-white text-xs sm:text-sm shadow-xs shrink-0`}
                   >
                     {item.initial}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-neutral-900 dark:text-white text-sm truncate">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <p className="font-bold text-white text-xs sm:text-sm truncate">
                         {item.name}
                       </p>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 shrink-0">
+                      <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 shrink-0">
                         {item.batch}
                       </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 truncate">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mt-0.5">
+                      <span className="text-[11px] sm:text-xs font-semibold text-emerald-400 truncate">
                         {item.college}
                       </span>
-                      <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                      <span className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                      <span className="text-neutral-700">•</span>
+                      <span className="text-[10px] sm:text-[11px] text-neutral-400 truncate">
                         {item.target}
                       </span>
                     </div>
@@ -1387,10 +1318,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Bottom Social Proof Highlight */}
-          <div className="mt-12 text-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-neutral-100/80 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400">
-              <span className="flex items-center gap-1.5 font-bold text-neutral-900 dark:text-white">
-                <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <div className="mt-8 sm:mt-12 text-center">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl bg-neutral-900/60 border border-neutral-800 text-[11px] sm:text-xs text-neutral-400">
+              <span className="flex items-center gap-1.5 font-bold text-white">
+                <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
                 ৯৮% শিক্ষার্থী
               </span>
               <span>জানিয়েছেন অভ্যাসের মাধ্যমে নিয়মিত প্র্যাকটিস তাদের পরীক্ষায় সিলি মিসটেক ও ভুল দাগানোর প্রবণতা কমিয়েছে</span>
@@ -1404,50 +1335,50 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="py-24 bg-white dark:bg-black"
+        className="py-10 sm:py-16 md:py-24 bg-black"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-16 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <Crown className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="text-center mb-8 sm:mb-12 md:mb-16 space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-emerald-950/50 border border-emerald-700/50 text-emerald-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <Crown className="w-3.5 h-3.5 text-emerald-400" />
               <span>সাশ্রয়ী ও ট্রান্সপারেন্ট প্রাইসিং</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
+            <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
               তোমার প্রস্তুতির সেরা প্ল্যানটি{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
                 বেছে নাও
               </span>
             </h2>
           </div>
 
           {/* Pricing Cards - Single Row Layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-flow-col lg:auto-cols-fr gap-3.5 xl:gap-4 items-stretch mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-flow-col lg:auto-cols-fr gap-3 sm:gap-3.5 xl:gap-4 items-stretch mb-8 sm:mb-12 md:mb-16">
             {pricingPlans.map((plan, i) => {
               const isPopular = Boolean(plan.highlight);
               return (
                 <div
                   key={i}
-                  className={`relative rounded-2xl p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 ${
+                  className={`relative rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 ${
                     isPopular
-                      ? 'bg-white dark:bg-[#18181b] border-2 border-[#22c55e] dark:border-[#22c55e] shadow-xl shadow-emerald-500/10 z-10'
-                      : 'bg-white dark:bg-[#18181b] border border-neutral-200 dark:border-neutral-800/90 shadow-sm hover:shadow-md'
+                      ? 'bg-[#18181b] border-2 border-[#22c55e] shadow-xl shadow-emerald-500/10 z-10'
+                      : 'bg-[#18181b] border border-neutral-800/90 shadow-sm hover:shadow-md'
                   }`}
                 >
                   {/* Floating Badge on Top Border */}
                   {isPopular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-0.5 rounded-full bg-[#22c55e] text-black font-black text-[11px] uppercase tracking-wider shadow-md whitespace-nowrap">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#22c55e] text-black font-black text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md whitespace-nowrap">
                       মোস্ট পপুলার
                     </div>
                   )}
 
                   <div>
                     {/* Plan Title */}
-                    <div className="mb-2">
+                    <div className="mb-1.5 sm:mb-2">
                       <span
                         className={`text-xs sm:text-sm font-bold tracking-tight ${
                           isPopular
                             ? 'text-[#22c55e]'
-                            : 'text-neutral-500 dark:text-neutral-400'
+                            : 'text-neutral-400'
                         }`}
                       >
                         {plan.title}
@@ -1456,28 +1387,28 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
                     {/* Price */}
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl sm:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
+                      <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
                         ৳{plan.price}
                       </span>
                     </div>
 
                     {/* Period Subtitle */}
-                    <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mt-1 mb-6">
+                    <p className="text-[11px] sm:text-xs font-semibold text-neutral-400 mt-0.5 sm:mt-1 mb-3.5 sm:mb-6">
                       {plan.period}
                     </p>
 
                     {/* Feature List */}
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-2 sm:space-y-2.5 mb-5 sm:mb-8">
                       {(plan.features || []).map((feature: string, f: number) => (
                         <li
                           key={f}
-                          className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium leading-snug"
+                          className="flex items-start gap-2 text-xs sm:text-sm text-neutral-300 font-medium leading-snug"
                         >
                           <Check
-                            className={`w-4 h-4 shrink-0 mt-0.5 ${
+                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 mt-0.5 ${
                               isPopular
                                 ? 'text-[#22c55e]'
-                                : 'text-sky-500 dark:text-sky-400'
+                                : 'text-sky-400'
                             }`}
                           />
                           <span>{feature}</span>
@@ -1490,10 +1421,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <button
                     type="button"
                     onClick={onGetStarted}
-                    className={`w-full py-3 px-4 rounded-xl text-xs sm:text-sm transition-all cursor-pointer text-center ${
+                    className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-all cursor-pointer text-center ${
                       isPopular
                         ? 'bg-[#22c55e] hover:bg-[#16a34a] text-black font-black shadow-lg shadow-emerald-500/25 active:scale-95'
-                        : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-[#27272a] dark:hover:bg-[#323236] text-neutral-900 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700/60 font-bold active:scale-95'
+                        : 'bg-[#27272a] hover:bg-[#323236] text-neutral-200 border border-neutral-700/60 font-bold active:scale-95'
                     }`}
                   >
                     {plan.cta}
@@ -1504,29 +1435,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Free vs Pro Detailed Comparison Table */}
-          <div className="rounded-3xl bg-white dark:bg-neutral-900/90 border border-neutral-200/90 dark:border-neutral-800 shadow-xl overflow-hidden">
-            <div className="p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-900">
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white text-center sm:text-left">
+          <div className="rounded-2xl sm:rounded-3xl bg-[#0e0f13] border border-neutral-800 shadow-xl overflow-hidden">
+            <div className="p-4 sm:p-6 md:p-8 border-b border-neutral-800 bg-[#131419]">
+              <h3 className="text-sm sm:text-base md:text-lg font-bold text-white text-center sm:text-left">
                 ফ্রি বনাম প্রো প্যাকেজের স্পষ্ট তুলনা
               </h3>
             </div>
 
             {/* Mobile Responsive Cards (visible on mobile only) */}
-            <div className="block sm:hidden divide-y divide-neutral-100 dark:divide-neutral-800/80 p-4 space-y-3.5">
+            <div className="block sm:hidden divide-y divide-neutral-800/80 p-3 space-y-2.5">
               {[
                 {
-                  feature: 'দৈনিক প্র্যাকটিস ও এক্সাম',
-                  free: '২টি / দিন',
+                  feature: 'দৈনিক পরীক্ষা কোটা',
+                  free: '২টি মক + ১টি QB / দিন',
                   pro: 'সীমাহীন আনলিমিটেড',
                 },
                 {
+                  feature: 'প্রতি পরীক্ষায় প্রশ্ন সংখ্যা',
+                  free: 'সর্বোচ্চ ৫০টি',
+                  pro: 'সীমাহীন',
+                },
+                {
                   feature: 'প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স',
-                  free: '❌ সীমিত',
+                  free: '❌ সীমিত (QB বন্ধ)',
                   pro: '✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ',
                 },
                 {
                   feature: '২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট',
-                  free: '❌ নেই',
+                  free: 'প্রশ্নপত্র ৩টি/সপ্তাহ (উত্তরপত্র Pro)',
                   pro: '✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট',
                 },
                 {
@@ -1550,24 +1486,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   pro: '✓ ১০০% বিজ্ঞাপনমুক্ত',
                 },
               ].map((row, idx) => (
-                <div key={idx} className={idx > 0 ? "pt-3.5" : ""}>
-                  <p className="font-bold text-sm text-neutral-900 dark:text-white mb-2">
+                <div key={idx} className={idx > 0 ? "pt-2.5" : ""}>
+                  <p className="font-bold text-xs sm:text-sm text-white mb-1.5">
                     {row.feature}
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200/70 dark:border-neutral-800 flex flex-col justify-between">
-                      <span className="block text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-1">
+                    <div className="p-2 rounded-lg bg-[#14151a] border border-neutral-800 flex flex-col justify-between">
+                      <span className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider mb-0.5">
                         ফ্রি (Free)
                       </span>
-                      <span className="text-neutral-600 dark:text-neutral-300 font-medium">
+                      <span className="text-neutral-300 font-medium text-[11px] sm:text-xs">
                         {row.free}
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col justify-between">
-                      <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                    <div className="p-2 rounded-lg bg-emerald-950/30 border border-emerald-800/50 flex flex-col justify-between">
+                      <span className="block text-[9px] font-bold text-emerald-400 uppercase tracking-wider mb-0.5">
                         প্রো (Pro)
                       </span>
-                      <span className="text-emerald-900 dark:text-emerald-200 font-bold">
+                      <span className="text-emerald-300 font-bold text-[11px] sm:text-xs">
                         {row.pro}
                       </span>
                     </div>
@@ -1591,9 +1527,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800 font-medium text-neutral-700 dark:text-neutral-300">
                   <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
-                      দৈনিক প্র্যাকটিস ও এক্সাম
+                      দৈনিক পরীক্ষা কোটা
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">২টি / দিন</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">২টি মক + ১টি QB / দিন</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       সীমাহীন আনলিমিটেড
                     </td>
@@ -1601,9 +1537,19 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
                   <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
+                      প্রতি পরীক্ষায় প্রশ্ন সংখ্যা
+                    </td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">সর্বোচ্চ ৫০টি</td>
+                    <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
+                      সীমাহীন
+                    </td>
+                  </tr>
+
+                  <tr className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                    <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       প্রশ্নের বিস্তারিত সমাধান ও বইয়ের রেফারেন্স
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ সীমিত</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ সীমিত (QB বন্ধ)</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ মূল পাঠ্যবই ও লেখক রেফারেন্স সহ
                     </td>
@@ -1613,7 +1559,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <td className="py-4 px-6 font-semibold text-neutral-900 dark:text-white">
                       ২-কলাম প্রশ্নপত্র ও উত্তরপত্র PDF প্রিন্ট
                     </td>
-                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">❌ নেই</td>
+                    <td className="py-4 px-6 text-center text-neutral-700 dark:text-neutral-300">প্রশ্নপত্র ৩টি/সপ্তাহ (উত্তরপত্র Pro)</td>
                     <td className="py-4 px-6 text-center text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-950/10">
                       ✓ আনলিমিটেড ডাউনলোড ও অফলাইন প্রিন্ট
                     </td>
@@ -1662,23 +1608,23 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </table>
             </div>
 
-            <div className="p-6 bg-neutral-50/80 dark:bg-neutral-900/60 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-neutral-100 dark:border-neutral-800">
-              <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-3.5 sm:p-6 bg-[#131419] flex flex-col md:flex-row items-center justify-between gap-3.5 sm:gap-6 border-t border-neutral-800">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   <span>নিরাপদ পেমেন্ট গেটওয়ে:</span>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap justify-center">
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-black bg-[#E2136E] text-white shadow-2xs">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#E2136E] text-white shadow-2xs">
                     bKash
                   </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-black bg-[#F7941D] text-white shadow-2xs">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#F7941D] text-white shadow-2xs">
                     Nagad
                   </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-black bg-[#8B2D88] text-white shadow-2xs">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#8B2D88] text-white shadow-2xs">
                     Rocket
                   </span>
-                  <span className="px-2.5 py-1 rounded-md text-[11px] font-black bg-[#005CA9] text-white shadow-2xs">
+                  <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-black bg-[#005CA9] text-white shadow-2xs">
                     Upay
                   </span>
                 </div>
@@ -1686,7 +1632,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={onGetStarted}
-                className="w-full sm:w-auto px-6 py-3 bg-[#12544F] hover:brightness-105 text-white rounded-[14px] font-bold text-xs shadow-[0_3.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
+                className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-[#12544F] hover:brightness-105 text-white rounded-xl sm:rounded-[14px] font-bold text-xs shadow-[0_3.5px_0_#092328] active:shadow-[0_1px_0_#092328] active:translate-y-[2.5px] transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 <span>প্রো প্ল্যানে আপগ্রেড করো</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -1697,37 +1643,37 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 max-w-4xl mx-auto px-4 lg:px-6 relative">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white">
+      <section className="py-10 sm:py-16 md:py-20 max-w-4xl mx-auto px-4 lg:px-6 relative">
+        <div className="text-center mb-6 sm:mb-10 md:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white">
             সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
           </h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-2.5 sm:space-y-4">
           {faqs.map((faq, idx) => {
             const isOpen = openFaq === idx;
             return (
               <div
                 key={idx}
-                className={`bg-white dark:bg-neutral-900/60 rounded-2xl border transition-all duration-300 overflow-hidden animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 shadow-sm hover:shadow-lg ${isOpen ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-500/10' : 'border-neutral-200 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700'}`}
+                className={`bg-[#0e0f13] rounded-xl sm:rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-lg ${isOpen ? 'border-emerald-500/80 shadow-lg ring-1 ring-emerald-500/20' : 'border-neutral-800/90 hover:border-neutral-700'}`}
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
                   aria-expanded={isOpen}
                   aria-label={faq.q}
-                  className="w-full text-left p-6 flex items-start justify-between gap-4 group"
+                  className="w-full text-left p-3.5 sm:p-5 md:p-6 flex items-start justify-between gap-3 sm:gap-4 group"
                 >
-                  <h3 className="font-bold text-sm sm:text-base text-neutral-900 dark:text-white flex items-start gap-2.5">
+                  <h3 className="font-bold text-xs sm:text-sm md:text-base text-white flex items-start gap-2 sm:gap-2.5">
                     <span
-                      className={`text-emerald-500 text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
+                      className={`text-emerald-400 text-base sm:text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
                     >
                       Q.
                     </span>
                     {faq.q}
                   </h3>
                   <div
-                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-emerald-500 border-emerald-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-emerald-500 group-hover:border-emerald-500'}`}
+                    className={`mt-0.5 sm:mt-1 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-emerald-500 border-emerald-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-emerald-400 group-hover:border-emerald-400'}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1735,7 +1681,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       viewBox="0 0 24 24"
                       strokeWidth={2.5}
                       stroke="currentColor"
-                      className="w-3.5 h-3.5"
+                      className="w-3 h-3 sm:w-3.5 sm:h-3.5"
                     >
                       <path
                         strokeLinecap="round"
@@ -1746,9 +1692,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </button>
                 <div
-                  className={`transition-all duration-300 ease-in-out px-6 ${isOpen ? 'max-h-[500px] pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+                  className={`transition-all duration-300 ease-in-out px-3.5 sm:px-6 ${isOpen ? 'max-h-[500px] pb-4 sm:pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
                 >
-                  <div className="pl-7 text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed border-t border-neutral-50 dark:border-neutral-800/50 pt-3">
+                  <div className="pl-5 sm:pl-7 text-neutral-400 text-xs sm:text-sm leading-relaxed border-t border-neutral-800/60 pt-2.5 sm:pt-3">
                     {faq.a}
                   </div>
                 </div>
@@ -1759,56 +1705,56 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Footer */}
-      <footer className="bg-neutral-50 dark:bg-black pt-20 pb-10 font-sans">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+      <footer className="bg-black pt-10 sm:pt-14 md:pt-20 pb-8 sm:pb-10 font-sans border-t border-neutral-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 mb-10 sm:mb-16">
             {/* Brand Column */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-[#071500] shadow-md shadow-emerald-950/25">
                   <img
                     src="/obhyash_logo.svg"
                     alt="Obhyash Logo"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
+                <span className="text-lg sm:text-xl font-black text-white tracking-tight">
                   অভ্যাস
                 </span>
               </div>
-              <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+              <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
                 HSC, ইঞ্জিনিয়ারিং, মেডিকেল ও ভার্সিটি ভর্তি পরীক্ষার জন্য বাংলাদেশের সবচেয়ে দ্রুত ও আধুনিক অনলাইন এক্সাম ও প্র্যাকটিস প্ল্যাটফর্ম।
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3 sm:gap-4">
                 <a
                   href="https://www.facebook.com/share/18779ur8WD/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Obhyash Facebook Page"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-neutral-900 flex items-center justify-center text-neutral-400 hover:bg-red-900/30 hover:text-red-400 transition-all border border-neutral-800"
                 >
-                  <Facebook className="w-5 h-5" />
+                  <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a
                   href="https://www.youtube.com/@obhyash"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Obhyash YouTube Channel"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-neutral-900 flex items-center justify-center text-neutral-400 hover:bg-red-900/30 hover:text-red-400 transition-all border border-neutral-800"
                 >
-                  <Youtube className="w-5 h-5" />
+                  <Youtube className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a
                   href="https://wa.me/8801409583992"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Obhyash WhatsApp Support"
-                  className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-all"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-neutral-900 flex items-center justify-center text-neutral-400 hover:bg-green-900/30 hover:text-green-400 transition-all border border-neutral-800"
                 >
                   <svg
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.438 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -1819,14 +1765,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Quick Links */}
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-white mb-3 sm:mb-6 text-sm sm:text-base">
                 দ্রুত লিংক
               </h3>
-              <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
+              <ul className="space-y-2.5 sm:space-y-4 text-xs sm:text-sm text-neutral-400">
                 <li>
                   <button
                     onClick={onGetStarted}
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     হোম
                   </button>
@@ -1838,7 +1784,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         .getElementById('features')
                         ?.scrollIntoView({ behavior: 'smooth' })
                     }
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     ফিচারসমূহ
                   </button>
@@ -1850,7 +1796,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         .getElementById('pricing')
                         ?.scrollIntoView({ behavior: 'smooth' })
                     }
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     প্রাইসিং
                   </button>
@@ -1858,7 +1804,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/blog"
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     ব্লগ
                   </Link>
@@ -1868,14 +1814,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Legal / Resources */}
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-white mb-3 sm:mb-6 text-sm sm:text-base">
                 রিসোর্স ও পলিসি
               </h3>
-              <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
+              <ul className="space-y-2.5 sm:space-y-4 text-xs sm:text-sm text-neutral-400">
                 <li>
                   <Link
                     href="/about-us"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     আমাদের সম্পর্কে (About Us)
                   </Link>
@@ -1883,7 +1829,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/privacy-policy"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     গোপনীয়তা নীতি (Privacy Policy)
                   </Link>
@@ -1891,7 +1837,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/terms-and-conditions"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     ব্যবহারের শর্তাবলী (Terms & Conditions)
                   </Link>
@@ -1899,7 +1845,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/refund-policy"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     রিফান্ড পলিসি (Refund Policy)
                   </Link>
@@ -1907,7 +1853,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/faq"
-                    className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
                   </Link>
@@ -1915,7 +1861,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/referral-program"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold"
+                    className="hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold text-emerald-400"
                   >
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     রেফারেল প্রোগ্রাম 🎁
@@ -1924,7 +1870,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <Link
                     href="/affiliate"
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400"
+                    className="hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold text-emerald-400"
                   >
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     অ্যাফিলিয়েট প্রোগ্রাম (Affiliate) 💼
@@ -1935,37 +1881,36 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Contact */}
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white mb-6">
+              <h3 className="font-bold text-white mb-3 sm:mb-6 text-sm sm:text-base">
                 যোগাযোগ
               </h3>
-              <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
-                <li className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <ul className="space-y-2.5 sm:space-y-4 text-xs sm:text-sm text-neutral-400">
+                <li className="flex items-start gap-2.5 sm:gap-3">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
                     লেভেল ৪, উত্তরা সেক্টর ১৩, <br /> ঢাকা-১২৩০, বাংলাদেশ
                   </span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+                <li className="flex items-center gap-2.5 sm:gap-3">
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
                   <span>+880 1409-583992</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+                <li className="flex items-center gap-2.5 sm:gap-3">
+                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
                   <span>support@obhyash.com</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-neutral-200 dark:border-neutral-800/60 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-neutral-500 dark:text-neutral-500 text-center md:text-left">
-              © {new Date().getFullYear()} Obhyash Platform. All rights
-              reserved.
+          <div className="pt-5 sm:pt-8 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 text-xs sm:text-sm text-neutral-500">
+            <p className="text-center sm:text-left">
+              © {new Date().getFullYear()} Obhyash Platform. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-sm text-neutral-500 dark:text-neutral-500">
-              <span className="flex items-center gap-1">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <span className="flex items-center gap-1 text-neutral-400">
                 অভ্যাসে শুরু{' '}
-                <span className="text-red-500 animate-pulse">✒️</span>
+                <span className="text-emerald-400 animate-pulse">✒️</span>
                 সাফল্যে শেষ
               </span>
             </div>

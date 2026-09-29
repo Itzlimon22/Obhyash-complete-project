@@ -7,7 +7,7 @@ import '../providers/live_exam_providers.dart';
 import '../../../../core/presentation/widgets/skeleton_loading.dart';
 import '../../../../core/presentation/widgets/app_refresh_indicator.dart';
 import '../domain/models.dart';
-import 'widgets/live_exam_routine_sheet.dart';
+import 'live_exam_routine_page.dart';
 import '../../../../core/providers/app_config_provider.dart';
 
 class LiveExamCategoryView extends ConsumerStatefulWidget {
@@ -60,7 +60,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(10, 20, 10, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -155,7 +155,13 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                   // Routine Action Button
                   GestureDetector(
                     onTap: () {
-                      LiveExamRoutineSheet.show(context, widget.category);
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (_) => LiveExamRoutinePage(
+                            categoryTitle: widget.category,
+                          ),
+                        ),
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(

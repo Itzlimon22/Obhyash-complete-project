@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'আপনার ইমেইলে ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে। ইনবক্স বা স্প্যাম ফোল্ডার চেক করুন।',
+      message: 'তোমার ইমেইলে ৬ ডিজিটের ওটিপি কোড পাঠানো হয়েছে। ইনবক্স বা স্প্যাম ফোল্ডার চেক করুন।',
       email: targetEmail,
       cooldown_seconds: data.cooldown_seconds || 60,
       expires_in_minutes: 10,

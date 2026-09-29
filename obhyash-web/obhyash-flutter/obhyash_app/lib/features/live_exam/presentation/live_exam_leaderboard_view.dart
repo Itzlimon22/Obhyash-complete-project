@@ -42,26 +42,17 @@ class _LiveExamLeaderboardViewState
   }
 
   String _formatTime(int? seconds, DateTime? start, DateTime? submit) {
-    if (seconds != null && seconds > 0) {
-      final mins = seconds ~/ 60;
-      final secs = seconds % 60;
-      return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')} মি.';
+    int? totalSecs = seconds;
+    if (totalSecs == null && start != null && submit != null) {
+      totalSecs = submit.difference(start).inSeconds;
     }
-    if (start != null && submit != null) {
-      final diff = submit.difference(start).inSeconds;
-      if (diff > 0 && diff <= 86400) {
-        final mins = diff ~/ 60;
-        final secs = diff % 60;
-        return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')} মি.';
-      }
-    }
-    if (submit != null) {
-      final local = submit.toLocal();
-      final hour = local.hour > 12
-          ? local.hour - 12
-          : (local.hour == 0 ? 12 : local.hour);
-      final period = local.hour >= 12 ? 'PM' : 'AM';
-      return '${hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')} $period';
+    if (totalSecs != null) {
+      final clamped = totalSecs < 0 ? 0 : (totalSecs > 86400 ? 86400 : totalSecs);
+      final mins = clamped ~/ 60;
+      final secs = clamped % 60;
+      final minsStr = BanglaNameHelper.toBanglaNumeral(mins.toString().padLeft(2, '0'));
+      final secsStr = BanglaNameHelper.toBanglaNumeral(secs.toString().padLeft(2, '0'));
+      return '$minsStr:$secsStr মি.';
     }
     return '--';
   }
@@ -304,7 +295,7 @@ class _LiveExamLeaderboardViewState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'আপনার অবস্থান',
+                                'তোমার অবস্থান',
                                 style: TextStyle(
                                   color: isDark
                                       ? const Color(0xFFA1A1AA)
@@ -726,7 +717,7 @@ class _LiveExamLeaderboardViewState
                                                       BorderRadius.circular(4),
                                                 ),
                                                 child: const Text(
-                                                  'আপনি',
+                                                  'তুমি',
                                                   style: TextStyle(
                                                     fontSize: 9.5,
                                                     fontWeight: FontWeight.bold,

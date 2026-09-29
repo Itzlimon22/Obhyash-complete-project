@@ -243,7 +243,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       AppPopups.warning(
         context,
         message:
-            'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।',
+            'তোমার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করো।',
       );
       return;
     }
@@ -253,7 +253,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       AppPopups.warning(
         context,
         message:
-            'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
+            'আজকের জন্য তোমার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করো।',
       );
       return;
     }
@@ -306,7 +306,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       AppPopups.warning(
         context,
         message:
-            'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।',
+            'তুমি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছ! নতুন কোনো তথ্য থাকলে তা উল্লেখ করো।',
       );
       return;
     }
@@ -509,7 +509,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।',
+                    'তোমার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করো।',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -547,7 +547,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'আজকের জন্য আপনার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
+                    'আজকের জন্য তোমার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করো।',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

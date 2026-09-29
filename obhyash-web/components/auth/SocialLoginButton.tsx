@@ -8,12 +8,14 @@ import { toast } from 'sonner';
 interface SocialLoginButtonProps {
   mode?: 'signin' | 'signup';
   className?: string;
+  label?: string;
   onBeforeRedirect?: () => void;
 }
 
 export default function SocialLoginButton({
   mode = 'signin',
   className = '',
+  label,
   onBeforeRedirect,
 }: SocialLoginButtonProps) {
   const [loading, setLoading] = useState(false);
@@ -73,8 +75,8 @@ export default function SocialLoginButton({
           />
         </svg>
       )}
-      <span>
-        {mode === 'signup' ? 'Google দিয়ে সাইন আপ করো' : 'Google দিয়ে লগইন করো'}
+      <span className="font-semibold text-sm sm:text-base">
+        {label || (mode === 'signup' ? 'Google দিয়ে সাইন আপ করো' : 'Google দিয়ে লগইন করো')}
       </span>
     </button>
   );

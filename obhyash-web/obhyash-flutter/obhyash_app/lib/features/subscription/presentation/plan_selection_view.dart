@@ -10,6 +10,7 @@ import '../domain/models.dart';
 import '../domain/coupon_service.dart';
 import 'widgets/coupon_bottom_sheet.dart';
 import 'widgets/payment_method_sheet.dart';
+import 'google_play_purchase_view.dart';
 
 class PlanSelectionView extends ConsumerStatefulWidget {
   final List<SubscriptionPlan>? initialPlans;
@@ -307,7 +308,24 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
       }
     }
 
-    // Show Chorcha-style payment method modal
+    final autoEnabled = ref.read(isPaymentAutoEnabledProvider);
+    final manualEnabled = ref.read(isPaymentManualEnabledProvider);
+    final googlePlayEnabled = ref.read(isPaymentGooglePlayEnabledProvider);
+
+    // If only Google Play In-App Purchase is enabled, navigate directly to Google Play Purchase screen
+    if (googlePlayEnabled && !autoEnabled && !manualEnabled) {
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => GooglePlayPurchaseView(
+            initialPlan: effectivePlan,
+            allPlans: _plans.where((p) => p.price > 0).toList(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Show payment method modal if multiple options exist
     PaymentMethodSheet.show(
       context: context,
       plan: effectivePlan,
@@ -413,7 +431,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 40),
+          padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -454,50 +472,8 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                   ),
                 ),
 
-              // MASTER PRICING & PLAN CARD (MATCHES SCREENSHOT EXACTLY)
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF141417) : Colors.white,
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    if (!isDark)
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 18,
-                        offset: const Offset(0, 6),
-                      ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // PRICING HEADER
-                    Text(
-                      'তোমার প্ল্যান বেছে নাও',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'সব প্ল্যানে সম্পূর্ণ প্রিমিয়াম অ্যাক্সেস আনলক হবে',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                        ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // COMPACT PLAN SELECTOR CARDS
-                    if (_isLoading)
+              // COMPACT PLAN SELECTOR (FLAT SCREEN)
+              if (_isLoading)
                       ...[1, 2, 3].map(
                         (i) => Container(
                           height: 84,
@@ -727,9 +703,6 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
                           );
                         }),
                     ],
-                  ],
-                ),
-              ),
             ],
           ),
         ),

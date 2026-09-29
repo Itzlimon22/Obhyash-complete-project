@@ -83,7 +83,7 @@ export const POST = async (req: Request) => {
 
   if (redeemerProfile?.subscription?.is_referral_blocked) {
     return NextResponse.json(
-      { error: 'আপনার অ্যাকাউন্ট থেকে রেফারেল কোড ব্যবহারের সুবিধা স্থগিত রয়েছে।' },
+      { error: 'তোমার অ্যাকাউন্ট থেকে রেফারেল কোড ব্যবহারের সুবিধা স্থগিত রয়েছে।' },
       { status: 403 },
     );
   }
@@ -324,7 +324,7 @@ export const POST = async (req: Request) => {
         await supabaseAdmin.from('notifications').insert({
           user_id: refRecord.owner_id,
           title: 'রেফারেল পর্যালোচনাধীন ⏳',
-          message: 'স্বাভাবিকের চেয়ে দ্রুত রেফারেল কার্যক্রম পরিলক্ষিত হওয়ায় নিরাপত্তা স্বার্থে আপনার সর্বশেষ রেফারেল বোনাসটি অ্যাডমিন পর্যালোচনার জন্য রাখা হয়েছে।',
+          message: 'স্বাভাবিকের চেয়ে দ্রুত রেফারেল কার্যক্রম পরিলক্ষিত হওয়ায় নিরাপত্তা স্বার্থে তোমার সর্বশেষ রেফারেল বোনাসটি অ্যাডমিন পর্যালোচনার জন্য রাখা হয়েছে।',
           type: 'system',
           is_read: false,
         });
@@ -352,7 +352,7 @@ export const POST = async (req: Request) => {
     await supabaseAdmin.from('notifications').insert({
       user_id: targetUserId,
       title: '১৫ দিনের ফ্রি প্রো সাবস্ক্রিপশন অ্যাক্টিভ! 🎉',
-      message: 'অভিনন্দন! রেফারেল কোড সফলভাবে যুক্ত হয়েছে। আপনার অ্যাকাউন্টে ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন চালু হয়েছে।',
+      message: 'অভিনন্দন! রেফারেল কোড সফলভাবে যুক্ত হয়েছে। তোমার অ্যাকাউন্টে ১৫ দিনের সম্পূর্ণ প্রো সাবস্ক্রিপশন চালু হয়েছে।',
       type: 'system',
       is_read: false,
     });

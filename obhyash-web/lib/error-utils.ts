@@ -16,7 +16,7 @@ export const getErrorMessage = (error: unknown): string => {
     return 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।';
   }
   if (message.includes('Email not confirmed')) {
-    return 'আপনার ইমেইলটি এখনও ভেরিফাই করা হয়নি।';
+    return 'তোমার ইমেইলটি এখনও ভেরিফাই করা হয়নি।';
   }
   if (message.includes('User already registered')) {
     return 'এই ইমেইল দিয়ে ইতঃমধ্যেই অ্যাকাউন্ট খোলা হয়েছে।';

@@ -29,9 +29,14 @@ import {
   Banknote,
   BookMarked,
   GraduationCap,
+  Crown,
 } from "lucide-react";
 import { Question } from "@/lib/types";
 import { BanglaNameHelper } from "@/lib/bangla-name-helper";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { isUserPro } from "@/lib/subscription-utils";
+import { ProUpgradeModal } from "@/components/common/ProUpgradeModal";
+import { supabase } from "@/services/core";
 import {
   InstituteCardItem,
   InstituteExamSet,
@@ -911,6 +916,11 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [initializedSubjects, setInitializedSubjects] = useState(false);
 
+  const { user, profile } = useAuth();
+  const effectiveUser = profile || user;
+  const isPro = isUserPro(effectiveUser);
+  const [showProModal, setShowProModal] = useState(false);
+
   const instId = institute.id.toLowerCase();
   const isWritten =
     examSet.type === "written" ||
@@ -1023,8 +1033,30 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
     }
   };
 
-  // Handler for 'পরীক্ষা দাও' (Mock Exam Mode)
+  // Handler for 'পরীক্ষা দাও' (1 attempt per day for free users, unlimited for Pro)
   const handleStartExam = async () => {
+    if (!isPro) {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          const now = new Date();
+          const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+          const { data: examResults } = await supabase
+            .from("exam_results")
+            .select("id")
+            .eq("user_id", userData.user.id)
+            .eq("chapters", "সকল অধ্যায়")
+            .gte("created_at", startOfDay);
+
+          if (examResults && examResults.length >= 1) {
+            setShowProModal(true);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("QB quota check error:", e);
+      }
+    }
     const qs = await loadQuestions();
     if (onTakeExam) {
       onTakeExam(
@@ -1264,30 +1296,32 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
             })}
           </div>
         ) : (
-          <div className="space-y-2">
-            {distributions.map((dist, idx) => {
-              const IconComp = dist.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white dark:bg-[#18181B] rounded-xl border border-neutral-200/80 dark:border-neutral-800 p-3 sm:px-3.5 flex items-center gap-3 shadow-2xs"
-                >
+          <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-3.5 sm:p-4 shadow-2xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 divide-y sm:divide-y-0 divide-neutral-100 dark:divide-neutral-800">
+              {distributions.map((dist, idx) => {
+                const IconComp = dist.icon;
+                return (
                   <div
-                    className={`w-9 h-9 rounded-full ${dist.bgColor} flex items-center justify-center shrink-0`}
+                    key={idx}
+                    className="flex items-center gap-3 pt-2.5 sm:pt-0 first:pt-0"
                   >
-                    <IconComp size={18} className={dist.color} />
+                    <div
+                      className={`w-8 h-8 rounded-xl ${dist.bgColor} flex items-center justify-center shrink-0`}
+                    >
+                      <IconComp size={16} className={dist.color} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-[13px] text-neutral-900 dark:text-white block truncate">
+                        {dist.subject}
+                      </span>
+                      <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 block truncate">
+                        {dist.questions} • {dist.marks}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="font-semibold text-sm text-neutral-900 dark:text-white block truncate">
-                      {dist.subject}
-                    </span>
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400 block truncate">
-                      {dist.questions} • {dist.marks}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
@@ -1316,6 +1350,15 @@ export const ExamSetDetailView: React.FC<ExamSetDetailViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Pro Upgrade Modal */}
+      <ProUpgradeModal
+        isOpen={showProModal}
+        onClose={() => setShowProModal(false)}
+        title="আজকের প্রশ্ন ব্যাংক কোটা শেষ 🎯"
+        message="ফ্রি অ্যাকাউন্টে দিনে ১টি প্রশ্ন ব্যাংক পরীক্ষা দেওয়া যায়। সীমাহীন পরীক্ষা দিতে অভ্যাস প্রো-তে আপগ্রেড করো।"
+        featurePill="দৈনিক কোটা: ১/১"
+      />
     </div>
   );
 };

@@ -25,7 +25,7 @@ export const FUNNY_EMPTY_STATES = [
     icon: '🤓',
   },
   {
-    message: 'আপনার ফোকাস এখন অন্য লেভেলে! 🎯',
+    message: 'তোমার ফোকাস এখন অন্য লেভেলে! 🎯',
     subtext: 'এই মনোযোগটা পড়াশোনায় কাজে লাগান।',
     icon: '🔥',
   },
@@ -52,7 +52,7 @@ export const FUNNY_EMPTY_STATES = [
     icon: '🍪',
   },
   {
-    message: 'আপনার ইনবক্স এখন ঘুমাচ্ছে 😴',
+    message: 'তোমার ইনবক্স এখন ঘুমাচ্ছে 😴',
     subtext: 'বিরক্ত করো না, রেস্ট নিতে দাও!',
     icon: '💤',
   },
@@ -96,7 +96,7 @@ export const FUNNY_EMPTY_STATES = [
 
   // --- Funny & Witty ---
   {
-    message: 'আপনার ইনবক্স এখন ডায়েটে আছে 🥗',
+    message: 'তোমার ইনবক্স এখন ডায়েটে আছে 🥗',
     subtext: 'কোনো নতুন আপডেট খায়নি এখনো।',
     icon: '🍽️',
   },
@@ -122,7 +122,7 @@ export const FUNNY_EMPTY_STATES = [
   },
   {
     message: 'এলিয়েনরা সব নিয়ে গেছে! �',
-    subtext: 'আপনার নোটিফিকেশন এখন অন্য গ্রহে।',
+    subtext: 'তোমার নোটিফিকেশন এখন অন্য গ্রহে।',
     icon: '🛸',
   },
   {

@@ -9,6 +9,7 @@ import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'institute_question_bank_detail_view.dart';
 
@@ -105,6 +106,8 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final totalCount = widget.questions.length;
+    final userProfile = ref.watch(userProfileProvider).value;
+    final isPro = userProfile?.isPro ?? false;
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFF8FAFC),
@@ -324,6 +327,7 @@ class _QuestionViewerViewState extends ConsumerState<QuestionViewerView> {
                       showFeedback: _selectedAnswers.containsKey(q.id) || q.options.isEmpty,
                       showAnswer: false,
                       hideSourceTag: true,
+                      hideExplanation: !isPro,
                       showReport: true,
                       initiallyExpanded: true,
                       onSelectOption: (optIndex) {

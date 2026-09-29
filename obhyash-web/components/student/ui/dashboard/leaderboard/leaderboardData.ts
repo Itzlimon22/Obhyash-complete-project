@@ -65,7 +65,7 @@ export const MOCK_USERS: UserProfile[] = [
   { id: '1', name: 'Ishraq Kabir', institute: 'Notre Dame College', xp: 5820, level: 'Legend', examsTaken: 95, avatarColor: 'bg-red-500' },
   { id: '2', name: 'Fatima Anjum', institute: 'Viqarunnisa Noon School', xp: 5150, level: 'Legend', examsTaken: 82, avatarColor: 'bg-emerald-500' },
   { id: '4', name: 'Sadia Islam', institute: 'Holy Cross College', xp: 4200, level: 'Titan', examsTaken: 68, avatarColor: 'bg-red-500' },
-  { id: 'me', name: 'আপনি (You)', institute: 'Rajuk Uttara Model College', xp: 2850, level: 'Warrior', examsTaken: 42, avatarColor: 'bg-emerald-600', isCurrentUser: true },
+  { id: 'me', name: 'তুমি (You)', institute: 'Rajuk Uttara Model College', xp: 2850, level: 'Warrior', examsTaken: 42, avatarColor: 'bg-emerald-600', isCurrentUser: true },
   { id: '5', name: 'Rahim Uddin', institute: 'Chittagong College', xp: 2600, level: 'Warrior', examsTaken: 38, avatarColor: 'bg-red-500' },
   { id: '6', name: 'Karim Ahmed', institute: 'Govt. Science College', xp: 2100, level: 'Warrior', examsTaken: 30, avatarColor: 'bg-red-500' },
   { id: '7', name: 'Nusrat Jahan', institute: 'Motijheel Ideal School', xp: 1800, level: 'Scout', examsTaken: 25, avatarColor: 'bg-emerald-500' },

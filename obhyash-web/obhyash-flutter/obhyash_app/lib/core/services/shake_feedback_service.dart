@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:shake/shake.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../router.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_popups.dart';
 
@@ -14,51 +12,12 @@ class ShakeFeedbackService {
   factory ShakeFeedbackService() => _instance;
   ShakeFeedbackService._internal();
 
-  ShakeDetector? _detector;
-  bool _isShowing = false;
-  bool _isEnabled = true;
+  /// Shake detection is completely removed as requested
+  void initialize() {}
 
-  /// Initialize shake listener across the entire app
-  void initialize() {
-    _detector?.stopListening();
-    try {
-      _detector = ShakeDetector.autoStart(
-        shakeThresholdGravity: 2.5,
-        shakeSlopTimeMS: 500,
-        onPhoneShake: (count) {
-          if (!_isEnabled || _isShowing) return;
-          _handleShake();
-        },
-      );
-    } catch (e) {
-      debugPrint('[ShakeFeedbackService] Failed to start shake detector: $e');
-    }
-  }
+  void setEnabled(bool enabled) {}
 
-  void setEnabled(bool enabled) {
-    _isEnabled = enabled;
-  }
-
-  void stop() {
-    _detector?.stopListening();
-  }
-
-  void _handleShake() {
-    final context = rootNavigatorKey.currentContext;
-    if (context == null) return;
-
-    _isShowing = true;
-    HapticFeedback.mediumImpact();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const ShakeFeedbackSheet(),
-    ).whenComplete(() {
-      _isShowing = false;
-    });
-  }
+  void stop() {}
 
   /// Manually trigger the feedback sheet (e.g., from settings or floating button)
   static void openFeedbackSheet(BuildContext context) {
@@ -122,7 +81,7 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
   Future<void> _submitFeedback() async {
     final text = _textController.text.trim();
     if (text.isEmpty) {
-      AppPopups.warning(context, message: 'অনুগ্রহ করে কিছু মতামত বা সমস্যার বিবরণ লিখুন।');
+      AppPopups.warning(context, message: 'অনুগ্রহ করে কিছু মতামত বা সমস্যার বিবরণ লেখো।');
       return;
     }
 
@@ -159,14 +118,14 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
         Navigator.pop(context);
         AppPopups.success(
           context,
-          message: 'আপনার মূল্যবান মতামত জমা হয়েছে! ধন্যবাদ ❤️',
+          message: 'তোমার মূল্যবান মতামত জমা হয়েছে! ধন্যবাদ ❤️',
         );
       }
     } catch (e) {
       if (mounted) {
         AppPopups.error(
           context,
-          message: 'মতামত পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।',
+          message: 'মতামত পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করো।',
         );
       }
     } finally {
@@ -264,7 +223,7 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
 
             // Title & Subtitle
             Text(
-              'আপনার মতামত বা সমস্যা জানান',
+              'তোমার মতামত বা সমস্যা জানাও',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -273,7 +232,7 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
             ),
             const SizedBox(height: 4),
             Text(
-              'অভ্যাস অ্যাপকে আরও নিখুঁত করতে যেকোনো বাগ রিপোর্ট বা মতামত লিখুন:',
+              'অভ্যাস অ্যাপকে আরও নিখুঁত করতে যেকোনো বাগ রিপোর্ট বা মতামত লেখো:',
               style: TextStyle(
                 fontSize: 13,
                 color: isDark ? Colors.grey[400] : AppColors.textSecondaryLight,
@@ -349,7 +308,7 @@ class _ShakeFeedbackSheetState extends State<ShakeFeedbackSheet> {
                 color: isDark ? Colors.white : Colors.black87,
               ),
               decoration: InputDecoration(
-                hintText: 'কী সমস্যা হচ্ছে বা কী যোগ করা উচিত বিস্তারিত লিখুন...',
+                hintText: 'কী সমস্যা হচ্ছে বা কী যোগ করা উচিত বিস্তারিত লেখো...',
                 hintStyle: TextStyle(
                   fontSize: 13,
                   color: isDark ? Colors.grey[500] : Colors.grey[400],

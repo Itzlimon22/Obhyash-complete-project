@@ -43,7 +43,14 @@ class DeepLinkService {
   Future<void> _handleDeepLink(Uri uri, GoRouter router) async {
     debugPrint('[DeepLinkService] Received deep link: $uri');
 
-    // 1. Handle OAuth errors returning from deep link
+    // 1. Handle Onboarding deep link returning from Google OAuth
+    if (uri.queryParameters['onboarding'] == 'true' ||
+        uri.fragment.contains('onboarding=true')) {
+      router.go('/complete-profile');
+      return;
+    }
+
+    // 2. Handle OAuth errors returning from deep link
     final error = uri.queryParameters['error'] ??
         (uri.fragment.contains('error=')
             ? RegExp(r'error=([^&]+)').firstMatch(uri.fragment)?.group(1)

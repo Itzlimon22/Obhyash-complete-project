@@ -71,7 +71,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
+    final sheetBg = isDark ? const Color(0xFF141417) : Colors.white;
     final borderColor = isDark
         ? const Color(0xFF1C1C1E)
         : const Color(0xFFE5E5E5);
