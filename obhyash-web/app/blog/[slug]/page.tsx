@@ -438,21 +438,13 @@ export default async function BlogPostPage({
         {...props}
       />
     ),
-    h1: ({
-      node: _,
-      ...props
-    }: React.ComponentPropsWithoutRef<'h1'> & { node?: unknown }) => (
-      <h1
-        className="text-3xl sm:text-4xl md:text-[40px] font-extrabold mt-12 sm:mt-16 mb-6 sm:mb-8 text-slate-900 dark:text-slate-50 font-anek tracking-tight leading-tight"
-        {...props}
-      />
-    ),
+    h1: () => null,
     h2: ({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'h2'> & { node?: unknown }) => (
       <h2
-        className="text-2xl sm:text-3xl md:text-[32px] font-bold mt-12 sm:mt-14 mb-5 sm:mb-6 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-anek tracking-tight"
+        className="text-2xl sm:text-3xl md:text-[32px] font-bold mt-12 sm:mt-14 mb-5 sm:mb-6 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-anek tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -461,7 +453,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h3'> & { node?: unknown }) => (
       <h3
-        className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 mb-4 sm:mb-5 text-slate-800 dark:text-slate-100 font-anek"
+        className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 mb-4 sm:mb-5 text-slate-800 dark:text-slate-100 font-anek tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -470,7 +462,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h4'> & { node?: unknown }) => (
       <h4
-        className="text-lg sm:text-xl md:text-[22px] font-bold mt-8 mb-3 sm:mb-4 text-slate-800 dark:text-slate-200 font-anek"
+        className="text-lg sm:text-xl md:text-[22px] font-bold mt-8 mb-3 sm:mb-4 text-slate-800 dark:text-slate-200 font-anek tracking-normal"
         {...props}
       />
     ),
@@ -479,7 +471,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h5'> & { node?: unknown }) => (
       <h5
-        className="text-[17px] sm:text-[19px] font-bold mt-6 mb-3 text-slate-700 dark:text-slate-300 font-anek"
+        className="text-[17px] sm:text-[19px] font-bold mt-6 mb-3 text-slate-700 dark:text-slate-300 font-anek tracking-normal"
         {...props}
       />
     ),
@@ -488,7 +480,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h6'> & { node?: unknown }) => (
       <h6
-        className="text-[15px] sm:text-[17px] font-bold mt-6 mb-2 text-slate-600 dark:text-slate-400 font-anek uppercase tracking-wide"
+        className="text-[15px] sm:text-[17px] font-bold mt-6 mb-2 text-slate-600 dark:text-slate-400 font-anek uppercase tracking-normal"
         {...props}
       />
     ),
@@ -509,7 +501,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'p'> & { node?: unknown }) => (
       <p
-        className="text-slate-700 dark:text-slate-300 leading-[1.8] sm:leading-[1.9] text-[16.5px] sm:text-[17px] md:text-[18px] mb-6 sm:mb-8 text-justify font-normal"
+        className="text-slate-700 dark:text-slate-300 leading-[1.8] sm:leading-[1.9] text-[16.5px] sm:text-[17px] md:text-[18px] mb-6 sm:mb-8 font-anek tracking-normal font-normal"
         {...props}
       />
     ),
@@ -527,7 +519,7 @@ export default async function BlogPostPage({
 
       {/* ─── Post Hero ─── */}
       <section className="bg-[#FAF6F3] dark:bg-[#121212]">
-        <div className="relative max-w-6xl mx-auto mt-16 px-4 sm:px-6">
+        <div className="relative max-w-4xl mx-auto mt-16 px-4 sm:px-6">
           {/* Breadcrumb */}
           <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">
             <Link
@@ -539,10 +531,10 @@ export default async function BlogPostPage({
             </Link>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-[56px] font-extrabold text-slate-900 dark:text-slate-50 leading-[1.15] tracking-tight mb-6 font-anek">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-normal mb-6 font-anek">
             {post.title}
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 leading-[1.6] mb-8 font-light font-anek max-w-4xl">
+          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-[1.7] mb-8 font-normal font-anek max-w-3xl tracking-normal">
             {post.excerpt}
           </p>
 
@@ -577,14 +569,14 @@ export default async function BlogPostPage({
 
       {/* Cover image */}
       {post.coverImage && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
           <div className="relative w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden shadow-md border border-black/5 dark:border-white/5">
             <Image
               src={post.coverImage}
               alt={post.title}
               fill
               className="object-cover"
-              sizes="(max-width: 1280px) 100vw, 1152px"
+              sizes="(max-width: 1024px) 100vw, 896px"
               priority
             />
           </div>
@@ -592,7 +584,7 @@ export default async function BlogPostPage({
       )}
 
       {/* ─── Single-column layout ─── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="flex flex-col gap-10">
           <article className="min-w-0">
             {/* Back link */}
@@ -604,10 +596,8 @@ export default async function BlogPostPage({
               ব্লগে ফিরে যাও
             </Link>
 
-
-
             {/* Post body */}
-            <div className="max-w-[72ch] mx-auto">
+            <div className="w-full">
               <div
                 className="prose prose-slate dark:prose-invert max-w-none w-full
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
