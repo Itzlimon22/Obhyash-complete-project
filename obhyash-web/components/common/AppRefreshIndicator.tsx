@@ -87,13 +87,42 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
     return window;
   }, [scrollContainerRef]);
 
-  // Check if target is at scrollTop <= 1 (tolerance for fractional pixel scaling)
+  // Check if target is at scrollTop <= 1 across all possible scroll targets (window, document, and container element)
   const checkIsAtTop = useCallback((): boolean => {
-    const el = getScrollElement();
-    if (el === window) {
-      return window.scrollY <= 1;
+    // 1. If window or document has scrolled, we are NOT at the top of the page
+    if (typeof window !== 'undefined') {
+      const winY =
+        window.scrollY ||
+        window.pageYOffset ||
+        document.documentElement?.scrollTop ||
+        document.body?.scrollTop ||
+        0;
+      if (winY > 1) {
+        return false;
+      }
     }
-    return (el as HTMLElement).scrollTop <= 1;
+
+    // 2. Check the container element scroll
+    const el = getScrollElement();
+    if (el && el !== window) {
+      const elem = el as HTMLElement;
+      if (elem.scrollTop > 1) {
+        return false;
+      }
+    }
+
+    // 3. Also check containerRef's scrollable parent if any
+    if (containerRef.current) {
+      let parent = containerRef.current.parentElement;
+      while (parent && parent !== document.body) {
+        if (parent.scrollTop > 1) {
+          return false;
+        }
+        parent = parent.parentElement;
+      }
+    }
+
+    return true;
   }, [getScrollElement]);
 
   useEffect(() => {
@@ -121,18 +150,28 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
       if (!isAtTopRef.current) return;
       if (e.touches.length !== 1) return;
 
-      // Re-verify we are still at top
-      if (!checkIsAtTop()) {
+      const currentY = e.touches[0].clientY;
+      const currentX = e.touches[0].clientX;
+      const deltaY = currentY - startYRef.current;
+      const deltaX = currentX - startXRef.current;
+
+      // If user is scrolling down into page (finger moving up), cancel pulling immediately
+      if (deltaY < 0) {
         isAtTopRef.current = false;
+        isPullingRef.current = false;
         pullDistanceRef.current = 0;
         setPullDistance(0);
         return;
       }
 
-      const currentY = e.touches[0].clientY;
-      const currentX = e.touches[0].clientX;
-      const deltaY = currentY - startYRef.current;
-      const deltaX = currentX - startXRef.current;
+      // Re-verify we are still at top
+      if (!checkIsAtTop()) {
+        isAtTopRef.current = false;
+        isPullingRef.current = false;
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        return;
+      }
 
       // If user moved horizontally more than vertically, do not intercept (e.g. tabs or swipe)
       if (!isPullingRef.current && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
@@ -140,12 +179,12 @@ export const AppRefreshIndicator: React.FC<AppRefreshIndicatorProps> = ({
         return;
       }
 
-      // If dragging downward at top
-      if (deltaY > 0) {
+      // Only engage pull-to-refresh if deliberately dragging downward when strictly at the top
+      if (deltaY > 15 && Math.abs(deltaY) > Math.abs(deltaX) * 1.4) {
         isPullingRef.current = true;
 
         // Prevent native browser page bounce/reload conflict
-        if (e.cancelable && deltaY > 8) {
+        if (e.cancelable) {
           e.preventDefault();
         }
 

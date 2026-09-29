@@ -93,6 +93,7 @@
     font-size: 16px;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: contain;
     overscroll-behavior-x: none;
     overflow-x: hidden;
   }
@@ -110,6 +111,7 @@
     font-size: 0.9375rem; /* 15px crisp modern app baseline */
     line-height: 1.5;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 }
 
