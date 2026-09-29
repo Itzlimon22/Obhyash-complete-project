@@ -1,6 +1,51 @@
 import { supabase, isSupabaseConfigured } from './core';
 import { Question } from '@/lib/types';
 
+// In-memory cache for instant 0ms subsequent loading
+let memoryBookmarksCache: {
+  userId: string;
+  questions: Question[];
+  timestamp: number;
+} | null = null;
+
+export const getCachedBookmarkedQuestions = (userId: string): Question[] | null => {
+  if (memoryBookmarksCache && memoryBookmarksCache.userId === userId) {
+    return memoryBookmarksCache.questions;
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = localStorage.getItem(`obhyash_bookmarks_${userId}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          memoryBookmarksCache = {
+            userId,
+            questions: parsed,
+            timestamp: Date.now(),
+          };
+          return parsed;
+        }
+      }
+    } catch (_) {}
+  }
+  return null;
+};
+
+export const invalidateBookmarksCache = (userId?: string) => {
+  if (userId) {
+    if (memoryBookmarksCache?.userId === userId) {
+      memoryBookmarksCache = null;
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`obhyash_bookmarks_${userId}`);
+      } catch (_) {}
+    }
+  } else {
+    memoryBookmarksCache = null;
+  }
+};
+
 export const toggleBookmark = async (
   userId: string,
   questionId: string | number,
@@ -24,6 +69,21 @@ export const toggleBookmark = async (
         .eq('question_id', qId);
 
       if (error) throw error;
+
+      if (memoryBookmarksCache && memoryBookmarksCache.userId === userId) {
+        memoryBookmarksCache.questions = memoryBookmarksCache.questions.filter(
+          (q) => String(q.id) !== String(qId),
+        );
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(
+              `obhyash_bookmarks_${userId}`,
+              JSON.stringify(memoryBookmarksCache.questions),
+            );
+          } catch (_) {}
+        }
+      }
+
       return false;
     } else {
       // For free tier users, verify current bookmark count before adding
@@ -48,6 +108,7 @@ export const toggleBookmark = async (
       });
 
       if (error) throw error;
+      invalidateBookmarksCache(userId);
       return true;
     }
   } catch (error) {
@@ -286,35 +347,67 @@ export const getBookmarkedQuestions = async (
 
     const questionMap = new Map<string, Question>();
 
-    // 2. Fetch from 'questions' table in chunks of 50 (only valid UUIDs to avoid 22P02 error)
+    // 2. Fetch from 'questions' table in parallel chunks of 50 (only valid UUIDs to avoid 22P02 error)
+    const chunkPromises: Promise<any[]>[] = [];
     for (let i = 0; i < uuidIds.length; i += 50) {
       const chunk = uuidIds.slice(i, i + 50);
-      try {
-        const { data: qData, error: qErr } = await sb
+      chunkPromises.push(
+        sb
           .from('questions')
           .select('*')
-          .in('id', chunk);
-
-        if (qErr) {
-          console.warn('[getBookmarkedQuestions] chunk query error:', qErr);
-        }
-
-        if (qData) {
-          qData.forEach((d: any) => {
-            if (d && d.id !== undefined && d.id !== null) {
-              const qid = String(d.id);
-              questionMap.set(qid, normalizeQuestion(d, dateMap.get(qid)));
-            }
-          });
-        }
-      } catch (chunkErr) {
-        console.warn('[getBookmarkedQuestions] chunk fetch error:', chunkErr);
-      }
+          .in('id', chunk)
+          .then(({ data, error }: any) => {
+            if (error) console.warn('[getBookmarkedQuestions] chunk query error:', error);
+            return data || [];
+          })
+          .catch((chunkErr: any) => {
+            console.warn('[getBookmarkedQuestions] chunk fetch error:', chunkErr);
+            return [];
+          }),
+      );
     }
 
-    // 3. Fallback: Search missing questions in exam_results
-    const missingIds = qIds.filter((id: string) => !questionMap.has(id));
-    if (missingIds.length > 0) {
+    const chunkResults = await Promise.all(chunkPromises);
+    chunkResults.forEach((qData) => {
+      if (Array.isArray(qData)) {
+        qData.forEach((d: any) => {
+          if (d && d.id !== undefined && d.id !== null) {
+            const qid = String(d.id);
+            questionMap.set(qid, normalizeQuestion(d, dateMap.get(qid)));
+          }
+        });
+      }
+    });
+
+    // 3. Fallback 1: LocalStorage cache for questions FIRST (instant client-side read)
+    const missingAfterDb = qIds.filter((id: string) => !questionMap.has(id));
+    if (missingAfterDb.length > 0 && typeof window !== 'undefined') {
+      try {
+        const cachedJson =
+          localStorage.getItem('obhyash_cached_questions') ||
+          localStorage.getItem('obhyash_all_questions');
+        if (cachedJson) {
+          const cachedList = JSON.parse(cachedJson);
+          if (Array.isArray(cachedList)) {
+            cachedList.forEach((item: any) => {
+              if (item && item.id !== undefined && item.id !== null) {
+                const sId = String(item.id);
+                if (missingAfterDb.includes(sId) && !questionMap.has(sId)) {
+                  questionMap.set(
+                    sId,
+                    normalizeQuestion(item, dateMap.get(sId)),
+                  );
+                }
+              }
+            });
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 4. Fallback 2: Search missing questions in user's exam_results (limited to last 10 exams for super fast load)
+    const stillMissing = qIds.filter((id: string) => !questionMap.has(id));
+    if (stillMissing.length > 0) {
       try {
         const { data: examRes } = await sb
           .from('exam_results')
@@ -322,7 +415,7 @@ export const getBookmarkedQuestions = async (
           .eq('user_id', userId)
           .not('questions', 'is', null)
           .order('created_at', { ascending: false })
-          .limit(50);
+          .limit(10);
 
         if (examRes) {
           examRes.forEach((row: any) => {
@@ -331,7 +424,7 @@ export const getBookmarkedQuestions = async (
               qList.forEach((item: any) => {
                 if (item && item.id !== undefined && item.id !== null) {
                   const sId = String(item.id);
-                  if (missingIds.includes(sId) && !questionMap.has(sId)) {
+                  if (stillMissing.includes(sId) && !questionMap.has(sId)) {
                     questionMap.set(
                       sId,
                       normalizeQuestion(item, dateMap.get(sId)),
@@ -350,34 +443,6 @@ export const getBookmarkedQuestions = async (
       }
     }
 
-    // 4. LocalStorage Fallback for any client-side cached questions
-    if (typeof window !== 'undefined') {
-      const stillMissing = qIds.filter((id: string) => !questionMap.has(id));
-      if (stillMissing.length > 0) {
-        try {
-          const cachedJson =
-            localStorage.getItem('obhyash_cached_questions') ||
-            localStorage.getItem('obhyash_all_questions');
-          if (cachedJson) {
-            const cachedList = JSON.parse(cachedJson);
-            if (Array.isArray(cachedList)) {
-              cachedList.forEach((item: any) => {
-                if (item && item.id !== undefined && item.id !== null) {
-                  const sId = String(item.id);
-                  if (stillMissing.includes(sId) && !questionMap.has(sId)) {
-                    questionMap.set(
-                      sId,
-                      normalizeQuestion(item, dateMap.get(sId)),
-                    );
-                  }
-                }
-              });
-            }
-          }
-        } catch (_) {}
-      }
-    }
-
     // 5. Return questions in original bookmark order
     const ordered: Question[] = [];
     qIds.forEach((id: string) => {
@@ -385,6 +450,18 @@ export const getBookmarkedQuestions = async (
         ordered.push(questionMap.get(id)!);
       }
     });
+
+    // Update memory and localStorage cache
+    memoryBookmarksCache = {
+      userId,
+      questions: ordered,
+      timestamp: Date.now(),
+    };
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`obhyash_bookmarks_${userId}`, JSON.stringify(ordered));
+      } catch (_) {}
+    }
 
     return ordered;
   } catch (error) {

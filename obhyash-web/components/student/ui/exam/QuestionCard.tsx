@@ -70,18 +70,23 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     const examHist = question.exam_history || question.examHistory;
     if (examHist && examHist.length > 0) {
       const first = examHist[0];
-      if (typeof first === 'object' && first?.institute) {
-        const yr = Number(first.year) > 0 ? ` '${String(Number(first.year) % 100).padStart(2, '0')}` : '';
-        return `${first.institute}${yr}`;
+      if (typeof first === 'object' && first) {
+        const rawCode = first.code || BanglaNameHelper.getInstituteCode(first.institute || '');
+        const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(first.institute || '');
+        const yrNum = Number(first.year) || 0;
+        const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
+        return `${rawCode}${yr}`;
       }
     }
     const insts = question.institutes || (question.institute ? [question.institute] : []);
     const yrs = question.years || (question.year ? [question.year] : []);
     if (insts.length > 0 && insts[0]) {
-      const inst = insts[0];
+      const rawInst = String(insts[0]);
+      const rawCode = BanglaNameHelper.getInstituteCode(rawInst);
+      const isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) || BanglaNameHelper.isTextbookAuthor(rawInst);
       const yrNum = yrs.length > 0 ? Number(yrs[0]) : 0;
-      const yr = yrNum > 0 ? ` '${String(yrNum % 100).padStart(2, '0')}` : '';
-      return `${inst}${yr}`;
+      const yr = yrNum > 0 && !isAuthor ? `'${String(yrNum % 100).padStart(2, '0')}` : '';
+      return `${rawCode}${yr}`;
     }
     return BanglaNameHelper.formatQuestionSource({
       institutes: insts,

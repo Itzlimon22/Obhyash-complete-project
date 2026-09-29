@@ -16,7 +16,11 @@ import { toast } from 'sonner';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 import ReportModal from '@/components/student/ui/common/ReportModal';
 import { cn } from '@/lib/utils';
-import { getBookmarkedQuestions } from '@/services/bookmark-service';
+import {
+  getBookmarkedQuestions,
+  getCachedBookmarkedQuestions,
+  toggleBookmark,
+} from '@/services/bookmark-service';
 
 interface BookmarkItem {
   question: Question;
@@ -127,9 +131,53 @@ interface BookmarksViewProps {
 export const BookmarksView: React.FC<BookmarksViewProps> = ({
   userId: propUserId,
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  // Check if we have instant cache available
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        let uid = propUserId;
+        if (!uid) {
+          const profileCached = localStorage.getItem('obhyash_user_profile');
+          if (profileCached) {
+            uid = JSON.parse(profileCached)?.id;
+          }
+        }
+        if (uid) {
+          const cachedQs = getCachedBookmarkedQuestions(uid);
+          if (cachedQs && cachedQs.length > 0) {
+            return cachedQs.map((q) => ({
+              question: ensureQuestionHasInstitute(q),
+              createdAt: q.bookmarkedAt ? new Date(q.bookmarkedAt) : new Date(),
+            }));
+          }
+        }
+      } catch (_) {}
+    }
+    return [];
+  });
+
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        let uid = propUserId;
+        if (!uid) {
+          const profileCached = localStorage.getItem('obhyash_user_profile');
+          if (profileCached) {
+            uid = JSON.parse(profileCached)?.id;
+          }
+        }
+        if (uid) {
+          const cachedQs = getCachedBookmarkedQuestions(uid);
+          if (cachedQs && cachedQs.length > 0) {
+            return false;
+          }
+        }
+      } catch (_) {}
+    }
+    return true;
+  });
+
   const [hasError, setHasError] = useState(false);
-  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
 
   // Filters
   const [filterSubject, setFilterSubject] = useState('');
@@ -140,9 +188,11 @@ export const BookmarksView: React.FC<BookmarksViewProps> = ({
   // Report Modal
   const [reportQuestionId, setReportQuestionId] = useState<string | null>(null);
 
-  const fetchBookmarks = useCallback(async () => {
-    setIsLoading(true);
-    setHasError(false);
+  const fetchBookmarks = useCallback(async (isBackground = false) => {
+    if (!isBackground) {
+      setIsLoading(true);
+      setHasError(false);
+    }
 
     try {
       const supabase = createClient();
@@ -183,20 +233,23 @@ export const BookmarksView: React.FC<BookmarksViewProps> = ({
       setBookmarks(ordered);
     } catch (err) {
       console.error('[BookmarksView] fetch error:', err);
-      setHasError(true);
+      if (!isBackground) {
+        setHasError(true);
+      }
     } finally {
       setIsLoading(false);
     }
   }, [propUserId]);
 
   useEffect(() => {
-    fetchBookmarks();
+    // If bookmarks are already populated from cache, run as background revalidation
+    fetchBookmarks(bookmarks.length > 0);
   }, [fetchBookmarks]);
 
   // Listen to global pull-to-refresh event
   useEffect(() => {
     const handleRefresh = () => {
-      fetchBookmarks();
+      fetchBookmarks(false);
     };
     window.addEventListener('app:refresh', handleRefresh);
     return () => window.removeEventListener('app:refresh', handleRefresh);
@@ -205,31 +258,34 @@ export const BookmarksView: React.FC<BookmarksViewProps> = ({
   // Remove single bookmark
   const handleRemoveBookmark = async (questionId: string | number) => {
     try {
-      const supabase = createClient();
       let targetUserId = propUserId;
+      if (!targetUserId && typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem('obhyash_user_profile');
+          if (cached) {
+            targetUserId = JSON.parse(cached)?.id;
+          }
+        } catch (_) {}
+      }
+
       if (!targetUserId) {
+        const supabase = createClient();
         const { data: sessionData } = await supabase.auth.getSession();
         targetUserId = sessionData?.session?.user?.id;
       }
-      if (!targetUserId) {
-        const { data: userData } = await supabase.auth.getUser();
-        targetUserId = userData?.user?.id;
-      }
+
       if (!targetUserId) return;
 
       const qIdStr = String(questionId);
       setBookmarks((prev) => prev.filter((b) => String(b.question.id) !== qIdStr));
       toast.success('বুকমার্ক থেকে সরানো হয়েছে');
 
-      await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('question_id', qIdStr);
+      // Update backend & local caches
+      await toggleBookmark(targetUserId, qIdStr, true);
     } catch (err) {
       console.error('[BookmarksView] remove error:', err);
       toast.error('বুকমার্ক সরাতে সমস্যা হয়েছে');
-      fetchBookmarks();
+      fetchBookmarks(false);
     }
   };
 
@@ -415,7 +471,7 @@ export const BookmarksView: React.FC<BookmarksViewProps> = ({
           </h3>
           <button
             type="button"
-            onClick={fetchBookmarks}
+            onClick={() => fetchBookmarks(false)}
             className="mt-4 px-5 py-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-semibold text-[13.5px] transition-all cursor-pointer shadow-xs active:scale-95"
           >
             আবার চেষ্টা করো

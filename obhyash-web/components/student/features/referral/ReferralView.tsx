@@ -103,99 +103,124 @@ export const ReferralView: React.FC = () => {
         return;
       }
 
-      // 1. Check eligibility & used status via RPC
-      try {
-        const { data: eligRes } = await supabase.rpc('check_referral_eligibility', {
-          p_user_id: user.id,
-        });
-        if (eligRes && typeof eligRes === 'object') {
+      // ── Step 0: Instant Local Cache (0-second render if previously loaded) ──
+      if (typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem(`cached_referral_${user.id}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed.code) setCode(parsed.code);
+            if (parsed.hasUsedReferral !== undefined) setHasUsedReferral(parsed.hasUsedReferral);
+            if (parsed.totalApproved !== undefined) setTotalReferrals(parsed.totalApproved);
+            if (Array.isArray(parsed.history)) setHistory(parsed.history);
+            if (Array.isArray(parsed.scratchCards)) setScratchCards(parsed.scratchCards);
+            if (Array.isArray(parsed.leaderboard)) setLeaderboard(parsed.leaderboard);
+            setIsLoading(false); // Instant display!
+          }
+        } catch (_) {}
+      }
+
+      // ── Step 1: Run Independent Network Calls in Parallel ──
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      const [eligResult, meResult, lbResult] = await Promise.all([
+        Promise.resolve(
+          supabase.rpc('check_referral_eligibility', { p_user_id: user.id })
+        ).catch((err: any) => {
+          console.warn('check_referral_eligibility error:', err);
+          return null;
+        }),
+        fetch('/api/referral/me', { headers })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch((err: any) => {
+            console.warn('Error fetching /api/referral/me:', err);
+            return null;
+          }),
+        Promise.resolve(supabase.rpc('get_monthly_leaderboard')).catch(() => null),
+      ]);
+
+      // Process Eligibility
+      const eligRes = eligResult?.data;
+      if (eligRes && typeof eligRes === 'object') {
+        if (typeof (eligRes as any).has_used_referral === 'boolean') {
           setHasUsedReferral((eligRes as any).has_used_referral === true);
-          if (typeof (eligRes as any).remaining_attempts === 'number') {
-            setRemainingAttempts((eligRes as any).remaining_attempts);
-          }
-          if (typeof (eligRes as any).lock_seconds === 'number' && (eligRes as any).lock_seconds > 0) {
-            startLockoutTimer((eligRes as any).lock_seconds);
-          }
         }
-      } catch (err) {
-        console.warn('check_referral_eligibility error:', err);
+        if (typeof (eligRes as any).remaining_attempts === 'number') {
+          setRemainingAttempts((eligRes as any).remaining_attempts);
+        }
+        if (typeof (eligRes as any).lock_seconds === 'number' && (eligRes as any).lock_seconds > 0) {
+          startLockoutTimer((eligRes as any).lock_seconds);
+        }
       }
 
-      // 2. Direct table fallback check for already redeemed
-      try {
-        const { data: usedCheck } = await supabase
-          .from('referral_history')
-          .select('id')
-          .eq('redeemed_by', user.id)
-          .maybeSingle();
+      // Process /api/referral/me
+      let currentCode = '';
+      let currentTotalApproved = 0;
+      let currentHistory: any[] = [];
+      let currentScratchCards: any[] = [];
+      let currentHasUsed = false;
 
-        if (usedCheck) {
-          setHasUsedReferral(true);
+      if (meResult) {
+        if (meResult.referral?.code) {
+          currentCode = meResult.referral.code;
+          setCode(currentCode);
         }
-      } catch (e) {
-        console.warn('usedCheck error:', e);
+        if (Array.isArray(meResult.history)) {
+          currentHistory = meResult.history;
+          setHistory(currentHistory);
+        }
+        if (typeof meResult.totalApproved === 'number') {
+          currentTotalApproved = meResult.totalApproved;
+          setTotalReferrals(currentTotalApproved);
+        }
+        if (Array.isArray(meResult.scratchCards)) {
+          currentScratchCards = meResult.scratchCards;
+          setScratchCards(currentScratchCards);
+        }
+        if (typeof meResult.hasUsedReferral === 'boolean') {
+          currentHasUsed = meResult.hasUsedReferral;
+          setHasUsedReferral(currentHasUsed);
+        }
       }
 
-      // 3. Direct client query for user's referral code
-      try {
-        const { data: refRow } = await supabase
-          .from('referrals')
-          .select('id, code')
-          .eq('owner_id', user.id)
-          .maybeSingle();
-
-        if (refRow?.code) {
-          setCode(refRow.code);
-        }
-      } catch (e) {
-        console.warn('direct referral code error:', e);
-      }
-
-      // 4. Fetch enriched data from /api/referral/me with Bearer token
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers: Record<string, string> = {};
-        if (session?.access_token) {
-          headers['Authorization'] = `Bearer ${session.access_token}`;
-        }
-        const res = await fetch('/api/referral/me', { headers });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.referral?.code) {
-            setCode(json.referral.code);
-          }
-          if (json.history) {
-            setHistory(json.history);
-          }
-          if (typeof json.totalApproved === 'number') {
-            setTotalReferrals(json.totalApproved);
-          }
-          if (json.scratchCards) {
-            setScratchCards(json.scratchCards);
-          }
-          if (typeof json.hasUsedReferral === 'boolean') {
-            setHasUsedReferral(json.hasUsedReferral);
-          }
-        }
-      } catch (err) {
-        console.warn('Error fetching /api/referral/me:', err);
-      }
-
-      // 5. Fetch leaderboard
-      try {
-        const { data: lbData } = await supabase.rpc('get_monthly_leaderboard');
-        if (Array.isArray(lbData) && lbData.length > 0) {
-          setLeaderboard(lbData);
-        } else {
+      // Process Leaderboard
+      let currentLeaderboard: any[] = [];
+      if (Array.isArray(lbResult?.data) && lbResult.data.length > 0) {
+        currentLeaderboard = lbResult.data;
+        setLeaderboard(currentLeaderboard);
+      } else {
+        try {
           const lbRes = await fetch('/api/referral/leaderboard');
           if (lbRes.ok) {
             const lbJson = await lbRes.json();
             if (Array.isArray(lbJson.leaderboard)) {
-              setLeaderboard(lbJson.leaderboard);
+              currentLeaderboard = lbJson.leaderboard;
+              setLeaderboard(currentLeaderboard);
             }
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
+
+      // Save fresh data to local cache
+      if (typeof window !== 'undefined' && currentCode) {
+        try {
+          localStorage.setItem(
+            `cached_referral_${user.id}`,
+            JSON.stringify({
+              code: currentCode,
+              totalApproved: currentTotalApproved,
+              history: currentHistory,
+              scratchCards: currentScratchCards,
+              hasUsedReferral: currentHasUsed,
+              leaderboard: currentLeaderboard,
+            })
+          );
+        } catch (_) {}
+      }
     } catch (err) {
       console.error('Error loading referral data:', err);
     } finally {
