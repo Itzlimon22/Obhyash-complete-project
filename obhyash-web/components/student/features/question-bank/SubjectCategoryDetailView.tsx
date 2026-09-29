@@ -244,10 +244,10 @@ export default function SubjectCategoryDetailView({
       (paper.includes("১ম") || paper.includes("1st") || subjectId.includes("1")));
 
   return (
-    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#FAF9F6] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-20">
+    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#F8F9FA] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-20">
       {/* ── Top Header ── */}
       {showHeader && (
-        <div className="sticky top-0 z-40 bg-[#FAF9F6]/90 dark:bg-[#000000]/90 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
+        <div className="sticky top-0 z-40 bg-[#F8F9FA]/95 dark:bg-[#000000]/95 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
           <button
             type="button"
             onClick={onBack}
@@ -257,7 +257,7 @@ export default function SubjectCategoryDetailView({
             <ArrowLeft size={18} className="stroke-[2.2]" />
           </button>
 
-          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-base md:text-[17px] text-neutral-900 dark:text-white tracking-tight text-center">
+          <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[16px] sm:text-[17.5px] text-neutral-900 dark:text-white tracking-tight text-center">
             {displayTitle}
           </h1>
 
@@ -275,10 +275,6 @@ export default function SubjectCategoryDetailView({
               <div
                 key={cat.id}
                 onClick={() => {
-                  if (isEnglishAcademic) {
-                    alert("ইংরেজি ১ম পত্রের কন্টেন্ট শীঘ্রই যুক্ত হচ্ছে।");
-                    return;
-                  }
                   if (cat.id === "academic") {
                     if (onSelectCategory) {
                       onSelectCategory(cat);
@@ -289,7 +285,7 @@ export default function SubjectCategoryDetailView({
                     handleOpenSection(cat);
                   }
                 }}
-                className={`group relative aspect-[1.25/1] rounded-[26px] overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3 sm:p-4 flex flex-col justify-between`}
+                className={`group relative aspect-[1.25/1] rounded-[26px] overflow-hidden cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/20 bg-gradient-to-br ${cat.gradient} p-3 sm:p-4 flex flex-col justify-between`}
               >
                 {/* Ambient Glow */}
                 <div className="absolute -right-5 -bottom-5 w-[100px] h-[100px] rounded-full bg-white/12 pointer-events-none group-hover:scale-125 transition-transform duration-500" />
@@ -303,7 +299,7 @@ export default function SubjectCategoryDetailView({
 
                 {/* Top Left: Card Title */}
                 <div className="relative z-10 text-left pt-2.5 sm:pt-3 pl-1 sm:pl-1.5">
-                  <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[19px] sm:text-[21px] text-white leading-tight tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
+                  <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[20px] sm:text-[22px] text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.35)]">
                     {cat.title}
                   </h2>
                 </div>

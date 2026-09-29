@@ -40,7 +40,7 @@ export const QuestionViewerPage: React.FC<QuestionViewerPageProps> = ({
   const answeredCount = Object.keys(selectedAnswers).length;
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif] max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#000000] text-neutral-900 dark:text-neutral-100 flex flex-col font-['HindSiliguri',sans-serif] max-w-full overflow-x-hidden">
       {/* ── Top AppBar (Exact same structure as ExamRunner) ── */}
       {showHeader && (
         <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#000000]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-white/[0.08] shadow-2xs">

@@ -815,48 +815,38 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
       {/* ── TAB 1: SUBJECT-WISE (বিষয় ভিত্তিক) ── */}
       {activeHeaderTab === "subject" && (
         <div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-4 md:gap-5">
             {filteredSubjects.map((item) => {
               return (
                 <div
                   key={item.id}
                   onClick={() => onSelectSubject && onSelectSubject(item)}
-                  className="group relative rounded-[16px] sm:rounded-[24px] overflow-hidden aspect-square cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/10 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation"
+                  className="group relative rounded-[26px] overflow-hidden aspect-square cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.25)] hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] select-none flex flex-col justify-between p-3.5 sm:p-4 touch-manipulation"
                 >
                   {/* Background Gradient */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${item.gradient} z-0`}
                   />
-                  {/* Subject Photo with Smooth Zoom */}
-                  <div className="absolute inset-0 z-0">
+                  {/* Subject Photo with Smooth Zoom & Blur */}
+                  <div className="absolute inset-0 z-0 overflow-hidden">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover object-center blur-[0.8px] scale-102 group-hover:scale-108 transition-all duration-500"
+                      className="object-cover object-center blur-[0.8px] scale-[1.02] group-hover:scale-108 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/20 to-black/45 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/15 to-black/35 pointer-events-none" />
                   </div>
 
-                  {/* Top-Left: Bengali Subject Name & Paper */}
-                  <div className="relative z-10 text-left">
-                    <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[15px] sm:text-2xl text-white leading-tight tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                  {/* Top-Left: Bengali Subject Name & Paper (Matching Flutter layout without bottom clutter) */}
+                  <div className="relative z-10 text-left pt-0.5 pl-0.5">
+                    <h2 className="font-['Anek_Bangla',sans-serif] font-bold text-[17px] sm:text-2xl text-white leading-[1.15] tracking-tight drop-shadow-[0_1.5px_4px_rgba(0,0,0,0.6)]">
                       {item.name}
                     </h2>
-                    <p className="font-['HindSiliguri',sans-serif] text-[11px] sm:text-sm font-medium text-white/90 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                    <p className="font-['HindSiliguri',sans-serif] text-[12px] sm:text-sm font-medium text-white/92 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
                       {item.paper}
                     </p>
-                  </div>
-
-                  {/* Bottom: Action Indicator */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="text-[10.5px] sm:text-[11px] font-semibold text-white/80 bg-black/30 backdrop-blur-xs px-2 sm:px-2.5 py-0.5 rounded-full">
-                      অধ্যায়ভিত্তিক
-                    </span>
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight size={13} />
-                    </div>
                   </div>
                 </div>
               );
@@ -875,60 +865,55 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
       {/* ── TAB 2: INSTITUTION-WISE (প্রতিষ্ঠান ভিত্তিক) ── */}
       {activeHeaderTab === "institution" && (
         <div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-4 md:gap-5">
             {filteredInstitutes.map((inst) => {
               return (
                 <div
                   key={inst.id}
                   onClick={() => onSelectInstitute && onSelectInstitute(inst)}
-                  className={`group relative rounded-[16px] sm:rounded-[24px] overflow-hidden aspect-[1.12/1] sm:aspect-[1.18/1] cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] border border-white/20 select-none flex flex-col justify-between p-3 sm:p-5 touch-manipulation ${inst.bgColor}`}
+                  className={`group relative rounded-[26px] overflow-hidden aspect-[1.18/1] cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.18)] hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] select-none flex flex-col justify-center items-center p-2.5 sm:p-3 touch-manipulation ${inst.bgColor}`}
                 >
-                  {/* Decorative Corner Bubbles matching mobile app */}
-                  <div
-                    className={`absolute -top-6 -right-6 w-24 h-24 rounded-full ${inst.bubbleColor} blur-xs pointer-events-none`}
-                  />
-                  <div
-                    className={`absolute -bottom-6 -left-6 w-20 h-20 rounded-full ${inst.bubbleColor} blur-xs pointer-events-none`}
-                  />
-
-                  {/* 1. Center Top: Official Logo or Board Landmark in White Circular Emblem */}
-                  <div className="relative z-10 w-full flex justify-center pt-1 sm:pt-2">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.1)] flex items-center justify-center p-1.5 sm:p-2 transition-transform group-hover:scale-105 duration-300">
-                      {inst.logo ? (
-                        <img
-                          src={inst.logo}
-                          alt={inst.name}
-                          className="w-full h-full object-contain drop-shadow-xs"
-                        />
-                      ) : (
-                        <div className="text-neutral-800 flex items-center justify-center">
-                          {inst.isBoard ? (
-                            <Landmark size={18} className="text-[#1E3A8A]" />
-                          ) : (
-                            <School size={18} className="text-[#065F46]" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 2. Middle: Bengali Institute Name */}
-                  <div className="relative z-10 text-center my-auto">
-                    <h2
-                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[14px] sm:text-lg md:text-xl leading-tight tracking-tight drop-shadow-xs ${inst.textColor}`}
-                    >
-                      {inst.name}
-                    </h2>
-                  </div>
+                  {/* Decorative Corner Bubbles (Flutter: top: -15, right: -15, 65px; bottom: -15, left: -15, 55px) */}
+                  <div className="absolute -top-4 -right-4 w-[65px] h-[65px] rounded-full bg-white/22 pointer-events-none" />
+                  <div className="absolute -bottom-4 -left-4 w-[55px] h-[55px] rounded-full bg-white/18 pointer-events-none" />
 
                   {/* Optional top-right check badge on IUT */}
                   {inst.id === "iut" && (
-                    <div className="absolute top-3 right-3 z-10">
-                      <div className="w-6 h-6 rounded-full bg-white/90 text-[#0891B2] flex items-center justify-center shadow-xs">
+                    <div className="absolute top-2.5 right-2.5 z-20">
+                      <div className="w-[22px] h-[22px] rounded-full bg-white/90 text-[#0891B2] flex items-center justify-center shadow-xs">
                         <Check size={13} className="stroke-[3]" />
                       </div>
                     </div>
                   )}
+
+                  {/* Center Content: Circular Emblem + Large Bold Bengali Name */}
+                  <div className="relative z-10 flex flex-col items-center justify-center w-full">
+                    {/* 1. White Circular Emblem (66x66 with 52x52 logo) */}
+                    <div className="w-[56px] h-[56px] sm:w-[66px] sm:h-[66px] rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center p-1.5 sm:p-2 transition-transform group-hover:scale-105 duration-300">
+                      {inst.logo ? (
+                        <img
+                          src={inst.logo}
+                          alt={inst.name}
+                          className="w-[42px] h-[42px] sm:w-[52px] sm:h-[52px] object-contain drop-shadow-xs"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          {inst.isBoard ? (
+                            <Landmark className={`w-6 h-6 sm:w-8 sm:h-8 ${inst.textColor}`} />
+                          ) : (
+                            <School className={`w-6 h-6 sm:w-8 sm:h-8 ${inst.textColor}`} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2. Middle: Large Bold Bengali Institute Name (20px, font weight 800) */}
+                    <h2
+                      className={`font-['Anek_Bangla',sans-serif] font-extrabold text-[17px] sm:text-[20px] leading-[1.1] text-center truncate w-full mt-2 sm:mt-2.5 drop-shadow-xs ${inst.textColor}`}
+                    >
+                      {inst.name}
+                    </h2>
+                  </div>
                 </div>
               );
             })}

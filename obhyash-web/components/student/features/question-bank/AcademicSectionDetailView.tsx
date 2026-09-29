@@ -490,76 +490,148 @@ export default function AcademicSectionDetailView({
             const isCQ = section.id === "cq";
             const isKa = section.id === "ka_bhandar";
             const isKha = section.id === "kha_bhandar";
+            const banglaNum = BanglaNameHelper.toBanglaNumeral(idx + 1);
+
+            const boardName =
+              q.examHistory && q.examHistory.length > 0
+                ? `${q.examHistory[0].institute} '${String(q.examHistory[0].year).slice(-2)}`
+                : q.institutes && q.institutes.length > 0
+                ? `${q.institutes[0]}${q.years && q.years[0] ? ` '${String(q.years[0]).slice(-2)}` : ""}`
+                : "বোর্ড প্রশ্ন";
 
             if (isCQ) {
               const isExpanded = expandedSolutions.has(q.id);
+
+              // ── CQ Extraction Helper matching Flutter ──
+              let stimulus = (q.passage || "").trim();
+              let subQuestions: string[] = (q.options || []).filter((s) => s.trim().length > 0);
+
+              if (subQuestions.length < 4) {
+                const rawText = (q.question || "").trim();
+                const splitRegex = /(?:\r?\n|^)\s*(?:\(([ক-ঘa-d1-4])\)|([ক-ঘa-d1-4])[\.\:\)]|\b([ক-ঘa-d])\s*[-–:])\s*/gi;
+                const matches: { start: number; end: number }[] = [];
+                let match: RegExpExecArray | null;
+                while ((match = splitRegex.exec(rawText)) !== null) {
+                  matches.push({ start: match.index, end: match.index + match[0].length });
+                }
+
+                if (matches.length >= 2) {
+                  if (!stimulus) {
+                    stimulus = rawText.substring(0, matches[0].start).trim();
+                  }
+                  const extracted: string[] = [];
+                  for (let i = 0; i < matches.length; i++) {
+                    const start = matches[i].start;
+                    const end = i + 1 < matches.length ? matches[i + 1].start : rawText.length;
+                    const part = rawText.substring(start, end).trim();
+                    if (part) extracted.push(part);
+                  }
+                  if (extracted.length > 0) subQuestions = extracted;
+                }
+              }
+
+              if (!stimulus) stimulus = (q.question || "").trim();
+
+              const defaultLabels = [
+                "(ক) জ্ঞানমূলক প্রশ্ন",
+                "(খ) অনুধাবনমূলক প্রশ্ন",
+                "(গ) প্রয়োগমূলক গাণিতিক সমস্যা",
+                "(ঘ) উচ্চতর দক্ষতামূলক বিশ্লেষণ",
+              ];
+              while (subQuestions.length < 4) {
+                subQuestions.push(defaultLabels[subQuestions.length]);
+              }
+
+              const formatSubQ = (prefix: string, text: string) => {
+                const trimmed = text.trim();
+                if (!trimmed) return prefix;
+                const cleanPrefix = prefix.replace(/[\(\)\.\:\s]/g, "");
+                const regex = new RegExp(`^(\\(${cleanPrefix}\\)|${cleanPrefix}[\\.\\:\\)]|\\b${cleanPrefix}\\b)\\s*`, "i");
+                if (regex.test(trimmed)) return trimmed;
+                return `${prefix} ${trimmed}`;
+              };
+
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#000000] rounded-[16px] border border-[#E5E7EB] dark:border-[#333333] shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none overflow-hidden mb-5"
+                  className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E2E8F0] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none p-4 sm:p-5 mb-4"
                 >
-                  {/* Header */}
-                  <div className="px-4 py-3 flex items-center justify-between border-b border-[#F1F5F9] dark:border-[#202024]">
+                  {/* Top row: Bookmark & Report on Left | Board Badge on Right */}
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 rounded-[6px] bg-[#F1F5F9] dark:bg-[#1C1C1E] font-['Anek_Bangla',sans-serif] font-bold text-xs text-[#475569] dark:text-[#D4D4D4]">
-                        {BanglaNameHelper.toBanglaNumeral(idx + 1)} নং সৃজনশীল প্রশ্ন
-                      </span>
-                      {q.institutes && q.institutes.length > 0 && (
-                        <span className="px-2 py-[3px] rounded-[6px] text-[11px] font-semibold bg-[#E0F7FA] dark:bg-[#0E3A4A] text-[#006064] dark:text-[#A5F3FC] border border-[#B2EBF2] dark:border-[#164E63]">
-                          {q.institutes[0]} {q.years && q.years[0] ? `'${String(q.years[0]).slice(-2)}` : ""}
-                        </span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleBookmark(q.id)}
+                        className="p-1 rounded text-neutral-400 hover:text-amber-500 transition cursor-pointer"
+                        title={bookmarkedQuestions.has(q.id) ? "বুকমার্ক সরান" : "বুকমার্ক করুন"}
+                      >
+                        <Bookmark
+                          size={18}
+                          className={bookmarkedQuestions.has(q.id) ? "fill-amber-500 text-amber-500" : ""}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          alert("রিপোর্ট গ্রহণ করা হয়েছে। আমাদের টিম এটি পর্যালোচনা করবে।");
+                        }}
+                        className="p-1 rounded text-neutral-400 hover:text-rose-500 transition cursor-pointer"
+                        title="রিপোর্ট করুন"
+                      >
+                        <Flag size={16} />
+                      </button>
                     </div>
-                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">পূর্ণমান: ১০</span>
-                  </div>
 
-                  {/* Stem / Stimulus */}
-                  <div className="p-4">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400 mb-1.5">
-                      <FileText size={14} />
-                      উদ্দীপক:
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-sm leading-relaxed text-neutral-900 dark:text-neutral-100 font-medium">
-                      <MathRenderer text={q.question} />
-                    </div>
-
-                    {/* Sub Questions Breakdown */}
-                    <div className="mt-3.5 space-y-1.5">
-                      <div className="flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-300">
-                        <span>(ক) জ্ঞানমূলক প্রশ্ন</span>
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] text-neutral-500">১ নম্বর</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-300">
-                        <span>(খ) অনুধাবনমূলক প্রশ্ন</span>
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] text-neutral-500">২ নম্বর</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-300">
-                        <span>(গ) প্রয়োগমূলক গাণিতিক সমস্যা</span>
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] text-neutral-500">৩ নম্বর</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-300">
-                        <span>(ঘ) উচ্চতর দক্ষতামূলক বিশ্লেষণ</span>
-                        <span className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[10px] text-neutral-500">৪ নম্বর</span>
-                      </div>
+                    <div className="px-2 py-0.5 rounded-md bg-[#DC2626]/[0.08] border border-[#DC2626]/[0.22] text-[#DC2626] font-semibold text-[12px]">
+                      {boardName}
                     </div>
                   </div>
 
-                  {/* Expand Solution Button (Warm Book Page Header) */}
-                  <button
-                    type="button"
-                    onClick={() => toggleSolution(q.id)}
-                    className="w-full px-4 py-2.5 flex items-center justify-between bg-[#F3ECE4] dark:bg-[#141416] border-t border-[#E2D7C9] dark:border-[#27272A] text-xs font-bold text-[#42352B] dark:text-[#F4F4F5] hover:opacity-90 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <BookOpen size={14} />
-                      {isExpanded ? "সমাধান লুকান" : "পূর্ণাঙ্গ উত্তর ও সমাধান দেখুন"}
-                    </div>
-                    {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                  </button>
+                  {/* Stem / Stimulus without artificial label */}
+                  <div className="text-[15.5px] font-medium leading-[1.55] text-[#0F172A] dark:text-white mb-3">
+                    <MathRenderer text={`${banglaNum}. ${stimulus}`} />
+                  </div>
 
+                  {/* 4 Sub-questions */}
+                  <div className="space-y-1.5 mb-4 pl-0.5">
+                    <div className="text-[14.5px] font-medium text-[#334155] dark:text-[#D4D4D8] leading-relaxed">
+                      <MathRenderer text={formatSubQ("(ক)", subQuestions[0])} />
+                    </div>
+                    <div className="text-[14.5px] font-medium text-[#334155] dark:text-[#D4D4D8] leading-relaxed">
+                      <MathRenderer text={formatSubQ("(খ)", subQuestions[1])} />
+                    </div>
+                    <div className="text-[14.5px] font-medium text-[#334155] dark:text-[#D4D4D8] leading-relaxed">
+                      <MathRenderer text={formatSubQ("(গ)", subQuestions[2])} />
+                    </div>
+                    <div className="text-[14.5px] font-medium text-[#334155] dark:text-[#D4D4D8] leading-relaxed">
+                      <MathRenderer text={formatSubQ("(ঘ)", subQuestions[3])} />
+                    </div>
+                  </div>
+
+                  {/* Bottom Right: Deep green "উত্তর দেখো" button */}
+                  <div className="flex justify-end items-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleSolution(q.id)}
+                      className="px-4 py-1.5 rounded-lg bg-[#064E3B] text-white hover:bg-[#053d2e] font-bold text-[13.5px] transition-all cursor-pointer shadow-xs active:scale-95"
+                    >
+                      {isExpanded ? "উত্তর সংক্ষেপ করুন" : "উত্তর দেখো"}
+                    </button>
+                  </div>
+
+                  {/* Expanded Complete CQ Solution Box */}
                   {isExpanded && (
-                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] text-xs sm:text-sm text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed border-t border-[#E8DFD3] dark:border-[#27272A]">
-                      <MathRenderer text={q.explanation || ""} block={true} />
+                    <div className="mt-4 p-4 rounded-xl bg-[#FAF7F2] dark:bg-[#141416] border border-[#E8DFD3] dark:border-[#27272A] text-sm text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed animate-in fade-in duration-200">
+                      <div className="font-bold text-xs uppercase tracking-wide text-amber-800 dark:text-amber-400 mb-2">
+                        সৃজনশীল সমাধান ও ব্যাখ্যা
+                      </div>
+                      <MathRenderer
+                        text={
+                          q.explanation ||
+                          "পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায় অনুযায়ী ক, খ, গ এবং ঘ অংশের আদর্শ সমাধান শীঘ্রই সম্পূর্ণভাবে যুক্ত হচ্ছে।"
+                        }
+                        block={true}
+                      />
                     </div>
                   )}
                 </div>
@@ -569,59 +641,89 @@ export default function AcademicSectionDetailView({
               return (
                 <div
                   key={q.id}
-                  className="bg-white dark:bg-[#000000] rounded-[16px] border border-[#E5E7EB] dark:border-[#333333] shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none overflow-hidden mb-5"
+                  className="bg-white dark:bg-[#18181B] rounded-[16px] border border-[#E2E8F0] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none overflow-hidden mb-4"
                 >
-                  <div className="px-4 py-2.5 flex items-center justify-between border-b border-[#F1F5F9] dark:border-[#202024]">
+                  {/* Header Row */}
+                  <div className="px-3.5 py-3 flex items-center justify-between border-b border-[#F1F5F9] dark:border-[#27272A]">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                        className={`px-2 py-0.5 rounded text-[12.5px] font-bold ${
                           isKa
-                            ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400"
-                            : "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
+                            ? "bg-[#3B82F6]/12 text-[#2563EB]"
+                            : "bg-[#047857]/12 text-[#047857]"
                         }`}
                       >
-                        {isKa
-                          ? `${BanglaNameHelper.toBanglaNumeral(idx + 1)}. জ্ঞানমূলক প্রশ্ন`
-                          : `${BanglaNameHelper.toBanglaNumeral(idx + 1)}. অনুধাবনমূলক প্রশ্ন`}
+                        {isKa ? `${banglaNum}. জ্ঞানমূলক প্রশ্ন` : `${banglaNum}. অনুধাবনমূলক প্রশ্ন`}
                       </span>
                       {q.institutes && q.institutes.length > 0 && (
-                        <span className="px-2 py-[3px] rounded-[6px] text-[10.5px] font-semibold bg-[#E0F7FA] dark:bg-[#0E3A4A] text-[#006064] dark:text-[#A5F3FC] border border-[#B2EBF2] dark:border-[#164E63]">
-                          {q.institutes[0]} {q.years && q.years[0] ? `'${String(q.years[0]).slice(-2)}` : ""}
+                        <span className="px-2 py-0.5 rounded text-[11.5px] text-[#64748B] dark:text-[#A1A1AA] bg-[#F1F5F9] dark:bg-[#27272A]">
+                          {boardName}
                         </span>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => toggleBookmark(q.id)}
-                      className="p-1 rounded text-neutral-400 hover:text-amber-500 transition cursor-pointer"
-                      title="বুকমার্ক"
-                    >
-                      <Bookmark size={16} className={bookmarkedQuestions.has(q.id) ? "fill-amber-500 text-amber-500" : ""} />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => toggleBookmark(q.id)}
+                        className="p-1 rounded text-neutral-400 hover:text-amber-500 transition cursor-pointer"
+                        title={bookmarkedQuestions.has(q.id) ? "বুকমার্ক সরান" : "বুকমার্ক করুন"}
+                      >
+                        <Bookmark
+                          size={17}
+                          className={bookmarkedQuestions.has(q.id) ? "fill-amber-500 text-amber-500" : ""}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          alert("রিপোর্ট গ্রহণ করা হয়েছে। আমাদের টিম এটি পর্যালোচনা করবে।");
+                        }}
+                        className="p-1 rounded text-neutral-400 hover:text-rose-500 transition cursor-pointer"
+                        title="রিপোর্ট করুন"
+                      >
+                        <Flag size={15} />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="p-4 text-[16px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5]">
+                  {/* Question Text */}
+                  <div className="p-4 text-[15.5px] font-semibold text-[#0F172A] dark:text-white leading-[1.5]">
                     <MathRenderer text={q.question} />
                   </div>
 
+                  {/* Expand Answer Accordion Bar */}
                   <button
                     type="button"
                     onClick={() => toggleSolution(q.id)}
-                    className="w-full px-4 py-2.5 flex items-center justify-between bg-[#F3ECE4] dark:bg-[#141416] border-t border-[#E2D7C9] dark:border-[#27272A] text-xs font-bold text-[#42352B] dark:text-[#F4F4F5] hover:opacity-90 transition cursor-pointer"
+                    className="w-full px-4 py-2.5 flex items-center justify-between bg-[#F8FAFC] dark:bg-[#1F1F23] border-t border-[#E2E8F0] dark:border-[#27272A] text-[13.5px] font-bold transition cursor-pointer"
                   >
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <Lightbulb
-                        size={14}
-                        className={isKa ? "text-blue-600 dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400"}
+                        size={15}
+                        className={isKa ? "text-[#2563EB]" : "text-[#047857]"}
                       />
-                      <span>{isExpanded ? "উত্তর সংক্ষেপ করুন" : "উত্তর ও ব্যাখ্যা দেখুন"}</span>
+                      <span className={isKa ? "text-[#2563EB]" : "text-[#047857]"}>
+                        {isExpanded ? "উত্তর সংক্ষেপ করুন" : "উত্তর ও ব্যাখ্যা দেখুন"}
+                      </span>
                     </div>
-                    {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                    {isExpanded ? (
+                      <ChevronUp size={15} className={isKa ? "text-[#2563EB]" : "text-[#047857]"} />
+                    ) : (
+                      <ChevronDown size={15} className={isKa ? "text-[#2563EB]" : "text-[#047857]"} />
+                    )}
                   </button>
 
                   {isExpanded && (
-                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#09090B] text-xs sm:text-sm text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed border-t border-[#E8DFD3] dark:border-[#27272A]">
-                      <MathRenderer text={q.explanation || ""} block={true} />
+                    <div className="p-4 bg-[#FAF7F2] dark:bg-[#141416] text-[14.5px] text-[#2E2621] dark:text-[#F4F4F5] leading-relaxed border-t border-[#E8DFD3] dark:border-[#27272A] animate-in fade-in duration-150">
+                      <MathRenderer
+                        text={
+                          q.explanation ||
+                          (q.options && q.options.length > 0
+                            ? q.options[0]
+                            : "এই প্রশ্নের উত্তর শীঘ্রই হালনাগাদ করা হবে।")
+                        }
+                        block={true}
+                      />
                     </div>
                   )}
                 </div>

@@ -5,7 +5,6 @@ import { ArrowLeft, Flame, Crown } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import StreakDialog from '../common/StreakDialog';
-import AppRefreshIndicator from '@/components/common/AppRefreshIndicator';
 import { UserProfile, Notification } from '@/lib/types';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { isUserPro } from '@/lib/subscription-utils';
@@ -418,7 +417,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         {/* ── Content Body (Adjusts padding dynamically when bottom nav is hidden) ── */}
         <main
           ref={mainScrollRef}
-          className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain min-w-0 max-w-full ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden min-w-0 max-w-full ${
             noPadding
               ? shouldShowBottomNav
                 ? 'pb-20 lg:pb-0'
@@ -428,15 +427,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 : 'py-3 sm:py-6 md:py-8 pb-8 lg:pb-12'
           } relative scroll-smooth`}
         >
-          <AppRefreshIndicator
-            onRefresh={onRefresh}
-            scrollContainerRef={mainScrollRef}
-            disabled={isLiveExam || activeTab === 'exam'}
-          >
-            <div className="w-full max-w-7xl mx-auto px-1.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col min-w-0 max-w-full overflow-x-hidden">
-              {children}
-            </div>
-          </AppRefreshIndicator>
+          <div className="w-full max-w-7xl mx-auto px-1.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 flex flex-col min-w-0 max-w-full overflow-x-hidden">
+            {children}
+          </div>
         </main>
 
         {/* ── Mobile Bottom Navigation (Shown only on primary tabs) ── */}

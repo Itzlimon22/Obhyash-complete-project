@@ -569,168 +569,113 @@ export const InstituteDetailView: React.FC<InstituteDetailViewProps> = ({
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 animate-in fade-in duration-200">
-      {/* ── Optional Custom Header ── */}
+    <div className="w-full max-w-4xl mx-auto min-h-screen bg-[#F8FAFC] dark:bg-[#000000] font-['HindSiliguri',sans-serif] select-none pb-24">
+      {/* ── Top Header Bar (Matching Flutter AppBar) ── */}
       {showHeader && (
-        <div className="relative flex items-center justify-center min-h-[44px]">
+        <div className="sticky top-0 z-40 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md px-4 h-14 sm:h-[60px] flex items-center justify-between border-b border-neutral-200/80 dark:border-white/[0.08]">
           <button
             type="button"
             onClick={onBack}
-            className="absolute left-0 w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#121212] border border-neutral-200/80 dark:border-white/[0.08] flex items-center justify-center text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
             aria-label="Back"
           >
             <ArrowLeft size={18} strokeWidth={2.2} />
           </button>
+
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-white shadow-xs p-1 flex items-center justify-center shrink-0">
+            <div className="w-[34px] h-[34px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] p-[3.5px] flex items-center justify-center shrink-0">
               {institute.logo ? (
                 <img
                   src={institute.logo}
                   alt={institute.name}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain rounded-full"
                 />
               ) : institute.isBoard ? (
-                <Landmark size={20} className="text-[#1E3A8A]" />
+                <Landmark size={18} className="text-[#2563EB]" />
               ) : (
-                <School size={20} className="text-[#065F46]" />
+                <School size={18} className="text-[#2563EB]" />
               )}
             </div>
-            <h1 className="text-[15px] sm:text-base md:text-[17px] font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
+            <h1 className="text-[17px] sm:text-lg font-bold text-neutral-900 dark:text-white font-['Anek_Bangla',sans-serif] leading-tight">
               {institute.name} প্রশ্নব্যাংক
             </h1>
           </div>
+
+          <div className="w-9" />
         </div>
       )}
 
-      {/* ── Institute Hero Summary Card ── */}
-      <div
-        className={`relative overflow-hidden rounded-[20px] sm:rounded-[24px] p-4 sm:p-6 text-white shadow-md ${institute.bgColor}`}
-      >
-        <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/15 blur-md pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-white/15 blur-md pointer-events-none" />
-
-        <div className="relative z-10 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2.5 shadow-md flex items-center justify-center shrink-0">
-              {institute.logo ? (
-                <img
-                  src={institute.logo}
-                  alt={institute.name}
-                  className="w-full h-full object-contain"
-                />
-              ) : institute.isBoard ? (
-                <Landmark size={36} className="text-[#1E3A8A]" />
-              ) : (
-                <School size={36} className="text-[#065F46]" />
-              )}
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-xs text-[11px] font-bold tracking-wide uppercase mb-1.5">
-                <Sparkles size={12} />
-                <span>প্রশ্নব্যাংক সংগ্রহ</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold font-['Anek_Bangla',sans-serif] drop-shadow-xs">
-                {institute.name}
-              </h2>
-              <p className="text-xs sm:text-sm text-white/85 line-clamp-1 max-w-md">
-                {institute.fullName}
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden sm:flex flex-col items-end text-right shrink-0">
-            <span className="text-3xl font-black">{allSets.length}টি</span>
-            <span className="text-xs text-white/80 font-medium">প্রশ্ন সেট</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Set Type Filter Buttons ── */}
-      <div className="flex items-center gap-2 pt-1">
-        {[
-          { id: "all", label: "সকল সেট" },
-          { id: "mcq", label: "MCQ প্রশ্ন" },
-          { id: "written", label: "লিখিত / সৃজনশীল" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setTypeFilter(tab.id as any)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none ${
-              typeFilter === tab.id
-                ? "bg-[#12544F] text-white shadow-xs"
-                : "bg-white dark:bg-[#121212] text-neutral-600 dark:text-neutral-400 border border-neutral-200/80 dark:border-white/[0.08] hover:text-neutral-900 dark:hover:text-white"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Serial-wise Exam Cards (Matching User Reference with Swapped Sides & Distinct Icons) ── */}
-      <div className="space-y-3 sm:space-y-3.5">
+      {/* ── Serial-wise Exam Sets List (Matching Flutter 1:1) ── */}
+      <div className="px-4 py-3.5 sm:py-5 space-y-3">
         {allSets.map((set) => {
+          const isWritten = set.type === "written";
+          const isCombined = set.type === "combined";
+          const isBuet = institute.id.toLowerCase() === "buet";
+
+          let badgeText = "MCQ";
+          let badgeColorClass = "bg-sky-500/12 text-sky-600 dark:text-sky-400";
+          if (isWritten) {
+            badgeText = "লিখিত";
+            badgeColorClass = "bg-purple-500/12 text-purple-600 dark:text-purple-400";
+          } else if (isCombined) {
+            badgeText = "MCQ + লিখিত";
+            badgeColorClass = "bg-orange-500/12 text-orange-600 dark:text-orange-400";
+          } else if (isBuet) {
+            badgeText = "প্রিলি (MCQ)";
+            badgeColorClass = "bg-sky-500/12 text-sky-600 dark:text-sky-400";
+          }
+
           return (
             <div
               key={set.id}
               onClick={() => handleOpenExamSet(set)}
-              className="group relative bg-white dark:bg-[#121212] rounded-[16px] p-3.5 sm:p-4 border border-neutral-200/80 dark:border-white/[0.08] shadow-xs hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 cursor-pointer select-none flex flex-col gap-2 active:scale-[0.98]"
+              className="group relative bg-white dark:bg-[#18181B] rounded-[20px] p-4 border border-[#F1F5F9] dark:border-[#27272A] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-200 cursor-pointer select-none flex flex-col gap-2.5 active:scale-[0.98]"
             >
-              {/* Top: Bold Title + Type Badge */}
+              {/* Top Row: Title + Type Badge */}
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-base sm:text-lg text-neutral-900 dark:text-neutral-100 font-['Anek_Bangla',sans-serif] tracking-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-                    {set.title}
-                  </h3>
-                  <span
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${
-                      set.type === "written"
-                        ? "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300"
-                        : set.type === "combined"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
-                        : "bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300"
-                    }`}
-                  >
-                    {set.type === "written"
-                      ? "লিখিত"
-                      : set.type === "combined"
-                      ? "MCQ + লিখিত"
-                      : institute.id.toLowerCase() === "buet"
-                      ? "প্রিলি (MCQ)"
-                      : "MCQ"}
-                  </span>
-                </div>
-                <ChevronRight
-                  size={18}
-                  className="text-neutral-300 dark:text-neutral-600 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0"
-                />
+                <h3 className="font-bold text-[15.5px] sm:text-base text-[#0F172A] dark:text-white font-['Anek_Bangla',sans-serif] tracking-tight truncate flex-1">
+                  {set.title}
+                </h3>
+                <span
+                  className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold shrink-0 ${badgeColorClass}`}
+                >
+                  {badgeText}
+                </span>
               </div>
 
-              {/* Bottom: Swapped Sides (Question on Left, Duration on Right with Distinct Icons) */}
-              <div className="flex items-center gap-3 text-xs sm:text-sm font-semibold pt-0.5 text-neutral-700 dark:text-neutral-300">
-                {/* 1. Left: Question Count with color ONLY on icon */}
+              {/* Bottom Row: Question Count (Left) | Time (Right) */}
+              <div className="flex items-center text-[12.5px] font-semibold text-[#334155] dark:text-[#CBD5E1] pt-0.5">
+                {/* Left: Question count with emerald icon */}
                 <div className="flex items-center gap-1.5">
-                  <FileQuestion size={15} strokeWidth={2.3} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <FileQuestion size={15} strokeWidth={2.4} className="text-[#10B981] shrink-0" />
                   <span>{set.questionLabel}</span>
                 </div>
 
                 {/* Vertical Divider */}
-                <span className="text-neutral-300 dark:text-neutral-700 font-light select-none">
+                <span className="text-[#CBD5E1] dark:text-[#475569] font-light mx-2.5 select-none">
                   |
                 </span>
 
-                {/* 2. Right: Duration in Minutes with color ONLY on icon */}
+                {/* Right: Duration in Minutes with rose icon */}
                 <div className="flex items-center gap-1.5">
-                  <Timer size={15} strokeWidth={2.3} className="text-rose-500 dark:text-rose-400 shrink-0" />
+                  <Timer size={15} strokeWidth={2.4} className="text-[#F43F5E] shrink-0" />
                   <span>{formatDurationMinutes(set.durationMinutes)}</span>
                 </div>
+
+                <div className="flex-1" />
+
+                {/* Chevron Right */}
+                <ChevronRight
+                  size={18}
+                  className="text-[#94A3B8] dark:text-[#64748B] group-hover:translate-x-0.5 transition-transform shrink-0"
+                />
               </div>
             </div>
           );
         })}
 
         {allSets.length === 0 && (
-          <div className="text-center py-16 bg-white dark:bg-neutral-900 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-800">
+          <div className="text-center py-16 bg-white dark:bg-[#18181B] rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-800">
             <BookOpen size={36} className="mx-auto text-neutral-400 mb-2 opacity-60" />
             <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">
               কোনো প্রশ্ন সেট পাওয়া যায়নি
