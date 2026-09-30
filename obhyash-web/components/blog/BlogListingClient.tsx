@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { BlogPost } from '@/lib/blog-data';
@@ -13,12 +14,17 @@ import {
   TrendingUp,
   X,
   Bookmark,
-  CheckCircle2,
-  Star,
-  Award,
   GraduationCap,
   Sparkles,
   Lightbulb,
+  LayoutList,
+  LayoutGrid,
+  Facebook,
+  Youtube,
+  Send,
+  ArrowRight,
+  Flame,
+  CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import BlogSearchModal from '@/components/blog/BlogSearchModal';
@@ -29,44 +35,30 @@ const SUB_CATEGORIES = [
   'সব',
   'পদার্থবিজ্ঞান',
   'রসায়ন',
-  'জীববিজ্ঞান',
   'উচ্চতর গণিত',
   'আইসিটি',
+  'বাংলা',
+  'ইংরেজি',
   'হিসাববিজ্ঞান',
-  'ব্যবসায় সংগঠন ও ব্যবস্থাপনা',
-  'ফিন্যাও্স/ব্যাংকিং',
-  'উৎপাদন ব্যবস্থাপনা ও বিপণন',
-  'বাংলাদেশ ও বিশ্বপরিচয়',
-  'ভূগোল',
+  'ব্যবসায় সংগঠন',
+  'ফিন্যান্স',
   'পৌরনীতি',
-  'ইসলাম শিক্ষা',
-  'বাংলা ১ম পত্র',
-  'বাংলা ২য় পত্র',
-  'ইংরেজি ১ম পত্র',
-  'ইংরেজি ২য় পত্র',
-  'সাধারণ গণিত',
+  'ভূগোল',
 ];
-
-const CATEGORY_TRANSLATIONS: Record<string, string> = {
-  All: 'সব',
-  'Study Tips': 'স্টাডি টিপস',
-  'Exam Prep': 'পরীক্ষার প্রস্তুতি',
-  'MCQ Techniques': 'MCQ কৌশল',
-  'Time Management': 'সময় ব্যবস্থাপনা',
-  Motivation: 'অনুপ্রেরণা',
-};
 
 export type AudienceSegment =
   | 'all'
+  | 'hsc-2027'
+  | 'hsc-2026'
   | 'admission-2026'
-  | 'test-paper'
   | 'study-hacks'
   | 'saved';
 
 export const AUDIENCE_SEGMENTS = [
   { id: 'all' as const, label: 'সকল পোস্ট', icon: Sparkles },
-  { id: 'admission-2026' as const, label: 'বিশ্ববিদ্যালয় ভর্তি ২০২৬', icon: GraduationCap },
-  { id: 'test-paper' as const, label: 'এইচএসসি টেস্ট পেপার', icon: BookOpen },
+  { id: 'hsc-2027' as const, label: 'এইচএসসি ২০২৭', icon: Flame },
+  { id: 'hsc-2026' as const, label: 'এইচএসসি ২০২৬', icon: BookOpen },
+  { id: 'admission-2026' as const, label: 'বিশ্ববিদ্যালয় ভর্তি', icon: GraduationCap },
   { id: 'study-hacks' as const, label: 'পড়ার স্মার্ট কৌশল', icon: Lightbulb },
   { id: 'saved' as const, label: 'সংরক্ষিত', icon: Bookmark },
 ] as const;
@@ -98,6 +90,8 @@ export default function BlogListingClient({
   const [activeSubCategory, setActiveSubCategory] = useState('সব');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSaved, setShowSaved] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const readSlugs = useReadHistory();
 
@@ -113,16 +107,21 @@ export default function BlogListingClient({
   const segmentCounts = useMemo(() => {
     return {
       all: posts.length,
+      'hsc-2027': posts.filter(
+        (p) =>
+          p.tags.some((t) => /2027|HSC 27|২০২৭/i.test(t)) ||
+          /2027|২০২৭/i.test(p.title),
+      ).length,
+      'hsc-2026': posts.filter(
+        (p) =>
+          p.tags.some((t) => /2026|HSC 26|২০২৬/i.test(t)) ||
+          /2026|২০২৬/i.test(p.title),
+      ).length,
       'admission-2026': posts.filter(
         (p) =>
           p.tags.some((t) =>
             /ভর্তি|Admission|বুয়েট|মেডিকেল|গুচ্ছ|CKRUET|DU|MIST|BUP/i.test(t),
           ) || /ভর্তি|admission|circular|সার্কুলার/i.test(p.title),
-      ).length,
-      'test-paper': posts.filter(
-        (p) =>
-          p.tags.some((t) => /টেস্ট পেপার|Test Paper/i.test(t)) ||
-          /টেস্ট পেপার|test paper/i.test(p.title),
       ).length,
       'study-hacks': posts.filter(
         (p) =>
@@ -167,18 +166,24 @@ export default function BlogListingClient({
       return result.filter((p) => bookmarkedSlugs.has(p.slug));
     }
 
-    if (activeSegment === 'admission-2026') {
+    if (activeSegment === 'hsc-2027') {
+      result = result.filter(
+        (p) =>
+          p.tags.some((t) => /2027|HSC 27|২০২৭/i.test(t)) ||
+          /2027|২০২৭/i.test(p.title),
+      );
+    } else if (activeSegment === 'hsc-2026') {
+      result = result.filter(
+        (p) =>
+          p.tags.some((t) => /2026|HSC 26|২০২৬/i.test(t)) ||
+          /2026|২০২৬/i.test(p.title),
+      );
+    } else if (activeSegment === 'admission-2026') {
       result = result.filter(
         (p) =>
           p.tags.some((t) =>
             /ভর্তি|Admission|বুয়েট|মেডিকেল|গুচ্ছ|CKRUET|DU|MIST|BUP/i.test(t),
           ) || /ভর্তি|admission|circular|সার্কুলার/i.test(p.title),
-      );
-    } else if (activeSegment === 'test-paper') {
-      result = result.filter(
-        (p) =>
-          p.tags.some((t) => /টেস্ট পেপার|Test Paper/i.test(t)) ||
-          /টেস্ট পেপার|test paper/i.test(p.title),
       );
     } else if (activeSegment === 'study-hacks') {
       result = result.filter(
@@ -196,11 +201,21 @@ export default function BlogListingClient({
       result = result.filter((p) => p.category === activeCategory);
     }
 
-    if (
-      activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' &&
-      activeSubCategory !== 'সব'
-    ) {
-      result = result.filter((p) => p.tags.includes(activeSubCategory));
+    if (activeSubCategory !== 'সব') {
+      result = result.filter(
+        (p) =>
+          p.tags.some((t) =>
+            t.toLowerCase().includes(activeSubCategory.toLowerCase()),
+          ) ||
+          p.title.toLowerCase().includes(activeSubCategory.toLowerCase()) ||
+          p.category.toLowerCase().includes(activeSubCategory.toLowerCase()),
+      );
+    }
+
+    if (activeTag) {
+      result = result.filter((p) =>
+        p.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase()),
+      );
     }
 
     if (searchQuery.trim()) {
@@ -213,111 +228,129 @@ export default function BlogListingClient({
       );
     }
 
-    if (activeTag) {
-      result = result.filter((p) =>
-        p.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase()),
-      );
-    }
-
     return result;
   }, [
     posts,
     activeSegment,
-    activeCategory,
-    activeSubCategory,
-    searchQuery,
-    activeTag,
     showSaved,
     bookmarkedSlugs,
+    activeCategory,
+    activeSubCategory,
+    activeTag,
+    searchQuery,
   ]);
 
-  const nonFeaturedFiltered = filteredPosts.filter(
-    (p) =>
-      !p.featured ||
-      activeCategory !== 'All' ||
-      activeSubCategory !== 'সব' ||
-      searchQuery,
-  );
+  // Main hero featured post
+  const heroPost = featuredPost || posts[0];
+  // Secondary featured posts (next 2 posts)
+  const secondaryFeatured = useMemo(() => {
+    return posts.filter((p) => p.slug !== heroPost?.slug).slice(0, 2);
+  }, [posts, heroPost]);
 
-  const showFeatured =
-    !searchQuery &&
-    !activeTag &&
-    !showSaved &&
-    activeCategory === 'All' &&
-    activeSubCategory === 'সব' &&
-    featuredPost;
+  // Trending posts for sidebar (top 5 posts with high views or recommendations)
+  const trendingPosts = useMemo(() => {
+    if (recommendedPosts.length >= 4) return recommendedPosts.slice(0, 5);
+    return posts.slice(0, 5);
+  }, [posts, recommendedPosts]);
+
+  // Category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    categories.forEach((c) => {
+      counts[c] = posts.filter((p) => p.category === c).length;
+    });
+    return counts;
+  }, [posts, categories]);
+
+  // Popular tags
+  const popularTags = useMemo(() => {
+    return [
+      'HSC 2027',
+      'HSC 2026',
+      'পদার্থবিজ্ঞান',
+      'রসায়ন',
+      'উচ্চতর গণিত',
+      'আইসিটি',
+      'বাংলা ১ম পত্র',
+      'ইংরেজি ২য় পত্র',
+      'বুয়েট ভর্তি',
+      'মেডিকেল প্রস্তুতি',
+      'পড়ার রুটিন',
+    ];
+  }, []);
+
+  const pagedPosts = filteredPosts.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredPosts.length;
 
   return (
-    <>
-      {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden bg-[#FAF6F3] dark:bg-[#0a0a0a]">
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.15] tracking-tight mb-6 animate-fade-in font-anek">
-            স্মার্ট প্রস্তুতি,{' '}
-            <span className="text-slate-500 dark:text-slate-400 font-light">
-              সেরা ফলাফল
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-anek font-light">
-            বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যাও্য পরীক্ষায় সফল হতে
-            সাহায্য করার জন্য বিশেষজ্ঞ টিপস, পরীক্ষিত কৌশল এবং দিকনির্দেশনা।
-          </p>
-
-          {/* Stats row */}
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-10">
-            {[
-              { icon: BookOpen, label: `${posts.length} আর্টিকেল` },
-              { icon: TrendingUp, label: 'পরীক্ষার কৌশল' },
-              { icon: CheckCircle2, label: 'সম্পূর্ণ ফ্রি' },
-            ].map(({ icon: Icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-500"
-              >
-                <Icon className="w-4 h-4" />
-                {label}
+    <div className="font-anek bg-[#fdfdfd] dark:bg-[#0e0e0e] min-h-screen text-slate-800 dark:text-slate-100 transition-colors">
+      {/* ─────────────────────────────────────────────────────────────
+          1. KATEN MAGAZINE HERO: FEATURED POST SECTION
+         ───────────────────────────────────────────────────────────── */}
+      {!activeTag && !searchQuery && activeSegment === 'all' && heroPost && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-12">
+          {/* Section Header with Katen Wave */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#fe4f70] to-[#ffa387]" />
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  নির্বাচিত ফিচার্ড পোস্ট
+                </h2>
               </div>
-            ))}
-          </div>
-
-          {/* Search bar — opens live search modal on click or Enter */}
-          <div
-            onClick={() => setIsSearchModalOpen(true)}
-            className="relative max-w-lg mx-auto cursor-pointer group"
-          >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 group-hover:text-rose-500 transition-colors pointer-events-none" />
-            <input
-              type="text"
-              readOnly
-              placeholder="আর্টিকেল বা বিষয় সার্চ করুন..."
-              value={searchQuery}
-              className="w-full pl-11 pr-28 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none cursor-pointer transition-all text-[15px] font-anek"
-            />
-            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 text-[11px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                ⌘K
-              </kbd>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSearchModalOpen(true);
-                }}
-                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition-colors font-anek whitespace-nowrap shadow-sm shadow-rose-600/20"
-              >
-                সার্চ
-              </button>
+              {/* Katen Signature Wave SVG */}
+              <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
+                  stroke="#fe4f70"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* ─── Segmented Filter & Category Filter ─── */}
-      <div id="blog-category-sticky-bar" className="sticky top-16 z-40 bg-[#FAF6F3]/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-3 pb-3 space-y-2">
-        {/* Segmented Audience Tabs */}
+          {/* Katen 2-Tier Featured Layout (1 Large Banner + 2 Secondary Cards) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Big Hero Card */}
+            <div className="lg:col-span-8">
+              <BlogCard
+                post={heroPost}
+                featured
+                stats={postCounts[heroPost.slug]}
+                isBookmarked={bookmarkedSlugs.has(heroPost.slug)}
+                onToggleBookmark={toggleBookmark}
+                isRead={readSlugs.has(heroPost.slug)}
+              />
+            </div>
+
+            {/* Secondary 2 Column Featured Cards */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              {secondaryFeatured.map((post) => (
+                <div key={post.slug + '-hero-sec'} className="flex-1">
+                  <BlogCard
+                    post={post}
+                    layout="grid"
+                    stats={postCounts[post.slug]}
+                    isBookmarked={bookmarkedSlugs.has(post.slug)}
+                    onToggleBookmark={toggleBookmark}
+                    isRead={readSlugs.has(post.slug)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          2. KATEN CATEGORY & SEGMENT NAVIGATION BAR
+         ───────────────────────────────────────────────────────────── */}
+      <section className="sticky top-20 z-30 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md border-y border-slate-200/80 dark:border-white/10 py-3 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 justify-start sm:justify-center">
+          {/* Segment Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
             {AUDIENCE_SEGMENTS.map((seg) => {
               const Icon = seg.icon;
               const isActive = activeSegment === seg.id;
@@ -327,27 +360,23 @@ export default function BlogListingClient({
                   key={seg.id}
                   onClick={() => {
                     setActiveSegment(seg.id);
-                    if (seg.id === 'saved') {
-                      setShowSaved(true);
-                    } else {
-                      setShowSaved(false);
-                    }
+                    setShowSaved(seg.id === 'saved');
                     setActiveCategory('All');
                     setActiveSubCategory('সব');
                   }}
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[13px] font-bold whitespace-nowrap transition-all font-anek shrink-0 ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-bold whitespace-nowrap transition-all duration-300 shrink-0 ${
                     isActive
-                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
-                      : 'bg-white/80 dark:bg-[#141414] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
+                      ? 'bg-gradient-to-r from-[#fe4f70] to-[#ffa387] text-white shadow-md shadow-rose-500/25 scale-[1.02]'
+                      : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-rose-500'}`} />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{seg.label}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded-full text-[11px] font-mono ${
                       isActive
                         ? 'bg-white/20 text-white'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {count}
@@ -356,132 +385,122 @@ export default function BlogListingClient({
               );
             })}
           </div>
-        </div>
 
-        {/* Sub-category pills for All / Subject study */}
-        {activeSegment === 'all' && (
-          <div className="max-w-7xl mx-auto pt-1">
-            <div className="relative">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-              <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
-                <div className="flex items-center gap-1.5 min-w-max mx-auto justify-start sm:justify-center">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setShowSaved(false);
-                        setActiveCategory(cat);
-                        setActiveSubCategory('সব');
-                      }}
-                      className={`px-3 py-1 rounded-lg text-[12.5px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                        !showSaved && activeCategory === cat
-                          ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
-                          : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
-                      }`}
-                    >
-                      {cat === 'All' ? 'সব বিষয়' : cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          {/* Sub-categories scroll pills for subjects */}
+          {activeSegment === 'all' && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-3 mt-2 border-t border-slate-100 dark:border-white/5">
+              {SUB_CATEGORIES.map((subcat) => (
+                <button
+                  key={subcat}
+                  onClick={() => setActiveSubCategory(subcat)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                    activeSubCategory === subcat
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {subcat}
+                </button>
+              ))}
             </div>
+          )}
+        </div>
+      </section>
 
-            {activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' && (
-              <div className="relative mt-2 pt-2 border-t border-slate-100 dark:border-[#2b2b2b]">
-                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-                <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
-                <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
-                  <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
-                    {SUB_CATEGORIES.map((subcat) => (
-                      <button
-                        key={subcat}
-                        onClick={() => setActiveSubCategory(subcat)}
-                        className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
-                          activeSubCategory === subcat
-                            ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
-                            : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
-                        }`}
-                      >
-                        {subcat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ─── Main Content ─── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Active tag filter chip */}
+      {/* ─────────────────────────────────────────────────────────────
+          3. KATEN MAIN LAYOUT: 8-COL FEED + 4-COL STICKY SIDEBAR
+         ───────────────────────────────────────────────────────────── */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        {/* Active Tag Notice */}
         {activeTag && (
-          <div className="flex items-center gap-2 mb-8">
-            <span className="text-sm text-slate-500 dark:text-slate-400 font-anek">
+          <div className="flex items-center gap-2 mb-8 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40">
+            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
               ট্যাগ ফিল্টার:
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-sm font-medium rounded-full border border-rose-200 dark:border-rose-900 font-anek">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-[#fe4f70] to-[#ffa387] text-white text-xs font-black rounded-full shadow-sm">
               #{activeTag}
               <button
                 onClick={() => router.push('/blog')}
-                aria-label="ফিল্টার সরান"
-                className="hover:text-rose-800 dark:hover:text-rose-300 transition-colors"
+                aria-label="ফিল্টার মুছুন"
+                className="hover:opacity-80 transition-opacity"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </span>
-            <span className="text-xs text-slate-400 font-anek">
-              {filteredPosts.length} টি আর্টিকেল পাওয়া গেছে
+            <span className="text-xs text-slate-500 ml-auto">
+              {filteredPosts.length} টি পোস্ট
             </span>
           </div>
         )}
 
-        {/* Recommended Top Section (Only shown if no search/tag) */}
-        {!searchQuery &&
-          !activeTag &&
-          !showSaved &&
-          activeCategory === 'All' &&
-          activeSubCategory === 'সব' &&
-          recommendedPosts.length > 0 && (
-            <div className="mb-16 pt-4 border-b border-slate-100 dark:border-[#2b2b2b] pb-16">
-              {isGuest ? (
-                <>
-                  <div className="flex items-center gap-2 mb-5">
-                    <TrendingUp className="w-5 h-5 text-slate-500 dark:text-slate-400" />
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 font-anek">
-                      শিক্ষার্থীদের কাছে জনপ্রিয়
-                    </h2>
-                  </div>
-                  <div id="blog-guest-account-banner" className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-6 sm:p-8 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] inapp-hide">
-                    <p className="text-slate-600 dark:text-slate-400 font-medium text-[15px] sm:text-[16px] text-left max-w-2xl leading-[1.6]">
-                      <strong>এখানে নতুন?</strong> অভ্যাস-এ রেজিস্টার করে তোমার
-                      অনুশীলনের তথ্যের ওপর ভিত্তি করে তোমার দুর্বল বিষয়গুলোর
-                      জন্য নির্দিষ্ট স্টাডি টিপস, পরীক্ষার কৌশল এবং আর্টিকেল
-                      পান।
-                    </p>
-                    <a
-                      href="/login"
-                      className="shrink-0 px-5 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium rounded-lg transition-colors text-sm hover:bg-slate-800 dark:hover:bg-slate-200 whitespace-nowrap font-anek"
-                    >
-                      ফ্রি অ্যাকাউন্ট খোলো
-                    </a>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-2 mb-6">
-                  <Star className="w-5 h-5 text-slate-500 dark:text-slate-400" />
-                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 tracking-tight font-anek">
-                    তোমার জন্য প্রস্তাবিত
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          {/* ─── LEFT COLUMN (8 COLS): MAIN ARTICLES FEED ─── */}
+          <div className="lg:col-span-8">
+            {/* Feed Section Header with Katen Wave & View Switcher */}
+            <div className="flex items-center justify-between pb-6 mb-8 border-b border-slate-100 dark:border-white/5">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#fe4f70] to-[#ffa387]" />
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    সর্বশেষ আর্টিকেলসমূহ
                   </h2>
                 </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-                {recommendedPosts.map((post) => (
+                <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
+                    stroke="#fe4f70"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+              {/* View Switcher (Katen List vs Grid View Toggle) */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  aria-label="লিস্ট ভিউ"
+                  title="লিস্ট ভিউ"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === 'list'
+                      ? 'bg-white dark:bg-[#202020] text-[#fe4f70] shadow-sm'
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
+                  <LayoutList className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  aria-label="গ্রিড ভিউ"
+                  title="গ্রিড ভিউ"
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === 'grid'
+                      ? 'bg-white dark:bg-[#202020] text-[#fe4f70] shadow-sm'
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Articles List / Grid */}
+            {pagedPosts.length > 0 ? (
+              <div
+                className={
+                  viewMode === 'list'
+                    ? 'space-y-6'
+                    : 'grid grid-cols-1 sm:grid-cols-2 gap-6'
+                }
+              >
+                {pagedPosts.map((post) => (
                   <BlogCard
-                    key={post.slug + '-rec'}
+                    key={post.slug}
                     post={post}
+                    layout={viewMode}
                     stats={postCounts[post.slug]}
                     isBookmarked={bookmarkedSlugs.has(post.slug)}
                     onToggleBookmark={toggleBookmark}
@@ -489,105 +508,247 @@ export default function BlogListingClient({
                   />
                 ))}
               </div>
-            </div>
-          )}
-
-        {showFeatured && (
-          <div className="mb-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Award className="w-4 h-4 text-slate-400" />
-              <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-anek">
-                নির্বাচিত পোস্ট
-              </h2>
-            </div>
-            <BlogCard
-              post={featuredPost!}
-              featured
-              stats={postCounts[featuredPost!.slug]}
-              isBookmarked={bookmarkedSlugs.has(featuredPost!.slug)}
-              onToggleBookmark={toggleBookmark}
-              isRead={readSlugs.has(featuredPost!.slug)}
-            />
-          </div>
-        )}
-
-        {/* Post Grid */}
-        {filteredPosts.length > 0 ? (
-          <>
-            {showFeatured && nonFeaturedFiltered.length > 0 && (
-              <div className="flex items-center gap-2 mb-6">
-                <BookOpen className="w-4 h-4 text-rose-500" />
-                <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-anek">
-                  সকল আর্টিকেল
-                </h2>
+            ) : (
+              <div className="text-center py-20 bg-white dark:bg-[#161616] rounded-3xl border border-slate-200/80 dark:border-white/10 p-8">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 text-[#fe4f70] flex items-center justify-center">
+                  <Search className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  কোনো আর্টিকেল পাওয়া যায়নি
+                </h3>
+                <p className="text-slate-500 text-sm max-w-sm mx-auto mb-6">
+                  অন্য কোনো বিষয় বা কিওয়ার্ড দিয়ে অনুসন্ধান করুন অথবা ফিল্টার মুছুন।
+                </p>
+                <button
+                  onClick={() => {
+                    setActiveSegment('all');
+                    setActiveCategory('All');
+                    setActiveSubCategory('সব');
+                    setSearchQuery('');
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#fe4f70] to-[#ffa387] text-white text-xs font-bold shadow-md hover:scale-105 transition-all"
+                >
+                  সকল পোস্ট দেখুন
+                </button>
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-              {(showFeatured && !searchQuery
-                ? nonFeaturedFiltered
-                : filteredPosts
-              ).map((post) => (
-                <BlogCard
-                  key={post.slug}
-                  post={post}
-                  stats={postCounts[post.slug]}
-                  isBookmarked={bookmarkedSlugs.has(post.slug)}
-                  onToggleBookmark={toggleBookmark}
-                  isRead={readSlugs.has(post.slug)}
-                />
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-20">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-              <Search className="w-8 h-8 text-slate-300 dark:text-slate-600" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 font-anek">
-              কোনো আর্টিকেল পাওয়া যায়নি
-            </h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm font-anek">
-              ভিন্ন কোনো শব্দ বা ক্যাটাগরি দিয়ে খুঁজুন।
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setActiveCategory('All');
-                setActiveSubCategory('সব');
-              }}
-              className="mt-4 px-4 py-2 text-sm font-semibold text-rose-600 hover:text-rose-700 transition-colors font-anek"
-            >
-              ফিল্টার মুছুন →
-            </button>
+            {/* Katen Load More Button */}
+            {hasMore && (
+              <div className="text-center mt-12">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 6)}
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 hover:border-[#fe4f70] text-slate-800 dark:text-slate-200 hover:text-[#fe4f70] text-sm font-bold shadow-sm hover:shadow-md transition-all duration-300 group"
+                >
+                  <span>আরও আর্টিকেল লোড করুন</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </section>
 
-      {/* ─── CTA Banner ─── */}
-      <section id="blog-cta-banner" className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-8 sm:p-12 text-center shadow-sm">
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 bg-white/50 dark:bg-[#2a2a2a] text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-[#383838]">
-              <GraduationCap className="w-3.5 h-3.5" />
-              অভ্যাস প্ল্যাটফর্ম
+          {/* ─── RIGHT COLUMN (4 COLS): KATEN STICKY SIDEBAR ─── */}
+          <aside className="lg:col-span-4 sticky top-36 space-y-8">
+            {/* Widget 1: Author / Platform About Widget */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 text-center shadow-sm">
+              <div className="relative w-20 h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-tr from-[#fe4f70] to-[#ffa387] p-1 shadow-lg shadow-rose-500/20">
+                <div className="w-full h-full bg-white dark:bg-[#181818] rounded-[20px] flex items-center justify-center p-3 overflow-hidden">
+                  <Image
+                    src="/obhyash_mark.svg"
+                    alt="Obhyash Brand Icon"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1">
+                অভ্যাস (Obhyash)
+              </h3>
+              <p className="text-xs font-bold text-[#fe4f70] uppercase tracking-wider mb-3">
+                স্মার্ট লার্নিং ও এক্সাম প্ল্যাটফর্ম
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+                বাংলাদেশের শিক্ষার্থীদের এসএসসি, এইচএসসি এবং ভর্তি পরীক্ষার সেরা প্রস্তুতির জন্য প্রশ্ন ব্যাংক, বিষয়ভিত্তিক পরীক্ষা এবং স্মার্ট ভুল সংশোধনের ডিজিটাল মাধ্যম।
+              </p>
+
+              {/* Social Buttons */}
+              <div className="flex items-center justify-center gap-2.5 pt-4 border-t border-slate-100 dark:border-white/5">
+                <a
+                  href="https://facebook.com/obhyash"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-[#fe4f70] hover:text-white flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors"
+                >
+                  <Facebook className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href="https://youtube.com/@obhyash"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-[#fe4f70] hover:text-white flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors"
+                >
+                  <Youtube className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href="https://t.me/obhyash"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-[#fe4f70] hover:text-white flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </a>
+              </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3 font-anek">
-              যা শিখেছেন তা অনুশীলনের জন্য প্রস্তুত?
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-lg mx-auto text-[15px] leading-[1.6] font-anek">
-              বোর্ড স্ট্যাও্ডার্ড MCQ মডেল টেস্ট দিন, তোমার অগ্রগতি ট্র্যাক করো
-              এবং দুর্বল বিষয়গুলো চিহ্নিত করো — সবই এক জায়গায়।
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors text-sm font-anek"
-            >
-              স্টুডেন্ট ড্যাশবোর্ডে যাও
-            </Link>
-          </div>
+
+            {/* Widget 2: Popular / Trending Posts (With #1, #2, #3 badges) */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 shadow-sm">
+              <div className="mb-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="w-4 h-4 text-[#fe4f70]" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    জনপ্রিয় আর্টিকেলসমূহ
+                  </h3>
+                </div>
+                <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
+                    stroke="#fe4f70"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+              <div className="space-y-4">
+                {trendingPosts.map((post, idx) => (
+                  <div
+                    key={post.slug + '-trending'}
+                    onClick={() => router.push(`/blog/${post.slug}`)}
+                    className="flex items-start gap-3.5 group cursor-pointer"
+                  >
+                    {/* Number Badge */}
+                    <span className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#fe4f70] to-[#ffa387] text-white text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                      {idx + 1}
+                    </span>
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#fe4f70] dark:group-hover:text-[#ffa387] transition-colors line-clamp-2 leading-snug">
+                        {post.title}
+                      </h4>
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">
+                        {post.category} • {post.readTime} মিনিট
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Widget 3: Categories & Counts */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 shadow-sm">
+              <div className="mb-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="w-4 h-4 text-[#fe4f70]" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    বিষয় ও ক্যাটাগরি
+                  </h3>
+                </div>
+                <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
+                    stroke="#fe4f70"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+              <div className="space-y-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setActiveCategory(cat);
+                      setActiveSegment('all');
+                      setActiveSubCategory('সব');
+                    }}
+                    className={`w-full flex items-center justify-between py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                      activeCategory === cat
+                        ? 'bg-gradient-to-r from-[#fe4f70] to-[#ffa387] text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{cat === 'All' ? 'সকল বিষয়' : cat}</span>
+                    <span className="text-[11px] font-mono opacity-80">
+                      ({categoryCounts[cat] || 0})
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Widget 4: Practice Callout Card */}
+            <div className="rounded-3xl bg-gradient-to-br from-[#18231C] to-[#080D0A] text-white p-7 shadow-xl relative overflow-hidden">
+              <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-[#fe4f70]/20 rounded-full blur-2xl" />
+              <div className="relative z-10">
+                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-rose-300 text-[11px] font-bold uppercase tracking-wider mb-4 border border-white/10">
+                  স্মার্ট প্র্যাকটিস
+                </span>
+                <h4 className="text-lg font-black leading-snug mb-2">
+                  বোর্ড ও ভর্তি পরীক্ষার প্রশ্ন ব্যাংক
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed mb-6">
+                  হাজারো প্রশ্ন প্র্যাকটিস করো, ভুল হলে স্বয়ংক্রিয় মিস্টেক নোটবুকে সেভ করো এবং লাইভ লিডারবোর্ডে র‍্যাঙ্ক দেখো।
+                </p>
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-full bg-gradient-to-r from-[#fe4f70] to-[#ffa387] text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-rose-500/30"
+                >
+                  <span>এখনই অনুশীলন শুরু করো</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Widget 5: Popular Tags Cloud */}
+            <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] p-6 shadow-sm">
+              <div className="mb-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-4 h-4 text-[#fe4f70]" />
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    জনপ্রিয় ট্যাগ
+                  </h3>
+                </div>
+                <svg width="33" height="6" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M0 2c3.5 0 3.5 2 7 2s3.5-2 7-2 3.5 2 7 2 3.5-2 7-2 3.5 2 5 2"
+                    stroke="#fe4f70"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {popularTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => router.push(`/blog?tag=${encodeURIComponent(tag)}`)}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#fe4f70] hover:text-[#fe4f70] dark:hover:text-[#ffa387] transition-colors"
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
-      </section>
+      </main>
 
       {/* Live Search Modal */}
       <BlogSearchModal
@@ -596,6 +757,6 @@ export default function BlogListingClient({
         posts={posts}
         initialQuery={searchQuery}
       />
-    </>
+    </div>
   );
 }
