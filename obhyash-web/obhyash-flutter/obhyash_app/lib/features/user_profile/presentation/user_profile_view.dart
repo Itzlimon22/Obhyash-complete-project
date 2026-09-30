@@ -596,6 +596,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
               subjectStats: _targetA.subjects,
               isViewingSelf: isViewingSelf,
               studentName: targetUser.name,
+              stream: targetUser.stream,
             ),
             const SizedBox(height: 16),
 
