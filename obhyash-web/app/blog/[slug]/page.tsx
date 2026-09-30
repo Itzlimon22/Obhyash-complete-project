@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getBlogPost, getAllPosts } from '@/lib/blog-data';
+import { getPostCover } from '@/lib/blog-images';
 
 // ISR: serve cached HTML, revalidate in background every hour
 // Aligned with the unstable_cache revalidate: 3600 in lib/blog-data.ts
@@ -68,11 +69,20 @@ export async function generateMetadata({
       authors: [post.author.name],
       tags: post.tags,
       url: `https://obhyash.com/blog/${post.slug}`,
+      images: [
+        {
+          url: `https://obhyash.com${getPostCover(post)}`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
+      images: [`https://obhyash.com${getPostCover(post)}`],
     },
     alternates: {
       canonical: `https://obhyash.com/blog/${post.slug}`,
@@ -118,9 +128,9 @@ export default async function BlogPostPage({
     '@id': `https://obhyash.com/blog/${post.slug}`,
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage
-      ? [post.coverImage]
-      : ['https://obhyash.com/og-image.png'],
+    image: [
+      `https://obhyash.com${getPostCover(post)}`,
+    ],
     author: {
       '@type': 'Organization',
       name: post.author.name,
@@ -568,20 +578,18 @@ export default async function BlogPostPage({
       </section>
 
       {/* Cover image */}
-      {post.coverImage && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
-          <div className="relative w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden shadow-md border border-black/5 dark:border-white/5">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 896px"
-              priority
-            />
-          </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
+        <div className="relative w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden shadow-md border border-black/5 dark:border-white/5">
+          <Image
+            src={getPostCover(post)}
+            alt={post.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 896px"
+            priority
+          />
         </div>
-      )}
+      </div>
 
       {/* ─── Single-column layout ─── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
