@@ -17,7 +17,7 @@ export default function BlogThemeToggle({ className = '' }: BlogThemeToggleProps
       onClick={toggleTheme}
       aria-label={isDark ? 'লাইট মোডে পরিবর্তন করুন' : 'ডার্ক মোডে পরিবর্তন করুন'}
       title={isDark ? 'লাইট মোড' : 'ডার্ক মোড'}
-      className={`relative w-9 h-9 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 ${className}`}
+      className={`relative w-10 h-10 flex items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors shrink-0 ${className}`}
     >
       {!mounted ? (
         <span className="w-4 h-4" />

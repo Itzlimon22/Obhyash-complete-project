@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Industrial Dark Brown / Slate -->
+    <radialGradient id="engrCosmos" cx="72%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#361704"/>
+      <stop offset="50%" stop-color="#1C0A02"/>
+      <stop offset="100%" stop-color="#0A0401"/>
+    </radialGradient>
+
+    <!-- Hot Amber Industrial Light -->
+    <linearGradient id="amberHot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="50%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+
+    <filter id="engrBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="engrUltraBloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="38" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#engrCosmos)"/>
+
+  <!-- Core Radiant Glow -->
+  <circle cx="800" cy="335" r="230" fill="#EA580C" opacity="0.28" filter="url(#engrUltraBloom)"/>
+  <circle cx="800" cy="335" r="130" fill="#F59E0B" opacity="0.25" filter="url(#engrBloom)"/>
+
+  <!-- 3D Structural Truss & Precision Drafting Geometry -->
+  <g transform="translate(800, 335)">
+    <!-- Isometric Blueprint Grid Base -->
+    <polygon points="0,-180 200,-60 0,60 -200,-60" fill="none" stroke="#F97316" stroke-width="1.2" stroke-dasharray="4 8" opacity="0.4"/>
+    <polygon points="0,-60 200,60 0,180 -200,60" fill="none" stroke="#F97316" stroke-width="1.2" stroke-dasharray="4 8" opacity="0.4"/>
+
+    <!-- 3D Structural Triangular Truss Framework -->
+    <g transform="scale(1.2)">
+      <!-- Base Line -->
+      <line x1="-150" y1="80" x2="150" y2="80" stroke="#F97316" stroke-width="3" filter="url(#engrBloom)"/>
+      <!-- Top Apex -->
+      <line x1="-150" y1="80" x2="0" y2="-120" stroke="#F97316" stroke-width="3" filter="url(#engrBloom)"/>
+      <line x1="150" y1="80" x2="0" y2="-120" stroke="#F97316" stroke-width="3" filter="url(#engrBloom)"/>
+
+      <!-- Inner Web Members (King Post & Struts) -->
+      <line x1="0" y1="-120" x2="0" y2="80" stroke="#FCD34D" stroke-width="2.5" filter="url(#engrBloom)"/>
+      <line x1="-75" y1="-20" x2="0" y2="80" stroke="#F59E0B" stroke-width="2"/>
+      <line x1="75" y1="-20" x2="0" y2="80" stroke="#F59E0B" stroke-width="2"/>
+      <line x1="-75" y1="-20" x2="-75" y2="80" stroke="#FB923C" stroke-width="1.8"/>
+      <line x1="75" y1="-20" x2="75" y2="80" stroke="#FB923C" stroke-width="1.8"/>
+
+      <!-- Gusset Plate Nodes (Luminous Rivets) -->
+      <circle cx="-150" cy="80" r="7" fill="#FFFFFF" filter="url(#engrBloom)"/>
+      <circle cx="150" cy="80" r="7" fill="#FFFFFF" filter="url(#engrBloom)"/>
+      <circle cx="0" cy="-120" r="8" fill="#FFFFFF" filter="url(#engrBloom)"/>
+      <circle cx="0" cy="80" r="7" fill="#FCD34D"/>
+      <circle cx="-75" cy="-20" r="6" fill="#FCD34D"/>
+      <circle cx="75" cy="-20" r="6" fill="#FCD34D"/>
+    </g>
+
+    <!-- Concentric Drafting Compass Circle -->
+    <circle cx="0" cy="0" r="230" fill="none" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="8 12" opacity="0.4"/>
+  </g>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#FB923C" letter-spacing="4" opacity="0.9">
+      ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি • BUET
+    </text>
+
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      ইঞ্জিনিয়ারিং
+    </text>
+
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#FDBA74" opacity="0.75" letter-spacing="1">
+      বুয়েট, চুয়েট, কুয়েট ও রুয়েট ভর্তি গাইড
+    </text>
+  </g>
+</svg>

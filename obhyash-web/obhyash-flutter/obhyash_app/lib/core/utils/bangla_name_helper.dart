@@ -971,58 +971,14 @@ class BanglaNameHelper {
     return variants.toList();
   }
 
+  /// Returns standard short code for institute (e.g. "RU", "DU", "BUET", "MAT", "DB")
+  static String getInstituteCode(String raw) {
+    return _normalizeInstituteOrAuthor(raw);
+  }
+
   static String _normalizeInstituteOrAuthor(String raw) {
     final trimmed = raw.trim();
     if (trimmed.isEmpty) return '';
-    final upper = trimmed.toUpperCase().replaceAll('-', ' ').replaceAll('_', ' ');
-
-    // Boards standard short codes (e.g. DB-24, DIN-22, RB-23)
-    if (upper == 'DB' || upper == 'DHAKA' || upper.contains('DHAKA') || upper.contains('ঢাকা')) return 'DB';
-    if (upper == 'DIN' || upper == 'DINAJ' || upper.contains('DINAJPUR') || upper.contains('দিনাজপুর')) return 'DIN';
-    if (upper == 'RB' || upper == 'RAJ' || upper.contains('RAJSHAHI') || upper.contains('রাজশাহী')) return 'RB';
-    if (upper == 'CB' || upper == 'CTG' || upper.contains('CHITTAGONG') || upper.contains('CHATTOGRAM') || upper.contains('চট্টগ্রাম')) return 'CB';
-    if (upper == 'COMB' || upper == 'COM' || upper.contains('COMILLA') || upper.contains('CUMILLA') || upper.contains('কুমিল্লা')) return 'COM';
-    if (upper == 'JB' || upper == 'JES' || upper.contains('JESSORE') || upper.contains('JASHORE') || upper.contains('যশোর')) return 'JB';
-    if (upper == 'BB' || upper == 'BAR' || upper.contains('BARISAL') || upper.contains('BARISHAL') || upper.contains('বরিশাল')) return 'BB';
-    if (upper == 'SB' || upper == 'SYL' || upper.contains('SYLHET') || upper.contains('সিলেট')) return 'SB';
-    if (upper == 'MB' || upper == 'MYM' || upper.contains('MYMENSINGH') || upper.contains('ময়মনসিংহ')) return 'MB';
-    if (upper == 'MAD' || upper.contains('MADRASAH') || upper.contains('মাদ্রাসা')) return 'MAD';
-    if (upper == 'TEC' || upper.contains('TECHNICAL') || upper.contains('কারিগরি')) return 'TEC';
-    if (upper == 'ALL' || upper.contains('ALL BOARD') || upper.contains('সকল বোর্ড')) return 'ALL';
-
-    // Admission & University Units
-    if (upper == 'DU A' || upper == 'DU KA' || upper == 'DU_A') return 'DU-A';
-    if (upper == 'DU D' || upper == 'DU GHA' || upper == 'DU_D') return 'DU-D';
-    if (upper == 'DU B' || upper == 'DU KHA' || upper == 'DU_B') return 'DU-B';
-    if (upper == 'DU C' || upper == 'DU GA' || upper == 'DU_C') return 'DU-C';
-    if (upper == 'DU IBA' || upper == 'IBA') return 'IBA';
-    if (upper == 'DU' || upper == 'DHAKA UNIVERSITY') return 'DU';
-    if (upper == 'BUET') return 'BUET';
-    if (upper == 'CKRUET') return 'CKRUET';
-    if (upper == 'RUET') return 'RUET';
-    if (upper == 'KUET') return 'KUET';
-    if (upper == 'CUET') return 'CUET';
-    if (upper == 'BUTEX') return 'BUTEX';
-    if (upper == 'SUST') return 'SUST';
-    if (upper == 'JU A' || upper == 'JU_A') return 'JU-A';
-    if (upper == 'JU D' || upper == 'JU_D') return 'JU-D';
-    if (upper == 'JU') return 'JU';
-    if (upper == 'RU A' || upper == 'RU_A') return 'RU-A';
-    if (upper == 'RU C' || upper == 'RU_C') return 'RU-C';
-    if (upper == 'RU') return 'RU';
-    if (upper == 'CU A' || upper == 'CU_A') return 'CU-A';
-    if (upper == 'CU D' || upper == 'CU_D') return 'CU-D';
-    if (upper == 'CU') return 'CU';
-    if (upper == 'IUT') return 'IUT';
-    if (upper == 'MIST') return 'MIST';
-    if (upper == 'BUP') return 'BUP';
-    if (upper == 'GST A' || upper == 'GST_A') return 'GST-A';
-    if (upper == 'GST') return 'GST';
-    if (upper == 'AGRI GST' || upper == 'AGRI' || upper == 'AGRICULTURE') return 'AGRI';
-    if (upper == 'DMC' || upper == 'MEDICAL' || upper == 'MAT') return 'MAT';
-    if (upper == 'DAT' || upper == 'DENTAL') return 'DAT';
-    if (upper == 'AFMC') return 'AFMC';
-    if (upper == 'AMC') return 'AMC';
 
     // Authors standard canonical mapping
     if (trimmed.contains('মাজেদা')) return 'মাজেদা ম্যাম';
@@ -1044,6 +1000,71 @@ class BanglaNameHelper {
     if (trimmed.contains('মাহবুবুর')) return 'মাহবুবুর রহমান';
     if (trimmed.contains('রফিকুল')) return 'রফিকুল স্যার';
     if (trimmed.contains('আলিম')) return 'আলিম স্যার';
+    if (isTextbookAuthor(trimmed)) return trimmed;
+
+    final upper = trimmed.toUpperCase().replaceAll('-', ' ').replaceAll('_', ' ');
+
+    // 1. Engineering
+    if (upper == 'BUET' || upper.contains('BUET') || trimmed.contains('বুয়েট') || trimmed.contains('বাংলাদেশ প্রকৌশল')) return 'BUET';
+    if (upper == 'CKRUET' || trimmed.contains('চুয়েট-কুয়েট-রুয়েট') || trimmed.contains('সিকেআরইউইটি')) return 'CKRUET';
+    if (upper == 'KUET' || trimmed.contains('কুয়েট') || trimmed.contains('খুলনা প্রকৌশল')) return 'KUET';
+    if (upper == 'RUET' || trimmed.contains('রুয়েট') || trimmed.contains('রাজশাহী প্রকৌশল')) return 'RUET';
+    if (upper == 'CUET' || trimmed.contains('চুয়েট') || trimmed.contains('চট্টগ্রাম প্রকৌশল')) return 'CUET';
+    if (upper == 'BUTEX' || trimmed.contains('বুটেক্স') || trimmed.contains('টেক্সটাইল')) return 'BUTEX';
+    if (upper == 'MIST' || trimmed.contains('এমআইএসটি') || trimmed.contains('মিলিটারি ইনস্টিটিউট')) return 'MIST';
+    if (upper == 'IUT' || trimmed.contains('আইইউটি')) return 'IUT';
+
+    // 2. Medical
+    if (upper == 'MAT' || upper.contains('MBBS') || upper.contains('MEDICAL') || trimmed.contains('মেডিকেল')) return 'MAT';
+    if (upper == 'DAT' || upper.contains('BDS') || upper.contains('DENTAL') || trimmed.contains('ডেন্টাল')) return 'DAT';
+    if (upper == 'AFMC' || trimmed.contains('আর্মড ফোর্সেস') || trimmed.contains('এএফএমসি')) return 'AFMC';
+    if (upper == 'AMC') return 'AMC';
+
+    // 3. Admission & University Units (Must check BEFORE general boards)
+    if (upper == 'DU A' || upper == 'DU KA' || upper == 'DU_A') return 'DU-A';
+    if (upper == 'DU D' || upper == 'DU GHA' || upper == 'DU_D') return 'DU-D';
+    if (upper == 'DU B' || upper == 'DU KHA' || upper == 'DU_B') return 'DU-B';
+    if (upper == 'DU C' || upper == 'DU GA' || upper == 'DU_C') return 'DU-C';
+    if (upper == 'DU IBA' || upper == 'IBA') return 'IBA';
+    if (upper == 'DU' || upper.contains('DHAKA UNIVERSITY') || trimmed.contains('ঢাকা বিশ্ববিদ্যালয়') || trimmed.contains('ঢাকা বিশ্ববিদ্যালয়') || trimmed == 'ঢাবি') return 'DU';
+
+    if (upper == 'JU A' || upper == 'JU_A') return 'JU-A';
+    if (upper == 'JU D' || upper == 'JU_D') return 'JU-D';
+    if (upper == 'JU' || upper.contains('JAHANGIRNAGAR') || trimmed.contains('জাহাঙ্গীরনগর বিশ্ববিদ্যালয়') || trimmed.contains('জাহাঙ্গীরনগর বিশ্ববিদ্যালয়') || trimmed == 'জাবি') return 'JU';
+
+    if (upper == 'RU A' || upper == 'RU_A') return 'RU-A';
+    if (upper == 'RU C' || upper == 'RU_C') return 'RU-C';
+    if (upper == 'RU' || upper.contains('RAJSHAHI UNIVERSITY') || trimmed.contains('রাজশাহী বিশ্ববিদ্যালয়') || trimmed.contains('রাজশাহী বিশ্ববিদ্যালয়') || trimmed == 'রাবি') return 'RU';
+
+    if (upper == 'CU A' || upper == 'CU_A') return 'CU-A';
+    if (upper == 'CU D' || upper == 'CU_D') return 'CU-D';
+    if (upper == 'CU' || upper.contains('CHITTAGONG UNIVERSITY') || upper.contains('CHATTOGRAM UNIVERSITY') || trimmed.contains('চট্টগ্রাম বিশ্ববিদ্যালয়') || trimmed.contains('চট্টগ্রাম বিশ্ববিদ্যালয়') || trimmed == 'চবি') return 'CU';
+
+    if (upper == 'GST A' || upper == 'GST_A') return 'GST-A';
+    if (upper == 'GST' || trimmed.contains('গুচ্ছ') || trimmed == 'জিএসটি') return 'GST';
+    if (upper == 'AGRI GST' || upper == 'AGRI' || upper == 'AGRICULTURE' || trimmed.contains('কৃষি গুচ্ছ')) return 'AGRI';
+    if (upper == 'SUST' || trimmed.contains('শাহজালাল বিজ্ঞান ও প্রযুক্তি') || trimmed == 'সাস্ট') return 'SUST';
+    if (upper == 'JNU' || upper.contains('JAGANNATH') || trimmed.contains('জগন্নাথ বিশ্ববিদ্যালয়') || trimmed.contains('জগন্নাথ বিশ্ববিদ্যালয়') || trimmed == 'জবি') return 'JnU';
+    if (upper == 'BUP' || trimmed.contains('বিইউপি')) return 'BUP';
+
+    // 4. Boards standard short codes (e.g. DB, DinB, RB, CB)
+    if (upper == 'DB' || upper.contains('DHAKA BOARD') || trimmed.contains('ঢাকা বোর্ড') || upper == 'DHAKA' || trimmed == 'ঢাকা') return 'DB';
+    if (upper == 'DIN' || upper == 'DINB' || upper.contains('DINAJPUR') || trimmed.contains('দিনাজপুর')) return 'DinB';
+    if (upper == 'RB' || upper.contains('RAJSHAHI BOARD') || trimmed.contains('রাজশাহী বোর্ড') || upper == 'RAJ' || trimmed == 'রাজশাহী') return 'RB';
+    if (upper == 'CB' || upper == 'CTGB' || upper.contains('CHITTAGONG BOARD') || upper.contains('CHATTOGRAM BOARD') || trimmed.contains('চট্টগ্রাম বোর্ড')) return 'CtgB';
+    if (upper == 'COMB' || upper == 'COM' || upper.contains('COMILLA') || upper.contains('CUMILLA') || trimmed.contains('কুমিল্লা')) return 'CB';
+    if (upper == 'JB' || upper.contains('JESSORE') || upper.contains('JASHORE') || trimmed.contains('যশোর')) return 'JB';
+    if (upper == 'BB' || upper.contains('BARISAL') || upper.contains('BARISHAL') || trimmed.contains('বরিশাল')) return 'BB';
+    if (upper == 'SB' || upper.contains('SYLHET') || trimmed.contains('সিলেট')) return 'SB';
+    if (upper == 'MB' || upper.contains('MYMENSINGH') || trimmed.contains('ময়মনসিংহ')) return 'MB';
+    if (upper == 'MAD' || upper == 'MADB' || upper.contains('MADRASAH') || trimmed.contains('মাদ্রাসা') || trimmed.contains('মাদরাসা')) return 'MadB';
+    if (upper == 'TEC' || upper == 'TECHB' || upper.contains('TECHNICAL') || trimmed.contains('কারিগরি')) return 'TechB';
+    if (upper == 'ALL' || upper.contains('ALL BOARD') || trimmed.contains('সকল বোর্ড')) return 'ALL';
+
+    // Fallback if already short ASCII code
+    if (trimmed.length <= 8 && RegExp(r'^[a-zA-Z0-9\s\-_]+$').hasMatch(trimmed)) {
+      return trimmed.toUpperCase();
+    }
 
     return trimmed;
   }

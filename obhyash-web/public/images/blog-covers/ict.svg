@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Cyber Abyssal Background -->
+    <radialGradient id="ictMatrix" cx="72%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#051C33"/>
+      <stop offset="50%" stop-color="#020E1C"/>
+      <stop offset="100%" stop-color="#01060D"/>
+    </radialGradient>
+
+    <!-- Neon Cyber Gradients -->
+    <linearGradient id="cyberTrace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+
+    <filter id="ictBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="ictHyperGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="35" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#ictMatrix)"/>
+
+  <!-- Core Radiant Glow -->
+  <circle cx="800" cy="335" r="210" fill="#0284C7" opacity="0.3" filter="url(#ictHyperGlow)"/>
+  <circle cx="800" cy="335" r="100" fill="#38BDF8" opacity="0.4" filter="url(#ictBloom)"/>
+
+  <!-- Holographic Microprocessor & Optical Traces -->
+  <g transform="translate(800, 335)">
+    <!-- Radiating PCB Bus Traces (Angled Geometric Circuitry) -->
+    <path d="M -110 -70 L -180 -70 L -240 -130 L -360 -130" fill="none" stroke="#38BDF8" stroke-width="2" opacity="0.6"/>
+    <circle cx="-360" cy="-130" r="4" fill="#38BDF8"/>
+
+    <path d="M 110 -70 L 190 -70 L 250 -130 L 340 -130" fill="none" stroke="#38BDF8" stroke-width="2" opacity="0.6"/>
+    <circle cx="340" cy="-130" r="4" fill="#38BDF8"/>
+
+    <path d="M -110 70 L -170 70 L -230 130 L -330 130" fill="none" stroke="#0284C7" stroke-width="2" opacity="0.6"/>
+    <circle cx="-330" cy="130" r="4" fill="#0284C7"/>
+
+    <path d="M 110 70 L 180 70 L 240 130 L 360 130" fill="none" stroke="#0284C7" stroke-width="2" opacity="0.6"/>
+    <circle cx="360" cy="130" r="4" fill="#0284C7"/>
+
+    <!-- Outer Processor Shell (Rotated 45-deg Diamond Silicon Die) -->
+    <g transform="rotate(45)">
+      <rect x="-115" y="-115" width="230" height="230" rx="30" fill="none" stroke="#0284C7" stroke-width="2" stroke-dasharray="10 8" opacity="0.5"/>
+      <rect x="-95" y="-95" width="190" height="190" rx="20" fill="#031628" stroke="#38BDF8" stroke-width="3" filter="url(#ictBloom)"/>
+      <rect x="-70" y="-70" width="140" height="140" rx="14" fill="#082A4D" stroke="#0284C7" stroke-width="1.5"/>
+
+      <!-- Inner Die Circuit Core -->
+      <rect x="-40" y="-40" width="80" height="80" rx="8" fill="#38BDF8" opacity="0.25" filter="url(#ictBloom)"/>
+    </g>
+
+    <!-- Center Core Emblem (Holographic Monogram) -->
+    <circle cx="0" cy="0" r="16" fill="#FFFFFF" filter="url(#ictBloom)"/>
+    <circle cx="0" cy="0" r="6" fill="#0284C7"/>
+  </g>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#38BDF8" letter-spacing="4" opacity="0.9">
+      তথ্য ও যোগাযোগ প্রযুক্তি • ICT
+    </text>
+
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      তথ্যপ্রযুক্তি
+    </text>
+
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#7DD3FC" opacity="0.75" letter-spacing="1">
+      প্রোগ্রামিং, ডিজিটাল লজিক ও ডেটাবেজ
+    </text>
+  </g>
+</svg>

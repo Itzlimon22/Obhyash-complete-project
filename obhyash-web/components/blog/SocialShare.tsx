@@ -42,7 +42,7 @@ export default function SocialShare({ url, title, compact }: SocialShareProps) {
   };
 
   const buttonClass =
-    'w-9 h-9 rounded-full flex items-center justify-center border transition-all hover:-translate-y-0.5 shadow-sm';
+    'w-9 h-9 rounded-full flex items-center justify-center border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#161616] text-slate-600 dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] hover:border-[#059669]/40 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/40 transition-colors shadow-xs';
 
   const icons = (
     <div className="flex flex-wrap items-center gap-2">
@@ -50,8 +50,9 @@ export default function SocialShare({ url, title, compact }: SocialShareProps) {
         href={shareLinks.facebook}
         target="_blank"
         rel="noopener noreferrer"
-        className={`${buttonClass} bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-[#333] text-[#1877F2] hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] dark:hover:bg-[#1877F2] dark:hover:border-[#1877F2]`}
+        className={buttonClass}
         aria-label="Share on Facebook"
+        title="ফেসবুকে শেয়ার করুন"
       >
         <Facebook className="w-4 h-4" />
       </a>
@@ -59,8 +60,9 @@ export default function SocialShare({ url, title, compact }: SocialShareProps) {
         href={shareLinks.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className={`${buttonClass} bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-[#333] text-[#25D366] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] dark:hover:bg-[#25D366] dark:hover:border-[#25D366]`}
+        className={buttonClass}
         aria-label="Share on WhatsApp"
+        title="হোয়াটসঅ্যাপে শেয়ার করুন"
       >
         <MessageCircle className="w-4 h-4" />
       </a>
@@ -68,27 +70,22 @@ export default function SocialShare({ url, title, compact }: SocialShareProps) {
         href={shareLinks.twitter}
         target="_blank"
         rel="noopener noreferrer"
-        className={`${buttonClass} bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-[#333] text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white hover:border-[#1DA1F2] dark:hover:bg-[#1DA1F2] dark:hover:border-[#1DA1F2]`}
-        aria-label="Share on Twitter"
+        className={buttonClass}
+        aria-label="Share on X"
+        title="X (Twitter)-এ শেয়ার করুন"
       >
-        <Twitter className="w-4 h-4" />
-      </a>
-      <a
-        href={shareLinks.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${buttonClass} bg-white dark:bg-[#1a1a1a] border-slate-200 dark:border-[#333] text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white hover:border-[#0A66C2] dark:hover:bg-[#0A66C2] dark:hover:border-[#0A66C2]`}
-        aria-label="Share on LinkedIn"
-      >
-        <Linkedin className="w-4 h-4" />
+        <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
       </a>
       <button
         onClick={handleCopyLink}
-        className={`${buttonClass} bg-slate-900 border-slate-900 text-white hover:bg-slate-700 hover:border-slate-700 dark:bg-slate-100 dark:border-slate-100 dark:text-slate-900 dark:hover:bg-white`}
+        className={`${buttonClass} ${copied ? 'text-emerald-600 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40' : ''}`}
         aria-label="Copy Link"
+        title="লিংক কপি করুন"
       >
         {copied ? (
-          <Check className="w-4 h-4" />
+          <Check className="w-4 h-4 text-emerald-600" />
         ) : (
           <LinkIcon className="w-4 h-4" />
         )}

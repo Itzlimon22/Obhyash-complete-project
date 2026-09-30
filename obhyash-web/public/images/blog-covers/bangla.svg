@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Royal Maroon / Crimson Night -->
+    <radialGradient id="bnNight" cx="72%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#380612"/>
+      <stop offset="50%" stop-color="#1F0309"/>
+      <stop offset="100%" stop-color="#0A0103"/>
+    </radialGradient>
+
+    <!-- Antique Gold Gradient -->
+    <linearGradient id="goldCalligraphy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+
+    <filter id="bnBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="bnAtmosphere" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bnNight)"/>
+
+  <!-- Warm Glowing Literary Aura -->
+  <circle cx="800" cy="335" r="230" fill="#E11D48" opacity="0.25" filter="url(#bnAtmosphere)"/>
+  <circle cx="800" cy="335" r="140" fill="#EAB308" opacity="0.2" filter="url(#bnAtmosphere)"/>
+
+  <!-- Artistic Bengali Calligraphy & Crescent Literature Halo -->
+  <g transform="translate(800, 335)">
+    <!-- Crescent Halo Ring -->
+    <path d="M 0 -190 A 190 190 0 1 1 -190 0 A 160 160 0 1 0 0 -190" fill="url(#goldCalligraphy)" opacity="0.3" filter="url(#bnBloom)"/>
+    <circle cx="0" cy="0" r="190" fill="none" stroke="#FB7185" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.5"/>
+
+    <!-- Monumental Sculptural Bengali Calligraphic Glyphs (অ & বাংলা) -->
+    <!-- Giant Glowing 'অ' -->
+    <text x="0" y="70" font-family="'Hind Siliguri', serif" font-size="240" font-weight="700" fill="url(#goldCalligraphy)" text-anchor="middle" filter="url(#bnBloom)">
+      অ
+    </text>
+
+    <!-- Floating Poetic Ink Drops / Stars -->
+    <circle cx="-130" cy="-110" r="5" fill="#FDE047" filter="url(#bnBloom)"/>
+    <circle cx="140" cy="-90" r="6" fill="#FDA4AF" filter="url(#bnBloom)"/>
+    <circle cx="110" cy="130" r="4.5" fill="#FDE047"/>
+    <circle cx="-140" cy="110" r="4" fill="#FDA4AF"/>
+  </g>
+
+  <!-- Flowing Ink Ripple Waves across bottom -->
+  <path d="M -50 580 C 250 500, 550 630, 850 550 S 1250 590, 1250 590" fill="none" stroke="#E11D48" stroke-width="2.5" opacity="0.35" filter="url(#bnBloom)"/>
+  <path d="M -50 610 C 200 540, 500 650, 800 580 S 1250 620, 1250 620" fill="none" stroke="#EAB308" stroke-width="1.8" opacity="0.25"/>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#FB7185" letter-spacing="4" opacity="0.9">
+      বাংলা সাহিত্য ও ব্যাকরণ • BANGLA
+    </text>
+
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      বাংলা সাহিত্য
+    </text>
+
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#FECDD3" opacity="0.75" letter-spacing="1">
+      সাহিত্যপাঠ, সহপাঠ, ব্যাকরণ ও নির্মিতি
+    </text>
+  </g>
+</svg>

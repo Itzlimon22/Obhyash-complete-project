@@ -18,6 +18,7 @@ import '../features/profile/presentation/profile_route_view.dart';
 import '../features/profile/presentation/profile_stats_page.dart';
 import '../features/subscription/presentation/subscription_view.dart';
 import '../features/subscription/presentation/my_subscription_view.dart';
+import '../features/subscription/presentation/plan_selection_view.dart';
 import '../features/complaint/presentation/complaint_view.dart';
 import '../features/feature_requests/presentation/feature_requests_view.dart';
 import '../features/reports/presentation/student_report_view.dart';
@@ -186,6 +187,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/dashboard',
         parentNavigatorKey: rootNavigatorKey,
         redirect: (context, state) => '/',
+      ),
+      GoRoute(
+        path: '/subscription',
+        parentNavigatorKey: rootNavigatorKey,
+        redirect: (context, state) => '/profile/subscription',
+      ),
+      GoRoute(
+        path: '/plan-selection',
+        parentNavigatorKey: rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const PlanSelectionView(), state),
       ),
       GoRoute(
         path: '/exam',

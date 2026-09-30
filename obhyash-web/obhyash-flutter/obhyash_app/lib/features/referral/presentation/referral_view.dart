@@ -84,61 +84,80 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         return;
       }
 
-      bool hasUsed = false;
+      final prefs = await SharedPreferences.getInstance();
+
+      // ── Step 0: Instant Cache Render (0-second load if visited before) ──
+      final cachedCode = prefs.getString('cached_referral_code_$uid');
+      final cachedHasUsed = prefs.getBool('cached_referral_has_used_$uid');
+      final cachedTotal = prefs.getInt('cached_referral_total_$uid');
+
+      if (cachedCode != null && cachedCode.isNotEmpty && mounted) {
+        setState(() {
+          _code = cachedCode;
+          if (cachedHasUsed != null) _hasUsedReferral = cachedHasUsed;
+          if (cachedTotal != null) _totalReferrals = cachedTotal;
+          _isLoading = false; // Show UI immediately without blocking spinner!
+        });
+      }
+
+      bool hasUsed = _hasUsedReferral;
       int remainingAttempts = _remainingAttempts;
 
-      // 1. Check eligibility & used status via RPC
-      try {
-        final eligRes = await sb.rpc('check_referral_eligibility', params: {
-          'p_user_id': uid,
-        });
-        if (eligRes is Map<String, dynamic>) {
-          if (eligRes['has_used_referral'] == true) {
-            hasUsed = true;
-          }
-          if (eligRes['remaining_attempts'] != null) {
-            remainingAttempts = (eligRes['remaining_attempts'] as num).toInt();
-          }
-          final lockSec = (eligRes['lock_seconds'] as num?)?.toInt() ?? 0;
-          if (lockSec > 0) {
-            _startLockoutTimer(lockSec);
-          }
+      // ── Step 1: Run Independent Network Calls in Parallel ──
+      final eligFuture = sb.rpc('check_referral_eligibility', params: {
+        'p_user_id': uid,
+      }).then<Map<String, dynamic>?>((res) => res is Map<String, dynamic> ? res : null).catchError((_) => null);
+
+      final refCodeFuture = sb
+          .from('referrals')
+          .select('id, code')
+          .eq('owner_id', uid)
+          .maybeSingle()
+          .catchError((_) => null);
+
+      final scratchCardsFuture = sb
+          .from('scratch_cards')
+          .select('*')
+          .eq('user_id', uid)
+          .order('created_at', ascending: false)
+          .then<List<Map<String, dynamic>>>((res) => (res as List).cast<Map<String, dynamic>>())
+          .catchError((_) => <Map<String, dynamic>>[]);
+
+      final leaderboardFuture = sb
+          .rpc('get_monthly_leaderboard')
+          .then<List<Map<String, dynamic>>>((res) => res is List ? res.cast<Map<String, dynamic>>() : <Map<String, dynamic>>[])
+          .catchError((_) => <Map<String, dynamic>>[]);
+
+      final results = await Future.wait([
+        eligFuture,
+        refCodeFuture,
+        scratchCardsFuture,
+        leaderboardFuture,
+      ]);
+
+      final eligRes = results[0] as Map<String, dynamic>?;
+      var refRow = results[1] as Map<String, dynamic>?;
+      final scratchCards = results[2] as List<Map<String, dynamic>>;
+      final leaderboard = results[3] as List<Map<String, dynamic>>;
+
+      if (eligRes != null) {
+        if (eligRes['has_used_referral'] == true) {
+          hasUsed = true;
         }
-      } catch (e) {
-        debugPrint('[ReferralView] check_referral_eligibility rpc error: $e');
+        if (eligRes['remaining_attempts'] != null) {
+          remainingAttempts = (eligRes['remaining_attempts'] as num).toInt();
+        }
+        final lockSec = (eligRes['lock_seconds'] as num?)?.toInt() ?? 0;
+        if (lockSec > 0) {
+          _startLockoutTimer(lockSec);
+        }
       }
 
-      // 2. Attempt status fallback (lockout countdown)
-      if (_lockoutSeconds == 0) {
+      String code = refRow?['code']?.toString() ?? '';
+      String referralId = refRow?['id']?.toString() ?? '';
+
+      if (code.isEmpty) {
         try {
-          final statusRes = await sb.rpc('get_referral_attempt_status', params: {
-            'p_user_id': uid,
-          });
-          if (statusRes is Map<String, dynamic>) {
-            remainingAttempts = (statusRes['remaining_attempts'] as num?)?.toInt() ?? remainingAttempts;
-            final lockSec = (statusRes['lock_seconds'] as num?)?.toInt() ?? 0;
-            if (lockSec > 0) {
-              _startLockoutTimer(lockSec);
-            }
-          }
-        } catch (e) {
-          debugPrint('[ReferralView] attempt status check error: $e');
-        }
-      }
-
-      // Try fetching existing code or create one
-      String code = '';
-      String referralId = '';
-
-      try {
-        final existing = await sb
-            .from('referrals')
-            .select('id, code')
-            .eq('owner_id', uid)
-            .maybeSingle();
-
-        if (existing == null) {
-          // Use cryptographically secure random to avoid timestamp-collision duplicates
           final rng = Random.secure();
           const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
           code = List.generate(8, (_) => chars[rng.nextInt(chars.length)]).join();
@@ -150,26 +169,46 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
               .single();
           referralId = created['id']?.toString() ?? '';
           code = created['code']?.toString() ?? code;
-        } else {
-          code = existing['code']?.toString() ?? '';
-          referralId = existing['id']?.toString() ?? '';
+        } catch (e) {
+          debugPrint('[ReferralView] code create/fetch error: $e');
         }
-      } catch (e) {
-        debugPrint('[ReferralView] code create/fetch error: $e');
       }
 
-      // Fetch redemption history
+      if (code.isNotEmpty) {
+        prefs.setString('cached_referral_code_$uid', code);
+        prefs.setBool('cached_referral_has_used_$uid', hasUsed);
+      }
+
+      // ── Step 2: Parallel Fetch of History & Count ──
       List<Map<String, dynamic>> enrichedHistory = [];
+      int totalApproved = _totalReferrals;
+
       if (referralId.isNotEmpty) {
         try {
-          final history = await sb
+          final histFuture = sb
               .from('referral_history')
               .select('redeemed_at, admin_status, redeemed_by')
               .eq('referral_id', referralId)
               .order('redeemed_at', ascending: false)
-              .limit(20);
+              .limit(20)
+              .then<List<Map<String, dynamic>>>((res) => (res as List).cast<Map<String, dynamic>>())
+              .catchError((_) => <Map<String, dynamic>>[]);
 
-          final historyList = (history as List).cast<Map<String, dynamic>>();
+          final countFuture = sb
+              .from('referral_history')
+              .select('id')
+              .eq('referral_id', referralId)
+              .eq('admin_status', 'Approved')
+              .count(CountOption.exact)
+              .then<int>((res) => res.count)
+              .catchError((_) => 0);
+
+          final subResults = await Future.wait([histFuture, countFuture]);
+          final historyList = subResults[0] as List<Map<String, dynamic>>;
+          totalApproved = subResults[1] as int;
+
+          prefs.setInt('cached_referral_total_$uid', totalApproved);
+
           final userIds = historyList
               .map((h) => h['redeemed_by'] as String?)
               .where((id) => id != null)
@@ -204,52 +243,11 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         }
       }
 
-      // Fetch scratch cards
-      List<Map<String, dynamic>> scratchCards = [];
-      try {
-        final cards = await sb
-            .from('scratch_cards')
-            .select('*')
-            .eq('user_id', uid)
-            .order('created_at', ascending: false);
-        scratchCards = (cards as List).cast<Map<String, dynamic>>();
-      } catch (e) {
-        debugPrint('[ReferralView] scratch cards fetch error: $e');
-      }
-
-      // Get exact count of successful referrals
-      int totalApproved = 0;
-      if (referralId.isNotEmpty) {
-        try {
-          final countRes = await sb
-              .from('referral_history')
-              .select('id')
-              .eq('referral_id', referralId)
-              .eq('admin_status', 'Approved')
-              .count(CountOption.exact);
-          totalApproved = countRes.count;
-        } catch (_) {}
-      }
-
-      // Get leaderboard
-      List<Map<String, dynamic>> leaderboard = [];
-      try {
-        final leaderboardRes = await sb.rpc('get_monthly_leaderboard');
-        if (leaderboardRes is List) {
-          leaderboard = leaderboardRes.cast<Map<String, dynamic>>();
-        }
-      } catch (e) {
-        debugPrint('[ReferralView] leaderboard fetch error: $e');
-      }
-
       if (!hasUsed && _claimCodeController.text.isEmpty) {
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          final saved = prefs.getString('referralCode')?.trim();
-          if (saved != null && saved.isNotEmpty) {
-            _claimCodeController.text = saved;
-          }
-        } catch (_) {}
+        final saved = prefs.getString('referralCode')?.trim();
+        if (saved != null && saved.isNotEmpty) {
+          _claimCodeController.text = saved;
+        }
       }
 
       if (mounted) {
@@ -328,6 +326,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
           // Ensure local user profile provider is refreshed
           ref.invalidate(userProfileProvider);
 
+          if (!mounted) return;
           CelebrationDialog.show(
             context,
             title: 'অভিনন্দন! 🎉',

@@ -8,14 +8,8 @@ import StreakDialog from '../common/StreakDialog';
 import { UserProfile, Notification } from '@/lib/types';
 import { BanglaNameHelper } from '@/lib/bangla-name-helper';
 import { isUserPro } from '@/lib/subscription-utils';
-import {
-  getNotifications,
-  getUnreadNotificationCount,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-} from '@/services/database';
+import { getUnreadNotificationCount } from '@/services/database';
 import NotificationBell from '../notifications/NotificationBell';
-import NotificationDropdown from '../notifications/NotificationDropdown';
 import UserAvatar from '../common/UserAvatar';
 import { supabase } from '@/services/database';
 import { toast } from 'sonner';
@@ -118,53 +112,25 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Dropdown & Modal States
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  // Modal State
   const [isStreakDialogOpen, setIsStreakDialogOpen] = useState(false);
 
   // Notification State
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
-  const notifRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdowns on outside click
+  // Fetch unread notifications count on mount & Subscribe to Realtime
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        notifRef.current &&
-        !notifRef.current.contains(event.target as Node)
-      ) {
-        if (window.innerWidth >= 768) {
-          setIsNotifOpen(false);
-        }
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Fetch notifications on mount & Subscribe to Realtime
-  useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchUnreadCount = async () => {
       if (!user?.id) return;
-
-      setNotificationsLoading(true);
       try {
-        const { data: notifs } = await getNotifications();
-        setNotifications(notifs);
-
         const count = await getUnreadNotificationCount();
         setUnreadCount(count);
       } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-      } finally {
-        setNotificationsLoading(false);
+        console.error('Failed to fetch unread notification count:', error);
       }
     };
 
-    fetchNotifications();
+    fetchUnreadCount();
 
     if (user?.id) {
       const channel = supabase
@@ -179,7 +145,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           },
           (payload: { new: Notification }) => {
             const newNotif = payload.new as Notification;
-            setNotifications((prev) => [newNotif, ...prev]);
             setUnreadCount((prev) => prev + 1);
 
             toast.info(newNotif.title, {
@@ -196,48 +161,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       };
     }
   }, [user?.id]);
-
-  // Notification Handlers
-  const handleNotificationClick = async (notification: Notification) => {
-    if (!user?.id) return;
-
-    if (!notification.is_read) {
-      try {
-        await markNotificationAsRead(notification.id);
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === notification.id ? { ...n, is_read: true } : n,
-          ),
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      } catch (error) {
-        console.error('Failed to mark notification as read:', error);
-      }
-    }
-
-    if (notification.action_url) {
-      window.location.href = notification.action_url;
-    }
-
-    setIsNotifOpen(false);
-  };
-
-  const handleMarkAllAsRead = async () => {
-    if (!user?.id) return;
-
-    try {
-      await markAllNotificationsAsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      setUnreadCount(0);
-    } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
-    }
-  };
-
-  const handleViewAllNotifications = () => {
-    setIsNotifOpen(false);
-    onTabChange('notifications');
-  };
 
   return (
     <div className="h-[100dvh] min-h-[100dvh] w-full bg-[#FAFAF9] dark:bg-[#000000] flex transition-colors overflow-hidden font-sans">
@@ -363,27 +286,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     </span>
                   </button>
 
-                  {/* Notification Bell */}
-                  <div className="relative" ref={notifRef}>
-                    <NotificationBell
-                      unreadCount={unreadCount}
-                      onClick={() => setIsNotifOpen((prev) => !prev)}
-                      isOpen={isNotifOpen}
-                    />
+                  {/* Notification Bell (Direct navigation to notifications tab, matching Flutter) */}
+                  <NotificationBell
+                    unreadCount={unreadCount}
+                    onClick={() => onTabChange('notifications')}
+                    isOpen={false}
+                  />
 
-                    {isNotifOpen && (
-                      <NotificationDropdown
-                        notifications={notifications}
-                        onNotificationClick={handleNotificationClick}
-                        onMarkAllAsRead={handleMarkAllAsRead}
-                        onViewAll={handleViewAllNotifications}
-                        isLoading={notificationsLoading}
-                        onClose={() => setIsNotifOpen(false)}
-                      />
-                    )}
-                  </div>
-
-                  {/* Profile Avatar with Flutter Pro Sweep Gradient Ring */}
+                  {/* Profile Avatar (Clean, proportionate and fits well within header) */}
                   <button
                     type="button"
                     onClick={() => onTabChange('settings')}
@@ -392,7 +302,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   >
                     <UserAvatar
                       user={user}
-                      size="md"
+                      size="sm"
                     />
                   </button>
                 </div>

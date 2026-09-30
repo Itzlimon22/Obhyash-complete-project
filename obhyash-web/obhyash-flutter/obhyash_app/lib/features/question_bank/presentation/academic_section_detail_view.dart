@@ -1448,11 +1448,19 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
   // ── CQ (Creative Question) Card ──
   Widget _buildCqCard(Question q, int number, bool isDark) {
     final banglaNum = BanglaNameHelper.toBanglaNumeral(number);
-    final boardName = q.examHistory.isNotEmpty
-        ? '${q.examHistory.first.institute} \'${(q.examHistory.first.year % 100).toString().padLeft(2, '0')}'
-        : (q.institutes.isNotEmpty
-            ? '${q.institutes.first}${q.years.isNotEmpty ? " '${(q.years.first % 100).toString().padLeft(2, '0')}" : ''}'
-            : 'বোর্ড প্রশ্ন');
+    final String boardName;
+    if (q.examHistory.isNotEmpty) {
+      final h = q.examHistory.first;
+      final code = h.code.isNotEmpty ? h.code : BanglaNameHelper.getInstituteCode(h.institute);
+      final yr = h.year > 0 ? "'${(h.year % 100).toString().padLeft(2, '0')}" : '';
+      boardName = '$code$yr';
+    } else if (q.institutes.isNotEmpty) {
+      final code = BanglaNameHelper.getInstituteCode(q.institutes.first);
+      final yr = q.years.isNotEmpty && q.years.first > 0 ? "'${(q.years.first % 100).toString().padLeft(2, '0')}" : '';
+      boardName = '$code$yr';
+    } else {
+      boardName = 'বোর্ড প্রশ্ন';
+    }
 
     final (stimulus, subQuestions) = _extractCqData(q);
 

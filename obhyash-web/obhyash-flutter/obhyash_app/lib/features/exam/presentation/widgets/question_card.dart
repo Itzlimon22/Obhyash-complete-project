@@ -211,19 +211,29 @@ class _QuestionCardState extends State<QuestionCard>
                                   widget.question.years.isNotEmpty)) ...[
                             () {
                               final String sourceText;
-                              if (widget.question.examHistory.isNotEmpty &&
-                                  widget.question.examHistory.first.institute.isNotEmpty) {
+                              if (widget.question.examHistory.isNotEmpty) {
                                 final h = widget.question.examHistory.first;
-                                final yr = h.year > 0
-                                    ? " '${(h.year % 100).toString().padLeft(2, '0')}"
+                                final rawCode = h.code.isNotEmpty
+                                    ? h.code
+                                    : BanglaNameHelper.getInstituteCode(h.institute);
+                                final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
+                                    BanglaNameHelper.isTextbookAuthor(h.institute);
+                                final yr = (h.year > 0 && !isAuthor)
+                                    ? "'${(h.year % 100).toString().padLeft(2, '0')}"
                                     : '';
-                                sourceText = '${h.institute}$yr';
+                                sourceText = '$rawCode$yr';
                               } else if (widget.question.institutes.isNotEmpty) {
-                                final inst = widget.question.institutes.first;
-                                final yr = widget.question.years.isNotEmpty && widget.question.years.first > 0
-                                    ? " '${(widget.question.years.first % 100).toString().padLeft(2, '0')}"
+                                final rawInst = widget.question.institutes.first;
+                                final rawCode = BanglaNameHelper.getInstituteCode(rawInst);
+                                final isAuthor = BanglaNameHelper.isTextbookAuthor(rawCode) ||
+                                    BanglaNameHelper.isTextbookAuthor(rawInst);
+                                final yrNum = widget.question.years.isNotEmpty
+                                    ? widget.question.years.first
+                                    : 0;
+                                final yr = (yrNum > 0 && !isAuthor)
+                                    ? "'${(yrNum % 100).toString().padLeft(2, '0')}"
                                     : '';
-                                sourceText = '$inst$yr';
+                                sourceText = '$rawCode$yr';
                               } else {
                                 sourceText = BanglaNameHelper.formatQuestionSource(
                                   examHistory: widget.question.examHistory,

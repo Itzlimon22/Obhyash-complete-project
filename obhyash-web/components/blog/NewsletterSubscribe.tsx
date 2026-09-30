@@ -40,11 +40,11 @@ export default function NewsletterSubscribe() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-2xl bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 border border-rose-100 dark:border-rose-900/30 px-5 py-5 sm:px-8 sm:py-6 font-anek shadow-sm">
+    <div className="w-full max-w-2xl mx-auto rounded-3xl bg-slate-50/80 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 px-5 py-5 sm:px-8 sm:py-6 font-anek shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 shrink-0 bg-white dark:bg-[#121212] rounded-xl shadow-sm border border-rose-100 dark:border-rose-900/50 flex items-center justify-center">
-            <Mail className="w-5 h-5 text-rose-500" />
+          <div className="w-10 h-10 shrink-0 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900/40 flex items-center justify-center text-[#059669] dark:text-[#34d399]">
+            <Mail className="w-5 h-5" />
           </div>
           <div className="min-w-0">
             <h3 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 leading-tight">
@@ -66,12 +66,12 @@ export default function NewsletterSubscribe() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ইমেইল ঠিকানা..."
-            className="flex-1 min-w-0 sm:w-52 bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-500/40 text-[14px]"
+            className="flex-1 min-w-0 sm:w-52 bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-[#059669] text-[14px]"
           />
           <button
             type="submit"
             disabled={isSubmitting || !email.trim()}
-            className="shrink-0 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-3 sm:px-4 py-2.5 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center gap-1.5 text-[14px]"
+            className="shrink-0 bg-[#059669] hover:bg-[#047857] text-white px-4 sm:px-5 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5 text-[14px] shadow-sm"
           >
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

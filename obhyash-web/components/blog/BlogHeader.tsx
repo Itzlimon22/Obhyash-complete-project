@@ -4,17 +4,61 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   Search,
-  ChevronDown,
   X,
   Facebook,
-  Youtube,
+  Menu,
   ArrowRight,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, usePathname } from 'next/navigation';
 import BlogThemeToggle from './BlogThemeToggle';
 import ProgressBar from './ProgressBar';
 import BlogSearchModal from './BlogSearchModal';
 import { BlogPost } from '@/lib/blog-data';
+
+// Crisp YouTube SVG Icon with transparent knockout play triangle
+const YouTubeIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M21.582 6.186a2.506 2.506 0 0 0-1.768-1.782C18.256 3.9 12 3.9 12 3.9s-6.256 0-7.814.504A2.506 2.506 0 0 0 2.418 6.186C2 7.754 2 11 2 11s0 3.246.418 4.814a2.506 2.506 0 0 0 1.768 1.782c1.558.504 7.814.504 7.814.504s6.256 0 7.814-.504a2.506 2.506 0 0 0 1.768-1.782C22 14.246 22 11 22 11s0-3.246-.418-4.814zM10 14.5V7.5L16 11l-6 3.5z"
+    />
+  </svg>
+);
+
+function NavLinks() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const currentTag = searchParams?.get('tag') ?? '';
+  const isHomeActive = pathname === '/blog' && !currentTag;
+
+  const navItems = [
+    { label: 'Home', href: '/blog', active: isHomeActive },
+    { label: 'HSC 2027', href: '/blog?tag=HSC 2027', active: currentTag === 'HSC 2027' },
+    { label: 'HSC 2026', href: '/blog?tag=HSC 2026', active: currentTag === 'HSC 2026' },
+    { label: 'Admission', href: '/blog?tag=বিশ্ববিদ্যালয় ভর্তি', active: currentTag === 'বিশ্ববিদ্যালয় ভর্তি' },
+    { label: 'Study Hacks', href: '/blog?tag=পড়ার কৌশল', active: currentTag === 'পড়ার কৌশল' },
+  ];
+
+  return (
+    <nav className="hidden lg:flex items-center gap-1 font-['Poppins',sans-serif] text-[14px]">
+      {navItems.map((item) => (
+        <Link
+          key={item.label}
+          href={item.href}
+          className={`px-3.5 py-1.5 rounded-full font-medium transition-colors ${
+            item.active
+              ? 'bg-[#059669] text-white font-semibold shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] hover:bg-slate-100 dark:hover:bg-white/5'
+          }`}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
 
 interface BlogHeaderProps {
   posts?: BlogPost[];
@@ -72,58 +116,21 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             </span>
           </Link>
 
-          {/* ─── 2. CENTER: NAVIGATION MENU (3D Deep Green Active Pill) ─── */}
-          <nav className="hidden lg:flex items-center gap-7 font-['Poppins',sans-serif] text-[14.5px]">
-            {/* Active Pill: 3D Deep Green */}
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white font-bold shadow-[0_3px_0_0_#064e3b,0_5px_12px_rgba(6,78,59,0.3)] hover:shadow-[0_2px_0_0_#064e3b] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all duration-150"
-            >
-              <span>Home</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-90" />
-            </Link>
+          {/* ─── 2. CENTER: NAVIGATION MENU (Dynamic Active State, Clean Normal Styling) ─── */}
+          <Suspense fallback={<div className="hidden lg:block w-96 h-8" />}>
+            <NavLinks />
+          </Suspense>
 
-            <Link
-              href="/blog?tag=HSC 2027"
-              className="font-medium text-[#79889e] dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
-            >
-              HSC 2027
-            </Link>
-
-            <Link
-              href="/blog?tag=HSC 2026"
-              className="font-medium text-[#79889e] dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
-            >
-              HSC 2026
-            </Link>
-
-            <Link
-              href="/blog?tag=বিশ্ববিদ্যালয় ভর্তি"
-              className="inline-flex items-center gap-1 font-medium text-[#79889e] dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
-            >
-              <span>Admission</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-            </Link>
-
-            <Link
-              href="/blog?tag=পড়ার কৌশল"
-              className="inline-flex items-center gap-1 font-medium text-[#79889e] dark:text-slate-300 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
-            >
-              <span>Study Hacks</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
-            </Link>
-          </nav>
-
-          {/* ─── 3. RIGHT: ONLY FACEBOOK & YOUTUBE + 3D DEEP GREEN BUTTONS ─── */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Social Icons (Only Facebook & YouTube) */}
-            <div className="flex items-center gap-3 text-[#203656] dark:text-slate-300">
+          {/* ─── 3. RIGHT: SOCIAL ICONS + SLEEK MATCHING ACTION BUTTONS ─── */}
+          <div className="flex items-center gap-3 sm:gap-3.5">
+            {/* Social Icons (Facebook & YouTube) */}
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
               <a
                 href="https://facebook.com/obhyash"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] transition-all"
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
               >
                 <Facebook className="w-4 h-4 fill-current" />
               </a>
@@ -132,40 +139,38 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] transition-all"
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
               >
-                <Youtube className="w-4 h-4 fill-current" />
+                <YouTubeIcon className="w-4 h-4" />
               </a>
             </div>
 
             {/* Subtle Divider */}
-            <div className="hidden sm:block w-[1px] h-6 bg-slate-200 dark:bg-white/10" />
+            <div className="hidden sm:block w-[1px] h-5 bg-slate-200 dark:bg-white/10" />
 
-            {/* Dark / Light Mode Toggle */}
+            {/* Dark / Light Mode Toggle (Matching 40x40 circular) */}
             <BlogThemeToggle />
 
-            {/* ─── BUTTON 1: 3D DEEP GREEN CIRCULAR SEARCH BUTTON ─── */}
+            {/* Search Button (Normal sleek circular) */}
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Search"
               title="Search articles (Ctrl+K)"
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] shadow-[0_4px_0_0_#064e3b,0_6px_14px_rgba(6,78,59,0.35)] hover:shadow-[0_2px_0_0_#064e3b,0_3px_8px_rgba(6,78,59,0.35)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all duration-150 shrink-0"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[#059669] hover:bg-[#047857] shadow-sm transition-colors shrink-0"
             >
-              <Search className="w-4 h-4 text-white stroke-[2.4]" />
+              <Search className="w-4 h-4 text-white stroke-[2.2]" />
             </button>
 
-            {/* ─── BUTTON 2: 3D DEEP GREEN CIRCULAR BURGER BUTTON (=) ─── */}
+            {/* Burger Menu Button (Normal sleek circular with 3-line Menu) */}
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
               aria-label="Open Canvas Menu"
               title="Menu"
-              className="w-10 h-10 rounded-full flex flex-col items-center justify-center gap-1.5 text-white bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] shadow-[0_4px_0_0_#064e3b,0_6px_14px_rgba(6,78,59,0.35)] hover:shadow-[0_2px_0_0_#064e3b,0_3px_8px_rgba(6,78,59,0.35)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all duration-150 shrink-0"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-[#059669] hover:bg-[#047857] shadow-sm transition-colors shrink-0"
             >
-              {/* Katen signature 2 white horizontal bars */}
-              <span className="w-4 h-[2px] bg-white rounded-full block shadow-sm" />
-              <span className="w-4 h-[2px] bg-white rounded-full block shadow-sm" />
+              <Menu className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
@@ -274,7 +279,7 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               aria-label="YouTube"
               className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-[#059669] hover:text-white flex items-center justify-center text-slate-700 dark:text-slate-300 transition-all shadow-sm"
             >
-              <Youtube className="w-4 h-4 fill-current" />
+              <YouTubeIcon className="w-4 h-4" />
             </a>
           </div>
           <p className="text-center text-[11px] text-slate-400 mt-4">

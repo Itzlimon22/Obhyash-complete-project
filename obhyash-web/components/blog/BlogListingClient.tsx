@@ -237,10 +237,10 @@ export default function BlogListingClient({
                 <button
                   type="button"
                   onClick={() => setHeroTab('popular')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-full transition-all duration-150 ${
+                  className={`flex-1 py-2 text-xs font-bold rounded-full transition-colors ${
                     heroTab === 'popular'
-                      ? 'bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white shadow-[0_3px_0_0_#064e3b,0_5px_12px_rgba(6,78,59,0.3)]'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'
+                      ? 'bg-[#059669] text-white shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
                   }`}
                 >
                   Popular
@@ -248,10 +248,10 @@ export default function BlogListingClient({
                 <button
                   type="button"
                   onClick={() => setHeroTab('recent')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-full transition-all duration-150 ${
+                  className={`flex-1 py-2 text-xs font-bold rounded-full transition-colors ${
                     heroTab === 'recent'
-                      ? 'bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white shadow-[0_3px_0_0_#064e3b,0_5px_12px_rgba(6,78,59,0.3)]'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'
+                      ? 'bg-[#059669] text-white shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
                   }`}
                 >
                   Recent
@@ -594,7 +594,7 @@ export default function BlogListingClient({
                 />
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white text-xs font-bold shadow-[0_3px_0_0_#064e3b,0_5px_12px_rgba(6,78,59,0.3)] hover:shadow-[0_2px_0_0_#064e3b] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all duration-150"
+                  className="w-full py-3 rounded-full bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold shadow-sm transition-colors"
                 >
                   সাবস্ক্রাইব করুন
                 </button>
@@ -625,10 +625,10 @@ export default function BlogListingClient({
                   <button
                     key={c}
                     onClick={() => setActiveCategory(c === 'ভর্তি' ? 'বিশ্ববিদ্যালয় ভর্তি' : c)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
                       (c === 'All' && activeCategory === 'All') || activeCategory === c
-                        ? 'bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        ? 'bg-[#059669] text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {c}
@@ -721,7 +721,7 @@ export default function BlogListingClient({
               <div className="text-center mt-12">
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 6)}
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-b from-[#10b981] via-[#059669] to-[#047857] text-white text-sm font-bold shadow-[0_3px_0_0_#064e3b,0_5px_12px_rgba(6,78,59,0.3)] hover:shadow-[0_2px_0_0_#064e3b] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all duration-150 group font-anek"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold shadow-sm transition-colors group font-anek"
                 >
                   <span>আরও আর্টিকেল লোড করুন</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

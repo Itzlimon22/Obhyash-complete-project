@@ -17,71 +17,59 @@ export function getPostCover(post: {
 
   // Physics
   if (text.includes('physics') || text.includes('পদার্থবিজ্ঞান') || text.includes('পদার্থ')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/physics_2.jpg'
-      : '/images/subjects/physics_1.jpg';
+    return '/images/blog-covers/physics.svg';
   }
 
   // Chemistry
   if (text.includes('chemistry') || text.includes('রসায়ন') || text.includes('রসায়ন')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/chemistry_2.jpg'
-      : '/images/subjects/chemistry_1.jpg';
+    return '/images/blog-covers/chemistry.svg';
   }
 
   // Higher Math / General Math
-  if (text.includes('math') || text.includes('গণিত') || text.includes('উচ্চতর গণিত')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/math_2.jpg'
-      : '/images/subjects/math_1.jpg';
+  if (text.includes('math') || text.includes('গণিত') || text.includes('উচ্চতর গণিত') || text.includes('ক্যালকুলাস')) {
+    return '/images/blog-covers/math.svg';
   }
 
   // Biology
   if (text.includes('biology') || text.includes('জীববিজ্ঞান') || text.includes('উদ্ভিদ') || text.includes('প্রাণী')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/biology_2.jpg'
-      : '/images/subjects/biology_1.jpg';
+    return '/images/blog-covers/biology.svg';
   }
 
   // ICT
   if (text.includes('ict') || text.includes('তথ্য ও যোগাযোগ') || text.includes('আইসিটি') || text.includes('প্রোগ্রামিং')) {
-    return '/images/subjects/ict.jpg';
+    return '/images/blog-covers/ict.svg';
   }
 
   // Bangla
   if (text.includes('bangla') || text.includes('বাংলা') || text.includes('সাহিত্য') || text.includes('লালসালু') || text.includes('সিরাজউদ্দৌলা')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/bangla_2.jpg'
-      : '/images/subjects/bangla_1.jpg';
+    return '/images/blog-covers/bangla.svg';
   }
 
   // English
-  if (text.includes('english') || text.includes('ইংরেজি') || text.includes('গ্রামার') || text.includes('grammar')) {
-    return text.includes('২য়') || text.includes('2nd') || text.includes('২য়')
-      ? '/images/subjects/english_2.jpg'
-      : '/images/subjects/english_1.jpg';
+  if (text.includes('english') || text.includes('ইংরেজি') || text.includes('গ্রামার') || text.includes('grammar') || text.includes('modifier')) {
+    return '/images/blog-covers/english.svg';
+  }
+
+  // Engineering / BUET / CK-RUET / MIST
+  if (text.includes('বুয়েট') || text.includes('buet') || text.includes('engineering') || text.includes('ইঞ্জিনিয়ারিং') || text.includes('ckruet') || text.includes('mist')) {
+    return '/images/blog-covers/engineering.svg';
   }
 
   // Medical Admission
-  if (text.includes('মেডিকেল') || text.includes('medical') || text.includes('dghs') || text.includes('mat')) {
-    return '/images/subjects/category_medical.jpg';
-  }
-
-  // Engineering / BUET / CK-RUET
-  if (text.includes('বুয়েট') || text.includes('buet') || text.includes('engineering') || text.includes('ইঞ্জিনিয়ারিং') || text.includes('ckruet') || text.includes('mist')) {
-    return '/images/subjects/category_engineering.jpg';
+  if (text.includes('মেডিকেল') || text.includes('medical') || text.includes('dghs') || text.includes('mat') || text.includes('mbbs') || text.includes('ডেন্টাল')) {
+    return '/images/blog-covers/medical.svg';
   }
 
   // University Admission / General Varsity
   if (text.includes('ভর্তি') || text.includes('admission') || text.includes('বিশ্ববিদ্যালয়') || text.includes('বিশ্ববিদ্যালয়') || text.includes('ঢাবি') || text.includes('du ') || text.includes('গুচ্ছ') || text.includes('gst')) {
-    return '/images/subjects/category_varsity_ka.jpg';
+    return '/images/blog-covers/admission.svg';
   }
 
-  // Books / Syllabus / Routines
-  if (text.includes('বই') || text.includes('book') || text.includes('সিলেবাস') || text.includes('syllabus') || text.includes('রুটিন') || text.includes('routine')) {
-    return '/images/subjects/category_textbook.jpg';
+  // Books / Syllabus / Routines / Revision
+  if (text.includes('সিলেবাস') || text.includes('syllabus') || text.includes('রুটিন') || text.includes('routine') || text.includes('রিভিশন') || text.includes('মানবণ্টন')) {
+    return '/images/blog-covers/routine.svg';
   }
 
   // Default Academic / Study Tips
-  return '/images/subjects/category_academic.jpg';
+  return '/images/blog-covers/academic.svg';
 }

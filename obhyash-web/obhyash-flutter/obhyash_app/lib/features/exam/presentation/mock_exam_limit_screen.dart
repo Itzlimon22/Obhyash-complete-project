@@ -23,65 +23,45 @@ class MockExamLimitScreen extends StatelessWidget {
     final primaryTextColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
+    final topPadding = MediaQuery.viewPaddingOf(context).top;
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F1117) : Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Top Navigation Bar: Back on left, Close on right ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Back Arrow Button
-                  InkWell(
-                    onTap: () => Navigator.of(context).pop(),
-                    borderRadius: BorderRadius.circular(22),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E2230) : const Color(0xFFF1F5F9),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF2A2F42) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        LucideIcons.arrowLeft,
-                        size: 18,
-                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                      ),
+      body: Column(
+        children: [
+          // ── Top Navigation Bar: Only Back Button (Safe from status bar) ──
+          Padding(
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: (topPadding > 0 ? topPadding : 20.0) + 8.0,
+              bottom: 8.0,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: () => Navigator.of(context).pop(),
+                borderRadius: BorderRadius.circular(22),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E2230) : const Color(0xFFF1F5F9),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF2A2F42) : const Color(0xFFE2E8F0),
                     ),
                   ),
-
-                  // Close Button
-                  InkWell(
-                    onTap: () => Navigator.of(context).pop(),
-                    borderRadius: BorderRadius.circular(22),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E2230) : const Color(0xFFF1F5F9),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF2A2F42) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        LucideIcons.x,
-                        size: 18,
-                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-                      ),
-                    ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    LucideIcons.arrowLeft,
+                    size: 18,
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                   ),
-                ],
+                ),
               ),
             ),
+          ),
 
             // ── Scrollable Body Matching Screenshot 1:1 ──
             Expanded(
@@ -184,49 +164,49 @@ class MockExamLimitScreen extends StatelessWidget {
 
                     const SizedBox(height: 22),
 
-                    // 5. Four Feature Cards Matching Screenshot
-                    // Feature 1: বিগত বছরসমূহের প্রশ্ন ব্যাংক
+                    // 5. Four Feature Cards Matching Obhyash
+                    // Feature 1: বিগত বছরের প্রশ্নব্যাংক ও সমাধান
                     _buildFeatureItem(
                       isDark: isDark,
                       iconWidget: _buildGoldenParcelBox(),
-                      title: 'বিগত বছরসমূহের প্রশ্ন ব্যাংক',
-                      subtitle: '৫০,০০০+ প্রশ্ন ও নির্ভুল ব্যাখ্যা ডাটাবেজ',
+                      title: 'বিগত বছরের প্রশ্নব্যাংক ও সমাধান',
+                      subtitle: 'অধ্যায়ভিত্তিক বোর্ড ও এডমিশন প্রশ্নের বিশাল সংগ্রহ',
                       primaryTextColor: primaryTextColor,
                       secondaryTextColor: secondaryTextColor,
                     ),
 
                     const SizedBox(height: 18),
 
-                    // Feature 2: আনলিমিটেড পরীক্ষা ও ব্যাখ্যা
+                    // Feature 2: আনলিমিটেড মডেল টেস্ট ও প্র্যাকটিস
                     _buildFeatureItem(
                       isDark: isDark,
                       iconWidget: _buildInfinityBox(),
-                      title: 'আনলিমিটেড পরীক্ষা ও ব্যাখ্যা',
-                      subtitle: 'প্র্যাকটিসের মাধ্যমে নিজেকে পূর্ণাঙ্গ তৈরি করো...',
+                      title: 'আনলিমিটেড মডেল টেস্ট ও প্র্যাকটিস',
+                      subtitle: 'সীমাহীন কাস্টম পরীক্ষা ও নির্ভুল ব্যাখ্যাসহ প্রস্তুতি',
                       primaryTextColor: primaryTextColor,
                       secondaryTextColor: secondaryTextColor,
                     ),
 
                     const SizedBox(height: 18),
 
-                    // Feature 3: AI অ্যাসিস্টেন্ট ও ডাউট সলভার
+                    // Feature 3: স্মার্ট পারফরম্যান্স অ্যানালিটিক্স
                     _buildFeatureItem(
                       isDark: isDark,
-                      iconWidget: _buildAiBotBox(),
-                      title: 'AI অ্যাসিস্টেন্ট ও ডাউট সলভার',
-                      subtitle: 'যেকোনো প্রশ্নের স্মার্ট ব্যাখ্যা ও সমাধান',
+                      iconWidget: _buildAnalyticsBox(),
+                      title: 'স্মার্ট পারফরম্যান্স অ্যানালিটিক্স',
+                      subtitle: 'ভুলত্রুটি শনাক্তকরণ ও দুর্বল বিষয়ে উন্নতির রিপোর্ট',
                       primaryTextColor: primaryTextColor,
                       secondaryTextColor: secondaryTextColor,
                     ),
 
                     const SizedBox(height: 18),
 
-                    // Feature 4: লাইভ উইকলি মডেল টেস্ট
+                    // Feature 4: জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড
                     _buildFeatureItem(
                       isDark: isDark,
                       iconWidget: _buildWeeklyExamBox(),
-                      title: 'লাইভ উইকলি মডেল টেস্ট',
-                      subtitle: 'এডমিশন ও বোর্ড স্ট্যান্ডার্ড লাইভ পরীক্ষা',
+                      title: 'জাতীয় লাইভ পরীক্ষা ও লিডারবোর্ড',
+                      subtitle: 'দেশজুড়ে শিক্ষার্থীদের সাথে লাইভ টেস্ট ও র‍্যাংকিং',
                       primaryTextColor: primaryTextColor,
                       secondaryTextColor: secondaryTextColor,
                     ),
@@ -238,92 +218,94 @@ class MockExamLimitScreen extends StatelessWidget {
             ),
 
             // ── Bottom Action Area (Customized for Obhyash) ──
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F1117) : Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: isDark ? const Color(0xFF1E2230) : const Color(0xFFF1F5F9),
-                    width: 1,
+            SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF0F1117) : Colors.white,
+                  border: Border(
+                    top: BorderSide(
+                      color: isDark ? const Color(0xFF1E2230) : const Color(0xFFF1F5F9),
+                      width: 1,
+                    ),
                   ),
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Primary CTA Button (Obhyash Signature Deep Emerald Gradient)
-                  Container(
-                    height: 52,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF004633),
-                          Color(0xFF065F46),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF004633).withValues(alpha: 0.38),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Primary CTA Button (Obhyash Signature Deep Emerald Gradient)
+                    Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF004633),
+                            Color(0xFF065F46),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          context.push('/subscription');
-                        },
                         borderRadius: BorderRadius.circular(16),
-                        child: const Center(
-                          child: Text(
-                            'অভ্যাস প্রিমিয়ামে আপগ্রেড করো',
-                            style: TextStyle(
-                              fontFamily: 'HindSiliguri',
-                              fontSize: 16.5,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF004633).withValues(alpha: 0.38),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            context.push('/plan-selection');
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: const Center(
+                            child: Text(
+                              'অভ্যাস প্রিমিয়ামে আপগ্রেড করো',
+                              style: TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: 0.2,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
-                  // Secondary Button ("পরে করবো")
-                  Center(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      ),
-                      child: Text(
-                        'পরে করবো',
-                        style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: secondaryTextColor,
+                    // Secondary Button ("পরে করবো")
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        ),
+                        child: Text(
+                          'পরে করবো',
+                          style: TextStyle(
+                            fontFamily: 'HindSiliguri',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: secondaryTextColor,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -480,7 +462,7 @@ class MockExamLimitScreen extends StatelessWidget {
                   color: secondaryTextColor,
                   height: 1.3,
                 ),
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
@@ -550,8 +532,8 @@ class MockExamLimitScreen extends StatelessWidget {
     );
   }
 
-  // ── Icon 3: Indigo Robot AI Box ──
-  Widget _buildAiBotBox() {
+  // ── Icon 3: Indigo Analytics Box ──
+  Widget _buildAnalyticsBox() {
     return Container(
       width: 48,
       height: 48,
@@ -572,9 +554,9 @@ class MockExamLimitScreen extends StatelessWidget {
       ),
       child: const Center(
         child: Icon(
-          LucideIcons.bot,
+          LucideIcons.lineChart,
           color: Colors.white,
-          size: 24,
+          size: 22,
         ),
       ),
     );

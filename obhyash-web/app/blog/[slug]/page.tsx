@@ -628,7 +628,7 @@ export default async function BlogPostPage({
               <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
                 <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 font-anek flex items-center gap-1.5">
                   <svg
-                    className="w-3 h-3"
+                    className="w-3 h-3 text-[#059669]"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -646,9 +646,9 @@ export default async function BlogPostPage({
                     <Link
                       key={tag}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 rounded-full border border-indigo-100 dark:border-indigo-900/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1 text-[12px] font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200/80 dark:border-white/10 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-[#059669] dark:hover:text-[#34d399] hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors"
                     >
-                      <span className="opacity-60">#</span>
+                      <span className="text-[#059669] dark:text-[#34d399] font-bold">#</span>
                       {tag}
                     </Link>
                   ))}
@@ -658,34 +658,34 @@ export default async function BlogPostPage({
             {/* end max-w readable */}
 
             {/* Share + Save Bar */}
-            <div className="flex flex-wrap items-center gap-2.5 mt-8 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
+            <div className="flex flex-wrap items-center gap-3 mt-8 px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
               <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-anek">
                 শেয়ার ও সেভ
               </span>
               <div className="flex items-center gap-2 ml-auto">
                 <SocialShare url={jsonLd.url} title={post.title} compact />
-                <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1" />
+                <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-1" />
                 <BlogBookmarkButton slug={post.slug} iconOnly />
               </div>
             </div>
 
             {/* Author Bio block */}
-            <div className="mt-6 mb-6 p-5 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
+            <div className="mt-6 mb-6 p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg">
+                <div className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#047857] flex items-center justify-center text-white font-black text-base shadow-sm">
                   {post.author.initials}
                 </div>
                 <div>
                   <Link
                     href={`/blog/author/${post.author.name}`}
-                    className="font-bold text-[15px] text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                    className="font-bold text-[16px] text-slate-900 dark:text-slate-100 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
                   >
                     {post.author.name}
                   </Link>
-                  <p className="text-sm font-medium text-rose-600 dark:text-rose-400 mt-0.5">
+                  <p className="text-xs sm:text-sm font-semibold text-[#059669] dark:text-[#34d399] mt-0.5 font-anek">
                     {post.author.role}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-anek">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-anek">
                     অভ্যাস টিম স্মার্ট প্রযুক্তি এবং পরীক্ষিত শিক্ষার কৌশলগুলির
                     মাধ্যমে বাংলাদেশী শিক্ষার্থীদের তাদের একাডেমিক লক্ষ্য অর্জনে
                     সহায়তা করতে অঙ্গীকারবদ্ধ।
@@ -695,10 +695,10 @@ export default async function BlogPostPage({
             </div>
 
             {/* Obhyash Smart Practice CTA Card */}
-            <div className="mt-8 mb-6 p-6 sm:p-8 rounded-3xl bg-linear-to-br from-rose-500/10 via-amber-500/5 to-transparent border border-rose-500/20 dark:border-rose-500/30">
+            <div className="mt-8 mb-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-950/20 shadow-sm">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                 <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 font-anek">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-anek">
                     🚀 লাইভ প্র্যাকটিস
                   </div>
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white font-anek">
@@ -710,7 +710,7 @@ export default async function BlogPostPage({
                 </div>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm font-anek shadow-lg shadow-rose-600/20 transition-all hover:scale-[1.02] shrink-0"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm font-anek shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] shrink-0"
                 >
                   বিনামূল্যে শুরু করো →
                 </Link>

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/config/app_config.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
@@ -128,19 +130,54 @@ class AuthController extends AsyncNotifier<void> {
     });
   }
 
-  // ── Google Sign-in (Account-linking Safe) ─────────────────────────────────
+  // ── Google Sign-in (Native In-App Sheet with Browser Fallback) ─────────────
 
   Future<void> loginWithGoogle() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       try {
-        await _supabase.auth.signInWithOAuth(
-          OAuthProvider.google,
-          redirectTo: 'io.supabase.obhyash://login-callback/',
+        final GoogleSignIn googleSignIn = GoogleSignIn(
+          serverClientId: AppConfig.googleWebClientId.isNotEmpty
+              ? AppConfig.googleWebClientId
+              : null,
+          scopes: ['email', 'profile'],
+        );
+
+        final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+        // User dismissed the bottom sheet dialog without choosing an account
+        if (googleUser == null) {
+          return;
+        }
+
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final String? idToken = googleAuth.idToken;
+        final String? accessToken = googleAuth.accessToken;
+
+        if (idToken == null) {
+          throw Exception('গুগল লগইন টোকেন পাওয়া যায়নি।');
+        }
+
+        await _supabase.auth.signInWithIdToken(
+          provider: OAuthProvider.google,
+          idToken: idToken,
+          accessToken: accessToken,
         );
       } catch (e) {
-        debugPrint('[AuthController] Google login error: $e');
-        throw Exception(e is AuthException ? e.message : 'গুগল লগইন ব্যর্থ হয়েছে।');
+        debugPrint('[AuthController] Native Google sign-in failed, trying fallback: $e');
+        // Graceful fallback to browser OAuth if native dialog is unavailable
+        try {
+          await _supabase.auth.signInWithOAuth(
+            OAuthProvider.google,
+            redirectTo: 'io.supabase.obhyash://login-callback/',
+          );
+        } catch (fallbackError) {
+          debugPrint('[AuthController] Fallback Google login error: $fallbackError');
+          throw Exception(
+            e is AuthException ? e.message : 'গুগল লগইন সম্পন্ন করা যায়নি।',
+          );
+        }
       }
     });
   }

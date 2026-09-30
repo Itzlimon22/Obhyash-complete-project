@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_icons.dart';
@@ -294,9 +295,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+              fontFamily: GoogleFonts.inter().fontFamily,
+              fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF334155),
             ),
           ),
           if (tooltip != null) ...[
@@ -395,20 +398,25 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           onTap: onTap,
           validator: validator,
           style: TextStyle(
-            fontSize: 14,
+            fontFamily: GoogleFonts.inter().fontFamily,
+            fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
+            fontSize: 14.5,
+            fontWeight: FontWeight.w500,
             color: readOnly
                 ? (isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3))
-                : (isDark ? Colors.white : Colors.black),
+                : (isDark ? Colors.white : const Color(0xFF0F172A)),
           ),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(
-              fontSize: 13,
+              fontFamily: GoogleFonts.inter().fontFamily,
+              fontFamilyFallback: const ['HindSiliguri', 'sans-serif'],
+              fontSize: 13.5,
               color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
-              vertical: 11,
+              vertical: 12,
             ),
             filled: true,
             fillColor: readOnly
@@ -439,6 +447,10 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                           : const Color(0xFFE5E5E5))
                     : const Color(0xFF10B981),
               ),
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
             suffixIcon: suffixIcon,
           ),
@@ -632,9 +644,15 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               isDark: isDark,
                               readOnly: true,
                               onTap: () => _selectDate(context),
-                              suffixIcon: const AppIcon(
-                                AppIcons.calendar,
-                                size: 16,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: Icon(
+                                  LucideIcons.calendar,
+                                  size: 19,
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF059669),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),

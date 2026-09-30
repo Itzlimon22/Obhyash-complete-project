@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Jungle / Bioluminescent Base -->
+    <radialGradient id="bioCosmos" cx="72%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#042C18"/>
+      <stop offset="50%" stop-color="#021A0E"/>
+      <stop offset="100%" stop-color="#010A05"/>
+    </radialGradient>
+
+    <!-- Bioluminescent Emerald-Lime -->
+    <linearGradient id="bioFlora" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="50%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <filter id="bioBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="bioDeepGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bioCosmos)"/>
+
+  <!-- Living Bioluminescent Ambient Glow -->
+  <circle cx="820" cy="335" r="230" fill="#16A34A" opacity="0.3" filter="url(#bioDeepGlow)"/>
+  <circle cx="980" cy="420" r="160" fill="#2DD4BF" opacity="0.2" filter="url(#bioDeepGlow)"/>
+
+  <!-- Ascending DNA Double Helix of Life -->
+  <g transform="translate(800, 335)">
+    <!-- Primary Strand 1 -->
+    <path d="M 0 -260 C 140 -170, 140 -90, 0 0 C -140 90, -140 170, 0 260" 
+          fill="none" stroke="#4ADE80" stroke-width="4.5" filter="url(#bioBloom)"/>
+    <!-- Primary Strand 2 (Opposite Phase) -->
+    <path d="M 0 -260 C -140 -170, -140 -90, 0 0 C 140 90, 140 170, 0 260" 
+          fill="none" stroke="#38BDF8" stroke-width="4" filter="url(#bioBloom)"/>
+
+    <!-- Luminous Base Pairs (Horizontal Rungs with nodes) -->
+    <!-- Rung 1 -->
+    <line x1="-70" y1="-210" x2="70" y2="-210" stroke="#FACC15" stroke-width="2.5" opacity="0.85"/>
+    <circle cx="-70" cy="-210" r="6" fill="#4ADE80" filter="url(#bioBloom)"/>
+    <circle cx="70" cy="-210" r="6" fill="#38BDF8" filter="url(#bioBloom)"/>
+
+    <!-- Rung 2 -->
+    <line x1="-95" y1="-130" x2="95" y2="-130" stroke="#FB7185" stroke-width="2.5" opacity="0.85"/>
+    <circle cx="-95" cy="-130" r="6.5" fill="#4ADE80" filter="url(#bioBloom)"/>
+    <circle cx="95" cy="-130" r="6.5" fill="#38BDF8" filter="url(#bioBloom)"/>
+
+    <!-- Center Crossover Node -->
+    <circle cx="0" cy="0" r="12" fill="#FFFFFF" filter="url(#bioBloom)"/>
+    <circle cx="0" cy="0" r="5" fill="#4ADE80"/>
+
+    <!-- Rung 3 -->
+    <line x1="-95" y1="130" x2="95" y2="130" stroke="#FACC15" stroke-width="2.5" opacity="0.85"/>
+    <circle cx="-95" cy="130" r="6.5" fill="#38BDF8" filter="url(#bioBloom)"/>
+    <circle cx="95" cy="130" r="6.5" fill="#4ADE80" filter="url(#bioBloom)"/>
+
+    <!-- Rung 4 -->
+    <line x1="-70" y1="210" x2="70" y2="210" stroke="#FB7185" stroke-width="2.5" opacity="0.85"/>
+    <circle cx="-70" cy="210" r="6" fill="#38BDF8" filter="url(#bioBloom)"/>
+    <circle cx="70" cy="210" r="6" fill="#4ADE80" filter="url(#bioBloom)"/>
+
+    <!-- Floating Chloroplast Organelles / Spores -->
+    <g transform="translate(180, -90) rotate(25)">
+      <ellipse cx="0" cy="0" rx="45" ry="22" fill="#047857" fill-opacity="0.4" stroke="#86EFAC" stroke-width="2" filter="url(#bioBloom)"/>
+      <line x1="-30" y1="0" x2="30" y2="0" stroke="#BBF7D0" stroke-width="1.8"/>
+    </g>
+    <g transform="translate(-180, 80) rotate(-20)">
+      <ellipse cx="0" cy="0" rx="36" ry="18" fill="#065F46" fill-opacity="0.4" stroke="#4ADE80" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#4ADE80" letter-spacing="4" opacity="0.9">
+      জীববিজ্ঞান • BIOLOGY
+    </text>
+
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      জীববিজ্ঞান
+    </text>
+
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#86EFAC" opacity="0.75" letter-spacing="1">
+      উদ্ভিদবিজ্ঞান, প্রাণিবিজ্ঞান ও জিনতত্ত্ব
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Indigo Void -->
+    <radialGradient id="mathVoid" cx="70%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#1E1656"/>
+      <stop offset="50%" stop-color="#0E0B2B"/>
+      <stop offset="100%" stop-color="#050314"/>
+    </radialGradient>
+
+    <!-- Celestial Gradient -->
+    <linearGradient id="mathGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+
+    <filter id="mathBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="mathUltraBloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="35" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#mathVoid)"/>
+
+  <!-- Glowing Core Light -->
+  <circle cx="780" cy="335" r="230" fill="#4F46E5" opacity="0.3" filter="url(#mathUltraBloom)"/>
+  <circle cx="940" cy="400" r="160" fill="#9333EA" opacity="0.22" filter="url(#mathUltraBloom)"/>
+
+  <!-- Fibonacci Golden Spiral / Sacred Geometry -->
+  <g transform="translate(780, 335)">
+    <!-- Golden Spiral Path (Mathematical Logarithmic Curve) -->
+    <path d="M 0 0 
+             A 15 15 0 0 1 15 15 
+             A 25 25 0 0 1 -10 40 
+             A 50 50 0 0 1 -60 -10 
+             A 90 90 0 0 1 30 -100 
+             A 160 160 0 0 1 190 60 
+             A 270 270 0 0 1 -80 330" 
+          fill="none" stroke="url(#mathGrad)" stroke-width="3" filter="url(#mathBloom)"/>
+
+    <!-- Concentric Sacred Coordinate Rings -->
+    <circle cx="0" cy="0" r="240" fill="none" stroke="#6366F1" stroke-width="1.2" stroke-dasharray="4 8" opacity="0.4"/>
+    <circle cx="0" cy="0" r="170" fill="none" stroke="#818CF8" stroke-width="1" stroke-dasharray="2 6" opacity="0.5"/>
+    <circle cx="0" cy="0" r="100" fill="none" stroke="#A855F7" stroke-width="1.5" opacity="0.6"/>
+
+    <!-- Isometric Hypercube / Tesseract Projection -->
+    <g transform="scale(1.15)">
+      <!-- Outer Cube -->
+      <polygon points="0,-120 104,-60 104,60 0,120 -104,60 -104,-60" fill="none" stroke="#818CF8" stroke-width="2" filter="url(#mathBloom)"/>
+      <!-- Inner Cube -->
+      <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" fill="none" stroke="#C084FC" stroke-width="1.8"/>
+      <!-- Connecting Vertices (4D projection) -->
+      <line x1="0" y1="-120" x2="0" y2="-60" stroke="#818CF8" stroke-width="1.5"/>
+      <line x1="104" y1="-60" x2="52" y2="-30" stroke="#818CF8" stroke-width="1.5"/>
+      <line x1="104" y1="60" x2="52" y2="30" stroke="#818CF8" stroke-width="1.5"/>
+      <line x1="0" y1="120" x2="0" y2="60" stroke="#818CF8" stroke-width="1.5"/>
+      <line x1="-104" y1="60" x2="-52" y2="30" stroke="#818CF8" stroke-width="1.5"/>
+      <line x1="-104" y1="-60" x2="-52" y2="-30" stroke="#818CF8" stroke-width="1.5"/>
+
+      <!-- Vertices Points -->
+      <circle cx="0" cy="-120" r="5" fill="#FFFFFF"/>
+      <circle cx="104" cy="-60" r="5" fill="#818CF8"/>
+      <circle cx="104" cy="60" r="5" fill="#C084FC"/>
+      <circle cx="0" cy="120" r="5" fill="#818CF8"/>
+      <circle cx="-104" cy="60" r="5" fill="#C084FC"/>
+      <circle cx="-104" cy="-60" r="5" fill="#818CF8"/>
+      <circle cx="0" cy="0" r="7" fill="#FFFFFF" filter="url(#mathBloom)"/>
+    </g>
+  </g>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#818CF8" letter-spacing="4" opacity="0.9">
+      উচ্চতর গণিত • HIGHER MATHEMATICS
+    </text>
+
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      উচ্চতর গণিত
+    </text>
+
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#C7D2FE" opacity="0.75" letter-spacing="1">
+      ক্যালকুলাস, জ্যামিতি ও বীজগণিত
+    </text>
+  </g>
+</svg>

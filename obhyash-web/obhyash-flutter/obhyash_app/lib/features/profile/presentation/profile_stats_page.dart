@@ -48,9 +48,12 @@ List<SubjectStats> _computeSubjectStats(List<ExamResult> history) {
         !BanglaNameHelper.isAcademicSubject(e.subjectLabel)) {
       continue;
     }
+    final formattedName = BanglaNameHelper.formatSubject(e.subject, e.subjectLabel)
+        .replaceAll(RegExp(r'\s*\([^)]*\)'), '')
+        .trim();
     final acc = map.putIfAbsent(
-      e.subject,
-      () => _SubjectAccum(label: BanglaNameHelper.formatSubject(e.subject, e.subjectLabel)),
+      formattedName,
+      () => _SubjectAccum(label: formattedName),
     );
     acc.examsCount++;
     acc.correct += e.correctCount;

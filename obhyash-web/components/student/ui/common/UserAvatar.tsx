@@ -96,26 +96,62 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
 
   if (!isPro) return avatarNode;
 
-  // Flutter Pro Style Multi-Color Sweep Gradient Ring (1:1 with Flutter user_avatar.dart)
+  // Clean Pro Member Style: Sleek Subtle Amber Ring + Crisp Crown Badge (Multicolor ring removed)
   return (
     <div
-      className={`relative shrink-0 rounded-full p-[2px] md:p-[2.5px] shadow-sm ${className}`}
-      style={{
-        background:
-          'conic-gradient(from 220deg, #D4AF37, #E8843A, #D94F7E, #9B72CB, #12544F, #34D399, #D4AF37)',
-      }}
+      className={`relative inline-flex items-center justify-center shrink-0 rounded-full ${className}`}
       title="Pro Member"
     >
-      <div className="rounded-full bg-white dark:bg-[#000000] p-[1.5px] flex items-center justify-center">
+      <div className="rounded-full ring-1.5 ring-amber-400 dark:ring-amber-500 shadow-xs">
         {avatarNode}
       </div>
-      {/* Crown Pro Badge - 1:1 with Flutter */}
-      <span className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-[#F59E0B] border-[1.8px] border-black dark:border-black flex items-center justify-center shadow-md select-none pointer-events-none">
-        <Crown size={10} className="text-black stroke-[2.5] fill-black/10" />
+      {/* Crown Pro Badge - Crisp & Proportionate */}
+      <span
+        className={`absolute -bottom-0.5 -right-0.5 ${getCrownBadgeClasses(size)} rounded-full bg-[#F59E0B] border-[1.5px] border-white dark:border-black flex items-center justify-center shadow-xs select-none pointer-events-none`}
+      >
+        <Crown size={getCrownIconSize(size)} className="text-black stroke-[2.5]" />
       </span>
     </div>
   );
 };
+
+function getCrownBadgeClasses(size: string): string {
+  switch (size) {
+    case 'xs':
+      return 'w-2.5 h-2.5';
+    case 'sm':
+      return 'w-3.5 h-3.5';
+    case 'md':
+      return 'w-4 h-4';
+    case 'lg':
+      return 'w-5 h-5';
+    case 'xl':
+      return 'w-6 h-6';
+    case '2xl':
+      return 'w-7 h-7';
+    default:
+      return 'w-3.5 h-3.5';
+  }
+}
+
+function getCrownIconSize(size: string): number {
+  switch (size) {
+    case 'xs':
+      return 6;
+    case 'sm':
+      return 8;
+    case 'md':
+      return 9;
+    case 'lg':
+      return 11;
+    case 'xl':
+      return 13;
+    case '2xl':
+      return 15;
+    default:
+      return 8;
+  }
+}
 
 function getSizeClasses(size: string): string {
   switch (size) {

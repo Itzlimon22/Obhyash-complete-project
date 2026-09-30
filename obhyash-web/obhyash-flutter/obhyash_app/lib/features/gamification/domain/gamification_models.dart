@@ -148,7 +148,7 @@ class ObhyashBadges {
       id: 'night_owl',
       name: 'Night Owl',
       titleBangla: 'নাইট আউল',
-      description: 'রাত ১১টার পর গভীর মনোযোগে পরীক্ষা সম্পন্ন',
+      description: 'রাত ১১টার পর গভীর মনোযোগে পরীক্ষা সম্পন্ন করেছো',
       icon: LucideIcons.moon,
       svgAsset: 'assets/dashboard-icons/badge_night_owl.svg',
       gradientStart: Color(0xFF7C3AED),

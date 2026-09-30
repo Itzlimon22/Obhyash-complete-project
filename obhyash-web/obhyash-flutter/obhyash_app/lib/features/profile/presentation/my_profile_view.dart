@@ -390,6 +390,7 @@ class MyProfileView extends ConsumerWidget {
                   SubjectsProgressSection(
                     subjectStats: subjectStats,
                     onSubjectClick: onSubjectClick,
+                    stream: user.stream,
                   ),
                   const SizedBox(height: 20),
                   RecentActivitySection(history: history),

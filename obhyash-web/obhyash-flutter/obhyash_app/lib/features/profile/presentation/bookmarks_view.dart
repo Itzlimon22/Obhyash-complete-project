@@ -16,6 +16,10 @@ import '../../../core/presentation/widgets/skeleton_loading.dart';
 class BookmarksView extends StatefulWidget {
   const BookmarksView({super.key});
 
+  static void invalidateCache() {
+    _BookmarksViewState.invalidateCache();
+  }
+
   @override
   State<BookmarksView> createState() => _BookmarksViewState();
 }
@@ -27,6 +31,15 @@ class _BookmarkItem {
 }
 
 class _BookmarksViewState extends State<BookmarksView> {
+  // Static memory cache for instant (0ms) load when revisiting
+  static List<_BookmarkItem>? _memoryCache;
+  static String? _cachedUserId;
+
+  static void invalidateCache() {
+    _memoryCache = null;
+    _cachedUserId = null;
+  }
+
   bool _isLoading = true;
   bool _hasError = false;
   List<_BookmarkItem> _bookmarks = [];
@@ -39,21 +52,28 @@ class _BookmarksViewState extends State<BookmarksView> {
   @override
   void initState() {
     super.initState();
-    _fetchBookmarks();
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (_memoryCache != null && _cachedUserId == uid) {
+      _bookmarks = List.from(_memoryCache!);
+      _isLoading = false;
+    }
+    _fetchBookmarks(isBackground: _bookmarks.isNotEmpty);
   }
 
-  Future<void> _fetchBookmarks() async {
+  Future<void> _fetchBookmarks({bool isBackground = false}) async {
     if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-    });
+    if (!isBackground) {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+      });
+    }
 
     try {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
       if (uid == null) {
-        setState(() => _isLoading = false);
+        if (mounted) setState(() => _isLoading = false);
         return;
       }
 
@@ -66,6 +86,8 @@ class _BookmarksViewState extends State<BookmarksView> {
 
       final rawList = (bData as List);
       if (rawList.isEmpty) {
+        _memoryCache = [];
+        _cachedUserId = uid;
         if (mounted) {
           setState(() {
             _bookmarks = [];
@@ -90,26 +112,52 @@ class _BookmarksViewState extends State<BookmarksView> {
 
       final questionMap = <String, Question>{};
 
-      // 2. Fetch from 'questions' table in safe chunks of 50
+      // 2. Fetch from 'questions' table in safe chunks in parallel (Future.wait)
+      final chunks = <List<String>>[];
       for (var i = 0; i < qIds.length; i += 50) {
         final end = (i + 50 > qIds.length) ? qIds.length : i + 50;
-        final chunk = qIds.sublist(i, end);
-        try {
-          final qData = await sb.from('questions').select().inFilter('id', chunk);
-          for (final q in (qData as List)) {
-            final parsed = Question.fromJson(q as Map<String, dynamic>);
-            if (parsed.id.isNotEmpty) {
-              questionMap[parsed.id] = parsed;
-            }
+        chunks.add(qIds.sublist(i, end));
+      }
+
+      final chunkResults = await Future.wait(
+        chunks.map((chunk) async {
+          try {
+            return await sb.from('questions').select().inFilter('id', chunk);
+          } catch (err) {
+            debugPrint('[BookmarksView] chunk fetch error: $err');
+            return [];
           }
-        } catch (err) {
-          debugPrint('[BookmarksView] chunk fetch error: $err');
+        }),
+      );
+
+      for (final qData in chunkResults) {
+        for (final q in qData) {
+          final parsed = Question.fromJson(q as Map<String, dynamic>);
+          if (parsed.id.isNotEmpty) {
+            questionMap[parsed.id] = parsed;
+          }
         }
       }
 
-      // 3. Fallback: Search missing questions in user's exam_results
-      final missingIds = qIds.where((id) => !questionMap.containsKey(id)).toSet();
-      if (missingIds.isNotEmpty) {
+      // 3. Fallback 1: Search local cached questions FIRST (instant disk read)
+      final missingAfterQuestions = qIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (missingAfterQuestions.isNotEmpty) {
+        try {
+          final cachedList = await LocalExamCacheService.getCachedQuestionsList();
+          if (cachedList != null) {
+            for (final item in cachedList) {
+              final q = Question.fromJson(item);
+              if (missingAfterQuestions.contains(q.id)) {
+                questionMap[q.id] = q;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 4. Fallback 2: Search missing questions in user's exam_results (limited to last 10 exams for speed)
+      final stillMissing = qIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (stillMissing.isNotEmpty) {
         try {
           final examRes = await sb
               .from('exam_results')
@@ -117,7 +165,7 @@ class _BookmarksViewState extends State<BookmarksView> {
               .eq('user_id', uid)
               .not('questions', 'is', null)
               .order('created_at', ascending: false)
-              .limit(50);
+              .limit(10);
 
           for (final row in (examRes as List)) {
             final qListRaw = row['questions'];
@@ -125,7 +173,7 @@ class _BookmarksViewState extends State<BookmarksView> {
               for (final item in qListRaw) {
                 if (item is Map<String, dynamic>) {
                   final q = Question.fromJson(item);
-                  if (missingIds.contains(q.id)) {
+                  if (stillMissing.contains(q.id)) {
                     questionMap[q.id] = q;
                   }
                 }
@@ -135,22 +183,6 @@ class _BookmarksViewState extends State<BookmarksView> {
         } catch (err) {
           debugPrint('[BookmarksView] exam_results fallback error: $err');
         }
-      }
-
-      // 4. Fallback: Search local cached questions
-      final stillMissing = qIds.where((id) => !questionMap.containsKey(id)).toSet();
-      if (stillMissing.isNotEmpty) {
-        try {
-          final cachedList = await LocalExamCacheService.getCachedQuestionsList();
-          if (cachedList != null) {
-            for (final item in cachedList) {
-              final q = Question.fromJson(item);
-              if (stillMissing.contains(q.id)) {
-                questionMap[q.id] = q;
-              }
-            }
-          }
-        } catch (_) {}
       }
 
       // 5. Build ordered bookmark list with ensured institute metadata
@@ -165,6 +197,9 @@ class _BookmarksViewState extends State<BookmarksView> {
         }
       }
 
+      _memoryCache = List.from(orderedBookmarks);
+      _cachedUserId = uid;
+
       if (mounted) {
         setState(() {
           _bookmarks = orderedBookmarks;
@@ -176,7 +211,9 @@ class _BookmarksViewState extends State<BookmarksView> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _hasError = true;
+          if (_bookmarks.isEmpty) {
+            _hasError = true;
+          }
         });
       }
     }
@@ -275,6 +312,7 @@ class _BookmarksViewState extends State<BookmarksView> {
           .eq('user_id', uid)
           .eq('question_id', questionId);
 
+      _memoryCache?.removeWhere((b) => b.question.id == questionId);
       setState(() {
         _bookmarks.removeWhere((b) => b.question.id == questionId);
       });

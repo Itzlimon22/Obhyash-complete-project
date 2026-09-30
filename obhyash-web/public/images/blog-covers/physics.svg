@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;display=swap');
+      .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+
+    <!-- Deep Cosmic Gradient -->
+    <radialGradient id="physCosmos" cx="65%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0E214A"/>
+      <stop offset="45%" stop-color="#071126"/>
+      <stop offset="100%" stop-color="#020611"/>
+    </radialGradient>
+
+    <!-- Glowing Energy Gradients -->
+    <linearGradient id="laserCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="physGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="physHyperGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="35" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Space Canvas -->
+  <rect width="1200" height="675" fill="url(#physCosmos)"/>
+
+  <!-- Gravitational Spacetime Warp Rings (Concentric Ellipses) -->
+  <g transform="translate(720, 335)" opacity="0.35">
+    <ellipse cx="0" cy="0" rx="420" ry="180" fill="none" stroke="#38BDF8" stroke-width="1.2" stroke-dasharray="3 6"/>
+    <ellipse cx="0" cy="0" rx="340" ry="145" fill="none" stroke="#818CF8" stroke-width="1.2" stroke-dasharray="6 8"/>
+    <ellipse cx="0" cy="0" rx="260" ry="110" fill="none" stroke="#C084FC" stroke-width="1.5"/>
+    <ellipse cx="0" cy="0" rx="180" ry="75" fill="none" stroke="#38BDF8" stroke-width="2"/>
+    <ellipse cx="0" cy="0" rx="100" ry="42" fill="none" stroke="#E0E7FF" stroke-width="2.5"/>
+  </g>
+
+  <!-- Ambient Light Emission Core -->
+  <circle cx="720" cy="335" r="140" fill="#38BDF8" opacity="0.28" filter="url(#physHyperGlow)"/>
+  <circle cx="720" cy="335" r="60" fill="#818CF8" opacity="0.45" filter="url(#physGlow)"/>
+  <circle cx="720" cy="335" r="18" fill="#FFFFFF" filter="url(#physGlow)"/>
+
+  <!-- Quantum Particle Orbits (Inclined 3D Gyroscope) -->
+  <g transform="translate(720, 335)">
+    <!-- Orbit Alpha -->
+    <g transform="rotate(35)">
+      <ellipse cx="0" cy="0" rx="280" ry="90" fill="none" stroke="url(#laserCyan)" stroke-width="3" filter="url(#physGlow)"/>
+      <circle cx="270" cy="25" r="9" fill="#38BDF8" filter="url(#physGlow)"/>
+      <circle cx="270" cy="25" r="3.5" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Orbit Beta -->
+    <g transform="rotate(-40)">
+      <ellipse cx="0" cy="0" rx="260" ry="85" fill="none" stroke="#C084FC" stroke-width="2.8" opacity="0.9" filter="url(#physGlow)"/>
+      <circle cx="-250" cy="-28" r="8" fill="#E879F9" filter="url(#physGlow)"/>
+      <circle cx="-250" cy="-28" r="3" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Orbit Gamma (Perpendicular) -->
+    <g transform="rotate(82)">
+      <ellipse cx="0" cy="0" rx="250" ry="75" fill="none" stroke="#22D3EE" stroke-width="2.2" opacity="0.8" stroke-dasharray="14 8" filter="url(#physGlow)"/>
+      <circle cx="180" cy="50" r="7" fill="#67E8F9" filter="url(#physGlow)"/>
+    </g>
+  </g>
+
+  <!-- Electromagnetic Wave Harmonic Dispersion across bottom -->
+  <path d="M -50 560 Q 200 460, 450 560 T 950 560 T 1300 560" fill="none" stroke="#38BDF8" stroke-width="3" opacity="0.4" filter="url(#physGlow)"/>
+  <path d="M -50 580 Q 250 490, 550 580 T 1150 580" fill="none" stroke="#818CF8" stroke-width="2" opacity="0.3"/>
+  <path d="M -50 600 Q 180 530, 420 600 T 900 600" fill="none" stroke="#C084FC" stroke-width="1.5" opacity="0.2"/>
+
+  <!-- Minimal Elegant Typography - NO BOXES, PURE HIND SHILIGURI -->
+  <g transform="translate(110, 290)">
+    <!-- Small Category Kicker -->
+    <text x="0" y="0" font-family="'Hind Siliguri', sans-serif" font-size="16" font-weight="600" fill="#38BDF8" letter-spacing="4" opacity="0.9">
+      পদার্থবিজ্ঞান • PHYSICS
+    </text>
+
+    <!-- Hero Bengali Subject Title -->
+    <text x="0" y="95" font-family="'Hind Siliguri', sans-serif" font-size="78" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">
+      পদার্থবিজ্ঞান
+    </text>
+
+    <!-- Minimal English Subtitle -->
+    <text x="0" y="145" font-family="'Hind Siliguri', sans-serif" font-size="22" font-weight="400" fill="#94A3B8" letter-spacing="1">
+      বলবিদ্যা, তড়িৎ ও আধুনিক পদার্থবিজ্ঞান
+    </text>
+  </g>
+</svg>
