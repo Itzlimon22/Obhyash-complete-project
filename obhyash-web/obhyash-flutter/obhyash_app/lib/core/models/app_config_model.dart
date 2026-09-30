@@ -49,7 +49,7 @@ class AppConfigModel {
     this.singleDeviceLoginEnabled = true,
     this.screenshotProtectionEnabled = true,
     this.examAntiCheatEnabled = true,
-    this.maxTabSwitchesAllowed = 2,
+    this.maxTabSwitchesAllowed = 3,
     this.paymentsEnabled = true,
     this.paymentAutoEnabled = false,
     this.paymentManualEnabled = false,

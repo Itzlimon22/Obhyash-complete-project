@@ -1023,7 +1023,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                    padding: const EdgeInsets.fromLTRB(8, 10, 8, 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1349,7 +1349,7 @@ class _ExamSetDetailViewState extends ConsumerState<ExamSetDetailView> {
 
                 // Fixed Bottom Action Bar with 2 Buttons: 'প্রশ্ন দেখো' & 'পরীক্ষা দাও'
                 Container(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(8, 12, 8, 16),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF18181B) : Colors.white,
                     border: Border(

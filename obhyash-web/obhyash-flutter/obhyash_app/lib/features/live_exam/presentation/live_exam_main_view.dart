@@ -228,7 +228,7 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
             if (hasAnyLive)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
                   child: Row(
                     children: [
                       Container(
@@ -264,12 +264,12 @@ class _LiveExamMainViewState extends ConsumerState<LiveExamMainView> {
 
             // 2-Column Grid of Premium Category Cards
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 32),
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 32),
               sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                   childAspectRatio: 0.85,
                 ),
                 delegate: SliverChildBuilderDelegate(

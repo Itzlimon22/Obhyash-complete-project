@@ -302,7 +302,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                       // ── Top 3 Compact Centered Stat Boxes ───────────────────
                       if (_reports.isNotEmpty)
                         SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(10, 16, 10, 12),
+                          padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
                           sliver: SliverToBoxAdapter(
                             child: Row(
                               children: [
@@ -397,7 +397,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
 
                       // ── Report List Content ──────────────────────────────
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(10, 12, 10, 80),
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 80),
                         sliver: _filteredReports.isEmpty
                             ? SliverToBoxAdapter(
                                 child: Container(

@@ -132,14 +132,33 @@ export async function startLiveExam(
     attemptId = attemptData.id;
   }
 
-  // 2. Fetch junction rows with question_id, points, serial
+  // 2. Fetch junction rows with question_id, points, serial, and direct secret question fields
   const { data: junctionData, error: junctionError } = await supabase
     .from("live_exam_questions")
-    .select("serial, points, question_id")
+    .select("id, serial, points, question_id, question, options, correct_answer_index, explanation, subject")
     .eq("live_exam_id", examId)
     .order("serial", { ascending: true });
 
   if (junctionError) throw junctionError;
+
+  // Direct secret questions stored inside live_exam_questions
+  const isDirect = (junctionData || []).some((j: any) => j.question && j.question.trim().length > 0);
+  if (isDirect) {
+    const questions: Question[] = (junctionData || []).map((j: any) => ({
+      id: j.id,
+      question: j.question,
+      options: Array.isArray(j.options) ? j.options : [],
+      correctAnswerIndex: j.correct_answer_index ?? 0,
+      correctAnswerIndices: [j.correct_answer_index ?? 0],
+      explanation: j.explanation || "",
+      subject: j.subject || "",
+      points: Number(j.points) || 1,
+      type: "MCQ",
+      difficulty: "Medium",
+    } as any));
+
+    return { attemptId: attemptId!, questions };
+  }
 
   const questionIds = (junctionData || [])
     .map((j: any) => j.question_id)
@@ -363,10 +382,28 @@ export async function getLiveExamSolutions(
     return { questions: mockQuestions, userAnswers: mockAnswers };
   }
 
-  // 1. Fetch junction rows with question_id, points, serial
+  // Security Check: Verify exam has finished and results are published before returning solutions
+  const { data: examMeta, error: examMetaErr } = await supabase
+    .from("live_exams")
+    .select("id, end_time, is_leaderboard_published")
+    .eq("id", examId)
+    .maybeSingle();
+
+  if (examMetaErr) {
+    console.error("Error fetching live exam metadata:", examMetaErr);
+  } else if (examMeta) {
+    const now = new Date();
+    const isPast = examMeta.end_time ? now.getTime() > new Date(examMeta.end_time).getTime() : false;
+    const isPublished = examMeta.is_leaderboard_published !== false;
+    if (!isPast || !isPublished) {
+      throw new Error("EXAM_RESULT_NOT_PUBLISHED");
+    }
+  }
+
+  // 1. Fetch junction rows with question_id, points, serial, and direct secret question fields
   const { data: junctionData, error: junctionErr } = await supabase
     .from("live_exam_questions")
-    .select("serial, points, question_id")
+    .select("id, serial, points, question_id, question, options, correct_answer_index, explanation, subject")
     .eq("live_exam_id", examId)
     .order("serial", { ascending: true });
 
@@ -375,30 +412,47 @@ export async function getLiveExamSolutions(
     throw junctionErr;
   }
 
-  const questionIds = (junctionData || [])
-    .map((j: any) => j.question_id)
-    .filter(Boolean);
-
+  const isDirect = (junctionData || []).some((j: any) => j.question && j.question.trim().length > 0);
   let questions: Question[] = [];
-  if (questionIds.length > 0) {
-    const { data: qListData, error: qListErr } = await supabase
-      .from("questions")
-      .select("*")
-      .in("id", questionIds);
 
-    if (qListErr) {
-      console.error("Error fetching solution questions:", qListErr);
-      throw qListErr;
-    }
+  if (isDirect) {
+    questions = (junctionData || []).map((j: any) => ({
+      id: j.id,
+      question: j.question,
+      options: Array.isArray(j.options) ? j.options : [],
+      correctAnswerIndex: j.correct_answer_index ?? 0,
+      correctAnswerIndices: [j.correct_answer_index ?? 0],
+      explanation: j.explanation || "",
+      subject: j.subject || "",
+      points: Number(j.points) || 1,
+      type: "MCQ",
+      difficulty: "Medium",
+    } as any));
+  } else {
+    const questionIds = (junctionData || [])
+      .map((j: any) => j.question_id)
+      .filter(Boolean);
 
-    const questionMap = new Map((qListData || []).map((q: any) => [q.id, q]));
-    for (const j of junctionData || []) {
-      if (questionMap.has(j.question_id)) {
-        const q = questionMap.get(j.question_id);
-        questions.push({
-          ...q,
-          points: Number(j.points) || q.points || 1,
-        });
+    if (questionIds.length > 0) {
+      const { data: qListData, error: qListErr } = await supabase
+        .from("questions")
+        .select("*")
+        .in("id", questionIds);
+
+      if (qListErr) {
+        console.error("Error fetching solution questions:", qListErr);
+        throw qListErr;
+      }
+
+      const questionMap = new Map((qListData || []).map((q: any) => [q.id, q]));
+      for (const j of junctionData || []) {
+        if (questionMap.has(j.question_id)) {
+          const q = questionMap.get(j.question_id);
+          questions.push({
+            ...q,
+            points: Number(j.points) || q.points || 1,
+          });
+        }
       }
     }
   }
@@ -443,7 +497,8 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
       correct_count,
       wrong_count,
       start_time,
-      submit_time,
+      time_taken_seconds,
+      time_taken_ms,
       created_at,
       users (
         name,
@@ -455,9 +510,6 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
     `)
     .eq("live_exam_id", examId)
     .eq("status", "submitted")
-    .order("score", { ascending: false })
-    .order("wrong_count", { ascending: true })
-    .order("submit_time", { ascending: true })
     .limit(limit * 2);
 
   if (error) {
@@ -469,6 +521,33 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
     .filter((item: any) => {
       const role = (item.users?.role || "student").toLowerCase();
       return role === "student";
+    })
+    .sort((a: any, b: any) => {
+      // 1. Score DESC (Highest marks first)
+      if (b.score !== a.score) return b.score - a.score;
+
+      // 2. Exact Millisecond Duration ASC (Fastest duration first)
+      const getDurationMs = (it: any) => {
+        if (it.time_taken_ms != null) return Number(it.time_taken_ms);
+        if (it.time_taken_seconds != null) return Number(it.time_taken_seconds) * 1000;
+        if (it.start_time && it.submit_time) {
+          return new Date(it.submit_time).getTime() - new Date(it.start_time).getTime();
+        }
+        return 999999999999;
+      };
+      const aDur = getDurationMs(a);
+      const bDur = getDurationMs(b);
+      if (aDur !== bDur) return aDur - bDur;
+
+      // 3. Wrong Count ASC (Fewest mistakes first)
+      if ((a.wrong_count || 0) !== (b.wrong_count || 0)) {
+        return (a.wrong_count || 0) - (b.wrong_count || 0);
+      }
+
+      // 4. Start Time ASC (First begun first)
+      const aStart = a.start_time ? new Date(a.start_time).getTime() : 0;
+      const bStart = b.start_time ? new Date(b.start_time).getTime() : 0;
+      return aStart - bStart;
     })
     .slice(0, limit);
 

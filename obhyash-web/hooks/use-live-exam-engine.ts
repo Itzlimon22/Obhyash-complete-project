@@ -42,7 +42,7 @@ export const useLiveExamEngine = () => {
       }
     });
 
-    const finalScore = Math.max(0, rawScore - negativeMarks);
+    const finalScore = Number((rawScore - negativeMarks).toFixed(4));
     return { finalScore, correctCount, wrongCount };
   };
 

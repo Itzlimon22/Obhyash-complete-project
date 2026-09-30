@@ -188,11 +188,11 @@ class SubjectQuestionBankDetailView extends StatelessWidget {
       ),
       body: SafeArea(
         child: GridView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: 14,
-            mainAxisSpacing: 14,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             childAspectRatio: 1.25,
           ),
           itemCount: categories.length,

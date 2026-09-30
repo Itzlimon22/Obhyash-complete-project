@@ -29,6 +29,7 @@ class QuestionCard extends StatefulWidget {
   final bool hideExplanation;
   final VoidCallback? onToggleBookmark;
   final VoidCallback? onDelete;
+  final EdgeInsetsGeometry? margin;
 
   const QuestionCard({
     super.key,
@@ -50,6 +51,7 @@ class QuestionCard extends StatefulWidget {
     this.hideExplanation = false,
     this.onToggleBookmark,
     this.onDelete,
+    this.margin,
   });
 
   @override
@@ -152,7 +154,7 @@ class _QuestionCardState extends State<QuestionCard>
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
+      margin: widget.margin ?? const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -176,9 +178,9 @@ class _QuestionCardState extends State<QuestionCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Serial number + question text (16.5px, regular, 1.5 line-height)
+                // Serial number + question text (16.5px, regular, 1.5 line-height) - non-bold serial
                 LatexText(
-                  text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
+                  text: '${_toBengaliNumeral(widget.serialNumber)}. ${widget.question.question}',
                   style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.normal,
@@ -346,7 +348,7 @@ class _QuestionCardState extends State<QuestionCard>
                       ),
                     ],
 
-                    if (widget.readOnly || widget.showReport) ...[
+                    if (widget.showReport) ...[
                       const SizedBox(width: 2),
 
                       // Report / Flag button
@@ -665,7 +667,7 @@ class _ExplanationPanel extends StatelessWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+      margin: const EdgeInsets.fromLTRB(8, 0, 8, 12),
       decoration: BoxDecoration(
         color: isOpen ? bodyBg : headerBg,
         borderRadius: BorderRadius.circular(10),

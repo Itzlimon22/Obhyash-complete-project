@@ -1191,7 +1191,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (activeTab == 'dashboard')
+                  if (activeTab == 'dashboard' && !(user?.isPro ?? false))
                     const PromoBannerWidget(),
                   MainBottomNav(
                     activeTab:

@@ -107,7 +107,7 @@ final maxTabSwitchesAllowedProvider = Provider<int>((ref) {
   final configAsync = ref.watch(appConfigStreamProvider);
   return configAsync.maybeWhen(
     data: (config) => config.maxTabSwitchesAllowed,
-    orElse: () => 2,
+    orElse: () => 3,
   );
 });
 

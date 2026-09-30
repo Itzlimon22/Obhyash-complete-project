@@ -460,7 +460,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
 
       // Exact net score with negative marking deduction
       final netScore = rawDbScore ??
-          (correct - (wrong * negRate)).clamp(0.0, totalMarks);
+          ((correct - (wrong * negRate)) > totalMarks ? totalMarks : (correct - (wrong * negRate)));
       final score = totalMarks > 0
           ? ((netScore / totalMarks) * 100.0).clamp(0.0, 100.0)
           : 0.0;
@@ -920,7 +920,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
             ),
-            padding: const EdgeInsets.fromLTRB(10, 16, 10, 90),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 80),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

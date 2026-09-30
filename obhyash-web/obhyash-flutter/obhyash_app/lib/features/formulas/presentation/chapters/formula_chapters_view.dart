@@ -110,7 +110,7 @@ class _FormulaChaptersViewState extends ConsumerState<FormulaChaptersView> {
       ),
       body: SafeArea(
         child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
           itemCount: chapters.length,
           itemBuilder: (context, index) {
             final chapter = chapters[index];

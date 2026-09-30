@@ -527,13 +527,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final isMarked = _bookmarkedIds.contains(qid);
 
     if (!isMarked) {
-      var profile = ref.read(userProfileProvider).value;
-      if (profile == null) {
-        try {
-          profile = await ref.read(userProfileProvider.future);
-        } catch (_) {}
-      }
-      final isPro = profile?.isPro ?? false;
+      final isPro = await resolveUserIsPro(ref);
       if (!isPro && _totalBookmarks >= 25) {
         if (!mounted) return;
         ProUpgradeModal.show(
@@ -715,7 +709,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 8),
+                  padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
                   child: Row(
                     children: [
                       _StatBox(
@@ -817,7 +811,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 )
               else ...[
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -856,7 +850,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (!hasMore || filtered.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 12, 10, 36),
+      padding: const EdgeInsets.fromLTRB(8, 12, 8, 36),
       child: Center(
         child: SizedBox(
           width: 220,

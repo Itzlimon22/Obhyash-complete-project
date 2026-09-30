@@ -148,7 +148,7 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
     });
 
     const penalty = wrongCount * negativeRate;
-    const finalScore = Math.max(0, rawScore - penalty);
+    const finalScore = Number((rawScore - penalty).toFixed(4));
     const accuracy =
       totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
     const totalMarks = engine.questions.reduce(

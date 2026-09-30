@@ -12,6 +12,7 @@ class LiveExam {
   final String category;
   final String? userAttemptStatus;
   final bool isLeaderboardPublished;
+  final bool isAnswerPublished;
 
   LiveExam({
     required this.id,
@@ -27,6 +28,7 @@ class LiveExam {
     required this.category,
     this.userAttemptStatus,
     this.isLeaderboardPublished = true,
+    this.isAnswerPublished = false,
   });
 
   factory LiveExam.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,7 @@ class LiveExam {
       category: json['category'] as String? ?? '',
       userAttemptStatus: json['userAttemptStatus'] as String?,
       isLeaderboardPublished: json['is_leaderboard_published'] as bool? ?? true,
+      isAnswerPublished: json['is_answer_published'] as bool? ?? false,
     );
   }
 
@@ -90,6 +93,7 @@ class LiveExam {
       'category': category,
       'userAttemptStatus': userAttemptStatus,
       'is_leaderboard_published': isLeaderboardPublished,
+      'is_answer_published': isAnswerPublished,
     };
   }
 
@@ -106,6 +110,13 @@ class LiveExam {
   bool get isPast {
     final now = DateTime.now();
     return now.isAfter(endTime);
+  }
+
+  bool get isResultPublished {
+    if (id.startsWith('mock-')) return true;
+    final now = DateTime.now();
+    final pubTime = endTime.add(const Duration(minutes: 15));
+    return now.isAfter(pubTime) && isLeaderboardPublished;
   }
 }
 
@@ -172,6 +183,7 @@ class LiveExamLeaderboardEntry {
   final DateTime? startTime;
   final DateTime? submitTime;
   final int? timeTakenSeconds;
+  final int? timeTakenMs;
 
   LiveExamLeaderboardEntry({
     required this.id,
@@ -186,7 +198,19 @@ class LiveExamLeaderboardEntry {
     this.startTime,
     this.submitTime,
     this.timeTakenSeconds,
+    this.timeTakenMs,
   });
+
+  String get formattedDuration {
+    final ms = timeTakenMs ?? ((timeTakenSeconds ?? 0) * 1000);
+    final totalSec = ms / 1000.0;
+    final mins = totalSec ~/ 60;
+    final remainingSec = (totalSec % 60).toStringAsFixed(2);
+    if (mins > 0) {
+      return '$mins মি. $remainingSec সে.';
+    }
+    return '$remainingSec সে.';
+  }
 
   factory LiveExamLeaderboardEntry.fromJson(Map<String, dynamic> json) {
     final userData = json['users'] as Map<String, dynamic>?;
@@ -194,11 +218,18 @@ class LiveExamLeaderboardEntry {
     final start = startRaw != null ? DateTime.tryParse(startRaw.toString()) : null;
     final submit = json['submit_time'] != null ? DateTime.tryParse(json['submit_time'].toString()) : null;
     int? timeTaken;
-    if (json['time_taken_seconds'] != null) {
+    int? timeTakenMilliseconds;
+
+    if (json['time_taken_ms'] != null) {
+      timeTakenMilliseconds = (json['time_taken_ms'] as num?)?.toInt();
+      timeTaken = (timeTakenMilliseconds! / 1000).round();
+    } else if (json['time_taken_seconds'] != null) {
       timeTaken = (json['time_taken_seconds'] as num?)?.toInt();
+      timeTakenMilliseconds = (timeTaken ?? 0) * 1000;
     } else if (start != null && submit != null) {
-      final diff = submit.difference(start).inSeconds;
-      timeTaken = diff < 0 ? 0 : (diff > 86400 ? 86400 : diff);
+      final diffMs = submit.difference(start).inMilliseconds;
+      timeTakenMilliseconds = diffMs < 0 ? 0 : (diffMs > 86400000 ? 86400000 : diffMs);
+      timeTaken = (timeTakenMilliseconds / 1000).round();
     }
 
     return LiveExamLeaderboardEntry(
@@ -214,6 +245,7 @@ class LiveExamLeaderboardEntry {
       startTime: start,
       submitTime: submit,
       timeTakenSeconds: timeTaken,
+      timeTakenMs: timeTakenMilliseconds,
     );
   }
 }

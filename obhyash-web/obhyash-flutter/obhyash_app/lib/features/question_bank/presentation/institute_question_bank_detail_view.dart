@@ -533,7 +533,7 @@ class _InstituteQuestionBankDetailViewState
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+                padding: const EdgeInsets.fromLTRB(8, 10, 8, 24),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -600,7 +600,7 @@ class _InstituteQuestionBankDetailViewState
             });
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

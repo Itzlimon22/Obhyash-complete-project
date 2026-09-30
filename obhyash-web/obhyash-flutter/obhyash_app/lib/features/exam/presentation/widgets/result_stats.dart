@@ -112,7 +112,7 @@ class ResultStats extends StatelessWidget {
         wrongCount: wrong,
         skippedCount: skipped,
         negativeMarksDeduction: negDeduction,
-        finalScore: score < 0 ? 0.0 : score,
+        finalScore: (score * 10000).round() / 10000.0,
         totalPoints: points,
       ));
     }

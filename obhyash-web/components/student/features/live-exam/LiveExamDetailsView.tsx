@@ -19,6 +19,7 @@ import {
   ArrowRight,
   History,
   EyeOff,
+  ChevronDown,
 } from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
 import LiveExamSolutionView from "./LiveExamSolutionView";
@@ -34,6 +35,340 @@ export interface LiveExamDetailsViewProps {
   commonLayoutProps: any;
   onBack: () => void;
 }
+
+
+interface SyllabusGroup {
+  title: string;
+  iconEmoji: string;
+  questionCountText: string;
+  topics: string[];
+}
+
+function toEnglishDigits(str: string): string {
+  const bn = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  let result = str;
+  for (let i = 0; i < 10; i++) {
+    result = result.replaceAll(bn[i], i.toString());
+  }
+  return result;
+}
+
+function splitRespectingParens(str: string, delimiter = ","): string[] {
+  const result: string[] = [];
+  let current = "";
+  let parenDepth = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    if (char === "(" || char === "（") parenDepth++;
+    else if (char === ")" || char === "）") parenDepth = Math.max(0, parenDepth - 1);
+
+    if (char === delimiter && parenDepth === 0) {
+      if (current.trim()) result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) result.push(current.trim());
+  return result;
+}
+
+function normalizeSubjectHeader(raw: string): { name: string; icon: string } {
+  const clean = raw.trim();
+  const lower = clean.toLowerCase();
+
+  if (lower.includes("পদার্থ") || lower.includes("পদ")) {
+    if (clean.includes("২") || clean.includes("2") || lower.includes("২য়") || lower.includes("২য়")) {
+      return { name: "পদার্থবিজ্ঞান ২য় পত্র", icon: "🧲" };
+    }
+    if (clean.includes("১") || clean.includes("1") || lower.includes("১ম")) {
+      return { name: "পদার্থবিজ্ঞান ১ম পত্র", icon: "🧲" };
+    }
+    return { name: "পদার্থবিজ্ঞান", icon: "🧲" };
+  }
+
+  if (lower.includes("রসায়ন") || lower.includes("রসায়ন") || lower.includes("রস") || lower.includes("chem")) {
+    if (clean.includes("২") || clean.includes("2") || lower.includes("২য়") || lower.includes("২য়")) {
+      return { name: "রসায়ন ২য় পত্র", icon: "🧪" };
+    }
+    if (clean.includes("১") || clean.includes("1") || lower.includes("১ম")) {
+      return { name: "রসায়ন ১ম পত্র", icon: "🧪" };
+    }
+    return { name: "রসায়ন", icon: "🧪" };
+  }
+
+  if (lower.includes("গণিত") || lower.includes("ম্যাথ") || lower.includes("math")) {
+    if (clean.includes("২") || clean.includes("2") || lower.includes("২য়") || lower.includes("২য়")) {
+      return { name: "উচ্চতর গণিত ২য় পত্র", icon: "📐" };
+    }
+    if (clean.includes("১") || clean.includes("1") || lower.includes("১ম")) {
+      return { name: "উচ্চতর গণিত ১ম পত্র", icon: "📐" };
+    }
+    return { name: "উচ্চতর গণিত", icon: "📐" };
+  }
+
+  if (lower.includes("উদ্ভিদ") || lower.includes("বোটানি")) {
+    return { name: "উদ্ভিদবিজ্ঞান", icon: "🌿" };
+  }
+
+  if (lower.includes("প্রাণি") || lower.includes("প্রাণী") || lower.includes("জুলো")) {
+    return { name: "প্রাণিবিজ্ঞান", icon: "🧬" };
+  }
+
+  if (lower.includes("জীব") || lower.includes("bio")) {
+    return { name: "জীববিজ্ঞান", icon: "🧬" };
+  }
+
+  if (lower.includes("gk") || lower.includes("সাধারণ জ্ঞান") || lower.includes("সাধারণজ্ঞান")) {
+    return { name: "সাধারণ জ্ঞান (GK)", icon: "🌍" };
+  }
+
+  if (lower.includes("english") || lower.includes("ইংরেজি") || lower.includes("ইংলিশ") || lower.includes("ইং")) {
+    return { name: "ইংরেজি (English)", icon: "🔤" };
+  }
+
+  return { name: clean, icon: "📖" };
+}
+
+function parseSyllabusGroups(description?: string, totalMarks = 50, totalQuestions = 0): SyllabusGroup[] {
+  if (!description || !description.trim()) {
+    return [{
+      title: "পূর্ণাঙ্গ সিলেবাস",
+      iconEmoji: "📚",
+      questionCountText: `${BanglaNameHelper.toBanglaNumeral(totalQuestions || totalMarks || 50)} টি প্রশ্ন`,
+      topics: ["বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট সম্পূর্ণ অধ্যায়সমূহ"]
+    }];
+  }
+
+  let rawSyllabus = description;
+  let subjectLine = "";
+
+  const lines = description.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    if (/^(?:বিষয়|বিষয়):/i.test(line)) {
+      subjectLine = line.replace(/^(?:বিষয়|বিষয়):\s*/i, "").trim();
+    } else if (/^(?:সিলেবাস):/i.test(line)) {
+      rawSyllabus = line.replace(/^(?:সিলেবাস):\s*/i, "").trim();
+    }
+  }
+
+  rawSyllabus = rawSyllabus.replace(/^(?:বিষয়|বিষয়):[^\n]+(?:\n|$)/gi, "").trim();
+  rawSyllabus = rawSyllabus.replace(/^(?:সিলেবাস):\s*/gi, "").trim();
+
+  // Check for marks distribution in parens, e.g. (জীব ৩০ + রস ২৫ + পদ ২০ + ইং ১৫ + জিকে ১০)
+  const distributionMatch = rawSyllabus.match(/\(([^)]*(?:\+|\b(?:মার্ক|নম্বর|টি))\b[^)]*)\)/);
+  const subjectMarksMap: Record<string, number> = {};
+  if (distributionMatch) {
+    const distStr = distributionMatch[1];
+    const parts = distStr.split("+").map(p => p.trim());
+    for (const p of parts) {
+      const m = p.match(/([^\d]+)\s*(\d+|[০-৯]+)/);
+      if (m) {
+        const sub = m[1].trim();
+        const cnt = parseInt(toEnglishDigits(m[2]), 10);
+        if (sub && cnt > 0) {
+          subjectMarksMap[sub] = cnt;
+        }
+      }
+    }
+  }
+
+  const blocks = rawSyllabus.split(/[;\n]+/).map(b => b.trim()).filter(Boolean);
+  const result: { title: string; iconEmoji: string; rawHeader: string; topics: string[] }[] = [];
+
+  for (const block of blocks) {
+    if (block.includes(":")) {
+      const idx = block.indexOf(":");
+      const rawHeader = block.substring(0, idx).trim();
+      const rawTopics = block.substring(idx + 1).trim();
+
+      const headerInfo = normalizeSubjectHeader(rawHeader);
+      const topics = splitRespectingParens(rawTopics, ",")
+        .map(t => t.replace(/^[•\s\d.-]+/, "").trim())
+        .filter(Boolean);
+
+      result.push({
+        title: headerInfo.name,
+        iconEmoji: headerInfo.icon,
+        rawHeader,
+        topics: topics.length > 0 ? topics : [rawTopics]
+      });
+    }
+  }
+
+  if (result.length === 0) {
+    const headerInfo = normalizeSubjectHeader(subjectLine || "সিলেবাস");
+    const topics = splitRespectingParens(rawSyllabus, ",")
+      .map(t => t.replace(/^[•\s\d.-]+/, "").trim())
+      .filter(Boolean);
+
+    result.push({
+      title: headerInfo.name,
+      iconEmoji: headerInfo.icon,
+      rawHeader: subjectLine,
+      topics: topics.length > 0 ? topics : [rawSyllabus]
+    });
+  }
+
+  const effectiveTotal = totalQuestions > 0 ? totalQuestions : (totalMarks > 0 ? totalMarks : 50);
+  const countPerSubject = Math.round(effectiveTotal / Math.max(1, result.length));
+
+  return result.map(group => {
+    let qCount = countPerSubject;
+    for (const [k, v] of Object.entries(subjectMarksMap)) {
+      if (group.title.includes(k) || group.rawHeader.includes(k)) {
+        qCount = v;
+        break;
+      }
+    }
+    const bnCount = BanglaNameHelper.toBanglaNumeral(qCount);
+    return {
+      title: group.title,
+      iconEmoji: group.iconEmoji,
+      questionCountText: `${bnCount} টি প্রশ্ন`,
+      topics: group.topics
+    };
+  });
+}
+
+function formatDateShortEng(dt: Date): string {
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  const day = String(dt.getDate()).padStart(2, "0");
+  const month = months[dt.getMonth()];
+  const year = dt.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+function formatRemainingTime(startTime: Date): string {
+  const now = new Date();
+  if (startTime <= now) return "শীঘ্রই";
+  const diffMs = startTime.getTime() - now.getTime();
+  const totalMinutes = Math.floor(diffMs / 60000);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) {
+    const bnDays = BanglaNameHelper.toBanglaNumeral(days);
+    if (hours > 0) {
+      const bnHours = BanglaNameHelper.toBanglaNumeral(hours);
+      return `${bnDays} দিন ${bnHours} ঘণ্টা`;
+    }
+    return `${bnDays} দিন`;
+  }
+  if (hours > 0) {
+    const bnHours = BanglaNameHelper.toBanglaNumeral(hours);
+    if (minutes > 0) {
+      const bnMinutes = BanglaNameHelper.toBanglaNumeral(minutes);
+      return `${bnHours} ঘণ্টা ${bnMinutes} মিনিট`;
+    }
+    return `${bnHours} ঘণ্টা`;
+  }
+  if (minutes > 0) {
+    const bnMinutes = BanglaNameHelper.toBanglaNumeral(minutes);
+    return `${bnMinutes} মিনিট`;
+  }
+  return "কিছুক্ষণ";
+}
+
+function formatBanglaDate(dt: Date): string {
+  const months = [
+    "", "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+    "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
+  ];
+  const day = BanglaNameHelper.toBanglaNumeral(dt.getDate());
+  const month = months[dt.getMonth() + 1];
+  const year = BanglaNameHelper.toBanglaNumeral(dt.getFullYear());
+  return `${day} ${month} ${year}`;
+}
+
+function formatBanglaTime(dt: Date): string {
+  const hour = dt.getHours();
+  const minute = dt.getMinutes();
+  const period = hour >= 12 ? (hour >= 16 ? (hour >= 20 ? "রাত" : "সন্ধ্যা") : (hour >= 12 && hour < 16 ? "দুপুর" : "রাত")) : (hour < 4 ? "রাত" : (hour < 6 ? "ভোর" : "সকাল"));
+  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+  const bnHour = BanglaNameHelper.toBanglaNumeral(displayHour);
+  const bnMin = minute > 0 ? BanglaNameHelper.toBanglaNumeral(minute.toString().padStart(2, "0")) : "০০";
+  return `${period} ${bnHour}:${bnMin} টা`;
+}
+
+function formatTime12Hour(dt: Date): string {
+  let hours = dt.getHours();
+  const minutes = dt.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const minutesStr = String(minutes).padStart(2, "0");
+  return `${hours}:${minutesStr} ${ampm}`;
+}
+
+function formatDurationBangla(minutes: number): string {
+  if (minutes === 60) return "১ ঘণ্টা";
+  if (minutes === 120) return "২ ঘণ্টা";
+  if (minutes < 60) return `${BanglaNameHelper.toBanglaNumeral(minutes)} মিনিট`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (m === 0) return `${BanglaNameHelper.toBanglaNumeral(h)} ঘণ্টা`;
+  return `${BanglaNameHelper.toBanglaNumeral(h)} ঘণ্টা ${BanglaNameHelper.toBanglaNumeral(m)} মিনিট`;
+}
+
+const SyllabusAccordionCard: React.FC<{
+  group: SyllabusGroup;
+  defaultExpanded?: boolean;
+}> = ({ group, defaultExpanded = true }) => {
+  const [isOpen, setIsOpen] = useState(defaultExpanded);
+
+  return (
+    <div className="border-b border-[#F1F5F9] dark:border-[#27272A] last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-3.5 px-4 flex items-center justify-between text-left hover:bg-[#F8FAFC]/80 dark:hover:bg-[#27272A]/40 transition-colors select-none cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="text-[19px] leading-none shrink-0">{group.iconEmoji}</span>
+          <span className="text-[15px] font-bold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+            {group.title}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0 ml-3">
+          {group.questionCountText && (
+            <span className="text-[12.5px] font-semibold text-[#475569] dark:text-[#94A3B8] bg-[#F1F5F9] dark:bg-[#27272A] px-2.5 py-0.5 rounded-full">
+              {group.questionCountText}
+            </span>
+          )}
+          <ChevronDown
+            size={18}
+            className={cn(
+              "text-[#64748B] dark:text-[#94A3B8] transition-transform duration-200",
+              isOpen && "rotate-180"
+            )}
+          />
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="pb-3.5 pt-1 pl-11 pr-4 space-y-1.5 animate-in fade-in-50 duration-150">
+          {group.topics.map((topic, idx) => (
+            <div key={idx} className="flex items-start gap-2">
+              <span className="text-[14px] leading-tight font-black text-[#64748B] dark:text-[#94A3B8] shrink-0">
+                •
+              </span>
+              <span className="text-[13.5px] leading-snug font-medium text-[#1E293B] dark:text-[#E2E8F0]">
+                {topic}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   examId,
@@ -72,10 +407,11 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
       const now = new Date();
       const end = new Date(detailsData.exam.end_time);
       const isPast = now > end;
+      const isResultPub = detailsData.exam.id.startsWith("mock-") || (isPast && detailsData.exam.is_leaderboard_published !== false);
 
       if (
         detailsData.attempt?.status === "submitted" &&
-        (isPast || detailsData.exam.id.startsWith("mock-"))
+        isResultPub
       ) {
         const lb = await getPublicLeaderboard(examId, 5);
         setLeaderboard(lb);
@@ -105,6 +441,10 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const isUpcoming = now < start;
   const isPast = now > end;
   const isTaken = attempt?.status === "submitted";
+  const pubTime = new Date(new Date(exam.end_time).getTime() + 15 * 60 * 1000);
+  const isResultPublished =
+    exam.id.startsWith("mock-") ||
+    (now >= pubTime && exam.is_leaderboard_published !== false);
 
   let statusBadgeText = "Upcoming";
   let statusBadgeColor = "#3B82F6";
@@ -128,12 +468,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
     statusBadgeBg = "bg-[#3B82F6]/10 dark:bg-[#3B82F6]/15 border-[#3B82F6]/25 dark:border-[#3B82F6]/30 text-[#3B82F6]";
   }
 
-  const syllabusList = exam.description?.trim()
-    ? exam.description
-        .split(/[\n\r,;•|]+/)
-        .map((s: string) => s.trim())
-        .filter(Boolean)
-    : [];
+  const syllabusGroups = parseSyllabusGroups(exam.description, exam.total_marks, exam.total_questions);
 
   // Leaderboard View Screen
   if (isViewingLeaderboard) {
@@ -142,6 +477,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         activeTab="live_exam"
         {...commonLayoutProps}
         title={`${exam.title} - মেধা তালিকা`}
+        centerTitle={true}
         onBack={() => setIsViewingLeaderboard(false)}
       >
         <LiveExamLeaderboardView
@@ -158,6 +494,11 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
   // Solution View Screen
   if (isViewingSolutions) {
+    if (!isResultPublished) {
+      setIsViewingSolutions(false);
+      toast.info("ফলাফল ও সমাধান এখনও প্রকাশ করা হয়নি।");
+      return null;
+    }
     return (
       <LiveExamSolutionView
         examId={exam.id}
@@ -202,7 +543,8 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
     <AppLayout
       activeTab="live_exam"
       {...commonLayoutProps}
-      title="পরীক্ষার বিবরণ"
+      title={exam.title}
+      centerTitle={true}
       onBack={onBack}
     >
       <div className="w-full max-w-4xl mx-auto px-2.5 sm:px-4 py-4 sm:py-6 font-['HindSiliguri'] pb-24">
@@ -224,117 +566,81 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
             </span>
           </div>
 
-          {/* Exam Title */}
-          <h1 className="mt-4 text-[20px] sm:text-[22px] font-black text-[#0F172A] dark:text-[#F8FAFC] tracking-[-0.3px] leading-tight">
-            {exam.title}
-          </h1>
+          {/* 2. Schedule Section - Matching Reference Image Exactly */}
+          <div className="mt-4 rounded-[18px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-4 sm:p-5 font-['HindSiliguri',sans-serif]">
+            {/* Centered Header */}
+            <div className="flex items-center justify-center gap-2 mb-3.5">
+              <span className="text-[18px] leading-none">🗓️</span>
+              <h3 className="font-['HindSiliguri',sans-serif] text-[16.5px] font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                সময়সূচী
+              </h3>
+            </div>
 
-          <div className="my-4 h-px bg-[#F1F5F9] dark:bg-[#27272A]" />
+            {/* 2-Column Schedule with Dash */}
+            <div className="flex items-center justify-between px-2 sm:px-8">
+              {/* Left: Start Date & Time */}
+              <div className="flex flex-col items-start text-left">
+                <span className="font-['HindSiliguri',sans-serif] text-[16.5px] sm:text-[18px] font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                  {formatDateShortEng(start)}
+                </span>
+                <span className="font-['HindSiliguri',sans-serif] text-[13.5px] sm:text-[14px] font-semibold text-[#64748B] dark:text-[#94A3B8] mt-0.5">
+                  {formatTime12Hour(start)}
+                </span>
+              </div>
 
-          {/* 2. Schedule Section */}
-          <div className="flex items-center gap-2 text-[14.5px] font-bold text-[#334155] dark:text-[#E2E8F0]">
-            <Calendar size={16} className="text-[#64748B] dark:text-[#94A3B8]" />
-            <span>পরীক্ষার সময়সূচী</span>
+              {/* Center Dash */}
+              <div className="w-8 sm:w-12 h-[2px] bg-[#CBD5E1] dark:bg-[#3F3F46] rounded-full mx-2 sm:mx-6 shrink-0" />
+
+              {/* Right: End Date & Time */}
+              <div className="flex flex-col items-end text-right">
+                <span className="font-['HindSiliguri',sans-serif] text-[16.5px] sm:text-[18px] font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                  {formatDateShortEng(end)}
+                </span>
+                <span className="font-['HindSiliguri',sans-serif] text-[13.5px] sm:text-[14px] font-semibold text-[#64748B] dark:text-[#94A3B8] mt-0.5">
+                  {formatTime12Hour(end)}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-3.5 flex items-center justify-between">
-            {/* Start info */}
-            <div>
-              <span className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA]">
-                শুরু
+          {/* 3. Meta Stats Pill Row Matching Reference Image */}
+          <div className="mt-3.5 rounded-[18px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] py-3.5 px-4 flex items-center justify-center gap-3 sm:gap-6 flex-wrap font-['HindSiliguri',sans-serif]">
+            {/* Duration */}
+            <div className="flex items-center gap-2">
+              <span className="text-[17px]">⏱️</span>
+              <span className="font-['HindSiliguri',sans-serif] text-[15px] sm:text-[16px] font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                {formatDurationBangla(exam.duration_minutes || 30)}
               </span>
-              <p className="text-[14px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
-                {BanglaNameHelper.toBanglaNumeral(start.getDate())}/
-                {BanglaNameHelper.toBanglaNumeral(start.getMonth() + 1)}/
-                {BanglaNameHelper.toBanglaNumeral(start.getFullYear())}
-              </p>
-              <p className="text-[12.5px] font-semibold text-[#475569] dark:text-[#CBD5E1]">
-                {BanglaNameHelper.toBanglaNumeral(padZero(start.getHours()))}:
-                {BanglaNameHelper.toBanglaNumeral(padZero(start.getMinutes()))}
-              </p>
             </div>
 
-            <ArrowRight size={18} className="text-[#CBD5E1] dark:text-[#52525B]" />
+            <div className="w-px h-5 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
 
-            {/* End info */}
-            <div className="text-right">
-              <span className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA]">
-                সমাপ্তি
+            {/* Total Questions */}
+            <div className="flex items-center gap-2">
+              <span className="text-[17px]">📝</span>
+              <span className="font-['HindSiliguri',sans-serif] text-[15px] sm:text-[16px] font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                {BanglaNameHelper.toBanglaNumeral(exam.total_questions || exam.total_marks || 50)}টি প্রশ্ন
               </span>
-              <p className="text-[14px] font-extrabold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
-                {BanglaNameHelper.toBanglaNumeral(end.getDate())}/
-                {BanglaNameHelper.toBanglaNumeral(end.getMonth() + 1)}/
-                {BanglaNameHelper.toBanglaNumeral(end.getFullYear())}
-              </p>
-              <p className="text-[12.5px] font-semibold text-[#EF4444]">
-                {BanglaNameHelper.toBanglaNumeral(padZero(end.getHours()))}:
-                {BanglaNameHelper.toBanglaNumeral(padZero(end.getMinutes()))}
-              </p>
             </div>
+
+            {(exam.negative_marking || 0.25) > 0 && (
+              <>
+                <div className="w-px h-5 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[16px]">🎯</span>
+                  <span className="font-['HindSiliguri',sans-serif] text-[15px] sm:text-[16px] font-semibold text-[#EF4444]">
+                    -{BanglaNameHelper.toBanglaNumeral(exam.negative_marking || 0.25)} মার্ক
+                  </span>
+                </div>
+              </>
+            )}
           </div>
-
-          {/* 3. Meta 3-Column Stats */}
-          <div className="mt-5 rounded-[16px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] py-3.5 px-3 flex items-center justify-around text-center">
-            <div>
-              <p className="text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
-                {BanglaNameHelper.toBanglaNumeral(exam.duration_minutes || 25)} মি.
-              </p>
-              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
-                সময়
-              </p>
-            </div>
-
-            <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
-
-            <div>
-              <p className="text-[17px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
-                {BanglaNameHelper.toBanglaNumeral(exam.total_questions || 25)} টি
-              </p>
-              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
-                মোট প্রশ্ন
-              </p>
-            </div>
-
-            <div className="w-px h-7 bg-[#E2E8F0] dark:bg-[#2E2E32]" />
-
-            <div>
-              <p className="text-[17px] font-black text-[#EF4444]">
-                -{BanglaNameHelper.toBanglaNumeral(exam.negative_marking || 0.25)}
-              </p>
-              <p className="text-[11.5px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
-                নেগেটিভ মার্ক
-              </p>
-            </div>
-          </div>
-
-          <div className="my-4 h-px bg-[#F1F5F9] dark:bg-[#27272A]" />
 
           {/* 4. Syllabus Section */}
-          <div className="flex items-center gap-2 text-[14.5px] font-bold text-[#334155] dark:text-[#E2E8F0]">
-            <BookOpen size={16} className="text-[#64748B] dark:text-[#94A3B8]" />
-            <span>সিলেবাস ও অধ্যায়সমূহ</span>
-          </div>
-
-          <div className="mt-3 rounded-[14px] bg-[#F8FAFC] dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] p-3.5">
-            {syllabusList.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                {syllabusList.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-1.5 min-w-0">
-                    <span className="text-[13px] font-bold text-[#64748B] dark:text-[#94A3B8] shrink-0">
-                      {BanglaNameHelper.toBanglaNumeral(padZero(idx + 1))}.
-                    </span>
-                    <span className="text-[13px] font-medium text-[#1E293B] dark:text-[#E2E8F0] line-clamp-2 leading-[1.35]">
-                      {item}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[13.5px] leading-relaxed text-[#475569] dark:text-[#CBD5E1]">
-                {exam.description?.trim() ||
-                  "এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।"}
-              </p>
-            )}
+          <div className="mt-3.5 rounded-[16px] bg-white dark:bg-[#18181B] border border-[#E2E8F0] dark:border-[#27272A] overflow-hidden divide-y divide-[#F1F5F9] dark:divide-[#27272A] shadow-xs">
+            {syllabusGroups.map((group, idx) => (
+              <SyllabusAccordionCard key={idx} group={group} defaultExpanded={idx < 2} />
+            ))}
           </div>
         </div>
 
@@ -345,7 +651,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsTakingExam(true)}
-                className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+                className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
               >
                 <span>পরীক্ষা শুরু করুন</span>
               </button>
@@ -353,15 +659,15 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               <button
                 type="button"
                 disabled
-                className="w-full h-[52px] rounded-2xl bg-[#E2E8F0] dark:bg-[#27272A] text-[#94A3B8] dark:text-[#71717A] font-bold text-[16px] cursor-not-allowed flex items-center justify-center"
+                className="w-full h-[52px] rounded-2xl bg-[#E2E8F0] dark:bg-[#27272A] text-[#94A3B8] dark:text-[#71717A] font-bold text-[14.5px] cursor-not-allowed flex items-center justify-center px-4"
               >
-                <span>পরীক্ষা এখনও শুরু হয়নি</span>
+                <span>পরীক্ষা এখনও শুরু হয়নি (⏱️ আর {formatRemainingTime(start)} বাকি)</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => setIsTakingExam(true)}
-                className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+                className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[16px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
               >
                 <RotateCcw size={18} />
                 <span>অনুশীলন পরীক্ষা শুরু করুন</span>
@@ -371,14 +677,16 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
             isPast || exam.id.startsWith("mock-") ? (
               <div className="space-y-3">
                 {/* Solutions Button */}
-                <button
-                  type="button"
-                  onClick={() => setIsViewingSolutions(true)}
-                  className="w-full h-[52px] rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[15.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
-                >
-                  <BookOpen size={18} />
-                  <span>সমাধান ও ব্যাখ্যা দেখুন</span>
-                </button>
+                {isResultPublished && (
+                  <button
+                    type="button"
+                    onClick={() => setIsViewingSolutions(true)}
+                    className="w-full h-[52px] rounded-2xl bg-[#004633] hover:bg-[#003828] text-white font-bold text-[15.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-99"
+                  >
+                    <BookOpen size={18} />
+                    <span>সমাধান ও ব্যাখ্যা দেখুন</span>
+                  </button>
+                )}
 
                 {/* Retake as Practice Button */}
                 <button
@@ -426,7 +734,11 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
               <div>
                 <p className="text-[19px] font-black text-[#0F172A] dark:text-[#F8FAFC]">
-                  {BanglaNameHelper.toBanglaNumeral(attempt.score ?? 0)}
+                  {(() => {
+                    const calc = Number((((attempt.correct_count || 0) - ((attempt.wrong_count || 0) * (exam.negative_marking || 0.25)))).toFixed(4));
+                    const eff = (attempt.score === 0 && calc < 0) ? calc : (attempt.score ?? 0);
+                    return BanglaNameHelper.toBanglaNumeral(eff);
+                  })()}
                 </p>
                 <p className="text-[12px] font-medium text-[#64748B] dark:text-[#A1A1AA] mt-0.5">
                   মোট স্কোর
@@ -493,8 +805,8 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
           </div>
         )}
 
-        {/* Anti-Leakage / Pending Results Banner (When ongoing) */}
-        {isTaken && isOngoing && !exam.id.startsWith("mock-") && (
+        {/* Anti-Leakage / Pending Results Banner (When taken and before result publish) */}
+        {isTaken && !isResultPublished && !exam.id.startsWith("mock-") && (
           <div className="mt-5 rounded-[20px] bg-[#F59E0B]/12 border border-[#F59E0B]/30 p-4 flex items-start gap-3">
             <AlertCircle size={20} className="text-[#D97706] shrink-0 mt-0.5" />
             <div>
@@ -502,10 +814,10 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                 উত্তরপত্র সফলভাবে জমা নেওয়া হয়েছে!
               </h4>
               <p className="mt-1 text-[12.5px] leading-relaxed text-[#78350F] dark:text-white/70">
-                পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষার সময়সীমা (
-                {BanglaNameHelper.toBanglaNumeral(padZero(end.getHours()))}:
-                {BanglaNameHelper.toBanglaNumeral(padZero(end.getMinutes()))}
-                ) শেষ হওয়ার পর সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
+                পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষা শেষ হওয়ার পর রাত{" "}
+                {BanglaNameHelper.toBanglaNumeral(padZero(pubTime.getHours()))}:
+                {BanglaNameHelper.toBanglaNumeral(padZero(pubTime.getMinutes()))}{" "}
+                মিনিটে সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
               </p>
             </div>
           </div>
@@ -527,7 +839,7 @@ export const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         )}
 
         {/* Leaderboard Section (Top 5 Rankers) */}
-        {isTaken && (isPast || exam.id.startsWith("mock-")) && exam.is_leaderboard_published && (
+        {isTaken && isResultPublished && (
           <div className="mt-6 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

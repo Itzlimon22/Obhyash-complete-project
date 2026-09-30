@@ -183,7 +183,9 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
   const handleScrollToQuestion = (index: number) => {
     const q = questions[index];
     if (q) {
-      const elem = document.getElementById(`question-${q.id}`);
+      const elem =
+        document.getElementById(`question-${q.id}`) ||
+        document.getElementById(`question-card-${index}`);
       if (elem) {
         elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -317,23 +319,26 @@ export const ExamRunner: React.FC<ExamRunnerProps> = ({
                     <div className="flex-1 h-px bg-[#E2E8F0] dark:bg-[#27272A]" />
                   </div>
                 )}
-                <QuestionCard
-                  question={question}
-                  serialNumber={idx + 1}
-                  selectedOptionIndex={userAnswers[question.id]}
-                  isFlagged={isFlagged}
-                  isBookmarked={isBookmarked}
-                  onSelectOption={(optIdx) =>
-                    handleOptionSelect(question.id, optIdx)
-                  }
-                  onToggleFlag={() => handleToggleFlag(question.id)}
-                  onToggleBookmark={
-                    onToggleBookmark
-                      ? () => onToggleBookmark(question.id)
-                      : undefined
-                  }
-                  onReport={() => setReportingQuestionId(question.id)}
-                />
+                <div id={`question-${question.id}`} data-question-index={idx} className="scroll-mt-20">
+                  <QuestionCard
+                    question={question}
+                    serialNumber={idx + 1}
+                    selectedOptionIndex={userAnswers[question.id]}
+                    isFlagged={isFlagged}
+                    isBookmarked={isBookmarked}
+                    readOnly={userAnswers[question.id] !== undefined}
+                    onSelectOption={(optIdx) =>
+                      handleOptionSelect(question.id, optIdx)
+                    }
+                    onToggleFlag={() => handleToggleFlag(question.id)}
+                    onToggleBookmark={
+                      onToggleBookmark
+                        ? () => onToggleBookmark(question.id)
+                        : undefined
+                    }
+                    onReport={() => setReportingQuestionId(question.id)}
+                  />
+                </div>
               </React.Fragment>
             );
           })}

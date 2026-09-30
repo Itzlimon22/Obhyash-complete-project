@@ -18,6 +18,7 @@ import '../../dashboard/services/streak_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../gamification/services/exam_xp_calculator.dart';
 import '../../../core/providers/app_config_provider.dart';
+import '../../../services/anti_piracy_service.dart';
 
 class LiveExamSessionView extends ConsumerStatefulWidget {
   final String examId;
@@ -54,6 +55,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Ban screenshots and screen recording ONLY on the live exam running page during exam
+    AntiPiracyService.enableProtection();
     _sessionStartTime = DateTime.now().toUtc();
     final durationMins = widget.exam?.durationMinutes ?? 45;
     _secondsRemaining = durationMins * 60;
@@ -76,12 +79,12 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
           .maybeSingle();
 
       if (existing == null) {
-        await supabase.from('live_exam_attempts').insert({
+        await supabase.from('live_exam_attempts').upsert({
           'live_exam_id': widget.examId,
           'user_id': user.id,
           'status': 'ongoing',
           'start_time': _sessionStartTime.toIso8601String(),
-        });
+        }, onConflict: 'live_exam_id,user_id');
       } else if (existing['status'] != 'submitted' && existing['start_time'] != null) {
         final parsed = DateTime.tryParse(existing['start_time'].toString());
         if (parsed != null) {
@@ -133,9 +136,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
     final isBookmarked = _bookmarkedIds.contains(questionId);
 
     if (!isBookmarked) {
-      final profile = ref.read(userProfileProvider).value;
-      final isPro = profile?.isPro ?? false;
+      final isPro = await resolveUserIsPro(ref);
       if (!isPro && _bookmarkedIds.length >= 25) {
+        if (!mounted) return;
         AppPopups.warning(
           context,
           message: 'বুকমার্ক লিমিট শেষ (২৫/২৫)! পরীক্ষা শেষে সাবস্ক্রিপশন আপগ্রেড করতে পারবে।',
@@ -171,6 +174,8 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
 
   @override
   void dispose() {
+    // Restore screenshot permission for the rest of the app upon leaving live exam
+    AntiPiracyService.disableProtection();
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _scrollController.dispose();
@@ -180,6 +185,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      // Re-ensure screenshot protection is active while on exam view
+      AntiPiracyService.enableProtection();
+    }
 
     final antiCheatEnabled = ref.read(isExamAntiCheatEnabledProvider);
     if (!antiCheatEnabled) return;
@@ -397,11 +407,14 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       }
     }
 
-    final finalScore = rawScore < 0 ? 0 : rawScore;
+    // Exact decimal precision: allow exact negative score without clamping to 0
+    final double netScore = rawScore.toDouble();
+    final double finalScore = (netScore * 10000).round() / 10000.0;
 
     try {
       bool isPracticeMode = false;
       int timeTakenSeconds = 0;
+      int timeTakenMs = 0;
 
       if (!widget.examId.startsWith('mock-')) {
         final supabase = Supabase.instance.client;
@@ -422,22 +435,36 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               (existing == null || existing['status'] != 'submitted') && !isPast;
 
           final submitTime = DateTime.now().toUtc();
-          timeTakenSeconds = submitTime.difference(_sessionStartTime).inSeconds.clamp(0, 86400);
+          timeTakenMs = submitTime.difference(_sessionStartTime).inMilliseconds.clamp(0, 86400000);
+          timeTakenSeconds = (timeTakenMs / 1000).round().clamp(0, 86400);
 
           if (isFirstOfficialAttempt) {
             // 1. Official Live Attempt -> Determines Leaderboard Rank
-            await supabase.from('live_exam_attempts').upsert({
+            final payload = {
               'live_exam_id': widget.examId,
               'user_id': user.id,
               'status': 'submitted',
               'score': finalScore,
               'correct_count': correctCount,
               'wrong_count': wrongCount,
+              'time_taken_seconds': timeTakenSeconds,
+              'time_taken_ms': timeTakenMs,
               'user_answers': _userAnswers,
               'start_time': _sessionStartTime.toIso8601String(),
               'submit_time': submitTime.toIso8601String(),
               'tab_switches_count': _tabSwitchCount,
-            });
+            };
+
+            if (existing != null && existing['id'] != null) {
+              await supabase
+                  .from('live_exam_attempts')
+                  .update(payload)
+                  .eq('id', existing['id']);
+            } else {
+              await supabase
+                  .from('live_exam_attempts')
+                  .upsert(payload, onConflict: 'live_exam_id,user_id');
+            }
             final streakData = await StreakService.syncStreak(user.id);
             ref.read(userProfileProvider.notifier).updateStreak(streakData.streakCount);
 
@@ -568,7 +595,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
             subjectLabel: widget.exam?.category ?? 'অনুশীলন',
             examType: 'live_exam_practice',
             date: DateTime.now().toIso8601String(),
-            score: (finalScore is double) ? finalScore : finalScore.toDouble(),
+            score: finalScore,
             totalMarks: widget.exam?.totalMarks.toDouble() ?? (questions.length * 1.0),
             totalQuestions: questions.length,
             correctCount: correctCount,
@@ -625,9 +652,26 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
       Scrollable.ensureVisible(
         key!.currentContext!,
         duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-        alignment: 0.08,
+        curve: Curves.easeInOutCubic,
+        alignment: 0.02,
       );
+    } else if (_scrollController.hasClients) {
+      final approxOffset = (index * 260.0).clamp(0.0, _scrollController.position.maxScrollExtent);
+      _scrollController.animateTo(
+        approxOffset,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic,
+      ).then((_) {
+        final retryKey = _itemKeys[index];
+        if (retryKey?.currentContext != null) {
+          Scrollable.ensureVisible(
+            retryKey!.currentContext!,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: 0.02,
+          );
+        }
+      });
     }
   }
 
@@ -669,6 +713,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                         ),
@@ -683,11 +728,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                     // Legend Row
                     Row(
                       children: [
-                        _LegendDot(color: const Color(0xFF059669), label: 'উত্তর দেওয়া (${_userAnswers.length})', isDark: isDark),
+                        _LegendDot(color: const Color(0xFF059669), label: 'উত্তর দেওয়া (${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)})', isDark: isDark),
                         const SizedBox(width: 12),
-                        _LegendDot(color: const Color(0xFFD97706), label: 'ফ্ল্যাগ (${_flaggedIds.length})', isDark: isDark),
+                        _LegendDot(color: const Color(0xFFD97706), label: 'ফ্ল্যাগ (${BanglaNameHelper.toBanglaNumeral(_flaggedIds.length)})', isDark: isDark),
                         const SizedBox(width: 12),
-                        _LegendDot(color: isDark ? const Color(0xFF52525B) : const Color(0xFF94A3B8), label: 'বাকি (${questions.length - _userAnswers.length})', isDark: isDark),
+                        _LegendDot(color: isDark ? const Color(0xFF52525B) : const Color(0xFF94A3B8), label: 'বাকি (${BanglaNameHelper.toBanglaNumeral(questions.length - _userAnswers.length)})', isDark: isDark),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -722,7 +767,11 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                             return GestureDetector(
                               onTap: () {
                                 Navigator.pop(ctx);
-                                _scrollToQuestion(i);
+                                Future.delayed(const Duration(milliseconds: 160), () {
+                                  if (mounted) {
+                                    _scrollToQuestion(i);
+                                  }
+                                });
                               },
                               child: Container(
                                 width: 44,
@@ -738,6 +787,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'HindSiliguri',
                                     color: textColor,
                                   ),
                                 ),
@@ -895,6 +945,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    ref.watch(userProfileProvider);
     final questionsAsync = ref.watch(liveExamQuestionsProvider(widget.examId));
 
     return PopScope(
@@ -918,23 +969,28 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // LEFT: Answered / Total Pill
+                    // LEFT: Answered / Total Pill (Clickable Question Palette)
                     questionsAsync.maybeWhen(
                       data: (questions) => ObhyashTooltip(
-                        message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা',
+                        message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা (প্যালেট দেখতে ক্লিক করুন)',
                         preferredPosition: TooltipPosition.bottom,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)} / ${BanglaNameHelper.toBanglaNumeral(questions.length)}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                        child: InkWell(
+                          onTap: () => _showQuestionPalette(questions),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)} / ${BanglaNameHelper.toBanglaNumeral(questions.length)}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                              ),
                             ),
                           ),
                         ),
@@ -1079,118 +1135,128 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView>
               subjectQuestionCounts[key] = (subjectQuestionCounts[key] ?? 0) + 1;
             }
 
-            return ListView.builder(
+            return SingleChildScrollView(
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 120),
-              itemCount: questions.length,
-              itemBuilder: (context, index) {
-                final q = questions[index];
-                _itemKeys[index] = GlobalKey();
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              padding: const EdgeInsets.fromLTRB(10, 14, 10, 120),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: List.generate(questions.length, (index) {
+                  final q = questions[index];
+                  final cardKey = _itemKeys.putIfAbsent(index, () => GlobalKey());
 
-                final currentSub = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
-                final prevSub = index > 0
-                    ? (questions[index - 1].subject.trim().isNotEmpty
-                        ? questions[index - 1].subject.trim()
-                        : (questions[index - 1].subjectLabel?.trim() ?? 'সাধারণ'))
-                    : null;
+                  final currentSub = q.subject.trim().isNotEmpty ? q.subject.trim() : (q.subjectLabel?.trim() ?? 'সাধারণ');
+                  final prevSub = index > 0
+                      ? (questions[index - 1].subject.trim().isNotEmpty
+                          ? questions[index - 1].subject.trim()
+                          : (questions[index - 1].subjectLabel?.trim() ?? 'সাধারণ'))
+                      : null;
 
-                final isFirstInSubject = index == 0 || (prevSub != null && prevSub.toLowerCase() != currentSub.toLowerCase());
+                  final isFirstInSubject = index == 0 || (prevSub != null && prevSub.toLowerCase() != currentSub.toLowerCase());
 
-                Widget? subjectHeader;
-                if (distinctSubjects.length > 1 && isFirstInSubject) {
-                  final banglaSub = BanglaNameHelper.formatSubject(currentSub);
-                  final count = subjectQuestionCounts[currentSub] ?? 0;
-                  subjectHeader = Container(
-                    margin: EdgeInsets.only(top: index == 0 ? 0 : 22, bottom: 14),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                            thickness: 1.2,
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
+                  Widget? subjectHeader;
+                  if (distinctSubjects.length > 1 && isFirstInSubject) {
+                    final banglaSub = BanglaNameHelper.formatSubject(currentSub);
+                    final count = subjectQuestionCounts[currentSub] ?? 0;
+                    subjectHeader = Container(
+                      margin: EdgeInsets.only(top: index == 0 ? 0 : 18, bottom: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                              thickness: 1.2,
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
-                              const SizedBox(width: 6),
-                              Text(
-                                banglaSub,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFFCBD5E1),
                               ),
-                              if (count > 0) ...[
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(LucideIcons.bookOpen, size: 14, color: Color(0xFF004633)),
                                 const SizedBox(width: 6),
                                 Text(
-                                  '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
+                                  banglaSub,
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                                   ),
                                 ),
+                                if (count > 0) ...[
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '(${BanglaNameHelper.toBanglaNumeral(count)}টি প্রশ্ন)',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontFamily: 'HindSiliguri',
+                                      color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                            thickness: 1.2,
+                          Expanded(
+                            child: Divider(
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                              thickness: 1.2,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (subjectHeader != null) subjectHeader,
-                    Container(
-                      key: _itemKeys[index],
-                      margin: const EdgeInsets.only(bottom: 14),
-                      child: QuestionCard(
-                        question: q,
-                        serialNumber: index + 1,
-                        selectedOptionIndex: _userAnswers[q.id],
-                        isFlagged: _flaggedIds.contains(q.id),
-                        isBookmarked: _bookmarkedIds.contains(q.id),
-                        onSelectOption: (optIndex) {
-                          setState(() {
-                            _userAnswers[q.id] = optIndex;
-                          });
-                        },
-                        onToggleFlag: () {
-                          setState(() {
-                            if (_flaggedIds.contains(q.id)) {
-                              _flaggedIds.remove(q.id);
-                            } else {
-                              _flaggedIds.add(q.id);
-                            }
-                          });
-                        },
-                        onToggleBookmark: () => _toggleBookmark(q.id),
-                        onReport: () => QuestionReportDialog.show(context, q.id),
+                        ],
                       ),
-                    ),
-                  ],
-                );
-              },
+                    );
+                  }
+
+                  final isAnswered = _userAnswers.containsKey(q.id);
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ?subjectHeader,
+                      Container(
+                        key: cardKey,
+                        child: QuestionCard(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          question: q,
+                          serialNumber: index + 1,
+                          selectedOptionIndex: _userAnswers[q.id],
+                          isFlagged: _flaggedIds.contains(q.id),
+                          isBookmarked: _bookmarkedIds.contains(q.id),
+                          readOnly: isAnswered, // Locked after selection
+                          hideSourceTag: true,
+                          onSelectOption: (optIndex) {
+                            if (_userAnswers.containsKey(q.id)) return; // Locked: no change allowed
+                            setState(() {
+                              _userAnswers[q.id] = optIndex;
+                            });
+                          },
+                          onToggleFlag: () {
+                            setState(() {
+                              if (_flaggedIds.contains(q.id)) {
+                                _flaggedIds.remove(q.id);
+                              } else {
+                                _flaggedIds.add(q.id);
+                              }
+                            });
+                          },
+                          onToggleBookmark: () => _toggleBookmark(q.id),
+                          onReport: () => QuestionReportDialog.show(context, q.id),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
             );
           },
         ),
@@ -1276,6 +1342,7 @@ class _LegendDot extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
+            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
           ),
         ),

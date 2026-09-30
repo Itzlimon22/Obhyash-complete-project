@@ -40,9 +40,9 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
     final isBookmarked = _bookmarkedIds.contains(questionId);
 
     if (!isBookmarked) {
-      final profile = ref.read(userProfileProvider).value;
-      final isPro = profile?.isPro ?? false;
+      final isPro = await resolveUserIsPro(ref);
       if (!isPro && _bookmarkedIds.length >= 25) {
+        if (!mounted) return;
         ProUpgradeModal.show(
           context,
           title: 'বুকমার্ক লিমিট শেষ 📌',
@@ -88,6 +88,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    ref.watch(userProfileProvider);
     final solutionAsync = ref.watch(liveExamSolutionProvider(widget.examId));
 
     return Scaffold(
@@ -118,6 +119,82 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
         ),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (data) {
+          final detailsAsync = ref.watch(liveExamDetailsProvider(widget.examId));
+          final exam = detailsAsync.value?.exam ?? widget.exam;
+
+          // Strict Result Protection Guard: Never leak solutions until exam is ended and result published
+          if (exam != null && !exam.isResultPublished) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 68,
+                      height: 68,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        LucideIcons.lock,
+                        size: 30,
+                        color: Color(0xFFD97706),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'ফলাফল ও সমাধান এখনও অপ্রকাশিত',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      exam.endTime.isAfter(DateTime.now())
+                          ? 'পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে লাইভ পরীক্ষার সময়সীমা (${exam.endTime.hour.toString().padLeft(2, '0')}:${exam.endTime.minute.toString().padLeft(2, '0')}) শেষ হওয়ার পর সম্পূর্ণ সমাধান ও ফলাফল উন্মুক্ত করা হবে।'
+                          : 'কর্তৃপক্ষ কর্তৃক এই পরীক্ষার ফলাফল ও সমাধান সাময়িকভাবে অপ্রকাশিত রাখা হয়েছে। প্রকাশিত হওয়ামাত্রই দেখতে পারবেন।',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 13.5,
+                        height: 1.5,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF004633),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      onPressed: () => context.pop(),
+                      icon: const Icon(LucideIcons.arrowLeft, size: 16),
+                      label: const Text(
+                        'ফিরে যান',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           final questions = data.questions;
           final userAnswers = data.userAnswers;
 
@@ -125,7 +202,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
           int wrongCount = 0;
           int skippedCount = 0;
           num score = 0;
-          final negativeRate = widget.exam?.negativeMarking.toDouble() ?? 0.25;
+          final negativeRate = exam?.negativeMarking.toDouble() ?? widget.exam?.negativeMarking.toDouble() ?? 0.25;
 
           for (final q in questions) {
             final pick = userAnswers[q.id];
@@ -140,7 +217,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
             }
           }
 
-          final finalScore = score < 0 ? 0 : score;
+          final finalScore = (score * 10000).round() / 10000.0;
 
           final filteredQuestions = questions.where((q) {
             final pick = userAnswers[q.id];

@@ -622,7 +622,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                   onRefresh: _fetch,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

@@ -191,7 +191,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
     const effNeg = examDetails?.negativeMarking ?? negativeMarking;
     const negativeMarksDeduction = wrongCount * effNeg;
-    const finalScore = Math.max(0, rawScore - negativeMarksDeduction);
+    const finalScore = Number((rawScore - negativeMarksDeduction).toFixed(2));
     const totalPoints =
       examDetails?.totalMarks ||
       questions.reduce((acc, q) => acc + (q.points ?? 1), 0);

@@ -563,7 +563,7 @@ export const AnalysisView: React.FC<AnalysisViewProps> = ({
         const netScore =
           rawDbScore !== null
             ? rawDbScore
-            : Math.min(totalMarks, Math.max(0, correct - wrong * negRate));
+            : Math.min(totalMarks, correct - wrong * negRate);
         const score =
           totalMarks > 0
             ? Math.min(100, Math.max(0, (netScore / totalMarks) * 100))

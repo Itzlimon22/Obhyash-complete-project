@@ -135,7 +135,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <MathRenderer
             text={
               serialNumber !== undefined
-                ? `**${BanglaNameHelper.toBanglaNumeral(serialNumber)}.** ${question.question || ''}`
+                ? `${BanglaNameHelper.toBanglaNumeral(serialNumber)}. ${question.question || ''}`
                 : (question.question || '')
             }
           />
@@ -231,7 +231,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
 
             {/* Report Button (Matching Flutter QuestionCard _IconBtn) */}
-            {onReport && (readOnly || showFeedback || showReport || true) && (
+            {onReport && (showFeedback || showReport) && (
               <button
                 type="button"
                 onClick={(e) => {

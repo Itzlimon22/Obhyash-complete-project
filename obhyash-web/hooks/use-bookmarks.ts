@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { toggleBookmark, getUserBookmarks } from '@/services/bookmark-service';
+import { isUserPro } from '@/lib/subscription-utils';
+import { createClient } from '@/utils/supabase/client';
 
 /**
  * useBookmarks — centralised bookmark state for the entire app.
@@ -56,8 +58,33 @@ export function useBookmarks(
       const qId = String(questionId);
       const wasBookmarked = bookmarkedIds.has(qId);
 
+      let effectiveIsPro = isPro;
+      if (!effectiveIsPro && typeof window !== 'undefined') {
+        try {
+          const cachedUser = localStorage.getItem('obhyash_user_profile') || localStorage.getItem('user');
+          if (cachedUser) {
+            const parsed = JSON.parse(cachedUser);
+            if (isUserPro(parsed)) effectiveIsPro = true;
+          }
+        } catch (_) {}
+
+        if (!effectiveIsPro && userId) {
+          try {
+            const supabase = createClient();
+            const { data } = await supabase
+              .from('users')
+              .select('id, role, is_subscribed, subscription, subscription_status, subscription_expires_at')
+              .eq('id', userId)
+              .maybeSingle();
+            if (data && isUserPro(data)) {
+              effectiveIsPro = true;
+            }
+          } catch (_) {}
+        }
+      }
+
       // Check limit for free users when adding new bookmark
-      if (!wasBookmarked && !isPro && bookmarkedIds.size >= 25) {
+      if (!wasBookmarked && !effectiveIsPro && bookmarkedIds.size >= 25) {
         if (onLimitReached) {
           onLimitReached();
         } else {

@@ -431,7 +431,7 @@ class _PlanSelectionViewState extends ConsumerState<PlanSelectionView> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.fromLTRB(16, 40, 16, 40),
+          padding: const EdgeInsets.fromLTRB(8, 16, 8, 36),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -740,8 +740,8 @@ class _PlanSelectionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           color: isDark
               ? (isSelected ? const Color(0xFF092328) : const Color(0xFF1C1C20))

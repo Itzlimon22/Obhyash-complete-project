@@ -535,7 +535,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 40),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

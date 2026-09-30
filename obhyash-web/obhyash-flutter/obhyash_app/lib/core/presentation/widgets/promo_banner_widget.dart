@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../providers/app_config_provider.dart';
+import '../../providers/shared_prefs_provider.dart';
 import '../../../features/dashboard/providers/dashboard_providers.dart';
+import '../../../features/dashboard/domain/models.dart';
 
 /// In-memory session state: when dismissed, remains hidden while the app is alive.
 /// When the app is closed from background/killed and reopened, it resets to false.
@@ -153,9 +157,27 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
       return const SizedBox.shrink();
     }
 
-    // User Pro status check
+    // User Pro status check - strictly show ONLY to free users, never to any pro/premium user
     final userProfileAsync = ref.watch(userProfileProvider);
-    final isPro = userProfileAsync.value?.isPro ?? false;
+    bool isPro = userProfileAsync.value?.isPro ?? false;
+    if (!isPro) {
+      try {
+        final prefs = ref.watch(sharedPreferencesProvider);
+        final uid = Supabase.instance.client.auth.currentUser?.id;
+        if (uid != null) {
+          final cached = prefs.getString('profile_$uid');
+          if (cached != null) {
+            final decoded = jsonDecode(cached) as Map<String, dynamic>;
+            if (UserProfile.fromJson(decoded).isPro) isPro = true;
+          }
+        }
+      } catch (_) {}
+    }
+
+    // Pro users must NEVER see this banner
+    if (isPro) {
+      return const SizedBox.shrink();
+    }
 
     // Resolve effective banner type (subscription vs referral)
     final bool isSub;
@@ -199,59 +221,41 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Theme adaptive colors
+    // Theme adaptive colors - Reddish / Crimson Rose Premium Theme
     final List<Color> bgGradient = isDark
-        ? (isSub
-            ? const [Color(0xFF16151B), Color(0xFF100F14)]
-            : const [Color(0xFF0F1A17), Color(0xFF0A1210)])
-        : (isSub
-            ? const [Color(0xFFFFFDF5), Color(0xFFFEF9EE)]
-            : const [Color(0xFFF4FDF9), Color(0xFFEDFBF5)]);
+        ? const [Color(0xFF261014), Color(0xFF180A0D)]
+        : const [Color(0xFFFFF1F2), Color(0xFFFFE4E6)];
 
     final Color borderColor = isDark
-        ? (isSub
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.32)
-            : const Color(0xFF10B981).withValues(alpha: 0.32))
-        : (isSub
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.28)
-            : const Color(0xFF10B981).withValues(alpha: 0.28));
+        ? const Color(0xFFFB7185).withValues(alpha: 0.35)
+        : const Color(0xFFFDA4AF).withValues(alpha: 0.75);
 
-    final Color titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final Color subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final Color titleColor = isDark ? Colors.white : const Color(0xFF881337);
+    final Color subtitleColor = isDark ? const Color(0xFFFDA4AF) : const Color(0xFFBE123C);
 
     final Color iconBg = isDark
-        ? (isSub
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.16)
-            : const Color(0xFF10B981).withValues(alpha: 0.16))
-        : (isSub
-            ? const Color(0xFFFEF3C7)
-            : const Color(0xFFD1FAE5));
+        ? const Color(0xFFE11D48).withValues(alpha: 0.22)
+        : const Color(0xFFFFE4E6);
 
     final Color iconBorder = isDark
-        ? (isSub
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.35)
-            : const Color(0xFF10B981).withValues(alpha: 0.35))
-        : (isSub
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.45)
-            : const Color(0xFF10B981).withValues(alpha: 0.45));
+        ? const Color(0xFFFB7185).withValues(alpha: 0.45)
+        : const Color(0xFFFDA4AF);
 
     final Color iconColor = isDark
-        ? (isSub ? const Color(0xFFFBBF24) : const Color(0xFF34D399))
-        : (isSub ? const Color(0xFFD97706) : const Color(0xFF059669));
+        ? const Color(0xFFFB7185)
+        : const Color(0xFFE11D48);
 
     final Color actionBtnBg = isDark
-        ? (isSub ? const Color(0xFFF59E0B) : const Color(0xFF10B981))
-        : (isSub ? const Color(0xFF0F172A) : const Color(0xFF065F46));
+        ? const Color(0xFFE11D48)
+        : const Color(0xFFBE123C);
 
-    final Color actionBtnTextColor = isDark
-        ? const Color(0xFF0F172A)
-        : Colors.white;
+    final Color actionBtnTextColor = Colors.white;
 
     final Color dismissBg = isDark
-        ? Colors.white.withValues(alpha: 0.10)
-        : Colors.black.withValues(alpha: 0.06);
+        ? Colors.white.withValues(alpha: 0.12)
+        : const Color(0xFFBE123C).withValues(alpha: 0.08);
 
-    final Color dismissIconColor = isDark ? Colors.white70 : const Color(0xFF64748B);
+    final Color dismissIconColor = isDark ? const Color(0xFFFDA4AF) : const Color(0xFFBE123C);
 
     return SizeTransition(
       sizeFactor: Tween<double>(begin: 1.0, end: 0.0).animate(_collapseAnimation),
@@ -275,8 +279,8 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : const Color(0xFFF59E0B).withValues(alpha: 0.06),
+                    ? Colors.black.withValues(alpha: 0.45)
+                    : const Color(0xFFE11D48).withValues(alpha: 0.10),
                 blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
@@ -360,13 +364,13 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
-                                      : const Color(0xFFFEF3C7),
+                                      ? const Color(0xFFE11D48).withValues(alpha: 0.20)
+                                      : const Color(0xFFFFE4E6),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: isDark
-                                        ? const Color(0xFFF59E0B).withValues(alpha: 0.3)
-                                        : const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                                        ? const Color(0xFFFB7185).withValues(alpha: 0.40)
+                                        : const Color(0xFFFDA4AF),
                                     width: 0.7,
                                   ),
                                 ),
@@ -377,8 +381,8 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                                       LucideIcons.zap,
                                       size: 10,
                                       color: isDark
-                                          ? const Color(0xFFFBBF24)
-                                          : const Color(0xFFD97706),
+                                          ? const Color(0xFFFB7185)
+                                          : const Color(0xFFE11D48),
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
@@ -388,8 +392,8 @@ class _PromoBannerWidgetState extends ConsumerState<PromoBannerWidget>
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w600,
                                         color: isDark
-                                            ? const Color(0xFFFBBF24)
-                                            : const Color(0xFFD97706),
+                                            ? const Color(0xFFFB7185)
+                                            : const Color(0xFFE11D48),
                                       ),
                                     ),
                                   ],

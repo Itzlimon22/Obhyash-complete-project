@@ -226,7 +226,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
             // Header Search Bar Section (Expandable via search icon)
             if (_isSearchOpen)
               Container(
-                margin: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+                margin: const EdgeInsets.fromLTRB(8, 4, 8, 10),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 height: 46,
                 decoration: BoxDecoration(
@@ -313,7 +313,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(10, 4, 10, 32),
+                      padding: const EdgeInsets.fromLTRB(8, 4, 8, 32),
                       itemCount: filteredFormulas.length,
                       itemBuilder: (context, index) {
                         final formula = filteredFormulas[index];

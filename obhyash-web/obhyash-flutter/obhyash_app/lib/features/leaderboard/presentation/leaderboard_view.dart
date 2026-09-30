@@ -667,7 +667,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           // ── View Mode Tab Switcher ──────────────────────────────────────────
           Container(
             color: isDark ? const Color(0xFF000000) : Colors.white,
-            padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
@@ -877,7 +877,7 @@ class _BatchAndTimelineHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1135,7 +1135,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      padding: const EdgeInsets.fromLTRB(10, 12, 10, 80),
+      padding: const EdgeInsets.fromLTRB(8, 12, 8, 80),
       children: [
         // College name header
         Container(
@@ -1233,7 +1233,7 @@ class _InstituteRankingsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) {
       return ListView(
-        padding: const EdgeInsets.fromLTRB(10, 16, 10, 80),
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 80),
         children: List.generate(
           8,
           (_) => Container(
@@ -1441,7 +1441,7 @@ class _InstituteRankingsBody extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 80),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
       children: [
         if (myCollegeEntry != null)
           buildCollegeRow(
@@ -1743,7 +1743,7 @@ class _StickyUserRankCard extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
       child: SafeArea(
         top: false,
         bottom: false,
@@ -2404,7 +2404,7 @@ class _PodiumSection extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 14, 10, 0),
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
             child: Row(
               children: [
                 const Text('🏆', style: TextStyle(fontSize: 18)),

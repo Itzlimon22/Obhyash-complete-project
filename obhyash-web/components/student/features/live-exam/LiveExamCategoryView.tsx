@@ -77,16 +77,27 @@ export const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     fetchExams();
   }, [category, user?.id]);
 
-  const filteredExams = exams.filter((exam) => {
-    const start = new Date(exam.start_time);
-    const end = new Date(exam.end_time);
-    const isOngoing = now >= start && now <= end;
-    const isUpcoming = now < start;
+  const filteredExams = exams
+    .filter((exam) => {
+      const start = new Date(exam.start_time);
+      const end = new Date(exam.end_time);
+      const isOngoing = now >= start && now <= end;
+      const isUpcoming = now < start;
 
-    if (activeFilter === "Ongoing" && !isOngoing) return false;
-    if (activeFilter === "Upcoming" && !isUpcoming) return false;
-    return true;
-  });
+      if (activeFilter === "Ongoing" && !isOngoing) return false;
+      if (activeFilter === "Upcoming" && !isUpcoming) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const aStart = new Date(a.start_time).getTime();
+      const bStart = new Date(b.start_time).getTime();
+
+      // Serial sorting:
+      // In 'All' tab (and by default), exams always remain strictly in serial / chronological order (Exam 1, Exam 2, ...).
+      // Attempted or finished exams do NOT jump to the last/bottom of the list.
+      if (aStart !== bStart) return aStart - bStart;
+      return a.title.localeCompare(b.title);
+    });
 
   const formatDurationBn = (minutes: number) => {
     if (!minutes || minutes <= 0) return "২০ মিনিট";

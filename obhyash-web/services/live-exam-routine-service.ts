@@ -138,10 +138,19 @@ export class LiveExamRoutineService {
       const rawDay = (c[1]?.v ?? "").toString().trim();
       const rawExamName = (c[2]?.v ?? "").toString().trim();
       const rawSubject = (c[3]?.v ?? "").toString().trim();
-      const rawSyllabus = (c[4]?.v ?? "").toString().trim();
+      let rawSyllabus = (c[4]?.v ?? "").toString().trim();
       const rawMarksTime = (c[5]?.v ?? "").toString().trim();
 
       if (!rawDate && !rawExamName) continue;
+
+      // Auto-enrich Medical GK & English high-yield topics
+      if (rawExamName.includes("Med Live 02") && !rawSyllabus.includes("Articles")) {
+        rawSyllabus = rawSyllabus.replace("English: Noun, Pronoun", "English: Noun, Pronoun, Articles & Determiners");
+      } else if (rawExamName.includes("Med Live 05") && !rawSyllabus.includes("Group Verbs")) {
+        rawSyllabus = rawSyllabus.replace("English: Preposition", "English: Appropriate Preposition, Group Verbs");
+      } else if (rawExamName.includes("Med Live 10") && !rawSyllabus.includes("ক্ষুদ্র নৃগোষ্ঠী")) {
+        rawSyllabus = rawSyllabus.replace("ভৌগোলিক পরিচিতি ও নদ-নদী", "ভৌগোলিক পরিচিতি, ক্ষুদ্র নৃগোষ্ঠী ও নদ-নদী");
+      }
 
       // Parse marks & time (e.g. "৫০ মার্কস (৩০ মিনিট)" or "100 মার্কস (60 মিনিট)")
       let totalMarks = 50;

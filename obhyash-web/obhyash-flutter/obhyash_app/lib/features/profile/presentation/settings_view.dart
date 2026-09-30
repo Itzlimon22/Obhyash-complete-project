@@ -322,7 +322,7 @@ class SettingsView extends ConsumerWidget {
         children: [
           // ── Profile Card ──────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 2, 10, 4),
+            padding: const EdgeInsets.fromLTRB(8, 2, 8, 4),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -509,7 +509,7 @@ class SettingsView extends ConsumerWidget {
                 else
                   const SizedBox(height: 18),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Column(
                     children: group.items.map((item) {
                       return Padding(

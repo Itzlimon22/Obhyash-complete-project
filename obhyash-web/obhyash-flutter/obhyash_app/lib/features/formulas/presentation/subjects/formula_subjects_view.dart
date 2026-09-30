@@ -49,7 +49,7 @@ class FormulaSubjectsView extends ConsumerWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
+          padding: const EdgeInsets.fromLTRB(8, 6, 8, 16),
           child: AppRefreshIndicator(
             onRefresh: () async {
               ref.invalidate(userProfileProvider);
@@ -63,8 +63,8 @@ class FormulaSubjectsView extends ConsumerWidget {
               ),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
                 childAspectRatio: 1.15,
               ),
               itemCount: subjects.length,

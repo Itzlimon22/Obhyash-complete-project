@@ -117,10 +117,19 @@ class LiveExamGoogleSheetService {
         final rawDay = (c[1]?['v'] ?? '').toString().trim();
         final rawExamName = (c[2]?['v'] ?? '').toString().trim();
         final rawSubject = (c[3]?['v'] ?? '').toString().trim();
-        final rawSyllabus = (c[4]?['v'] ?? '').toString().trim();
+        String rawSyllabus = (c[4]?['v'] ?? '').toString().trim();
         final rawMarksTime = (c[5]?['v'] ?? '').toString().trim();
 
         if (rawDate.isEmpty && rawExamName.isEmpty) continue;
+
+        // Auto-enrich Medical GK & English high-yield topics
+        if (rawExamName.contains('Med Live 02') && !rawSyllabus.contains('Articles')) {
+          rawSyllabus = rawSyllabus.replaceAll('English: Noun, Pronoun', 'English: Noun, Pronoun, Articles & Determiners');
+        } else if (rawExamName.contains('Med Live 05') && !rawSyllabus.contains('Group Verbs')) {
+          rawSyllabus = rawSyllabus.replaceAll('English: Preposition', 'English: Appropriate Preposition, Group Verbs');
+        } else if (rawExamName.contains('Med Live 10') && !rawSyllabus.contains('ক্ষুদ্র নৃগোষ্ঠী')) {
+          rawSyllabus = rawSyllabus.replaceAll('ভৌগোলিক পরিচিতি ও নদ-নদী', 'ভৌগোলিক পরিচিতি, ক্ষুদ্র নৃগোষ্ঠী ও নদ-নদী');
+        }
 
         int totalMarks = 50;
         int durationMinutes = 30;

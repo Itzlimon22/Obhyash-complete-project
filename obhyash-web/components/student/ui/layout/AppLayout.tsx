@@ -45,6 +45,7 @@ interface AppLayoutProps {
     onTabSelect: (id: string) => void;
   };
   headerRight?: ReactNode;
+  centerTitle?: boolean;
   onRefresh?: () => Promise<void> | void;
 }
 
@@ -103,6 +104,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   headerTabs,
   headerSegment,
   headerRight,
+  centerTitle = false,
   onRefresh,
 }) => {
   const isSubPage = SUB_PAGES_WITHOUT_BOTTOM_NAV.has(activeTab);
@@ -184,7 +186,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
           <header className="h-[52px] bg-white/95 dark:bg-[#000000] backdrop-blur-xl border-b border-[#F3F4F6] dark:border-[#1C1C1E] z-30 shrink-0 sticky top-0 transition-all duration-300 select-none">
-            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20">
+            <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-between px-3.5 sm:px-6 md:px-8 lg:px-14 xl:px-16 2xl:px-20 relative">
               {/* ── Left / Center: Back Button (when not on dashboard) + (Title OR Header Tabs) ── */}
               <div className={`flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-2 ${headerTabs ? 'justify-center' : ''}`}>
                 {(onBack || (activeTab !== 'dashboard' && activeTab !== 'setup' && activeTab !== 'question_bank' && activeTab !== 'profile')) && (
@@ -200,7 +202,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         onTabChange('dashboard');
                       }
                     }}
-                    className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0"
+                    className="p-1 -ml-1 text-neutral-900 dark:text-white hover:opacity-80 transition-opacity cursor-pointer shrink-0 z-10"
                     aria-label="Back"
                     title="ফিরে যাও"
                   >
@@ -261,15 +263,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     })}
                   </div>
                 ) : !hideTitle ? (
-                  <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
-                    {title}
-                  </h1>
+                  centerTitle ? (
+                    <div className="absolute inset-x-0 inset-y-0 flex items-center justify-center pointer-events-none px-12 sm:px-16">
+                      <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[17.5px] sm:text-[19px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate pointer-events-auto text-center max-w-[70%]">
+                        {title}
+                      </h1>
+                    </div>
+                  ) : (
+                    <h1 className="font-['Anek_Bangla',sans-serif] font-bold text-[19.5px] leading-none text-neutral-900 dark:text-white tracking-[-0.2px] truncate">
+                      {title}
+                    </h1>
+                  )
                 ) : null}
               </div>
 
               {/* ── Right Section: Matches Flutter 1:1 ── */}
               {headerRight ? (
-                <div className="flex items-center shrink-0">{headerRight}</div>
+                <div className="flex items-center shrink-0 z-10">{headerRight}</div>
               ) : activeTab === 'dashboard' ? (
                 /* Dashboard Header Right: Streak + Notification + User Avatar */
                 <div className="flex items-center gap-4 shrink-0">

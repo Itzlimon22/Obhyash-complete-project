@@ -1226,7 +1226,8 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       }
     }
 
-    final finalScore = (rawScore - negativeMarks).clamp(0, double.infinity);
+    final finalScore =
+        ((rawScore - negativeMarks) * 10000).round() / 10000.0;
 
     var result = ExamResult(
       id: state.dbSessionId ?? DateTime.now().millisecondsSinceEpoch.toString(),

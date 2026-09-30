@@ -1780,7 +1780,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     final filteredBadges = _getFilteredPresetBadges(profile);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 40),
       physics: const BouncingScrollPhysics(),
       child: Center(
         child: Wrap(
@@ -2195,7 +2195,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       child: currentSetupTab == 'preset'
           ? _buildPresetExamsTab(isDark, profile)
           : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 32),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 32),
               physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

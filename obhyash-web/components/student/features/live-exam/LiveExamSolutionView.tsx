@@ -20,7 +20,8 @@ import {
   Award,
   BookOpen,
   Target,
-  HelpCircle
+  HelpCircle,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,6 +50,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   const [filter, setFilter] = useState<"all" | "correct" | "wrong" | "skipped" | "bookmarked">("all");
   const [bookmarkingId, setBookmarkingId] = useState<string | null>(null);
   const [showProBookmarkModal, setShowProBookmarkModal] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
   const isPro = isUserPro(profile);
 
@@ -59,6 +61,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
   const fetchSolutions = async () => {
     try {
       setIsLoading(true);
+      setIsLocked(false);
       const [solutionData, userBookmarks] = await Promise.all([
         getLiveExamSolutions(examId, user?.id),
         user?.id ? getUserBookmarks(user.id) : Promise.resolve(new Set<string | number>())
@@ -67,9 +70,13 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
       setQuestions(solutionData.questions);
       setUserAnswers(solutionData.userAnswers);
       setBookmarkedIds(userBookmarks);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load solutions:", error);
-      toast.error("সমাধান লোড করতে সমস্যা হয়েছে");
+      if (error?.message === "EXAM_RESULT_NOT_PUBLISHED") {
+        setIsLocked(true);
+      } else {
+        toast.error("সমাধান লোড করতে সমস্যা হয়েছে");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +150,7 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
     }
   });
 
-  const finalScore = Math.max(0, Number(totalScore.toFixed(2)));
+  const finalScore = Number(totalScore.toFixed(2));
   const totalAttempted = correctCount + wrongCount;
   const accuracy = totalAttempted > 0 ? Math.round((correctCount / totalAttempted) * 100) : 0;
 
@@ -160,6 +167,39 @@ export const LiveExamSolutionView: React.FC<LiveExamSolutionViewProps> = ({
     if (filter === "bookmarked") return bookmarkedIds.has(q.id);
     return true;
   });
+
+  if (isLocked) {
+    return (
+      <AppLayout
+        activeTab="live_exam"
+        {...commonLayoutProps}
+        title={`${examTitle} - সমাধান`}
+        centerTitle={true}
+        onBack={onBack}
+      >
+        <div className="w-full max-w-lg mx-auto px-4 py-20 text-center animate-in fade-in duration-300 font-['HindSiliguri']">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center mx-auto mb-4 shadow-xs">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
+            ফলাফল ও সমাধান স্থগিত রয়েছে
+          </h2>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            এই লাইভ পরীক্ষার নির্দিষ্ট সময় শেষ হলে এবং কর্তৃপক্ষ কর্তৃক মেধা তালিকা প্রকাশিত হলে পূর্ণাঙ্গ সমাধান দেখতে পাবেন।
+          </p>
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-6 py-2.5 rounded-xl bg-neutral-900 dark:bg-neutral-100 hover:bg-neutral-800 dark:hover:bg-neutral-200 text-white dark:text-black font-semibold text-sm transition-all cursor-pointer"
+            >
+              ফিরে যান
+            </button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout

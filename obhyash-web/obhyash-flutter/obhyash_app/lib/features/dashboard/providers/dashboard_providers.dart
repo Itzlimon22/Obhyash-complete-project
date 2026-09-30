@@ -178,6 +178,49 @@ final userProfileProvider =
       return UserProfileNotifier();
     });
 
+/// Reliably resolves whether the current user is a Pro/Premium subscriber,
+/// preventing any false-negative Free status due to in-flight provider loading,
+/// cache latency, or route transitions.
+Future<bool> resolveUserIsPro(dynamic ref) async {
+  try {
+    // 1. Fast synchronous check
+    final profile = ref.read(userProfileProvider).value;
+    if (profile?.isPro == true) return true;
+
+    // 2. Await the future if currently loading
+    try {
+      final fetched = await ref.read(userProfileProvider.future);
+      if (fetched?.isPro == true) return true;
+    } catch (_) {}
+
+    // 3. Check local SharedPreferences cache
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid != null) {
+      try {
+        final prefs = ref.read(sharedPreferencesProvider);
+        final cached = prefs.getString('profile_$uid');
+        if (cached != null) {
+          final decoded = jsonDecode(cached) as Map<String, dynamic>;
+          if (UserProfile.fromJson(decoded).isPro) return true;
+        }
+      } catch (_) {}
+
+      // 4. Direct Supabase query as ultimate safety net
+      try {
+        final dbUser = await Supabase.instance.client
+            .from('users')
+            .select('id, role, is_subscribed, subscription, subscription_status, subscription_expires_at')
+            .eq('id', uid)
+            .maybeSingle();
+        if (dbUser != null && UserProfile.fromJson(dbUser).isPro) {
+          return true;
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+  return false;
+}
+
 const int _kLeaderboardTtlMs = 10 * 60 * 1000; // 10 minutes
 const int _kSubjectStatsTtlMs = 15 * 60 * 1000; // 15 minutes
 

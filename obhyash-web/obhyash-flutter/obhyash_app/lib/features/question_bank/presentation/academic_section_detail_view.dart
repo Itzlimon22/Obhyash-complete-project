@@ -1254,7 +1254,7 @@ class _AcademicSectionDetailViewState extends State<AcademicSectionDetailView> {
     return ListView.builder(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 30),
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 30),
       itemCount: _questions.length + 1,
       itemBuilder: (context, index) {
         if (index == _questions.length) {

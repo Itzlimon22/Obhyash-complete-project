@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Award, RefreshCw, ExternalLink } from "lucide-react";
+import { ArrowLeft, Award, RefreshCw, ExternalLink, Lock } from "lucide-react";
 import { supabase } from "@/services/core";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ interface LiveExamHistoryRecord {
   durationSeconds: number;
   rank: number;
   totalParticipants: number;
+  isResultPublished: boolean;
 }
 
 interface LiveExamHistoryPageViewProps {
@@ -105,7 +106,7 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
       const { data: attempts, error } = await supabase
         .from("live_exam_attempts")
         .select(
-          "id, live_exam_id, score, correct_count, wrong_count, start_time, submit_time, live_exams(id, title, category, total_marks, duration_minutes)"
+          "id, live_exam_id, score, correct_count, wrong_count, start_time, submit_time, live_exams(id, title, category, total_marks, duration_minutes, start_time, end_time, is_leaderboard_published, is_answer_published, status)"
         )
         .eq("user_id", user.id)
         .eq("status", "submitted")
@@ -132,28 +133,36 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
           durationSecs = Math.max(0, Math.floor(diff));
         }
 
-        // Rank count & Total count
+        const isMock = String(examId).startsWith("mock-");
+        const now = new Date();
+        const isPast = examData?.end_time ? now.getTime() > new Date(examData.end_time).getTime() : false;
+        const isLbPub = examData?.is_leaderboard_published !== false;
+        const isResultPub = isMock || (isPast && isLbPub);
+
+        // Rank count & Total count (only calculated if results are published)
         let rank = 1;
         let total = 1;
-        try {
-          const { count: higherCount } = await supabase
-            .from("live_exam_attempts")
-            .select("id", { count: "exact", head: true })
-            .eq("live_exam_id", examId)
-            .eq("status", "submitted")
-            .gt("score", userScore);
+        if (isResultPub) {
+          try {
+            const { count: higherCount } = await supabase
+              .from("live_exam_attempts")
+              .select("id", { count: "exact", head: true })
+              .eq("live_exam_id", examId)
+              .eq("status", "submitted")
+              .gt("score", userScore);
 
-          rank = (higherCount || 0) + 1;
+            rank = (higherCount || 0) + 1;
 
-          const { count: totalCount } = await supabase
-            .from("live_exam_attempts")
-            .select("id", { count: "exact", head: true })
-            .eq("live_exam_id", examId)
-            .eq("status", "submitted");
+            const { count: totalCount } = await supabase
+              .from("live_exam_attempts")
+              .select("id", { count: "exact", head: true })
+              .eq("live_exam_id", examId)
+              .eq("status", "submitted");
 
-          total = totalCount || 1;
-        } catch {
-          // fallback
+            total = totalCount || 1;
+          } catch {
+            // fallback
+          }
         }
 
         list.push({
@@ -169,6 +178,7 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
           durationSeconds: durationSecs,
           rank,
           totalParticipants: total,
+          isResultPublished: isResultPub,
         });
       }
 
@@ -299,12 +309,25 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
 
                       {/* মেধাক্রম */}
                       <td className="py-3.5 px-3.5">
-                        <div className="font-normal text-black dark:text-white">
-                          {toBanglaDigits(r.rank)} তম
-                        </div>
-                        <div className="text-[11px] text-neutral-500 font-normal mt-0.5">
-                          ({toBanglaDigits(r.totalParticipants)} জন)
-                        </div>
+                        {r.isResultPublished ? (
+                          <>
+                            <div className="font-normal text-black dark:text-white">
+                              {toBanglaDigits(r.rank)} তম
+                            </div>
+                            <div className="text-[11px] text-neutral-500 font-normal mt-0.5">
+                              ({toBanglaDigits(r.totalParticipants)} জন)
+                            </div>
+                          </>
+                        ) : (
+                          <div>
+                            <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              অপেক্ষমাণ
+                            </span>
+                            <div className="text-[10px] text-neutral-400 dark:text-neutral-500 font-normal mt-0.5">
+                              মেধাতালিকা স্থগিত
+                            </div>
+                          </div>
+                        )}
                       </td>
 
                       {/* সময় */}
@@ -314,19 +337,33 @@ export const LiveExamHistoryPageView: React.FC<LiveExamHistoryPageViewProps> = (
 
                       {/* সমাধান */}
                       <td className="py-3.5 px-3.5 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (onViewSolution) {
-                              onViewSolution(r.liveExamId);
-                            } else {
-                              window.location.href = `/live-exam/${r.category}?examId=${r.liveExamId}&solution=true`;
-                            }
-                          }}
-                          className="px-2.5 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-black dark:text-white border border-neutral-300 dark:border-neutral-700 rounded-md transition-all cursor-pointer"
-                        >
-                          সমাধান
-                        </button>
+                        {r.isResultPublished ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onViewSolution) {
+                                onViewSolution(r.liveExamId);
+                              } else {
+                                window.location.href = `/live-exam/${r.category}?examId=${r.liveExamId}&solution=true`;
+                              }
+                            }}
+                            className="px-2.5 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-black dark:text-white border border-neutral-300 dark:border-neutral-700 rounded-md transition-all cursor-pointer"
+                          >
+                            সমাধান
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              toast.info("পরীক্ষার সময় শেষ হলে এবং মেধা তালিকা প্রকাশিত হলে সমাধান দেখতে পারবেন।");
+                            }}
+                            className="px-2 py-1 text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/25 rounded-md transition-all cursor-pointer flex items-center justify-center gap-1 mx-auto"
+                            title="সমাধান এখনো প্রকাশ করা হয়নি"
+                          >
+                            <Lock className="w-3 h-3" />
+                            <span>লক করা</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );

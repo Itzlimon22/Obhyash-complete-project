@@ -260,7 +260,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(14, 18, 14, 48),
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -383,7 +383,7 @@ class _UpgradeHeroCtaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF141417) : Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -510,7 +510,7 @@ class _CurrentSubscriptionCard extends StatelessWidget {
         : 'সীমিত অ্যাক্সেস • সকল ফিচার আনলক করতে আপগ্রেড করুন';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -662,7 +662,7 @@ class _UnifiedFeaturesShowcase extends StatelessWidget {
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(22),
@@ -859,8 +859,8 @@ class _ComparisonTable extends StatelessWidget {
               // Header row
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                  horizontal: 10,
+                  vertical: 12,
                 ),
                 decoration: BoxDecoration(
                   color: headerBg,

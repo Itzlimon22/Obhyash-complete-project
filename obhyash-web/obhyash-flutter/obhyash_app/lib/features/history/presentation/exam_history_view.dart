@@ -394,9 +394,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       final isBookmarked = _bookmarkedIds.contains(questionId);
 
       if (!isBookmarked) {
-        final profile = ref.read(userProfileProvider).value;
-        final isPro = profile?.isPro ?? false;
+        final isPro = await resolveUserIsPro(ref);
         if (!isPro && _bookmarkedIds.length >= 25) {
+          if (!mounted) return;
           ProUpgradeModal.show(
             context,
             title: 'বুকমার্ক লিমিট শেষ 📌',
@@ -967,8 +967,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     final rSub = recordSubject.toLowerCase().trim();
     final rLabel = recordSubjectLabel.toLowerCase().trim();
 
-    if (lowerVariants.contains(rSub) || lowerVariants.contains(rLabel))
+    if (lowerVariants.contains(rSub) || lowerVariants.contains(rLabel)) {
       return true;
+    }
     for (final v in lowerVariants) {
       if (v.isNotEmpty &&
           (rSub.contains(v) ||
@@ -1296,7 +1297,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         // ── Single Row Filter: Subject | Chapter | Date ─────────────────────
         // Guaranteed to stay in a single row for all mobile screen sizes
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
           child: Row(
             children: [
               // 1. Subject Dropdown
@@ -1655,7 +1656,7 @@ class _ExamsTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         children: [
           // ── Compact Center-Aligned 3-Card Stat Row ─────────────────────────────
           Row(
@@ -2215,7 +2216,7 @@ class _QuestionsTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         itemCount: itemCount,
         itemBuilder: (context, index) {
           if (index == questions.length) {

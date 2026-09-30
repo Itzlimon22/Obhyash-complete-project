@@ -515,6 +515,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(examEngineProvider);
+    ref.watch(userProfileProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Navigate to ExamCelebrationView when exam is completed
@@ -885,14 +886,14 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     );
                   },
                   isBookmarked: state.bookmarkedQuestions.contains(q.id),
-                  onToggleBookmark: () {
-                    final isPro =
-                        ref.read(userProfileProvider).value?.isPro ?? false;
+                  onToggleBookmark: () async {
+                    final isPro = await resolveUserIsPro(ref);
                     final isBookmarked =
                         state.bookmarkedQuestions.contains(q.id);
                     if (!isBookmarked &&
                         !isPro &&
                         state.bookmarkedQuestions.length >= 25) {
+                      if (!context.mounted) return;
                       AppPopups.warning(
                         context,
                         message:

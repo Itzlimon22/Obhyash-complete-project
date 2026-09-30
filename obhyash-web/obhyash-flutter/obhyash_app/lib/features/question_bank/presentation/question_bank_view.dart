@@ -699,12 +699,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     }).toList();
 
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       sliver: SliverGrid(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           childAspectRatio: 1.0,
         ),
         delegate: SliverChildBuilderDelegate(
@@ -852,12 +852,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     final items = isSSC ? _sscInstitutes : _institutes;
 
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       sliver: SliverGrid(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           childAspectRatio: 1.18,
         ),
         delegate: SliverChildBuilderDelegate(

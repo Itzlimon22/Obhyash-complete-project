@@ -172,7 +172,7 @@ final liveExamsCategoryProvider = FutureProvider.autoDispose.family<List<LiveExa
     }
   }
 
-  final examsResponse = await filterBuilder.order('start_time', ascending: false);
+  final examsResponse = await filterBuilder.order('start_time', ascending: true);
 
   final List<LiveExam> allExams = (examsResponse as List)
       .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
@@ -231,7 +231,7 @@ final filteredLiveExamsCategoryProvider = Provider.autoDispose.family<List<LiveE
 
   return examsAsync.when(
     data: (exams) {
-      return exams.where((exam) {
+      final filtered = exams.where((exam) {
         // Apply search filter
         if (search.isNotEmpty && !exam.title.toLowerCase().contains(search)) {
           return false;
@@ -243,6 +243,17 @@ final filteredLiveExamsCategoryProvider = Provider.autoDispose.family<List<LiveE
 
         return true;
       }).toList();
+
+      // Serial sorting:
+      // In 'All' tab (and by default), exams always remain strictly in serial / chronological order (Exam 1, Exam 2, ...).
+      // Attempted or finished exams do NOT jump to the last/bottom of the list.
+      filtered.sort((a, b) {
+        final cmp = a.startTime.compareTo(b.startTime);
+        if (cmp != 0) return cmp;
+        return a.title.compareTo(b.title);
+      });
+
+      return filtered;
     },
     loading: () => [],
     error: (_, _) => [],
@@ -309,15 +320,39 @@ final liveExamQuestionsProvider =
     FutureProvider.autoDispose.family<List<Question>, String>((ref, examId) async {
   final supabase = Supabase.instance.client;
 
-  // 1. Fetch junction rows with serial, points, question_id
+  // 1. Fetch junction rows with serial, points, question_id, and direct secret question fields
   final junctionRes = await supabase
       .from('live_exam_questions')
-      .select('serial, points, question_id')
+      .select('id, serial, points, question_id, question, options, correct_answer_index, explanation, subject')
       .eq('live_exam_id', examId)
       .order('serial', ascending: true);
 
   final junctionList = (junctionRes as List).cast<Map<String, dynamic>>();
   if (junctionList.isEmpty) return [];
+
+  // Direct secret questions stored directly in live_exam_questions
+  final isDirect = junctionList.any((j) => (j['question']?.toString().trim().isNotEmpty ?? false));
+  if (isDirect) {
+    return junctionList.map((j) {
+      final rawOpts = j['options'];
+      final List<String> options = (rawOpts is List)
+          ? rawOpts.map((e) => e.toString()).toList()
+          : <String>[];
+      final correctIdx = (j['correct_answer_index'] as num?)?.toInt() ?? 0;
+      final points = (j['points'] as num?)?.toInt() ?? 1;
+
+      return Question(
+        id: j['id']?.toString() ?? '',
+        subject: j['subject']?.toString() ?? '',
+        question: j['question']?.toString() ?? '',
+        options: options,
+        correctAnswerIndex: correctIdx,
+        correctAnswerIndices: [correctIdx],
+        explanation: j['explanation']?.toString(),
+        points: points,
+      );
+    }).toList();
+  }
 
   final questionIds = junctionList
       .map((j) => j['question_id']?.toString())
@@ -357,23 +392,47 @@ final liveExamLeaderboardProvider = FutureProvider.autoDispose
   final supabase = Supabase.instance.client;
   final data = await supabase
       .from('live_exam_attempts')
-      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, created_at, users(id, name, institute, avatar_color, avatar_url, role)')
+      .select('id, user_id, score, correct_count, wrong_count, start_time, submit_time, time_taken_seconds, time_taken_ms, created_at, users(id, name, institute, avatar_color, avatar_url, role)')
       .eq('live_exam_id', examId)
       .eq('status', 'submitted')
-      .order('score', ascending: false)
-      .order('wrong_count', ascending: true)
-      .order('submit_time', ascending: true)
-      .limit(200);
+      .limit(300);
 
-  return (data as List)
+  final List<LiveExamLeaderboardEntry> list = (data as List)
       .where((e) {
         final u = e['users'] as Map<String, dynamic>?;
         final role = (u?['role'] ?? 'student').toString().toLowerCase();
         return role == 'student';
       })
-      .take(100)
       .map((e) => LiveExamLeaderboardEntry.fromJson(e as Map<String, dynamic>))
       .toList();
+
+  // Bulletproof Multi-Tier Tie-Breaker Engine:
+  // 1st Priority: Score (Highest first / DESC)
+  // 2nd Priority: Exact Millisecond Duration (Shortest time first / ASC)
+  // 3rd Priority: Wrong Count (Fewest mistakes first / ASC)
+  // 4th Priority: Start Time (First begun / ASC)
+  list.sort((a, b) {
+    // 1. Score DESC
+    final scoreComp = b.score.compareTo(a.score);
+    if (scoreComp != 0) return scoreComp;
+
+    // 2. Millisecond precision duration ASC
+    final aMs = a.timeTakenMs ?? ((a.timeTakenSeconds ?? 999999) * 1000);
+    final bMs = b.timeTakenMs ?? ((b.timeTakenSeconds ?? 999999) * 1000);
+    final msComp = aMs.compareTo(bMs);
+    if (msComp != 0) return msComp;
+
+    // 3. Wrong Count ASC
+    final wrongComp = a.wrongCount.compareTo(b.wrongCount);
+    if (wrongComp != 0) return wrongComp;
+
+    // 4. Start Time ASC
+    final aStart = a.startTime?.millisecondsSinceEpoch ?? 0;
+    final bStart = b.startTime?.millisecondsSinceEpoch ?? 0;
+    return aStart.compareTo(bStart);
+  });
+
+  return list.take(100).toList();
 });
 
 // Solution Provider (Questions + User Answers)

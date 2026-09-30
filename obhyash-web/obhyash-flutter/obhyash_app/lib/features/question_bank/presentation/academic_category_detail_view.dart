@@ -97,14 +97,14 @@ class AcademicCategoryDetailView extends StatelessWidget {
 
   Widget _buildGridBody(BuildContext context, bool isDark, String subjectTitle) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: GridView.builder(
         physics: const BouncingScrollPhysics(),
         itemCount: _academicSections.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           childAspectRatio: 1.25,
         ),
         itemBuilder: (context, index) {

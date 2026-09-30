@@ -446,7 +446,7 @@ class _FormulaPracticePageViewState extends State<FormulaPracticePageView> {
         centerTitle: false,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 36),
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 36),
         children: [
           // 1. Exact Equation Card at Top
           _buildTopEquationCard(isDark),
