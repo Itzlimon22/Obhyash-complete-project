@@ -1711,8 +1711,9 @@ export default function StudentRoot({
             title="রেফারেল ও রিওয়ার্ড"
             onBack={() => smartBack("dashboard")}
             hideBottomNav={true}
+            noPadding={true}
           >
-            <ReferralView />
+            <ReferralView user={currentUser} />
           </AppLayout>
         );
       }

@@ -31,32 +31,43 @@ export const GET = async (req: Request) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 0. Check global referral switch
-    let isReferralSystemEnabled = true;
-    try {
-      const { data: cfg } = await supabaseAdmin
+    // 0. Run initial queries in parallel (Config, User Referral, Scratch Cards, Has Used)
+    const [cfgRes, refRes, scratchRes, hasUsedRes] = await Promise.all([
+      supabaseAdmin
         .from('app_config')
         .select('referral_system_enabled')
         .eq('id', 'global_config')
-        .maybeSingle();
-      if (cfg && cfg.referral_system_enabled !== undefined && cfg.referral_system_enabled !== null) {
-        isReferralSystemEnabled = cfg.referral_system_enabled;
-      }
-    } catch (_) {}
-
-    // 1. Get or auto-create referral code for user
-    let referral: any = null;
-    try {
-      const { data: ref } = await supabaseAdmin
+        .maybeSingle()
+        .then((r) => r, () => null),
+      supabaseAdmin
         .from('referrals')
         .select('*')
         .eq('owner_id', user.id)
-        .maybeSingle();
+        .maybeSingle()
+        .then((r) => r, () => null),
+      supabaseAdmin
+        .from('scratch_cards')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .then((r) => r, () => null),
+      supabaseAdmin
+        .from('referral_history')
+        .select('id', { count: 'exact', head: true })
+        .eq('redeemed_by', user.id)
+        .then((r) => r, () => null),
+    ]);
 
-      if (ref) {
-        referral = ref;
-      } else {
-        // Auto-create referral code with retry if collision occurs
+    const isReferralSystemEnabled =
+      cfgRes?.data?.referral_system_enabled !== undefined && cfgRes?.data?.referral_system_enabled !== null
+        ? cfgRes.data.referral_system_enabled
+        : true;
+
+    let referral = refRes?.data || null;
+
+    // Auto-create referral code if doesn't exist yet
+    if (!referral) {
+      try {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         for (let attempt = 0; attempt < 5; attempt++) {
           let randCode = '';
@@ -78,46 +89,47 @@ export const GET = async (req: Request) => {
             break;
           }
         }
-
-        if (!referral) {
-          const { data: existingRef } = await supabaseAdmin
-            .from('referrals')
-            .select('*')
-            .eq('owner_id', user.id)
-            .maybeSingle();
-          if (existingRef) referral = existingRef;
-        }
+      } catch (e) {
+        console.warn('Error creating referral:', e);
       }
-    } catch (e) {
-      console.warn('Error fetching or creating referral:', e);
     }
+
+    const scratchCards = scratchRes?.data || [];
+    const hasUsedReferral = ((hasUsedRes as any)?.count || 0) > 0;
 
     if (!referral) {
       return NextResponse.json({
         referral: null,
         history: [],
         totalApproved: 0,
-        scratchCards: [],
+        scratchCards,
+        hasUsedReferral,
+        is_enabled: isReferralSystemEnabled,
       });
     }
 
-    // 2. Safely get redemption history
-    let history: any[] = [];
-    try {
-      const { data: hist } = await supabaseAdmin
+    // 2. Fetch history and totalApproved in parallel
+    const [histRes, countRes] = await Promise.all([
+      supabaseAdmin
         .from('referral_history')
         .select('id, redeemed_at, redeemed_by, admin_status, reward_given')
         .eq('referral_id', referral.id)
-        .order('redeemed_at', { ascending: false });
+        .order('redeemed_at', { ascending: false })
+        .then((r) => r, () => null),
+      supabaseAdmin
+        .from('referral_history')
+        .select('id', { count: 'exact', head: true })
+        .eq('referral_id', referral.id)
+        .eq('admin_status', 'Approved')
+        .then((r) => r, () => null),
+    ]);
 
-      if (hist) history = hist;
-    } catch (e) {
-      console.warn('Error fetching referral history:', e);
-    }
+    const history = histRes?.data || [];
+    const totalApproved = (countRes as any)?.count || 0;
 
     // 3. Batch fetch redeemer user details
     const redeemerIds = Array.from(
-      new Set(history.map((h) => h.redeemed_by).filter(Boolean)),
+      new Set(history.map((h: any) => h.redeemed_by).filter(Boolean)),
     );
     const userMap: Record<string, { name: string; email: string }> = {};
     if (redeemerIds.length > 0) {
@@ -140,48 +152,13 @@ export const GET = async (req: Request) => {
       }
     }
 
-    const enriched = history.map((h) => ({
+    const enriched = history.map((h: any) => ({
       ...h,
       redeemed_by: userMap[h.redeemed_by] || {
         name: 'Student',
         email: h.redeemed_by || '',
       },
     }));
-
-    // 4. Get exact count of approved referrals
-    let totalApproved = 0;
-    try {
-      const { count } = await supabaseAdmin
-        .from('referral_history')
-        .select('id', { count: 'exact', head: true })
-        .eq('referral_id', referral.id)
-        .eq('admin_status', 'Approved');
-
-      totalApproved = count || 0;
-    } catch (_) {}
-
-    // 5. Get scratch cards
-    let scratchCards: any[] = [];
-    try {
-      const { data: sc } = await supabaseAdmin
-        .from('scratch_cards')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (sc) scratchCards = sc;
-    } catch (_) {}
-
-    // 6. Check if user has already redeemed any referral code
-    let hasUsedReferral = false;
-    try {
-      const { count: redeemedCount } = await supabaseAdmin
-        .from('referral_history')
-        .select('id', { count: 'exact', head: true })
-        .eq('redeemed_by', user.id);
-
-      hasUsedReferral = (redeemedCount || 0) > 0;
-    } catch (_) {}
 
     return NextResponse.json({
       referral,

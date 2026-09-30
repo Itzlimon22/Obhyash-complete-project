@@ -45,6 +45,7 @@ import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
 import NextPostFloater from '@/components/blog/NextPostFloater';
+import HscGpaCalculator from '@/components/blog/HscGpaCalculator';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -158,6 +159,15 @@ export default async function BlogPostPage({
 
   // Custom Markdown Callout components
   const MarkdownComponents = {
+    div: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'div'> & { node?: unknown }) => {
+      if ((props as Record<string, unknown>)['data-widget'] === 'hsc-gpa-calculator') {
+        return <HscGpaCalculator />;
+      }
+      return <div {...props} />;
+    },
     blockquote: ({
       children,
       ...props
