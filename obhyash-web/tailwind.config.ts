@@ -98,7 +98,6 @@ const config = {
         sans: [
           'var(--font-hind)',
           'var(--font-inter)',
-          'var(--font-anek)',
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
@@ -106,14 +105,19 @@ const config = {
           'Roboto',
           'sans-serif',
         ],
+        hind: [
+          'var(--font-hind)',
+          "'Hind Siliguri'",
+          'sans-serif',
+        ],
         anek: [
-          'var(--font-anek)',
-          "'Anek Bangla'",
+          'var(--font-hind)',
+          "'Hind Siliguri'",
           'sans-serif',
         ],
         bengali: [
-          'var(--font-anek)',
           'var(--font-hind)',
+          "'Hind Siliguri'",
           'var(--font-inter)',
           'system-ui',
           'sans-serif',

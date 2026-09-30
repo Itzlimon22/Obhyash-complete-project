@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 type Theme = 'dark' | 'light';
 
@@ -19,15 +20,23 @@ const THEME_EVENT = 'obhyash-theme-change';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const isBlog = pathname?.startsWith('/blog');
+  const isBlogRef = useRef(isBlog);
+  isBlogRef.current = isBlog;
 
   // Apply theme to DOM documentElement and broadcast
   const applyTheme = useCallback((newTheme: Theme, broadcast = true) => {
     setThemeState(newTheme);
-    const root = document.documentElement;
-    if (newTheme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+
+    // Only manipulate DOM if NOT on blog routes (blog manages its own theme)
+    if (!isBlogRef.current) {
+      const root = document.documentElement;
+      if (newTheme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
     }
 
     try {
@@ -57,20 +66,46 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // Fallback
     }
 
-    applyTheme(currentTheme, false);
+    setThemeState(currentTheme);
+
+    // Only apply to DOM if NOT on blog routes
+    if (!window.location.pathname.startsWith('/blog')) {
+      const root = document.documentElement;
+      if (currentTheme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
     setMounted(true);
 
     // Synchronize across multiple components and browser tabs
     const handleStorage = (e: StorageEvent) => {
       if (e.key === THEME_KEY && (e.newValue === 'dark' || e.newValue === 'light')) {
-        applyTheme(e.newValue, false);
+        setThemeState(e.newValue);
+        if (!window.location.pathname.startsWith('/blog')) {
+          const root = document.documentElement;
+          if (e.newValue === 'dark') {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+        }
       }
     };
 
     const handleCustomThemeChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ theme: Theme }>;
       if (customEvent.detail?.theme) {
-        applyTheme(customEvent.detail.theme, false);
+        setThemeState(customEvent.detail.theme);
+        if (!window.location.pathname.startsWith('/blog')) {
+          const root = document.documentElement;
+          if (customEvent.detail.theme === 'dark') {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+        }
       }
     };
 
@@ -81,7 +116,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(THEME_EVENT, handleCustomThemeChange);
     };
-  }, [applyTheme]);
+  }, []);
+
+  // When navigating back from blog to main app, re-apply the app theme
+  const prevIsBlogRef = useRef(isBlog);
+  useEffect(() => {
+    if (mounted && prevIsBlogRef.current && !isBlog) {
+      let currentAppTheme: Theme = theme;
+      try {
+        const stored = localStorage.getItem(THEME_KEY);
+        if (stored === 'dark' || stored === 'light') {
+          currentAppTheme = stored;
+        }
+      } catch {}
+      const root = document.documentElement;
+      if (currentAppTheme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+    prevIsBlogRef.current = isBlog;
+  }, [isBlog, mounted, theme]);
 
   const setTheme = useCallback(
     (newTheme: Theme) => {

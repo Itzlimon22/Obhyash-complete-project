@@ -244,7 +244,7 @@ export default async function BlogPostPage({
 
       return (
         <div
-          className={`not-prose flex flex-col sm:flex-row gap-3 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-anek`}
+          className={`not-prose flex flex-col sm:flex-row gap-3 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-hind`}
         >
           <div className="shrink-0 mt-0.5">{icon}</div>
           <div className="text-[15px] sm:text-[16px] leading-relaxed [&>p]:m-0">
@@ -385,7 +385,7 @@ export default async function BlogPostPage({
           loading="lazy"
         />
         {alt && (
-          <span className="block text-center text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 p-3 font-anek italic bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+          <span className="block text-center text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 p-3 font-hind italic bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
             {alt}
           </span>
         )}
@@ -396,7 +396,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'ul'> & { node?: unknown }) => (
       <ul
-        className="list-none ml-2 sm:ml-4 space-y-2 sm:space-y-3 my-6 sm:my-8"
+        className="list-none ml-2 sm:ml-4 space-y-2 sm:space-y-3 my-6 sm:my-8 font-hind"
         {...props}
       />
     ),
@@ -405,7 +405,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'ol'> & { node?: unknown }) => (
       <ol
-        className="list-decimal list-outside ml-5 sm:ml-6 space-y-2 sm:space-y-3 marker:text-rose-500/80 dark:marker:text-rose-400/80 marker:font-semibold my-6 font-anek"
+        className="list-decimal list-outside ml-5 sm:ml-6 space-y-2 sm:space-y-3 marker:text-rose-500/80 dark:marker:text-rose-400/80 marker:font-medium my-6 font-hind"
         {...props}
       />
     ),
@@ -464,7 +464,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h2'> & { node?: unknown }) => (
       <h2
-        className="text-2xl sm:text-3xl md:text-[32px] font-bold mt-12 sm:mt-14 mb-5 sm:mb-6 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-anek tracking-normal leading-snug"
+        className="text-2xl sm:text-3xl md:text-[28px] font-semibold mt-10 sm:mt-12 mb-4 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-2.5 font-hind tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -473,7 +473,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h3'> & { node?: unknown }) => (
       <h3
-        className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 mb-4 sm:mb-5 text-slate-800 dark:text-slate-100 font-anek tracking-normal leading-snug"
+        className="text-xl sm:text-2xl md:text-[22px] font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100 font-hind tracking-normal leading-snug"
         {...props}
       />
     ),
@@ -482,7 +482,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h4'> & { node?: unknown }) => (
       <h4
-        className="text-lg sm:text-xl md:text-[22px] font-bold mt-8 mb-3 sm:mb-4 text-slate-800 dark:text-slate-200 font-anek tracking-normal"
+        className="text-lg sm:text-xl font-semibold mt-6 mb-2.5 text-slate-800 dark:text-slate-200 font-hind tracking-normal"
         {...props}
       />
     ),
@@ -491,7 +491,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h5'> & { node?: unknown }) => (
       <h5
-        className="text-[17px] sm:text-[19px] font-bold mt-6 mb-3 text-slate-700 dark:text-slate-300 font-anek tracking-normal"
+        className="text-[16px] sm:text-[17px] font-semibold mt-5 mb-2 text-slate-700 dark:text-slate-300 font-hind tracking-normal"
         {...props}
       />
     ),
@@ -500,7 +500,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'h6'> & { node?: unknown }) => (
       <h6
-        className="text-[15px] sm:text-[17px] font-bold mt-6 mb-2 text-slate-600 dark:text-slate-400 font-anek uppercase tracking-normal"
+        className="text-[14px] sm:text-[15px] font-semibold mt-5 mb-2 text-slate-600 dark:text-slate-400 font-hind uppercase tracking-normal"
         {...props}
       />
     ),
@@ -521,7 +521,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'p'> & { node?: unknown }) => (
       <p
-        className="text-slate-700 dark:text-slate-300 leading-[1.8] sm:leading-[1.9] text-[16.5px] sm:text-[17px] md:text-[18px] mb-6 sm:mb-8 font-anek tracking-normal font-normal"
+        className="text-slate-700 dark:text-slate-300 leading-[1.85] sm:leading-[1.9] text-[16px] sm:text-[17px] mb-6 font-hind tracking-normal font-normal"
         {...props}
       />
     ),
@@ -544,17 +544,17 @@ export default async function BlogPostPage({
           <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">
             <Link
               href="/blog"
-              className="hover:text-slate-800 dark:hover:text-slate-300 transition-colors flex items-center gap-1 font-anek"
+              className="hover:text-slate-800 dark:hover:text-slate-300 transition-colors flex items-center gap-1 font-hind"
             >
               <BookOpen className="w-3.5 h-3.5" />
               ব্লগ
             </Link>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-normal mb-6 font-anek">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.3] tracking-normal mb-6 font-hind">
             {post.title}
           </h1>
-          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-[1.7] mb-8 font-normal font-anek max-w-3xl tracking-normal">
+          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-[1.75] mb-8 font-normal font-hind max-w-3xl tracking-normal">
             {post.excerpt}
           </p>
 
@@ -567,13 +567,13 @@ export default async function BlogPostPage({
                 {post.author.initials}
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                   {post.author.name}
                 </p>
                 <p className="text-xs text-slate-400">{post.author.role}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 sm:ml-auto text-xs text-slate-400 dark:text-slate-500 flex-wrap font-anek">
+            <div className="flex items-center gap-4 sm:ml-auto text-xs text-slate-400 dark:text-slate-500 flex-wrap font-hind">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 {formatDate(post.publishedAt)}
@@ -608,7 +608,7 @@ export default async function BlogPostPage({
             {/* Back link */}
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 mb-8 transition-colors group font-anek"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 mb-8 transition-colors group font-hind"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               ব্লগে ফিরে যাও
@@ -618,7 +618,7 @@ export default async function BlogPostPage({
             <div className="w-full">
               <div
                 className="prose prose-slate dark:prose-invert max-w-none w-full
-                prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
+                prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold font-normal font-hind
               "
               >
                 <ReactMarkdown
@@ -636,7 +636,7 @@ export default async function BlogPostPage({
               </div>
               {/* Tags */}
               <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 font-anek flex items-center gap-1.5">
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 font-hind flex items-center gap-1.5">
                   <svg
                     className="w-3 h-3 text-[#059669]"
                     viewBox="0 0 24 24"
@@ -669,7 +669,7 @@ export default async function BlogPostPage({
 
             {/* Share + Save Bar */}
             <div className="flex flex-wrap items-center gap-3 mt-8 px-5 py-3.5 rounded-2xl bg-slate-50 dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-anek">
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-hind">
                 শেয়ার ও সেভ
               </span>
               <div className="flex items-center gap-2 ml-auto">
@@ -682,20 +682,20 @@ export default async function BlogPostPage({
             {/* Author Bio block */}
             <div className="mt-6 mb-6 p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#161616] border border-slate-200/80 dark:border-white/10 shadow-xs">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#047857] flex items-center justify-center text-white font-black text-base shadow-sm">
+                <div className="w-12 h-12 shrink-0 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#047857] flex items-center justify-center text-white font-bold text-base shadow-sm">
                   {post.author.initials}
                 </div>
                 <div>
                   <Link
                     href={`/blog/author/${post.author.name}`}
-                    className="font-bold text-[16px] text-slate-900 dark:text-slate-100 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
+                    className="font-semibold text-[16px] text-slate-900 dark:text-slate-100 hover:text-[#059669] dark:hover:text-[#34d399] transition-colors"
                   >
                     {post.author.name}
                   </Link>
-                  <p className="text-xs sm:text-sm font-semibold text-[#059669] dark:text-[#34d399] mt-0.5 font-anek">
+                  <p className="text-xs sm:text-sm font-semibold text-[#059669] dark:text-[#34d399] mt-0.5 font-hind">
                     {post.author.role}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-anek">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-hind">
                     অভ্যাস টিম স্মার্ট প্রযুক্তি এবং পরীক্ষিত শিক্ষার কৌশলগুলির
                     মাধ্যমে বাংলাদেশী শিক্ষার্থীদের তাদের একাডেমিক লক্ষ্য অর্জনে
                     সহায়তা করতে অঙ্গীকারবদ্ধ।
@@ -708,19 +708,19 @@ export default async function BlogPostPage({
             <div className="mt-8 mb-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-950/20 shadow-sm">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                 <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-anek">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-hind">
                     🚀 লাইভ প্র্যাকটিস
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white font-anek">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white font-hind">
                     পড়াশোনাকে অভ্যাসে পরিণত করো এখনই!
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 font-anek max-w-xl">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 font-hind max-w-xl">
                     বোর্ড প্রশ্ন, শর্টকাট টেস্ট এবং লাইভ লিডারবোর্ডে হাজারো শিক্ষার্থীর সাথে নিজের প্রস্তুতি যাচাই করতে যুক্ত হও অভ্যাসে।
                   </p>
                 </div>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm font-anek shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] shrink-0"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-semibold text-sm font-hind shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] shrink-0"
                 >
                   বিনামূল্যে শুরু করো →
                 </Link>

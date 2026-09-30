@@ -18,11 +18,11 @@ const inter = Inter({
   preload: true,
 });
 
-// ✅ Configure Hind Siliguri (Optimized to essential weights only)
+// ✅ Configure Hind Siliguri (Optimized weights)
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind",
   subsets: ["bengali"],
-  weight: ["400", "500", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });
@@ -146,11 +146,13 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var storedTheme = localStorage.getItem('theme');
-                if (storedTheme === 'dark' || (!storedTheme && true)) {
-                  document.documentElement.classList.add('dark');
-                } else {
+                var isBlog = window.location.pathname.indexOf('/blog') === 0;
+                var themeKey = isBlog ? 'obhyash-blog-theme' : 'theme';
+                var storedTheme = localStorage.getItem(themeKey);
+                if (storedTheme === 'light') {
                   document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
                 }
               } catch (e) {
                 document.documentElement.classList.add('dark');

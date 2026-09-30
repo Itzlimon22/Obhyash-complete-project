@@ -8,6 +8,7 @@ import {
   Facebook,
   Menu,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
@@ -100,20 +101,26 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 sm:h-24 flex items-center justify-between gap-4">
-          {/* ─── 1. LEFT: LOGO (Obhyash.) ─── */}
-          <Link href="/blog" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-              <Image
-                src="/obhyash_mark.svg"
-                alt="Obhyash"
-                width={30}
-                height={30}
-                className="object-contain group-hover:scale-105 transition-transform"
-              />
-            </div>
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#203656] dark:text-white font-['Poppins',sans-serif]">
-              Obhyash<span className="text-[#059669] dark:text-[#10b981]">.</span>
-            </span>
+          {/* ─── 1. LEFT: LOGO (Exact same logo as obhyash.com) ─── */}
+          <Link href="/blog" className="flex items-center group shrink-0" aria-label="অভ্যাস ব্লগ হোমপেজ">
+            {/* Light mode logo */}
+            <Image
+              src="/obhyash_full_logo.svg"
+              alt="অভ্যাস"
+              width={132}
+              height={34}
+              className="h-7 sm:h-8 w-auto object-contain dark:hidden group-hover:opacity-90 transition-opacity"
+              priority
+            />
+            {/* Dark mode logo */}
+            <Image
+              src="/obhyash_full_logo_dark.svg"
+              alt="অভ্যাস"
+              width={132}
+              height={34}
+              className="h-7 sm:h-8 w-auto object-contain hidden dark:block group-hover:opacity-90 transition-opacity"
+              priority
+            />
           </Link>
 
           {/* ─── 2. CENTER: NAVIGATION MENU (Dynamic Active State, Clean Normal Styling) ─── */}
@@ -121,10 +128,10 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             <NavLinks />
           </Suspense>
 
-          {/* ─── 3. RIGHT: SOCIAL ICONS + SLEEK MATCHING ACTION BUTTONS ─── */}
-          <div className="flex items-center gap-3 sm:gap-3.5">
-            {/* Social Icons (Facebook & YouTube) */}
-            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+          {/* ─── 3. RIGHT: FREE EXAM CTA + ACTIONS ─── */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Social Icons (Facebook & YouTube) - Desktop only */}
+            <div className="hidden lg:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
               <a
                 href="https://facebook.com/obhyash"
                 target="_blank"
@@ -145,10 +152,19 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
               </a>
             </div>
 
-            {/* Subtle Divider */}
-            <div className="hidden sm:block w-[1px] h-5 bg-slate-200 dark:bg-white/10" />
+            {/* Subtle Divider (Desktop only) */}
+            <div className="hidden lg:block w-[1px] h-5 bg-slate-200 dark:bg-white/10" />
 
-            {/* Dark / Light Mode Toggle (Matching 40x40 circular) */}
+            {/* Free Exam Button (ফ্রি এক্সাম দাও) */}
+            <Link
+              href="/demo"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#059669] hover:bg-[#047857] active:scale-95 text-white text-xs sm:text-sm font-bold shadow-sm shadow-emerald-600/20 hover:shadow transition-all shrink-0"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300/40" />
+              <span>ফ্রি এক্সাম দাও</span>
+            </Link>
+
+            {/* Dark / Light Mode Toggle (Matching circular button) */}
             <BlogThemeToggle />
 
             {/* Search Button (Normal sleek circular) */}
@@ -195,11 +211,23 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             <Link
               href="/blog"
               onClick={() => setIsDrawerOpen(false)}
-              className="flex items-center gap-2"
+              className="flex items-center"
+              aria-label="অভ্যাস ব্লগ"
             >
-              <span className="text-2xl font-extrabold tracking-tight text-[#203656] dark:text-white font-['Poppins',sans-serif]">
-                Obhyash<span className="text-[#059669]">.</span>
-              </span>
+              <Image
+                src="/obhyash_full_logo.svg"
+                alt="অভ্যাস"
+                width={120}
+                height={30}
+                className="h-7 w-auto object-contain dark:hidden"
+              />
+              <Image
+                src="/obhyash_full_logo_dark.svg"
+                alt="অভ্যাস"
+                width={120}
+                height={30}
+                className="h-7 w-auto object-contain hidden dark:block"
+              />
             </Link>
             <button
               onClick={() => setIsDrawerOpen(false)}
@@ -208,6 +236,18 @@ export default function BlogHeader({ posts = [] }: BlogHeaderProps) {
             >
               <X className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Quick Free Exam CTA Banner in Drawer */}
+          <div className="py-4 border-b border-slate-100 dark:border-white/5">
+            <Link
+              href="/demo"
+              onClick={() => setIsDrawerOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm shadow-md shadow-emerald-600/20 active:scale-98 transition-all"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300/40" />
+              <span>ফ্রি এক্সাম দাও (ডেমো টেস্ট)</span>
+            </Link>
           </div>
 
           {/* About Obhyash Brief */}
