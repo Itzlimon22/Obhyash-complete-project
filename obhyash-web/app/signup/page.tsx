@@ -436,24 +436,37 @@ function SignupForm() {
 
   // --- RENDER STEPS ---
 
-  // Progress Bar
+  // Progress Stepper matching Flutter Screenshot 3
+  const stepLabels = ['বেসিক তথ্য', 'একাডেমিক', 'অ্যাকাউন্ট'];
+
   const renderProgress = () => (
-    <div className="flex items-center justify-center mb-4 md:mb-6 gap-3">
-      {[1, 2, 3].map((s) => (
-        <div key={s} className="flex items-center">
-          <div
-            className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 ${
-              step >= s
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 scale-100'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 scale-90'
-            }`}
-          >
-            {s}
+    <div className="flex items-center justify-between max-w-xs mx-auto mb-6 px-1">
+      {[1, 2, 3].map((s, idx) => (
+        <div key={s} className="flex items-center flex-1 last:flex-none">
+          <div className="flex flex-col items-center">
+            <div
+              className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                step >= s
+                  ? 'bg-[#006A4E] text-white shadow-sm'
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'
+              }`}
+            >
+              {s}
+            </div>
+            <span
+              className={`text-[11px] sm:text-xs mt-1.5 transition-colors whitespace-nowrap ${
+                step >= s
+                  ? 'font-bold text-neutral-900 dark:text-white'
+                  : 'font-medium text-neutral-400 dark:text-neutral-500'
+              }`}
+            >
+              {stepLabels[idx]}
+            </span>
           </div>
           {s < 3 && (
             <div
-              className={`w-10 sm:w-12 h-1 rounded-full mx-2 transition-all duration-500 ${
-                step > s ? 'bg-emerald-600' : 'bg-neutral-200 dark:bg-neutral-800'
+              className={`flex-1 h-0.5 mx-2 -mt-5 transition-colors ${
+                step > s ? 'bg-[#006A4E]' : 'bg-neutral-200 dark:bg-neutral-800'
               }`}
             />
           )}
@@ -463,22 +476,37 @@ function SignupForm() {
   );
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
-      {/* Top Header / Language Switcher & Back Link */}
-      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
-        <Link
-          href="/"
-          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
-        >
-          <span>← হোম</span>
-        </Link>
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white dark:bg-[#07080a] md:bg-neutral-50 md:dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+      {/* Top Header */}
+      <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
+        {/* Back Link on desktop or steps > 1 */}
+        {step > 1 ? (
+          <button
+            type="button"
+            onClick={handleBack}
+            className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1 cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>আগের ধাপ</span>
+          </button>
+        ) : (
+          <div className="hidden md:block">
+            <Link
+              href="/"
+              className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+            >
+              <span>← হোম</span>
+            </Link>
+          </div>
+        )}
+        {step === 1 && <div className="md:hidden" />}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ml-auto">
           {mounted && (
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
               aria-label="Toggle theme"
             >
@@ -488,18 +516,18 @@ function SignupForm() {
 
           <Link
             href="/support"
-            className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
             সাপোর্ট লাগবে?
           </Link>
         </div>
       </header>
 
-      {/* Center Form Container */}
-      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
-        <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
-          {/* Centered Brand Logo & Title */}
-          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+      {/* Center Form Container - Flutter Full-bleed on mobile, Centered Card on desktop */}
+      <main className="flex-1 flex items-center justify-center px-5 sm:px-6 py-4 sm:py-8">
+        <div className="w-full max-w-sm sm:max-w-md md:bg-white md:dark:bg-[#111216] md:border md:border-neutral-200/90 md:dark:border-neutral-800/80 md:rounded-3xl sm:p-2 md:p-8 md:shadow-xl md:shadow-neutral-200/40 md:dark:shadow-none space-y-6 transition-colors">
+          {/* Centered Brand Logo & Title matching Flutter screenshot */}
+          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-1">
             <img
               src="/obhyash_full_logo.png"
               alt="Obhyash Logo"
@@ -511,7 +539,7 @@ function SignupForm() {
               className="h-10 w-auto object-contain hidden dark:block"
             />
             <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-              নতুন অ্যাকাউন্ট তৈরি করো
+              লগইন/রেজিস্টার
             </h1>
           </div>
 
@@ -526,27 +554,27 @@ function SignupForm() {
           <div className="space-y-4 md:space-y-6">
             {/* STEP 1: PERSONAL DETAILS (Option 2: Name + Phone) */}
             {step === 1 && (
-              <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
+              <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-normal text-slate-700 dark:text-slate-300 ml-1">
+                  <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
                     তোমার নাম
                   </label>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-[#006A4E] transition-colors" />
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="পূর্ণ নাম (Full Name)"
-                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                      className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-sm sm:text-base"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between ml-1">
-                    <label className="text-sm font-normal text-slate-700 dark:text-slate-300">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
                       মোবাইল নম্বর
                     </label>
                     {isPhoneVerified && verifiedPhone === formData.phone.trim() && (
@@ -557,22 +585,22 @@ function SignupForm() {
                     )}
                   </div>
                   <div className="relative group">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-[#006A4E] transition-colors" />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="017XXXXXXXX"
-                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 font-mono"
+                      className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 font-mono text-sm sm:text-base"
                     />
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-neutral-100/80 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800/80 flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800/80 flex items-center gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>
-                    পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইল নম্বরে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।
+                    পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইলে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।
                   </span>
                 </div>
               </div>
@@ -838,12 +866,12 @@ function SignupForm() {
             )}
 
             {/* ACTION BUTTONS */}
-            <div className="pt-4 flex gap-3">
+            <div className="pt-2 flex gap-3">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="w-14 items-center justify-center flex rounded-xl sm:rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                  className="w-14 h-14 items-center justify-center flex rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -853,7 +881,7 @@ function SignupForm() {
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
                 disabled={loading || isSendingOtp}
-                className="flex-1 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex-1 h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading || isSendingOtp ? (
                   <>
@@ -864,7 +892,8 @@ function SignupForm() {
                   'অ্যাকাউন্ট তৈরি করো'
                 ) : (
                   <>
-                    এগিয়ে যাও <ChevronRight className="w-5 h-5" />
+                    <span>পরবর্তী ধাপ</span>
+                    <ChevronRight className="w-5 h-5" />
                   </>
                 )}
               </button>
@@ -879,7 +908,7 @@ function SignupForm() {
                   <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white dark:bg-[#111216] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
+                  <span className="bg-white dark:bg-[#07080a] md:bg-white md:dark:bg-[#111216] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
                     Login / Registration with
                   </span>
                 </div>
@@ -887,13 +916,13 @@ function SignupForm() {
 
               <Suspense
                 fallback={
-                  <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl sm:rounded-2xl animate-pulse" />
+                  <div className="h-14 w-full bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
                 }
               >
                 <SocialLoginButton
                   mode="signup"
                   label="Google"
-                  className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white dark:!bg-[#16171d] !border !border-neutral-300 dark:!border-neutral-700/80 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
+                  className="!h-14 !py-3.5 !rounded-2xl !bg-white dark:!bg-[#16171d] !border !border-neutral-300 dark:!border-neutral-700/80 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
                 />
               </Suspense>
             </>

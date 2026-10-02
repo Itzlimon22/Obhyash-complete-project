@@ -19,7 +19,7 @@ export async function getStudentPageData(): Promise<{
   }
 
   const [{ data: dbProfile }, { data: subjectsData }, { data: examResultsData }] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('subjects').select('*').order('sort_order', { ascending: true, nullsFirst: false }),
     supabase
       .from('exam_results')
@@ -29,6 +29,15 @@ export async function getStudentPageData(): Promise<{
       .order('date', { ascending: false })
       .limit(100),
   ]);
+
+  // If user profile is not completed (e.g. exited from Google onboarding without filling),
+  // redirect them to /onboarding to finish setting up their stream and batch.
+  const role = (dbProfile?.role || user.user_metadata?.role || '').toLowerCase();
+  if (role !== 'admin' && role !== 'teacher') {
+    if (!dbProfile || !dbProfile.stream || !dbProfile.batch) {
+      redirect('/onboarding');
+    }
+  }
 
   const subjects = subjectsData || [];
 

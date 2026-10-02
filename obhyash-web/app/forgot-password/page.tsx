@@ -152,14 +152,14 @@ function ForgotPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white dark:bg-[#07080a] md:bg-neutral-50 md:dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
       {/* Top Header */}
-      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
+      <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
         <Link
           href="/login"
           className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
         >
-          <span>← লগইন পেজে যাও</span>
+          <span>← লগইন</span>
         </Link>
 
         <div className="flex items-center gap-3">
@@ -167,7 +167,7 @@ function ForgotPasswordContent() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
               aria-label="Toggle theme"
             >
@@ -177,18 +177,18 @@ function ForgotPasswordContent() {
 
           <Link
             href="/support"
-            className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
             সাপোর্ট লাগবে?
           </Link>
         </div>
       </header>
 
-      {/* Center Auth Card */}
-      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
-        <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
+      {/* Center Auth Card - Flutter Full-bleed on mobile, Centered Card on desktop */}
+      <main className="flex-1 flex items-center justify-center px-5 sm:px-6 py-4 sm:py-8">
+        <div className="w-full max-w-sm sm:max-w-md md:bg-white md:dark:bg-[#111216] md:border md:border-neutral-200/90 md:dark:border-neutral-800/80 md:rounded-3xl sm:p-2 md:p-8 md:shadow-xl md:shadow-neutral-200/40 md:dark:shadow-none space-y-6 transition-colors">
           {/* Logo & Title */}
-          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-1">
             <img
               src="/obhyash_full_logo.png"
               alt="Obhyash Logo"
@@ -237,7 +237,7 @@ function ForgotPasswordContent() {
                     placeholder="কমপক্ষে ৬ অক্ষর"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-4 pr-11 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                    className="w-full pl-4 pr-11 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                   />
                   <button
                     type="button"
@@ -245,7 +245,7 @@ function ForgotPasswordContent() {
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors p-1 cursor-pointer"
                     aria-label="Toggle password visibility"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -260,14 +260,14 @@ function ForgotPasswordContent() {
                   placeholder="পাসওয়ার্ডটি আবার লেখো"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                  className="w-full px-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -289,7 +289,7 @@ function ForgotPasswordContent() {
                 <input
                   type="text"
                   required
-                  className="w-full px-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                  className="w-full px-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                   placeholder="01XXXXXXXX অথবা example@mail.com"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
@@ -299,7 +299,7 @@ function ForgotPasswordContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -313,7 +313,7 @@ function ForgotPasswordContent() {
             </form>
           )}
 
-          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+          <div className="pt-2 text-center text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
             পাসওয়ার্ড মনে পড়েছে?{' '}
             <Link
               href="/login"

@@ -112,21 +112,24 @@ export default function SupportPage() {
     }
   };
 
+  const isFormValid = Boolean(
+    issueType && phone.trim() && description.trim().length >= 20,
+  );
+
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 flex flex-col font-bengali">
-      {/* Top Header - Navigation */}
-      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
+    <div className="min-h-screen bg-white dark:bg-[#07080a] md:bg-neutral-50 md:dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 flex flex-col font-bengali">
+      {/* Top Header - Navigation matching Flutter Screenshot 2 */}
+      <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
         <button
           type="button"
           onClick={() => router.back()}
-          className="p-1.5 -ml-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+          className="p-1 -ml-1 text-neutral-800 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
           title="ফিরে যান"
         >
-          <ArrowLeft size={20} />
-          <span className="text-xs sm:text-sm font-semibold">ফিরে যাও</span>
+          <ArrowLeft size={24} className="stroke-[2.5]" />
         </button>
 
-        <h1 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white text-center flex-1">
+        <h1 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white text-center flex-1 pr-6">
           সাপোর্টে যোগাযোগ
         </h1>
 
@@ -135,7 +138,7 @@ export default function SupportPage() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
               aria-label="Toggle theme"
             >
@@ -145,9 +148,9 @@ export default function SupportPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex items-center justify-center">
-        <div className="w-full bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
+      {/* Main Content - Flutter full-bleed on mobile, Centered Card on desktop */}
+      <main className="flex-1 w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 py-4 sm:py-8 flex items-center justify-center">
+        <div className="w-full md:bg-white md:dark:bg-[#111216] md:border md:border-neutral-200/90 md:dark:border-neutral-800/80 md:rounded-3xl sm:p-2 md:p-8 md:shadow-xl md:shadow-neutral-200/40 md:dark:shadow-none space-y-6 transition-colors">
           {submittedTicket ? (
             /* SUCCESS STATE */
             <div className="text-center py-4 space-y-6">
@@ -186,33 +189,33 @@ export default function SupportPage() {
                   href={submittedTicket.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
+                  className="w-full h-14 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
                 >
-                  <MessageCircle size={18} />
+                  <MessageCircle size={20} />
                   <span>সরাসরি WhatsApp-এ কথা বলুন</span>
                 </a>
 
                 <Link
                   href="/login"
-                  className="w-full py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#16171d] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-xs flex items-center justify-center transition-colors"
+                  className="w-full h-12 px-4 rounded-2xl bg-neutral-100 dark:bg-[#16171d] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-xs flex items-center justify-center transition-colors"
                 >
                   লগইন পেজে ফিরে যান
                 </Link>
               </div>
             </div>
           ) : (
-            /* FORM STATE */
+            /* FORM STATE MATCHING FLUTTER SCREENSHOT 2 */
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* 1. সমস্যার ক্যাটাগরি */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block">
                   সমস্যার ক্যাটাগরি
                 </label>
                 <div className="relative">
                   <select
                     value={issueType}
                     onChange={(e) => setIssueType(e.target.value)}
-                    className="w-full appearance-none px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all cursor-pointer"
+                    className="w-full appearance-none px-4 py-3.5 sm:py-4 rounded-2xl bg-[#f3f4f6] dark:bg-[#16171d] border-0 text-sm font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 transition-all cursor-pointer"
                   >
                     <option value="" disabled className="dark:bg-[#16171d]">
                       ক্যাটাগরি নির্বাচন করো
@@ -224,15 +227,15 @@ export default function SupportPage() {
                     ))}
                   </select>
                   <ChevronDown
-                    size={18}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none"
+                    size={20}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 dark:text-neutral-400 pointer-events-none stroke-[2.5]"
                   />
                 </div>
               </div>
 
               {/* 2. তোমার ফোন নাম্বার */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block">
                   তোমার ফোন নাম্বার
                 </label>
                 <input
@@ -240,31 +243,31 @@ export default function SupportPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="০১XXXXXXXXX"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all"
+                  className="w-full px-4 py-3.5 sm:py-4 rounded-2xl bg-[#f3f4f6] dark:bg-[#16171d] border-0 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 transition-all font-mono"
                 />
               </div>
 
               {/* 3. তোমার সমস্যা */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block">
                   তোমার সমস্যা
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  placeholder="এখানে সমস্যা বিস্তারিত লিখে পাঠাও"
-                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all resize-none"
+                  placeholder="এখানে লিখে পাঠাও"
+                  className="w-full px-4 py-3.5 sm:py-4 rounded-2xl bg-[#f3f4f6] dark:bg-[#16171d] border-0 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 transition-all resize-none"
                 />
                 <p className="text-xs text-neutral-400 dark:text-neutral-500">
                   কমপক্ষে ২০ অক্ষর লিখতে হবে
                 </p>
               </div>
 
-              {/* 4. ছবি / ভিডিও আপলোড করো */}
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
-                  ছবি / স্ক্রিনশট আপলোড করো (ঐচ্ছিক)
+              {/* 4. ছবি / ভিডিও আপলোড করো - Flutter screenshot mint button */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block">
+                  ছবি / ভিডিও আপলোড করো
                 </label>
                 <div>
                   <input
@@ -277,9 +280,9 @@ export default function SupportPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#e8fbf3] dark:bg-emerald-950/40 border border-[#a3e9cc] dark:border-emerald-800/60 text-[#006A4E] dark:text-emerald-400 text-xs sm:text-sm font-bold hover:bg-[#d8f8ea] dark:hover:bg-emerald-950/60 transition-all cursor-pointer"
                   >
-                    <FileUp size={16} />
+                    <FileUp size={18} />
                     <span>
                       {selectedFile
                         ? `সিলেক্টেড: ${selectedFile.name}`
@@ -291,21 +294,25 @@ export default function SupportPage() {
                           e.stopPropagation();
                           setSelectedFile(null);
                         }}
-                        className="ml-1 p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full"
+                        className="ml-1 p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800 rounded-full"
                       >
-                        <X size={13} />
+                        <X size={14} />
                       </span>
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button matching Flutter Screenshot 2 */}
               <div className="pt-2">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || !isFormValid}
+                  className={`w-full h-14 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-sm ${
+                    isFormValid
+                      ? 'bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white cursor-pointer'
+                      : 'bg-[#f3f4f6] dark:bg-[#16171d] text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
+                  }`}
                 >
                   {isSubmitting ? (
                     <>

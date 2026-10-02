@@ -199,22 +199,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
-      {/* Top Header / Language Switcher & Back Link */}
-      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
-        <Link
-          href="/"
-          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
-        >
-          <span>← হোম</span>
-        </Link>
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white dark:bg-[#07080a] md:bg-neutral-50 md:dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+      {/* Top Header */}
+      <header className="w-full max-w-sm sm:max-w-md md:max-w-xl mx-auto px-5 sm:px-6 pt-4 sm:pt-6 pb-2 flex items-center justify-between">
+        {/* Hidden on mobile to match Flutter screenshot, visible on desktop */}
+        <div className="hidden md:block">
+          <Link
+            href="/"
+            className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+          >
+            <span>← হোম</span>
+          </Link>
+        </div>
+        <div className="md:hidden" />
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ml-auto">
           {mounted && (
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
               aria-label="Toggle theme"
             >
@@ -222,21 +226,21 @@ export default function LoginPage() {
             </button>
           )}
 
-          {/* Support Link */}
+          {/* Support Link matching Flutter Screenshot top-right */}
           <Link
             href="/support"
-            className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            className="text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
             সাপোর্ট লাগবে?
           </Link>
         </div>
       </header>
 
-      {/* Center Auth Form */}
-      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
-        <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
-          {/* Centered Brand Logo & Title */}
-          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
+      {/* Center Auth Form - Flutter Full-bleed on mobile, Centered Card on desktop */}
+      <main className="flex-1 flex items-center justify-center px-5 sm:px-6 py-4 sm:py-8">
+        <div className="w-full max-w-sm sm:max-w-md md:bg-white md:dark:bg-[#111216] md:border md:border-neutral-200/90 md:dark:border-neutral-800/80 md:rounded-3xl sm:p-2 md:p-8 md:shadow-xl md:shadow-neutral-200/40 md:dark:shadow-none space-y-6 transition-colors">
+          {/* Centered Brand Logo & Title matching Flutter screenshot */}
+          <div className="flex flex-col items-center justify-center text-center space-y-3 pt-1">
             <img
               src="/obhyash_full_logo.png"
               alt="Obhyash Logo"
@@ -268,7 +272,7 @@ export default function LoginPage() {
                 id="identifier"
                 type="text"
                 required
-                className="w-full px-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                className="w-full px-4 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                 placeholder="01XXXXXXXX"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
@@ -284,7 +288,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full pl-4 pr-11 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
+                  className="w-full pl-4 pr-11 py-3.5 bg-white dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-2xl text-sm sm:text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -296,13 +300,13 @@ export default function LoginPage() {
                   aria-label="Toggle password visibility"
                 >
                   {showPassword ? (
-                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Eye className="w-5 h-5" />
                   ) : (
-                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <EyeOff className="w-5 h-5" />
                   )}
                 </button>
               </div>
-              {/* Forgot password link */}
+              {/* Forgot password link matching Flutter screenshot (Red text, right aligned) */}
               <div className="flex justify-end pt-1">
                 <Link
                   href="/forgot-password"
@@ -313,11 +317,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Primary Action Button */}
+            {/* Primary Action Button - Flutter height 56px / h-14, rounded-2xl */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full h-14 bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -325,39 +329,39 @@ export default function LoginPage() {
                   <span>প্রবেশ করা হচ্ছে...</span>
                 </>
               ) : (
-                <span>এগিয়ে যাও</span>
+                <span>এগিয়ে যান</span>
               )}
             </button>
           </form>
 
-          {/* Divider */}
+          {/* Divider matching screenshot */}
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white dark:bg-[#111216] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
+              <span className="bg-white dark:bg-[#07080a] md:bg-white md:dark:bg-[#111216] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
                 Login / Registration with
               </span>
             </div>
           </div>
 
-          {/* Social Google Login Card */}
+          {/* Social Google Login Button matching Flutter screenshot */}
           <Suspense
             fallback={
-              <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl sm:rounded-2xl animate-pulse" />
+              <div className="h-14 w-full bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
             }
           >
             <SocialLoginButton
               mode="signin"
               label="Google"
-              className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white dark:!bg-[#16171d] !border !border-neutral-300 dark:!border-neutral-700/80 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
+              className="!h-14 !py-3.5 !rounded-2xl !bg-white dark:!bg-[#16171d] !border !border-neutral-300 dark:!border-neutral-700/80 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
             />
           </Suspense>
 
-          {/* Registration Prompt */}
+          {/* Registration Prompt matching Flutter screenshot */}
           <div className="pt-2 text-center">
-            <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+            <div className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
               অ্যাকাউন্ট নেই?{' '}
               <Link
                 href="/signup"
