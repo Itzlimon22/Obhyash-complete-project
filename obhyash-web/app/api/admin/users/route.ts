@@ -333,7 +333,6 @@ export async function PATCH(request: NextRequest) {
         subscription_status: isSubActive ? 'active' : (isFree ? 'inactive' : subStatus.toLowerCase()),
         subscription_expires_at: expiryIso,
         level: isSubActive ? 'Pro' : 'Free',
-        plan: isSubActive ? 'Pro' : 'Free',
       }).eq('id', userId);
 
       if (error) throw error;
