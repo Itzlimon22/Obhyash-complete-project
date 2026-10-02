@@ -77,7 +77,8 @@ export async function GET(request: NextRequest) {
     // 4. Build Aggregated User Referral Master List
     // Group redemptions by referral_id
     const redemptionsByRefId: Record<string, any[]> = {};
-    let pendingApprovalsCount = 0;
+    let pendingExamCount = 0;
+    let pendingReviewCount = 0;
     let approvedRewardsCount = 0;
 
     historyItems.forEach((h) => {
@@ -100,10 +101,16 @@ export async function GET(request: NextRequest) {
 
       redemptionsByRefId[h.referral_id].push(redemptionRecord);
 
-      if (h.admin_status === 'Pending' || !h.admin_status) pendingApprovalsCount++;
-      if (h.admin_status === 'Approved') approvedRewardsCount++;
+      if (h.admin_status === 'Pending Exam') {
+        pendingExamCount++;
+      } else if (h.admin_status === 'Pending Review' || h.admin_status === 'Pending' || !h.admin_status) {
+        pendingReviewCount++;
+      } else if (h.admin_status === 'Approved') {
+        approvedRewardsCount++;
+      }
     });
 
+    const pendingApprovalsCount = pendingExamCount + pendingReviewCount;
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     const userReferrals = referralList.map((ref) => {
@@ -114,14 +121,15 @@ export async function GET(request: NextRequest) {
       };
       const referees = redemptionsByRefId[ref.id] || [];
       const totalUses = referees.length;
-      const approvedUses = referees.filter((r) => r.admin_status === 'Approved').length;
+      const approvedUses = referees.filter((r) => r.admin_status === 'Approved' || r.reward_given).length;
       const pendingUses = referees.filter(
-        (r) => r.admin_status === 'Pending' || r.admin_status === 'Pending Review' || !r.admin_status,
+        (r) => r.admin_status === 'Pending Exam' || r.admin_status === 'Pending' || r.admin_status === 'Pending Review' || !r.admin_status,
       ).length;
       const rejectedUses = referees.filter((r) => r.admin_status === 'Rejected').length;
       const isBlocked = ref.expires_at ? new Date(ref.expires_at) < new Date() : false;
       const hourlyUses = referees.filter((r) => new Date(r.redeemed_at) > oneHourAgo).length;
       const hasAnomalyAlert = hourlyUses >= 10;
+      const rewardDaysEarned = approvedUses * 7;
 
       return {
         id: ref.id,
@@ -136,8 +144,16 @@ export async function GET(request: NextRequest) {
         rejectedUses,
         hourlyUses,
         hasAnomalyAlert,
+        rewardDaysEarned,
         referees,
       };
+    });
+
+    // Sort active referrers first (most uses -> most approved -> newest)
+    userReferrals.sort((a, b) => {
+      if (b.totalUses !== a.totalUses) return b.totalUses - a.totalUses;
+      if (b.approvedUses !== a.approvedUses) return b.approvedUses - a.approvedUses;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
     // 5. Build Enriched History Flat List
@@ -210,6 +226,8 @@ export async function GET(request: NextRequest) {
         totalRedemptions: historyItems.length,
         uniqueReferrers: userReferrals.filter((u) => u.totalUses > 0).length,
         pendingApprovals: pendingApprovalsCount,
+        pendingExamCount,
+        pendingReviewCount,
         approvedRewards: approvedRewardsCount,
         anomalyAlerts: userReferrals.filter((u) => u.hasAnomalyAlert).length,
       },

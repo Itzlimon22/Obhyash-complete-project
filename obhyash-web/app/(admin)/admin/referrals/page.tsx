@@ -59,6 +59,7 @@ interface UserReferralItem {
   rejectedUses: number;
   hourlyUses?: number;
   hasAnomalyAlert?: boolean;
+  rewardDaysEarned?: number;
   referees: RefereeRecord[];
 }
 
@@ -96,6 +97,8 @@ export default function AdminReferralsPage() {
     totalRedemptions: 0,
     uniqueReferrers: 0,
     pendingApprovals: 0,
+    pendingExamCount: 0,
+    pendingReviewCount: 0,
     approvedRewards: 0,
   });
 
@@ -435,36 +438,44 @@ export default function AdminReferralsPage() {
           <p className="text-[11px] text-neutral-400 dark:text-zinc-500">অনুমোদিত রিওয়ার্ড: {stats.approvedRewards} টি</p>
         </div>
 
-        {/* Pending Approvals */}
+        {/* Pending Referrals */}
         <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-neutral-500 dark:text-zinc-400 uppercase tracking-wider">
-              অপেক্ষমাণ অ্যাপ্রুভাল (Pending)
+              অপেক্ষমাণ রেফারেল (Pending)
             </span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
               <Clock size={16} />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
-            {stats.pendingApprovals} <span className="text-xs font-bold text-neutral-500">টি রিকোয়েস্ট</span>
+            {stats.pendingApprovals} <span className="text-xs font-bold text-neutral-500">টি</span>
           </div>
-          <p className="text-[11px] text-neutral-400 dark:text-zinc-500">অ্যাডমিনের অনুমোদনের অপেক্ষায়</p>
+          <p className="text-[11px] text-neutral-400 dark:text-zinc-500">
+            {stats.pendingExamCount > 0
+              ? `${stats.pendingExamCount} টি ১ম পরীক্ষার অপেক্ষায়`
+              : stats.pendingReviewCount > 0
+              ? `${stats.pendingReviewCount} টি রিভিউ প্রয়োজন`
+              : 'কোনো রেফারেল পেন্ডিং নেই'}
+          </p>
         </div>
 
-        {/* Approved Rewards */}
+        {/* Completed Rewards */}
         <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-neutral-500 dark:text-zinc-400 uppercase tracking-wider">
-              সফল অনুমোদন (Approved)
+              সফল রিওয়ার্ড (Completed)
             </span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
               <CheckCircle size={16} />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
-            {stats.approvedRewards} <span className="text-xs font-bold text-neutral-500">টি সম্পন্ন</span>
+            {stats.approvedRewards} <span className="text-xs font-bold text-neutral-500">টি সফল</span>
           </div>
-          <p className="text-[11px] text-neutral-400 dark:text-zinc-500">বোনাস ও প্রো সাবস্ক্রিপশন প্রদানকৃত</p>
+          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+            মোট +{stats.approvedRewards * 7} দিন প্রো বোনাস প্রদত্ত
+          </p>
         </div>
       </div>
 
@@ -530,7 +541,7 @@ export default function AdminReferralsPage() {
                   <th className="py-3.5 px-4">রেফারেল কোড</th>
                   <th className="py-3.5 px-4">তৈরির তারিখ ও সময় (24h)</th>
                   <th className="py-3.5 px-4 text-center">মোট ব্যবহারকারী</th>
-                  <th className="py-3.5 px-4 text-center">অনুমোদন স্ট্যাটাস</th>
+                  <th className="py-3.5 px-4 text-center">অর্জিত রিওয়ার্ড</th>
                   <th className="py-3.5 px-4 text-right">রেফারেল অ্যাকশন</th>
                 </tr>
               </thead>
@@ -616,18 +627,27 @@ export default function AdminReferralsPage() {
                           </span>
                         </td>
 
-                        {/* Status Breakdown */}
+                        {/* Earned Rewards (Alternative 1) */}
                         <td className="py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold">
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                              ✓ {item.approvedUses} অনুমোদিত
-                            </span>
-                            {item.pendingUses > 0 && (
-                              <span className="text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded-full border border-amber-300 dark:border-amber-800">
-                                ⏳ {item.pendingUses} অপেক্ষমাণ
+                          {item.approvedUses > 0 ? (
+                            <div className="inline-flex flex-col items-center">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
+                                <Gift size={12} className="text-emerald-500 shrink-0" />
+                                <span>+{item.approvedUses * 7} দিন প্রো</span>
                               </span>
-                            )}
-                          </div>
+                              {item.pendingUses > 0 && (
+                                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium mt-0.5">
+                                  ({item.pendingUses} টি পরীক্ষার অপেক্ষায়)
+                                </span>
+                              )}
+                            </div>
+                          ) : item.pendingUses > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold border border-blue-200 dark:border-blue-800">
+                              <Clock size={11} /> ১ম পরীক্ষার অপেক্ষায়
+                            </span>
+                          ) : (
+                            <span className="text-neutral-400 dark:text-zinc-600 text-xs font-bold">—</span>
+                          )}
                         </td>
 
                         {/* Actions */}
@@ -737,16 +757,24 @@ export default function AdminReferralsPage() {
 
                         {/* Status */}
                         <td className="py-3.5 px-4 text-center">
-                          {item.admin_status === 'Approved' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-[10px]">
-                              <CheckCircle size={11} /> অনুমোদিত
+                          {item.admin_status === 'Approved' || item.reward_given ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold text-[10px] border border-emerald-200 dark:border-emerald-800">
+                              <CheckCircle size={11} /> সফল (রিওয়ার্ড প্রদত্ত)
+                            </span>
+                          ) : item.admin_status === 'Pending Exam' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-bold text-[10px] border border-blue-200 dark:border-blue-800">
+                              <Clock size={11} /> ১ম পরীক্ষার অপেক্ষায়
+                            </span>
+                          ) : item.admin_status === 'Pending Review' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-bold text-[10px] border border-amber-200 dark:border-amber-800 animate-pulse">
+                              <ShieldAlert size={11} /> রিভিউ প্রয়োজন
                             </span>
                           ) : item.admin_status === 'Rejected' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-bold text-[10px]">
-                              <XCircle size={11} /> বাতিল
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 font-bold text-[10px] border border-rose-200 dark:border-rose-800">
+                              <XCircle size={11} /> বাতিলকৃত
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold text-[10px] animate-pulse">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300 font-bold text-[10px]">
                               <Clock size={11} /> অপেক্ষমাণ
                             </span>
                           )}
@@ -754,26 +782,27 @@ export default function AdminReferralsPage() {
 
                         {/* Approval Actions */}
                         <td className="py-3.5 px-4 text-right">
-                          {item.admin_status === 'Pending' || !item.admin_status ? (
+                          {item.admin_status === 'Approved' || item.reward_given ? (
+                            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-end gap-1">
+                              <Check size={12} /> বোনাস সক্রিয়
+                            </span>
+                          ) : (
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => handleApproveAction(item.id, 'approve')}
-                                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1 shadow-sm"
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 shadow-xs"
+                                title="ম্যানুয়ালি বোনাস অনুমোদন করুন"
                               >
-                                <Check size={13} />
+                                <Check size={12} />
                                 <span>অনুমোদন</span>
                               </button>
                               <button
                                 onClick={() => handleApproveAction(item.id, 'reject')}
-                                className="px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-zinc-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/60 dark:hover:text-rose-400 text-neutral-700 dark:text-zinc-300 font-bold text-xs transition border border-neutral-200/60 dark:border-zinc-700/60"
+                                className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-zinc-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/60 dark:hover:text-rose-400 text-neutral-700 dark:text-zinc-300 font-bold text-xs transition border border-neutral-200/60 dark:border-zinc-700/60"
                               >
                                 বাতিল
                               </button>
                             </div>
-                          ) : (
-                            <span className="text-[11px] text-neutral-400 dark:text-zinc-500">
-                              কার্যক্রম সম্পন্ন
-                            </span>
                           )}
                         </td>
                       </tr>
@@ -877,22 +906,28 @@ export default function AdminReferralsPage() {
                           </span>
                           <span
                             className={`text-[10px] font-bold ${
-                              ref.admin_status === 'Approved'
+                              ref.admin_status === 'Approved' || ref.reward_given
                                 ? 'text-emerald-600 dark:text-emerald-400'
                                 : ref.admin_status === 'Rejected'
                                 ? 'text-rose-600 dark:text-rose-400'
+                                : ref.admin_status === 'Pending Exam'
+                                ? 'text-blue-600 dark:text-blue-400'
                                 : 'text-amber-600 dark:text-amber-400'
                             }`}
                           >
-                            {ref.admin_status === 'Approved'
-                              ? '✓ অনুমোদিত'
+                            {ref.admin_status === 'Approved' || ref.reward_given
+                              ? '✓ সফল (বোনাস সক্রিয়)'
+                              : ref.admin_status === 'Pending Exam'
+                              ? '⏳ পরীক্ষার অপেক্ষায়'
+                              : ref.admin_status === 'Pending Review'
+                              ? '🚨 অ্যাডমিন রিভিউ প্রয়োজন'
                               : ref.admin_status === 'Rejected'
                               ? '✕ বাতিল'
                               : '⏳ অপেক্ষমাণ'}
                           </span>
                         </div>
 
-                        {ref.admin_status === 'Pending' && (
+                        {ref.admin_status !== 'Approved' && !ref.reward_given && ref.admin_status !== 'Rejected' && (
                           <div className="flex items-center gap-1 shrink-0">
                             <button
                               onClick={() => handleApproveAction(ref.id, 'approve')}
