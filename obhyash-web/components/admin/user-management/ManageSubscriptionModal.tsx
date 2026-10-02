@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, AlertTriangle, CheckCircle, Clock, Sparkles } from 'lucide-react';
+import { X, Calendar, AlertTriangle, CheckCircle, Clock, Sparkles, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/lib/types';
 
@@ -11,7 +11,8 @@ interface ManageSubscriptionModalProps {
 }
 
 const PLAN_OPTIONS = [
-  { id: 'Free', label: 'Free Plan', days: 0 },
+  { id: 'Free', label: 'Free Plan (ফ্রি)', days: 0 },
+  { id: 'Custom', label: 'কাস্টম মেয়াদ (Custom Days / Trial)', days: 0 },
   { id: '1 Month', label: '১ মাস (1 Month - ৳১৪৯)', days: 30 },
   { id: '3 Months', label: '৩ মাস (3 Months - ৳৩৪৯)', days: 90 },
   { id: '6 Months', label: '৬ মাস (6 Months - ৳৫৯৯)', days: 180 },
@@ -28,6 +29,7 @@ export default function ManageSubscriptionModal({
   const [plan, setPlan] = useState<string>('Free');
   const [status, setStatus] = useState<string>('Active');
   const [expiryDate, setExpiryDate] = useState<string>('');
+  const [customDays, setCustomDays] = useState<string>('');
   const [reason, setReason] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,6 +40,7 @@ export default function ManageSubscriptionModal({
       setPlan(currentPlan);
       setStatus(currentStatus);
       setReason('');
+      setCustomDays('');
 
       if (user.subscription?.expiry) {
         const d = new Date(user.subscription.expiry);
@@ -57,6 +60,13 @@ export default function ManageSubscriptionModal({
     if (newPlan === 'Free') {
       setStatus('Inactive');
       setExpiryDate('');
+    } else if (newPlan === 'Custom') {
+      setStatus('Active');
+      if (!expiryDate) {
+        const target = new Date();
+        target.setDate(target.getDate() + 7);
+        setExpiryDate(target.toISOString().split('T')[0]);
+      }
     } else {
       setStatus('Active');
       const opt = PLAN_OPTIONS.find((p) => p.id === newPlan);
@@ -68,14 +78,30 @@ export default function ManageSubscriptionModal({
   };
 
   const handleAddDays = (days: number) => {
-    const base = expiryDate ? new Date(expiryDate) : new Date();
-    const current = isNaN(base.getTime()) ? new Date() : base;
-    current.setDate(current.getDate() + days);
-    setExpiryDate(current.toISOString().split('T')[0]);
-    if (plan === 'Free') {
-      setPlan('1 Month');
-      setStatus('Active');
+    const now = new Date();
+    let base = expiryDate ? new Date(expiryDate) : null;
+    if (!base || isNaN(base.getTime()) || base.getTime() < now.getTime()) {
+      base = now;
     }
+    const target = new Date(base.getTime());
+    target.setDate(target.getDate() + days);
+    setExpiryDate(target.toISOString().split('T')[0]);
+
+    if (plan === 'Free') {
+      setPlan('Custom');
+    }
+    setStatus('Active');
+  };
+
+  const handleCustomDaysSubmit = () => {
+    const d = parseInt(customDays, 10);
+    if (isNaN(d) || d <= 0) {
+      toast.error('অনুগ্রহ করে সঠিক দিনের সংখ্যা লিখুন (যেমন: ৫, ১৪, ২০)');
+      return;
+    }
+    handleAddDays(d);
+    setCustomDays('');
+    toast.success(`মেয়াদ সফলভাবে +${d} দিন বাড়ানো হয়েছে`);
   };
 
   const handleSubmit = async () => {
@@ -99,7 +125,7 @@ export default function ManageSubscriptionModal({
         body: JSON.stringify({
           action: 'update_subscription',
           userId: user.id,
-          plan,
+          plan: plan === 'Free' ? 'Free' : (plan === 'Custom' ? 'Custom Pro' : plan),
           status: isFree ? 'Inactive' : status,
           expiry: expiryIso,
           reason: reason.trim(),
@@ -125,6 +151,9 @@ export default function ManageSubscriptionModal({
   if (!isOpen || !user) return null;
 
   const isFree = plan === 'Free';
+  const daysRemaining = expiryDate
+    ? Math.ceil((new Date(expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -212,50 +241,191 @@ export default function ManageSubscriptionModal({
             </div>
           )}
 
-          {/* Expiry Date & Extension (Only if not Free) */}
-          {!isFree && (
-            <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 flex justify-between items-center">
-                <span>Expiration Date</span>
-                <span className="text-xs text-neutral-500 font-normal">মেয়াদ শেষ হওয়ার তারিখ</span>
-              </label>
+          {/* Expiry Date & Extension */}
+          {!isFree ? (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 flex justify-between items-center">
+                  <span>Expiration Date</span>
+                  <span className="text-xs text-neutral-500 font-normal">মেয়াদ শেষ হওয়ার তারিখ</span>
+                </label>
 
-              <input
-                type="date"
-                value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 mb-2"
-              />
+                <input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => {
+                    setExpiryDate(e.target.value);
+                    if (plan === 'Free') setPlan('Custom');
+                    setStatus('Active');
+                  }}
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl text-sm font-medium text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+
+                {expiryDate && (
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5 flex items-center gap-1.5">
+                    <Clock size={13} />
+                    <span>
+                      মেয়াদ: {new Date(expiryDate).toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {daysRemaining > 0 ? ` (আজ থেকে ${daysRemaining} দিন বাকি)` : ' (আজ শেষ)'}
+                    </span>
+                  </p>
+                )}
+              </div>
 
               {/* Quick Extend Buttons */}
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div>
+                <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">
+                  দ্রুত মেয়াদ বাড়ান (Quick Extend):
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(7)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  >
+                    +৭ দিন
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(14)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg transition-colors border border-emerald-300 dark:border-emerald-700"
+                  >
+                    +১৪ দিন
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(30)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  >
+                    +১ মাস (+৩০ দিন)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(90)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  >
+                    +৩ মাস (+৯০ দিন)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(180)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  >
+                    +৬ মাস (+১৮০ দিন)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddDays(365)}
+                    className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  >
+                    +১ বছর (+৩৬৫ দিন)
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Number of Days Input */}
+              <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-200 dark:border-neutral-750">
+                <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  নির্দিষ্ট কাস্টম দিন যোগ করুন (Custom Days):
+                </p>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="number"
+                      min="1"
+                      max="3650"
+                      placeholder="যেমন: ১০ বা ১৪ দিন"
+                      value={customDays}
+                      onChange={(e) => setCustomDays(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleCustomDaysSubmit();
+                        }
+                      }}
+                      className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-medium text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400">
+                      দিন
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCustomDaysSubmit}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0"
+                  >
+                    <Plus size={14} />
+                    <span>দিন যোগ করুন</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Quick Grant Access Box when on Free */
+            <div className="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                  ইউজারকে কাস্টম দিন বা মেয়াদ দিতে চান?
+                </span>
+              </div>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                নিচের যেকোনো অপশন নির্বাচন করলে ইউজারের জন্য সরাসরি প্রিমিয়াম সাবস্ক্রিপশন চালু হয়ে যাবে:
+              </p>
+
+              {/* Quick preset buttons */}
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => handleAddDays(7)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  className="px-2.5 py-1 text-xs font-semibold bg-white dark:bg-neutral-800 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded-lg transition-colors border border-emerald-300 dark:border-emerald-700"
                 >
                   +৭ দিন
                 </button>
                 <button
                   type="button"
+                  onClick={() => handleAddDays(14)}
+                  className="px-2.5 py-1 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors shadow-xs"
+                >
+                  +১৪ দিন
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleAddDays(30)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  className="px-2.5 py-1 text-xs font-semibold bg-white dark:bg-neutral-800 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded-lg transition-colors border border-emerald-300 dark:border-emerald-700"
                 >
                   +১ মাস (+৩০ দিন)
                 </button>
+              </div>
+
+              {/* Custom days input on free */}
+              <div className="flex gap-2 pt-1">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="কাস্টম দিন লিখুন (যেমন: ৫, ১০, ১৪)"
+                    value={customDays}
+                    onChange={(e) => setCustomDays(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleCustomDaysSubmit();
+                      }
+                    }}
+                    className="w-full px-3 py-1.5 bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-700 rounded-lg text-xs font-medium text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400">
+                    দিন
+                  </span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => handleAddDays(90)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
+                  onClick={handleCustomDaysSubmit}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1 shrink-0"
                 >
-                  +৩ মাস (+৯০ দিন)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddDays(180)}
-                  className="px-2.5 py-1.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700"
-                >
-                  +৬ মাস (+১৮০ দিন)
+                  <Plus size={13} />
+                  <span>দিন যোগ করুন</span>
                 </button>
               </div>
             </div>
