@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import {
-  Flame,
   Mail,
   Facebook,
-  Twitter,
   Youtube,
+  Users,
   ArrowRight,
 } from 'lucide-react';
 
@@ -19,14 +19,32 @@ export default function BlogFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
           {/* Brand & About */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2.5 group w-max">
-              <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center text-white dark:text-slate-900 group-hover:scale-105 transition-transform duration-200">
-                <Flame className="w-[18px] h-[18px]" />
-              </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                অভ্যাস ব্লগ
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 group w-max"
+              aria-label="অভ্যাস হোমপেজ"
+            >
+              {/* Light mode logo */}
+              <Image
+                src="/obhyash_full_logo.svg"
+                alt="অভ্যাস"
+                width={132}
+                height={34}
+                className="h-8 w-auto object-contain dark:hidden group-hover:opacity-90 transition-opacity"
+              />
+              {/* Dark mode logo */}
+              <Image
+                src="/obhyash_full_logo_dark.svg"
+                alt="অভ্যাস"
+                width={132}
+                height={34}
+                className="h-8 w-auto object-contain hidden dark:block group-hover:opacity-90 transition-opacity"
+              />
+              <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-neutral-100 dark:bg-zinc-800 text-rose-600 dark:text-rose-400 border border-neutral-200 dark:border-zinc-700">
+                ব্লগ
               </span>
             </Link>
+
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
               বাংলাদেশের শিক্ষার্থীদের এসএসসি, এইচএসসি এবং অ্যাডমিশন পরীক্ষার
               প্রস্তুতিকে আরও সহজ এবং কার্যকর করার জন্য অভ্যাস প্ল্যাটফর্মের
@@ -34,25 +52,45 @@ export default function BlogFooter() {
               এবং অনুপ্রেরণামূলক আর্টিকেল।
             </p>
 
-            {/* Social Links */}
-            <div className="flex items-center gap-4 mt-2">
+            {/* Social Links (Facebook Page, Facebook Group, YouTube) */}
+            <div className="flex items-center gap-3 mt-1">
+              {/* Facebook Page */}
               <a
-                href="#"
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-500 hover:text-rose-500 hover:border-rose-200 dark:hover:border-rose-900 transition-all"
+                href="https://www.facebook.com/share/18779ur8WD/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Obhyash Facebook Page"
+                title="অভ্যাস অফিসিয়াল ফেসবুক পেজ"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:border-blue-300 dark:hover:border-blue-800 transition-all text-xs font-semibold"
               >
-                <Facebook className="w-4 h-4" />
+                <Facebook className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>ফেসবুক পেজ</span>
               </a>
+
+              {/* Facebook Group */}
               <a
-                href="#"
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-500 hover:text-sky-500 hover:border-sky-200 dark:hover:border-sky-900 transition-all"
+                href="https://www.facebook.com/groups/obhyash"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Obhyash Facebook Community Group"
+                title="অভ্যাস শিক্ষার্থী কমিউনিটি গ্রুপ"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:border-blue-300 dark:hover:border-blue-800 transition-all text-xs font-semibold"
               >
-                <Twitter className="w-4 h-4" />
+                <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>গ্রুপ</span>
               </a>
+
+              {/* YouTube Channel */}
               <a
-                href="#"
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-500 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900 transition-all"
+                href="https://www.youtube.com/@obhyash"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Obhyash YouTube Channel"
+                title="অভ্যাস অফিসিয়াল ইউটিউব চ্যানেল"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] text-slate-600 dark:text-slate-300 hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-all text-xs font-semibold"
               >
-                <Youtube className="w-4 h-4" />
+                <Youtube className="w-4 h-4 text-red-600 dark:text-red-500 shrink-0" />
+                <span>ইউটিউব</span>
               </a>
             </div>
           </div>
@@ -74,38 +112,47 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/blog?category=Study+Tips"
+                  href="/blog?category=স্টাডি+টিপস+ও+রুটিন"
                   className="hover:text-rose-600 dark:hover:text-rose-400 transition-colors inline-flex items-center gap-1.5 group"
                 >
                   <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all text-rose-500" />
-                  স্টাডি টিপস
+                  স্টাডি টিপস ও রুটিন
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/blog?category=Exam+Prep"
+                  href="/blog?category=এইচএসসি+প্রস্তুতি"
                   className="hover:text-rose-600 dark:hover:text-rose-400 transition-colors inline-flex items-center gap-1.5 group"
                 >
                   <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all text-rose-500" />
-                  পরীক্ষার প্রস্তুতি
+                  এইচএসসি ও বোর্ড প্রস্তুতি
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/blog?category=MCQ+Techniques"
+                  href="/blog?category=ক্যারিয়ার+ও+ভর্তি+গাইড"
                   className="hover:text-rose-600 dark:hover:text-rose-400 transition-colors inline-flex items-center gap-1.5 group"
                 >
                   <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all text-rose-500" />
-                  MCQ কৌশল
+                  ভর্তি পরীক্ষা গাইড
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/blog?category=Motivation"
+                  href="/blog?category=বিষয়ভিত্তিক+পড়াশোনা"
                   className="hover:text-rose-600 dark:hover:text-rose-400 transition-colors inline-flex items-center gap-1.5 group"
                 >
                   <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all text-rose-500" />
-                  অনুপ্রেরণা
+                  বিষয়ভিত্তিক পড়াশোনা
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog?category=মোটিভেশন+ও+মানসিক+স্বাস্থ্য"
+                  className="hover:text-rose-600 dark:hover:text-rose-400 transition-colors inline-flex items-center gap-1.5 group"
+                >
+                  <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all text-rose-500" />
+                  মোটিভেশন ও মানসিক স্বাস্থ্য
                 </Link>
               </li>
             </ul>
@@ -127,7 +174,7 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href="/about-us"
                   className="hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                   আমাদের সম্পর্কে
@@ -151,10 +198,18 @@ export default function BlogFooter() {
               </li>
               <li>
                 <Link
-                  href="/faq"
+                  href="/support"
                   className="hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
-                  সাধারণ জিজ্ঞাসা
+                  সাপোর্ট ও যোগাযোগ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/demo"
+                  className="hover:text-slate-900 dark:hover:text-white transition-colors"
+                >
+                  ফ্রি এক্সাম দাও
                 </Link>
               </li>
             </ul>
@@ -180,7 +235,7 @@ export default function BlogFooter() {
                   href="/about-us"
                   className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  About Us
+                  About Us (আমাদের সম্পর্কে)
                 </Link>
               </li>
               <li>
@@ -188,7 +243,7 @@ export default function BlogFooter() {
                   href="/privacy-policy"
                   className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  Privacy Policy
+                  Privacy Policy (গোপনীয়তা নীতি)
                 </Link>
               </li>
               <li>
@@ -196,7 +251,7 @@ export default function BlogFooter() {
                   href="/terms-and-conditions"
                   className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  Terms & Conditions
+                  Terms & Conditions (শর্তাবলি)
                 </Link>
               </li>
               <li>
@@ -204,7 +259,7 @@ export default function BlogFooter() {
                   href="/refund-policy"
                   className="hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                 >
-                  Refund Policy
+                  Refund Policy (রিফান্ড নীতি)
                 </Link>
               </li>
             </ul>

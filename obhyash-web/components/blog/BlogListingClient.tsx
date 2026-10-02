@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -66,9 +66,16 @@ export default function BlogListingClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTag = searchParams.get('tag') ?? '';
+  const categoryParam = searchParams.get('category') ?? '';
 
   const [heroTab, setHeroTab] = useState<'popular' | 'recent'>('popular');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(() => categoryParam || 'All');
+
+  useEffect(() => {
+    if (categoryParam) {
+      setActiveCategory(categoryParam);
+    }
+  }, [categoryParam]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(6);
   const [emailInput, setEmailInput] = useState('');
@@ -125,7 +132,16 @@ export default function BlogListingClient({
   const filteredLatestPosts = useMemo(() => {
     let result = posts;
     if (activeCategory !== 'All') {
-      result = result.filter((p) => p.category === activeCategory);
+      result = result.filter((p) => {
+        if (!p.category) return false;
+        if (p.category.toLowerCase() === activeCategory.toLowerCase()) return true;
+        if (p.category.includes(activeCategory) || activeCategory.includes(p.category)) return true;
+        if (activeCategory === 'Study Tips' && (p.category.includes('টিপস') || p.category.includes('রুটিন'))) return true;
+        if (activeCategory === 'Exam Prep' && (p.category.includes('প্রস্তুতি') || p.category.includes('পরীক্ষা'))) return true;
+        if (activeCategory === 'MCQ Techniques' && (p.category.includes('কৌশল') || p.category.includes('টিপস'))) return true;
+        if (activeCategory === 'Motivation' && p.category.includes('মোটিভেশন')) return true;
+        return false;
+      });
     }
     if (activeTag) {
       result = result.filter((p) =>
