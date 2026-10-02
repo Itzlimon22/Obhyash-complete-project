@@ -547,12 +547,22 @@ window.build = function(plan, off, hdr) {
       </div>\`;
     } else {
       top = 80;
+      const leftIconSvg = SETTINGS.showHeaderLeftIcon !== false 
+        ? '<svg viewBox="0 0 24 24"><path d="M3.6 1.6c-.3.3-.5.8-.5 1.4v18c0 .6.2 1.1.5 1.4l.1.1L13.8 12.4v-.2L3.7 1.5z" fill="#00a0ff"/><path d="M17.2 15.8l-3.4-3.4v-.2l3.4-3.4.1.1 4 2.3c1.1.6 1.1 1.7 0 2.3l-4 2.2z" fill="#ffc400"/><path d="M17.3 15.7L13.8 12.3 3.6 22.4c.4.4 1 .4 1.7.1z" fill="#f43249"/><path d="M17.3 8.9L5.3 2.1c-.7-.4-1.3-.3-1.7.1l10.2 10.1z" fill="#00e676"/></svg>'
+        : '';
+      const leftTagOpen = SETTINGS.headerLeftUrl 
+        ? ('<a href="' + SETTINGS.headerLeftUrl + '">') 
+        : '<div style="position:absolute;left:0;top:0;display:flex;align-items:center;gap:7px;color:#0f4c5c;font-size:15px;font-weight:bold;">';
+      const leftTagClose = SETTINGS.headerLeftUrl ? '</a>' : '</div>';
+      const rightText = SETTINGS.headerRightText || SETTINGS.title;
+      const leftText = SETTINGS.headerLeftText || 'অ্যাপ ইনস্টল করো';
+
       p.innerHTML = \`<div class="rh">
-        <a href="\${SETTINGS.playStoreUrl}">
-          <svg viewBox="0 0 24 24"><path d="M3.6 1.6c-.3.3-.5.8-.5 1.4v18c0 .6.2 1.1.5 1.4l.1.1L13.8 12.4v-.2L3.7 1.5z" fill="#00a0ff"/><path d="M17.2 15.8l-3.4-3.4v-.2l3.4-3.4.1.1 4 2.3c1.1.6 1.1 1.7 0 2.3l-4 2.2z" fill="#ffc400"/><path d="M17.3 15.7L13.8 12.3 3.6 22.4c.4.4 1 .4 1.7.1z" fill="#f43249"/><path d="M17.3 8.9L5.3 2.1c-.7-.4-1.3-.3-1.7.1l10.2 10.1z" fill="#00e676"/></svg>
-          অ্যাপ ইনস্টল করো
-        </a>
-        <div class="nm">\${SETTINGS.title}</div>
+        \${leftTagOpen}
+          \${leftIconSvg}
+          <span>\${leftText}</span>
+        \${leftTagClose}
+        <div class="nm">\${rightText}</div>
       </div>\`;
     }
 
@@ -567,7 +577,14 @@ window.build = function(plan, off, hdr) {
 
     const f = document.createElement('div');
     f.className = 'foot';
-    f.innerHTML = \`<a href="\${SETTINGS.websiteUrl}">আনলিমিটেড এক্সাম দাও <span class="site">\${SETTINGS.websiteUrl.replace(/^https?:\\/\\//, '')}</span> এ</a><div class="pg">পৃষ্ঠা<i>\${BN(off + k + 1)}</i></div>\`;
+    const footerUrl = SETTINGS.footerLeftUrl || 'https://www.obhyash.com';
+    const footerPrefix = SETTINGS.footerLeftPrefix || 'আনলিমিটেড এক্সাম দাও';
+    const siteText = SETTINGS.footerSiteText || 'www.obhyash.com';
+    const footerSuffix = SETTINGS.footerLeftSuffix || 'এ';
+    const pagePrefix = SETTINGS.footerPagePrefix || 'পৃষ্ঠা';
+    const pageNumStr = SETTINGS.useBanglaDigits !== false ? BN(off + k + 1) : String(off + k + 1);
+
+    f.innerHTML = \`<a href="\${footerUrl}">\${footerPrefix} <span class="site">\${siteText}</span> \${footerSuffix}</a><div class="pg">\${pagePrefix} <i>\${pageNumStr}</i></div>\`;
     p.appendChild(f);
     root.appendChild(p);
   });

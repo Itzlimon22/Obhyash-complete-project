@@ -12,11 +12,11 @@ import {
   AlertTriangle,
   ZoomIn,
   ZoomOut,
-  Maximize2,
   Layers,
   Settings,
   Sparkles,
-  ExternalLink,
+  Sliders,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { GeneratorSettings } from '@/lib/pdf-generator/types';
 
@@ -26,12 +26,15 @@ export default function PdfGeneratorPage() {
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'cover' | 'header' | 'footer'>('cover');
+
   const [stats, setStats] = useState<{
     totalPages: number;
     totalCards: number;
     fillPercentage: number;
     overflows: Array<[string, number]>;
   } | null>(null);
+
   const [parseNotice, setParseNotice] = useState<{
     count: number;
     type: string;
@@ -42,9 +45,17 @@ export default function PdfGeneratorPage() {
     title: 'মেডিকেল ভর্তি মডেল টেস্ট ০১',
     subtitle: 'রসায়ন, পদার্থ, জীববিজ্ঞান, ইংরেজি ও সাধারণ জ্ঞান • MCQ সমাধান শীট',
     hasHeader: true,
+    headerLeftText: 'অ্যাপ ইনস্টল করো',
+    headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
+    headerRightText: '',
+    showHeaderLeftIcon: true,
+    footerLeftPrefix: 'আনলিমিটেড এক্সাম দাও',
+    footerSiteText: 'www.obhyash.com',
+    footerLeftUrl: 'https://www.obhyash.com',
+    footerLeftSuffix: 'এ',
+    footerPagePrefix: 'পৃষ্ঠা',
+    useBanglaDigits: true,
     pageOffset: 0,
-    playStoreUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
-    websiteUrl: 'https://www.obhyash.com',
   });
 
   const [zoomLevel, setZoomLevel] = useState(85);
@@ -79,6 +90,8 @@ export default function PdfGeneratorPage() {
       setSettings(prev => ({ ...prev, title: 'মেডিকেল ভর্তি মডেল টেস্ট ০১' }));
     } else if (nameWithoutExt.toLowerCase().includes('model_test_02') || nameWithoutExt.includes('০২')) {
       setSettings(prev => ({ ...prev, title: 'মেডিকেল ভর্তি মডেল টেস্ট ০২' }));
+    } else if (nameWithoutExt.toLowerCase().includes('model_test_03') || nameWithoutExt.includes('০৩')) {
+      setSettings(prev => ({ ...prev, title: 'মেডিকেল ভর্তি মডেল টেস্ট ০৩' }));
     }
 
     const reader = new FileReader();
@@ -222,7 +235,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${settings.title}_Solution.pdf`;
+        a.download = `${settings.title || 'Model_Test'}_Solution.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -265,7 +278,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                 </span>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                যেকোনো মডেল টেস্টের txt বা md ফাইল থেকে আনব্রেকেবল কার্ড লেআউটে অফিশিয়াল PDF শীট তৈরি করুন।
+                হেডার, ফুটার, পেজিং এবং কভার টেক্সট সম্পূর্ণ কাস্টমাইজ করে ব্র্যান্ডেড PDF সলিউশন তৈরি করুন।
               </p>
             </div>
           </div>
@@ -304,7 +317,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
             {/* Dropzone */}
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-400 rounded-xl p-6 text-center cursor-pointer transition bg-gray-50/50 dark:bg-gray-850/50 group"
+              className="border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-400 rounded-xl p-5 text-center cursor-pointer transition bg-gray-50/50 dark:bg-gray-850/50 group"
             >
               <input
                 ref={fileInputRef}
@@ -313,8 +326,8 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <div className="w-12 h-12 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                <Upload className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 mx-auto flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <Upload className="w-5 h-5" />
               </div>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                 ক্লিক করে <span className="text-teal-600">.txt</span> বা <span className="text-teal-600">.md</span> ফাইল আপলোড করুন
@@ -347,14 +360,14 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
                 placeholder="#1&#10;Q টেরিসের স্পোরাঞ্জিয়া...&#10;a সোরাস&#10;b ফলস ইন্ডুসিয়াম...&#10;A ক&#10;E ব্যাখ্যা..."
-                rows={7}
+                rows={5}
                 className="w-full p-3 font-mono text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-teal-500 focus:outline-none transition resize-y"
               />
             </div>
 
             {/* Parser Status Notice */}
             {parseNotice && (
-              <div className="p-3.5 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-xs space-y-1.5">
+              <div className="p-3 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-xs space-y-1.5">
                 <div className="flex items-center gap-2 text-teal-800 dark:text-teal-300 font-semibold">
                   <CheckCircle2 className="w-4 h-4 text-teal-600" />
                   <span>
@@ -380,48 +393,58 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
             )}
           </div>
 
-          {/* Settings Section */}
+          {/* Granular Customization Section */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-4">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <Settings className="w-4 h-4 text-teal-600" />
-              হেডার ও লেআউট কনফিগারেশন
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-teal-600" />
+                হেডার ও ফুটার কাস্টমাইজেশন
+              </h2>
+            </div>
 
-            <div className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  মডেল টেস্ট শিরোনাম (Title)
-                </label>
-                <input
-                  type="text"
-                  value={settings.title}
-                  onChange={e =>
-                    setSettings(prev => ({ ...prev, title: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
-                  placeholder="যেমন: মেডিকেল ভর্তি মডেল টেস্ট ০১"
-                />
-              </div>
+            {/* Customization Tabs */}
+            <div className="flex rounded-xl bg-gray-100 dark:bg-gray-900 p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveTab('cover')}
+                className={`flex-1 py-1.5 rounded-lg transition ${
+                  activeTab === 'cover'
+                    ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+              >
+                ১ম পৃষ্ঠা হেডার
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('header')}
+                className={`flex-1 py-1.5 rounded-lg transition ${
+                  activeTab === 'header'
+                    ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+              >
+                ২য়+ পৃষ্ঠা হেডার (L/R)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('footer')}
+                className={`flex-1 py-1.5 rounded-lg transition ${
+                  activeTab === 'footer'
+                    ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+              >
+                ফুটার ও পেজিং (L/R)
+              </button>
+            </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  সাবটাইটেল (Subtitle)
-                </label>
-                <input
-                  type="text"
-                  value={settings.subtitle}
-                  onChange={e =>
-                    setSettings(prev => ({ ...prev, subtitle: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
-                  placeholder="রসায়ন, পদার্থ, জীববিজ্ঞান..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-1">
+            {/* Tab 1: Cover Header */}
+            {activeTab === 'cover' && (
+              <div className="space-y-3.5 pt-1">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    হেডার স্টাইল
+                    ১ম পৃষ্ঠা কভার হেডার মোড
                   </label>
                   <select
                     value={settings.hasHeader ? 'true' : 'false'}
@@ -433,30 +456,248 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                     }
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
                   >
-                    <option value="true">১ম পৃষ্ঠায় বড় হেডার (Cover)</option>
-                    <option value="false">শুধু মিনি হেডার (Continuation)</option>
+                    <option value="true">১ম পৃষ্ঠায় বড় ডার্ক টিল কভার হেডার (Part 1)</option>
+                    <option value="false">শুধু মিনি হেডার দিয়ে শুরু (Continuation Part 2)</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    শুরুর পৃষ্ঠা নম্বর (Offset)
+                    প্রধান শিরোনাম (Main Title)
                   </label>
                   <input
-                    type="number"
-                    min="0"
-                    value={settings.pageOffset}
+                    type="text"
+                    value={settings.title}
                     onChange={e =>
-                      setSettings(prev => ({
-                        ...prev,
-                        pageOffset: Math.max(0, parseInt(e.target.value) || 0),
-                      }))
+                      setSettings(prev => ({ ...prev, title: e.target.value }))
                     }
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                    placeholder="যেমন: মেডিকেল ভর্তি মডেল টেস্ট ০১"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    সাবটাইটেল (Subtitle)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.subtitle}
+                    onChange={e =>
+                      setSettings(prev => ({ ...prev, subtitle: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                    placeholder="রসায়ন, পদার্থ, জীববিজ্ঞান, ইংরেজি ও সাধারণ জ্ঞান • MCQ সমাধান শীট"
                   />
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Tab 2: Mini Header Left & Right */}
+            {activeTab === 'header' && (
+              <div className="space-y-3.5 pt-1">
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750 space-y-2.5">
+                  <div className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center justify-between">
+                    <span>হেডার বাম পাশ (Header Left)</span>
+                    <label className="inline-flex items-center gap-1.5 cursor-pointer font-normal">
+                      <input
+                        type="checkbox"
+                        checked={settings.showHeaderLeftIcon !== false}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            showHeaderLeftIcon: e.target.checked,
+                          }))
+                        }
+                        className="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
+                      />
+                      <span>প্লে স্টোর আইকন দেখাও</span>
+                    </label>
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      value={settings.headerLeftText}
+                      onChange={e =>
+                        setSettings(prev => ({
+                          ...prev,
+                          headerLeftText: e.target.value,
+                        }))
+                      }
+                      placeholder="যেমন: অ্যাপ ইনস্টল করো"
+                      className="w-full px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-0.5">
+                      বাম পাশের ক্লিক লিংক (URL):
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.headerLeftUrl}
+                      onChange={e =>
+                        setSettings(prev => ({
+                          ...prev,
+                          headerLeftUrl: e.target.value,
+                        }))
+                      }
+                      placeholder="https://play.google.com/..."
+                      className="w-full px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750 space-y-1.5">
+                  <span className="text-xs font-bold text-gray-800 dark:text-gray-200 block">
+                    হেডার ডান পাশ (Header Right)
+                  </span>
+                  <input
+                    type="text"
+                    value={settings.headerRightText}
+                    onChange={e =>
+                      setSettings(prev => ({
+                        ...prev,
+                        headerRightText: e.target.value,
+                      }))
+                    }
+                    placeholder={`ডিফল্ট: ${settings.title}`}
+                    className="w-full px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  />
+                  <p className="text-[11px] text-gray-400">
+                    ফাঁকা রাখলে মূল শিরোনামটি স্বয়ংক্রিয়ভাবে ডান পাশে দেখাবে।
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 3: Footer Left & Right */}
+            {activeTab === 'footer' && (
+              <div className="space-y-3.5 pt-1">
+                {/* Footer Left */}
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750 space-y-2">
+                  <span className="text-xs font-bold text-gray-800 dark:text-gray-200 block">
+                    ফুটার বাম পাশ (Footer Left Branding & Link)
+                  </span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-1">
+                      <label className="block text-[11px] text-gray-500 mb-0.5">প্রিফিক্স:</label>
+                      <input
+                        type="text"
+                        value={settings.footerLeftPrefix}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            footerLeftPrefix: e.target.value,
+                          }))
+                        }
+                        placeholder="আনলিমিটেড এক্সাম দাও"
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <label className="block text-[11px] text-gray-500 mb-0.5">সাইট ডোমেইন:</label>
+                      <input
+                        type="text"
+                        value={settings.footerSiteText}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            footerSiteText: e.target.value,
+                          }))
+                        }
+                        placeholder="www.obhyash.com"
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <label className="block text-[11px] text-gray-500 mb-0.5">সাফিক্স:</label>
+                      <input
+                        type="text"
+                        value={settings.footerLeftSuffix}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            footerLeftSuffix: e.target.value,
+                          }))
+                        }
+                        placeholder="এ"
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-gray-500 mb-0.5">ফুটার ক্লিক URL:</label>
+                    <input
+                      type="text"
+                      value={settings.footerLeftUrl}
+                      onChange={e =>
+                        setSettings(prev => ({
+                          ...prev,
+                          footerLeftUrl: e.target.value,
+                        }))
+                      }
+                      placeholder="https://www.obhyash.com"
+                      className="w-full px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Footer Right (Page Numbers) */}
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750 space-y-2">
+                  <span className="text-xs font-bold text-gray-800 dark:text-gray-200 block">
+                    ফুটার ডান পাশ (Page Numbering)
+                  </span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-0.5">পৃষ্ঠা লেবেল:</label>
+                      <input
+                        type="text"
+                        value={settings.footerPagePrefix}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            footerPagePrefix: e.target.value,
+                          }))
+                        }
+                        placeholder="পৃষ্ঠা"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-0.5">সংখ্যার ধরণ:</label>
+                      <select
+                        value={settings.useBanglaDigits ? 'true' : 'false'}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            useBanglaDigits: e.target.value === 'true',
+                          }))
+                        }
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      >
+                        <option value="true">বাংলা (১, ২, ৩)</option>
+                        <option value="false">ইংরেজি (1, 2, 3)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-gray-500 mb-0.5">শুরুর পৃষ্ঠা (Offset):</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={settings.pageOffset}
+                        onChange={e =>
+                          setSettings(prev => ({
+                            ...prev,
+                            pageOffset: Math.max(0, parseInt(e.target.value) || 0),
+                          }))
+                        }
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-850 text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="pt-3 border-t border-gray-100 dark:border-gray-750 flex flex-col sm:flex-row gap-2.5">
@@ -575,7 +816,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                   কোনো প্রিভিউ লোড করা হয়নি
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
-                  বামে ফাইল আপলোড করুন অথবা &quot;নমুনা ডেটা লোড করুন&quot; ক্লিক করে প্রিভিউ তৈরি করুন।
+                  বামে ফাইল আপলোড করুন এবং &quot;প্রিভিউ তৈরি করুন&quot; ক্লিক করুন।
                 </p>
               </div>
             ) : (
