@@ -28,6 +28,7 @@ import {
   Moon,
   SlidersHorizontal,
   Tag,
+  FileText,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
@@ -95,6 +96,12 @@ const ADMIN_NAVIGATION: NavSection[] = [
         label: 'লাইভ পরীক্ষা কন্ট্রোলার',
         icon: Radio,
         href: '/admin/live-exams',
+      },
+      {
+        id: 'pdf-generator',
+        label: 'মডেল টেস্ট PDF তৈরি',
+        icon: FileText,
+        href: '/admin/pdf-generator',
       },
       {
         id: 'users',
