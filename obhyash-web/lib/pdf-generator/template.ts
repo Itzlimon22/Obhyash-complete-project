@@ -166,17 +166,76 @@ export function renderCardHtml(q: QuestionItem): string {
   return `<div class="card"><div class="qb"><span class="bd">${toBnNumber(q.n)}</span>${inlineMath(q.q)}</div><div class="opts">${opts}</div><div class="ex">${explHtml(q.E)}</div></div>`;
 }
 
+const DENSITY_CONFIGS = {
+  balanced: {
+    qbFontSize: '14.2px',
+    qbPadding: '7px 11px',
+    qbLineHeight: '1.4',
+    bdFontSize: '13px',
+    bdPadding: '0 8px',
+    bdLineHeight: '20px',
+    optsGap: '6px',
+    optsMargin: '6px 0',
+    opFontSize: '13.4px',
+    opPadding: '5px 8px',
+    opMinHeight: '28px',
+    opLineHeight: '1.35',
+    exFontSize: '12.6px',
+    exPadding: '7px 10px',
+    exLineHeight: '1.42',
+    cardGap: 10,
+  },
+  compact: {
+    qbFontSize: '13.5px',
+    qbPadding: '6px 9px',
+    qbLineHeight: '1.38',
+    bdFontSize: '12.5px',
+    bdPadding: '0 7px',
+    bdLineHeight: '19px',
+    optsGap: '5px',
+    optsMargin: '5px 0',
+    opFontSize: '12.6px',
+    opPadding: '4px 7px',
+    opMinHeight: '26px',
+    opLineHeight: '1.3',
+    exFontSize: '12.0px',
+    exPadding: '6px 9px',
+    exLineHeight: '1.38',
+    cardGap: 8,
+  },
+  spacious: {
+    qbFontSize: '15.5px',
+    qbPadding: '11px 12px 11px 14px',
+    qbLineHeight: '1.5',
+    bdFontSize: '14px',
+    bdPadding: '0 9px',
+    bdLineHeight: '22px',
+    optsGap: '8px',
+    optsMargin: '8px 0',
+    opFontSize: '14.5px',
+    opPadding: '7px 10px',
+    opMinHeight: '34px',
+    opLineHeight: '1.4',
+    exFontSize: '13.6px',
+    exPadding: '9px 12px',
+    exLineHeight: '1.5',
+    cardGap: 14,
+  },
+};
+
 export function generateTemplateHtml(
   questions: QuestionItem[],
   settings: GeneratorSettings
 ): string {
+  const density = settings.density || 'balanced';
+  const dc = DENSITY_CONFIGS[density] || DENSITY_CONFIGS.balanced;
   const cardsJson = JSON.stringify(questions.map(renderCardHtml));
 
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>${escapeHtml(settings.title)}</title>
+<title>\${escapeHtml(settings.title)}</title>
 <link rel="stylesheet" href="/katex/katex.min.css">
 <style>
 @font-face {
@@ -294,28 +353,28 @@ body {
   margin-bottom: 0;
 }
 .col .card + .card {
-  margin-top: 14px;
+  margin-top: \${dc.cardGap}px;
 }
 
 /* Question Box */
 .qb {
   background: #e6f1f1;
-  border-left: 6px solid #0f4c5c;
-  border-radius: 14px;
-  padding: 11px 12px 11px 14px;
+  border-left: 5px solid #0f4c5c;
+  border-radius: 12px;
+  padding: \${dc.qbPadding};
   font-weight: bold;
-  font-size: 15.5px;
-  line-height: 1.5;
+  font-size: \${dc.qbFontSize};
+  line-height: \${dc.qbLineHeight};
 }
 .bd {
   display: inline-block;
   background: #d62839;
   color: #fff;
   border-radius: 8px;
-  padding: 0 9px;
-  margin-right: 8px;
-  font-size: 14px;
-  line-height: 22px;
+  padding: \${dc.bdPadding};
+  margin-right: 7px;
+  font-size: \${dc.bdFontSize};
+  line-height: \${dc.bdLineHeight};
   font-weight: bold;
 }
 
@@ -323,43 +382,43 @@ body {
 .opts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 8px 0;
+  gap: \${dc.optsGap};
+  margin: \${dc.optsMargin};
 }
 .op {
   position: relative;
   background: #fff;
-  border: 1.6px solid #c9cfd3;
-  border-radius: 10px;
-  padding: 7px 10px;
-  font-size: 14.5px;
-  line-height: 1.4;
-  min-height: 34px;
+  border: 1.5px solid #c9cfd3;
+  border-radius: 9px;
+  padding: \${dc.opPadding};
+  font-size: \${dc.opFontSize};
+  line-height: \${dc.opLineHeight};
+  min-height: \${dc.opMinHeight};
   display: block;
 }
 .op b { margin-right: 5px; }
-.op.smo { font-size: 13.4px; }
+.op.smo { font-size: calc(\${dc.opFontSize} - 1px); }
 .op.ok {
   border-color: #2e9e57;
   background: #e8f6ec;
-  padding-right: 26px;
+  padding-right: 24px;
 }
 .ck {
   position: absolute;
   right: 7px;
   top: 50%;
   margin-top: -8px;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 /* Explanation */
 .ex {
   background: #fdf0ec;
-  border-radius: 14px;
-  padding: 9px 12px;
-  font-size: 13.6px;
-  line-height: 1.5;
+  border-radius: 12px;
+  padding: \${dc.exPadding};
+  font-size: \${dc.exFontSize};
+  line-height: \${dc.exLineHeight};
 }
 .ln { margin: 2px 0; }
 .lab { color: #d62839; font-weight: bold; }
@@ -472,7 +531,7 @@ renderMath(M);
 window.READY = false;
 
 // Dynamic Programming Pagination
-const GAP = 14;
+const GAP = ${dc.cardGap};
 const U_FULL = 1123 - 40 - 72; // = 1011
 
 function paginate(h, hdr) {
@@ -495,9 +554,10 @@ function paginate(h, hdr) {
       let b = 0;
       while (i + a + b <= n && (b === 0 || hh(i + a, i + a + b) <= U)) {
         const j = i + a + b;
+        // Prioritize: 1) minimum pages, 2) maximum cards packed on this page, 3) column balance
         const cand = [
           p + 1,
-          best[i][1] + p * (a + b),
+          best[i][1] - (a + b),
           best[i][2] + Math.abs(hh(i, i + a) - hh(i + a, j))
         ];
         if (
@@ -566,11 +626,26 @@ window.build = function(plan, off, hdr) {
       </div>\`;
     }
 
+    const U_AVAIL = U_FULL - (k === 0 && hdr ? 156 : 44);
+
     [[pl[0], 40], [pl[1], 410]].forEach(([ids, x]) => {
       const c = document.createElement('div');
       c.className = 'col';
       c.style.left = x + 'px';
       c.style.top = top + 'px';
+
+      // Smart vertical gap distribution if extra space exists
+      if (SETTINGS.balanceColumns !== false && ids.length > 1) {
+        const colCardsHeight = ids.reduce((sum, i) => sum + (window.heights ? window.heights[i] : 0), 0);
+        const remainingSpace = U_AVAIL - colCardsHeight;
+        if (remainingSpace > 0 && remainingSpace < 220) {
+          const distributedGap = Math.min(26, Math.max(GAP, Math.floor(remainingSpace / (ids.length - 1))));
+          c.style.display = 'flex';
+          c.style.flexDirection = 'column';
+          c.style.gap = distributedGap + 'px';
+        }
+      }
+
       ids.forEach(i => c.appendChild(M.children[i].cloneNode(true)));
       p.appendChild(c);
     });

@@ -7,6 +7,10 @@ export interface QuestionItem {
 }
 
 export interface GeneratorSettings {
+  // Density and Spacing
+  density?: 'balanced' | 'compact' | 'spacious'; // default: 'balanced'
+  balanceColumns?: boolean; // default: true
+
   // First page Hero Header
   title: string;
   subtitle: string;

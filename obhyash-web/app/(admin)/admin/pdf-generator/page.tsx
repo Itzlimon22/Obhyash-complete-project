@@ -16,7 +16,7 @@ import {
   Settings,
   Sparkles,
   Sliders,
-  Link as LinkIcon,
+  AlignJustify,
 } from 'lucide-react';
 import { GeneratorSettings } from '@/lib/pdf-generator/types';
 
@@ -26,7 +26,7 @@ export default function PdfGeneratorPage() {
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'cover' | 'header' | 'footer'>('cover');
+  const [activeTab, setActiveTab] = useState<'cover' | 'header' | 'footer' | 'layout'>('layout');
 
   const [stats, setStats] = useState<{
     totalPages: number;
@@ -45,6 +45,8 @@ export default function PdfGeneratorPage() {
     title: 'মেডিকেল ভর্তি মডেল টেস্ট ০১',
     subtitle: 'রসায়ন, পদার্থ, জীববিজ্ঞান, ইংরেজি ও সাধারণ জ্ঞান • MCQ সমাধান শীট',
     hasHeader: true,
+    density: 'balanced',
+    balanceColumns: true,
     headerLeftText: 'অ্যাপ ইনস্টল করো',
     headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
     headerRightText: '',
@@ -274,11 +276,11 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                   মডেল টেস্ট PDF জেনারেটর
                 </h1>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
-                  A4 2-Column Engine
+                  Zero-Gap Dynamic Engine
                 </span>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                হেডার, ফুটার, পেজিং এবং কভার টেক্সট সম্পূর্ণ কাস্টমাইজ করে ব্র্যান্ডেড PDF সলিউশন তৈরি করুন।
+                হেডার, ফুটার, ডেনসিটি ও স্মার্ট স্পেসিং কাস্টমাইজ করে কোনো অতিরিক্ত ফাঁকা জায়গা ছাড়াই নিখুঁত PDF তৈরি করুন।
               </p>
             </div>
           </div>
@@ -398,12 +400,23 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-teal-600" />
-                হেডার ও ফুটার কাস্টমাইজেশন
+                হেডার, ফুটার ও লেআউট কন্ট্রোল
               </h2>
             </div>
 
             {/* Customization Tabs */}
             <div className="flex rounded-xl bg-gray-100 dark:bg-gray-900 p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveTab('layout')}
+                className={`flex-1 py-1.5 rounded-lg transition ${
+                  activeTab === 'layout'
+                    ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                }`}
+              >
+                লেআউট ও ডেনসিটি
+              </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('cover')}
@@ -424,7 +437,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                     : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               >
-                ২য়+ পৃষ্ঠা হেডার (L/R)
+                ২য়+ পৃষ্ঠা হেডার
               </button>
               <button
                 type="button"
@@ -435,11 +448,69 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                     : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               >
-                ফুটার ও পেজিং (L/R)
+                ফুটার ও পেজিং
               </button>
             </div>
 
-            {/* Tab 1: Cover Header */}
+            {/* Tab: Layout & Density (Solves Huge Gap) */}
+            {activeTab === 'layout' && (
+              <div className="space-y-3.5 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    লেআউট ডেনসিটি (Density & Card Fit)
+                  </label>
+                  <select
+                    value={settings.density || 'balanced'}
+                    onChange={e =>
+                      setSettings(prev => ({
+                        ...prev,
+                        density: e.target.value as 'balanced' | 'compact' | 'spacious',
+                      }))
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                  >
+                    <option value="balanced">
+                      ভারসাম্যপূর্ণ (Balanced - Recommended) • কোনো গ্যাপ নেই, ৫-৬ প্রশ্ন/পেজ
+                    </option>
+                    <option value="compact">
+                      কম্প্যাক্ট (Compact) • ১৬ পৃষ্ঠায় ১০০ প্রশ্ন, সর্বোচ্চ স্পেস ব্যবহার
+                    </option>
+                    <option value="spacious">
+                      প্রশস্ত (Spacious) • বড় ফন্ট (১৫.৫px), ছোট ব্যাখ্যাযুক্ত টেস্টের জন্য
+                    </option>
+                  </select>
+                  <p className="text-[11px] text-teal-600 dark:text-teal-400 mt-1">
+                    * &apos;Balanced&apos; মোডে বড় ব্যাখ্যাযুক্ত প্রশ্নেও কলামের নিচের অতিরিক্ত ফাঁকা জায়গা (gap) পুরোপুরি দূর হয়ে যায়।
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.balanceColumns !== false}
+                      onChange={e =>
+                        setSettings(prev => ({
+                          ...prev,
+                          balanceColumns: e.target.checked,
+                        }))
+                      }
+                      className="rounded text-teal-600 focus:ring-teal-500 w-4 h-4"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 block">
+                        স্মার্ট ভার্টিক্যাল স্পেস ব্যালেন্সিং
+                      </span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
+                        কোনো কলামে কম কার্ড থাকলে নিচে বড় গ্যাপ ফেলে না রেখে কার্ডগুলোর মাঝে ফাঁকা জায়গা সমানভাবে ছড়িয়ে দেয়।
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Cover Header */}
             {activeTab === 'cover' && (
               <div className="space-y-3.5 pt-1">
                 <div>
@@ -493,7 +564,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
               </div>
             )}
 
-            {/* Tab 2: Mini Header Left & Right */}
+            {/* Tab: Mini Header Left & Right */}
             {activeTab === 'header' && (
               <div className="space-y-3.5 pt-1">
                 <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-750 space-y-2.5">
@@ -511,7 +582,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
                         }
                         className="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
                       />
-                      <span>প্লে স্টোর আইকন দেখাও</span>
+                      <span>আইকন দেখাও</span>
                     </label>
                   </div>
                   <div>
@@ -570,7 +641,7 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
               </div>
             )}
 
-            {/* Tab 3: Footer Left & Right */}
+            {/* Tab: Footer Left & Right */}
             {activeTab === 'footer' && (
               <div className="space-y-3.5 pt-1">
                 {/* Footer Left */}
