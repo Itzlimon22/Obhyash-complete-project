@@ -75,6 +75,16 @@ const nextConfig: NextConfig = {
         destination: '/privacy',
         permanent: true,
       },
+      {
+        source: '/register',
+        destination: '/signup',
+        permanent: true,
+      },
+      {
+        source: '/reset-password',
+        destination: '/forgot-password?type=recovery',
+        permanent: false,
+      },
     ];
   },
 

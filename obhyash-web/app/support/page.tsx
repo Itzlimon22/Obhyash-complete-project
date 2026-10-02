@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -11,8 +11,11 @@ import {
   ChevronDown,
   FileUp,
   X,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 const ISSUE_TYPES = [
   'লগইন হচ্ছে না (Login Issue)',
@@ -26,6 +29,12 @@ const ISSUE_TYPES = [
 export default function SupportPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { theme, toggleTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [phone, setPhone] = useState('');
   const [issueType, setIssueType] = useState('');
@@ -104,198 +113,213 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-bengali">
-      {/* Top Header - Flat Navigation */}
-      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-6 pb-2 flex items-center justify-between">
+    <div className="min-h-screen bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 flex flex-col font-bengali">
+      {/* Top Header - Navigation */}
+      <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
         <button
           type="button"
           onClick={() => router.back()}
-          className="p-1.5 -ml-1.5 text-neutral-800 hover:text-neutral-600 transition-colors"
+          className="p-1.5 -ml-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
           title="ফিরে যান"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft size={20} />
+          <span className="text-xs sm:text-sm font-semibold">ফিরে যাও</span>
         </button>
 
-        <h1 className="text-lg sm:text-xl font-bold text-neutral-900 text-center flex-1">
+        <h1 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white text-center flex-1">
           সাপোর্টে যোগাযোগ
         </h1>
 
-        <div className="w-6" />
+        <div className="flex items-center gap-2">
+          {mounted && (
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
+        </div>
       </header>
 
-      {/* Main Content - Flat to Screen, No Outer Card */}
-      <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-6 py-4">
-        {submittedTicket ? (
-          /* SUCCESS STATE - Flat */
-          <div className="text-center py-8 space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <CheckCircle2 size={36} />
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black text-neutral-900">
-                রিকোয়েস্ট জমা হয়েছে!
-              </h2>
-              <p className="text-sm text-neutral-500 max-w-sm mx-auto">
-                আমাদের টিম দ্রুত তোমার ফোন নম্বরে যোগাযোগ করবে।
-              </p>
-            </div>
-
-            {/* Ticket Info Flat Box */}
-            <div className="p-5 rounded-2xl bg-neutral-100 text-left space-y-3">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-neutral-500">রেফারেন্স আইডি:</span>
-                <span className="font-mono font-extrabold text-neutral-900">
-                  #{submittedTicket.id.slice(0, 8).toUpperCase()}
-                </span>
+      {/* Main Content */}
+      <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex items-center justify-center">
+        <div className="w-full bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
+          {submittedTicket ? (
+            /* SUCCESS STATE */
+            <div className="text-center py-4 space-y-6">
+              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <CheckCircle2 size={36} />
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-neutral-500">ক্যাটাগরি:</span>
-                <span className="font-medium text-neutral-800">
-                  {issueType}
-                </span>
+
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-neutral-900 dark:text-white">
+                  রিকোয়েস্ট জমা হয়েছে!
+                </h2>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
+                  আমাদের টিম দ্রুত তোমার ফোন নম্বরে যোগাযোগ করবে।
+                </p>
               </div>
-            </div>
 
-            {/* Actions */}
-            <div className="space-y-3 pt-2">
-              <a
-                href={submittedTicket.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all"
-              >
-                <MessageCircle size={18} />
-                <span>সরাসরি WhatsApp-এ কথা বলুন</span>
-              </a>
-
-              <Link
-                href="/login"
-                className="w-full py-3 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-xs flex items-center justify-center transition-colors"
-              >
-                লগইন পেজে ফিরে যান
-              </Link>
-            </div>
-          </div>
-        ) : (
-          /* FORM STATE - Flat to Screen */
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* 1. সমস্যার ক্যাটাগরি */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-neutral-900">
-                সমস্যার ক্যাটাগরি
-              </label>
-              <div className="relative">
-                <select
-                  value={issueType}
-                  onChange={(e) => setIssueType(e.target.value)}
-                  className="w-full appearance-none px-4 py-3.5 rounded-xl bg-neutral-100 text-sm text-neutral-900 focus:outline-none transition-all cursor-pointer"
-                >
-                  <option value="" disabled>
-                    ক্যাটাগরি নির্বাচন করো
-                  </option>
-                  {ISSUE_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={18}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none"
-                />
-              </div>
-            </div>
-
-            {/* 2. তোমার ফোন নাম্বার */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-neutral-900">
-                তোমার ফোন নাম্বার
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="০১XXXXXXXXX"
-                className="w-full px-4 py-3.5 rounded-xl bg-neutral-100 text-sm font-semibold text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all"
-              />
-            </div>
-
-            {/* 3. তোমার সমস্যা */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-neutral-900">
-                তোমার সমস্যা
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                placeholder="এখানে লিখে পাঠাও"
-                className="w-full px-4 py-3.5 rounded-2xl bg-neutral-100 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all resize-none"
-              />
-              <p className="text-xs text-neutral-400">
-                কমপক্ষে ২০ অক্ষর লিখতে হবে
-              </p>
-            </div>
-
-            {/* 4. ছবি / ভিডিও আপলোড করো */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-neutral-900">
-                ছবি / ভিডিও আপলোড করো
-              </label>
-              <div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept="image/*,video/*"
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold hover:bg-emerald-100/70 transition-all"
-                >
-                  <FileUp size={16} />
-                  <span>
-                    {selectedFile
-                      ? `সিলেক্টেড: ${selectedFile.name}`
-                      : 'পিকচার / ভিডিও আপলোড করো'}
+              {/* Ticket Info Box */}
+              <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 text-left space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-neutral-500 dark:text-neutral-400">রেফারেন্স আইডি:</span>
+                  <span className="font-mono font-extrabold text-neutral-900 dark:text-white">
+                    #{submittedTicket.id.slice(0, 8).toUpperCase()}
                   </span>
-                  {selectedFile && (
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedFile(null);
-                      }}
-                      className="ml-1 p-0.5 hover:bg-emerald-200 rounded-full"
-                    >
-                      <X size={13} />
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-neutral-500 dark:text-neutral-400">ক্যাটাগরি:</span>
+                  <span className="font-medium text-neutral-800 dark:text-neutral-200">
+                    {issueType}
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="space-y-3 pt-2">
+                <a
+                  href={submittedTicket.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
+                >
+                  <MessageCircle size={18} />
+                  <span>সরাসরি WhatsApp-এ কথা বলুন</span>
+                </a>
+
+                <Link
+                  href="/login"
+                  className="w-full py-3 px-4 rounded-xl bg-neutral-100 dark:bg-[#16171d] hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-xs flex items-center justify-center transition-colors"
+                >
+                  লগইন পেজে ফিরে যান
+                </Link>
+              </div>
+            </div>
+          ) : (
+            /* FORM STATE */
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* 1. সমস্যার ক্যাটাগরি */}
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+                  সমস্যার ক্যাটাগরি
+                </label>
+                <div className="relative">
+                  <select
+                    value={issueType}
+                    onChange={(e) => setIssueType(e.target.value)}
+                    className="w-full appearance-none px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all cursor-pointer"
+                  >
+                    <option value="" disabled className="dark:bg-[#16171d]">
+                      ক্যাটাগরি নির্বাচন করো
+                    </option>
+                    {ISSUE_TYPES.map((type) => (
+                      <option key={type} value={type} className="dark:bg-[#16171d]">
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={18}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 pointer-events-none"
+                  />
+                </div>
+              </div>
+
+              {/* 2. তোমার ফোন নাম্বার */}
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+                  তোমার ফোন নাম্বার
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="০১XXXXXXXXX"
+                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all"
+                />
+              </div>
+
+              {/* 3. তোমার সমস্যা */}
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+                  তোমার সমস্যা
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  placeholder="এখানে সমস্যা বিস্তারিত লিখে পাঠাও"
+                  className="w-full px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-sm font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all resize-none"
+                />
+                <p className="text-xs text-neutral-400 dark:text-neutral-500">
+                  কমপক্ষে ২০ অক্ষর লিখতে হবে
+                </p>
+              </div>
+
+              {/* 4. ছবি / ভিডিও আপলোড করো */}
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-300 block">
+                  ছবি / স্ক্রিনশট আপলোড করো (ঐচ্ছিক)
+                </label>
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*,video/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-200/70 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+                  >
+                    <FileUp size={16} />
+                    <span>
+                      {selectedFile
+                        ? `সিলেক্টেড: ${selectedFile.name}`
+                        : 'পিকচার / ভিডিও আপলোড করো'}
                     </span>
+                    {selectedFile && (
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedFile(null);
+                        }}
+                        className="ml-1 p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full"
+                      >
+                        <X size={13} />
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#006A4E] hover:bg-[#00573e] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>পাঠানো হচ্ছে...</span>
+                    </>
+                  ) : (
+                    <span>সাপোর্ট রিকোয়েস্ট পাঠাও</span>
                   )}
                 </button>
               </div>
-            </div>
-
-            {/* 6. Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>পাঠানো হচ্ছে...</span>
-                  </>
-                ) : (
-                  <span>সাপোর্ট রিকোয়েস্ট পাঠাও</span>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
+            </form>
+          )}
+        </div>
       </main>
     </div>
   );

@@ -25,6 +25,8 @@ import {
   Info,
   ArrowRight,
   HelpCircle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -33,6 +35,7 @@ import { getRandomAvatar } from '@/lib/avatar-utils';
 import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
 import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -63,6 +66,12 @@ function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
+
+  const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -355,21 +364,40 @@ function SignupForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 font-sans selection:bg-emerald-500/20">
-        <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition-transform">
-              অ
-            </div>
-            <span className="font-extrabold text-xl tracking-tight text-neutral-900 dark:text-white">
-              OBHYASH
-            </span>
+      <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
+        <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
+          >
+            <span>← হোম</span>
           </Link>
+
+          <div className="flex items-center gap-3">
+            {mounted && (
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+                title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+            )}
+
+            <Link
+              href="/support"
+              className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            >
+              সাপোর্ট লাগবে?
+            </Link>
+          </div>
         </header>
 
         <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-          <div className="w-full max-w-md bg-white dark:bg-neutral-900/80 rounded-2xl p-8 shadow-xl border border-neutral-200/90 dark:border-neutral-800 text-center animate-in fade-in zoom-in duration-300 space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+          <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111216] rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none border border-neutral-200/90 dark:border-neutral-800/80 text-center animate-in fade-in zoom-in duration-300 space-y-4">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/40 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
@@ -381,7 +409,7 @@ function SignupForm() {
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center w-full py-3.5 px-6 font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-md shadow-emerald-600/20 text-sm"
+                className="inline-flex items-center justify-center w-full py-3.5 px-6 font-bold text-white bg-[#006A4E] hover:bg-[#00573e] rounded-xl sm:rounded-2xl transition-all shadow-md shadow-emerald-600/20 text-sm"
               >
                 লগইন পেজে যাও
               </Link>
@@ -389,16 +417,16 @@ function SignupForm() {
           </div>
         </main>
 
-        <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
-          <Link href="/privacy" className="hover:underline">
+        <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-500 flex items-center justify-center gap-4">
+          <Link href="/privacy-policy" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
             গোপনীয়তা নীতি
           </Link>
           <span>•</span>
-          <Link href="/terms" className="hover:underline">
+          <Link href="/terms-and-conditions" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
             শর্তাবলী
           </Link>
           <span>•</span>
-          <Link href="/faq" className="hover:underline">
+          <Link href="/faq" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
             সহায়তা / FAQ
           </Link>
         </footer>
@@ -435,36 +463,54 @@ function SignupForm() {
   );
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-white text-neutral-900 font-sans selection:bg-[#006A4E]/20">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden flex flex-col justify-between bg-neutral-50 dark:bg-[#07080a] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-[#006A4E]/20">
       {/* Top Header / Language Switcher & Back Link */}
       <header className="w-full max-w-xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
         <Link
           href="/"
-          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 transition-colors flex items-center gap-1.5"
+          className="text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors flex items-center gap-1.5"
         >
           <span>← হোম</span>
         </Link>
 
-        {/* Support Link - Plain text, no box, no background */}
-        <Link
-          href="/support"
-          className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
-        >
-          সাপোর্ট লাগবে?
-        </Link>
+        <div className="flex items-center gap-3">
+          {mounted && (
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 transition-colors"
+              title={theme === 'dark' ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো'}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          )}
+
+          <Link
+            href="/support"
+            className="text-xs sm:text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+          >
+            সাপোর্ট লাগবে?
+          </Link>
+        </div>
       </header>
 
       {/* Center Form Container */}
       <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
-        <div className="w-full max-w-sm sm:max-w-md bg-white sm:border sm:border-neutral-200/90 sm:rounded-3xl sm:p-8 sm:shadow-lg space-y-6">
+        <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111216] border border-neutral-200/90 dark:border-neutral-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl shadow-neutral-200/40 dark:shadow-none space-y-6 transition-colors">
           {/* Centered Brand Logo & Title */}
           <div className="flex flex-col items-center justify-center text-center space-y-3 pt-2">
             <img
               src="/obhyash_full_logo.png"
               alt="Obhyash Logo"
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain dark:hidden"
             />
-            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+            <img
+              src="/obhyash_full_logo_dark.png"
+              alt="Obhyash Logo"
+              className="h-10 w-auto object-contain hidden dark:block"
+            />
+            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
               নতুন অ্যাকাউন্ট তৈরি করো
             </h1>
           </div>
@@ -493,7 +539,7 @@ function SignupForm() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="পূর্ণ নাম (Full Name)"
-                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                     />
                   </div>
                 </div>
@@ -518,12 +564,12 @@ function SignupForm() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="017XXXXXXXX"
-                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 font-mono"
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 font-mono"
                     />
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
+                <div className="p-3.5 rounded-xl bg-neutral-100/80 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800/80 flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400 font-bengali">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <span>
                     পরবর্তী ধাপে যাওয়ার সময় তোমার মোবাইল নম্বরে ৬ ডিজিটের ওটিপি যাচাই কোড পাঠানো হবে।
@@ -558,11 +604,11 @@ function SignupForm() {
                       }
                       placeholder="কলেজ / স্কুলের নাম"
                       autoComplete="off"
-                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                      className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                     />
                     {showCollegeSuggestions &&
                       searchColleges(formData.institute).length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg overflow-hidden">
+                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden">
                           {searchColleges(formData.institute).map((name) => (
                             <button
                               key={name}
@@ -592,7 +638,7 @@ function SignupForm() {
                       name="stream"
                       value={formData.stream}
                       onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
+                      className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
                     >
                       <option value="HSC">HSC</option>
                       <option value="SSC">SSC</option>
@@ -611,7 +657,7 @@ function SignupForm() {
                         name="group"
                         value={formData.group}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
                       >
                         <option value="Science">Science (বিজ্ঞান)</option>
                         {formData.stream === 'SSC' ? (
@@ -643,7 +689,7 @@ function SignupForm() {
                         name="batch"
                         value={formData.batch}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white appearance-none cursor-pointer"
                       >
                         {(formData.stream === 'SSC' ? [2026, 2027, 2028] : [2025, 2026, 2027, 2028]).map((year) => (
                           <option
@@ -670,8 +716,8 @@ function SignupForm() {
                         onClick={() => setFormData({ ...formData, gender: g })}
                         className={`py-3 rounded-xl text-sm font-normal transition-all border ${
                           formData.gender === g
-                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                            : 'bg-neutral-50 dark:bg-[#16171d] border-neutral-300 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1f2029]'
                         }`}
                       >
                         {g === 'Male' ? 'পুরুষ' : 'মহিলা'}
@@ -700,7 +746,7 @@ function SignupForm() {
                           className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
                             formData.examTarget === t.id
                               ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
-                              : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
+                              : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#16171d] hover:border-neutral-300 dark:hover:border-neutral-700'
                           }`}
                         >
                           <span className="text-xl">{t.emoji}</span>
@@ -738,7 +784,7 @@ function SignupForm() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="example@mail.com"
-                        className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
+                        className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                     </div>
                   </div>
@@ -755,7 +801,7 @@ function SignupForm() {
                         value={formData.password}
                         onChange={handleChange}
                         placeholder="কমপক্ষে ৬ অক্ষর"
-                        className="w-full pl-12 pr-12 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                        className="w-full pl-12 pr-12 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                       <button
                         type="button"
@@ -783,7 +829,7 @@ function SignupForm() {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         placeholder="পাসওয়ার্ডটি আবার লেখো"
-                        className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
+                        className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-[#16171d] border border-neutral-300 dark:border-neutral-700/80 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#006A4E]/20 focus:border-[#006A4E] transition-all font-medium text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                     </div>
                   </div>
@@ -797,7 +843,7 @@ function SignupForm() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="w-14 items-center justify-center flex rounded-xl sm:rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#14151a] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                  className="w-14 items-center justify-center flex rounded-xl sm:rounded-2xl border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-[#16171d] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -833,7 +879,7 @@ function SignupForm() {
                   <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white dark:bg-black sm:dark:bg-[#0d0e12] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
+                  <span className="bg-white dark:bg-[#111216] px-3 text-neutral-500 dark:text-neutral-400 font-medium">
                     Login / Registration with
                   </span>
                 </div>
@@ -847,7 +893,7 @@ function SignupForm() {
                 <SocialLoginButton
                   mode="signup"
                   label="Google"
-                  className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white dark:!bg-[#14151a] !border !border-neutral-300 dark:!border-neutral-800 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
+                  className="!py-3.5 !rounded-xl sm:!rounded-2xl !bg-white dark:!bg-[#16171d] !border !border-neutral-300 dark:!border-neutral-700/80 !text-neutral-800 dark:!text-neutral-200 !shadow-2xs hover:!bg-neutral-50 dark:hover:!bg-neutral-800/80 transition-all font-semibold"
                 />
               </Suspense>
             </>
@@ -856,7 +902,7 @@ function SignupForm() {
           {/* OTP VERIFICATION MODAL */}
           {isOtpModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 font-bengali">
+              <div className="w-full max-w-sm bg-white dark:bg-[#111216] border border-neutral-200 dark:border-neutral-800/80 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 font-bengali">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -880,7 +926,7 @@ function SignupForm() {
                   </button>
                 </div>
 
-                <div className="p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-between text-xs">
+                <div className="p-3 bg-neutral-50 dark:bg-[#16171d] border border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-between text-xs">
                   <span className="text-neutral-500">নম্বর:</span>
                   <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">
                     {formData.phone}
@@ -902,7 +948,7 @@ function SignupForm() {
                       if (otpError) setOtpError(null);
                     }}
                     placeholder="••••••"
-                    className="w-full py-3.5 text-center text-3xl font-mono font-bold tracking-[0.4em] bg-neutral-100 dark:bg-neutral-950 border-2 border-emerald-500/50 focus:border-emerald-500 rounded-2xl focus:outline-none transition-all"
+                    className="w-full py-3.5 text-center text-3xl font-mono font-bold tracking-[0.4em] bg-neutral-100 dark:bg-[#16171d] text-neutral-900 dark:text-white border-2 border-emerald-500/50 focus:border-emerald-500 rounded-2xl focus:outline-none transition-all"
                   />
                   {otpError && (
                     <p className="text-xs text-red-500 font-medium flex items-center gap-1">
@@ -951,12 +997,11 @@ function SignupForm() {
 
           {/* Login Prompt */}
           <div className="pt-2 text-center">
-
             <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
               আগেই অ্যাকাউন্ট আছে?{' '}
               <Link
                 href="/login"
-                className="text-[#006A4E] dark:text-emerald-400 hover:underline font-bold transition-all ml-1"
+                className="text-[#006A4E] dark:text-[#00A87E] hover:underline font-bold transition-all ml-1"
               >
                 লগইন করো
               </Link>
@@ -965,18 +1010,17 @@ function SignupForm() {
         </div>
       </main>
 
-
       {/* Bottom Footer */}
-      <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-600 flex items-center justify-center gap-4">
-        <Link href="/privacy-policy" className="hover:underline">
+      <footer className="w-full py-4 text-center text-xs text-neutral-400 dark:text-neutral-500 flex items-center justify-center gap-4">
+        <Link href="/privacy-policy" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
           গোপনীয়তা নীতি
         </Link>
         <span>•</span>
-        <Link href="/terms-and-conditions" className="hover:underline">
+        <Link href="/terms-and-conditions" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
           শর্তাবলী
         </Link>
         <span>•</span>
-        <Link href="/faq" className="hover:underline">
+        <Link href="/faq" className="hover:underline hover:text-neutral-600 dark:hover:text-neutral-300">
           সহায়তা / FAQ
         </Link>
       </footer>
