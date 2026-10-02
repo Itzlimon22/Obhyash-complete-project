@@ -7,8 +7,11 @@ export async function POST() {
     const cookieStore = await cookies();
     const supabase = await createClient();
     
-    // Server-side auth signout
-    await supabase.auth.signOut().catch(() => {});
+    // Server-side auth signout (with safety race so cookie deletion is never blocked)
+    await Promise.race([
+      supabase.auth.signOut(),
+      new Promise((res) => setTimeout(res, 250)),
+    ]).catch(() => {});
 
     const response = NextResponse.json({ success: true, message: 'Signed out successfully' });
 
@@ -52,7 +55,10 @@ export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
     const supabase = await createClient();
-    await supabase.auth.signOut().catch(() => {});
+    await Promise.race([
+      supabase.auth.signOut(),
+      new Promise((res) => setTimeout(res, 250)),
+    ]).catch(() => {});
 
     const response = NextResponse.redirect(new URL('/login?logout=true', origin));
     const allCookies = cookieStore.getAll();

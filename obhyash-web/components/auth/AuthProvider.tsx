@@ -471,21 +471,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       } catch (e) {}
     }
 
-    // 2. Fire server and Supabase signouts concurrently with a strict 400ms safety timeout
+    // 2. Fire server and Supabase signouts concurrently with a strict 200ms safety timeout
     try {
       await Promise.race([
         Promise.allSettled([
           userId ? unregisterCurrentDevice(userId) : Promise.resolve(),
-          fetch("/api/auth/signout", { method: "POST" }),
+          fetch("/api/auth/signout", { method: "POST", keepalive: true }),
           supabase.auth.signOut({ scope: "local" }),
         ]),
-        new Promise((resolve) => setTimeout(resolve, 400)),
+        new Promise((resolve) => setTimeout(resolve, 200)),
       ]);
     } catch (err) {
       console.error("Signout error in AuthProvider:", err);
     } finally {
       // 3. Immediate hard navigation to login — never blocks or requires manual refresh
-      window.location.href = "/login?logout=true";
+      window.location.replace("/login?logout=true");
     }
   }, [supabase, user]);
 

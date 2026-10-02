@@ -51,8 +51,12 @@ export function useAdminAuth() {
 
   const signOut = useCallback(async () => {
     try {
+      // 1. Immediately reset internal state
+      setUser(null);
+      setProfile(DEFAULT_ADMIN);
+
       if (typeof window !== 'undefined') {
-        // Clear all admin & user profiles and session caches
+        // Clear all admin & user profiles and session caches immediately
         try {
           Object.keys(localStorage).forEach((key) => {
             if (
@@ -68,7 +72,7 @@ export function useAdminAuth() {
           sessionStorage.clear();
         } catch (e) {}
 
-        // Expire all cookies from client
+        // Expire all cookies from client immediately
         try {
           document.cookie.split(';').forEach((cookie) => {
             const eqPos = cookie.indexOf('=');
@@ -81,20 +85,24 @@ export function useAdminAuth() {
         } catch (e) {}
       }
 
-      // Server-side signout to clear HTTP-only cookies
-      await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
-
-      // Client-side Supabase signout
+      // 2. Perform concurrent background signouts with max 150ms race
       const supabase = createClient();
-      await supabase.auth.signOut().catch(() => {});
+      await Promise.race([
+        Promise.allSettled([
+          authSignOut ? authSignOut().catch(() => {}) : Promise.resolve(),
+          fetch('/api/auth/signout', { method: 'POST', keepalive: true }).catch(() => {}),
+          supabase.auth.signOut({ scope: 'local' }).catch(() => {}),
+        ]),
+        new Promise((resolve) => setTimeout(resolve, 150)),
+      ]);
     } catch (err) {
       console.error('Admin sign out error:', err);
     } finally {
       if (typeof window !== 'undefined') {
-        window.location.href = '/login?logout=true';
+        window.location.replace('/login?logout=true');
       }
     }
-  }, []);
+  }, [authSignOut]);
 
   useEffect(() => {
     if (authUser) {
