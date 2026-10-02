@@ -1,6 +1,7 @@
 export interface QuestionItem {
   n: number;
   q: string;
+  img?: string;
   o: Record<string, string>; // 'a', 'b', 'c', 'd'
   A: string; // 'ক', 'খ', 'গ', 'ঘ' or 'a', 'b', 'c', 'd'
   E: string[]; // explanation lines
@@ -32,6 +33,11 @@ export interface GeneratorSettings {
   footerPagePrefix: string; // e.g. "পৃষ্ঠা" or "Page"
   useBanglaDigits: boolean; // true = ১, ২; false = 1, 2
   pageOffset: number; // Starting page offset (0 = starts at 1)
+
+  // Standalone Viewer / Print Support
+  standaloneToolbar?: boolean;
+  autoPrint?: boolean;
+  baseUrl?: string;
 }
 
 export interface ParseResult {

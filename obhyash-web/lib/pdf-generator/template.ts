@@ -159,11 +159,13 @@ export function renderCardHtml(q: QuestionItem): string {
   for (const k of ['a', 'b', 'c', 'd']) {
     const raw = q.o[k] || '';
     const plain = raw.replace(/\$/g, '');
-    const isOk = k === ansKey;
+    const isOk = rawAns ? k === ansKey : false;
     const cls = 'op' + (plain.length > 26 ? ' smo' : '') + (isOk ? ' ok' : '');
     opts += `<div class="${cls}"><b>${LET[k]}.</b> ${inlineMath(raw)}${isOk ? CHK_SVG : ''}</div>`;
   }
-  return `<div class="card"><div class="qb"><span class="bd">${toBnNumber(q.n)}</span>${inlineMath(q.q)}</div><div class="opts">${opts}</div><div class="ex">${explHtml(q.E)}</div></div>`;
+  const ex = explHtml(q.E);
+  const imgHtml = q.img ? `<div class="q-img" style="text-align:center;margin:6px 0;"><img src="${escapeHtml(q.img)}" style="max-height:130px;max-width:96%;object-fit:contain;border-radius:4px;" /></div>` : '';
+  return `<div class="card"><div class="qb"><span class="bd">${toBnNumber(q.n)}</span>${inlineMath(q.q)}</div>${imgHtml}<div class="opts">${opts}</div>${ex ? `<div class="ex">${ex}</div>` : ''}</div>`;
 }
 
 const DENSITY_CONFIGS = {
@@ -236,7 +238,8 @@ export function generateTemplateHtml(
 <head>
 <meta charset="utf-8">
 <title>\${escapeHtml(settings.title)}</title>
-<link rel="stylesheet" href="/katex/katex.min.css">
+\${settings.baseUrl ? \`<base href="\${escapeHtml(settings.baseUrl)}/">\` : ''}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <style>
 @font-face {
   font-family: 'Kalpurush';
@@ -489,16 +492,30 @@ body {
 #measure .card { margin-bottom: 0; }
 
 @media print {
+  .no-print { display: none !important; }
   #measure { display: none !important; }
   body { background: #fff !important; }
 }
 </style>
 </head>
 <body>
+\${settings.standaloneToolbar ? \`
+<div class="no-print" style="position: sticky; top: 0; z-index: 99999; background: #0f4c5c; color: #ffffff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.18); font-family: 'Kalpurush', 'Times New Roman', sans-serif;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span style="font-weight: bold; font-size: 16px; letter-spacing: 0.3px;">অভ্যাস — A4 সল্যুশন শিট</span>
+    <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;">ভেক্টর PDF</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 14px;">
+    <span style="font-size: 13px; opacity: 0.85;">কীবোর্ড: Ctrl+P বা ⌘+P</span>
+    <button onclick="window.print()" style="background: #2e9e57; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+      🖨️ প্রিন্ট / Save as PDF
+    </button>
+  </div>
+</div>\` : ''}
 <div id="measure"></div>
 <div id="root"></div>
 
-<script src="/katex/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script>
 const CARDS = ${cardsJson};
 const SETTINGS = ${JSON.stringify(settings)};
@@ -687,6 +704,15 @@ document.fonts.ready.then(() => {
     const plan = paginate(window.heights, SETTINGS.hasHeader);
     window.build(plan, SETTINGS.pageOffset, SETTINGS.hasHeader);
     window.READY = true;
+
+    if (SETTINGS.autoPrint) {
+      setTimeout(() => {
+        try {
+          window.focus();
+          window.print();
+        } catch(e) {}
+      }, 500);
+    }
     
     // Post message to parent iframe if embedded
     if (window.parent && window.parent !== window) {

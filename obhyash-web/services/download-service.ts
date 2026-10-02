@@ -1,5 +1,7 @@
 import { Question, ExamDetails, UserAnswers } from '@/lib/types';
 import katex from 'katex';
+import { generateTemplateHtml } from '@/lib/pdf-generator/template';
+import { QuestionItem, GeneratorSettings } from '@/lib/pdf-generator/types';
 
 // --- Bengali Number Conversion Helper ---
 const toBengaliNumber = (num: number | string): string => {
@@ -340,173 +342,111 @@ const sharedExamStyles = `
     max-width: 100%;
     overflow-x: auto;
   }
-
-  /* Solution Box (Only on Solution Paper) */
-  .solution-box {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-top: 5px;
-    margin-left: 18px;
-    padding: 6px 8px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 3px solid #059669;
-    border-radius: 3px;
-    font-size: 8.5pt;
-    line-height: 1.35;
-  }
-
-  .sol-row {
-    margin-bottom: 2.5px;
-  }
-
-  .sol-label {
-    font-weight: 700;
-    font-size: 8pt;
-    color: #374151;
-    margin-right: 4px;
-    text-transform: uppercase;
-  }
-
-  .sol-correct {
-    font-weight: 700;
-    color: #047857;
-  }
-
-  .sol-wrong {
-    font-weight: 700;
-    color: #b91c1c;
-  }
-
-  .sol-skipped {
-    color: #d97706;
-    font-style: italic;
-  }
-
-  .sol-explanation {
-    margin-top: 4px;
-    border-top: 0.5px solid #e2e8f0;
-    padding-top: 3px;
-    color: #1f2937;
-  }
-
-  @media print {
-    body {
-      padding-top: 0;
-    }
-  }
-
-  ${dlBarStyles}
 `;
 
-// ─── 1. Download Question Paper (2-Column Exam Paper ONLY) ───────────────────
+// ─── Helper: Print or Open HTML in Dedicated Window / Iframe ───────────────────
+const printOrOpenHtml = (html: string) => {
+  if (typeof window === 'undefined') return;
+
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  } else {
+    // If popup is blocked, use hidden iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    iframe.contentWindow?.document.open();
+    iframe.contentWindow?.document.write(html);
+    iframe.contentWindow?.document.close();
+
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'OBHYASH_PDF_READY') {
+        window.removeEventListener('message', handleMessage);
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        setTimeout(() => {
+          try {
+            document.body.removeChild(iframe);
+          } catch {}
+        }, 3000);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+  }
+};
+
+// ─── 1. Download Question Paper (2-Column Zero-Gap Exam Paper) ───────────────
 
 export const downloadQuestionPaper = (
   details: ExamDetails,
   questions: Question[],
 ) => {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
   const subjectTitle = formatSubjectTitle(details.subject, details.subjectLabel);
-  const subjectCode = getSubjectCode(details.subject, details.subjectLabel);
-  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+  const totalCount = questions.length;
+  const marks = details.totalMarks || totalCount;
+  const duration = details.durationMinutes || 25;
 
-  const html = `
-    <!DOCTYPE html>
-    <html lang="bn">
-      <head>
-        <meta charset="UTF-8">
-        <title>${subjectTitle} - প্রশ্নপত্র (Question Paper)</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-        <style>
-          ${sharedExamStyles}
-        </style>
-      </head>
-      <body>
-        ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
-        
-        <div class="header-container">
-          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;">
-            <div style="width:110px;text-align:left;font-size:8.5pt;font-weight:700;color:#334155;">
-              ${subjectCode ? `বিষয় কোড: ${subjectCode}` : 'মডেল টেস্ট'}
-            </div>
-            <div style="text-align:center;">
-              <div class="header-top">অভ্যাস — বিশেষ মডেল টেস্ট</div>
-              <div class="header-sub">উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com</div>
-              <div class="exam-title-badge">${subjectTitle} (বহুনির্বাচনি অভীক্ষা)</div>
-            </div>
-            <div style="width:110px;text-align:right;font-size:8.5pt;font-weight:700;color:#334155;">
-              সেট কোড: ক
-            </div>
-          </div>
-          <table class="meta-table">
-            <tr>
-              <td width="25%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
-              <td width="25%" align="center">&#10067; মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি</td>
-              <td width="25%" align="center">&#9998; পূর্ণমান: ${toBengaliNumber(details.totalMarks)}</td>
-              <td width="25%" align="right">&#9888; নেগেটিভ মার্ক: ${details.negativeMarking ? `-${toBengaliNumber(details.negativeMarking)}` : 'নেই'}</td>
-            </tr>
-          </table>
-          <div style="margin-top:4px;font-size:6.8pt;color:#475569;text-align:center;line-height:1.3;">
-            [ বিশেষ দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা ভরাট করো। সকল প্রশ্নের মান সমান (প্রতিটি ১ নম্বর)।${details.negativeMarking ? ` প্রতিটি ভুল উত্তরের জন্য -${toBengaliNumber(details.negativeMarking)} নম্বর কাটা যাবে।` : ''} ]
-          </div>
-        </div>
+  const mappedQuestions: QuestionItem[] = questions.map((q, idx) => ({
+    n: idx + 1,
+    q: q.question || '',
+    img: q.imageUrl,
+    o: {
+      a: q.options[0] || '',
+      b: q.options[1] || '',
+      c: q.options[2] || '',
+      d: q.options[3] || '',
+    },
+    A: '', // Question paper has no answers marked
+    E: [], // No explanation box
+  }));
 
-        <div class="content-wrapper">
-          ${questions
-            .map(
-              (q, idx) => `
-            <div class="question-item">
-              <div class="q-header">
-                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
-                <span class="q-text">${renderLatex(q.question || '')}</span>
-              </div>
-              ${renderImage(q.imageUrl)}
-              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
-              <ul class="options-list">
-                ${q.options
-                  .map(
-                    (opt, oIdx) => `
-                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
-                    <span class="opt-letter">${optLetters[oIdx]}</span>
-                    <span class="opt-content">${renderLatex(opt)}</span>
-                  </li>
-                `,
-                  )
-                  .join('')}
-              </ul>
-            </div>
-          `,
-            )
-            .join('')}
-        </div>
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
 
-        <div style="text-align:center;margin:18px 0 10px 0;font-size:8.5pt;font-weight:700;color:#64748b;letter-spacing:0.5px;">
-          — প্রশ্নপত্র সমাপ্ত (End of Question Paper) —
-        </div>
-      </body>
-    </html>
-  `;
+  const settings: GeneratorSettings = {
+    title: `${subjectTitle} — প্রশ্নপত্র`,
+    subtitle: `উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${toBengaliNumber(totalCount)}টি · পূর্ণমান: ${toBengaliNumber(marks)} · সময়: ${toBengaliNumber(duration)} মিনিট`,
+    hasHeader: true,
+    headerLeftText: 'অ্যাপ ইনস্টল করো',
+    headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
+    headerRightText: `${subjectTitle} — প্রশ্নপত্র`,
+    showHeaderLeftIcon: true,
+    footerLeftPrefix: 'আনলিমিটেড এক্সাম দাও',
+    footerSiteText: 'www.obhyash.com',
+    footerLeftUrl: 'https://www.obhyash.com',
+    footerLeftSuffix: 'এ',
+    footerPagePrefix: 'পৃষ্ঠা',
+    useBanglaDigits: true,
+    pageOffset: 0,
+    density: 'balanced',
+    balanceColumns: true,
+    standaloneToolbar: true,
+    autoPrint: true,
+    baseUrl: origin,
+  };
 
-  w.document.write(html);
-  w.document.close();
+  const html = generateTemplateHtml(mappedQuestions, settings);
+  printOrOpenHtml(html);
 };
 
-// ─── 2. Download Result & Solutions (2-Column with Answers & Explanations) ────
+// ─── 2. Download Result & Solutions (2-Column Zero-Gap Solution Sheet) ────────
 
 export const downloadResult = (
   details: ExamDetails,
   questions: Question[],
   userAnswers: UserAnswers = {},
 ) => {
-  const w = window.open('', '_blank');
-  if (!w) return;
-
   const subjectTitle = formatSubjectTitle(details.subject, details.subjectLabel);
-  const subjectCode = getSubjectCode(details.subject, details.subjectLabel);
-  const optLetters = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+  const banglaLetters = ['ক', 'খ', 'গ', 'ঘ'];
+  const hasUserAnswers = userAnswers && Object.keys(userAnswers).length > 0;
 
   const score = questions.reduce((acc, q) => {
     const ua = userAnswers[q.id];
@@ -514,108 +454,82 @@ export const downloadResult = (
   }, 0);
   const totalPoints = questions.reduce((acc, q) => acc + (q.points || 1), 0);
 
-  const html = `
-    <!DOCTYPE html>
-    <html lang="bn">
-      <head>
-        <meta charset="UTF-8">
-        <title>${subjectTitle} - উত্তর ও ব্যাখ্যা (Solution Sheet)</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-        <style>
-          ${sharedExamStyles}
-        </style>
-      </head>
-      <body>
-        ${dlToolbar('PDF ডাউনলোড / প্রিন্ট')}
-        
-        <div class="header-container">
-          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;">
-            <div style="width:110px;text-align:left;font-size:8.5pt;font-weight:700;color:#334155;">
-              ${subjectCode ? `বিষয় কোড: ${subjectCode}` : 'মডেল টেস্ট'}
-            </div>
-            <div style="text-align:center;">
-              <div class="header-top">অভ্যাস — সমাধান ও ব্যাখ্যা</div>
-              <div class="header-sub">উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · obhyash.com</div>
-              <div class="exam-title-badge">${subjectTitle} — সমাধান পত্র (সেট: ক)</div>
-            </div>
-            <div style="width:110px;text-align:right;font-size:8.5pt;font-weight:700;color:#334155;">
-              সেট কোড: ক
-            </div>
-          </div>
-          <table class="meta-table">
-            <tr>
-              <td width="25%" align="left">&#9201; সময়: ${toBengaliNumber(details.durationMinutes)} মিনিট</td>
-              <td width="25%" align="center">&#10067; মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি</td>
-              <td width="25%" align="center">&#127942; প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)}</td>
-              <td width="25%" align="right">&#9888; নেগেটিভ মার্ক: ${details.negativeMarking ? `-${toBengaliNumber(details.negativeMarking)}` : 'নেই'}</td>
-            </tr>
-          </table>
-        </div>
+  const mappedQuestions: QuestionItem[] = questions.map((q, idx) => {
+    const ua = userAnswers ? userAnswers[q.id] : undefined;
+    const isAnswered = ua !== undefined && ua !== null && ua !== -1;
+    const isCorrect = isAnswered && ua === q.correctAnswerIndex;
 
-        <div class="content-wrapper">
-          ${questions
-            .map((q, idx) => {
-              const userAns = userAnswers[q.id];
-              const isCorrect = userAns === q.correctAnswerIndex;
-              const isSkipped = userAns === undefined || userAns === null;
-              const userAnsLetter = isSkipped ? 'উত্তর নেই' : optLetters[userAns];
-              const correctAnsLetter = optLetters[q.correctAnswerIndex] || optLetters[0];
-              const correctOptText = q.options[q.correctAnswerIndex] || '';
+    const expLines: string[] = [];
 
-              return `
-            <div class="question-item">
-              <div class="q-header">
-                <span class="q-num">${toBengaliNumber(idx + 1)}.</span>
-                <span class="q-text">${renderLatex(q.question || '')}</span>
-              </div>
-              ${renderImage(q.imageUrl)}
-              <div style="margin-left:20px">${renderQuestionMeta(q)}</div>
-              <ul class="options-list">
-                ${q.options
-                  .map(
-                    (opt, oIdx) => `
-                  <li class="option-item ${opt.length > 35 || opt.includes('$$') ? 'full-width' : ''}">
-                    <span class="opt-letter">${optLetters[oIdx]}</span>
-                    <span class="opt-content">${renderLatex(opt)}</span>
-                  </li>
-                `,
-                  )
-                  .join('')}
-              </ul>
+    // Add student choice badge if user answers are provided
+    if (hasUserAnswers) {
+      if (isAnswered) {
+        const userChoiceLetter = banglaLetters[ua] || String(ua);
+        if (isCorrect) {
+          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — সঠিক হয়েছে ✓]`);
+        } else {
+          expLines.push(`[তোমার উত্তর: ${userChoiceLetter} — ভুল হয়েছে ✗]`);
+        }
+      } else {
+        expLines.push(`[তোমার উত্তর: দেওয়া হয়নি (অনুত্তর)]`);
+      }
+    }
 
-              <div class="solution-box">
-                <div class="sol-row">
-                  <span class="sol-label">সঠিক উত্তর:</span>
-                  <span class="sol-correct">${correctAnsLetter} ${renderLatex(correctOptText)}</span>
-                </div>
-                ${
-                  userAnswers && Object.keys(userAnswers).length > 0
-                    ? `
-                <div class="sol-row">
-                  <span class="sol-label">তোমার উত্তর:</span>
-                  <span class="${isSkipped ? 'sol-skipped' : isCorrect ? 'sol-correct' : 'sol-wrong'}">
-                    ${isSkipped ? 'উত্তর নেই' : `${userAnsLetter} ${renderLatex(q.options[userAns] || '')}`}
-                  </span>
-                </div>
-                `
-                    : ''
-                }
-                <div class="sol-explanation">
-                  <span class="sol-label">ব্যাখ্যা:</span>
-                  <div style="margin-top:2px;">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</div>
-                </div>
-              </div>
-            </div>
-          `;
-            })
-            .join('')}
-        </div>
-      </body>
-    </html>
-  `;
+    if (q.explanation && q.explanation.trim()) {
+      q.explanation
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean)
+        .forEach(l => expLines.push(l));
+    } else if (expLines.length === 0) {
+      expLines.push('এই প্রশ্নের জন্য অতিরিক্ত কোনো ব্যাখ্যা নেই।');
+    }
 
-  w.document.write(html);
-  w.document.close();
+    return {
+      n: idx + 1,
+      q: q.question || '',
+      img: q.imageUrl,
+      o: {
+        a: q.options[0] || '',
+        b: q.options[1] || '',
+        c: q.options[2] || '',
+        d: q.options[3] || '',
+      },
+      A: banglaLetters[q.correctAnswerIndex] || 'ক',
+      E: expLines,
+    };
+  });
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.obhyash.com';
+
+  const subtitle = hasUserAnswers
+    ? `প্রাপ্ত নম্বর: ${toBengaliNumber(score.toFixed(1))} / ${toBengaliNumber(totalPoints)} · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · সময়: ${toBengaliNumber(details.durationMinutes || 25)} মিনিট`
+    : `উচ্চ মাধ্যমিক ও ভর্তি পরীক্ষা প্রস্তুতি · মোট প্রশ্ন: ${toBengaliNumber(questions.length)}টি · পূর্ণমান: ${toBengaliNumber(details.totalMarks || questions.length)}`;
+
+  const settings: GeneratorSettings = {
+    title: `${subjectTitle} — সমাধান ও ব্যাখ্যা`,
+    subtitle,
+    hasHeader: true,
+    headerLeftText: 'অ্যাপ ইনস্টল করো',
+    headerLeftUrl: 'https://play.google.com/store/apps/details?id=com.obhyash.app',
+    headerRightText: `${subjectTitle} — সমাধান পত্র`,
+    showHeaderLeftIcon: true,
+    footerLeftPrefix: 'আনলিমিটেড এক্সাম দাও',
+    footerSiteText: 'www.obhyash.com',
+    footerLeftUrl: 'https://www.obhyash.com',
+    footerLeftSuffix: 'এ',
+    footerPagePrefix: 'পৃষ্ঠা',
+    useBanglaDigits: true,
+    pageOffset: 0,
+    density: 'balanced',
+    balanceColumns: true,
+    standaloneToolbar: true,
+    autoPrint: true,
+    baseUrl: origin,
+  };
+
+  const html = generateTemplateHtml(mappedQuestions, settings);
+  printOrOpenHtml(html);
 };
 
 export const downloadResultWithExplanations = downloadResult;
