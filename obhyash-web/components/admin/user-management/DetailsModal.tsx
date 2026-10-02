@@ -742,7 +742,7 @@ export default function DetailsModal({
                     return (
                       <div
                         key={exam.id}
-                        className="p-3.5 flex items-center justify-between bg-white dark:bg-neutral-850 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors text-xs"
+                        className="p-3.5 flex items-center justify-between bg-white dark:bg-neutral-900/90 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors text-xs"
                       >
                         <div>
                           <p className="font-bold text-neutral-900 dark:text-white">

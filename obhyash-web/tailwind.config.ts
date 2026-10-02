@@ -58,6 +58,10 @@ const config = {
           200: '#e5e5e5',
           900: '#171717',
         },
+        neutral: {
+          750: '#212124',
+          850: '#17171a',
+        },
 
         // --- 🔵 EXISTING: Shadcn Colors ---
         border: 'hsl(var(--border))',

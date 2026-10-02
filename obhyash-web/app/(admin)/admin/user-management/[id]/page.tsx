@@ -699,28 +699,28 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                       Academic Profile & Target
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Institute:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white text-sm mt-0.5 block">
-                          {userData.institute || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Institute:</span>
+                        <span className={`font-bold text-sm mt-0.5 block ${userData.institute ? 'text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500 font-normal'}`}>
+                          {userData.institute || 'Not specified'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Academic Batch:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white text-sm mt-0.5 block">
-                          {userData.batch || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Academic Batch:</span>
+                        <span className={`font-bold text-sm mt-0.5 block ${userData.batch ? 'text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500 font-normal'}`}>
+                          {userData.batch || 'Not specified'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Division / Group:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white text-sm mt-0.5 block">
-                          {userData.division || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Division / Group:</span>
+                        <span className={`font-bold text-sm mt-0.5 block ${userData.division ? 'text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500 font-normal'}`}>
+                          {userData.division || 'Not specified'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Stream & Target:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white text-sm mt-0.5 block">
-                          {userData.stream || 'N/A'} {userData.target ? `(${userData.target})` : ''}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Stream & Target:</span>
+                        <span className={`font-bold text-sm mt-0.5 block ${userData.stream || userData.target ? 'text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500 font-normal'}`}>
+                          {userData.stream || userData.target ? `${userData.stream || 'General'} ${userData.target ? `(${userData.target})` : ''}` : 'Not specified'}
                         </span>
                       </div>
                     </div>
@@ -733,28 +733,28 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                       SSC / Board Credentials
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Roll:</span>
-                        <span className="font-bold font-mono text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.ssc_roll || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Roll:</span>
+                        <span className={`font-mono text-sm mt-0.5 block ${userData.ssc_roll ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.ssc_roll || '—'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Registration:</span>
-                        <span className="font-bold font-mono text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.ssc_reg || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Registration:</span>
+                        <span className={`font-mono text-sm mt-0.5 block ${userData.ssc_reg ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.ssc_reg || '—'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Board:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.ssc_board || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Board:</span>
+                        <span className={`text-sm mt-0.5 block ${userData.ssc_board ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.ssc_board || '—'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Passing Year:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.ssc_passing_year || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Passing Year:</span>
+                        <span className={`text-sm mt-0.5 block ${userData.ssc_passing_year ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.ssc_passing_year || '—'}
                         </span>
                       </div>
                     </div>
@@ -767,16 +767,16 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                       Personal Information
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Gender & Date of Birth:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.gender || 'N/A'} {userData.dob ? `• ${userData.dob}` : ''}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Gender & Date of Birth:</span>
+                        <span className={`text-sm mt-0.5 block ${userData.gender || userData.dob ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.gender || userData.dob ? `${userData.gender || 'Not set'}${userData.dob ? ` • ${userData.dob}` : ''}` : 'Not set'}
                         </span>
                       </div>
-                      <div className="p-3 bg-white dark:bg-neutral-850 rounded-xl border border-neutral-200/60 dark:border-neutral-750">
-                        <span className="text-neutral-500 block text-[11px]">Address:</span>
-                        <span className="font-bold text-neutral-900 dark:text-white mt-0.5 block">
-                          {userData.address || 'N/A'}
+                      <div className="p-3 bg-white dark:bg-neutral-900/80 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-neutral-500 dark:text-neutral-400 block text-[11px]">Address:</span>
+                        <span className={`text-sm mt-0.5 block ${userData.address ? 'font-bold text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                          {userData.address || 'Not provided'}
                         </span>
                       </div>
                     </div>
@@ -806,7 +806,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                         return (
                           <div
                             key={exam.id}
-                            className="p-4 bg-white dark:bg-neutral-850 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-between text-xs gap-4"
+                            className="p-4 bg-white dark:bg-neutral-900/90 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-between text-xs gap-4"
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
