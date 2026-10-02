@@ -243,19 +243,29 @@ E পদার্থবিজ্ঞান ২য় পত্রের 'সে�
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        // Fallback to client print
+        // Serverless / Fallback mode: Trigger browser print
         const data = await res.json();
         if (data.html) {
           setPreviewHtml(data.html);
           setTimeout(() => {
-            handlePrint();
+            if (iframeRef.current?.contentWindow) {
+              iframeRef.current.contentWindow.focus();
+              iframeRef.current.contentWindow.print();
+            } else {
+              handlePrint();
+            }
           }, 600);
         } else {
-          throw new Error(data.error || 'PDF তৈরি করা সম্ভব হয়নি।');
+          throw new Error(data.error || 'PDF রেন্ডার করা সম্ভব হয়নি।');
         }
       }
     } catch (err: any) {
-      alert(err.message || 'PDF ডাউনলোড ত্রুটি');
+      // If server error, fallback to client-side print
+      if (previewHtml) {
+        handlePrint();
+      } else {
+        alert(err.message || 'PDF তৈরির সময় একটি সমস্যা হয়েছে।');
+      }
     } finally {
       setDownloading(false);
     }

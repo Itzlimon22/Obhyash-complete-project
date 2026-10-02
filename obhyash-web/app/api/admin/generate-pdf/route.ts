@@ -3,6 +3,7 @@ import { parseQuestionContent } from '@/lib/pdf-generator/parser';
 import { generateTemplateHtml } from '@/lib/pdf-generator/template';
 import { GeneratorSettings } from '@/lib/pdf-generator/types';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { exec } from 'child_process';
 import util from 'util';
@@ -63,12 +64,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Direct PDF generation via headless Chromium (if available)
-    const tmpDir = path.join(process.cwd(), 'scratch');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
+    // Check if running on Vercel or environment without headless Chromium
+    const isVercel = !!process.env.VERCEL;
+    const defaultVenv = '/Volumes/LimonSSD/PDF_Question_Extractor/venv/bin/python';
+    const chromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+    const hasChrome = fs.existsSync(chromePath);
+    const hasPython = fs.existsSync(defaultVenv);
+
+    if (isVercel || (!hasChrome && !hasPython)) {
+      return NextResponse.json({
+        success: true,
+        useClientPrint: true,
+        html,
+        message: 'সার্ভারলেস হোস্টিংয়ে ব্রাউজার প্রিন্ট ডায়ালগ ব্যবহার করে সরাসরি ভেক্টর PDF সংরক্ষণ করুন।',
+        questionsCount: parseResult.questions.length,
+      });
     }
 
+    // Direct PDF generation via headless Chromium (Local / VPS)
+    const tmpDir = os.tmpdir();
     const fileId = `solution_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const htmlFilePath = path.join(tmpDir, `${fileId}.html`);
     const pdfFilePath = path.join(tmpDir, `${fileId}.pdf`);
@@ -82,16 +96,9 @@ export async function POST(req: NextRequest) {
 
     fs.writeFileSync(htmlFilePath, localHtml, 'utf-8');
 
-    // Check for Python venv with Playwright
-    const defaultVenv = '/Volumes/LimonSSD/PDF_Question_Extractor/venv/bin/python';
-    const pythonExec = fs.existsSync(defaultVenv) ? defaultVenv : 'python3';
-
-    const renderScript = path.join(cwd, 'scripts', 'render_solution_pdf.py');
+    const pythonExec = hasPython ? defaultVenv : 'python3';
 
     try {
-      const chromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-      const chromeArg = fs.existsSync(chromePath) ? ` "${chromePath}"` : '';
-
       await execPromise(
         `"${pythonExec}" -c "
 from playwright.sync_api import sync_playwright
@@ -139,12 +146,12 @@ with sync_playwright() as pw:
       console.error('Headless PDF generation error:', renderError);
     }
 
-    // Fallback: Return HTML with instruction
+    // Fallback: Return HTML with client print instruction
     return NextResponse.json({
       success: true,
-      fallback: true,
+      useClientPrint: true,
       html,
-      message: 'সার্ভার রেন্ডার ব্যর্থ হয়েছে, ব্রাউজার প্রিন্ট দিয়ে সেভ করুন।',
+      message: 'ব্রাউজারের প্রিন্ট ডায়ালগ থেকে সরাসরি ভেক্টর PDF সংরক্ষণ করুন।',
       questionsCount: parseResult.questions.length,
       warnings: parseResult.warnings,
     });
