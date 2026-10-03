@@ -169,6 +169,19 @@ body::after {
   font-family: var(--font-inter), var(--font-hind), var(--font-anek), system-ui, sans-serif;
 }
 
+/* Ensure HindSiliguri is recognized as a font-family alias matching Flutter */
+@font-face {
+  font-family: 'HindSiliguri';
+  src: local('Hind Siliguri');
+  font-display: swap;
+}
+
+.font-hind,
+[class*="font-['HindSiliguri'"],
+[class*="font-[HindSiliguri"] {
+  font-family: var(--font-hind), 'Hind Siliguri', 'HindSiliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
 /* --- Chorcha & Flutter Benchmark Typography Utilities --- */
 .tabular-nums, .font-tabular {
   font-variant-numeric: tabular-nums;

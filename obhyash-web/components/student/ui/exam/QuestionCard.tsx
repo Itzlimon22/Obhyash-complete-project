@@ -112,18 +112,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       id={`question-${question.id}`}
       className={cn(
-        "relative mb-5 sm:mb-6 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-['HindSiliguri',sans-serif] w-full max-w-full overflow-hidden min-w-0 box-border",
+        "relative mb-5 sm:mb-6 scroll-mt-24 rounded-[16px] bg-white dark:bg-[#000000] transition-all duration-200 font-hind w-full max-w-full overflow-hidden min-w-0 box-border",
         isFlagged
           ? 'border-[#FB923C] border-2 ring-2 ring-[#FB923C]/20 shadow-md'
           : 'border-[#E5E7EB] dark:border-[#333333] border shadow-[0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-none',
       )}
     >
       {/* ── Top Question Section (Flutter: EdgeInsets.fromLTRB(14, 14, 14, 10)) ── */}
-      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-4 sm:pb-3 w-full max-w-full min-w-0 overflow-hidden box-border">
+      <div className="p-3.5 pt-3.5 pb-2.5 sm:p-4 sm:pb-3 w-full max-w-full min-w-0 overflow-hidden box-border font-hind">
         {/* Stimulus / Passage (উদ্দীপক) if present */}
         {question.passage && (
-          <div className="mb-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word]">
-            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block mb-1 uppercase tracking-wider">
+          <div className="mb-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed max-w-full overflow-hidden break-words [overflow-wrap:anywhere] [word-break:break-word] font-hind">
+            <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 block mb-1 uppercase tracking-wider font-hind">
               উদ্দীপক
             </span>
             <MathRenderer text={question.passage} />
@@ -131,7 +131,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         )}
 
         {/* Serial number + Question text INLINE (Flutter: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}') */}
-        <div className="text-[16.5px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5] w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
+        <div className="text-[16.5px] font-semibold text-[#0F172A] dark:text-[#F8FAFC] leading-[1.5] font-hind w-full max-w-full min-w-0 break-words [overflow-wrap:anywhere] [word-break:break-word]">
           <MathRenderer
             text={
               serialNumber !== undefined
@@ -319,31 +319,31 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               disabled={readOnly || showFeedback || isLocked}
               onClick={() => onSelectOption && onSelectOption(idx)}
               className={cn(
-                'w-full max-w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group touch-manipulation min-w-0 overflow-hidden box-border',
+                'w-full max-w-full flex items-center justify-between gap-3 px-3.5 py-2.5 sm:py-3 rounded-[12px] border transition-all text-left group touch-manipulation min-w-0 box-border font-hind',
                 boxBg,
                 boxBorder,
                 !readOnly && !showFeedback && !isLocked && 'cursor-pointer active:scale-[0.99]',
                 isLocked && !showFeedback && !showAnswer && isSelected && 'cursor-default',
               )}
             >
-              <div className="flex items-center gap-3 min-w-0 flex-1 max-w-full overflow-hidden">
+              <div className="flex items-center gap-3 min-w-0 flex-1 max-w-full font-hind">
                 {/* Circular Badge Indicator (Flutter: 26x26, 13.0px, w600) */}
                 <div
                   className={cn(
-                    'w-[26px] h-[26px] rounded-full border-[1.4px] flex items-center justify-center text-[13px] shrink-0 transition-colors',
+                    'w-[26px] h-[26px] rounded-full border-[1.4px] flex items-center justify-center text-[13px] shrink-0 transition-colors font-hind select-none',
                     bulletBg,
                     bulletBorder,
                     bulletText,
                     isBold ? 'font-bold' : 'font-semibold',
                   )}
                 >
-                  <span>{banglaIndex}</span>
+                  <span className="leading-none">{banglaIndex}</span>
                 </div>
 
                 {/* Option Text (Flutter: 16.0px, w500 / w700, line-height 1.45) */}
                 <div
                   className={cn(
-                    'flex-1 min-w-0 max-w-full text-[16px] leading-[1.45] break-words [overflow-wrap:anywhere] [word-break:break-word] overflow-hidden',
+                    'flex-1 min-w-0 max-w-full text-[16px] leading-[1.45] font-hind break-words [overflow-wrap:anywhere] [word-break:break-word]',
                     optionTextColor,
                     isBold ? 'font-bold' : 'font-medium',
                   )}

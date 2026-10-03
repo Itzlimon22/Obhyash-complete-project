@@ -427,15 +427,39 @@ function preprocess(text: string): string {
   return result;
 }
 
+/**
+ * Fast check to determine if text has LaTeX, Markdown, chemistry arrows, or special tokens.
+ * Matches Flutter's LatexText: if (!hasSpecialSyntax) return Text(text, style: effectiveStyle);
+ */
+function hasMathOrMarkdown(text: string): boolean {
+  if (!text) return false;
+  return /[\$\*_#`@\n\\\|⇌⇄→\^~<>{}]/.test(text);
+}
+
 function BaseMathRenderer({ text, block = false, className = "" }: MathRendererProps) {
   if (!text) return null;
+
+  // Fast path matching Flutter's LatexText: If no math or markdown syntax, render clean text directly
+  if (!hasMathOrMarkdown(text)) {
+    return (
+      <span
+        className={cn(
+          "font-hind leading-normal break-words [overflow-wrap:anywhere]",
+          block ? "block mb-2" : "inline",
+          className
+        )}
+      >
+        {text}
+      </span>
+    );
+  }
 
   const formattedText = preprocess(text);
 
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none dark:prose-invert font-sans min-w-0 max-w-full break-words [overflow-wrap:anywhere] [word-break:break-word]",
+        "prose prose-sm max-w-none dark:prose-invert font-hind min-w-0 max-w-full break-words [overflow-wrap:anywhere] [word-break:break-word]",
         block ? "block my-1.5" : "inline-block max-w-full align-middle",
         !block && "prose-p:inline prose-p:my-0 prose-p:leading-normal",
         className

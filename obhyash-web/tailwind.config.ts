@@ -101,6 +101,8 @@ const config = {
       fontFamily: {
         sans: [
           'var(--font-hind)',
+          "'Hind Siliguri'",
+          'HindSiliguri',
           'var(--font-inter)',
           'system-ui',
           '-apple-system',
@@ -112,6 +114,13 @@ const config = {
         hind: [
           'var(--font-hind)',
           "'Hind Siliguri'",
+          'HindSiliguri',
+          'sans-serif',
+        ],
+        HindSiliguri: [
+          'var(--font-hind)',
+          "'Hind Siliguri'",
+          'HindSiliguri',
           'sans-serif',
         ],
         anek: [
